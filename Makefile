@@ -64,6 +64,19 @@ lint: ## Lint go source code
 
 .PHONY: lint
 
+# --- frontend -----------------------------------------------------------------
+frontend: | $(O) ## Build frontend, typically iterate with npm and inside frontend
+	rm -rf $(O)/public
+	cp -r frontend $(O)/public
+
+firebase-deploy: frontend ## Deploy to live channel on firebase, use with care
+	firebase --config firebase/firebase.json deploy
+
+firebase-test: frontend ## Run firebase emulator for auth, hosting and datastore
+	firebase --config firebase/firebase.json emulators:start
+
+.PHONY: firebase-deploy firebase-test frontend
+
 # --- Release -------------------------------------------------------------------
 release: nexttag ## Tag and release binaries for different OS on GitHub release
 	git tag $(NEXTTAG)

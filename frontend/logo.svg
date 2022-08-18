@@ -1,0 +1,9 @@
+<svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+	<!-- dark background -->
+	<rect fill="#202451" width="100%" height="100%"/>
+	<!-- green letters 'e' 'v' 'y' -->
+	<path   fill="#00ff00" d="
+M4,20 h5 v1 h1 v2 h-5 v1 h4 v1 h-5 v-1 h-1 v-3 h1 z m1 1 v1 h3 v-1 h-3 z
+m7,-1 h2 v3 h2 v-3 h2 v3 h-1 v1 h-1 v1 h-2 v-1 h-1 v-1 h-1 z
+m7,0 h2 v3 h3 v-3 h2 v5 h-1 v1 h-5 v-1 h4 v-1 h-4 v-1 h-1 z"/>
+</svg>

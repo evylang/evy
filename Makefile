@@ -5,9 +5,8 @@
 O = out
 COVERAGE = 15
 VERSION ?= $(shell git describe --tags --dirty  --always)
-REPO_ROOT = $(shell git rev-parse --show-toplevel)
 
-all: build tiny test check-coverage lint ## Build, test, check coverage and lint
+all: build tiny test test-tiny check-coverage lint frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -31,21 +30,28 @@ build: | $(O) ## Build reflect binaries
 install: ## Build and install binaries in $GOBIN
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
-tiny: | $(O) ## Build and test for tinygo
-	tinygo test ./...
-	# Optimise tinygo output for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
-	tinygo build -o $(O)/evy.wasm -target wasm -no-debug -ldflags='$(GO_LDFLAGS)'
+# Optimise tinygo output for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
+tiny: | $(O) ## Build for tinygo / wasm
+	tinygo build -o frontend/evy.wasm -target wasm -no-debug -ldflags='$(GO_LDFLAGS)'
+	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
 
 tidy: ## Tidy go modules with "go mod tidy"
 	go mod tidy
 
-.PHONY: build install tidy
+clean::
+	-rm -f frontend/evy.wasm
+	-rm -f frontend/wasm_exec.js
+
+.PHONY: build install tidy tiny
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
 
-test: | $(O) ## Run tests and generate a coverage file
+test: | $(O) ## Run non-tinygo tests and generate a coverage file
 	go test -coverprofile=$(COVERFILE) ./...
+
+test-tiny: | $(O) ## Run tinygo tests
+	tinygo test ./...
 
 check-coverage: test ## Check that test coverage meets the required level
 	@go tool cover -func=$(COVERFILE) | $(CHECK_COVERAGE) || $(FAIL_COVERAGE)
@@ -56,7 +62,7 @@ cover: test ## Show test coverage in your browser
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
 FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_NORMAL)'; exit 1; }
 
-.PHONY: check-coverage cover test
+.PHONY: check-coverage cover test test-tiny
 
 # --- Lint ---------------------------------------------------------------------
 lint: ## Lint go source code
@@ -65,17 +71,32 @@ lint: ## Lint go source code
 .PHONY: lint
 
 # --- frontend -----------------------------------------------------------------
-frontend: | $(O) ## Build frontend, typically iterate with npm and inside frontend
+frontend: tiny | $(O) ## Build frontend, typically iterate with npm and inside frontend
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
 
-firebase-deploy: frontend ## Deploy to live channel on firebase, use with care
+frontend-serve: frontend ## Build frontend and serve on free port
+	servedir $(O)/public
+
+.PHONY: frontend frontend-serve
+
+# --- firebase -----------------------------------------------------------------
+CHANNEL ?= dev
+
+firebase-deploy-prod: firebase-public ## Deploy to live channel on firebase, use with care!
 	firebase --config firebase/firebase.json deploy
 
-firebase-test: frontend ## Run firebase emulator for auth, hosting and datastore
+firebase-deploy: firebase-public ## Deploy to dev (or other) channel on firebase
+	firebase --config firebase/firebase.json hosting:channel:deploy $(CHANNEL)
+
+firebase-emulate: firebase-public ## Run firebase emulator for auth, hosting and datastore
 	firebase --config firebase/firebase.json emulators:start
 
-.PHONY: firebase-deploy firebase-test frontend
+firebase-public: frontend
+	rm -rf firebase/public
+	cp -r $(O)/public firebase
+
+.PHONY: firebase-deploy firebase-deploy-prod firebase-emulate firebase-public
 
 # --- Release -------------------------------------------------------------------
 release: nexttag ## Tag and release binaries for different OS on GitHub release

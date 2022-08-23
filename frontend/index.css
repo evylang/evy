@@ -1,0 +1,156 @@
+/* This CSS file is experimental and wants to be thrown away */
+:root {
+  --primary-color: hsl(235, 43%, 22%); /* dark purple */
+  --primary-color-dimmed: hsl(235, 12%, 73%);
+  --primary-color-dimmer: hsl(235, 12%, 78%);
+  --secondary-color: hsl(120, 100%, 50%);
+  --font-family-code: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  --code-color: hsl(235, 43%, 22%);
+  --code-background: hsl(45, 100%, 98%);
+}
+
+/* Some resets */
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+html {
+  -moz-tab-size: 4;
+  tab-size: 4;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-family-code);
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+}
+button,
+select {
+  text-transform: none;
+}
+[type='button'],
+[type='reset'],
+[type='submit'],
+button {
+  -webkit-appearance: button;
+}
+::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+/* index.html */
+.play {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  height: 128px;
+  padding: 0 32px;
+  background: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color-dimmed);
+}
+header button {
+  height: 2.25rem;
+  padding: 8px 32px;
+  margin-bottom: 16px;
+  letter-spacing: 0.1rem;
+  background: var(--code-background);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 0.25rem;
+  box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.7), 8px 4px 20px 6px rgb(255 255 255 / 20%);
+  cursor: pointer;
+}
+header button:hover:enabled {
+  filter: saturate(10);
+}
+header button:active:enabled {
+  filter: saturate(20);
+}
+header button:disabled {
+  background: lightgray;
+  color: block;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  color: var(--code-color);
+  background: var(--code-background);
+  flex: 1;
+}
+.pane {
+  flex: 1;
+  padding: 12px 16px;
+  overflow: scroll;
+}
+.pane.code {
+  border-right: 1px solid var(--primary-color-dimmer);
+}
+.pane pre {
+  line-height: 1.4;
+  padding: 4px 16px;
+  margin: 0;
+}
+
+/* mobile */
+@media screen and (max-width: 768px) {
+  header {
+    width: 100%;
+    height: 6rem;
+    padding: 0 20px;
+  }
+  header button {
+    height: 1.75rem;
+    padding: 4px 24px;
+    font-size: 0.75rem;
+    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6), 5px 2px 15px 3px rgb(255 255 255 / 15%);
+  }
+  .pane pre {
+    padding: 4px;
+  }
+  @media (orientation: portrait) {
+    .play main {
+      flex-direction: column;
+    }
+    .pane.code {
+      border-right: none;
+      border-bottom: 1px solid var(--primary-color-dimmer);
+    }
+  }
+}

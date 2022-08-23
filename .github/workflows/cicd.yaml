@@ -20,7 +20,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: git fetch --prune --unshallow --tags
-    - run: ./bin/hermit env --raw >> $GITHUB_ENV
-    - run: make release
+    - run: ./bin/make release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

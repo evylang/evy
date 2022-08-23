@@ -1,15 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"testing"
 
 	"foxygo.at/evy/assert"
 )
 
-func TestMain(t *testing.T) {
-	got := &bytes.Buffer{}
-	err := compile(got)
-	assert.NoError(t, err)
-	assert.Equal(t, "🌱\n", got.String())
+func TestTruncate(t *testing.T) {
+	assert.Equal(t, "123", truncate("12345", 3))
+	assert.Equal(t, "12345", truncate("12345", 5))
+	assert.Equal(t, "12345", truncate("12345", 6))
+	assert.Equal(t, "🦊", truncate("🦊🦊🦊🦊", 1))
 }

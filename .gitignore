@@ -1,3 +1,6 @@
 /firebase/*.log
 /firebase/.firebase/
+/firebase/public/
+/frontend/evy.wasm
+/frontend/wasm_exec.js
 /out/

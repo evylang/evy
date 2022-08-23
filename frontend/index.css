@@ -128,6 +128,18 @@ main {
   margin: 0;
 }
 
+.confetti {
+  height: 7vw;
+  width: 7vw;
+  line-height: 7vw;
+  border-radius: 50%;
+  position: absolute;
+  font-size: 1.5vw;
+  user-select: none;
+  text-align: center;
+  color: white;
+}
+
 /* mobile */
 @media screen and (max-width: 768px) {
   header {

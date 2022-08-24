@@ -3,34 +3,80 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"strings"
+	"io"
+	"os"
+
+	"foxygo.at/evy/pkg/evaluator"
+	"foxygo.at/evy/pkg/lexer"
+	"foxygo.at/evy/pkg/parser"
+	"github.com/alecthomas/kong"
 )
 
-var (
-	version string
-)
+var version string = "v0.0.0"
+
+const description = `
+evy is a tool for managing evy source code.
+`
+
+type config struct {
+	Version  kong.VersionFlag `short:"V" help:"Print version information"`
+	Run      cmdRun           `cmd:"" help:"Run evy program"`
+	Tokenize cmdTokenize      `cmd:"" help:"Tokenize evy program"`
+	Parse    cmdParse         `cmd:"" help:"Parse evy program"`
+}
+
+type cmdRun struct {
+	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+}
+type cmdTokenize struct {
+	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+}
+type cmdParse struct {
+	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+}
+
+func (c *cmdRun) Run() error {
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return err
+	}
+	print := func(s string) { fmt.Print(s) }
+	evaluator.Run(string(b), print)
+	return nil
+}
+
+func (c *cmdTokenize) Run() error {
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return err
+	}
+	result := lexer.Run(string(b))
+	fmt.Println(result)
+	return nil
+}
+
+func (c *cmdParse) Run() error {
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return err
+	}
+	result := parser.Run(string(b))
+	fmt.Println(result)
+	return nil
+}
 
 func main() {
-	versionFlag := flag.Bool("version", false, "Print version information")
-	flag.Parse()
-	if *versionFlag {
-		fmt.Println("Version", version)
-		return
-	}
-
-	fmt.Println(evaluate("some program"))
+	kctx := kong.Parse(&config{},
+		kong.Description(description),
+		kong.Vars{"version": version},
+	)
+	kctx.FatalIfErrorf(kctx.Run())
 }
 
-func evaluate(program string) string {
-	return strings.ToUpper(truncate(program, 20))
-}
-
-func truncate(s string, max int) string {
-	r := []rune(s)
-	if len(r) <= max {
-		return s
+func fileBytes(filename string) ([]byte, error) {
+	if filename == "-" {
+		return io.ReadAll(os.Stdin)
 	}
-	return string(r[:max])
+	return os.ReadFile(filename)
 }

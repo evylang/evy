@@ -134,10 +134,14 @@ main {
   line-height: 7vw;
   border-radius: 50%;
   position: absolute;
-  font-size: 1.5vw;
+  font-size: 4vw;
   user-select: none;
   text-align: center;
   color: white;
+}
+.confetti.fadeout {
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
 }
 
 /* mobile */

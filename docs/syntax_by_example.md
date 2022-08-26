@@ -85,7 +85,7 @@ specification see the [syntax grammar].
 
 ### `for` … `range` array
 
-    for x := range num[ 1 2 3] 
+    for x := range num[ 1 2 3 ]
         print x        // 1 2 3
     end
 
@@ -112,7 +112,7 @@ specification see the [syntax grammar].
 
 ## Function definition
 
-    func add:int a:int b:int
+    func add:num a:num b:num
         return a + b
     end
 
@@ -149,9 +149,9 @@ specification see the [syntax grammar].
 
 ### Concatenation, append, prepend
 
-    z = z + int[ 100 ] // [ 1 2 3 4 5 6 100 ]
-    z = append z 101       // [ 1 2 3 4 5 6 100 101]
-    z = prepend z 0        // [ 0 1 2 3 4 5 6 100 101]
+    z = z + num[ 100 ] // [ 1 2 3 4 5 6 100 ]
+    z = append z 101       // [ 1 2 3 4 5 6 100 101 ]
+    z = prepend z 0        // [ 0 1 2 3 4 5 6 100 101 ]
 
 ### Slicing
 
@@ -197,20 +197,20 @@ specification see the [syntax grammar].
    
 ## Type reflection
 
-    reflect "abc"            // {type: "string"}
-    reflect true             // {type: "bool"}
-    reflect num[1 2]         // {type: "array", 
-                             //  sub:  {type: "num"}
-                             // }
-    reflect num[[1 2] [3 4]] // {
-                             //   type: "array", 
-                             //   sub:  {
-                             //     type: "array"
-                             //     sub: {
-                             //       type: "num"
-                             //     }
-                             //   }
-                             // }
+    reflect "abc"              // {type: "string"}
+    reflect true               // {type: "bool"}
+    reflect num[ 1 2 ]         // {type: "array",
+                               //  sub:  {type: "num"}
+                               // }
+    reflect num[ [1 2] [3 4] ] // {
+                               //   type: "array",
+                               //   sub:  {
+                               //     type: "array"
+                               //     sub: {
+                               //       type: "num"
+                               //     }
+                               //   }
+                               // }
 
 ### Type reflection Usage Example
 
@@ -271,10 +271,10 @@ specification see the [syntax grammar].
 
 ### Strings
     
-    "Hello"[2]              // "l"
-    "Hello world"[1:5]      // "ello"
-    join ["one" "two"] ", " // "one, two"
-    split "hi there" " "    // ["hi" "there"]
+    "Hello"[2]                // "l"
+    "Hello world"[1:5]        // "ello"
+    join [ "one" "two" ] ", " // "one, two"
+    split "hi there" " "      // [ "hi" "there" ]
 
 ### Length
  

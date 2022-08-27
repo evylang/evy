@@ -52,9 +52,9 @@ initWasm()
 // When source input string contains the sub string "confetti"
 // show confetti when clicking Run button.
 function showConfetti() {
-  const names = ['?']
-  const colors = ['red']
-  let confetti = new Array(10)
+  const names = ['🦊', '🐐']
+  const colors = ['red', 'purple', 'blue', 'orange', 'gold', 'green']
+  let confetti = new Array(100)
     .fill()
     .map((_, i) => {
       return {
@@ -96,4 +96,7 @@ function showConfetti() {
     cancelAnimationFrame(frame)
     confettiDivs.forEach((div) => div.remove())
   }, 10000)
+  setTimeout(() => {
+    confettiDivs.forEach((div) => div.classList.add('fadeout'))
+  }, 8500)
 }

@@ -4,6 +4,10 @@ package main
 import (
 	"strings"
 	"unsafe"
+
+	"foxygo.at/evy/pkg/evaluator"
+	"foxygo.at/evy/pkg/lexer"
+	"foxygo.at/evy/pkg/parser"
 )
 
 var (
@@ -23,22 +27,21 @@ func jsPrint(string)
 // * https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
 // * https://www.alcarney.me/blog/2020/passing-strings-between-tinygo-wasm/
 //export evaluate
-func evaluate(ptr *uint32, length int) {
+func jsEvaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	s = strings.ToUpper(s)
-	jsPrint(s)
+	evaluator.Run(s, jsPrint)
 }
 
 //export tokenize
-func tokenize(ptr *uint32, length int) {
+func jsTokenize(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	println("tokenize:\n" + truncate(s, 20) + "\n")
+	jsPrint(lexer.Run(s))
 }
 
 //export parse
-func parse(ptr *uint32, length int) {
+func jsParse(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	println("parse:\n" + truncate(s, 20) + "\n")
+	jsPrint(parser.Run(s))
 }
 
 // alloc pre-allocates memory used in string parameter passing.
@@ -58,12 +61,4 @@ func getString(ptr *uint32, length int) string {
 		builder.WriteByte(byte(s))
 	}
 	return builder.String()
-}
-
-func truncate(s string, max int) string {
-	r := []rune(s)
-	if len(r) <= max {
-		return s
-	}
-	return string(r[:max])
 }

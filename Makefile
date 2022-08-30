@@ -32,7 +32,7 @@ install: ## Build and install binaries in $GOBIN
 
 # Optimise tinygo output for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
 tiny: | $(O) ## Build for tinygo / wasm
-	tinygo build -o frontend/evy.wasm -target wasm -no-debug -ldflags='$(GO_LDFLAGS)'
+	tinygo build -o frontend/evy.wasm -target wasm -no-debug -ldflags='$(GO_LDFLAGS)' ./pkg/wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
 
 tidy: ## Tidy go modules with "go mod tidy"

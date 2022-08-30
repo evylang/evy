@@ -86,6 +86,7 @@ header button {
   height: 2.25rem;
   padding: 8px 32px;
   margin-bottom: 16px;
+  margin-right: 16px;
   letter-spacing: 0.1rem;
   background: var(--code-background);
   color: var(--primary-color);
@@ -105,6 +106,9 @@ header button:disabled {
   color: block;
   box-shadow: none;
   cursor: not-allowed;
+}
+.hidden {
+  display: none;
 }
 
 main {

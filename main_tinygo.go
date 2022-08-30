@@ -25,20 +25,22 @@ func jsPrint(string)
 //export evaluate
 func evaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	s = strings.ToUpper(s)
-	jsPrint(s)
+	result := strings.ToUpper(s)
+	jsPrint(result)
 }
 
 //export tokenize
 func tokenize(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	println("tokenize:\n" + truncate(s, 20) + "\n")
+	result := "tokenize:\n" + truncate(s, 20) + "\n"
+	jsPrint(result)
 }
 
 //export parse
 func parse(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	println("parse:\n" + truncate(s, 20) + "\n")
+	result := "parse:\n" + truncate(s, 20) + "\n"
+	jsPrint(result)
 }
 
 // alloc pre-allocates memory used in string parameter passing.

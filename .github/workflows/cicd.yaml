@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: ./bin/hermit env --raw >> $GITHUB_ENV
-    - run: make ci
+    - run: ./bin/make ci
 
   release:
     runs-on: ubuntu-latest

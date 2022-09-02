@@ -33,7 +33,7 @@ function jsPrint(ptr, len) {
 // converts it to wasm memory bytes. It then calls the evy evaluate
 // function.
 function handleRun(event) {
-  const source = document.getElementById('source').textContent
+  const source = document.getElementById('source').value
   const bytes = new TextEncoder('utf8').encode(source)
   const ptr = wasm.exports.alloc(bytes.length)
   const mem = new Uint8Array(wasm.exports.memory.buffer, ptr, bytes.length)

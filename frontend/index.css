@@ -126,10 +126,17 @@ main {
 .pane.code {
   border-right: 1px solid var(--primary-color-dimmer);
 }
-.pane pre {
+.pane textarea {
+  font-family: var(--font-family-code);
+  color: var(--code-color);
   line-height: 1.4;
   padding: 4px 16px;
   margin: 0;
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: var(--code-background);
+  resize: none;
 }
 
 .confetti {
@@ -161,7 +168,7 @@ main {
     font-size: 0.75rem;
     box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6), 5px 2px 15px 3px rgb(255 255 255 / 15%);
   }
-  .pane pre {
+  .pane textarea {
     padding: 4px;
   }
   @media (orientation: portrait) {

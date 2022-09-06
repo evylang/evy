@@ -13,25 +13,26 @@
     <header>
       <div>
         <button id="evaluate" disabled>Run</button>
-        <button id="tokenize" class="hidden" disabled>Tokenize</button>
-        <button id="parse" class="hidden" disabled>Parse</button>
+        <button id="tokenize" disabled>Tokenize</button>
+        <button id="parse" disabled>Parse</button>
       </div>
       <img src="logo.svg" alt="evy logo" height="100%" />
     </header>
     <main>
       <div class="pane code">
-        <pre contenteditable="true" id="source">
+        <textarea id="source">
 move 10 10
 line 20 20
-x int = 12
+x := 12
 if x > 10
     print "🍦 big x" x
-        </pre>
+end
+        </textarea>
       </div>
       <div class="pane">
-        <pre id="output">
-big x 12
-        </pre>
+        <textarea id="output" disabled>
+🍦 big x 12
+        </textarea>
       </div>
     </main>
   </body>

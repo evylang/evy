@@ -30,8 +30,12 @@ build: | $(O) ## Build reflect binaries
 install: ## Build and install binaries in $GOBIN
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
+# Use `go version` to ensure the right go version is installed when using tinygo.
+go-version:
+	go version
+
 # Optimise tinygo output for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
-tiny: | $(O) ## Build for tinygo / wasm
+tiny: go-version | $(O) ## Build for tinygo / wasm
 	tinygo build -o frontend/evy.wasm -target wasm -no-debug -ldflags='$(GO_LDFLAGS)' ./pkg/wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
 
@@ -42,7 +46,7 @@ clean::
 	-rm -f frontend/evy.wasm
 	-rm -f frontend/wasm_exec.js
 
-.PHONY: build install tidy tiny
+.PHONY: build go-version install tidy tiny
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
@@ -50,7 +54,7 @@ COVERFILE = $(O)/coverage.txt
 test: | $(O) ## Run non-tinygo tests and generate a coverage file
 	go test -coverprofile=$(COVERFILE) ./...
 
-test-tiny: | $(O) ## Run tinygo tests
+test-tiny: go-version | $(O) ## Run tinygo tests
 	tinygo test ./...
 
 check-coverage: test ## Check that test coverage meets the required level

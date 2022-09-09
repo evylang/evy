@@ -65,7 +65,7 @@ not allowed.
 
     program    = { statements | func | event_handler } .
     statements = { statement NL } .
-    statement  =  assignment | declaration | 
+    statement  =  assignment | declaration | func_call |
                   loop | if | return | 
                   BREAK | EMPTY_STATEMENT .
 
@@ -73,12 +73,16 @@ not allowed.
     BREAK           = "break" .
 
     /* --- Assignment --- */
-    assignment = ident "=" expr .
-    ident      = LETTER { LETTER | UNICODE_DIGIT } .
+    assignment     = assignable "=" expr .
+    assignable     = ident { selector } .
+    ident          = LETTER { LETTER | UNICODE_DIGIT } .
+    selector       = index | dot_selector .
+    index          = "[" expr "]" .
+    dot_selector   = "." ident .
 
     /* --- Declarations --- */
-    decl          = typed_decl | inferred_decl .
-    typed_decl    = ident ":" type .
+    declaration    = typed_decl | inferred_decl .
+    typed_ident    = ident ":" type .
     inferred_decl = ident ":=" toplevel_expr .
 
     type       = BASIC_TYPE | array_type | map_type | "any" .
@@ -87,48 +91,44 @@ not allowed.
     map_type   = [type] "{}" .
 
     /* --- Expressions --- */
-    toplevel_expr = func_call | type_assertion | expr.
+    toplevel_expr = func_call | expr .
 
     func_call = ident args .
-    args      = { unary_expression } .
+    args      = { term } .
 
-    type_assertion = type ( ident | ident_selector ) .
-    ident_selector = ident selector { selector } .
-    selector       = index | slice | dot_selector .
-    index          = "[" expr "]" .
-    slice          = "[" [expr] : [expr] "]" .
-    dot_selector   = "." ident .
+    type_assertion = assignable "." "(" type ")" .
 
-    expr       = unary_expr | expr OP expr .
-    unary_expr = operand | UNARY_OP unary_expr .
-    operand    = literal | ident | ident_selector | "(" toplevel_expr ")" .
+    expr       = term | expr OP expr .
+    term       = operand | UNARY_OP term .
+    operand    = literal | assignable | slice | type_assertion | "(" toplevel_expr ")" .
     UNARY_OP   = "+" | "-" | "!" .
     OP         = "or" | "and" | REL_OP | ADD_OP | MUL_OP .
     REL_OP     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
     ADD_OP     = "+" | "-" .
     MUL_OP     = "*" | "/" | "%" .
 
-    /* --- Literals --- */
-    literal     =  num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
-    num_lit     =  DECIMAL_DIGIT { DECIMAL_DIGIT } |
-                   DECIMAL_DIGIT { DECIMAL_DIGIT } "." { DECIMAL_DIGIT } .
+    /* --- Slice and Literals --- */
+    slice       = assignable "[" [expr] : [expr] "]" .
+    literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
+    num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
+                  DECIMAL_DIGIT { DECIMAL_DIGIT } "." { DECIMAL_DIGIT } .
     string_lit  = """ { UNICODE_CHAR } """ .
     BOOL_CONST  = "true" | "false" .
     array_lit   = type "[" array_elems "]" .
-    array_elems = { unary_expr [NL] }
+    array_elems = { term [NL] }
     map_lit     = [type] "{" map_elems "}" .
-    map_elems   = { ident ":" unary_expr [NL] } .
+    map_elems   = { ident ":" term [NL] } .
     
     /* --- Control flow --- */
     loop       = for | while .
     for        = "for" range NL
                      statements
-                 END .
+                 "end" .
     range      = ident ( ":=" | "=" ) "range" range_args .
-    range_args = unary_expr [ unary_expr [ unary_expr ] ] .
+    range_args = term [ term [ term ] ] .
     while      = "while" toplevel_expr NL
                      statements
-                 END .
+                 "end" .
 
     if = "if" toplevel_expr NL
                 statements
@@ -136,21 +136,20 @@ not allowed.
                 statements }
           [ "else" NL
                 statements ]
-          END .
+          "end" .
 
     /* --- Functions ---- */
-    func            = "func" func_signature NL
+    func            = "func" ident func_signature NL
                           statements
-                      END .
-    func_signature  = ident [ ":" type ] params .
-    params          = { param } | variadic_param .
-    param           = ident ":" type .
-    variadic_param  = param "..." .
-    return          = "return" [toplevel_expr] .
+                      "end" .
+    func_signature  = [ ":" type ] params .
+    params          = { typed_decl } | variadic_param .
+    variadic_param  = typed_decl "..." .
+    return          = "return" [ toplevel_expr ] .
 
     event_handler   = "on" ident NL
                           statements
-                      END .
+                      "end" .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .
@@ -158,16 +157,140 @@ not allowed.
     UNICODE_DIGIT  = /* a Unicode code point categorized as "Number, decimal digit" */ .
     UNICODE_CHAR   = /* an arbitrary Unicode code point except newline */ .
     DECIMAL_DIGIT  = "0" … "9" .
-    END            = "end" .
     NL             = "\n" .
+
+## Comments
+
+There is only one type of comment, the line comment which starts with
+`//` and stops at the end of the line. Line comments cannot start
+inside string literals.
+
+## Variables and Zero values
+
+A variable is a storage location for holding a value. The set of
+permissible values is determined by the variable's [type](#types).
+
+A variable must be _declared_ before it can be used either in
+an _inferred declaration_ or in a _typed declaration_.
+
+With the inferred declaration the type is not given but inferred from
+the value. For example `a := 2` declares variable `a` of type `num`
+holding the value `2`. `num` is the inferred type.
+
+Variables declared via typed declaration are not given a value, for
+example `x:num`. They are initialised to the zero value of their type:
+
+    Type        Zero
+    num         0
+    string      ""
+    bool        false
+    any[]       [] // empty array
+    any{}       {} // empty map
+
+## Assignment and Expressions
+
+When a variable is assigned to a new variable or passed as an argument
+to a function, a copy of its value is made. Modifying the copy does not
+change the original, for example:
+
+    arr1 := [ 1 2 ]
+    arr2 := arr1
+    arr2[0] = 2
+    print arr1 arr2 // [ 1 2 ] [ 2 2 ]
+
+The following assignment statement is ambiguous `a := b - 1`. Does the
+expression `b - 1` represent a function call of function `b` with
+argument `-1`? Or is `b` a variable so that `b - 1` becomes the
+arithmetic expression "`b` minus `1`"?
+
+`evy` resolves this ambiguity by tracking identifiers in a symbol table
+and annotating them as _variable_ or _function_ names. If `b` has not
+been declared as a variable or function by the point where the
+expression `b - 1` is seen it is assumed that `b` is the name of a
+function. This allows for [mutual recursion] of functions.
+
+[mutual recursion]: https://en.wikipedia.org/wiki/Mutual_recursion
+
+## Types
+
+There are three basic types: `string`, `bool` and `num` as well as two
+composite types: [arrays](#arrays) `[]` and [maps](#maps) `{}`.
+The _dynamic_ type `any` can hold any of the previously listed
+types.
+
+Composite types can nest further composite types, for example `num[][]{}`.
+
+A `bool` value is either `true` or `false`.
+
+A number value can be expressed as integer `1234` or decimal `56.78`.
+Internally a number is represented as a [double-precision floating-point number]
+according to the IEEE-754 64-bit floating point standard.
+
+[double-precision floating-point number]: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
+
+## Strings
+
+A `string` is a sequence of [Unicode code points]. A string literal is
+enclosed by double quotes `"`, for example str := "Hallöchen Welt 🌏".
+
+`len str` returns the number of Unicode code points, _characters_, in
+the string. `for ch := range str` iterates over all characters of the
+string. Individual characters of a string can be addressed and updated
+by index. Strings can be concatenated with the `+` operator.
+
+    str := "hello!"
+    str[0] = "H"             // Hello
+    str1 := str + ", " + str // Hello, Hello
+
+[Unicode code points]: https://en.wikipedia.org/wiki/Unicode
+
+## Arrays
+
+Arrays are declared with brackets `[]`. Their elements have a type, for
+example `arr := num[ 1 2 3 ]` is an array of `num`. Arrays can be
+nested `arr:num[][]{}`.
+
+An array of type `any` can be composed of different types:
+
+    arr := any[ "abc" 123 ]
+
+`len arr` returns the length of the array. `for el := range arr`
+iterates over all elements of the array. `arr = append arr 1` and `arr
+= prepend arr 0` add a new element to beginning or end of the array.
+Arrays can be concatenated with the `+` operator `arr2 := arr + arr`.
+
+## Maps
+
+Map keys must be strings that match the grammars `ident` production. Map
+values can be accessed with the dot selector, for example `map.key`.
+They can also be accessed with a key expression and the index selector:
+
+    m := { letters: "abc" }
+    print m.letters    // abc
+    print m["letters"] // abc
+
+    s := "letters"
+    print m[s]         // abc
+
+The `has` function tests for the existence of a key in a map:
+
+    has m "letters"    // true
+    has m "digits"     // false
+
+`for key := range map` iterates over all map keys.
+
+`len m` returns the number of values in the map.
+
+When leaving out the value type of a map, `any` is inferred. Therefore
+`m:any{}`, `m:{}`, `m := any{}` and `m := {}` are all equivalent.
 
 ## Operators
 
 Binary operations can only be executed with operands of the same type.
 There is no automated type conversion of operands.
 
-    operands   operators      result    
-    num        + - * / % ^    num       
+    operands   operators      result
+    num        + - * / % ^    num
     string     +              string
     array      +              array
     bool       and or         bool
@@ -229,7 +352,7 @@ holding the value `2`. `num` is the inferred type.
 Variables declared via typed declaration are not given a value, for
 example `x:num`. They are initialised to the zero value of their type:
 
-    Type        Zero 
+    Type        Zero
     num         0
     string      ""
     bool        false
@@ -267,7 +390,7 @@ by index. Strings can be concatenated with the `+` operator.
 The first index of an array or string is `0`. A negative index `-i` is a
 short hand for `(len a) - i`, for example `a[-1]` references the last
 element. When trying to index an array or string out of bounds a
-[run-time panic] occurs.
+[run-time panic](#run-time-panics-and-recoverable-errors) occurs.
 
 Portions of an array or string can be copied with the slice selector,
 for example `a[1:3]`. `a[start : end]` copies a substring or subarray,
@@ -283,7 +406,7 @@ defaults to `len a`, for example:
     print s[:]   // abcd
     print s[:-1] // abc
 
-[run-time panic]:#run-time-panics-and-recoverable-errors
+Slices may not be sliced further, `a[:2][1:]` is illegal.
 
 ## Maps
 
@@ -328,6 +451,22 @@ regular flow of control. `break` is used to exit from the inner-most
 loop body. `return` is used to exit from a function and may be followed
 by an expression whose value is returned by the function call.
 
+## Functions
+
+A function declaration binds an identifier, the function name, to a
+function. As part of the function declaration, the function signature
+defines the number, order and types of input parameters as well as the
+result or return type of the function. If the return type is left out
+the function does not return a value.
+
+    func is_valid:bool text:string cap:num
+        return (len text) <= cap
+    end
+
+The example above has a function name of `is_valid`, input parameters
+`text` of type `string` and `cap` of type `num`. The return type is
+`bool`.
+
 ## Variadic functions
 
 A function with a single parameter may have a type suffixed with `...`.
@@ -363,33 +502,47 @@ keys `type` and optionally `sub`. The `type` value is one of `"num"`,
 optionally `sub` representing the type of the array elements or map
 values.
 
-    reflect "abc"           // {type: "string"}
-    reflect true            // {type: "bool"}
-    reflect num[1 2]        // {type: "array", 
-                            //  sub:  {type: "num"}
-                            // }
-    reflect num[[1 2] [3 4] // {
-                            //   typ e: "array", 
-                            //   sub:  {
-                            //     type: "array"
-                            //     sub: {
-                            //       type: "num"
-                            //     }
-                            //   }
-                            // }
+    reflect "abc"              // {type: "string"}
+    reflect true               // {type: "bool"}
+    reflect num[ 1 2 ]         // {type: "array",
+                               //  sub:  {type: "num"}
+                               // }
+    reflect num[ [1 2] [3 4] ] // {
+                               //   type: "array",
+                               //   sub:  {
+                               //     type: "array"
+                               //     sub: {
+                               //       type: "num"
+                               //     }
+                               //   }
+                               // }
 
 ## Type assertion
 
-A type assertion `type ident` asserts that the value of the variable
+A type assertion `ident.(type)` asserts that the value of the variable
 `ident` is of the given `type`. This is particularly useful for a
 variable of type `any`, `any[]`, `any{}`, `any[][]` etc. The value
 returned by the assertion is of given `type` and can be used in a
 declaration, assignment or function call. If the assertion does not hold
-a run-time panic occurs.
+a [run-time panic](#run-time-panics-and-recoverable-errors) panic occurs.
 
     x:any
     x = num[ 1 2 3 4 ]  
-    num_array := num[] x // concrete type num[] 
+    num_array := x.(num[])
+    x = "abc"
+    str := x.(string)
+
+Only variables or variable selectors of type `any` can be type asserted.
+That means an array of type `any`, _cannot_ be type assert
+to be an array of type `num` or other concrete type:
+
+    x:any[]
+    x = [1 2]
+    // x.([]num) // compile time error
+    x[1] = [3 4 5]
+
+However, the elements of `x` can be type assert, e.g. `x[0].(num)`, `x
+[1].([]num)`.
 
 ## Event Handler
 
@@ -420,8 +573,7 @@ access a map value for a key that does not exist or a failed type
 assertion trigger a run-time panic. The execution of the `evy` program
 stops and error details are printed.
 
-A panic can be triggered with `panic "messsage"`.
+A panic can be triggered with `panic "message"`.
 
 Functions that can cause recoverable errors set the global string
 variable `error` and the error classification number `errno`.
-

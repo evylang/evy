@@ -67,6 +67,7 @@ var typeNameStrings = map[TypeName]typeNameString{
 	ANY:     {string: "ANY", format: "any"},
 	ARRAY:   {string: "ARRAY", format: "[]"},
 	MAP:     {string: "MAP", format: "{}"},
+	NONE:    {string: "NONE", format: ""},
 }
 
 func (t TypeName) String() string {

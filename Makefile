@@ -3,7 +3,7 @@
 
 # --- Global -------------------------------------------------------------------
 O = out
-COVERAGE = 70
+COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 
 all: build tiny test test-tiny check-coverage lint frontend ## Build, test, check coverage and lint

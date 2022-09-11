@@ -65,7 +65,7 @@ func (p *Parser) parseArrayElements(t *Type) []Node {
 	tt := p.cur.TokenType()
 	p.advance()
 	if tt != lexer.RBRACKET {
-		p.appendError("invalid array end: " + tt.FormatDetails())
+		p.appendError("unterminated array literal")
 		return nil
 	}
 	for _, term := range terms {
@@ -105,7 +105,7 @@ func (p *Parser) parseMapPairs(t *Type) (map[string]Node, []string) {
 	tt := p.cur.TokenType()
 	p.advance()
 	if tt != lexer.RCURLY {
-		p.appendError("invalid map end: " + tt.FormatDetails())
+		p.appendError("unterminated map literal")
 		return nil, nil
 	}
 	return pairs, order

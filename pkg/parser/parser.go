@@ -15,7 +15,7 @@ func Run(input string) string {
 		for i, e := range parser.errors {
 			errs[i] = e.String()
 		}
-		return strings.Join(errs, "\n") + "\n\n" + prog.String()
+		return parser.errorsString() + "\n\n" + prog.String()
 	}
 	return prog.String()
 }
@@ -43,10 +43,14 @@ func (e Error) String() string {
 }
 
 func New(input string) *Parser {
+	return NewWithBuiltins(input, builtins())
+}
+
+func NewWithBuiltins(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
 	p := &Parser{
 		vars:  map[string]*Var{},
-		funcs: builtins(),
+		funcs: builtins,
 	}
 
 	// Read all tokens, collect function declaration tokens by index
@@ -79,9 +83,10 @@ func builtins() map[string]*FuncDecl {
 		"print": &FuncDecl{
 			Name:          "print",
 			VariadicParam: &Var{Name: "a", nType: ANY_TYPE},
+			ReturnType:    NONE_TYPE,
 		},
 		"len": &FuncDecl{
-			Name:       "print",
+			Name:       "len",
 			Params:     []*Var{{Name: "a", nType: ANY_TYPE}},
 			ReturnType: NUM_TYPE,
 		},
@@ -99,6 +104,7 @@ func (p *Parser) parseProgram() *Program {
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
+
 		switch p.cur.TokenType() {
 		case lexer.FUNC:
 			stmt = p.parseFunc()
@@ -126,7 +132,7 @@ func (p *Parser) parseFunc() Node {
 	}
 	fd := p.funcs[tok.Literal]
 	if fd.Body != nil {
-		p.appendError("Redeclaration of function '" + tok.Literal + "'")
+		p.appendError("redeclaration of function '" + tok.Literal + "'")
 		return nil
 	}
 	fd.Body = block
@@ -134,6 +140,7 @@ func (p *Parser) parseFunc() Node {
 }
 
 func (p *Parser) parseEventHandler() Node {
+	p.advance() // advance past ON token
 	e := &EventHandler{}
 	if p.assertToken(lexer.IDENT) {
 		e.Name = p.cur.Literal
@@ -177,7 +184,7 @@ func (p *Parser) parseStatement() Node {
 	case lexer.IF:
 		return p.parseIfStatment() // TODO
 	}
-	p.appendError("unexpected token '" + p.cur.Format() + "'")
+	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
 	return nil
 }
@@ -187,22 +194,29 @@ func (p *Parser) parseAssignStatement() Node {
 }
 
 func (p *Parser) parseFuncDeclSignature() *FuncDecl {
-	fd := &FuncDecl{Token: p.cur}
+	fd := &FuncDecl{Token: p.cur, ReturnType: NONE_TYPE}
 	p.advance() // advance past FUNC
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
 		return nil
 	}
+	fd.Name = p.cur.Literal
 	p.advance() // advance past function name IDENT
 	if p.cur.TokenType() == lexer.COLON {
 		p.advance() // advance past `:` of return type declaration, e.g. in `func rand:num`
 		fd.ReturnType = p.parseType()
 		if fd.ReturnType.Name == ILLEGAL {
-			p.appendErrorForToken("bust return type", fd.Token)
+			p.appendErrorForToken("invalid return type: "+p.cur.FormatDetails(), fd.Token)
 		}
 	}
+	paramNames := map[string]bool{}
 	for !p.isAtEOL() && p.cur.TokenType() != lexer.DOT3 {
 		decl := p.parseTypedDecl().(*Declaration)
+		name := decl.Var.Name
+		if paramNames[name] {
+			p.appendError("redeclaration of parameter '" + name + "'")
+		}
+		paramNames[name] = true
 		fd.Params = append(fd.Params, decl.Var)
 	}
 	if p.cur.TokenType() == lexer.DOT3 {
@@ -210,7 +224,7 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 			fd.VariadicParam = fd.Params[0]
 			fd.Params = nil
 		} else {
-			p.appendError("variadic parameters must be used with single type")
+			p.appendError("invalid variadic parameter, must be used with single type")
 		}
 	}
 	p.assertEOL()
@@ -241,7 +255,7 @@ func (p *Parser) parseTypedDecl() Node {
 	decl.Var.nType = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
-		p.appendErrorForToken("bust type declaration", decl.Token)
+		p.appendErrorForToken("invalid type declaration for '"+ident+"'", decl.Token)
 	} else {
 		p.vars[ident] = decl.Var
 	}
@@ -261,9 +275,14 @@ func (p *Parser) parseInferredDeclStatement() Node {
 	}
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:=`
+	valToken := p.cur
 	val := p.parseTopLevelExpression()
-	if val == nil {
+	if val == nil || val.Type() == nil || val.Type() == ILLEGAL_TYPE {
 		decl.Var.nType = ILLEGAL_TYPE
+		p.appendError("invalid inferred declaration for '" + ident + "'")
+	} else if val.Type() == NONE_TYPE {
+		decl.Var.nType = ILLEGAL_TYPE
+		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
 	} else {
 		decl.Value = val
 		decl.Var.nType = val.Type()
@@ -306,7 +325,7 @@ func (p *Parser) parseTerm() Node {
 		}
 		return lit
 	}
-	p.appendError("invalid term")
+	p.appendError("unexpected character " + tt.FormatDetails())
 	p.advance()
 	return nil
 
@@ -341,31 +360,26 @@ func (p *Parser) parseFuncCall() Node {
 }
 
 func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
-	if decl.Params != nil {
-		if len(decl.Params) != len(args) {
-			p.appendError("expected " + strconv.Itoa(len(decl.Params)) + ", found " + strconv.Itoa(len(args)))
-			return
-		}
-		for i := range args {
-			paramType := decl.Params[i].Type()
-			argType := args[i].Type()
-			if !paramType.Accepts(argType) {
-				p.appendError("expected type" + paramType.String() + ", found " + argType.String())
-			}
-		}
-		return
-	}
+	funcName := decl.Name
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			if !paramType.Accepts(arg.Type()) {
-				p.appendError("expected variadic type" + paramType.String() + ", found " + arg.Type().String())
+				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.Format() + "', found '" + arg.Type().Format() + "'")
 			}
 		}
 		return
 	}
-	if len(args) != 0 {
-		p.appendError("expected no arguments")
+	if len(decl.Params) != len(args) {
+		p.appendError("'" + funcName + "' takes " + quantify(len(decl.Params), "argument") + ", found " + strconv.Itoa(len(args)))
+		return
+	}
+	for i := range args {
+		paramType := decl.Params[i].Type()
+		argType := args[i].Type()
+		if !paramType.Accepts(argType) {
+			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
+		}
 	}
 }
 
@@ -403,7 +417,7 @@ func (p *Parser) isAtEOL() bool {
 
 func (p *Parser) assertToken(tt lexer.TokenType) bool {
 	if p.cur.TokenType() != tt {
-		p.appendError("expected token type '" + tt.String() + "', got '" + p.cur.TokenType().String() + "'")
+		p.appendError("expected '" + tt.FormatDetails() + "', got '" + p.cur.TokenType().String() + "'")
 		return false
 	}
 	return true
@@ -411,7 +425,7 @@ func (p *Parser) assertToken(tt lexer.TokenType) bool {
 
 func (p *Parser) assertEOL() bool {
 	if !p.isAtEOL() {
-		p.appendError("expected end of line, found '" + p.cur.Format() + "'")
+		p.appendError("expected end of line, found " + p.cur.FormatDetails())
 		return false
 	}
 	return true

@@ -61,30 +61,31 @@ func TestEmptyProgram(t *testing.T) {
 }
 
 func TestParseDeclarationError(t *testing.T) {
-	tests := []string{
-		"a :invalid",
-		"a :",
-		"a :\n",
-		"a ://blabla\n",
-		"a :true",
-		"a :[]",
-		"a :[]num",
-		"a :()",
-		"a ::",
-		"a := num{}[{a:1}]",
-		"a := num[true]",
-		"a := num{a:true}",
-		"a := num{}{",
-		"a :=:",
-		"a := num{",
-		"a := num{}[",
-		"a :num num",
-		"a :num{}num",
+	tests := map[string]string{
+		"a :invalid":        "line 1 column 1: invalid type declaration for 'a'",
+		"a :":               "line 1 column 1: invalid type declaration for 'a'",
+		"a :\n":             "line 1 column 1: invalid type declaration for 'a'",
+		"a ://blabla\n":     "line 1 column 1: invalid type declaration for 'a'",
+		"a :true":           "line 1 column 1: invalid type declaration for 'a'",
+		"a :[]":             "line 1 column 1: invalid type declaration for 'a'",
+		"a :[]num":          "line 1 column 1: invalid type declaration for 'a'",
+		"a :()":             "line 1 column 1: invalid type declaration for 'a'",
+		"a ::":              "line 1 column 1: invalid type declaration for 'a'",
+		"a := num{}[{a:1}]": "line 1 column 12: unexpected character '{'", // TODO: expected `num` found `{`
+		"a := num[true]":    "line 1 column 15: array literal 'true' should have type 'num'",
+		"a := num{a:true}":  "line 1 column 16: map literal 'true' should have type 'num'",
+		"a := num{}{":       "line 1 column 12: unterminated map literal",
+		"a :=:":             "line 1 column 5: unexpected character ':'",
+		"a := num{":         "line 1 column 10: unterminated map literal",
+		"a := num{}[":       "line 1 column 12: unterminated array literal",
+		"a :num num":        "line 1 column 8: expected end of line, found 'num'",
+		"a :num{}num":       "line 1 column 9: expected end of line, found 'num'",
 	}
-	for _, input := range tests {
+	for input, err1 := range tests {
 		parser := New(input)
 		_ = parser.Parse()
 		assert.Equal(t, true, 1 <= len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
 	}
 }
 
@@ -108,6 +109,36 @@ func TestFunctionCall(t *testing.T) {
 		got := parser.Parse()
 		assert.Equal(t, 0, len(parser.errors), "input: %s\nerrors: %s", input, parser.errorsString())
 		assert.Equal(t, want, got.String())
+	}
+}
+
+func TestFunctionCallError(t *testing.T) {
+	builtins := builtins()
+	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
+	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", nType: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", nType: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins["f3"] = &FuncDecl{
+		Name:       "f3",
+		Params:     []*Var{&Var{Name: "a", nType: NUM_TYPE}, &Var{Name: "b", nType: STRING_TYPE}},
+		ReturnType: NONE_TYPE,
+	}
+	tests := map[string]string{
+		`len 2 2`:    "line 1 column 8: 'len' takes 1 argument, found 2",
+		`len`:        "line 1 column 4: 'len' takes 1 argument, found 0",
+		`a := print`: "line 1 column 11: invalid declaration, function 'print' has no return value",
+		`a := f0`:    "line 1 column 8: invalid declaration, function 'f0' has no return value",
+		`f0 "arg"`:   "line 1 column 9: 'f0' takes 0 arguments, found 1",
+		`f2`:         "line 1 column 3: 'f2' takes 1 argument, found 0",
+		`f1 "arg"`:   "line 1 column 9: 'f1' takes variadic arguments of type 'num', found 'string'",
+		`f3 1 2`:     "line 1 column 7: 'f3' takes 2nd argument of type 'string', found 'num'",
+		`f3 "1" "2"`: "line 1 column 11: 'f3' takes 1st argument of type 'num', found 'string'",
+		`foo 0`:      "line 1 column 1: unknown function 'foo'",
+	}
+	for input, err1 := range tests {
+		parser := NewWithBuiltins(input, builtins)
+		_ = parser.Parse()
+		assert.Equal(t, true, 1 <= len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
 	}
 }
 
@@ -142,6 +173,37 @@ x := len "123"
 x:NUM=len('123')
 `[1:]
 	assert.Equal(t, want, got.String())
+}
+
+func TestFuncDecl(t *testing.T) {
+	parser := New(`
+c := add 1 2
+func add:num n1:num n2:num
+	if c > 10
+	    print c
+	end
+	return n1 + n2
+end
+on mousedown
+	if c > 10
+	    print c
+	end
+end
+`)
+	_ = parser.Parse()
+	assert.Equal(t, 0, len(parser.errors), "errors: %#v", parser.errors)
+	builtinCnt := len(builtins())
+	assert.Equal(t, builtinCnt+1, len(parser.funcs))
+	got := parser.funcs["add"]
+	assert.Equal(t, "add", got.Name)
+	assert.Equal(t, NUM_TYPE, got.ReturnType)
+	var wantVariadicParam *Var = nil
+	assert.Equal(t, wantVariadicParam, got.VariadicParam)
+	assert.Equal(t, 2, len(got.Params))
+	n1 := got.Params[0]
+	assert.Equal(t, "n1", n1.Name)
+	assert.Equal(t, NUM_TYPE, n1.Type())
+	assert.Equal(t, 0, len(got.Body.Statements))
 }
 
 func TestDemo(t *testing.T) {

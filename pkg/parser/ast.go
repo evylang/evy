@@ -83,7 +83,8 @@ type ArrayLiteral struct {
 
 type MapLiteral struct {
 	Token *lexer.Token
-	Pairs map[string]*Term
+	Pairs map[string]Node
+	Order []string // Track insertion order of keys for deterministic output.
 	nType *Type
 }
 
@@ -196,7 +197,8 @@ func (a *ArrayLiteral) Type() *Type {
 
 func (m *MapLiteral) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
-	for key, val := range m.Pairs {
+	for _, key := range m.Order {
+		val := m.Pairs[key]
 		pairs = append(pairs, key+":"+val.String())
 	}
 	return "{" + strings.Join(pairs, ", ") + "}"

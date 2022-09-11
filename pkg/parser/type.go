@@ -1,6 +1,8 @@
 package parser
 
-import "foxygo.at/evy/pkg/lexer"
+import (
+	"foxygo.at/evy/pkg/lexer"
+)
 
 type TypeName int
 
@@ -52,21 +54,33 @@ func compositeTypeName(t lexer.TokenType) TypeName {
 	return ILLEGAL
 }
 
-var typeNameStrings = map[TypeName]string{
-	ILLEGAL: "ILLEGAL",
-	NUM:     "NUM",
-	STRING:  "STRING",
-	BOOL:    "BOOL",
-	ANY:     "ANY",
-	ARRAY:   "ARRAY",
-	MAP:     "MAP",
+type typeNameString struct {
+	string string
+	format string
+}
+
+var typeNameStrings = map[TypeName]typeNameString{
+	ILLEGAL: {string: "ILLEGAL", format: "ILLEGAL"},
+	NUM:     {string: "NUM", format: "num"},
+	STRING:  {string: "STRING", format: "string"},
+	BOOL:    {string: "BOOL", format: "bool"},
+	ANY:     {string: "ANY", format: "any"},
+	ARRAY:   {string: "ARRAY", format: "[]"},
+	MAP:     {string: "MAP", format: "{}"},
 }
 
 func (t TypeName) String() string {
 	if s, ok := typeNameStrings[t]; ok {
-		return s
+		return s.string
 	}
 	return "UNKNOWN"
+}
+
+func (t TypeName) Format() string {
+	if s, ok := typeNameStrings[t]; ok {
+		return s.format
+	}
+	return "<unknown>"
 }
 
 func (t TypeName) GoString() string {
@@ -83,6 +97,13 @@ func (t *Type) String() string {
 		return t.Name.String()
 	}
 	return t.Name.String() + " " + t.Sub.String()
+}
+
+func (t *Type) Format() string {
+	if t.Sub == nil {
+		return t.Name.Format()
+	}
+	return t.Sub.Format() + t.Name.Format()
 }
 
 func (t *Type) Accepts(t2 *Type) bool {

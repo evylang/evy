@@ -15,9 +15,21 @@ func TestParseDeclaration(t *testing.T) {
 		`a := "abc"
 		b:bool
 		c := true`: []string{"a:STRING='abc'", "b:BOOL=false", "c:BOOL=true"},
-		"a:num[]":     []string{"a:ARRAY NUM=[]"},
-		"a:num[]{}":   []string{"a:MAP ARRAY NUM={}"},
-		"abc:any[]{}": []string{"abc:MAP ARRAY ANY={}"},
+		"a:num[]":                      []string{"a:ARRAY NUM=[]"},
+		"a:num[]{}":                    []string{"a:MAP ARRAY NUM={}"},
+		"abc:any[]{}":                  []string{"abc:MAP ARRAY ANY={}"},
+		"a := bool[true]":              []string{"a:ARRAY BOOL=[true]"}, // TODO: should be print "a:ARRAY BOOL=[true]
+		"a := num[]":                   []string{"a:ARRAY NUM=[]"},
+		"a := num[][num[1 2]num[3 4]]": []string{"a:ARRAY ARRAY NUM=[[1, 2], [3, 4]]"},
+		"a := num{a:1 b:2}":            []string{"a:MAP NUM={a:1, b:2}"},
+		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": []string{"a:MAP ARRAY NUM={digits:[1, 2, 3], nums:[4, 5]}"},
+		"a := num[]{digits: num[] nums: num[4]}":        []string{"a:MAP ARRAY NUM={digits:[], nums:[4]}"},
+		"a := num[]{digits: num[4] nums: num[]}":        []string{"a:MAP ARRAY NUM={digits:[4], nums:[]}"},
+		"a := num{}[]":                                  []string{"a:ARRAY MAP NUM=[]"},
+		"a := num{}[num{}]":                             []string{"a:ARRAY MAP NUM=[{}]"},
+		"a := any{a:1 b:true}":                          []string{"a:MAP ANY={a:1, b:true}"},
+		"a := any{a:1 b:true c:num[1]}":                 []string{"a:MAP ANY={a:1, b:true, c:[1]}"},
+		"a := num{}[num{a:1}]":                          []string{"a:ARRAY MAP NUM=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -49,26 +61,30 @@ func TestEmptyProgram(t *testing.T) {
 }
 
 func TestParseDeclarationError(t *testing.T) {
-	tests := map[string][]string{
-		"a :invalid":    []string{"a:ILLEGAL"},
-		"a :":           []string{"a:ILLEGAL"},
-		"a :\n":         []string{"a:ILLEGAL"},
-		"a ://blabla\n": []string{"a:ILLEGAL"},
-		"a :true":       []string{"a:ILLEGAL"},
-		"a :[]":         []string{"a:ILLEGAL"},
-		"a :num num":    []string{"a:NUM=0"},
-		"a :[]num":      []string{"a:ILLEGAL"},
-		"a :()":         []string{"a:ILLEGAL"},
-		"a :num{}num":   []string{"a:MAP NUM={}"},
-		"a ::":          []string{"a:ILLEGAL"},
-		"a :=:":         []string{"a:ILLEGAL"},
+	tests := []string{
+		"a :invalid",
+		"a :",
+		"a :\n",
+		"a ://blabla\n",
+		"a :true",
+		"a :[]",
+		"a :[]num",
+		"a :()",
+		"a ::",
+		"a := num{}[{a:1}]",
+		"a := num[true]",
+		"a := num{a:true}",
+		"a := num{}{",
+		"a :=:",
+		"a := num{",
+		"a := num{}[",
+		"a :num num",
+		"a :num{}num",
 	}
-	for input, wantSlice := range tests {
-		want := strings.Join(wantSlice, "\n") + "\n"
+	for _, input := range tests {
 		parser := New(input)
-		got := parser.Parse()
-		assert.Equal(t, 1, len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
-		assert.Equal(t, want, got.String(), "input: %s", input)
+		_ = parser.Parse()
+		assert.Equal(t, true, 1 <= len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
 	}
 }
 
@@ -78,6 +94,9 @@ func TestFunctionCall(t *testing.T) {
 		"print 123":           []string{"print(123)"},
 		`print 123 "abc"`:     []string{"print(123, 'abc')"},
 		"a:=1 \n print a":     []string{"a:NUM=1", "print(a:NUM)"},
+		`a := len "abc"`:      []string{"a:NUM=len('abc')"},
+		`len "abc"`:           []string{"len('abc')"},
+		`len num[]`:           []string{"len([])"},
 		"a:string \n print a": []string{"a:STRING=''", "print(a:STRING)"},
 		`a:=true
 		b:string

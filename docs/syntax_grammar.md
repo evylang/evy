@@ -63,27 +63,35 @@ enclosed in double quotes `""`. Comments are fenced by `/* … */`.
 The `evy` source code is UTF-8 encoded. The NUL character `U+0000` is
 not allowed.
 
-    program    = { statements | func | event_handler } .
-    statements = { statement NL } .
-    statement  =  assignment | declaration | func_call |
-                  loop | if | return | 
-                  BREAK | EMPTY_STATEMENT .
+    program    = { statement | func | event_handler } .
+    statement  = empty_stmt | 
+                 assign_stmt | typed_decl_stmt | inferred_decl_stmt |
+                 func_call_stmt | 
+                 return_stmt | break_stmt |
+                 for_stmt | while_stmt | if_stmt  .
 
-    EMPTY_STATEMENT = .
-    BREAK           = "break" .
+
+    /* --- Statement ---- */
+    empty_stmt = NL .
+
+    assign_stmt        = assignable "=" expr NL .
+    typed_decl_stmt    = typed_decl NL .
+    inferred_decl_stmt = ident ":=" toplevel_expr NL .
+
+    func_call_stmt = func_call NL.
+
+    return_stmt = "return" [ toplevel_expr ] NL.
+    break_stmt  = "break" NL .
 
     /* --- Assignment --- */
-    assignment     = assignable "=" expr .
     assignable     = ident { selector } .
     ident          = LETTER { LETTER | UNICODE_DIGIT } .
     selector       = index | dot_selector .
     index          = "[" expr "]" .
     dot_selector   = "." ident .
 
-    /* --- Declarations --- */
-    declaration    = typed_decl | inferred_decl .
-    typed_ident    = ident ":" type .
-    inferred_decl = ident ":=" toplevel_expr .
+    /* --- Type --- */
+    typed_decl         = ident ":" type .
 
     type       = BASIC_TYPE | array_type | map_type | "any" .
     BASIC_TYPE = "num" | "string" | "bool" .
@@ -120,36 +128,34 @@ not allowed.
     map_elems   = { ident ":" term [NL] } .
     
     /* --- Control flow --- */
-    loop       = for | while .
-    for        = "for" range NL
-                     statements
-                 "end" .
+    for_stmt   = "for" range NL
+                    { statement }
+                 "end" NL .
     range      = ident ( ":=" | "=" ) "range" range_args .
     range_args = term [ term [ term ] ] .
-    while      = "while" toplevel_expr NL
-                     statements
-                 "end" .
+    while_stmt = "while" toplevel_expr NL
+                     { statement }
+                 "end" NL .
 
-    if = "if" toplevel_expr NL
-                statements
-          { "else" "if" toplevel_expr NL
-                statements }
-          [ "else" NL
-                statements ]
-          "end" .
+    if_stmt = "if" toplevel_expr NL
+                    { statement }
+              { "else" "if" toplevel_expr NL
+                    { statement } }
+              [ "else" NL
+                    { statement } ]
+              "end" NL .
 
     /* --- Functions ---- */
     func            = "func" ident func_signature NL
-                          statements
-                      "end" .
+                          { statement }
+                      "end" NL .
     func_signature  = [ ":" type ] params .
     params          = { typed_decl } | variadic_param .
     variadic_param  = typed_decl "..." .
-    return          = "return" [ toplevel_expr ] .
 
     event_handler   = "on" ident NL
-                          statements
-                      "end" .
+                          { statement }
+                      "end" NL .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .

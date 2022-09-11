@@ -184,6 +184,10 @@ func (t *Token) SetType(tokenType TokenType) *Token {
 	return t
 }
 
+func (t *Token) TokenType() TokenType {
+	return t.Type
+}
+
 func (t *Token) SetLiteral(literal string) *Token {
 	t.Literal = literal
 	return t

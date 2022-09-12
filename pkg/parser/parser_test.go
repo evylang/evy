@@ -207,6 +207,108 @@ end
 	assert.Equal(t, 0, len(got.Body.Statements))
 }
 
+func TestScope(t *testing.T) {
+	inputs := []string{`
+x := 1
+func foo
+	x := "abc"
+end
+`, `
+x := 1
+func foo x:string
+	x = "abc"
+end
+`, `
+x := 1
+func foo x:string...
+	print x
+end
+`, `
+x := 1
+if true
+	x := "abc" // block scope
+end
+`,
+	}
+	for _, input := range inputs {
+		parser := New(input)
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestScopeErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+x := 1
+x := 2
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x := 1
+x := "abc"
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x := "abc"
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x := "abc"
+x :num
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x :num
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x :string
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+func x
+   print "abc"
+end
+`: "line 2 column 1: invalid declaration of 'x', already used as function name",
+		`
+func x in:num
+   in:string
+end
+`: "line 3 column 4: redeclaration of 'in'",
+		`
+func foo
+   x := 0
+   x := 0
+end
+`: "line 4 column 4: redeclaration of 'x'",
+		`
+func x
+   x := 0
+end
+`: "line 3 column 4: invalid declaration of 'x', already used as function name",
+		`
+func x in:string in:string
+   print in
+end
+`: "line 2 column 18: redeclaration of parameter 'in'",
+		`
+func x x:string
+   print x
+end
+`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+		`
+func x x:string...
+   print x
+end
+`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input)
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.errors[0].String())
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

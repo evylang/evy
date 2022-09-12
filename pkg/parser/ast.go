@@ -134,8 +134,11 @@ func (f *FuncDecl) String() string {
 		params += f.VariadicParam.String() + "..."
 	}
 	signature := f.Name + "(" + params + ")"
-	body := f.Body.String()
-	return signature + "{\n" + body + "\n}\n"
+	body := ""
+	if f.Body != nil {
+		body = f.Body.String()
+	}
+	return signature + "{\n" + body + "}\n"
 }
 func (f *FuncDecl) Type() *Type {
 	return f.ReturnType
@@ -143,7 +146,7 @@ func (f *FuncDecl) Type() *Type {
 
 func (e *EventHandler) String() string {
 	body := e.Body.String()
-	return "on " + e.Name + " {\n" + body + "\n}\n"
+	return "on " + e.Name + " {\n" + body + "}\n"
 }
 func (e *EventHandler) Type() *Type {
 	return NONE_TYPE

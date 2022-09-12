@@ -98,6 +98,7 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"func":   FUNC,
+	"on":     ON,
 	"return": RETURN,
 	"for":    FOR,
 	"range":  RANGE,
@@ -218,6 +219,16 @@ func (t *Token) Format() string {
 		return `"` + t.Literal + `"`
 	}
 	return t.Type.Format()
+}
+
+func (t *Token) FormatDetails() string {
+	switch t.Type {
+	case COMMENT, IDENT, NUM_LIT:
+		return t.Literal
+	case STRING_LIT:
+		return `"` + t.Literal + `"`
+	}
+	return t.Type.FormatDetails()
 }
 
 func (t *Token) Location() string {

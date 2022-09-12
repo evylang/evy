@@ -179,6 +179,13 @@ func (t TokenType) GoString() string {
 	return t.String()
 }
 
+func (t TokenType) FormatDetails() string {
+	if t == EOF {
+		return "<end of input>"
+	}
+	return "'" + t.Format() + "'"
+}
+
 func (t *Token) SetType(tokenType TokenType) *Token {
 	t.Type = tokenType
 	return t

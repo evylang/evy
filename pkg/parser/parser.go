@@ -248,40 +248,6 @@ func (p *Parser) parseTypedDecl() Node {
 	return decl
 }
 
-// parseType parses `num[]{}` into `MAP ARRAY NUM` inverting the order.
-func (p *Parser) parseType() *Type {
-	result := p.parseBasicType()
-	if result == ILLEGAL_TYPE {
-		return result
-	}
-	return p.parseSubType(result)
-}
-
-func (p *Parser) parseBasicType() *Type {
-	tt := p.cur.TokenType()
-	t := basicTypeName(tt)
-	p.advance()
-	if t == ILLEGAL {
-		return ILLEGAL_TYPE
-	}
-	return &Type{Name: t}
-}
-
-func (p *Parser) parseSubType(parent *Type) *Type {
-	tt := p.cur.TokenType()
-	typeName := compositeTypeName(tt)
-	if typeName == ILLEGAL { // we have moved passed the type declaration
-		return parent
-	}
-	if !matchParen(tt, p.peek.Type) {
-		return ILLEGAL_TYPE
-	}
-	p.advance() // advance past opening token `[` or `{`
-	p.advance() // advance past closing token `]` or `}`
-	node := &Type{Name: typeName, Sub: parent}
-	return p.parseSubType(node)
-}
-
 func matchParen(t1, t2 lexer.TokenType) bool {
 	return (t1 == lexer.LBRACKET && t2 == lexer.RBRACKET) ||
 		(t1 == lexer.LCURLY && t2 == lexer.RCURLY)
@@ -344,38 +310,6 @@ func (p *Parser) parseTerm() Node {
 	p.advance()
 	return nil
 
-}
-
-func (p *Parser) isLiteral() bool {
-	tt := p.cur.TokenType()
-	if tt == lexer.NUM_LIT || tt == lexer.STRING_LIT || tt == lexer.TRUE || tt == lexer.FALSE {
-		return true
-	}
-	if !isBasicType(tt) {
-		return false
-	}
-	peek := p.peek.TokenType()
-	return peek == lexer.LBRACKET || peek == lexer.LCURLY
-}
-
-func (p *Parser) parseLiteral() Node {
-	tok := p.cur
-	tt := tok.TokenType()
-	p.advance()
-	switch tt {
-	case lexer.STRING_LIT:
-		return &StringLiteral{Token: tok, Value: tok.Literal}
-	case lexer.NUM_LIT:
-		val, err := strconv.ParseFloat(tok.Literal, 64)
-		if err != nil {
-			p.appendError(err.Error())
-			return nil
-		}
-		return &NumLiteral{Token: tok, Value: val}
-	case lexer.TRUE, lexer.FALSE:
-		return &Bool{Token: tok, Value: tt == lexer.TRUE}
-	}
-	return nil
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {

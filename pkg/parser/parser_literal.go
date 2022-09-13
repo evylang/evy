@@ -18,7 +18,7 @@ func (p *Parser) isLiteral() bool {
 	return peek == lexer.LBRACKET || peek == lexer.LCURLY
 }
 
-func (p *Parser) parseLiteral() Node {
+func (p *Parser) parseLiteral(scope *scope) Node {
 	tok := p.cur
 	tt := tok.TokenType()
 	switch tt {
@@ -37,18 +37,18 @@ func (p *Parser) parseLiteral() Node {
 		p.advance()
 		return &Bool{Token: tok, Value: tt == lexer.TRUE}
 	}
-	return p.parseCompositeLiteral()
+	return p.parseCompositeLiteral(scope)
 }
 
-func (p *Parser) parseCompositeLiteral() Node {
+func (p *Parser) parseCompositeLiteral(scope *scope) Node {
 	tok := p.cur
 	litType := p.parseLiteralType()
 	switch litType.Name {
 	case ARRAY:
-		elements := p.parseArrayElements(litType.Sub)
+		elements := p.parseArrayElements(scope, litType.Sub)
 		return &ArrayLiteral{Token: tok, Elements: elements, nType: litType}
 	case MAP:
-		pairs, order := p.parseMapPairs(litType.Sub)
+		pairs, order := p.parseMapPairs(scope, litType.Sub)
 		return &MapLiteral{
 			Token: tok,
 			Pairs: pairs,
@@ -60,8 +60,8 @@ func (p *Parser) parseCompositeLiteral() Node {
 	return nil
 }
 
-func (p *Parser) parseArrayElements(t *Type) []Node {
-	terms := p.parseTerms()
+func (p *Parser) parseArrayElements(scope *scope, t *Type) []Node {
+	terms := p.parseTerms(scope)
 	tt := p.cur.TokenType()
 	p.advance()
 	if tt != lexer.RBRACKET {
@@ -76,7 +76,7 @@ func (p *Parser) parseArrayElements(t *Type) []Node {
 	return terms
 }
 
-func (p *Parser) parseMapPairs(t *Type) (map[string]Node, []string) {
+func (p *Parser) parseMapPairs(scope *scope, t *Type) (map[string]Node, []string) {
 	pairs := map[string]Node{}
 	var order []string
 	for !p.isTermsEnd() {
@@ -85,7 +85,7 @@ func (p *Parser) parseMapPairs(t *Type) (map[string]Node, []string) {
 		p.advance()
 		p.assertToken(lexer.COLON)
 		p.advance()
-		val := p.parseTerm()
+		val := p.parseTerm(scope)
 		if tt != lexer.IDENT {
 			p.appendError("invalid map key '" + tt.Format() + "'")
 			continue

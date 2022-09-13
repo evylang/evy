@@ -35,7 +35,7 @@ func TestParseDeclaration(t *testing.T) {
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := New(input)
 		got := parser.Parse()
-		assert.Equal(t, 0, len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
 }
@@ -55,7 +55,7 @@ func TestEmptyProgram(t *testing.T) {
 	for _, input := range tests {
 		parser := New(input)
 		got := parser.Parse()
-		assert.Equal(t, 0, len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assertNoParseError(t, parser, input)
 		assert.Equal(t, "\n", got.String())
 	}
 }
@@ -84,7 +84,7 @@ func TestParseDeclarationError(t *testing.T) {
 	for input, err1 := range tests {
 		parser := New(input)
 		_ = parser.Parse()
-		assert.Equal(t, true, 1 <= len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assertParseError(t, parser, input)
 		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
 	}
 }
@@ -107,7 +107,7 @@ func TestFunctionCall(t *testing.T) {
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := New(input)
 		got := parser.Parse()
-		assert.Equal(t, 0, len(parser.errors), "input: %s\nerrors: %s", input, parser.errorsString())
+		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
 }
@@ -137,7 +137,7 @@ func TestFunctionCallError(t *testing.T) {
 	for input, err1 := range tests {
 		parser := NewWithBuiltins(input, builtins)
 		_ = parser.Parse()
-		assert.Equal(t, true, 1 <= len(parser.errors), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assertParseError(t, parser, input)
 		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
 	}
 }
@@ -157,7 +157,7 @@ func TestBlock(t *testing.T) {
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := New(input)
 		got := parser.Parse()
-		assert.Equal(t, 0, len(parser.errors), "input: %s\nerrors: %#v", input, parser.errors)
+		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
 }
@@ -168,7 +168,7 @@ x := len "123"
 `
 	parser := New(input)
 	got := parser.Parse()
-	assert.Equal(t, 0, len(parser.errors), "errors: %#v", parser.errors)
+	assertNoParseError(t, parser, input)
 	want := `
 x:NUM=len('123')
 `[1:]
@@ -176,7 +176,7 @@ x:NUM=len('123')
 }
 
 func TestFuncDecl(t *testing.T) {
-	parser := New(`
+	input := `
 c := add 1 2
 func add:num n1:num n2:num
 	if c > 10
@@ -189,9 +189,10 @@ on mousedown
 	    print c
 	end
 end
-`)
+`
+	parser := New(input)
 	_ = parser.Parse()
-	assert.Equal(t, 0, len(parser.errors), "errors: %#v", parser.errors)
+	assertNoParseError(t, parser, input)
 	builtinCnt := len(builtins())
 	assert.Equal(t, builtinCnt+1, len(parser.funcs))
 	got := parser.funcs["add"]
@@ -206,6 +207,108 @@ end
 	assert.Equal(t, 0, len(got.Body.Statements))
 }
 
+func TestScope(t *testing.T) {
+	inputs := []string{`
+x := 1
+func foo
+	x := "abc"
+end
+`, `
+x := 1
+func foo x:string
+	x = "abc"
+end
+`, `
+x := 1
+func foo x:string...
+	print x
+end
+`, `
+x := 1
+if true
+	x := "abc" // block scope
+end
+`,
+	}
+	for _, input := range inputs {
+		parser := New(input)
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestScopeErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+x := 1
+x := 2
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x := 1
+x := "abc"
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x := "abc"
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x := "abc"
+x :num
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x :num
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+x :string
+`: "line 3 column 1: redeclaration of 'x'",
+		`
+x :num
+func x
+   print "abc"
+end
+`: "line 2 column 1: invalid declaration of 'x', already used as function name",
+		`
+func x in:num
+   in:string
+end
+`: "line 3 column 4: redeclaration of 'in'",
+		`
+func foo
+   x := 0
+   x := 0
+end
+`: "line 4 column 4: redeclaration of 'x'",
+		`
+func x
+   x := 0
+end
+`: "line 3 column 4: invalid declaration of 'x', already used as function name",
+		`
+func x in:string in:string
+   print in
+end
+`: "line 2 column 18: redeclaration of parameter 'in'",
+		`
+func x x:string
+   print x
+end
+`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+		`
+func x x:string...
+   print x
+end
+`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input)
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.errors[0].String())
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10
@@ -218,7 +321,7 @@ if x > 10
 end`
 	parser := New(input)
 	got := parser.Parse()
-	assert.Equal(t, 2, len(parser.errors), "errors: %#v", parser.errors)
+	assertParseError(t, parser, input)
 	assert.Equal(t, "line 2 column 1: unknown function 'move'", parser.errors[0].String())
 	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
 	want := `
@@ -226,4 +329,14 @@ x:NUM=12
 print('x:', x:NUM)
 `[1:]
 	assert.Equal(t, want, got.String())
+}
+
+func assertParseError(t *testing.T, parser *Parser, input string) {
+	t.Helper()
+	assert.Equal(t, true, len(parser.errors) > 0, "expected parser errors, got none: input: %s\n", input)
+}
+
+func assertNoParseError(t *testing.T, parser *Parser, input string) {
+	t.Helper()
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.errorsString())
 }

@@ -29,7 +29,6 @@ type Parser struct {
 
 	tokens []*lexer.Token
 	funcs  map[string]*FuncDecl // all function declaration by name and index in tokens.
-	vars   map[string]*Var      // TODO: needs scoping in block statements; // all declared variables with type
 }
 
 // Error is an Evy parse error.
@@ -48,10 +47,7 @@ func New(input string) *Parser {
 
 func NewWithBuiltins(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
-	p := &Parser{
-		vars:  map[string]*Var{},
-		funcs: builtins,
-	}
+	p := &Parser{funcs: builtins}
 
 	// Read all tokens, collect function declaration tokens by index
 	// funcs temporarily holds FUNC token indices for further processing
@@ -94,12 +90,12 @@ func builtins() map[string]*FuncDecl {
 }
 
 func (p *Parser) Parse() *Program {
-	return p.parseProgram()
+	return p.parseProgram(newScope())
 }
 
 // function names matching `parsePROCUTION` align with production names
 // in grammar doc/syntax_grammar.md
-func (p *Parser) parseProgram() *Program {
+func (p *Parser) parseProgram(scope *scope) *Program {
 	program := &Program{Statements: []Node{}}
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
@@ -107,11 +103,11 @@ func (p *Parser) parseProgram() *Program {
 
 		switch p.cur.TokenType() {
 		case lexer.FUNC:
-			stmt = p.parseFunc()
+			stmt = p.parseFunc(scope)
 		case lexer.ON:
-			stmt = p.parseEventHandler()
+			stmt = p.parseEventHandler(scope)
 		default:
-			stmt = p.parseStatement()
+			stmt = p.parseStatement(scope)
 		}
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
@@ -120,26 +116,48 @@ func (p *Parser) parseProgram() *Program {
 	return program
 }
 
-func (p *Parser) parseFunc() Node {
+func (p *Parser) parseFunc(scope *scope) Node {
 	p.advance()  // advance past FUNC
 	tok := p.cur // function name
+	funcName := p.cur.Literal
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
-	block := p.parseBlock()
+	fd := p.funcs[funcName]
+	scope = newEnclosedScope(scope)
+	p.addParamsToScope(scope, fd)
+	block := p.parseBlock(scope) // parse to "end"
 
 	if tok.TokenType() != lexer.IDENT {
 		return nil
 	}
-	fd := p.funcs[tok.Literal]
 	if fd.Body != nil {
-		p.appendError("redeclaration of function '" + tok.Literal + "'")
+		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
 	}
 	fd.Body = block
 	return fd
 }
 
-func (p *Parser) parseEventHandler() Node {
+func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
+	for _, param := range fd.Params {
+		if scope.inLocalScope(param.Name) {
+			p.appendErrorForToken("redeclaration of parameter '"+param.Name+"'", param.Token)
+		}
+		if _, ok := p.funcs[param.Name]; ok {
+			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
+		}
+		scope.set(param.Name, param)
+	}
+	if fd.VariadicParam != nil {
+		param := fd.VariadicParam
+		if _, ok := p.funcs[param.Name]; ok {
+			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
+		}
+		scope.set(param.Name, param)
+	}
+}
+
+func (p *Parser) parseEventHandler(scope *scope) Node {
 	p.advance() // advance past ON token
 	e := &EventHandler{}
 	if p.assertToken(lexer.IDENT) {
@@ -148,11 +166,11 @@ func (p *Parser) parseEventHandler() Node {
 		p.assertEOL()
 	}
 	p.advancePastNL() // advance past `on EVENT_NAME`
-	e.Body = p.parseBlock()
+	e.Body = p.parseBlock(scope)
 	return e
 }
 
-func (p *Parser) parseStatement() Node {
+func (p *Parser) parseStatement(scope *scope) Node {
 	switch p.cur.TokenType() {
 	// empty statement
 	case lexer.NL, lexer.EOF, lexer.COMMENT:
@@ -161,35 +179,36 @@ func (p *Parser) parseStatement() Node {
 	case lexer.IDENT:
 		switch p.peek.Type {
 		case lexer.ASSIGN, lexer.LBRACKET, lexer.DOT:
-			return p.parseAssignStatement() // TODO
+			return p.parseAssignStatement(scope) // TODO
 		case lexer.COLON:
-			return p.parseTypedDeclStatement()
+			return p.parseTypedDeclStatement(scope)
 		case lexer.DECLARE:
-			return p.parseInferredDeclStatement()
+			return p.parseInferredDeclStatement(scope)
 		}
 		if p.isFuncCall(p.cur) {
-			return p.parseFunCallStatement()
+			return p.parseFunCallStatement(scope)
 		}
 		p.appendError("unknown function '" + p.cur.Literal + "'")
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
-		return p.parseReturnStatment() // TODO
+		return p.parseReturnStatment(scope) // TODO
 	case lexer.BREAK:
 		return p.parseBreakStatment() // TODO
 	case lexer.FOR:
-		return p.parseForStatment() // TODO
+		return p.parseForStatment(scope) // TODO
 	case lexer.WHILE:
-		return p.parseWhileStatment() // TODO
+		return p.parseWhileStatment(scope) // TODO
 	case lexer.IF:
-		return p.parseIfStatment() // TODO
+		return p.parseIfStatment(scope) // TODO
 	}
 	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
 	return nil
 }
 
-func (p *Parser) parseAssignStatement() Node {
+func (p *Parser) parseAssignStatement(scope *scope) Node {
+	p.advancePastNL()
 	return nil
 }
 
@@ -209,17 +228,13 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 			p.appendErrorForToken("invalid return type: "+p.cur.FormatDetails(), fd.Token)
 		}
 	}
-	paramNames := map[string]bool{}
 	for !p.isAtEOL() && p.cur.TokenType() != lexer.DOT3 {
-		decl := p.parseTypedDecl().(*Declaration)
-		name := decl.Var.Name
-		if paramNames[name] {
-			p.appendError("redeclaration of parameter '" + name + "'")
-		}
-		paramNames[name] = true
+		p.assertToken(lexer.IDENT)
+		decl := p.parseTypedDecl()
 		fd.Params = append(fd.Params, decl.Var)
 	}
 	if p.cur.TokenType() == lexer.DOT3 {
+		p.advance()
 		if len(fd.Params) == 1 {
 			fd.VariadicParam = fd.Params[0]
 			fd.Params = nil
@@ -232,9 +247,10 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 	return fd
 }
 
-func (p *Parser) parseTypedDeclStatement() Node {
+func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL {
+	if decl.Type().Name != ILLEGAL && p.validateVar(scope, decl.Var, decl.Token) {
+		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
 	p.advancePastNL()
@@ -243,11 +259,12 @@ func (p *Parser) parseTypedDeclStatement() Node {
 
 // parseTypedDecl parses declarations like
 // `x:num` or `y:any[]{}`
-func (p *Parser) parseTypedDecl() Node {
-	ident := p.cur.Literal
+func (p *Parser) parseTypedDecl() *Declaration {
+	p.assertToken(lexer.IDENT)
+	varName := p.cur.Literal
 	decl := &Declaration{
 		Token: p.cur,
-		Var:   &Var{Token: p.cur, Name: ident},
+		Var:   &Var{Token: p.cur, Name: varName},
 	}
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:`
@@ -255,11 +272,21 @@ func (p *Parser) parseTypedDecl() Node {
 	decl.Var.nType = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
-		p.appendErrorForToken("invalid type declaration for '"+ident+"'", decl.Token)
-	} else {
-		p.vars[ident] = decl.Var
+		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.Token)
 	}
 	return decl
+}
+
+func (p *Parser) validateVar(scope *scope, v *Var, tok *lexer.Token) bool {
+	if scope.inLocalScope(v.Name) { // already declared in current scope
+		p.appendErrorForToken("redeclaration of '"+v.Name+"'", tok)
+		return false
+	}
+	if _, ok := p.funcs[v.Name]; ok {
+		p.appendErrorForToken("invalid declaration of '"+v.Name+"', already used as function name", tok)
+		return false
+	}
+	return true
 }
 
 func matchParen(t1, t2 lexer.TokenType) bool {
@@ -267,59 +294,63 @@ func matchParen(t1, t2 lexer.TokenType) bool {
 		(t1 == lexer.LCURLY && t2 == lexer.RCURLY)
 }
 
-func (p *Parser) parseInferredDeclStatement() Node {
-	ident := p.cur.Literal
+func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
+	p.assertToken(lexer.IDENT)
+	varName := p.cur.Literal
 	decl := &Declaration{
 		Token: p.cur,
-		Var:   &Var{Token: p.cur, Name: ident}, // , nType: &Type{Name: ILLEGAL}},
+		Var:   &Var{Token: p.cur, Name: varName},
 	}
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:=`
 	valToken := p.cur
-	val := p.parseTopLevelExpression()
-	if val == nil || val.Type() == nil || val.Type() == ILLEGAL_TYPE {
-		decl.Var.nType = ILLEGAL_TYPE
-		p.appendError("invalid inferred declaration for '" + ident + "'")
-	} else if val.Type() == NONE_TYPE {
-		decl.Var.nType = ILLEGAL_TYPE
-		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
-	} else {
-		decl.Value = val
-		decl.Var.nType = val.Type()
-		p.vars[ident] = decl.Var
-		p.assertEOL()
+	val := p.parseTopLevelExpression(scope)
+	defer p.advancePastNL()
+	if val == nil || val.Type() == nil {
+		p.appendError("invalid inferred declaration for '" + varName + "'")
+		return nil
 	}
-	p.advancePastNL()
+	if val.Type() == NONE_TYPE {
+		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
+		return nil
+	}
+	decl.Var.nType = val.Type()
+	if !p.validateVar(scope, decl.Var, decl.Token) {
+		return nil
+	}
+	decl.Value = val
+	scope.set(varName, decl.Var)
+	p.assertEOL()
 	return decl
 }
 
-func (p *Parser) parseTopLevelExpression() Node {
+func (p *Parser) parseTopLevelExpression(scope *scope) Node {
 	tt := p.cur.TokenType()
 	if tt == lexer.IDENT && p.isFuncCall(p.cur) {
-		return p.parseFuncCall()
+		return p.parseFuncCall(scope)
 	}
-	return p.parseExpression()
+	return p.parseExpression(scope)
 }
 
-func (p *Parser) parseExpression() Node {
-	return p.parseTerm()
+func (p *Parser) parseExpression(scope *scope) Node {
+	return p.parseTerm(scope)
 }
 
-func (p *Parser) parseTerm() Node {
+func (p *Parser) parseTerm(scope *scope) Node {
 	//TODO: UNARY_OP Term; composite literals; assignable; slice; type_assertion; "(" toplevel_expr ")"
 	tt := p.cur.TokenType()
 	if tt == lexer.IDENT {
-		ident := p.cur.Literal
+		varName := p.cur.Literal
 		p.advance()
-		v, ok := p.vars[ident]
+		v, ok := scope.get(varName)
 		if !ok {
-			p.appendError("unknown identifier '" + ident + "'")
+			p.appendError("unknown variable name '" + varName + "'")
 			return nil
 		}
 		return v
 	}
 	if p.isLiteral() {
-		lit := p.parseLiteral()
+		lit := p.parseLiteral(scope)
 		if lit == nil {
 			return nil
 		}
@@ -337,19 +368,19 @@ func (p *Parser) isFuncCall(tok *lexer.Token) bool {
 	return ok
 }
 
-func (p *Parser) parseFunCallStatement() Node {
-	fc := p.parseFuncCall()
+func (p *Parser) parseFunCallStatement(scope *scope) Node {
+	fc := p.parseFuncCall(scope)
 	p.assertEOL()
 	p.advancePastNL()
 	return fc
 }
 
-func (p *Parser) parseFuncCall() Node {
+func (p *Parser) parseFuncCall(scope *scope) Node {
 	funcToken := p.cur
 	funcName := p.cur.Literal
 	decl := p.funcs[funcName]
 	p.advance() // advance past function name IDENT
-	args := p.parseTerms()
+	args := p.parseTerms(scope)
 	p.assertArgTypes(decl, args)
 	return &FunctionCall{
 		Name:      funcName,
@@ -383,10 +414,10 @@ func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
 	}
 }
 
-func (p *Parser) parseTerms() []Node {
+func (p *Parser) parseTerms(scope *scope) []Node {
 	var terms []Node
 	for !p.isTermsEnd() {
-		term := p.parseTerm()
+		term := p.parseTerm(scope)
 		if term != nil {
 			terms = append(terms, term)
 		}
@@ -439,11 +470,11 @@ func (p *Parser) appendErrorForToken(message string, token *lexer.Token) {
 	p.errors = append(p.errors, Error{message: message, token: token})
 }
 
-func (p *Parser) parseBlock() *BlockStatement {
+func (p *Parser) parseBlock(scope *scope) *BlockStatement {
 	tok := p.cur
 	var stmts []Node
 	for p.cur.TokenType() != lexer.END && p.cur.TokenType() != lexer.EOF {
-		stmt := p.parseStatement()
+		stmt := p.parseStatement(scope)
 		if stmt != nil {
 			stmts = append(stmts, stmt)
 		}
@@ -480,7 +511,7 @@ func (p *Parser) errorsString() string {
 }
 
 //TODO: implemented
-func (p *Parser) parseReturnStatment() Node {
+func (p *Parser) parseReturnStatment(scope *scope) Node {
 	p.advancePastNL()
 	return nil
 }
@@ -492,22 +523,25 @@ func (p *Parser) parseBreakStatment() Node {
 }
 
 //TODO: implemented
-func (p *Parser) parseForStatment() Node {
+func (p *Parser) parseForStatment(scope *scope) Node {
+	scope = newEnclosedScope(scope)
 	p.advancePastNL()
-	p.parseBlock()
+	p.parseBlock(scope)
 	return nil
 }
 
 //TODO: implemented
-func (p *Parser) parseWhileStatment() Node {
+func (p *Parser) parseWhileStatment(scope *scope) Node {
+	scope = newEnclosedScope(scope)
 	p.advancePastNL()
-	p.parseBlock()
+	p.parseBlock(scope)
 	return nil
 }
 
 //TODO: implemented
-func (p *Parser) parseIfStatment() Node {
+func (p *Parser) parseIfStatment(scope *scope) Node {
+	scope = newEnclosedScope(scope)
 	p.advancePastNL()
-	p.parseBlock()
+	p.parseBlock(scope)
 	return nil
 }

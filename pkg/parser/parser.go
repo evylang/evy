@@ -78,12 +78,12 @@ func builtins() map[string]*FuncDecl {
 	return map[string]*FuncDecl{
 		"print": &FuncDecl{
 			Name:          "print",
-			VariadicParam: &Var{Name: "a", nType: ANY_TYPE},
+			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
 			ReturnType:    NONE_TYPE,
 		},
 		"len": &FuncDecl{
 			Name:       "len",
-			Params:     []*Var{{Name: "a", nType: ANY_TYPE}},
+			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
 			ReturnType: NUM_TYPE,
 		},
 	}
@@ -269,7 +269,7 @@ func (p *Parser) parseTypedDecl() *Declaration {
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:`
 	v := p.parseType()
-	decl.Var.nType = v
+	decl.Var.T = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
 		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.Token)
@@ -314,7 +314,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
 		return nil
 	}
-	decl.Var.nType = val.Type()
+	decl.Var.T = val.Type()
 	if !p.validateVar(scope, decl.Var, decl.Token) {
 		return nil
 	}
@@ -386,7 +386,7 @@ func (p *Parser) parseFuncCall(scope *scope) Node {
 		Name:      funcName,
 		Token:     funcToken,
 		Arguments: args,
-		nType:     decl.ReturnType,
+		T:         decl.ReturnType,
 	}
 }
 

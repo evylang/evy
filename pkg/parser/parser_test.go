@@ -115,11 +115,11 @@ func TestFunctionCall(t *testing.T) {
 func TestFunctionCallError(t *testing.T) {
 	builtins := builtins()
 	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
-	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", nType: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", nType: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
 	builtins["f3"] = &FuncDecl{
 		Name:       "f3",
-		Params:     []*Var{&Var{Name: "a", nType: NUM_TYPE}, &Var{Name: "b", nType: STRING_TYPE}},
+		Params:     []*Var{&Var{Name: "a", T: NUM_TYPE}, &Var{Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
 	}
 	tests := map[string]string{

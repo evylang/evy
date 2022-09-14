@@ -46,14 +46,14 @@ func (p *Parser) parseCompositeLiteral(scope *scope) Node {
 	switch litType.Name {
 	case ARRAY:
 		elements := p.parseArrayElements(scope, litType.Sub)
-		return &ArrayLiteral{Token: tok, Elements: elements, nType: litType}
+		return &ArrayLiteral{Token: tok, Elements: elements, T: litType}
 	case MAP:
 		pairs, order := p.parseMapPairs(scope, litType.Sub)
 		return &MapLiteral{
 			Token: tok,
 			Pairs: pairs,
 			Order: order,
-			nType: litType,
+			T:     litType,
 		}
 	}
 	p.appendError("unknown literal " + tok.String())

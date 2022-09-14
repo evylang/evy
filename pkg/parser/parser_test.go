@@ -129,6 +129,7 @@ func TestFunctionCallError(t *testing.T) {
 		`a := f0`:    "line 1 column 8: invalid declaration, function 'f0' has no return value",
 		`f0 "arg"`:   "line 1 column 9: 'f0' takes 0 arguments, found 1",
 		`f2`:         "line 1 column 3: 'f2' takes 1 argument, found 0",
+		`f2 f1`:      "line 1 column 4: function call must be parenthesized: (f1 ...)",
 		`f1 "arg"`:   "line 1 column 9: 'f1' takes variadic arguments of type 'num', found 'string'",
 		`f3 1 2`:     "line 1 column 7: 'f3' takes 2nd argument of type 'string', found 'num'",
 		`f3 "1" "2"`: "line 1 column 11: 'f3' takes 1st argument of type 'num', found 'string'",
@@ -207,6 +208,65 @@ end
 	assert.Equal(t, 1, len(got.Body.Statements)) // return statement; if statement not yet implemented.
 	returnStmt := got.Body.Statements[0]
 	assert.Equal(t, "return n1", returnStmt.String())
+}
+
+func TestFuncAssignment(t *testing.T) {
+	inputs := []string{`
+a := 1
+b:num
+b = a
+`, `
+a:num
+b:num
+b = a
+`, `
+a:num
+b:any
+b = a
+`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestFuncAssignmentErr(t *testing.T) {
+	inputs := map[string]string{`
+b:num
+b = true
+`: "line 3 column 3: 'b' accepts values of type num, found bool",
+		`
+a:= 1
+a = b
+`: "line 3 column 6: unknown variable name 'b'",
+		`
+a:= 1
+b = a
+`: "line 3 column 3: unknown variable name 'b'",
+		`
+a:= 1
+a = num[]
+`: "line 3 column 3: 'a' accepts values of type num, found num[]",
+		`
+a:num
+b:any
+a = b
+`: "line 4 column 3: 'a' accepts values of type num, found any",
+		`
+func fn
+	return true
+end
+fn = 3
+`: "line 5 column 1: cannot assign to 'fn' as it is a function not a variable",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+	}
 }
 
 func TestScope(t *testing.T) {

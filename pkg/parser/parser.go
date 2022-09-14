@@ -168,7 +168,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.IDENT:
 		switch p.peek.Type {
 		case lexer.ASSIGN, lexer.LBRACKET, lexer.DOT:
-			return p.parseAssignStatement(scope) // TODO
+			return p.parseAssignmentStatement(scope)
 		case lexer.COLON:
 			return p.parseTypedDeclStatement(scope)
 		case lexer.DECLARE:
@@ -196,9 +196,44 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	return nil
 }
 
-func (p *Parser) parseAssignStatement(scope *scope) Node {
+func (p *Parser) parseAssignmentStatement(scope *scope) Node {
+	if p.isFuncCall(p.cur) {
+		p.appendError("cannot assign to '" + p.cur.Literal + "' as it is a function not a variable")
+		p.advancePastNL()
+		return nil
+	}
+
+	target := p.parseAssignable(scope)
+	tok := p.cur
+	if target == nil {
+		p.advancePastNL()
+		return nil
+	}
+	p.assertToken(lexer.ASSIGN)
+	p.advance()
+	value := p.parseTopLevelExpression(scope)
+	if value == nil {
+		p.advancePastNL()
+		return nil
+	}
+	if !target.Type().Accepts(value.Type()) {
+		msg := "'" + target.String() + "' accepts values of type " + target.Type().Format() + ", found " + value.Type().Format()
+		p.appendErrorForToken(msg, tok)
+	}
+	p.assertEOL()
 	p.advancePastNL()
-	return nil
+	return &Assignment{Token: tok, Target: target, Value: value}
+}
+
+func (p *Parser) parseAssignable(scope *scope) Node {
+	name := p.cur.Literal
+	p.advance()
+	v, ok := scope.get(name)
+	if !ok {
+		p.appendError("unknown variable name '" + name + "'")
+		return nil
+	}
+	return v
 }
 
 func (p *Parser) parseFuncDeclSignature() *FuncDecl {
@@ -329,18 +364,12 @@ func (p *Parser) parseTerm(scope *scope) Node {
 	//TODO: UNARY_OP Term; composite literals; assignable; slice; type_assertion; "(" toplevel_expr ")"
 	tt := p.cur.TokenType()
 	if tt == lexer.IDENT {
-		varName := p.cur.Literal
-		p.advance()
-		v, ok := scope.get(varName)
-		if !ok {
-			if _, ok := p.funcs[varName]; ok {
-				p.appendError("function call must be parenthesized: (" + varName + " ...)")
-			} else {
-				p.appendError("unknown variable name '" + varName + "'")
-			}
+		if p.isFuncCall(p.cur) {
+			p.appendError("function call must be parenthesized: (" + p.cur.Literal + " ...)")
+			p.advance()
 			return nil
 		}
-		return v
+		return p.parseAssignable(scope)
 	}
 	if p.isLiteral() {
 		lit := p.parseLiteral(scope)

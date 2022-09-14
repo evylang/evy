@@ -36,6 +36,12 @@ type Declaration struct {
 	Value Node // literal, expression, assignable, ...
 }
 
+type Assignment struct {
+	Token  *lexer.Token
+	Target Node // Variable, index or field expression
+	Value  Node // literal, expression, assignable, ...
+}
+
 type Return struct {
 	Token *lexer.Token
 	Value Node // literal, expression, assignable, ...
@@ -139,6 +145,13 @@ func (r *Return) String() string {
 }
 func (r *Return) Type() *Type {
 	return r.T
+}
+
+func (a *Assignment) String() string {
+	return a.Target.String() + " = " + a.Value.String()
+}
+func (a *Assignment) Type() *Type {
+	return a.Target.Type()
 }
 
 func (f *FuncDecl) String() string {

@@ -41,8 +41,8 @@ func (c *cmdRun) Run() error {
 	if err != nil {
 		return err
 	}
-	print := func(s string) { fmt.Print(s) }
-	evaluator.Run(string(b), print)
+	printFunc := func(s string) { fmt.Print(s) }
+	evaluator.Run(string(b), printFunc)
 	return nil
 }
 
@@ -61,7 +61,9 @@ func (c *cmdParse) Run() error {
 	if err != nil {
 		return err
 	}
-	result := parser.Run(string(b))
+	printFunc := func(s string) { fmt.Print(s) }
+	builtins := evaluator.DefaultBuiltins(printFunc).Decls()
+	result := parser.Run(string(b), builtins)
 	fmt.Println(result)
 	return nil
 }

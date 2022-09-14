@@ -35,6 +35,48 @@ func TestParseDeclaration(t *testing.T) {
 	}
 }
 
+func TestReturn(t *testing.T) {
+	prog := `
+func fox:string
+       return "🦊"
+end
+
+f := fox
+print f
+print f f
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "🦊\n🦊 🦊\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestReturnScope(t *testing.T) {
+	prog := `
+f := 1
+func fox1:string
+       f := "🦊"
+       return f
+end
+
+func fox2:string
+       return fox1
+end
+
+print f
+f1 := fox1
+print f1
+f2 := fox2
+print f2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "1\n🦊\n🦊\n"
+	assert.Equal(t, want, b.String())
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

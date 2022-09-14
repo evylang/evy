@@ -20,6 +20,7 @@ type FunctionCall struct {
 	Token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
+	FuncDecl  *FuncDecl
 	T         *Type
 }
 

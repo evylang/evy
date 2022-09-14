@@ -9,6 +9,10 @@ func newScope() *scope {
 	return &scope{values: map[string]Value{}}
 }
 
+func newInnerScope(outer *scope) *scope {
+	return &scope{values: map[string]Value{}, outer: outer}
+}
+
 func (s *scope) get(name string) (Value, bool) {
 	if s == nil {
 		return nil, false

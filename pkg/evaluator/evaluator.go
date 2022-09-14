@@ -44,6 +44,10 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return &Bool{Val: node.Value}
 	case *parser.FunctionCall:
 		return e.evalFunctionCall(scope, node)
+	case *parser.Return:
+		return e.evalReturn(scope, node)
+	case *parser.BlockStatement:
+		return e.evalBlockStatment(scope, node)
 	}
 	return nil
 }
@@ -74,10 +78,51 @@ func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall
 		return args[0]
 	}
 	builtin, ok := e.builtins[funcCall.Name]
-	if !ok {
-		return newError("cannot find builtin function " + funcCall.Name)
+	if ok {
+		return builtin.Func(args)
 	}
-	return builtin.Func(args)
+	scope = innerScopeWithArgs(scope, funcCall.FuncDecl, args)
+	funcResult := e.Eval(scope, funcCall.FuncDecl.Body)
+	if returnValue, ok := funcResult.(*ReturnValue); ok {
+		return returnValue.Val
+	}
+	return funcResult // error or nil
+}
+
+func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope {
+	scope = newInnerScope(scope)
+	for i, param := range fd.Params {
+		scope.set(param.Name, args[i])
+	}
+	if fd.VariadicParam != nil {
+		varArg := &Array{Elements: args}
+		scope.set(fd.VariadicParam.Name, varArg)
+	}
+	return scope
+}
+
+func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
+	if ret.Value == nil {
+		return nil
+	}
+	val := e.Eval(scope, ret.Value)
+	if isError(val) {
+		return val
+	}
+	return &ReturnValue{Val: val}
+}
+
+func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {
+	for _, statement := range block.Statements {
+		result := e.Eval(scope, statement)
+		if result != nil {
+			rt := result.Type()
+			if rt == RETURN_VALUE || rt == ERROR {
+				return result
+			}
+		}
+	}
+	return nil
 }
 
 func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {

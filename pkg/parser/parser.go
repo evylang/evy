@@ -352,7 +352,11 @@ func (p *Parser) parseTerm(scope *scope) Node {
 		p.advance()
 		v, ok := scope.get(varName)
 		if !ok {
-			p.appendError("unknown variable name '" + varName + "'")
+			if _, ok := p.funcs[varName]; ok {
+				p.appendError("function call must be parenthesized: (" + varName + " ...)")
+			} else {
+				p.appendError("unknown variable name '" + varName + "'")
+			}
 			return nil
 		}
 		return v
@@ -394,6 +398,7 @@ func (p *Parser) parseFuncCall(scope *scope) Node {
 		Name:      funcName,
 		Token:     funcToken,
 		Arguments: args,
+		FuncDecl:  decl,
 		T:         decl.ReturnType,
 	}
 }

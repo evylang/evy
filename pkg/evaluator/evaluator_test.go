@@ -9,7 +9,7 @@ import (
 
 func TestBasicEval(t *testing.T) {
 	in := "a:=1\n print a 2"
-	want := "1 2"
+	want := "1 2\n"
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(in, fn)
@@ -30,9 +30,51 @@ func TestParseDeclaration(t *testing.T) {
 			b := bytes.Buffer{}
 			fn := func(s string) { b.WriteString(s) }
 			Run(in, fn)
-			assert.Equal(t, want, b.String())
+			assert.Equal(t, want+"\n", b.String())
 		})
 	}
+}
+
+func TestReturn(t *testing.T) {
+	prog := `
+func fox:string
+       return "🦊"
+end
+
+f := fox
+print f
+print f f
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "🦊\n🦊 🦊\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestReturnScope(t *testing.T) {
+	prog := `
+f := 1
+func fox1:string
+       f := "🦊"
+       return f
+end
+
+func fox2:string
+       return fox1
+end
+
+print f
+f1 := fox1
+print f1
+f2 := fox2
+print f2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "1\n🦊\n🦊\n"
+	assert.Equal(t, want, b.String())
 }
 
 func TestDemo(t *testing.T) {
@@ -48,6 +90,10 @@ end`
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "x: 12"
+	want := `
+'move' not yet implemented
+'line' not yet implemented
+x: 12
+`[1:]
 	assert.Equal(t, want, b.String())
 }

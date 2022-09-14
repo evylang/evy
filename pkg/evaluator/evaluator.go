@@ -5,11 +5,16 @@ import (
 )
 
 func Run(input string, print func(string)) {
-	p := parser.New(input)
+	builtins := DefaultBuiltins(print)
+	p := parser.NewWithBuiltins(input, builtins.Decls())
 	prog := p.Parse()
+	if p.HasErrors() {
+		print(p.MaxErrorsString(8))
+		return
+	}
 	e := &Evaluator{print: print}
-	e.builtins = newBuiltins(e)
-	val := e.Eval(prog, NewScope())
+	e.builtins = builtins
+	val := e.Eval(newScope(), prog)
 	if isError(val) {
 		print(val.String())
 	}
@@ -20,17 +25,17 @@ type Evaluator struct {
 	builtins map[string]Builtin
 }
 
-func (e *Evaluator) Eval(node parser.Node, scope *Scope) Value {
+func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	switch node := node.(type) {
 	case *parser.Program:
-		return e.evalProgram(node, scope)
+		return e.evalProgram(scope, node)
 	case *parser.Declaration:
-		return e.evalDeclaration(node, scope)
+		return e.evalDeclaration(scope, node)
 	case *parser.Var:
-		v := e.evalVar(node, scope)
+		v := e.evalVar(scope, node)
 		return v
 	case *parser.Term:
-		return e.evalTerm(node, scope)
+		return e.evalTerm(scope, node)
 	case *parser.NumLiteral:
 		return &Num{Val: node.Value}
 	case *parser.StringLiteral:
@@ -38,15 +43,19 @@ func (e *Evaluator) Eval(node parser.Node, scope *Scope) Value {
 	case *parser.Bool:
 		return &Bool{Val: node.Value}
 	case *parser.FunctionCall:
-		return e.evalFunctionCall(node, scope)
+		return e.evalFunctionCall(scope, node)
+	case *parser.Return:
+		return e.evalReturn(scope, node)
+	case *parser.BlockStatement:
+		return e.evalBlockStatment(scope, node)
 	}
 	return nil
 }
 
-func (e *Evaluator) evalProgram(program *parser.Program, scope *Scope) Value {
+func (e *Evaluator) evalProgram(scope *scope, program *parser.Program) Value {
 	var result Value
 	for _, statement := range program.Statements {
-		result = e.Eval(statement, scope)
+		result = e.Eval(scope, statement)
 		if isError(result) {
 			return result
 		}
@@ -54,43 +63,84 @@ func (e *Evaluator) evalProgram(program *parser.Program, scope *Scope) Value {
 	return result
 }
 
-func (e *Evaluator) evalDeclaration(decl *parser.Declaration, scope *Scope) Value {
-	val := e.Eval(decl.Value, scope)
+func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Value {
+	val := e.Eval(scope, decl.Value)
 	if isError(val) {
 		return val
 	}
-	scope.Set(decl.Var.Name, val)
+	scope.set(decl.Var.Name, val)
 	return nil
 }
 
-func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall, scope *Scope) Value {
-	args := e.evalTerms(funcCall.Arguments, scope)
+func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
+	args := e.evalTerms(scope, funcCall.Arguments)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
 	}
 	builtin, ok := e.builtins[funcCall.Name]
-	if !ok {
-		return newError("cannot find builtin function " + funcCall.Name)
+	if ok {
+		return builtin.Func(args)
 	}
-	return builtin(args)
+	scope = innerScopeWithArgs(scope, funcCall.FuncDecl, args)
+	funcResult := e.Eval(scope, funcCall.FuncDecl.Body)
+	if returnValue, ok := funcResult.(*ReturnValue); ok {
+		return returnValue.Val
+	}
+	return funcResult // error or nil
 }
 
-func (e *Evaluator) evalVar(v *parser.Var, scope *Scope) Value {
-	if val, ok := scope.Get(v.Name); ok {
+func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope {
+	scope = newInnerScope(scope)
+	for i, param := range fd.Params {
+		scope.set(param.Name, args[i])
+	}
+	if fd.VariadicParam != nil {
+		varArg := &Array{Elements: args}
+		scope.set(fd.VariadicParam.Name, varArg)
+	}
+	return scope
+}
+
+func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
+	if ret.Value == nil {
+		return nil
+	}
+	val := e.Eval(scope, ret.Value)
+	if isError(val) {
+		return val
+	}
+	return &ReturnValue{Val: val}
+}
+
+func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {
+	for _, statement := range block.Statements {
+		result := e.Eval(scope, statement)
+		if result != nil {
+			rt := result.Type()
+			if rt == RETURN_VALUE || rt == ERROR {
+				return result
+			}
+		}
+	}
+	return nil
+}
+
+func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {
+	if val, ok := scope.get(v.Name); ok {
 		return val
 	}
 	return newError("cannot find variable " + v.Name)
 }
 
-func (e *Evaluator) evalTerm(term parser.Node, scope *Scope) Value {
-	return e.Eval(term, scope)
+func (e *Evaluator) evalTerm(scope *scope, term parser.Node) Value {
+	return e.Eval(scope, term)
 }
 
-func (e *Evaluator) evalTerms(terms []parser.Node, scope *Scope) []Value {
+func (e *Evaluator) evalTerms(scope *scope, terms []parser.Node) []Value {
 	result := make([]Value, len(terms))
 
 	for i, t := range terms {
-		evaluated := e.Eval(t, scope)
+		evaluated := e.Eval(scope, t)
 		if isError(evaluated) {
 			return []Value{evaluated}
 		}

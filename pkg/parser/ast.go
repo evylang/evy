@@ -20,19 +20,26 @@ type FunctionCall struct {
 	Token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
-	nType     *Type
+	FuncDecl  *FuncDecl
+	T         *Type
 }
 
 type Term struct {
 	Token *lexer.Token
 	Value Node
-	nType *Type
+	T     *Type
 }
 
 type Declaration struct {
 	Token *lexer.Token
 	Var   *Var
 	Value Node // literal, expression, assignable, ...
+}
+
+type Return struct {
+	Token *lexer.Token
+	Value Node // literal, expression, assignable, ...
+	T     *Type
 }
 
 type FuncDecl struct {
@@ -52,7 +59,7 @@ type EventHandler struct {
 type Var struct {
 	Token *lexer.Token
 	Name  string
-	nType *Type
+	T     *Type
 }
 
 type BlockStatement struct {
@@ -78,14 +85,14 @@ type StringLiteral struct {
 type ArrayLiteral struct {
 	Token    *lexer.Token
 	Elements []Node
-	nType    *Type
+	T        *Type
 }
 
 type MapLiteral struct {
 	Token *lexer.Token
 	Pairs map[string]Node
 	Order []string // Track insertion order of keys for deterministic output.
-	nType *Type
+	T     *Type
 }
 
 func (p *Program) String() string {
@@ -104,14 +111,14 @@ func (f *FunctionCall) String() string {
 	return f.Name + "(" + args + ")"
 }
 func (f *FunctionCall) Type() *Type {
-	return f.nType
+	return f.T
 }
 
 func (t *Term) String() string {
 	return t.Value.String()
 }
 func (t *Term) Type() *Type {
-	return t.nType
+	return t.T
 }
 
 func (d *Declaration) String() string {
@@ -121,7 +128,17 @@ func (d *Declaration) String() string {
 	return d.Var.String() + "=" + d.Value.String()
 }
 func (d *Declaration) Type() *Type {
-	return d.Var.nType
+	return d.Var.T
+}
+
+func (r *Return) String() string {
+	if r.Value == nil {
+		return "return"
+	}
+	return "return " + r.Value.String()
+}
+func (r *Return) Type() *Type {
+	return r.T
 }
 
 func (f *FuncDecl) String() string {
@@ -153,10 +170,10 @@ func (e *EventHandler) Type() *Type {
 }
 
 func (v *Var) String() string {
-	return v.Name + ":" + v.nType.String()
+	return v.Name + ":" + v.T.String()
 }
 func (v *Var) Type() *Type {
-	return v.nType
+	return v.T
 }
 
 func (b *BlockStatement) String() string {
@@ -195,7 +212,7 @@ func (a *ArrayLiteral) String() string {
 	return "[" + strings.Join(elements, ", ") + "]"
 }
 func (a *ArrayLiteral) Type() *Type {
-	return a.nType
+	return a.T
 }
 
 func (m *MapLiteral) String() string {
@@ -207,7 +224,7 @@ func (m *MapLiteral) String() string {
 	return "{" + strings.Join(pairs, ", ") + "}"
 }
 func (m *MapLiteral) Type() *Type {
-	return m.nType
+	return m.T
 }
 
 func newlineList(nodes []Node) string {

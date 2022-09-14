@@ -15,7 +15,7 @@ func Run(input string) string {
 		for i, e := range parser.errors {
 			errs[i] = e.String()
 		}
-		return parser.errorsString() + "\n\n" + prog.String()
+		return parser.MaxErrorsString(8) + "\n\n" + prog.String()
 	}
 	return prog.String()
 }
@@ -78,15 +78,23 @@ func builtins() map[string]*FuncDecl {
 	return map[string]*FuncDecl{
 		"print": &FuncDecl{
 			Name:          "print",
-			VariadicParam: &Var{Name: "a", nType: ANY_TYPE},
+			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
 			ReturnType:    NONE_TYPE,
 		},
 		"len": &FuncDecl{
 			Name:       "len",
-			Params:     []*Var{{Name: "a", nType: ANY_TYPE}},
+			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
 			ReturnType: NUM_TYPE,
 		},
 	}
+}
+
+func (p *Parser) Errors() []Error {
+	return p.errors
+}
+
+func (p *Parser) HasErrors() bool {
+	return len(p.errors) != 0
 }
 
 func (p *Parser) Parse() *Program {
@@ -123,7 +131,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -192,7 +200,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
-		return p.parseReturnStatment(scope) // TODO
+		return p.parseReturnStatment(scope)
 	case lexer.BREAK:
 		return p.parseBreakStatment() // TODO
 	case lexer.FOR:
@@ -269,7 +277,7 @@ func (p *Parser) parseTypedDecl() *Declaration {
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:`
 	v := p.parseType()
-	decl.Var.nType = v
+	decl.Var.T = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
 		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.Token)
@@ -314,7 +322,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
 		return nil
 	}
-	decl.Var.nType = val.Type()
+	decl.Var.T = val.Type()
 	if !p.validateVar(scope, decl.Var, decl.Token) {
 		return nil
 	}
@@ -344,7 +352,11 @@ func (p *Parser) parseTerm(scope *scope) Node {
 		p.advance()
 		v, ok := scope.get(varName)
 		if !ok {
-			p.appendError("unknown variable name '" + varName + "'")
+			if _, ok := p.funcs[varName]; ok {
+				p.appendError("function call must be parenthesized: (" + varName + " ...)")
+			} else {
+				p.appendError("unknown variable name '" + varName + "'")
+			}
 			return nil
 		}
 		return v
@@ -386,7 +398,8 @@ func (p *Parser) parseFuncCall(scope *scope) Node {
 		Name:      funcName,
 		Token:     funcToken,
 		Arguments: args,
-		nType:     decl.ReturnType,
+		FuncDecl:  decl,
+		T:         decl.ReturnType,
 	}
 }
 
@@ -502,18 +515,42 @@ func (p *Parser) lookAt(pos int) *lexer.Token {
 	return p.tokens[pos]
 }
 
-func (p *Parser) errorsString() string {
-	errs := make([]string, len(p.errors))
-	for i, err := range p.errors {
-		errs[i] = err.String()
+func (p *Parser) MaxErrorsString(n int) string {
+	errs := p.errors
+	if n != -1 && len(errs) > n {
+		errs = errs[:n]
 	}
-	return strings.Join(errs, "\n")
+	return errString(errs)
 }
 
-//TODO: implemented
+func (p *Parser) ErrorsString() string {
+	return errString(p.errors)
+}
+
+func errString(errs []Error) string {
+	errsSrings := make([]string, len(errs))
+	for i, err := range errs {
+		errsSrings[i] = err.String()
+	}
+	return strings.Join(errsSrings, "\n")
+}
+
 func (p *Parser) parseReturnStatment(scope *scope) Node {
+	ret := &Return{Token: p.cur}
+	p.advance()      // advance past RETURN token
+	if p.isAtEOL() { // no return value, we are done
+		ret.T = NONE_TYPE
+		return ret
+	}
+	ret.Value = p.parseTopLevelExpression(scope)
+	if ret.Value == nil {
+		ret.T = ILLEGAL_TYPE
+	} else {
+		ret.T = ret.Value.Type()
+		p.assertEOL()
+	}
 	p.advancePastNL()
-	return nil
+	return ret
 }
 
 //TODO: implemented
@@ -524,7 +561,7 @@ func (p *Parser) parseBreakStatment() Node {
 
 //TODO: implemented
 func (p *Parser) parseForStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil
@@ -532,7 +569,7 @@ func (p *Parser) parseForStatment(scope *scope) Node {
 
 //TODO: implemented
 func (p *Parser) parseWhileStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil
@@ -540,7 +577,7 @@ func (p *Parser) parseWhileStatment(scope *scope) Node {
 
 //TODO: implemented
 func (p *Parser) parseIfStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil

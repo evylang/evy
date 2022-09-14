@@ -85,7 +85,7 @@ func TestParseDeclarationError(t *testing.T) {
 		parser := New(input)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -115,11 +115,11 @@ func TestFunctionCall(t *testing.T) {
 func TestFunctionCallError(t *testing.T) {
 	builtins := builtins()
 	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
-	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", nType: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", nType: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
 	builtins["f3"] = &FuncDecl{
 		Name:       "f3",
-		Params:     []*Var{&Var{Name: "a", nType: NUM_TYPE}, &Var{Name: "b", nType: STRING_TYPE}},
+		Params:     []*Var{&Var{Name: "a", T: NUM_TYPE}, &Var{Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
 	}
 	tests := map[string]string{
@@ -138,7 +138,7 @@ func TestFunctionCallError(t *testing.T) {
 		parser := NewWithBuiltins(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -182,7 +182,7 @@ func add:num n1:num n2:num
 	if c > 10
 	    print c
 	end
-	return n1 + n2
+	return n1 // + n2
 end
 on mousedown
 	if c > 10
@@ -204,7 +204,9 @@ end
 	n1 := got.Params[0]
 	assert.Equal(t, "n1", n1.Name)
 	assert.Equal(t, NUM_TYPE, n1.Type())
-	assert.Equal(t, 0, len(got.Body.Statements))
+	assert.Equal(t, 1, len(got.Body.Statements)) // return statement; if statement not yet implemented.
+	returnStmt := got.Body.Statements[0]
+	assert.Equal(t, "return n1:NUM", returnStmt.String())
 }
 
 func TestScope(t *testing.T) {
@@ -338,5 +340,5 @@ func assertParseError(t *testing.T, parser *Parser, input string) {
 
 func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	t.Helper()
-	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.errorsString())
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.ErrorsString())
 }

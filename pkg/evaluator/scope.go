@@ -1,29 +1,29 @@
 package evaluator
 
-type Scope struct {
-	store map[string]Value
-	outer *Scope
+type scope struct {
+	values map[string]Value
+	outer  *scope
 }
 
-func NewScope() *Scope {
-	return &Scope{store: map[string]Value{}}
+func newScope() *scope {
+	return &scope{values: map[string]Value{}}
 }
 
-func NewEnclosedScope(outer *Scope) *Scope {
-	return &Scope{store: map[string]Value{}, outer: outer}
+func newInnerScope(outer *scope) *scope {
+	return &scope{values: map[string]Value{}, outer: outer}
 }
 
-func (s *Scope) Get(name string) (Value, bool) {
+func (s *scope) get(name string) (Value, bool) {
 	if s == nil {
 		return nil, false
 	}
-	if val, ok := s.store[name]; ok {
+	if val, ok := s.values[name]; ok {
 		return val, ok
 	}
-	return s.outer.Get(name)
+	return s.outer.get(name)
 }
 
-func (s *Scope) Set(name string, val Value) Value {
-	s.store[name] = val
+func (s *scope) set(name string, val Value) Value {
+	s.values[name] = val
 	return val
 }

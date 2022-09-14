@@ -9,7 +9,7 @@ func newScope() *scope {
 	return &scope{vars: map[string]*Var{}}
 }
 
-func newEnclosedScope(outer *scope) *scope {
+func newInnerScope(outer *scope) *scope {
 	return &scope{vars: map[string]*Var{}, outer: outer}
 }
 

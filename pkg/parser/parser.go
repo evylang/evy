@@ -200,15 +200,15 @@ func (p *Parser) parseStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
-		return p.parseReturnStatment(scope)
+		return p.parseReturnStatement(scope)
 	case lexer.BREAK:
-		return p.parseBreakStatment() // TODO
+		return p.parseBreakStatement() // TODO
 	case lexer.FOR:
-		return p.parseForStatment(scope) // TODO
+		return p.parseForStatement(scope) // TODO
 	case lexer.WHILE:
-		return p.parseWhileStatment(scope) // TODO
+		return p.parseWhileStatement(scope) // TODO
 	case lexer.IF:
-		return p.parseIfStatment(scope) // TODO
+		return p.parseIfStatement(scope) // TODO
 	}
 	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
@@ -535,7 +535,7 @@ func errString(errs []Error) string {
 	return strings.Join(errsSrings, "\n")
 }
 
-func (p *Parser) parseReturnStatment(scope *scope) Node {
+func (p *Parser) parseReturnStatement(scope *scope) Node {
 	ret := &Return{Token: p.cur}
 	p.advance()      // advance past RETURN token
 	if p.isAtEOL() { // no return value, we are done
@@ -554,13 +554,13 @@ func (p *Parser) parseReturnStatment(scope *scope) Node {
 }
 
 //TODO: implemented
-func (p *Parser) parseBreakStatment() Node {
+func (p *Parser) parseBreakStatement() Node {
 	p.advancePastNL()
 	return nil
 }
 
 //TODO: implemented
-func (p *Parser) parseForStatment(scope *scope) Node {
+func (p *Parser) parseForStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
@@ -568,7 +568,7 @@ func (p *Parser) parseForStatment(scope *scope) Node {
 }
 
 //TODO: implemented
-func (p *Parser) parseWhileStatment(scope *scope) Node {
+func (p *Parser) parseWhileStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
@@ -576,7 +576,7 @@ func (p *Parser) parseWhileStatment(scope *scope) Node {
 }
 
 //TODO: implemented
-func (p *Parser) parseIfStatment(scope *scope) Node {
+func (p *Parser) parseIfStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)

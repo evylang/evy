@@ -8,6 +8,10 @@ func Run(input string, print func(string)) {
 	builtins := DefaultBuiltins(print)
 	p := parser.NewWithBuiltins(input, builtins.Decls())
 	prog := p.Parse()
+	if p.HasErrors() {
+		print(p.MaxErrorsString(8))
+		return
+	}
 	e := &Evaluator{print: print}
 	e.builtins = builtins
 	val := e.Eval(prog, newScope())

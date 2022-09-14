@@ -85,7 +85,7 @@ func TestParseDeclarationError(t *testing.T) {
 		parser := New(input)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -138,7 +138,7 @@ func TestFunctionCallError(t *testing.T) {
 		parser := NewWithBuiltins(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.errorsString())
+		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -338,5 +338,5 @@ func assertParseError(t *testing.T, parser *Parser, input string) {
 
 func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	t.Helper()
-	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.errorsString())
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.ErrorsString())
 }

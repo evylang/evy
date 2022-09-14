@@ -15,7 +15,7 @@ func Run(input string) string {
 		for i, e := range parser.errors {
 			errs[i] = e.String()
 		}
-		return parser.errorsString() + "\n\n" + prog.String()
+		return parser.MaxErrorsString(8) + "\n\n" + prog.String()
 	}
 	return prog.String()
 }
@@ -87,6 +87,14 @@ func builtins() map[string]*FuncDecl {
 			ReturnType: NUM_TYPE,
 		},
 	}
+}
+
+func (p *Parser) Errors() []Error {
+	return p.errors
+}
+
+func (p *Parser) HasErrors() bool {
+	return len(p.errors) != 0
 }
 
 func (p *Parser) Parse() *Program {
@@ -502,12 +510,24 @@ func (p *Parser) lookAt(pos int) *lexer.Token {
 	return p.tokens[pos]
 }
 
-func (p *Parser) errorsString() string {
-	errs := make([]string, len(p.errors))
-	for i, err := range p.errors {
-		errs[i] = err.String()
+func (p *Parser) MaxErrorsString(n int) string {
+	errs := p.errors
+	if n != -1 && len(errs) > n {
+		errs = errs[:n]
 	}
-	return strings.Join(errs, "\n")
+	return errString(errs)
+}
+
+func (p *Parser) ErrorsString() string {
+	return errString(p.errors)
+}
+
+func errString(errs []Error) string {
+	errsSrings := make([]string, len(errs))
+	for i, err := range errs {
+		errsSrings[i] = err.String()
+	}
+	return strings.Join(errsSrings, "\n")
 }
 
 //TODO: implemented

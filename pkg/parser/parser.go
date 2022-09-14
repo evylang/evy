@@ -200,7 +200,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
-		return p.parseReturnStatment(scope) // TODO
+		return p.parseReturnStatment(scope)
 	case lexer.BREAK:
 		return p.parseBreakStatment() // TODO
 	case lexer.FOR:
@@ -530,10 +530,22 @@ func errString(errs []Error) string {
 	return strings.Join(errsSrings, "\n")
 }
 
-//TODO: implemented
 func (p *Parser) parseReturnStatment(scope *scope) Node {
+	ret := &Return{Token: p.cur}
+	p.advance()      // advance past RETURN token
+	if p.isAtEOL() { // no return value, we are done
+		ret.T = NONE_TYPE
+		return ret
+	}
+	ret.Value = p.parseTopLevelExpression(scope)
+	if ret.Value == nil {
+		ret.T = ILLEGAL_TYPE
+	} else {
+		ret.T = ret.Value.Type()
+		p.assertEOL()
+	}
 	p.advancePastNL()
-	return nil
+	return ret
 }
 
 //TODO: implemented

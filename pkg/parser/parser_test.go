@@ -182,7 +182,7 @@ func add:num n1:num n2:num
 	if c > 10
 	    print c
 	end
-	return n1 + n2
+	return n1 // + n2
 end
 on mousedown
 	if c > 10
@@ -204,7 +204,9 @@ end
 	n1 := got.Params[0]
 	assert.Equal(t, "n1", n1.Name)
 	assert.Equal(t, NUM_TYPE, n1.Type())
-	assert.Equal(t, 0, len(got.Body.Statements))
+	assert.Equal(t, 1, len(got.Body.Statements)) // return statement; if statement not yet implemented.
+	returnStmt := got.Body.Statements[0]
+	assert.Equal(t, "return n1:NUM", returnStmt.String())
 }
 
 func TestScope(t *testing.T) {

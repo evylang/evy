@@ -35,6 +35,12 @@ type Declaration struct {
 	Value Node // literal, expression, assignable, ...
 }
 
+type Return struct {
+	Token *lexer.Token
+	Value Node // literal, expression, assignable, ...
+	T     *Type
+}
+
 type FuncDecl struct {
 	Token         *lexer.Token // The 'func' token
 	Name          string
@@ -122,6 +128,16 @@ func (d *Declaration) String() string {
 }
 func (d *Declaration) Type() *Type {
 	return d.Var.T
+}
+
+func (r *Return) String() string {
+	if r.Value == nil {
+		return "return"
+	}
+	return "return " + r.Value.String()
+}
+func (r *Return) Type() *Type {
+	return r.T
 }
 
 func (f *FuncDecl) String() string {

@@ -9,7 +9,7 @@ func Run(input string, print func(string)) {
 	prog := p.Parse()
 	e := &Evaluator{print: print}
 	e.builtins = newBuiltins(e)
-	val := e.Eval(prog, NewScope())
+	val := e.Eval(prog, newScope())
 	if isError(val) {
 		print(val.String())
 	}
@@ -20,7 +20,7 @@ type Evaluator struct {
 	builtins map[string]Builtin
 }
 
-func (e *Evaluator) Eval(node parser.Node, scope *Scope) Value {
+func (e *Evaluator) Eval(node parser.Node, scope *scope) Value {
 	switch node := node.(type) {
 	case *parser.Program:
 		return e.evalProgram(node, scope)
@@ -43,7 +43,7 @@ func (e *Evaluator) Eval(node parser.Node, scope *Scope) Value {
 	return nil
 }
 
-func (e *Evaluator) evalProgram(program *parser.Program, scope *Scope) Value {
+func (e *Evaluator) evalProgram(program *parser.Program, scope *scope) Value {
 	var result Value
 	for _, statement := range program.Statements {
 		result = e.Eval(statement, scope)
@@ -54,16 +54,16 @@ func (e *Evaluator) evalProgram(program *parser.Program, scope *Scope) Value {
 	return result
 }
 
-func (e *Evaluator) evalDeclaration(decl *parser.Declaration, scope *Scope) Value {
+func (e *Evaluator) evalDeclaration(decl *parser.Declaration, scope *scope) Value {
 	val := e.Eval(decl.Value, scope)
 	if isError(val) {
 		return val
 	}
-	scope.Set(decl.Var.Name, val)
+	scope.set(decl.Var.Name, val)
 	return nil
 }
 
-func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall, scope *Scope) Value {
+func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall, scope *scope) Value {
 	args := e.evalTerms(funcCall.Arguments, scope)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
@@ -75,18 +75,18 @@ func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall, scope *Scope
 	return builtin(args)
 }
 
-func (e *Evaluator) evalVar(v *parser.Var, scope *Scope) Value {
-	if val, ok := scope.Get(v.Name); ok {
+func (e *Evaluator) evalVar(v *parser.Var, scope *scope) Value {
+	if val, ok := scope.get(v.Name); ok {
 		return val
 	}
 	return newError("cannot find variable " + v.Name)
 }
 
-func (e *Evaluator) evalTerm(term parser.Node, scope *Scope) Value {
+func (e *Evaluator) evalTerm(term parser.Node, scope *scope) Value {
 	return e.Eval(term, scope)
 }
 
-func (e *Evaluator) evalTerms(terms []parser.Node, scope *Scope) []Value {
+func (e *Evaluator) evalTerms(terms []parser.Node, scope *scope) []Value {
 	result := make([]Value, len(terms))
 
 	for i, t := range terms {

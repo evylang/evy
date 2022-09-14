@@ -123,7 +123,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -524,7 +524,7 @@ func (p *Parser) parseBreakStatment() Node {
 
 //TODO: implemented
 func (p *Parser) parseForStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil
@@ -532,7 +532,7 @@ func (p *Parser) parseForStatment(scope *scope) Node {
 
 //TODO: implemented
 func (p *Parser) parseWhileStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil
@@ -540,7 +540,7 @@ func (p *Parser) parseWhileStatment(scope *scope) Node {
 
 //TODO: implemented
 func (p *Parser) parseIfStatment(scope *scope) Node {
-	scope = newEnclosedScope(scope)
+	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	return nil

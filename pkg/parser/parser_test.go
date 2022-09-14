@@ -33,7 +33,7 @@ func TestParseDeclaration(t *testing.T) {
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -53,7 +53,7 @@ func TestEmptyProgram(t *testing.T) {
 		" \n //blabla",
 	}
 	for _, input := range tests {
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, "\n", got.String())
@@ -82,7 +82,7 @@ func TestParseDeclarationError(t *testing.T) {
 		"a :num{}num":       "line 1 column 9: expected end of line, found 'num'",
 	}
 	for input, err1 := range tests {
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
 		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
@@ -105,7 +105,7 @@ func TestFunctionCall(t *testing.T) {
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -113,7 +113,7 @@ func TestFunctionCall(t *testing.T) {
 }
 
 func TestFunctionCallError(t *testing.T) {
-	builtins := builtins()
+	builtins := testBuiltins()
 	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
 	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
 	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
@@ -135,7 +135,7 @@ func TestFunctionCallError(t *testing.T) {
 		`foo 0`:      "line 1 column 1: unknown function 'foo'",
 	}
 	for input, err1 := range tests {
-		parser := NewWithBuiltins(input, builtins)
+		parser := New(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
 		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
@@ -155,7 +155,7 @@ func TestBlock(t *testing.T) {
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -166,7 +166,7 @@ func TestToplevelExprFuncCall(t *testing.T) {
 	input := `
 x := len "123"
 `
-	parser := New(input)
+	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertNoParseError(t, parser, input)
 	want := `
@@ -190,10 +190,10 @@ on mousedown
 	end
 end
 `
-	parser := New(input)
+	parser := New(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
-	builtinCnt := len(builtins())
+	builtinCnt := len(testBuiltins())
 	assert.Equal(t, builtinCnt+1, len(parser.funcs))
 	got := parser.funcs["add"]
 	assert.Equal(t, "add", got.Name)
@@ -233,7 +233,7 @@ end
 `,
 	}
 	for _, input := range inputs {
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -304,7 +304,7 @@ end
 `: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input)
+		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
 		assert.Equal(t, wantErr, parser.errors[0].String())
@@ -321,7 +321,7 @@ print "x:" x
 if x > 10
     print "🍦 big x"
 end`
-	parser := New(input)
+	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertParseError(t, parser, input)
 	assert.Equal(t, "line 2 column 1: unknown function 'move'", parser.errors[0].String())
@@ -341,4 +341,19 @@ func assertParseError(t *testing.T, parser *Parser, input string) {
 func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	t.Helper()
 	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.ErrorsString())
+}
+
+func testBuiltins() map[string]*FuncDecl {
+	return map[string]*FuncDecl{
+		"print": &FuncDecl{
+			Name:          "print",
+			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
+			ReturnType:    NONE_TYPE,
+		},
+		"len": &FuncDecl{
+			Name:       "len",
+			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
+			ReturnType: NUM_TYPE,
+		},
+	}
 }

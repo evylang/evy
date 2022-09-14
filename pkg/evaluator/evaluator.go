@@ -5,8 +5,11 @@ import (
 )
 
 func Run(input string, print func(string)) {
-	builtins := DefaultBuiltins(print)
-	p := parser.NewWithBuiltins(input, builtins.Decls())
+	RunWithBuiltins(input, print, DefaultBuiltins(print))
+}
+
+func RunWithBuiltins(input string, print func(string), builtins Builtins) {
+	p := parser.New(input, builtins.Decls())
 	prog := p.Parse()
 	if p.HasErrors() {
 		print(p.MaxErrorsString(8))

@@ -7,8 +7,8 @@ import (
 	"foxygo.at/evy/pkg/lexer"
 )
 
-func Run(input string) string {
-	parser := New(input)
+func Run(input string, builtins map[string]*FuncDecl) string {
+	parser := New(input, builtins)
 	prog := parser.Parse()
 	if len(parser.errors) > 0 {
 		errs := make([]string, len(parser.errors))
@@ -41,11 +41,7 @@ func (e Error) String() string {
 	return e.token.Location() + ": " + e.message
 }
 
-func New(input string) *Parser {
-	return NewWithBuiltins(input, builtins())
-}
-
-func NewWithBuiltins(input string, builtins map[string]*FuncDecl) *Parser {
+func New(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
 	p := &Parser{funcs: builtins}
 
@@ -72,21 +68,6 @@ func NewWithBuiltins(input string, builtins map[string]*FuncDecl) *Parser {
 		}
 	}
 	return p
-}
-
-func builtins() map[string]*FuncDecl {
-	return map[string]*FuncDecl{
-		"print": &FuncDecl{
-			Name:          "print",
-			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
-			ReturnType:    NONE_TYPE,
-		},
-		"len": &FuncDecl{
-			Name:       "len",
-			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
-			ReturnType: NUM_TYPE,
-		},
-	}
 }
 
 func (p *Parser) Errors() []Error {

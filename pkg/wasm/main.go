@@ -41,7 +41,8 @@ func jsTokenize(ptr *uint32, length int) {
 //export parse
 func jsParse(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	jsPrint(parser.Run(s))
+	builtins := evaluator.DefaultBuiltins(jsPrint).Decls()
+	jsPrint(parser.Run(s, builtins))
 }
 
 // alloc pre-allocates memory used in string parameter passing.

@@ -5,10 +5,11 @@ import (
 )
 
 func Run(input string, print func(string)) {
-	p := parser.New(input)
+	builtins := DefaultBuiltins(print)
+	p := parser.NewWithBuiltins(input, builtins.Decls())
 	prog := p.Parse()
 	e := &Evaluator{print: print}
-	e.builtins = newBuiltins(e)
+	e.builtins = builtins
 	val := e.Eval(prog, newScope())
 	if isError(val) {
 		print(val.String())
@@ -72,7 +73,7 @@ func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall, scope *scope
 	if !ok {
 		return newError("cannot find builtin function " + funcCall.Name)
 	}
-	return builtin(args)
+	return builtin.Func(args)
 }
 
 func (e *Evaluator) evalVar(v *parser.Var, scope *scope) Value {

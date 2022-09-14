@@ -9,7 +9,7 @@ import (
 
 func TestBasicEval(t *testing.T) {
 	in := "a:=1\n print a 2"
-	want := "1 2"
+	want := "1 2\n"
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(in, fn)
@@ -30,7 +30,7 @@ func TestParseDeclaration(t *testing.T) {
 			b := bytes.Buffer{}
 			fn := func(s string) { b.WriteString(s) }
 			Run(in, fn)
-			assert.Equal(t, want, b.String())
+			assert.Equal(t, want+"\n", b.String())
 		})
 	}
 }
@@ -48,6 +48,10 @@ end`
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "x: 12"
+	want := `
+'move' not yet implemented
+'line' not yet implemented
+x: 12
+`[1:]
 	assert.Equal(t, want, b.String())
 }

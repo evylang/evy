@@ -77,6 +77,49 @@ print f2
 	assert.Equal(t, want, b.String())
 }
 
+func TestAssignment(t *testing.T) {
+	prog := `
+f1:num
+f2:num
+f3 := 3
+print f1 f2 f3
+f1 = 1
+print f1 f2 f3
+f1 = f3
+f2 = f1
+f3 = 4
+print f1 f2 f3
+
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "0 0 3\n1 0 3\n3 3 4\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestAssignmentAny(t *testing.T) {
+	prog := `
+f1:any
+f2:num
+print f1 f2
+f1 = f2
+print f1 f2
+f1 = fox
+print f1 f2
+
+func fox:string
+       return "🦊"
+end
+
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "false 0\n0 0\n🦊 0\n"
+	assert.Equal(t, want, b.String())
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

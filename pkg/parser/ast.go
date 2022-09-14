@@ -170,7 +170,7 @@ func (e *EventHandler) Type() *Type {
 }
 
 func (v *Var) String() string {
-	return v.Name + ":" + v.T.String()
+	return v.Name
 }
 func (v *Var) Type() *Type {
 	return v.T

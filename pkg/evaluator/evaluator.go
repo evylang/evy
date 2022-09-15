@@ -46,11 +46,13 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	case *parser.StringLiteral:
 		return &String{Val: node.Value}
 	case *parser.Bool:
-		return &Bool{Val: node.Value}
+		return e.evalBool(node)
 	case *parser.FunctionCall:
 		return e.evalFunctionCall(scope, node)
 	case *parser.Return:
 		return e.evalReturn(scope, node)
+	case *parser.If:
+		return e.evalIf(scope, node)
 	case *parser.BlockStatement:
 		return e.evalBlockStatment(scope, node)
 	}
@@ -66,6 +68,13 @@ func (e *Evaluator) evalProgram(scope *scope, program *parser.Program) Value {
 		}
 	}
 	return result
+}
+
+func (e *Evaluator) evalBool(b *parser.Bool) Value {
+	if b.Value {
+		return TRUE
+	}
+	return FALSE
 }
 
 func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Value {
@@ -124,6 +133,36 @@ func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
 		return val
 	}
 	return &ReturnValue{Val: val}
+}
+
+func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
+	val := e.evalConditionalBlock(scope, i.IfBlock)
+	if val == TRUE || isError(val) {
+		return val
+	}
+	for _, elseif := range i.ElseIfBlocks {
+		val := e.evalConditionalBlock(scope, elseif)
+		if val == TRUE || isError(val) {
+			return val
+		}
+	}
+	if i.Else != nil {
+		return e.Eval(newInnerScope(scope), i.Else)
+	}
+	return FALSE
+}
+
+func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) Value {
+	scope = newInnerScope(scope)
+	cond := e.Eval(scope, condBlock.Condition)
+	if isError(cond) {
+		return cond
+	}
+	if cond == TRUE {
+		e.Eval(scope, condBlock.Block)
+		return TRUE
+	}
+	return FALSE
 }
 
 func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {

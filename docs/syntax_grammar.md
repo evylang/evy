@@ -70,6 +70,35 @@ not allowed.
                  return_stmt | break_stmt |
                  for_stmt | while_stmt | if_stmt  .
 
+    /* --- Functions and Event handlers ---- */
+    func            = "func" ident func_signature NL
+                          { statement }
+                      "end" NL .
+    func_signature  = [ ":" type ] params .
+    params          = { typed_decl } | variadic_param .
+    variadic_param  = typed_decl "..." .
+
+    event_handler   = "on" ident NL
+                          { statement }
+                      "end" NL .
+
+    /* --- Control flow --- */
+    if_stmt = "if" toplevel_expr NL
+                    { statement }
+              { "else" "if" toplevel_expr NL
+                    { statement } }
+              [ "else" NL
+                    { statement } ]
+              "end" NL .
+
+    for_stmt   = "for" range NL
+                    { statement }
+                 "end" NL .
+    range      = ident ( ":=" | "=" ) "range" range_args .
+    range_args = term [ term [ term ] ] .
+    while_stmt = "while" toplevel_expr NL
+                     { statement }
+                 "end" NL .
 
     /* --- Statement ---- */
     empty_stmt = NL .
@@ -126,36 +155,6 @@ not allowed.
     array_elems = { term [NL] }
     map_lit     = [type] "{" map_elems "}" .
     map_elems   = { ident ":" term [NL] } .
-    
-    /* --- Control flow --- */
-    for_stmt   = "for" range NL
-                    { statement }
-                 "end" NL .
-    range      = ident ( ":=" | "=" ) "range" range_args .
-    range_args = term [ term [ term ] ] .
-    while_stmt = "while" toplevel_expr NL
-                     { statement }
-                 "end" NL .
-
-    if_stmt = "if" toplevel_expr NL
-                    { statement }
-              { "else" "if" toplevel_expr NL
-                    { statement } }
-              [ "else" NL
-                    { statement } ]
-              "end" NL .
-
-    /* --- Functions ---- */
-    func            = "func" ident func_signature NL
-                          { statement }
-                      "end" NL .
-    func_signature  = [ ":" type ] params .
-    params          = { typed_decl } | variadic_param .
-    variadic_param  = typed_decl "..." .
-
-    event_handler   = "on" ident NL
-                          { statement }
-                      "end" NL .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .

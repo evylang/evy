@@ -71,11 +71,11 @@ func TestParseDeclarationError(t *testing.T) {
 		"a :[]num":          "line 1 column 1: invalid type declaration for 'a'",
 		"a :()":             "line 1 column 1: invalid type declaration for 'a'",
 		"a ::":              "line 1 column 1: invalid type declaration for 'a'",
-		"a := num{}[{a:1}]": "line 1 column 12: unexpected character '{'", // TODO: expected `num` found `{`
+		"a := num{}[{a:1}]": "line 1 column 12: unexpected '{'", // TODO: expected `num` found `{`
 		"a := num[true]":    "line 1 column 15: array literal 'true' should have type 'num'",
 		"a := num{a:true}":  "line 1 column 16: map literal 'true' should have type 'num'",
 		"a := num{}{":       "line 1 column 12: unterminated map literal",
-		"a :=:":             "line 1 column 5: unexpected character ':'",
+		"a :=:":             "line 1 column 5: unexpected ':'",
 		"a := num{":         "line 1 column 10: unterminated map literal",
 		"a := num{}[":       "line 1 column 12: unterminated array literal",
 		"a :num num":        "line 1 column 8: expected end of line, found 'num'",

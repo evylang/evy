@@ -378,7 +378,7 @@ func (p *Parser) parseTerm(scope *scope) Node {
 		}
 		return lit
 	}
-	p.appendError("unexpected character " + tt.FormatDetails())
+	p.appendError("unexpected " + tt.FormatDetails())
 	p.advance()
 	return nil
 

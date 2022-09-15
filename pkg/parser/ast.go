@@ -57,6 +57,19 @@ type FuncDecl struct {
 	Body          *BlockStatement
 }
 
+type If struct {
+	Token        *lexer.Token
+	IfBlock      *ConditionalBlock
+	ElseIfBlocks []*ConditionalBlock
+	Else         *BlockStatement
+}
+
+type ConditionalBlock struct {
+	Token     *lexer.Token
+	Condition Node // must be of type bool
+	Block     *BlockStatement
+}
+
 type EventHandler struct {
 	Name string
 	Body *BlockStatement
@@ -174,6 +187,21 @@ func (f *FuncDecl) Type() *Type {
 	return f.ReturnType
 }
 
+func (i *If) String() string {
+	result := "if " + i.IfBlock.String()
+	for _, elseif := range i.ElseIfBlocks {
+		result += "else if" + elseif.String()
+	}
+	if i.Else != nil {
+		result += "else {\n" + i.Else.String() + "}\n"
+	}
+	return result
+}
+
+func (i *If) Type() *Type {
+	return NONE_TYPE
+}
+
 func (e *EventHandler) String() string {
 	body := e.Body.String()
 	return "on " + e.Name + " {\n" + body + "}\n"
@@ -193,6 +221,14 @@ func (b *BlockStatement) String() string {
 	return newlineList(b.Statements)
 }
 func (b *BlockStatement) Type() *Type {
+	return NONE_TYPE
+}
+
+func (c *ConditionalBlock) String() string {
+	condition := "(" + c.Condition.String() + ")"
+	return condition + " {\n" + c.Block.String() + "}"
+}
+func (c *ConditionalBlock) Type() *Type {
 	return NONE_TYPE
 }
 
@@ -224,6 +260,7 @@ func (a *ArrayLiteral) String() string {
 	}
 	return "[" + strings.Join(elements, ", ") + "]"
 }
+
 func (a *ArrayLiteral) Type() *Type {
 	return a.T
 }
@@ -236,6 +273,7 @@ func (m *MapLiteral) String() string {
 	}
 	return "{" + strings.Join(pairs, ", ") + "}"
 }
+
 func (m *MapLiteral) Type() *Type {
 	return m.T
 }

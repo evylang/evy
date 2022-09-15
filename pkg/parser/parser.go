@@ -123,6 +123,8 @@ func (p *Parser) parseFunc(scope *scope) Node {
 		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
 	}
+	p.assertEnd()
+	p.advancePastNL()
 	fd.Body = block
 	return fd
 }
@@ -156,6 +158,8 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 	}
 	p.advancePastNL() // advance past `on EVENT_NAME`
 	e.Body = p.parseBlock(scope)
+	p.assertEnd()
+	p.advancePastNL()
 	return e
 }
 
@@ -189,7 +193,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.WHILE:
 		return p.parseWhileStatement(scope) // TODO
 	case lexer.IF:
-		return p.parseIfStatement(scope) // TODO
+		return p.parseIfStatement(scope)
 	}
 	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
@@ -465,13 +469,16 @@ func (p *Parser) advancePastNL() {
 }
 
 func (p *Parser) isAtEOL() bool {
-	tt := p.cur.TokenType()
+	return isEOL(p.cur.TokenType())
+}
+
+func isEOL(tt lexer.TokenType) bool {
 	return tt == lexer.NL || tt == lexer.EOF || tt == lexer.COMMENT
 }
 
 func (p *Parser) assertToken(tt lexer.TokenType) bool {
 	if p.cur.TokenType() != tt {
-		p.appendError("expected '" + tt.FormatDetails() + "', got '" + p.cur.TokenType().String() + "'")
+		p.appendError("expected " + tt.FormatDetails() + ", got " + p.cur.TokenType().FormatDetails())
 		return false
 	}
 	return true
@@ -485,6 +492,13 @@ func (p *Parser) assertEOL() bool {
 	return true
 }
 
+func (p *Parser) assertEnd() bool {
+	if !p.assertToken(lexer.END) {
+		return false
+	}
+	return isEOL(p.peek.TokenType())
+}
+
 func (p *Parser) appendError(message string) {
 	p.errors = append(p.errors, Error{message: message, token: p.cur})
 }
@@ -494,15 +508,27 @@ func (p *Parser) appendErrorForToken(message string, token *lexer.Token) {
 }
 
 func (p *Parser) parseBlock(scope *scope) *BlockStatement {
+	endTokens := map[lexer.TokenType]bool{lexer.END: true, lexer.EOF: true}
+	return p.parseBlockWithEndTokens(scope, endTokens)
+}
+
+func (p *Parser) parseIfBlock(scope *scope) *BlockStatement {
+	endTokens := map[lexer.TokenType]bool{lexer.END: true, lexer.EOF: true, lexer.ELSE: true}
+	return p.parseBlockWithEndTokens(scope, endTokens)
+}
+
+func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.TokenType]bool) *BlockStatement {
 	tok := p.cur
 	var stmts []Node
-	for p.cur.TokenType() != lexer.END && p.cur.TokenType() != lexer.EOF {
+	for !endTokens[p.cur.TokenType()] {
 		stmt := p.parseStatement(scope)
 		if stmt != nil {
 			stmts = append(stmts, stmt)
 		}
 	}
-	p.advancePastNL()
+	if len(stmts) == 0 {
+		p.appendErrorForToken("at least one statement is required here", tok)
+	}
 	return &BlockStatement{Token: tok, Statements: stmts}
 }
 
@@ -574,6 +600,7 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
+	p.advancePastNL()
 	return nil
 }
 
@@ -582,13 +609,43 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
+	p.advancePastNL()
 	return nil
 }
 
-//TODO: implemented
 func (p *Parser) parseIfStatement(scope *scope) Node {
-	scope = newInnerScope(scope)
+	ifStmt := &If{Token: p.cur}
+	ifStmt.IfBlock = p.parseIfConditionalBlock(scope)
+	// else if blocks
+	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
+		p.advance() // advance past ELSE token
+		elseIfBlock := p.parseIfConditionalBlock(scope)
+		ifStmt.ElseIfBlocks = append(ifStmt.ElseIfBlocks, elseIfBlock)
+	}
+	// else block
+	if p.cur.TokenType() == lexer.ELSE {
+		p.advance() // advance past ELSE token
+		p.assertEOL()
+		p.advancePastNL()
+		ifStmt.Else = p.parseBlock(newInnerScope(scope))
+	}
+	p.assertEnd()
 	p.advancePastNL()
-	p.parseBlock(scope)
-	return nil
+	return ifStmt
+}
+
+func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
+	tok := p.cur
+	p.advance() // advance past IF token
+	scope = newInnerScope(scope)
+	condition := p.parseTopLevelExpression(scope)
+	if condition != nil {
+		p.assertEOL()
+		if condition.Type() != BOOL_TYPE {
+			p.appendErrorForToken("expected 'if' condition of type bool, found "+condition.Type().Format(), tok)
+		}
+	}
+	p.advancePastNL()
+	block := p.parseIfBlock(scope)
+	return &ConditionalBlock{Token: tok, Condition: condition, Block: block}
 }

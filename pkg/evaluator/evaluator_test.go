@@ -127,7 +127,7 @@ line 20 20
 
 x := 12
 print "x:" x
-if x > 10
+if true //TODO: x > 10
     print "🍦 big x"
 end`
 	b := bytes.Buffer{}

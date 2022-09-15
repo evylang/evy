@@ -64,6 +64,7 @@ The `evy` source code is UTF-8 encoded. The NUL character `U+0000` is
 not allowed.
 
     program    = { statement | func | event_handler } .
+    statements = statement { statement }
     statement  = empty_stmt | 
                  assign_stmt | typed_decl_stmt | inferred_decl_stmt |
                  func_call_stmt | 
@@ -72,32 +73,32 @@ not allowed.
 
     /* --- Functions and Event handlers ---- */
     func            = "func" ident func_signature NL
-                          { statement }
+                          statements
                       "end" NL .
     func_signature  = [ ":" type ] params .
     params          = { typed_decl } | variadic_param .
     variadic_param  = typed_decl "..." .
 
     event_handler   = "on" ident NL
-                          { statement }
+                          statements
                       "end" NL .
 
     /* --- Control flow --- */
     if_stmt = "if" toplevel_expr NL
-                    { statement }
+                    statements
               { "else" "if" toplevel_expr NL
-                    { statement } }
+                    statements }
               [ "else" NL
-                    { statement } ]
+                    statements ]
               "end" NL .
 
     for_stmt   = "for" range NL
-                    { statement }
+                    statements
                  "end" NL .
     range      = ident ( ":=" | "=" ) "range" range_args .
     range_args = term [ term [ term ] ] .
     while_stmt = "while" toplevel_expr NL
-                     { statement }
+                     statements
                  "end" NL .
 
     /* --- Statement ---- */

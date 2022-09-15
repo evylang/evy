@@ -34,6 +34,8 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalProgram(scope, node)
 	case *parser.Declaration:
 		return e.evalDeclaration(scope, node)
+	case *parser.Assignment:
+		return e.evalAssignment(scope, node)
 	case *parser.Var:
 		v := e.evalVar(scope, node)
 		return v
@@ -72,6 +74,15 @@ func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Valu
 		return val
 	}
 	scope.set(decl.Var.Name, val)
+	return nil
+}
+
+func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) Value {
+	val := e.Eval(scope, assignment.Value)
+	if isError(val) {
+		return val
+	}
+	scope.set(assignment.Target.String(), val) // TODO: update when indexing and field selectors are implemented.
 	return nil
 }
 

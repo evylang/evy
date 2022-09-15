@@ -9,27 +9,27 @@ import (
 
 func TestParseDeclaration(t *testing.T) {
 	tests := map[string][]string{
-		"a := 1":     []string{"a:NUM=1"},
-		"b:bool":     []string{"b:BOOL=false"},
-		"\nb:bool\n": []string{"b:BOOL=false"},
+		"a := 1":     []string{"a=1"},
+		"b:bool":     []string{"b=false"},
+		"\nb:bool\n": []string{"b=false"},
 		`a := "abc"
 		b:bool
-		c := true`: []string{"a:STRING='abc'", "b:BOOL=false", "c:BOOL=true"},
-		"a:num[]":                      []string{"a:ARRAY NUM=[]"},
-		"a:num[]{}":                    []string{"a:MAP ARRAY NUM={}"},
-		"abc:any[]{}":                  []string{"abc:MAP ARRAY ANY={}"},
-		"a := bool[true]":              []string{"a:ARRAY BOOL=[true]"}, // TODO: should be print "a:ARRAY BOOL=[true]
-		"a := num[]":                   []string{"a:ARRAY NUM=[]"},
-		"a := num[][num[1 2]num[3 4]]": []string{"a:ARRAY ARRAY NUM=[[1, 2], [3, 4]]"},
-		"a := num{a:1 b:2}":            []string{"a:MAP NUM={a:1, b:2}"},
-		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": []string{"a:MAP ARRAY NUM={digits:[1, 2, 3], nums:[4, 5]}"},
-		"a := num[]{digits: num[] nums: num[4]}":        []string{"a:MAP ARRAY NUM={digits:[], nums:[4]}"},
-		"a := num[]{digits: num[4] nums: num[]}":        []string{"a:MAP ARRAY NUM={digits:[4], nums:[]}"},
-		"a := num{}[]":                                  []string{"a:ARRAY MAP NUM=[]"},
-		"a := num{}[num{}]":                             []string{"a:ARRAY MAP NUM=[{}]"},
-		"a := any{a:1 b:true}":                          []string{"a:MAP ANY={a:1, b:true}"},
-		"a := any{a:1 b:true c:num[1]}":                 []string{"a:MAP ANY={a:1, b:true, c:[1]}"},
-		"a := num{}[num{a:1}]":                          []string{"a:ARRAY MAP NUM=[{a:1}]"},
+		c := true`: []string{"a='abc'", "b=false", "c=true"},
+		"a:num[]":                      []string{"a=[]"},
+		"a:num[]{}":                    []string{"a={}"},
+		"abc:any[]{}":                  []string{"abc={}"},
+		"a := bool[true]":              []string{"a=[true]"},
+		"a := num[]":                   []string{"a=[]"},
+		"a := num[][num[1 2]num[3 4]]": []string{"a=[[1, 2], [3, 4]]"},
+		"a := num{a:1 b:2}":            []string{"a={a:1, b:2}"},
+		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": []string{"a={digits:[1, 2, 3], nums:[4, 5]}"},
+		"a := num[]{digits: num[] nums: num[4]}":        []string{"a={digits:[], nums:[4]}"},
+		"a := num[]{digits: num[4] nums: num[]}":        []string{"a={digits:[4], nums:[]}"},
+		"a := num{}[]":                                  []string{"a=[]"},
+		"a := num{}[num{}]":                             []string{"a=[{}]"},
+		"a := any{a:1 b:true}":                          []string{"a={a:1, b:true}"},
+		"a := any{a:1 b:true c:num[1]}":                 []string{"a={a:1, b:true, c:[1]}"},
+		"a := num{}[num{a:1}]":                          []string{"a=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -85,7 +85,7 @@ func TestParseDeclarationError(t *testing.T) {
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
+		assert.Equal(t, err1, parser.MaxErrorsString(1), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -94,14 +94,14 @@ func TestFunctionCall(t *testing.T) {
 		"print":               []string{"print()"},
 		"print 123":           []string{"print(123)"},
 		`print 123 "abc"`:     []string{"print(123, 'abc')"},
-		"a:=1 \n print a":     []string{"a:NUM=1", "print(a:NUM)"},
-		`a := len "abc"`:      []string{"a:NUM=len('abc')"},
+		"a:=1 \n print a":     []string{"a=1", "print(a)"},
+		`a := len "abc"`:      []string{"a=len('abc')"},
 		`len "abc"`:           []string{"len('abc')"},
 		`len num[]`:           []string{"len([])"},
-		"a:string \n print a": []string{"a:STRING=''", "print(a:STRING)"},
+		"a:string \n print a": []string{"a=''", "print(a)"},
 		`a:=true
 		b:string
-		print a b`: []string{"a:BOOL=true", "b:STRING=''", "print(a:BOOL, b:STRING)"},
+		print a b`: []string{"a=true", "b=''", "print(a, b)"},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -129,6 +129,7 @@ func TestFunctionCallError(t *testing.T) {
 		`a := f0`:    "line 1 column 8: invalid declaration, function 'f0' has no return value",
 		`f0 "arg"`:   "line 1 column 9: 'f0' takes 0 arguments, found 1",
 		`f2`:         "line 1 column 3: 'f2' takes 1 argument, found 0",
+		`f2 f1`:      "line 1 column 4: function call must be parenthesized: (f1 ...)",
 		`f1 "arg"`:   "line 1 column 9: 'f1' takes variadic arguments of type 'num', found 'string'",
 		`f3 1 2`:     "line 1 column 7: 'f3' takes 2nd argument of type 'string', found 'num'",
 		`f3 "1" "2"`: "line 1 column 11: 'f3' takes 1st argument of type 'num', found 'string'",
@@ -138,7 +139,7 @@ func TestFunctionCallError(t *testing.T) {
 		parser := New(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.errors[0].String(), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
+		assert.Equal(t, err1, parser.MaxErrorsString(1), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
 	}
 }
 
@@ -170,7 +171,7 @@ x := len "123"
 	got := parser.Parse()
 	assertNoParseError(t, parser, input)
 	want := `
-x:NUM=len('123')
+x=len('123')
 `[1:]
 	assert.Equal(t, want, got.String())
 }
@@ -206,7 +207,66 @@ end
 	assert.Equal(t, NUM_TYPE, n1.Type())
 	assert.Equal(t, 1, len(got.Body.Statements)) // return statement; if statement not yet implemented.
 	returnStmt := got.Body.Statements[0]
-	assert.Equal(t, "return n1:NUM", returnStmt.String())
+	assert.Equal(t, "return n1", returnStmt.String())
+}
+
+func TestFuncAssignment(t *testing.T) {
+	inputs := []string{`
+a := 1
+b:num
+b = a
+`, `
+a:num
+b:num
+b = a
+`, `
+a:num
+b:any
+b = a
+`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestFuncAssignmentErr(t *testing.T) {
+	inputs := map[string]string{`
+b:num
+b = true
+`: "line 3 column 3: 'b' accepts values of type num, found bool",
+		`
+a:= 1
+a = b
+`: "line 3 column 6: unknown variable name 'b'",
+		`
+a:= 1
+b = a
+`: "line 3 column 3: unknown variable name 'b'",
+		`
+a:= 1
+a = num[]
+`: "line 3 column 3: 'a' accepts values of type num, found num[]",
+		`
+a:num
+b:any
+a = b
+`: "line 4 column 3: 'a' accepts values of type num, found any",
+		`
+func fn
+	return true
+end
+fn = 3
+`: "line 5 column 1: cannot assign to 'fn' as it is a function not a variable",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+	}
 }
 
 func TestScope(t *testing.T) {
@@ -307,7 +367,7 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.errors[0].String())
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
 	}
 }
 
@@ -324,11 +384,11 @@ end`
 	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertParseError(t, parser, input)
-	assert.Equal(t, "line 2 column 1: unknown function 'move'", parser.errors[0].String())
+	assert.Equal(t, "line 2 column 1: unknown function 'move'", parser.MaxErrorsString(1))
 	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
 	want := `
-x:NUM=12
-print('x:', x:NUM)
+x=12
+print('x:', x)
 `[1:]
 	assert.Equal(t, want, got.String())
 }

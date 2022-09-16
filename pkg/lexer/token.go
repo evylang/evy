@@ -182,7 +182,10 @@ func (t TokenType) GoString() string {
 
 func (t TokenType) FormatDetails() string {
 	if t == EOF {
-		return "<end of input>"
+		return "end of input"
+	}
+	if t == NL {
+		return "end of line"
 	}
 	return "'" + t.Format() + "'"
 }

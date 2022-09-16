@@ -71,11 +71,11 @@ func TestParseDeclarationError(t *testing.T) {
 		"a :[]num":          "line 1 column 1: invalid type declaration for 'a'",
 		"a :()":             "line 1 column 1: invalid type declaration for 'a'",
 		"a ::":              "line 1 column 1: invalid type declaration for 'a'",
-		"a := num{}[{a:1}]": "line 1 column 12: unexpected character '{'", // TODO: expected `num` found `{`
+		"a := num{}[{a:1}]": "line 1 column 12: unexpected '{'", // TODO: expected `num` found `{`
 		"a := num[true]":    "line 1 column 15: array literal 'true' should have type 'num'",
 		"a := num{a:true}":  "line 1 column 16: map literal 'true' should have type 'num'",
 		"a := num{}{":       "line 1 column 12: unterminated map literal",
-		"a :=:":             "line 1 column 5: unexpected character ':'",
+		"a :=:":             "line 1 column 5: unexpected ':'",
 		"a := num{":         "line 1 column 10: unterminated map literal",
 		"a := num{}[":       "line 1 column 12: unterminated array literal",
 		"a :num num":        "line 1 column 8: expected end of line, found 'num'",
@@ -144,18 +144,29 @@ func TestFunctionCallError(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	tests := map[string][]string{
-		`if true
-			print "TRUE"
-		end`: []string{""},
-		`if true
-			if 12 > 11
-				print "TRUE"
-			end
-		end`: []string{""},
+	tests := map[string]string{
+		`
+if true
+	print "TRUE"
+end`: `
+if (true) {
+print('TRUE')
+}
+`[1:],
+		`
+if true
+	if true
+		print "TRUE"
+	end
+end`: `
+if (true) {
+if (true) {
+print('TRUE')
+}
+}
+`[1:],
 	}
-	for input, wantSlice := range tests {
-		want := strings.Join(wantSlice, "\n") + "\n"
+	for input, want := range tests {
 		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
@@ -180,13 +191,13 @@ func TestFuncDecl(t *testing.T) {
 	input := `
 c := add 1 2
 func add:num n1:num n2:num
-	if c > 10
+	if true //TODO: > 10
 	    print c
 	end
 	return n1 // + n2
 end
 on mousedown
-	if c > 10
+	if true //TODO: > 10
 	    print c
 	end
 end
@@ -205,8 +216,8 @@ end
 	n1 := got.Params[0]
 	assert.Equal(t, "n1", n1.Name)
 	assert.Equal(t, NUM_TYPE, n1.Type())
-	assert.Equal(t, 1, len(got.Body.Statements)) // return statement; if statement not yet implemented.
-	returnStmt := got.Body.Statements[0]
+	assert.Equal(t, 2, len(got.Body.Statements))
+	returnStmt := got.Body.Statements[1]
 	assert.Equal(t, "return n1", returnStmt.String())
 }
 
@@ -371,6 +382,100 @@ end
 	}
 }
 
+func TestIf(t *testing.T) {
+	inputs := []string{
+		`if true
+			print "yeah"
+		end`,
+		`if true
+			print "true"
+		 else
+			print "false"
+		 end`,
+		`if true
+			print "true"
+		 else if false
+			print "false"
+		 end`,
+		`if true
+			print "true"
+		 else if false
+			print "false"
+		 else if true
+			print "true true"
+		 else
+			print "false"
+		 end`,
+		`if true
+			if true
+				print "true true"
+			else
+				print "true false"
+			end
+		 else
+			if true
+				print "false true"
+			else
+				print "false false"
+			end
+		 end`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestIfErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+if true
+	print "baba yaga"
+`: "line 4 column 1: expected 'end', got end of input", // TODO🚨: better term for 'EOF'
+		`
+if true
+end`: "line 3 column 1: at least one statement is required here",
+		`
+if
+	print "baba yaga"
+end`: "line 2 column 3: unexpected end of line",
+		`
+if true
+	print "true"
+else true
+	print "true"
+end`: "line 4 column 6: expected end of line, found 'true'",
+		`
+if true
+	print "true"
+else if
+	print "true"
+end`: "line 4 column 8: unexpected end of line",
+		`
+if true
+	print "true"
+else
+   print "false"
+else if false
+	print "true"
+end`: "line 6 column 1: unexpected input 'else'",
+		`
+if true
+	if true
+		print "true true"
+else
+	print "false"
+end`: "line 7 column 4: expected 'end', got end of input",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10
@@ -378,7 +483,7 @@ line 20 20
 
 x := 12
 print "x:" x
-if x > 10
+if true //TODO: x > 10
     print "🍦 big x"
 end`
 	parser := New(input, testBuiltins())
@@ -389,6 +494,9 @@ end`
 	want := `
 x=12
 print('x:', x)
+if (true) {
+print('🍦 big x')
+}
 `[1:]
 	assert.Equal(t, want, got.String())
 }

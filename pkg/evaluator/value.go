@@ -7,6 +7,11 @@ import (
 
 type ValueType int
 
+var (
+	TRUE  Value = &Bool{Val: true}
+	FALSE Value = &Bool{Val: false}
+)
+
 const (
 	ERROR ValueType = iota
 	NUM
@@ -91,7 +96,7 @@ func (r *ReturnValue) String() string  { return r.Val.String() }
 
 func (e *Error) Type() ValueType { return ERROR }
 func (e *Error) String() string  { return "ERROR: " + e.Message }
-func isError(val Value) bool {
+func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }
 func newError(msg string) *Error {

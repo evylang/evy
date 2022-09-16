@@ -38,7 +38,7 @@ func TestParseDeclaration(t *testing.T) {
 func TestReturn(t *testing.T) {
 	prog := `
 func fox:string
-       return "🦊"
+    return "🦊"
 end
 
 f := fox
@@ -56,12 +56,12 @@ func TestReturnScope(t *testing.T) {
 	prog := `
 f := 1
 func fox1:string
-       f := "🦊"
-       return f
+    f := "🦊"
+    return f
 end
 
 func fox2:string
-       return fox1
+    return fox1
 end
 
 print f
@@ -109,7 +109,7 @@ f1 = fox
 print f1 f2
 
 func fox:string
-       return "🦊"
+    return "🦊"
 end
 
 `
@@ -120,6 +120,48 @@ end
 	assert.Equal(t, want, b.String())
 }
 
+func TestIf(t *testing.T) {
+	tests := []string{
+		`
+if true
+    print "🎈"
+else
+    print "💣"
+end
+`,
+		`
+if false
+    print "💣"
+else
+    if true
+        print "🎈"
+    end
+end
+`,
+		`
+if true
+    if false
+        print "💣1"
+    else if true
+        print "🎈"
+    else if true
+        print "💣2"
+    else
+        print "💣3"
+    end
+else
+    print "💣4"
+end
+`,
+	}
+	for _, input := range tests {
+		b := bytes.Buffer{}
+		fn := func(s string) { b.WriteString(s) }
+		Run(input, fn)
+		assert.Equal(t, "🎈\n", b.String(), "input: %s", input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10
@@ -127,7 +169,7 @@ line 20 20
 
 x := 12
 print "x:" x
-if x > 10
+if true //TODO: x > 10
     print "🍦 big x"
 end`
 	b := bytes.Buffer{}
@@ -137,6 +179,7 @@ end`
 'move' not yet implemented
 'line' not yet implemented
 x: 12
+🍦 big x
 `[1:]
 	assert.Equal(t, want, b.String())
 }

@@ -141,33 +141,32 @@ func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
 }
 
 func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
-	val := e.evalConditionalBlock(scope, i.IfBlock)
-	if val == TRUE || isError(val) {
+	val, ok := e.evalConditionalBlock(scope, i.IfBlock)
+	if ok || isError(val) {
 		return val
 	}
 	for _, elseif := range i.ElseIfBlocks {
-		val := e.evalConditionalBlock(scope, elseif)
-		if val == TRUE || isError(val) {
+		val, ok := e.evalConditionalBlock(scope, elseif)
+		if ok || isError(val) {
 			return val
 		}
 	}
 	if i.Else != nil {
 		return e.Eval(newInnerScope(scope), i.Else)
 	}
-	return FALSE
+	return nil
 }
 
-func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) Value {
+func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) (Value, bool) {
 	scope = newInnerScope(scope)
 	cond := e.Eval(scope, condBlock.Condition)
 	if isError(cond) {
-		return cond
+		return cond, false
 	}
 	if cond == TRUE {
-		e.Eval(scope, condBlock.Block)
-		return TRUE
+		return e.Eval(scope, condBlock.Block), true
 	}
-	return FALSE
+	return nil, false
 }
 
 func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {

@@ -1,5 +1,7 @@
 package parser
 
+import "foxygo.at/evy/pkg/lexer"
+
 // parseType parses `num[]{}` into `MAP ARRAY NUM` inverting the order.
 func (p *Parser) parseType() *Type {
 	result := p.parseBasicType()
@@ -11,12 +13,18 @@ func (p *Parser) parseType() *Type {
 
 func (p *Parser) parseBasicType() *Type {
 	tt := p.cur.TokenType()
-	t := basicTypeName(tt)
 	p.advance()
-	if t == ILLEGAL {
-		return ILLEGAL_TYPE
+	switch tt {
+	case lexer.NUM:
+		return NUM_TYPE
+	case lexer.STRING:
+		return STRING_TYPE
+	case lexer.BOOL:
+		return BOOL_TYPE
+	case lexer.ANY:
+		return ANY_TYPE
 	}
-	return &Type{Name: t}
+	return ILLEGAL_TYPE
 }
 
 func (p *Parser) parseSubType(parent *Type) *Type {

@@ -13,7 +13,8 @@ type Node interface {
 }
 
 type Program struct {
-	Statements []Node
+	Statements    []Node
+	alwaysReturns bool
 }
 
 type FunctionCall struct {
@@ -86,8 +87,9 @@ type Var struct {
 }
 
 type BlockStatement struct {
-	Token      *lexer.Token // the NL before the first statement
-	Statements []Node
+	Token         *lexer.Token // the NL before the first statement
+	Statements    []Node
+	alwaysReturns bool
 }
 
 type Bool struct {
@@ -123,6 +125,9 @@ func (p *Program) String() string {
 }
 func (*Program) Type() *Type {
 	return NONE_TYPE
+}
+func (p *Program) AlwaysReturns() bool {
+	return p.alwaysReturns
 }
 
 func (f *FunctionCall) String() string {
@@ -162,6 +167,9 @@ func (r *Return) String() string {
 }
 func (r *Return) Type() *Type {
 	return r.T
+}
+func (*Return) AlwaysReturns() bool {
+	return true
 }
 
 func (a *Assignment) String() string {
@@ -205,6 +213,20 @@ func (i *If) String() string {
 func (i *If) Type() *Type {
 	return NONE_TYPE
 }
+func (i *If) AlwaysReturns() bool {
+	if i.Else == nil || !i.Else.AlwaysReturns() {
+		return false
+	}
+	if !i.IfBlock.AlwaysReturns() {
+		return false
+	}
+	for _, b := range i.ElseIfBlocks {
+		if !b.AlwaysReturns() {
+			return false
+		}
+	}
+	return true
+}
 
 func (e *EventHandler) String() string {
 	body := e.Body.String()
@@ -227,6 +249,14 @@ func (b *BlockStatement) String() string {
 func (b *BlockStatement) Type() *Type {
 	return NONE_TYPE
 }
+func (b *BlockStatement) AlwaysReturns() bool {
+	return b.alwaysReturns
+}
+
+func alwaysReturns(n Node) bool {
+	r, ok := n.(interface{ AlwaysReturns() bool })
+	return ok && r.AlwaysReturns()
+}
 
 func (w *While) String() string {
 	return "while " + w.ConditionalBlock.String()
@@ -242,6 +272,9 @@ func (c *ConditionalBlock) String() string {
 }
 func (c *ConditionalBlock) Type() *Type {
 	return NONE_TYPE
+}
+func (c *ConditionalBlock) AlwaysReturns() bool {
+	return c.Block.AlwaysReturns()
 }
 
 func (b *Bool) String() string {

@@ -85,18 +85,25 @@ func (p *Parser) Parse() *Program {
 // function names matching `parsePROCUTION` align with production names
 // in grammar doc/syntax_grammar.md
 func (p *Parser) parseProgram(scope *scope) *Program {
-	program := &Program{Statements: []Node{}}
+	program := &Program{}
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
-
 		switch p.cur.TokenType() {
 		case lexer.FUNC:
 			stmt = p.parseFunc(scope)
 		case lexer.ON:
 			stmt = p.parseEventHandler(scope)
 		default:
+			tok := p.cur
 			stmt = p.parseStatement(scope)
+			if stmt != nil && program.AlwaysReturns() {
+				p.appendErrorForToken("unreachable code", tok)
+				stmt = nil
+			}
+			if alwaysReturns(stmt) {
+				program.alwaysReturns = true
+			}
 		}
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
@@ -518,18 +525,26 @@ func (p *Parser) parseIfBlock(scope *scope) *BlockStatement {
 }
 
 func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.TokenType]bool) *BlockStatement {
-	tok := p.cur
-	var stmts []Node
+	block := &BlockStatement{Token: p.cur}
 	for !endTokens[p.cur.TokenType()] {
+		tok := p.cur
 		stmt := p.parseStatement(scope)
-		if stmt != nil {
-			stmts = append(stmts, stmt)
+		if stmt == nil {
+			continue
 		}
+		if block.AlwaysReturns() {
+			p.appendErrorForToken("unreachable code", tok)
+			continue
+		}
+		if alwaysReturns(stmt) {
+			block.alwaysReturns = true
+		}
+		block.Statements = append(block.Statements, stmt)
 	}
-	if len(stmts) == 0 {
-		p.appendErrorForToken("at least one statement is required here", tok)
+	if len(block.Statements) == 0 {
+		p.appendErrorForToken("at least one statement is required here", block.Token)
 	}
-	return &BlockStatement{Token: tok, Statements: stmts}
+	return block
 }
 
 func (p *Parser) advance() {

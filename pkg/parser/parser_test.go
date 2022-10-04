@@ -116,10 +116,10 @@ func TestFunctionCallError(t *testing.T) {
 	builtins := testBuiltins()
 	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
 	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{&Var{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
 	builtins["f3"] = &FuncDecl{
 		Name:       "f3",
-		Params:     []*Var{&Var{Name: "a", T: NUM_TYPE}, &Var{Name: "b", T: STRING_TYPE}},
+		Params:     []*Var{{Name: "a", T: NUM_TYPE}, {Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
 	}
 	tests := map[string]string{
@@ -195,7 +195,7 @@ func nums1:num n1:num n2:num
 	    print c
 	    return n1
 	end
-	return n1 // + n2
+	return n2
 end
 on mousedown
 	if true //TODO: > 10
@@ -214,7 +214,6 @@ func nums3
 		return
 	end
 end
-
 return "success"
 `
 	parser := New(input, testBuiltins())
@@ -233,7 +232,64 @@ return "success"
 	assert.Equal(t, NUM_TYPE, n1.Type())
 	assert.Equal(t, 2, len(got.Body.Statements))
 	returnStmt := got.Body.Statements[1]
-	assert.Equal(t, "return n1", returnStmt.String())
+	assert.Equal(t, "return n2", returnStmt.String())
+}
+
+func TestReturnErr(t *testing.T) {
+	inputs := map[string]string{`
+func add:num
+	return 1
+	print "boom"
+end
+`: "line 4 column 2: unreachable code",
+		`
+func nums:num
+	if true
+		return 1
+	else
+		return 2
+	end
+	print "boom"
+end
+`: "line 8 column 2: unreachable code",
+		`
+func nums:num
+	if true
+		if true
+			return 3
+		else
+			return 4
+		end
+	else
+		return 2
+	end
+	print "boom"
+end
+`: "line 12 column 2: unreachable code",
+		`
+func nums:num
+	a := 5
+	while true
+		return 1
+	end
+	print "boom"
+end
+`: "line 7 column 2: unreachable code",
+		`
+foo
+return false
+func foo
+  print "hello"
+end
+print "do i run?"
+`: "line 7 column 1: unreachable code",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+	}
 }
 
 func TestFuncAssignment(t *testing.T) {

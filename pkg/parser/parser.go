@@ -191,7 +191,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.FOR:
 		return p.parseForStatement(scope) // TODO
 	case lexer.WHILE:
-		return p.parseWhileStatement(scope) // TODO
+		return p.parseWhileStatement(scope)
 	case lexer.IF:
 		return p.parseIfStatement(scope)
 	}
@@ -600,17 +600,27 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()
 	p.parseBlock(scope)
+	p.assertEnd()
 	p.advancePastNL()
 	return nil
 }
 
-//TODO: implemented
 func (p *Parser) parseWhileStatement(scope *scope) Node {
+	tok := p.cur
+	p.advance() // advance past WHILE token
 	scope = newInnerScope(scope)
+	condition := p.parseCondition(scope)
 	p.advancePastNL()
-	p.parseBlock(scope)
+	block := p.parseBlock(scope)
+	p.assertEnd()
 	p.advancePastNL()
-	return nil
+	return &While{
+		ConditionalBlock{
+			Token:     tok,
+			Condition: condition,
+			Block:     block,
+		},
+	}
 }
 
 func (p *Parser) parseIfStatement(scope *scope) Node {
@@ -638,14 +648,20 @@ func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
 	tok := p.cur
 	p.advance() // advance past IF token
 	scope = newInnerScope(scope)
+	condition := p.parseCondition(scope)
+	p.advancePastNL()
+	block := p.parseIfBlock(scope)
+	return &ConditionalBlock{Token: tok, Condition: condition, Block: block}
+}
+
+func (p *Parser) parseCondition(scope *scope) Node {
+	tok := p.cur
 	condition := p.parseTopLevelExpression(scope)
 	if condition != nil {
 		p.assertEOL()
 		if condition.Type() != BOOL_TYPE {
-			p.appendErrorForToken("expected 'if' condition of type bool, found "+condition.Type().Format(), tok)
+			p.appendErrorForToken("expected condition of type bool, found "+condition.Type().Format(), tok)
 		}
 	}
-	p.advancePastNL()
-	block := p.parseIfBlock(scope)
-	return &ConditionalBlock{Token: tok, Condition: condition, Block: block}
+	return condition
 }

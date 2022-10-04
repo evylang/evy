@@ -53,6 +53,8 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalReturn(scope, node)
 	case *parser.If:
 		return e.evalIf(scope, node)
+	case *parser.While:
+		return e.evalWhile(scope, node)
 	case *parser.BlockStatement:
 		return e.evalBlockStatment(scope, node)
 	}
@@ -157,6 +159,15 @@ func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
 	return nil
 }
 
+func (e *Evaluator) evalWhile(scope *scope, w *parser.While) Value {
+	whileBlock := &w.ConditionalBlock
+	val, ok := e.evalConditionalBlock(scope, whileBlock)
+	for ok && !isError(val) && !isReturn(val) {
+		val, ok = e.evalConditionalBlock(scope, whileBlock)
+	}
+	return val
+}
+
 func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) (Value, bool) {
 	scope = newInnerScope(scope)
 	cond := e.Eval(scope, condBlock.Condition)
@@ -172,11 +183,8 @@ func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.Conditi
 func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {
 	for _, statement := range block.Statements {
 		result := e.Eval(scope, statement)
-		if result != nil {
-			rt := result.Type()
-			if rt == RETURN_VALUE || rt == ERROR {
-				return result
-			}
+		if isError(result) || isReturn(result) {
+			return result
 		}
 	}
 	return nil

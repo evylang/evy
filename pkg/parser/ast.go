@@ -64,6 +64,10 @@ type If struct {
 	Else         *BlockStatement
 }
 
+type While struct {
+	ConditionalBlock
+}
+
 type ConditionalBlock struct {
 	Token     *lexer.Token
 	Condition Node // must be of type bool
@@ -222,6 +226,14 @@ func (b *BlockStatement) String() string {
 }
 func (b *BlockStatement) Type() *Type {
 	return NONE_TYPE
+}
+
+func (w *While) String() string {
+	return "while " + w.ConditionalBlock.String()
+}
+
+func (w *While) Type() *Type {
+	return w.ConditionalBlock.Type()
 }
 
 func (c *ConditionalBlock) String() string {

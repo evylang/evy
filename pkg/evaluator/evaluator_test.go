@@ -55,6 +55,7 @@ print f f
 func TestReturnScope(t *testing.T) {
 	prog := `
 f := 1
+
 func fox1:string
     f := "🦊"
     return f
@@ -167,6 +168,44 @@ end
 		Run(input, fn)
 		assert.Equal(t, "🎈\n", b.String(), "input: %s", input)
 	}
+}
+
+func TestWhile(t *testing.T) {
+	input := `
+x := true
+while x
+	print "🍭"
+	x = false
+end
+
+one_more := true
+two_more := true
+func has_more:bool
+	if one_more
+		if two_more
+			two_more = false
+			return true
+		else
+			one_more = false
+			return true
+		end
+	end
+	return false
+end
+
+one_more = true
+while has_more
+	print "🎈"
+end
+
+while has_more
+	print "💣"
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(input, fn)
+	assert.Equal(t, "🍭\n🎈\n🎈\n", b.String())
 }
 
 func TestDemo(t *testing.T) {

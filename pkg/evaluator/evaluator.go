@@ -91,7 +91,12 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	if isError(val) {
 		return val
 	}
-	scope.set(assignment.Target.String(), val) // TODO: update when indexing and field selectors are implemented.
+	name := assignment.Target.String()
+	// We need to update the variable in the scope it was defined.
+	if s, ok := scope.getScope(name); ok {
+		scope = s
+	}
+	scope.set(name, val)
 	return nil
 }
 

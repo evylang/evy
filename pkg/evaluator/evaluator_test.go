@@ -130,6 +130,13 @@ else
 end
 `,
 		`
+x := "💣"
+if true
+    x = "🎈"
+end
+print x
+`,
+		`
 if false
     print "💣"
 else

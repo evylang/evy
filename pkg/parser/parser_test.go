@@ -432,7 +432,7 @@ func TestIfErr(t *testing.T) {
 		`
 if true
 	print "baba yaga"
-`: "line 4 column 1: expected 'end', got end of input", // TODO🚨: better term for 'EOF'
+`: "line 4 column 1: expected 'end', got end of input",
 		`
 if true
 end`: "line 3 column 1: at least one statement is required here",
@@ -467,6 +467,62 @@ if true
 else
 	print "false"
 end`: "line 7 column 4: expected 'end', got end of input",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+	}
+}
+
+func TestWhile(t *testing.T) {
+	inputs := []string{
+		`
+while true
+	print "forever"
+end`,
+		`
+while has_more
+	print "🍭"
+end
+
+two_more := true
+one_more := true
+func has_more:bool
+	if one_more
+		if two_more
+			two_more = false
+			return false
+		else
+			one_more = false
+			return false
+		end
+	end
+	return true
+end
+`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestWhileErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+while true
+	print "forever"
+`: "line 4 column 1: expected 'end', got end of input",
+		`
+while true
+end`: "line 3 column 1: at least one statement is required here",
+		`
+while
+	print "forever"
+end`: "line 2 column 6: unexpected end of line",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

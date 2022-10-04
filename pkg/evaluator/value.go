@@ -99,6 +99,9 @@ func (e *Error) String() string  { return "ERROR: " + e.Message }
 func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }
+func isReturn(val Value) bool {
+	return val != nil && val.Type() == RETURN_VALUE
+}
 func newError(msg string) *Error {
 	return &Error{Message: msg}
 }

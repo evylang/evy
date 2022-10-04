@@ -30,20 +30,6 @@ func isBasicType(t lexer.TokenType) bool {
 	return t == lexer.NUM || t == lexer.STRING || t == lexer.BOOL || t == lexer.ANY
 }
 
-func basicTypeName(t lexer.TokenType) TypeName {
-	switch t {
-	case lexer.NUM:
-		return NUM
-	case lexer.STRING:
-		return STRING
-	case lexer.BOOL:
-		return BOOL
-	case lexer.ANY:
-		return ANY
-	}
-	return ILLEGAL
-}
-
 func compositeTypeName(t lexer.TokenType) TypeName {
 	switch t {
 	case lexer.LBRACKET:

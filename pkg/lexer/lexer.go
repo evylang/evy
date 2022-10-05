@@ -1,3 +1,7 @@
+// Package lexer tokenizes input and lets follow up phases in compiler,
+// such as parser, iterate over tokens via Lexer.Next() function. The
+// lexer package also exposes a Run method for debugging the lexing
+// phase only.
 package lexer
 
 import (

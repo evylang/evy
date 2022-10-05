@@ -123,9 +123,11 @@ type MapLiteral struct {
 func (p *Program) String() string {
 	return newlineList(p.Statements)
 }
+
 func (*Program) Type() *Type {
 	return NONE_TYPE
 }
+
 func (p *Program) AlwaysReturns() bool {
 	return p.alwaysReturns
 }
@@ -138,6 +140,7 @@ func (f *FunctionCall) String() string {
 	args := strings.Join(s, ", ")
 	return f.Name + "(" + args + ")"
 }
+
 func (f *FunctionCall) Type() *Type {
 	return f.T
 }
@@ -145,6 +148,7 @@ func (f *FunctionCall) Type() *Type {
 func (t *Term) String() string {
 	return t.Value.String()
 }
+
 func (t *Term) Type() *Type {
 	return t.T
 }
@@ -155,6 +159,7 @@ func (d *Declaration) String() string {
 	}
 	return d.Var.String() + "=" + d.Value.String()
 }
+
 func (d *Declaration) Type() *Type {
 	return d.Var.T
 }
@@ -165,9 +170,11 @@ func (r *Return) String() string {
 	}
 	return "return " + r.Value.String()
 }
+
 func (r *Return) Type() *Type {
 	return r.T
 }
+
 func (*Return) AlwaysReturns() bool {
 	return true
 }
@@ -175,6 +182,7 @@ func (*Return) AlwaysReturns() bool {
 func (a *Assignment) String() string {
 	return a.Target.String() + " = " + a.Value.String()
 }
+
 func (a *Assignment) Type() *Type {
 	return a.Target.Type()
 }
@@ -195,6 +203,7 @@ func (f *FuncDecl) String() string {
 	}
 	return signature + "{\n" + body + "}\n"
 }
+
 func (f *FuncDecl) Type() *Type {
 	return f.ReturnType
 }
@@ -213,6 +222,7 @@ func (i *If) String() string {
 func (i *If) Type() *Type {
 	return NONE_TYPE
 }
+
 func (i *If) AlwaysReturns() bool {
 	if i.Else == nil || !i.Else.AlwaysReturns() {
 		return false
@@ -232,6 +242,7 @@ func (e *EventHandler) String() string {
 	body := e.Body.String()
 	return "on " + e.Name + " {\n" + body + "}\n"
 }
+
 func (e *EventHandler) Type() *Type {
 	return NONE_TYPE
 }
@@ -239,6 +250,7 @@ func (e *EventHandler) Type() *Type {
 func (v *Var) String() string {
 	return v.Name
 }
+
 func (v *Var) Type() *Type {
 	return v.T
 }
@@ -246,9 +258,11 @@ func (v *Var) Type() *Type {
 func (b *BlockStatement) String() string {
 	return newlineList(b.Statements)
 }
+
 func (b *BlockStatement) Type() *Type {
 	return NONE_TYPE
 }
+
 func (b *BlockStatement) AlwaysReturns() bool {
 	return b.alwaysReturns
 }
@@ -270,9 +284,11 @@ func (c *ConditionalBlock) String() string {
 	condition := "(" + c.Condition.String() + ")"
 	return condition + " {\n" + c.Block.String() + "}"
 }
+
 func (c *ConditionalBlock) Type() *Type {
 	return NONE_TYPE
 }
+
 func (c *ConditionalBlock) AlwaysReturns() bool {
 	return c.Block.AlwaysReturns()
 }
@@ -280,6 +296,7 @@ func (c *ConditionalBlock) AlwaysReturns() bool {
 func (b *Bool) String() string {
 	return strconv.FormatBool(b.Value)
 }
+
 func (b *Bool) Type() *Type {
 	return BOOL_TYPE
 }
@@ -287,6 +304,7 @@ func (b *Bool) Type() *Type {
 func (n *NumLiteral) String() string {
 	return strconv.FormatFloat(n.Value, 'f', -1, 64)
 }
+
 func (n *NumLiteral) Type() *Type {
 	return NUM_TYPE
 }
@@ -294,6 +312,7 @@ func (n *NumLiteral) Type() *Type {
 func (s *StringLiteral) String() string {
 	return "'" + s.Value + "'"
 }
+
 func (s *StringLiteral) Type() *Type {
 	return STRING_TYPE
 }

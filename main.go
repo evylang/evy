@@ -29,9 +29,11 @@ type config struct {
 type cmdRun struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
+
 type cmdTokenize struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
+
 type cmdParse struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }

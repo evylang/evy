@@ -1,3 +1,9 @@
+// Package parser creates an abstract syntax tree (ast) from input
+// string in parser.Run() function. The parser is also responsible for
+// type analysis, unreachable code analysis, unused variable analysis
+// and other semantic checks. The generated ast is syntactically and
+// semantically correct and may not contain any further compile time
+// errors, only potential run time errors.
 package parser
 
 import (
@@ -83,7 +89,7 @@ func (p *Parser) Parse() *Program {
 }
 
 // function names matching `parsePROCUTION` align with production names
-// in grammar doc/syntax_grammar.md
+// in grammar doc/syntax_grammar.md.
 func (p *Parser) parseProgram(scope *scope) *Program {
 	program := &Program{}
 	p.advanceTo(0)
@@ -296,7 +302,7 @@ func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 }
 
 // parseTypedDecl parses declarations like
-// `x:num` or `y:any[]{}`
+// `x:num` or `y:any[]{}`.
 func (p *Parser) parseTypedDecl() *Declaration {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
@@ -375,7 +381,7 @@ func (p *Parser) parseExpression(scope *scope) Node {
 }
 
 func (p *Parser) parseTerm(scope *scope) Node {
-	//TODO: UNARY_OP Term; composite literals; assignable; slice; type_assertion; "(" toplevel_expr ")"
+	// TODO: UNARY_OP Term; composite literals; assignable; slice; type_assertion; "(" toplevel_expr ")"
 	tt := p.cur.TokenType()
 	if tt == lexer.IDENT {
 		if p.isFuncCall(p.cur) {
@@ -395,7 +401,6 @@ func (p *Parser) parseTerm(scope *scope) Node {
 	p.appendError("unexpected " + tt.FormatDetails())
 	p.advance()
 	return nil
-
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {
@@ -494,19 +499,14 @@ func (p *Parser) assertToken(tt lexer.TokenType) bool {
 	return true
 }
 
-func (p *Parser) assertEOL() bool {
+func (p *Parser) assertEOL() {
 	if !p.isAtEOL() {
 		p.appendError("expected end of line, found " + p.cur.FormatDetails())
-		return false
 	}
-	return true
 }
 
-func (p *Parser) assertEnd() bool {
-	if !p.assertToken(lexer.END) {
-		return false
-	}
-	return isEOL(p.peek.TokenType())
+func (p *Parser) assertEnd() {
+	p.assertToken(lexer.END)
 }
 
 func (p *Parser) appendError(message string) {
@@ -615,13 +615,13 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 	return ret
 }
 
-//TODO: implemented
+// TODO: implemented.
 func (p *Parser) parseBreakStatement() Node {
 	p.advancePastNL()
 	return nil
 }
 
-//TODO: implemented
+// TODO: implemented.
 func (p *Parser) parseForStatement(scope *scope) Node {
 	scope = newInnerScope(scope)
 	p.advancePastNL()

@@ -104,7 +104,7 @@ func (t *Type) Accepts(t2 *Type) bool {
 	return false
 }
 
-// any[] (ARRAY ANY) DOES NOT accept num[] (ARRAY NUM)
+// any[] (ARRAY ANY) DOES NOT accept num[] (ARRAY NUM).
 func (t *Type) acceptsStrict(t2 *Type) bool {
 	n, n2 := t.Name, t2.Name
 	if n == ILLEGAL || n2 == ILLEGAL {

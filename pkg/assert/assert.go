@@ -1,3 +1,6 @@
+// Package assert is a testing utility package for online assertion that
+// also work with TinyGo which has only limited support for
+// reflection.
 package assert
 
 import (
@@ -7,18 +10,18 @@ import (
 )
 
 func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
+	t.Helper()
 	if err == nil {
 		return
 	}
-	t.Helper()
 	fatalf(t, "err: %v%s", err, format(msgAndArgs...))
 }
 
 func Equal(t *testing.T, want, got any, msgAndArgs ...interface{}) {
+	t.Helper()
 	if equal(want, got) {
 		return
 	}
-	t.Helper()
 	fatalf(t, "want != got\n%#v\n%#v%s", want, got, format(msgAndArgs...))
 }
 

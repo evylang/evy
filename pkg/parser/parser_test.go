@@ -9,27 +9,27 @@ import (
 
 func TestParseDeclaration(t *testing.T) {
 	tests := map[string][]string{
-		"a := 1":     []string{"a=1"},
-		"b:bool":     []string{"b=false"},
-		"\nb:bool\n": []string{"b=false"},
+		"a := 1":     {"a=1"},
+		"b:bool":     {"b=false"},
+		"\nb:bool\n": {"b=false"},
 		`a := "abc"
 		b:bool
-		c := true`: []string{"a='abc'", "b=false", "c=true"},
-		"a:num[]":                      []string{"a=[]"},
-		"a:num[]{}":                    []string{"a={}"},
-		"abc:any[]{}":                  []string{"abc={}"},
-		"a := bool[true]":              []string{"a=[true]"},
-		"a := num[]":                   []string{"a=[]"},
-		"a := num[][num[1 2]num[3 4]]": []string{"a=[[1, 2], [3, 4]]"},
-		"a := num{a:1 b:2}":            []string{"a={a:1, b:2}"},
-		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": []string{"a={digits:[1, 2, 3], nums:[4, 5]}"},
-		"a := num[]{digits: num[] nums: num[4]}":        []string{"a={digits:[], nums:[4]}"},
-		"a := num[]{digits: num[4] nums: num[]}":        []string{"a={digits:[4], nums:[]}"},
-		"a := num{}[]":                                  []string{"a=[]"},
-		"a := num{}[num{}]":                             []string{"a=[{}]"},
-		"a := any{a:1 b:true}":                          []string{"a={a:1, b:true}"},
-		"a := any{a:1 b:true c:num[1]}":                 []string{"a={a:1, b:true, c:[1]}"},
-		"a := num{}[num{a:1}]":                          []string{"a=[{a:1}]"},
+		c := true`: {"a='abc'", "b=false", "c=true"},
+		"a:num[]":                      {"a=[]"},
+		"a:num[]{}":                    {"a={}"},
+		"abc:any[]{}":                  {"abc={}"},
+		"a := bool[true]":              {"a=[true]"},
+		"a := num[]":                   {"a=[]"},
+		"a := num[][num[1 2]num[3 4]]": {"a=[[1, 2], [3, 4]]"},
+		"a := num{a:1 b:2}":            {"a={a:1, b:2}"},
+		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": {"a={digits:[1, 2, 3], nums:[4, 5]}"},
+		"a := num[]{digits: num[] nums: num[4]}":        {"a={digits:[], nums:[4]}"},
+		"a := num[]{digits: num[4] nums: num[]}":        {"a={digits:[4], nums:[]}"},
+		"a := num{}[]":                                  {"a=[]"},
+		"a := num{}[num{}]":                             {"a=[{}]"},
+		"a := any{a:1 b:true}":                          {"a={a:1, b:true}"},
+		"a := any{a:1 b:true c:num[1]}":                 {"a={a:1, b:true, c:[1]}"},
+		"a := num{}[num{a:1}]":                          {"a=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -91,17 +91,17 @@ func TestParseDeclarationError(t *testing.T) {
 
 func TestFunctionCall(t *testing.T) {
 	tests := map[string][]string{
-		"print":               []string{"print()"},
-		"print 123":           []string{"print(123)"},
-		`print 123 "abc"`:     []string{"print(123, 'abc')"},
-		"a:=1 \n print a":     []string{"a=1", "print(a)"},
-		`a := len "abc"`:      []string{"a=len('abc')"},
-		`len "abc"`:           []string{"len('abc')"},
-		`len num[]`:           []string{"len([])"},
-		"a:string \n print a": []string{"a=''", "print(a)"},
+		"print":               {"print()"},
+		"print 123":           {"print(123)"},
+		`print 123 "abc"`:     {"print(123, 'abc')"},
+		"a:=1 \n print a":     {"a=1", "print(a)"},
+		`a := len "abc"`:      {"a=len('abc')"},
+		`len "abc"`:           {"len('abc')"},
+		`len num[]`:           {"len([])"},
+		"a:string \n print a": {"a=''", "print(a)"},
 		`a:=true
 		b:string
-		print a b`: []string{"a=true", "b=''", "print(a, b)"},
+		print a b`: {"a=true", "b=''", "print(a, b)"},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -236,7 +236,8 @@ return "success"
 }
 
 func TestReturnErr(t *testing.T) {
-	inputs := map[string]string{`
+	inputs := map[string]string{
+		`
 func add:num
 	return 1
 	print "boom"
@@ -309,7 +310,8 @@ end
 }
 
 func TestFuncAssignment(t *testing.T) {
-	inputs := []string{`
+	inputs := []string{
+		`
 a := 1
 b:num
 b = a
@@ -331,7 +333,8 @@ b = a
 }
 
 func TestFuncAssignmentErr(t *testing.T) {
-	inputs := map[string]string{`
+	inputs := map[string]string{
+		`
 b:num
 b = true
 `: "line 3 column 3: 'b' accepts values of type num, found bool",
@@ -368,7 +371,8 @@ fn = 3
 }
 
 func TestScope(t *testing.T) {
-	inputs := []string{`
+	inputs := []string{
+		`
 x := 1
 func foo
 	x := "abc"
@@ -656,12 +660,12 @@ func assertNoParseError(t *testing.T, parser *Parser, input string) {
 
 func testBuiltins() map[string]*FuncDecl {
 	return map[string]*FuncDecl{
-		"print": &FuncDecl{
+		"print": {
 			Name:          "print",
 			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
 			ReturnType:    NONE_TYPE,
 		},
-		"len": &FuncDecl{
+		"len": {
 			Name:       "len",
 			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
 			ReturnType: NUM_TYPE,

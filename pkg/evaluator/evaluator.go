@@ -1,25 +1,28 @@
+// Package evaluator evaluates a given syntax tree as created by the
+// parser packages. It also exports a Run and RunWithBuiltings function
+// which creates and calls a Parser.
 package evaluator
 
 import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-func Run(input string, print func(string)) {
-	RunWithBuiltins(input, print, DefaultBuiltins(print))
+func Run(input string, printFn func(string)) {
+	RunWithBuiltins(input, printFn, DefaultBuiltins(printFn))
 }
 
-func RunWithBuiltins(input string, print func(string), builtins Builtins) {
+func RunWithBuiltins(input string, printFn func(string), builtins Builtins) {
 	p := parser.New(input, builtins.Decls())
 	prog := p.Parse()
 	if p.HasErrors() {
-		print(p.MaxErrorsString(8))
+		printFn(p.MaxErrorsString(8))
 		return
 	}
-	e := &Evaluator{print: print}
+	e := &Evaluator{print: printFn}
 	e.builtins = builtins
 	val := e.Eval(newScope(), prog)
 	if isError(val) {
-		print(val.String())
+		printFn(val.String())
 	}
 }
 

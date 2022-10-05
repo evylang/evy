@@ -33,7 +33,6 @@ func (s *scope) getScope(name string) (*scope, bool) {
 	return s.outer.getScope(name)
 }
 
-func (s *scope) set(name string, val Value) Value {
+func (s *scope) set(name string, val Value) {
 	s.values[name] = val
-	return val
 }

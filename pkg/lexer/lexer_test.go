@@ -11,13 +11,45 @@ func TestSingleToken(t *testing.T) {
 		in   string
 		want TokenType
 	}{
-		{in: ":=", want: DECLARE}, {in: "=", want: ASSIGN}, {in: "+", want: PLUS}, {in: "-", want: MINUS}, {in: "!", want: BANG}, {in: "*", want: ASTERISK}, {in: "/", want: SLASH},
-		{in: "==", want: EQ}, {in: "!=", want: NOT_EQ}, {in: "<", want: LT}, {in: ">", want: GT}, {in: "<=", want: LTEQ}, {in: ">=", want: GTEQ},
-		{in: "(", want: LPAREN}, {in: ")", want: RPAREN}, {in: "[", want: LBRACKET}, {in: "]", want: RBRACKET}, {in: "{", want: LCURLY}, {in: "}", want: RCURLY},
-		{in: ":", want: COLON}, {in: ".", want: DOT}, {in: "...", want: DOT3},
-		{in: "num", want: NUM}, {in: "string", want: STRING}, {in: "bool", want: BOOL}, {in: "any", want: ANY},
-		{in: "true", want: TRUE}, {in: "false", want: FALSE}, {in: "and", want: AND}, {in: "or", want: OR},
-		{in: "if", want: IF}, {in: "else", want: ELSE}, {in: "func", want: FUNC}, {in: "return", want: RETURN}, {in: "for", want: FOR}, {in: "range", want: RANGE}, {in: "while", want: WHILE}, {in: "break", want: BREAK}, {in: "end", want: END},
+		{in: ":=", want: DECLARE},
+		{in: "=", want: ASSIGN},
+		{in: "+", want: PLUS},
+		{in: "-", want: MINUS},
+		{in: "!", want: BANG},
+		{in: "*", want: ASTERISK},
+		{in: "/", want: SLASH},
+		{in: "==", want: EQ},
+		{in: "!=", want: NOT_EQ},
+		{in: "<", want: LT},
+		{in: ">", want: GT},
+		{in: "<=", want: LTEQ},
+		{in: ">=", want: GTEQ},
+		{in: "(", want: LPAREN},
+		{in: ")", want: RPAREN},
+		{in: "[", want: LBRACKET},
+		{in: "]", want: RBRACKET},
+		{in: "{", want: LCURLY},
+		{in: "}", want: RCURLY},
+		{in: ":", want: COLON},
+		{in: ".", want: DOT},
+		{in: "...", want: DOT3},
+		{in: "num", want: NUM},
+		{in: "string", want: STRING},
+		{in: "bool", want: BOOL},
+		{in: "any", want: ANY},
+		{in: "true", want: TRUE},
+		{in: "false", want: FALSE},
+		{in: "and", want: AND},
+		{in: "or", want: OR},
+		{in: "if", want: IF},
+		{in: "else", want: ELSE},
+		{in: "func", want: FUNC},
+		{in: "return", want: RETURN},
+		{in: "for", want: FOR},
+		{in: "range", want: RANGE},
+		{in: "while", want: WHILE},
+		{in: "break", want: BREAK},
+		{in: "end", want: END},
 	}
 
 	for _, tt := range tests {
@@ -101,7 +133,7 @@ func TestNums(t *testing.T) {
 y := 1
 y = y * ( 3 + 7)
 `
-	wantTokens := []Token{
+	wantTokens := []*Token{
 		{Type: NL, Literal: "", Offset: 0, Line: 1, Col: 1},
 		{Type: IDENT, Literal: "y", Offset: 1, Line: 2, Col: 1},
 		{Type: DECLARE, Literal: "", Offset: 3, Line: 2, Col: 3},
@@ -122,7 +154,7 @@ y = y * ( 3 + 7)
 	l := New(in)
 	for _, want := range wantTokens {
 		got := l.Next()
-		assert.Equal(t, &want, got)
+		assert.Equal(t, want, got)
 	}
 }
 
@@ -131,7 +163,7 @@ func TestStrings(t *testing.T) {
 s:string
 s = "abc"
 s = s[:1] // "bc"`
-	wantTokens := []Token{
+	wantTokens := []*Token{
 		{Type: NL, Literal: "", Offset: 0, Line: 1, Col: 1},
 		{Type: IDENT, Literal: "s", Offset: 1, Line: 2, Col: 1},
 		{Type: COLON, Literal: "", Offset: 2, Line: 2, Col: 2},
@@ -156,7 +188,7 @@ s = s[:1] // "bc"`
 	l := New(in)
 	for _, want := range wantTokens {
 		got := l.Next()
-		assert.Equal(t, &want, got)
+		assert.Equal(t, want, got)
 	}
 }
 
@@ -167,7 +199,7 @@ for key := range m
     print key m[key] // Mali climbing
 end
 `
-	wantTokens := []Token{
+	wantTokens := []*Token{
 		{Type: NL, Literal: "", Offset: 0, Line: 1, Col: 1},
 		{Type: IDENT, Literal: "m", Offset: 1, Line: 2, Col: 1},
 		{Type: DECLARE, Literal: "", Offset: 3, Line: 2, Col: 3},
@@ -206,7 +238,7 @@ end
 	l := New(in)
 	for _, want := range wantTokens {
 		got := l.Next()
-		assert.Equal(t, &want, got)
+		assert.Equal(t, want, got)
 	}
 }
 

@@ -1,4 +1,5 @@
 //go:build tinygo
+
 package main
 
 import (
@@ -10,9 +11,7 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-var (
-	version string
-)
+var version string
 
 func main() {
 }
@@ -26,6 +25,7 @@ func jsPrint(string)
 // See:
 // * https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
 // * https://www.alcarney.me/blog/2020/passing-strings-between-tinygo-wasm/
+//
 //export evaluate
 func jsEvaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
@@ -46,6 +46,7 @@ func jsParse(ptr *uint32, length int) {
 }
 
 // alloc pre-allocates memory used in string parameter passing.
+//
 //export alloc
 func alloc(size uint32) *byte {
 	buf := make([]byte, size)

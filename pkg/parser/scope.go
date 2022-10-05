@@ -34,7 +34,6 @@ func (s *scope) get(name string) (*Var, bool) {
 	return s.outer.get(name)
 }
 
-func (s *scope) set(name string, v *Var) *Var {
+func (s *scope) set(name string, v *Var) {
 	s.vars[name] = v
-	return v
 }

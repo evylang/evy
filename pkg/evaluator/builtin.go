@@ -27,12 +27,12 @@ type BuiltinFunc func(args []Value) Value
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
 
-func DefaultBuiltins(print func(string)) Builtins {
+func DefaultBuiltins(printFn func(string)) Builtins {
 	return Builtins{
-		"print": {Func: printFunc(print), Decl: printDecl},
+		"print": {Func: printFunc(printFn), Decl: printDecl},
 		"len":   {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
-		"move":  {Func: moveFunc(print), Decl: moveDecl},
-		"line":  {Func: lineFunc(print), Decl: lineDecl},
+		"move":  {Func: moveFunc(printFn), Decl: moveDecl},
+		"line":  {Func: lineFunc(printFn), Decl: lineDecl},
 	}
 }
 
@@ -77,8 +77,8 @@ func lenFunc(args []Value) Value {
 var moveDecl = &parser.FuncDecl{
 	Name: "move",
 	Params: []*parser.Var{
-		&parser.Var{Name: "x", T: parser.NUM_TYPE},
-		&parser.Var{Name: "y", T: parser.NUM_TYPE},
+		{Name: "x", T: parser.NUM_TYPE},
+		{Name: "y", T: parser.NUM_TYPE},
 	},
 	ReturnType: parser.NUM_TYPE,
 }
@@ -93,8 +93,8 @@ func moveFunc(printFn func(string)) BuiltinFunc {
 var lineDecl = &parser.FuncDecl{
 	Name: "line",
 	Params: []*parser.Var{
-		&parser.Var{Name: "x", T: parser.NUM_TYPE},
-		&parser.Var{Name: "y", T: parser.NUM_TYPE},
+		{Name: "x", T: parser.NUM_TYPE},
+		{Name: "y", T: parser.NUM_TYPE},
 	},
 	ReturnType: parser.NUM_TYPE,
 }

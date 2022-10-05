@@ -20,12 +20,12 @@ const (
 	EOF
 	COMMENT // `// a comment`
 
-	// Identifiers and Literals
+	// Identifiers and Literals.
 	IDENT      // some_identifier
 	NUM_LIT    // 123 456.78
 	STRING_LIT // "a string 🧵"
 
-	// Operators
+	// Operators.
 	DECLARE  // :=
 	ASSIGN   // =
 	PLUS     // +
@@ -41,7 +41,7 @@ const (
 	LTEQ   // <=
 	GTEQ   // >=
 
-	// Delimiters
+	// Delimiters.
 	LPAREN   // (
 	RPAREN   // )
 	LBRACKET // [
@@ -54,7 +54,7 @@ const (
 	DOT   // .
 	DOT3  // ...
 
-	// Keywords
+	// Keywords.
 	NUM    // num
 	STRING // string
 	BOOL   // bool

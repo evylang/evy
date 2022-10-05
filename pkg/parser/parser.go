@@ -85,18 +85,25 @@ func (p *Parser) Parse() *Program {
 // function names matching `parsePROCUTION` align with production names
 // in grammar doc/syntax_grammar.md
 func (p *Parser) parseProgram(scope *scope) *Program {
-	program := &Program{Statements: []Node{}}
+	program := &Program{}
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
-
 		switch p.cur.TokenType() {
 		case lexer.FUNC:
 			stmt = p.parseFunc(scope)
 		case lexer.ON:
 			stmt = p.parseEventHandler(scope)
 		default:
+			tok := p.cur
 			stmt = p.parseStatement(scope)
+			if stmt != nil && program.AlwaysReturns() {
+				p.appendErrorForToken("unreachable code", tok)
+				stmt = nil
+			}
+			if alwaysReturns(stmt) {
+				program.alwaysReturns = true
+			}
 		}
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
@@ -112,7 +119,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newInnerScope(scope)
+	scope = newInnerScopeWithReturnType(scope, fd.ReturnType)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -122,6 +129,9 @@ func (p *Parser) parseFunc(scope *scope) Node {
 	if fd.Body != nil {
 		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
+	}
+	if fd.ReturnType != NONE_TYPE && !block.AlwaysReturns() {
+		p.appendError("missing return")
 	}
 	p.assertEnd()
 	p.advancePastNL()
@@ -518,18 +528,26 @@ func (p *Parser) parseIfBlock(scope *scope) *BlockStatement {
 }
 
 func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.TokenType]bool) *BlockStatement {
-	tok := p.cur
-	var stmts []Node
+	block := &BlockStatement{Token: p.cur}
 	for !endTokens[p.cur.TokenType()] {
+		tok := p.cur
 		stmt := p.parseStatement(scope)
-		if stmt != nil {
-			stmts = append(stmts, stmt)
+		if stmt == nil {
+			continue
 		}
+		if block.AlwaysReturns() {
+			p.appendErrorForToken("unreachable code", tok)
+			continue
+		}
+		if alwaysReturns(stmt) {
+			block.alwaysReturns = true
+		}
+		block.Statements = append(block.Statements, stmt)
 	}
-	if len(stmts) == 0 {
-		p.appendErrorForToken("at least one statement is required here", tok)
+	if len(block.Statements) == 0 {
+		p.appendErrorForToken("at least one statement is required here", block.Token)
 	}
-	return &BlockStatement{Token: tok, Statements: stmts}
+	return block
 }
 
 func (p *Parser) advance() {
@@ -573,17 +591,25 @@ func errString(errs []Error) string {
 
 func (p *Parser) parseReturnStatement(scope *scope) Node {
 	ret := &Return{Token: p.cur}
-	p.advance()      // advance past RETURN token
-	if p.isAtEOL() { // no return value, we are done
+	p.advance() // advance past RETURN token
+	retValueToken := p.cur
+	if p.isAtEOL() { // no return value
 		ret.T = NONE_TYPE
-		return ret
-	}
-	ret.Value = p.parseTopLevelExpression(scope)
-	if ret.Value == nil {
-		ret.T = ILLEGAL_TYPE
 	} else {
-		ret.T = ret.Value.Type()
-		p.assertEOL()
+		ret.Value = p.parseTopLevelExpression(scope)
+		if ret.Value == nil {
+			ret.T = ILLEGAL_TYPE
+		} else {
+			ret.T = ret.Value.Type()
+			p.assertEOL()
+		}
+	}
+	if !scope.returnType.Accepts(ret.T) {
+		msg := "expected return value of type " + scope.returnType.Format() + ", found " + ret.T.Format()
+		if scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
+			msg = "expected no return value, found " + ret.T.Format()
+		}
+		p.appendErrorForToken(msg, retValueToken)
 	}
 	p.advancePastNL()
 	return ret

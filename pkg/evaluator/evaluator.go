@@ -37,8 +37,7 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	case *parser.Assignment:
 		return e.evalAssignment(scope, node)
 	case *parser.Var:
-		v := e.evalVar(scope, node)
-		return v
+		return e.evalVar(scope, node)
 	case *parser.Term:
 		return e.evalTerm(scope, node)
 	case *parser.NumLiteral:
@@ -62,10 +61,14 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 }
 
 func (e *Evaluator) evalProgram(scope *scope, program *parser.Program) Value {
+	return e.evalStatments(scope, program.Statements)
+}
+
+func (e *Evaluator) evalStatments(scope *scope, statements []parser.Node) Value {
 	var result Value
-	for _, statement := range program.Statements {
+	for _, statement := range statements {
 		result = e.Eval(scope, statement)
-		if isError(result) {
+		if isError(result) || isReturn(result) {
 			return result
 		}
 	}
@@ -181,13 +184,7 @@ func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.Conditi
 }
 
 func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {
-	for _, statement := range block.Statements {
-		result := e.Eval(scope, statement)
-		if isError(result) || isReturn(result) {
-			return result
-		}
-	}
-	return nil
+	return e.evalStatments(scope, block.Statements)
 }
 
 func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {

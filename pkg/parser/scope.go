@@ -3,14 +3,20 @@ package parser
 type scope struct {
 	vars  map[string]*Var
 	outer *scope
+
+	returnType *Type
 }
 
 func newScope() *scope {
-	return &scope{vars: map[string]*Var{}}
+	return &scope{vars: map[string]*Var{}, returnType: ANY_TYPE}
 }
 
 func newInnerScope(outer *scope) *scope {
-	return &scope{vars: map[string]*Var{}, outer: outer}
+	return &scope{vars: map[string]*Var{}, outer: outer, returnType: outer.returnType}
+}
+
+func newInnerScopeWithReturnType(outer *scope, returnType *Type) *scope {
+	return &scope{vars: map[string]*Var{}, outer: outer, returnType: returnType}
 }
 
 func (s *scope) inLocalScope(name string) bool {

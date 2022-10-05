@@ -53,7 +53,7 @@ var typeNameStrings = map[TypeName]typeNameString{
 	ANY:     {string: "ANY", format: "any"},
 	ARRAY:   {string: "ARRAY", format: "[]"},
 	MAP:     {string: "MAP", format: "{}"},
-	NONE:    {string: "NONE", format: ""},
+	NONE:    {string: "NONE", format: "none"},
 }
 
 func (t TypeName) String() string {
@@ -107,7 +107,7 @@ func (t *Type) Accepts(t2 *Type) bool {
 // any[] (ARRAY ANY) DOES NOT accept num[] (ARRAY NUM)
 func (t *Type) acceptsStrict(t2 *Type) bool {
 	n, n2 := t.Name, t2.Name
-	if n == ILLEGAL || n == NONE || n2 == ILLEGAL || n2 == NONE {
+	if n == ILLEGAL || n2 == ILLEGAL {
 		return false
 	}
 	if n != n2 {

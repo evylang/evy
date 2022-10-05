@@ -189,10 +189,11 @@ x=len('123')
 
 func TestFuncDecl(t *testing.T) {
 	input := `
-c := add 1 2
-func add:num n1:num n2:num
+c := 1
+func nums1:num n1:num n2:num
 	if true //TODO: > 10
 	    print c
+	    return n1
 	end
 	return n1 // + n2
 end
@@ -201,14 +202,28 @@ on mousedown
 	    print c
 	end
 end
+func nums2:num n1:num n2:num
+	if true //TODO: > 10
+		return n1
+	else
+		return n2
+	end
+end
+func nums3
+	if true
+		return
+	end
+end
+
+return "success"
 `
 	parser := New(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
 	builtinCnt := len(testBuiltins())
-	assert.Equal(t, builtinCnt+1, len(parser.funcs))
-	got := parser.funcs["add"]
-	assert.Equal(t, "add", got.Name)
+	assert.Equal(t, builtinCnt+3, len(parser.funcs))
+	got := parser.funcs["nums1"]
+	assert.Equal(t, "nums1", got.Name)
 	assert.Equal(t, NUM_TYPE, got.ReturnType)
 	var wantVariadicParam *Var = nil
 	assert.Equal(t, wantVariadicParam, got.VariadicParam)
@@ -266,7 +281,7 @@ b:any
 a = b
 `: "line 4 column 3: 'a' accepts values of type num, found any",
 		`
-func fn
+func fn:bool
 	return true
 end
 fn = 3

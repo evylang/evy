@@ -112,7 +112,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newInnerScope(scope)
+	scope = newInnerScopeWithReturnType(scope, fd.ReturnType)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -573,17 +573,25 @@ func errString(errs []Error) string {
 
 func (p *Parser) parseReturnStatement(scope *scope) Node {
 	ret := &Return{Token: p.cur}
-	p.advance()      // advance past RETURN token
-	if p.isAtEOL() { // no return value, we are done
+	p.advance() // advance past RETURN token
+	retValueToken := p.cur
+	if p.isAtEOL() { // no return value
 		ret.T = NONE_TYPE
-		return ret
-	}
-	ret.Value = p.parseTopLevelExpression(scope)
-	if ret.Value == nil {
-		ret.T = ILLEGAL_TYPE
 	} else {
-		ret.T = ret.Value.Type()
-		p.assertEOL()
+		ret.Value = p.parseTopLevelExpression(scope)
+		if ret.Value == nil {
+			ret.T = ILLEGAL_TYPE
+		} else {
+			ret.T = ret.Value.Type()
+			p.assertEOL()
+		}
+	}
+	if !scope.returnType.Accepts(ret.T) {
+		msg := "expected return value of type " + scope.returnType.Format() + ", found " + ret.T.Format()
+		if scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
+			msg = "expected no return value, found " + ret.T.Format()
+		}
+		p.appendErrorForToken(msg, retValueToken)
 	}
 	p.advancePastNL()
 	return ret

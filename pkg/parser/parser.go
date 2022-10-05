@@ -130,6 +130,9 @@ func (p *Parser) parseFunc(scope *scope) Node {
 		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
 	}
+	if fd.ReturnType != NONE_TYPE && !block.AlwaysReturns() {
+		p.appendError("missing return")
+	}
 	p.assertEnd()
 	p.advancePastNL()
 	fd.Body = block

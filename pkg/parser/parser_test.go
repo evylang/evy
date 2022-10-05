@@ -283,6 +283,22 @@ func foo
 end
 print "do i run?"
 `: "line 7 column 1: unreachable code",
+		`
+func nums:num
+	while true
+		if true
+			return 1
+		end
+	end
+end
+`: "line 8 column 1: missing return",
+		`
+func nums:num
+	if true
+		return 1
+	end
+end
+`: "line 6 column 1: missing return",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

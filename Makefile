@@ -89,7 +89,7 @@ CHANNEL ?= dev
 AUTH_CI = $(if $(CI), { printenv FIREBASE_SERVICE_ACCOUNT > out/gac.json; export GOOGLE_APPLICATION_CREDENTIALS=out/gac.json; };)
 
 firebase-deploy-prod: firebase-public ## Deploy to live channel on firebase, use with care!
-	$(AUTH_CI) firebase --config firebase/firebase.json deploy
+	$(AUTH_CI) firebase --config firebase/firebase.json deploy --only hosting
 
 firebase-deploy: firebase-public ## Deploy to dev (or other) channel on firebase
 	$(AUTH_CI) firebase --config firebase/firebase.json hosting:channel:deploy $(CHANNEL)

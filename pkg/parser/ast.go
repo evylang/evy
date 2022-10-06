@@ -81,9 +81,10 @@ type EventHandler struct {
 }
 
 type Var struct {
-	Token *lexer.Token
-	Name  string
-	T     *Type
+	Token  *lexer.Token
+	Name   string
+	T      *Type
+	isUsed bool
 }
 
 type BlockStatement struct {

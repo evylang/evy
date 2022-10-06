@@ -10,14 +10,15 @@ import (
 func TestParseDeclaration(t *testing.T) {
 	tests := map[string][]string{
 		"a := 1":     {"a=1"},
-		"b:bool":     {"b=false"},
-		"\nb:bool\n": {"b=false"},
+		"a:bool":     {"a=false"},
+		"\na:bool\n": {"a=false"},
 		`a := "abc"
 		b:bool
-		c := true`: {"a='abc'", "b=false", "c=true"},
+		c := true
+		print a b c`: {"a='abc'", "b=false", "c=true", "print(a, b, c)"},
 		"a:num[]":                      {"a=[]"},
 		"a:num[]{}":                    {"a={}"},
-		"abc:any[]{}":                  {"abc={}"},
+		"a:any[]{}":                    {"a={}"},
 		"a := bool[true]":              {"a=[true]"},
 		"a := num[]":                   {"a=[]"},
 		"a := num[][num[1 2]num[3 4]]": {"a=[[1, 2], [3, 4]]"},
@@ -32,6 +33,8 @@ func TestParseDeclaration(t *testing.T) {
 		"a := num{}[num{a:1}]":                          {"a=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
+		input += "\n print a"
+		wantSlice = append(wantSlice, "print(a)")
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := New(input, testBuiltins())
 		got := parser.Parse()
@@ -91,14 +94,14 @@ func TestParseDeclarationError(t *testing.T) {
 
 func TestFunctionCall(t *testing.T) {
 	tests := map[string][]string{
-		"print":               {"print()"},
-		"print 123":           {"print(123)"},
-		`print 123 "abc"`:     {"print(123, 'abc')"},
-		"a:=1 \n print a":     {"a=1", "print(a)"},
-		`a := len "abc"`:      {"a=len('abc')"},
-		`len "abc"`:           {"len('abc')"},
-		`len num[]`:           {"len([])"},
-		"a:string \n print a": {"a=''", "print(a)"},
+		"print":                          {"print()"},
+		"print 123":                      {"print(123)"},
+		`print 123 "abc"`:                {"print(123, 'abc')"},
+		"a:=1 \n print a":                {"a=1", "print(a)"},
+		`a := len "abc"` + " \n print a": {"a=len('abc')", "print(a)"},
+		`len "abc"`:                      {"len('abc')"},
+		`len num[]`:                      {"len([])"},
+		"a:string \n print a":            {"a=''", "print(a)"},
 		`a:=true
 		b:string
 		print a b`: {"a=true", "b=''", "print(a, b)"},
@@ -177,12 +180,14 @@ print('TRUE')
 func TestToplevelExprFuncCall(t *testing.T) {
 	input := `
 x := len "123"
+print x
 `
 	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertNoParseError(t, parser, input)
 	want := `
 x=len('123')
+print(x)
 `[1:]
 	assert.Equal(t, want, got.String())
 }
@@ -315,14 +320,17 @@ func TestFuncAssignment(t *testing.T) {
 a := 1
 b:num
 b = a
+print b
 `, `
 a:num
 b:num
 b = a
+print b
 `, `
 a:num
 b:any
 b = a
+print b
 `,
 	}
 	for _, input := range inputs {
@@ -341,11 +349,11 @@ b = true
 		`
 a:= 1
 a = b
-`: "line 3 column 6: unknown variable name 'b'",
+`: "line 3 column 5: unknown variable name 'b'",
 		`
 a:= 1
 b = a
-`: "line 3 column 3: unknown variable name 'b'",
+`: "line 3 column 1: unknown variable name 'b'",
 		`
 a:= 1
 a = num[]
@@ -376,28 +384,138 @@ func TestScope(t *testing.T) {
 x := 1
 func foo
 	x := "abc"
+	print x
 end
+print x
 `, `
 x := 1
 func foo x:string
 	x = "abc"
+	print x
+end
+print x
+`, `
+x := 1
+func foo
+	x = 2
+	print x
 end
 `, `
 x := 1
 func foo x:string...
 	print x
 end
+print x
 `, `
 x := 1
 if true
 	x := "abc" // block scope
+	print x
 end
+print x
 `,
 	}
 	for _, input := range inputs {
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestUnusedErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+x := 1
+`: "line 2 column 1: 'x' declared but not used",
+		`
+x := 1
+if true
+	x := 1
+end
+print x
+`: "line 4 column 2: 'x' declared but not used",
+		`
+x := 1
+if true
+	x := 1
+	print x
+end
+`: "line 2 column 1: 'x' declared but not used",
+		`
+x := 1
+if true
+	print "foo"
+else
+	x := 1
+	print x
+end
+`: "line 2 column 1: 'x' declared but not used",
+		`
+x := 1
+if true
+	print "foo"
+else
+	x := 1
+end
+print x
+`: "line 6 column 2: 'x' declared but not used",
+		`
+x := 1
+if true
+	print "foo"
+else if true
+	x := 1
+end
+print x
+`: "line 6 column 2: 'x' declared but not used",
+		`
+x := 1
+for i := range 10
+	x := 2
+	print x
+end
+`: "line 2 column 1: 'x' declared but not used",
+		`
+x := 1
+for i := range 10
+	x := 2
+end
+print x
+`: "line 4 column 2: 'x' declared but not used",
+		`
+x := 1
+while true
+	x := 2
+	print x
+end
+`: "line 2 column 1: 'x' declared but not used",
+		`
+x := 1
+while true
+	x := 2
+end
+print x
+`: "line 4 column 2: 'x' declared but not used",
+		`
+x := 1
+func foo
+	x := 2
+end
+print x
+`: "line 4 column 2: 'x' declared but not used",
+		`
+x := 1
+func foo
+	x := 2
+	print x
+end
+`: "line 2 column 1: 'x' declared but not used",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
 	}
 }
 

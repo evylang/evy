@@ -115,6 +115,7 @@ func (p *Parser) parseProgram(scope *scope) *Program {
 			program.Statements = append(program.Statements, stmt)
 		}
 	}
+	p.validateScope(scope)
 	return program
 }
 
@@ -222,7 +223,6 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	}
-
 	target := p.parseAssignable(scope)
 	tok := p.cur
 	if target == nil {
@@ -246,11 +246,12 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseAssignable(scope *scope) Node {
+	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
 	v, ok := scope.get(name)
 	if !ok {
-		p.appendError("unknown variable name '" + name + "'")
+		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
 		return nil
 	}
 	return v
@@ -293,7 +294,7 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 
 func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVar(scope, decl.Var, decl.Token) {
+	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.Token) {
 		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
@@ -321,7 +322,7 @@ func (p *Parser) parseTypedDecl() *Declaration {
 	return decl
 }
 
-func (p *Parser) validateVar(scope *scope, v *Var, tok *lexer.Token) bool {
+func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
 	if scope.inLocalScope(v.Name) { // already declared in current scope
 		p.appendErrorForToken("redeclaration of '"+v.Name+"'", tok)
 		return false
@@ -359,7 +360,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		return nil
 	}
 	decl.Var.T = val.Type()
-	if !p.validateVar(scope, decl.Var, decl.Token) {
+	if !p.validateVarDecl(scope, decl.Var, decl.Token) {
 		return nil
 	}
 	decl.Value = val
@@ -389,7 +390,11 @@ func (p *Parser) parseTerm(scope *scope) Node {
 			p.advance()
 			return nil
 		}
-		return p.parseAssignable(scope)
+		assignable := p.parseAssignable(scope)
+		if v, ok := assignable.(*Var); ok {
+			v.isUsed = true
+		}
+		return assignable
 	}
 	if p.isLiteral() {
 		lit := p.parseLiteral(scope)
@@ -517,6 +522,15 @@ func (p *Parser) appendErrorForToken(message string, token *lexer.Token) {
 	p.errors = append(p.errors, Error{message: message, token: token})
 }
 
+// validateScope ensures all variables in scope have been used.
+func (p *Parser) validateScope(scope *scope) {
+	for _, v := range scope.vars {
+		if !v.isUsed {
+			p.appendErrorForToken("'"+v.Name+"' declared but not used", v.Token)
+		}
+	}
+}
+
 func (p *Parser) parseBlock(scope *scope) *BlockStatement {
 	endTokens := map[lexer.TokenType]bool{lexer.END: true, lexer.EOF: true}
 	return p.parseBlockWithEndTokens(scope, endTokens)
@@ -547,6 +561,7 @@ func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 	if len(block.Statements) == 0 {
 		p.appendErrorForToken("at least one statement is required here", block.Token)
 	}
+	p.validateScope(scope)
 	return block
 }
 

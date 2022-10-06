@@ -11,6 +11,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: ./bin/make ci
+    - run: ./bin/make firebase-deploy
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
 
   release:
     runs-on: ubuntu-latest
@@ -22,3 +25,6 @@ jobs:
     - run: ./bin/make release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: ./bin/make firebase-deploy-prod
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}

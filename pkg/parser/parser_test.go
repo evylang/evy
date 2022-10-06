@@ -341,11 +341,11 @@ b = true
 		`
 a:= 1
 a = b
-`: "line 3 column 6: unknown variable name 'b'",
+`: "line 3 column 5: unknown variable name 'b'",
 		`
 a:= 1
 b = a
-`: "line 3 column 3: unknown variable name 'b'",
+`: "line 3 column 1: unknown variable name 'b'",
 		`
 a:= 1
 a = num[]

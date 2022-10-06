@@ -246,11 +246,12 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseAssignable(scope *scope) Node {
+	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
 	v, ok := scope.get(name)
 	if !ok {
-		p.appendError("unknown variable name '" + name + "'")
+		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
 		return nil
 	}
 	return v

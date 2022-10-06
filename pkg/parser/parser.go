@@ -293,7 +293,7 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 
 func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVar(scope, decl.Var, decl.Token) {
+	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.Token) {
 		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
@@ -321,7 +321,7 @@ func (p *Parser) parseTypedDecl() *Declaration {
 	return decl
 }
 
-func (p *Parser) validateVar(scope *scope, v *Var, tok *lexer.Token) bool {
+func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
 	if scope.inLocalScope(v.Name) { // already declared in current scope
 		p.appendErrorForToken("redeclaration of '"+v.Name+"'", tok)
 		return false
@@ -359,7 +359,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		return nil
 	}
 	decl.Var.T = val.Type()
-	if !p.validateVar(scope, decl.Var, decl.Token) {
+	if !p.validateVarDecl(scope, decl.Var, decl.Token) {
 		return nil
 	}
 	decl.Value = val

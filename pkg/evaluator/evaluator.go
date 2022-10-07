@@ -139,7 +139,7 @@ func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope 
 
 func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
 	if ret.Value == nil {
-		return nil
+		return &ReturnValue{}
 	}
 	val := e.Eval(scope, ret.Value)
 	if isError(val) {

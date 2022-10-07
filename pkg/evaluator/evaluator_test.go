@@ -41,14 +41,23 @@ func fox:string
     return "🦊"
 end
 
+func fox2
+    if true
+        print "🦊2"
+        return
+    end
+    print "💣"
+end
+
 f := fox
 print f
 print f f
+fox2
 `
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "🦊\n🦊 🦊\n"
+	want := "🦊\n🦊 🦊\n🦊2\n"
 	assert.Equal(t, want, b.String())
 }
 

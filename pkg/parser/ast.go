@@ -281,6 +281,10 @@ func (w *While) Type() *Type {
 	return w.ConditionalBlock.Type()
 }
 
+func (*While) AlwaysReturns() bool {
+	return false
+}
+
 func (c *ConditionalBlock) String() string {
 	condition := "(" + c.Condition.String() + ")"
 	return condition + " {\n" + c.Block.String() + "}"

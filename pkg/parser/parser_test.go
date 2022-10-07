@@ -220,12 +220,20 @@ func nums3
 	end
 end
 return "success"
+func nums4:num
+	a := 5
+	while true
+		return 1
+	end
+	print a "reachable"
+	return 0
+end
 `
 	parser := New(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
 	builtinCnt := len(testBuiltins())
-	assert.Equal(t, builtinCnt+3, len(parser.funcs))
+	assert.Equal(t, builtinCnt+4, len(parser.funcs))
 	got := parser.funcs["nums1"]
 	assert.Equal(t, "nums1", got.Name)
 	assert.Equal(t, NUM_TYPE, got.ReturnType)
@@ -273,14 +281,15 @@ func nums:num
 end
 `: "line 12 column 2: unreachable code",
 		`
-func nums:num
-	a := 5
-	while true
+while true
+	if true
 		return 1
+	else
+		return 2
 	end
-	print "boom"
+	print "deadcode"
 end
-`: "line 7 column 2: unreachable code",
+`: "line 8 column 2: unreachable code",
 		`
 foo
 return false

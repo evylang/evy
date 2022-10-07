@@ -6,7 +6,7 @@ O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 
-all: build tiny test test-tiny check-coverage lint frontend ## Build, test, check coverage and lint
+all: build tiny test test-tiny check-coverage lint sh-lint frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -85,14 +85,12 @@ frontend-serve: frontend ## Build frontend and serve on free port
 .PHONY: frontend frontend-serve
 
 # --- firebase -----------------------------------------------------------------
-CHANNEL ?= dev
-AUTH_CI = $(if $(CI), { printenv FIREBASE_SERVICE_ACCOUNT > out/gac.json; export GOOGLE_APPLICATION_CREDENTIALS=out/gac.json; };)
 
 firebase-deploy-prod: firebase-public ## Deploy to live channel on firebase, use with care!
-	$(AUTH_CI) firebase --config firebase/firebase.json deploy --only hosting
+	./firebase/deploy live
 
 firebase-deploy: firebase-public ## Deploy to dev (or other) channel on firebase
-	$(AUTH_CI) firebase --config firebase/firebase.json hosting:channel:deploy $(CHANNEL)
+	./firebase/deploy
 
 firebase-emulate: firebase-public ## Run firebase emulator for auth, hosting and datastore
 	firebase --config firebase/firebase.json emulators:start
@@ -102,6 +100,18 @@ firebase-public: frontend
 	cp -r $(O)/public firebase
 
 .PHONY: firebase-deploy firebase-deploy-prod firebase-emulate firebase-public
+
+# --- scripts ------------------------------------------------------------------
+SCRIPTS = firebase/deploy
+
+sh-lint: ## Lint script files with shellcheck and shfmt
+	shellcheck $(SCRIPTS)
+	shfmt --diff $(SCRIPTS)
+
+sh-fmt:  ## Format script files
+	shfmt --write $(SCRIPTS)
+
+.PHONY: sh-fmt sh-lint
 
 # --- Release -------------------------------------------------------------------
 release: nexttag ## Tag and release binaries for different OS on GitHub release

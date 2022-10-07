@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+main() {
+	set -euo pipefail
+	on_ci && set -x
+	local channel result url
+
+	if (($# > 1)); then
+		exit_error "usage [CHANNEL=dev]"
+	fi
+
+	on_ci && setup_ci_creds
+
+	channel=$(get_channel "${1:-}")
+	if [[ "${channel}" == "live" ]]; then
+		firebase --config firebase/firebase.json deploy --only hosting
+		exit 0
+	fi
+
+	result=$(firebase --json --config firebase/firebase.json hosting:channel:deploy "${channel}")
+	check_deploy_error "${result}"
+	url=$(jq -r '.result."evy-lang".url' <<<"${result}")
+	echo "Deployed to ${url}"
+
+	on_ci && post_pr_comment "${url}"
+}
+
+on_ci() {
+	[[ -n "${CI:-}" ]]
+}
+
+setup_ci_creds() {
+	if [ -z "${FIREBASE_SERVICE_ACCOUNT}" ]; then
+		exit_error "FIREBASE_SERVICE_ACCOUNT environment variable must be set on CI."
+	fi
+	export GOOGLE_APPLICATION_CREDENTIALS=out/gac.json
+	printenv FIREBASE_SERVICE_ACCOUNT >"${GOOGLE_APPLICATION_CREDENTIALS}"
+}
+
+get_channel() {
+	local channel="$1"
+	if [[ -n "${channel}" ]]; then
+		echo "${channel}"
+		return
+	fi
+	if [[ -z "${CI:-}" ]]; then
+		echo "dev"
+		return
+	fi
+	get_pr_num
+}
+
+get_pr_num() {
+	local pr_num=${GITHUB_REF:-unknown-pr} # GITHUB_REF == "refs/pull/:PR_NUM/merge"
+	pr_num=${pr_num#refs/pull/}
+	pr_num=${pr_num%/merge}
+	echo "${pr_num}"
+}
+
+check_deploy_error() {
+	local result="$1" status
+	status=$(jq -r '.status' <<<"${result}")
+	if [[ "${status}" == "error" ]]; then
+		error_msg=$(jq -r '.error' <<<"${result}")
+		exit_error "${error_msg}"
+	fi
+	if [[ "${status}" != "success" ]]; then
+		exit_error "unknown status: ${result}"
+	fi
+}
+
+post_pr_comment() {
+	local url="$1" sha body comment_id pr_num
+	sha=$(git rev-parse "origin/${GITHUB_HEAD_REF}")
+	body="firebase-deployment: ${url} (${sha})"
+	body+=$'\n<!--- bot:firebase-url --->' # marker to find correct comment for update
+	pr_num=$(get_pr_num)
+
+	comment_id=$(
+		gh api -H "Accept: application/vnd.github+json" "/repos/foxygoat/evy/issues/${pr_num}/comments" |
+			jq 'map(select(.body | contains ("<!--- bot:firebase-url --->"))) | .[] .id' |
+			head -n1
+	)
+	if [[ -z "${comment_id}" ]]; then
+		# create new comment
+		gh pr comment "${pr_num}" --body "${body}"
+		return
+	fi
+	# update comment
+	gh api --method PATCH -H "Accept: application/vnd.github+json" \
+		"/repos/foxygoat/evy/issues/comments/${comment_id}" \
+		-f body="${body}"
+}
+
+exit_error() {
+	echo "$*"
+	exit 1
+}
+
+# Only run main if executed as a script and not sourced.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi

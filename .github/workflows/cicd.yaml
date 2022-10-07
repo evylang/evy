@@ -14,6 +14,7 @@ jobs:
         fetch-depth: 0
     - run: ./bin/make ci
     - run: ./bin/make firebase-deploy
+      if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/master in release job
       env:
         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,7 +22,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: [ ci ]
-    if: github.event_name == 'push' # only run on push to master
+    if: ${{ github.event_name == 'push' }} # only run on push to master
     steps:
     - uses: actions/checkout@v3
       with:

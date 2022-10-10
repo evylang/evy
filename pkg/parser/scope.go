@@ -1,22 +1,26 @@
 package parser
 
 type scope struct {
-	vars  map[string]*Var
-	outer *scope
-
-	returnType *Type
+	vars       map[string]*Var
+	outer      *scope
+	block      Node
+	returnType *Type // TODO: maybe get rid of returnType and look up the scope chain for Func nodes and their return type
 }
 
-func newScope() *scope {
-	return &scope{vars: map[string]*Var{}, returnType: ANY_TYPE}
+func newScope(outer *scope, node Node) *scope {
+	if outer == nil {
+		return newScopeWithReturnType(nil, node, ANY_TYPE)
+	}
+	return newScopeWithReturnType(outer, node, outer.returnType)
 }
 
-func newInnerScope(outer *scope) *scope {
-	return &scope{vars: map[string]*Var{}, outer: outer, returnType: outer.returnType}
-}
-
-func newInnerScopeWithReturnType(outer *scope, returnType *Type) *scope {
-	return &scope{vars: map[string]*Var{}, outer: outer, returnType: returnType}
+func newScopeWithReturnType(outer *scope, node Node, returnType *Type) *scope {
+	return &scope{
+		vars:       map[string]*Var{},
+		block:      node,
+		outer:      outer,
+		returnType: returnType,
+	}
 }
 
 func (s *scope) inLocalScope(name string) bool {

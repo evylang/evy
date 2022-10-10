@@ -85,13 +85,14 @@ func (p *Parser) HasErrors() bool {
 }
 
 func (p *Parser) Parse() *Program {
-	return p.parseProgram(newScope())
+	return p.parseProgram()
 }
 
 // function names matching `parsePROCUTION` align with production names
 // in grammar doc/syntax_grammar.md.
-func (p *Parser) parseProgram(scope *scope) *Program {
+func (p *Parser) parseProgram() *Program {
 	program := &Program{}
+	scope := newScope(nil, program)
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
@@ -126,7 +127,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newInnerScopeWithReturnType(scope, fd.ReturnType)
+	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -638,7 +639,7 @@ func (p *Parser) parseBreakStatement() Node {
 
 // TODO: implemented.
 func (p *Parser) parseForStatement(scope *scope) Node {
-	scope = newInnerScope(scope)
+	scope = newScope(scope, nil)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	p.assertEnd()
@@ -647,21 +648,17 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseWhileStatement(scope *scope) Node {
-	tok := p.cur
+	while := &While{}
+	while.Token = p.cur
 	p.advance() // advance past WHILE token
-	scope = newInnerScope(scope)
-	condition := p.parseCondition(scope)
+	scope = newScope(scope, while)
+	while.Condition = p.parseCondition(scope)
+	scope = newScope(scope, while)
 	p.advancePastNL()
-	block := p.parseBlock(scope)
+	while.Block = p.parseBlock(scope)
 	p.assertEnd()
 	p.advancePastNL()
-	return &While{
-		ConditionalBlock{
-			Token:     tok,
-			Condition: condition,
-			Block:     block,
-		},
-	}
+	return while
 }
 
 func (p *Parser) parseIfStatement(scope *scope) Node {
@@ -678,7 +675,7 @@ func (p *Parser) parseIfStatement(scope *scope) Node {
 		p.advance() // advance past ELSE token
 		p.assertEOL()
 		p.advancePastNL()
-		ifStmt.Else = p.parseBlock(newInnerScope(scope))
+		ifStmt.Else = p.parseBlock(newScope(scope, ifStmt))
 	}
 	p.assertEnd()
 	p.advancePastNL()
@@ -686,13 +683,13 @@ func (p *Parser) parseIfStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
-	tok := p.cur
+	ifBlock := &ConditionalBlock{Token: p.cur}
 	p.advance() // advance past IF token
-	scope = newInnerScope(scope)
-	condition := p.parseCondition(scope)
+	ifBlock.Condition = p.parseCondition(scope)
 	p.advancePastNL()
-	block := p.parseIfBlock(scope)
-	return &ConditionalBlock{Token: tok, Condition: condition, Block: block}
+	scope = newScope(scope, ifBlock)
+	ifBlock.Block = p.parseIfBlock(scope)
+	return ifBlock
 }
 
 func (p *Parser) parseCondition(scope *scope) Node {

@@ -750,6 +750,115 @@ end`: "line 2 column 6: unexpected end of line",
 	}
 }
 
+func TestBreak(t *testing.T) {
+	inputs := []string{
+		`
+while true
+	break
+end`, `
+while true
+	if false
+		break
+	end
+end`, `
+while true
+	print "🎈"
+	if true
+		break
+	end
+	print "💣"
+end`, `
+func foo
+	while true
+		break
+	end
+end`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestBreakErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+while true
+	break 123
+end
+`: "line 3 column 8: expected end of line, found 123",
+		`
+break
+`: "line 2 column 1: break is not in a loop",
+		`
+if true
+	break
+end
+`: "line 3 column 2: break is not in a loop",
+		`
+func x
+	break
+end
+`: "line 3 column 2: break is not in a loop",
+		`
+func x
+	if true
+		print "foo"
+	else
+		break
+	end
+end
+`: "line 6 column 3: break is not in a loop",
+		`
+while true
+	break
+	print "deadcode"
+end
+`: "line 4 column 2: unreachable code",
+		`
+while true
+	if true
+		break
+	else
+		break
+	end
+	print "deadcode"
+end
+`: "line 8 column 2: unreachable code",
+		`
+func a
+	while true
+		if true
+			break
+		else
+			return
+		end
+		print "deadcode"
+	end
+end
+`: "line 9 column 3: unreachable code",
+		`
+func a:num
+	while true
+		if true
+			return 0
+		else
+			break
+		end
+		print "deadcode"
+	end
+end
+`: "line 9 column 3: unreachable code",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

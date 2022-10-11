@@ -87,6 +87,51 @@ print f2
 	assert.Equal(t, want, b.String())
 }
 
+func TestBreak(t *testing.T) {
+	tests := []string{
+		`
+while true
+    print "🎈"
+    break
+end
+`, `
+while true
+    print "🎈"
+    if true
+        break
+    end
+    print "💣"
+end
+`, `
+stop := false
+while true
+    if stop
+        print "🎈"
+        break
+    end
+    stop = true
+end
+`, `
+continue := true
+while true
+    if continue
+        print "🎈"
+    else
+        break
+    end
+    continue = false
+end
+`,
+	}
+	for _, input := range tests {
+		b := bytes.Buffer{}
+		fn := func(s string) { b.WriteString(s) }
+		Run(input, fn)
+		want := "🎈\n"
+		assert.Equal(t, want, b.String(), input)
+	}
+}
+
 func TestAssignment(t *testing.T) {
 	prog := `
 f1:num

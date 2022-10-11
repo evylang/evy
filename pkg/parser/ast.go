@@ -49,6 +49,10 @@ type Return struct {
 	T     *Type
 }
 
+type Break struct {
+	Token *lexer.Token
+}
+
 type FuncDecl struct {
 	Token         *lexer.Token // The 'func' token
 	Name          string
@@ -177,6 +181,18 @@ func (r *Return) Type() *Type {
 }
 
 func (*Return) AlwaysTerminates() bool {
+	return true
+}
+
+func (*Break) String() string {
+	return "break"
+}
+
+func (*Break) Type() *Type {
+	return NONE_TYPE
+}
+
+func (b *Break) AlwaysTerminates() bool {
 	return true
 }
 

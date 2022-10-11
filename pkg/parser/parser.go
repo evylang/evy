@@ -205,7 +205,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.RETURN:
 		return p.parseReturnStatement(scope)
 	case lexer.BREAK:
-		return p.parseBreakStatement() // TODO
+		return p.parseBreakStatement(scope)
 	case lexer.FOR:
 		return p.parseForStatement(scope) // TODO
 	case lexer.WHILE:
@@ -631,10 +631,15 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 	return ret
 }
 
-// TODO: implemented.
-func (p *Parser) parseBreakStatement() Node {
+func (p *Parser) parseBreakStatement(scope *scope) Node {
+	breakStmt := &Break{Token: p.cur}
+	if !inLoop(scope) {
+		p.appendError("break is not in a loop")
+	}
+	p.advance() // advance past BREAK token
+	p.assertEOL()
 	p.advancePastNL()
-	return nil
+	return breakStmt
 }
 
 // TODO: implemented.
@@ -653,7 +658,6 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 	p.advance() // advance past WHILE token
 	scope = newScope(scope, while)
 	while.Condition = p.parseCondition(scope)
-	scope = newScope(scope, while)
 	p.advancePastNL()
 	while.Block = p.parseBlock(scope)
 	p.assertEnd()
@@ -661,13 +665,22 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 	return while
 }
 
+func inLoop(s *scope) bool {
+	for ; s != nil; s = s.outer {
+		if _, ok := s.block.(*While); ok {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *Parser) parseIfStatement(scope *scope) Node {
 	ifStmt := &If{Token: p.cur}
-	ifStmt.IfBlock = p.parseIfConditionalBlock(scope)
+	ifStmt.IfBlock = p.parseIfConditionalBlock(newScope(scope, ifStmt))
 	// else if blocks
 	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
 		p.advance() // advance past ELSE token
-		elseIfBlock := p.parseIfConditionalBlock(scope)
+		elseIfBlock := p.parseIfConditionalBlock(newScope(scope, ifStmt))
 		ifStmt.ElseIfBlocks = append(ifStmt.ElseIfBlocks, elseIfBlock)
 	}
 	// else block
@@ -687,7 +700,6 @@ func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
 	p.advance() // advance past IF token
 	ifBlock.Condition = p.parseCondition(scope)
 	p.advancePastNL()
-	scope = newScope(scope, ifBlock)
 	ifBlock.Block = p.parseIfBlock(scope)
 	return ifBlock
 }

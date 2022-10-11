@@ -20,6 +20,7 @@ const (
 	ARRAY
 	MAP
 	RETURN_VALUE
+	BREAK
 	FUNCTION
 	BUILTIN
 )
@@ -76,6 +77,8 @@ type ReturnValue struct {
 	Val Value
 }
 
+type Break struct{}
+
 type Error struct {
 	Message string
 }
@@ -94,6 +97,9 @@ func (s *Bool) String() string {
 func (r *ReturnValue) Type() ValueType { return RETURN_VALUE }
 func (r *ReturnValue) String() string  { return r.Val.String() }
 
+func (r *Break) Type() ValueType { return BREAK }
+func (r *Break) String() string  { return "" }
+
 func (e *Error) Type() ValueType { return ERROR }
 func (e *Error) String() string  { return "ERROR: " + e.Message }
 func isError(val Value) bool { // TODO: replace with panic flow
@@ -102,6 +108,10 @@ func isError(val Value) bool { // TODO: replace with panic flow
 
 func isReturn(val Value) bool {
 	return val != nil && val.Type() == RETURN_VALUE
+}
+
+func isBreak(val Value) bool {
+	return val != nil && val.Type() == BREAK
 }
 
 func newError(msg string) *Error {

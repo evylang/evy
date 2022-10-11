@@ -13,8 +13,8 @@ type Node interface {
 }
 
 type Program struct {
-	Statements    []Node
-	alwaysReturns bool
+	Statements       []Node
+	alwaysTerminates bool
 }
 
 type FunctionCall struct {
@@ -88,9 +88,9 @@ type Var struct {
 }
 
 type BlockStatement struct {
-	Token         *lexer.Token // the NL before the first statement
-	Statements    []Node
-	alwaysReturns bool
+	Token            *lexer.Token // the NL before the first statement
+	Statements       []Node
+	alwaysTerminates bool
 }
 
 type Bool struct {
@@ -129,8 +129,8 @@ func (*Program) Type() *Type {
 	return NONE_TYPE
 }
 
-func (p *Program) AlwaysReturns() bool {
-	return p.alwaysReturns
+func (p *Program) AlwaysTerminates() bool {
+	return p.alwaysTerminates
 }
 
 func (f *FunctionCall) String() string {
@@ -176,7 +176,7 @@ func (r *Return) Type() *Type {
 	return r.T
 }
 
-func (*Return) AlwaysReturns() bool {
+func (*Return) AlwaysTerminates() bool {
 	return true
 }
 
@@ -224,15 +224,15 @@ func (i *If) Type() *Type {
 	return NONE_TYPE
 }
 
-func (i *If) AlwaysReturns() bool {
-	if i.Else == nil || !i.Else.AlwaysReturns() {
+func (i *If) AlwaysTerminates() bool {
+	if i.Else == nil || !i.Else.AlwaysTerminates() {
 		return false
 	}
-	if !i.IfBlock.AlwaysReturns() {
+	if !i.IfBlock.AlwaysTerminates() {
 		return false
 	}
 	for _, b := range i.ElseIfBlocks {
-		if !b.AlwaysReturns() {
+		if !b.AlwaysTerminates() {
 			return false
 		}
 	}
@@ -264,13 +264,13 @@ func (b *BlockStatement) Type() *Type {
 	return NONE_TYPE
 }
 
-func (b *BlockStatement) AlwaysReturns() bool {
-	return b.alwaysReturns
+func (b *BlockStatement) AlwaysTerminates() bool {
+	return b.alwaysTerminates
 }
 
-func alwaysReturns(n Node) bool {
-	r, ok := n.(interface{ AlwaysReturns() bool })
-	return ok && r.AlwaysReturns()
+func alwaysTerminates(n Node) bool {
+	r, ok := n.(interface{ AlwaysTerminates() bool })
+	return ok && r.AlwaysTerminates()
 }
 
 func (w *While) String() string {
@@ -281,7 +281,7 @@ func (w *While) Type() *Type {
 	return w.ConditionalBlock.Type()
 }
 
-func (*While) AlwaysReturns() bool {
+func (*While) AlwaysTerminates() bool {
 	return false
 }
 
@@ -294,8 +294,8 @@ func (c *ConditionalBlock) Type() *Type {
 	return NONE_TYPE
 }
 
-func (c *ConditionalBlock) AlwaysReturns() bool {
-	return c.Block.AlwaysReturns()
+func (c *ConditionalBlock) AlwaysTerminates() bool {
+	return c.Block.AlwaysTerminates()
 }
 
 func (b *Bool) String() string {

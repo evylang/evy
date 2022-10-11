@@ -104,12 +104,12 @@ func (p *Parser) parseProgram() *Program {
 		default:
 			tok := p.cur
 			stmt = p.parseStatement(scope)
-			if stmt != nil && program.AlwaysReturns() {
+			if stmt != nil && program.AlwaysTerminates() {
 				p.appendErrorForToken("unreachable code", tok)
 				stmt = nil
 			}
-			if alwaysReturns(stmt) {
-				program.alwaysReturns = true
+			if alwaysTerminates(stmt) {
+				program.alwaysTerminates = true
 			}
 		}
 		if stmt != nil {
@@ -138,7 +138,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
 	}
-	if fd.ReturnType != NONE_TYPE && !block.AlwaysReturns() {
+	if fd.ReturnType != NONE_TYPE && !block.AlwaysTerminates() {
 		p.appendError("missing return")
 	}
 	p.assertEnd()
@@ -550,12 +550,12 @@ func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 		if stmt == nil {
 			continue
 		}
-		if block.AlwaysReturns() {
+		if block.AlwaysTerminates() {
 			p.appendErrorForToken("unreachable code", tok)
 			continue
 		}
-		if alwaysReturns(stmt) {
-			block.alwaysReturns = true
+		if alwaysTerminates(stmt) {
+			block.alwaysTerminates = true
 		}
 		block.Statements = append(block.Statements, stmt)
 	}

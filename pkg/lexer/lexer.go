@@ -33,7 +33,6 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) Next() *Token {
-	l.consumeHorizontalWhitespace()
 	l.advance()
 
 	tok := &Token{
@@ -42,6 +41,9 @@ func (l *Lexer) Next() *Token {
 		Col:    l.col,
 	}
 	switch l.cur {
+	case ' ', '\t':
+		l.consumeHorizontalWhitespace()
+		return tok.SetType(WS)
 	case '=':
 		if l.peekRune() == '=' {
 			l.advance()

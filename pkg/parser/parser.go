@@ -195,6 +195,9 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.NL, lexer.EOF, lexer.COMMENT:
 		p.advancePastNL()
 		return nil
+	case lexer.WS:
+		p.advance()
+		return nil
 	case lexer.IDENT:
 		switch p.peek.Type {
 		case lexer.ASSIGN, lexer.DOT:
@@ -519,6 +522,17 @@ func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 }
 
 func (p *Parser) advance() {
+	p.advanceWSS()
+	if p.cur.Type == lexer.WS {
+		p.advanceWSS()
+	}
+	if p.peek.Type == lexer.WS {
+		p.peek = p.lookAt(p.pos + 2)
+	}
+}
+
+// advanceWSS advances to the next token in whitespace sensitive (wss) manner.
+func (p *Parser) advanceWSS() {
 	p.pos++
 	p.cur = p.lookAt(p.pos)
 	p.peek = p.lookAt(p.pos + 1)
@@ -528,6 +542,9 @@ func (p *Parser) advanceTo(pos int) {
 	p.pos = pos
 	p.cur = p.lookAt(pos)
 	p.peek = p.lookAt(pos + 1)
+	if p.peek.Type == lexer.WS {
+		p.peek = p.lookAt(p.pos + 2)
+	}
 }
 
 func (p *Parser) lookAt(pos int) *lexer.Token {

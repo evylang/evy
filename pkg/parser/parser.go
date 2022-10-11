@@ -85,13 +85,14 @@ func (p *Parser) HasErrors() bool {
 }
 
 func (p *Parser) Parse() *Program {
-	return p.parseProgram(newScope())
+	return p.parseProgram()
 }
 
 // function names matching `parsePROCUTION` align with production names
 // in grammar doc/syntax_grammar.md.
-func (p *Parser) parseProgram(scope *scope) *Program {
+func (p *Parser) parseProgram() *Program {
 	program := &Program{}
+	scope := newScope(nil, program)
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
@@ -103,12 +104,12 @@ func (p *Parser) parseProgram(scope *scope) *Program {
 		default:
 			tok := p.cur
 			stmt = p.parseStatement(scope)
-			if stmt != nil && program.AlwaysReturns() {
+			if stmt != nil && program.AlwaysTerminates() {
 				p.appendErrorForToken("unreachable code", tok)
 				stmt = nil
 			}
-			if alwaysReturns(stmt) {
-				program.alwaysReturns = true
+			if alwaysTerminates(stmt) {
+				program.alwaysTerminates = true
 			}
 		}
 		if stmt != nil {
@@ -126,7 +127,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newInnerScopeWithReturnType(scope, fd.ReturnType)
+	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
 	p.addParamsToScope(scope, fd)
 	block := p.parseBlock(scope) // parse to "end"
 
@@ -137,7 +138,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 		p.appendError("redeclaration of function '" + funcName + "'")
 		return nil
 	}
-	if fd.ReturnType != NONE_TYPE && !block.AlwaysReturns() {
+	if fd.ReturnType != NONE_TYPE && !block.AlwaysTerminates() {
 		p.appendError("missing return")
 	}
 	p.assertEnd()
@@ -204,7 +205,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.RETURN:
 		return p.parseReturnStatement(scope)
 	case lexer.BREAK:
-		return p.parseBreakStatement() // TODO
+		return p.parseBreakStatement(scope)
 	case lexer.FOR:
 		return p.parseForStatement(scope) // TODO
 	case lexer.WHILE:
@@ -549,12 +550,12 @@ func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 		if stmt == nil {
 			continue
 		}
-		if block.AlwaysReturns() {
+		if block.AlwaysTerminates() {
 			p.appendErrorForToken("unreachable code", tok)
 			continue
 		}
-		if alwaysReturns(stmt) {
-			block.alwaysReturns = true
+		if alwaysTerminates(stmt) {
+			block.alwaysTerminates = true
 		}
 		block.Statements = append(block.Statements, stmt)
 	}
@@ -630,15 +631,20 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 	return ret
 }
 
-// TODO: implemented.
-func (p *Parser) parseBreakStatement() Node {
+func (p *Parser) parseBreakStatement(scope *scope) Node {
+	breakStmt := &Break{Token: p.cur}
+	if !inLoop(scope) {
+		p.appendError("break is not in a loop")
+	}
+	p.advance() // advance past BREAK token
+	p.assertEOL()
 	p.advancePastNL()
-	return nil
+	return breakStmt
 }
 
 // TODO: implemented.
 func (p *Parser) parseForStatement(scope *scope) Node {
-	scope = newInnerScope(scope)
+	scope = newScope(scope, nil)
 	p.advancePastNL()
 	p.parseBlock(scope)
 	p.assertEnd()
@@ -647,30 +653,34 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseWhileStatement(scope *scope) Node {
-	tok := p.cur
+	while := &While{}
+	while.Token = p.cur
 	p.advance() // advance past WHILE token
-	scope = newInnerScope(scope)
-	condition := p.parseCondition(scope)
+	scope = newScope(scope, while)
+	while.Condition = p.parseCondition(scope)
 	p.advancePastNL()
-	block := p.parseBlock(scope)
+	while.Block = p.parseBlock(scope)
 	p.assertEnd()
 	p.advancePastNL()
-	return &While{
-		ConditionalBlock{
-			Token:     tok,
-			Condition: condition,
-			Block:     block,
-		},
+	return while
+}
+
+func inLoop(s *scope) bool {
+	for ; s != nil; s = s.outer {
+		if _, ok := s.block.(*While); ok {
+			return true
+		}
 	}
+	return false
 }
 
 func (p *Parser) parseIfStatement(scope *scope) Node {
 	ifStmt := &If{Token: p.cur}
-	ifStmt.IfBlock = p.parseIfConditionalBlock(scope)
+	ifStmt.IfBlock = p.parseIfConditionalBlock(newScope(scope, ifStmt))
 	// else if blocks
 	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
 		p.advance() // advance past ELSE token
-		elseIfBlock := p.parseIfConditionalBlock(scope)
+		elseIfBlock := p.parseIfConditionalBlock(newScope(scope, ifStmt))
 		ifStmt.ElseIfBlocks = append(ifStmt.ElseIfBlocks, elseIfBlock)
 	}
 	// else block
@@ -678,7 +688,7 @@ func (p *Parser) parseIfStatement(scope *scope) Node {
 		p.advance() // advance past ELSE token
 		p.assertEOL()
 		p.advancePastNL()
-		ifStmt.Else = p.parseBlock(newInnerScope(scope))
+		ifStmt.Else = p.parseBlock(newScope(scope, ifStmt))
 	}
 	p.assertEnd()
 	p.advancePastNL()
@@ -686,13 +696,12 @@ func (p *Parser) parseIfStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
-	tok := p.cur
+	ifBlock := &ConditionalBlock{Token: p.cur}
 	p.advance() // advance past IF token
-	scope = newInnerScope(scope)
-	condition := p.parseCondition(scope)
+	ifBlock.Condition = p.parseCondition(scope)
 	p.advancePastNL()
-	block := p.parseIfBlock(scope)
-	return &ConditionalBlock{Token: tok, Condition: condition, Block: block}
+	ifBlock.Block = p.parseIfBlock(scope)
+	return ifBlock
 }
 
 func (p *Parser) parseCondition(scope *scope) Node {

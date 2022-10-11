@@ -53,6 +53,8 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalFunctionCall(scope, node)
 	case *parser.Return:
 		return e.evalReturn(scope, node)
+	case *parser.Break:
+		return e.evalBreak(scope, node)
 	case *parser.If:
 		return e.evalIf(scope, node)
 	case *parser.While:
@@ -71,7 +73,7 @@ func (e *Evaluator) evalStatments(scope *scope, statements []parser.Node) Value 
 	var result Value
 	for _, statement := range statements {
 		result = e.Eval(scope, statement)
-		if isError(result) || isReturn(result) {
+		if isError(result) || isReturn(result) || isBreak(result) {
 			return result
 		}
 	}
@@ -139,13 +141,17 @@ func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope 
 
 func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
 	if ret.Value == nil {
-		return nil
+		return &ReturnValue{}
 	}
 	val := e.Eval(scope, ret.Value)
 	if isError(val) {
 		return val
 	}
 	return &ReturnValue{Val: val}
+}
+
+func (e *Evaluator) evalBreak(scope *scope, ret *parser.Break) Value {
+	return &Break{}
 }
 
 func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
@@ -168,7 +174,7 @@ func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
 func (e *Evaluator) evalWhile(scope *scope, w *parser.While) Value {
 	whileBlock := &w.ConditionalBlock
 	val, ok := e.evalConditionalBlock(scope, whileBlock)
-	for ok && !isError(val) && !isReturn(val) {
+	for ok && !isError(val) && !isReturn(val) && !isBreak(val) {
 		val, ok = e.evalConditionalBlock(scope, whileBlock)
 	}
 	return val

@@ -41,14 +41,23 @@ func fox:string
     return "🦊"
 end
 
+func fox2
+    if true
+        print "🦊2"
+        return
+    end
+    print "💣"
+end
+
 f := fox
 print f
 print f f
+fox2
 `
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "🦊\n🦊 🦊\n"
+	want := "🦊\n🦊 🦊\n🦊2\n"
 	assert.Equal(t, want, b.String())
 }
 
@@ -76,6 +85,51 @@ print f2
 	Run(prog, fn)
 	want := "1\n🦊\n🦊\n"
 	assert.Equal(t, want, b.String())
+}
+
+func TestBreak(t *testing.T) {
+	tests := []string{
+		`
+while true
+    print "🎈"
+    break
+end
+`, `
+while true
+    print "🎈"
+    if true
+        break
+    end
+    print "💣"
+end
+`, `
+stop := false
+while true
+    if stop
+        print "🎈"
+        break
+    end
+    stop = true
+end
+`, `
+continue := true
+while true
+    if continue
+        print "🎈"
+    else
+        break
+    end
+    continue = false
+end
+`,
+	}
+	for _, input := range tests {
+		b := bytes.Buffer{}
+		fn := func(s string) { b.WriteString(s) }
+		Run(input, fn)
+		want := "🎈\n"
+		assert.Equal(t, want, b.String(), input)
+	}
 }
 
 func TestAssignment(t *testing.T) {

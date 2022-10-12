@@ -16,21 +16,20 @@ func TestParseDeclaration(t *testing.T) {
 		b:bool
 		c := true
 		print a b c`: {"a='abc'", "b=false", "c=true", "print(a, b, c)"},
-		"a:num[]":                      {"a=[]"},
-		"a:num[]{}":                    {"a={}"},
-		"a:any[]{}":                    {"a={}"},
-		"a := bool[true]":              {"a=[true]"},
-		"a := num[]":                   {"a=[]"},
-		"a := num[][num[1 2]num[3 4]]": {"a=[[1, 2], [3, 4]]"},
-		"a := num{a:1 b:2}":            {"a={a:1, b:2}"},
-		"a := num[]{digits: num[1 2 3] nums: num[4 5]}": {"a={digits:[1, 2, 3], nums:[4, 5]}"},
-		"a := num[]{digits: num[] nums: num[4]}":        {"a={digits:[], nums:[4]}"},
-		"a := num[]{digits: num[4] nums: num[]}":        {"a={digits:[4], nums:[]}"},
-		"a := num{}[]":                                  {"a=[]"},
-		"a := num{}[num{}]":                             {"a=[{}]"},
-		"a := any{a:1 b:true}":                          {"a={a:1, b:true}"},
-		"a := any{a:1 b:true c:num[1]}":                 {"a={a:1, b:true, c:[1]}"},
-		"a := num{}[num{a:1}]":                          {"a=[{a:1}]"},
+		"a:num[]":                            {"a=[]"},
+		"a:num[]{}":                          {"a={}"},
+		"a:any[]{}":                          {"a={}"},
+		"a := [true]":                        {"a=[true]"},
+		"a := []":                            {"a=[]"},
+		"a := [[1 2] ([3 4])]":               {"a=[[1, 2], [3, 4]]"},
+		"a := {a:1 b:2}":                     {"a={a:1, b:2}"},
+		"a := {digits: [1 2 3] nums: [4 5]}": {"a={digits:[1, 2, 3], nums:[4, 5]}"},
+		"a := {digits: [] nums: [4]}":        {"a={digits:[], nums:[4]}"},
+		"a := {digits: [4] nums: []}":        {"a={digits:[4], nums:[]}"},
+		"a := [{}]":                          {"a=[{}]"},
+		"a := {a:1 b:true}":                  {"a={a:1, b:true}"},
+		"a := {a:1 b:true c:[1]}":            {"a={a:1, b:true, c:[1]}"},
+		"a := [{a:1}]":                       {"a=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
 		input += "\n print a"
@@ -65,24 +64,21 @@ func TestEmptyProgram(t *testing.T) {
 
 func TestParseDeclarationError(t *testing.T) {
 	tests := map[string]string{
-		"a :invalid":        "line 1 column 1: invalid type declaration for 'a'",
-		"a :":               "line 1 column 1: invalid type declaration for 'a'",
-		"a :\n":             "line 1 column 1: invalid type declaration for 'a'",
-		"a ://blabla\n":     "line 1 column 1: invalid type declaration for 'a'",
-		"a :true":           "line 1 column 1: invalid type declaration for 'a'",
-		"a :[]":             "line 1 column 1: invalid type declaration for 'a'",
-		"a :[]num":          "line 1 column 1: invalid type declaration for 'a'",
-		"a :()":             "line 1 column 1: invalid type declaration for 'a'",
-		"a ::":              "line 1 column 1: invalid type declaration for 'a'",
-		"a := num{}[{a:1}]": "line 1 column 12: unexpected '{'", // TODO: expected `num` found `{`
-		"a := num[true]":    "line 1 column 15: array literal 'true' should have type 'num'",
-		"a := num{a:true}":  "line 1 column 16: map literal 'true' should have type 'num'",
-		"a := num{}{":       "line 1 column 12: unterminated map literal",
-		"a :=:":             "line 1 column 5: unexpected ':'",
-		"a := num{":         "line 1 column 10: unterminated map literal",
-		"a := num{}[":       "line 1 column 12: unterminated array literal",
-		"a :num num":        "line 1 column 8: expected end of line, found 'num'",
-		"a :num{}num":       "line 1 column 9: expected end of line, found 'num'",
+		"a :invalid":    "line 1 column 1: invalid type declaration for 'a'",
+		"a :":           "line 1 column 1: invalid type declaration for 'a'",
+		"a :\n":         "line 1 column 1: invalid type declaration for 'a'",
+		"a ://blabla\n": "line 1 column 1: invalid type declaration for 'a'",
+		"a :true":       "line 1 column 1: invalid type declaration for 'a'",
+		"a :[]":         "line 1 column 1: invalid type declaration for 'a'",
+		"a :[]num":      "line 1 column 1: invalid type declaration for 'a'",
+		"a :()":         "line 1 column 1: invalid type declaration for 'a'",
+		"a ::":          "line 1 column 1: invalid type declaration for 'a'",
+		"a := {}{":      "line 1 column 8: expected end of line, found '{'",
+		"a :=:":         "line 1 column 5: unexpected ':'",
+		"a := {":        "line 1 column 7: expected '}', got end of input",
+		"a := {}[":      "line 1 column 9: unexpected end of input",
+		"a :num num":    "line 1 column 8: expected end of line, found 'num'",
+		"a :num{}num":   "line 1 column 9: expected end of line, found 'num'",
 	}
 	for input, err1 := range tests {
 		parser := New(input, testBuiltins())
@@ -100,7 +96,7 @@ func TestFunctionCall(t *testing.T) {
 		"a:=1 \n print a":                {"a=1", "print(a)"},
 		`a := len "abc"` + " \n print a": {"a=len('abc')", "print(a)"},
 		`len "abc"`:                      {"len('abc')"},
-		`len num[]`:                      {"len([])"},
+		`len []`:                         {"len([])"},
 		"a:string \n print a":            {"a=''", "print(a)"},
 		`a:=true
 		b:string
@@ -196,19 +192,19 @@ func TestFuncDecl(t *testing.T) {
 	input := `
 c := 1
 func nums1:num n1:num n2:num
-	if true //TODO: > 10
+	if c > 10
 	    print c
 	    return n1
 	end
 	return n2
 end
 on mousedown
-	if true //TODO: > 10
+	if c > 10
 	    print c
 	end
 end
 func nums2:num n1:num n2:num
-	if true //TODO: > 10
+	if c > 10
 		return n1
 	else
 		return n2
@@ -365,8 +361,8 @@ b = a
 `: "line 3 column 1: unknown variable name 'b'",
 		`
 a:= 1
-a = num[]
-`: "line 3 column 3: 'a' accepts values of type num, found num[]",
+a = []
+`: "line 3 column 3: 'a' accepts values of type num, found any[]",
 		`
 a:num
 b:any
@@ -866,7 +862,7 @@ line 20 20
 
 x := 12
 print "x:" x
-if true //TODO: x > 10
+if x > 10
     print "🍦 big x"
 end`
 	parser := New(input, testBuiltins())
@@ -877,7 +873,7 @@ end`
 	want := `
 x=12
 print('x:', x)
-if (true) {
+if ((x>10)) {
 print('🍦 big x')
 }
 `[1:]

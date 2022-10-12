@@ -24,11 +24,9 @@ var (
 	STRING_TYPE  = &Type{Name: STRING}
 	ANY_TYPE     = &Type{Name: ANY}
 	NONE_TYPE    = &Type{Name: NONE}
+	EMPTY_ARRAY  = &Type{Name: ARRAY, Sub: NONE_TYPE}
+	EMPTY_MAP    = &Type{Name: MAP, Sub: NONE_TYPE}
 )
-
-func isBasicType(t lexer.TokenType) bool {
-	return t == lexer.NUM || t == lexer.STRING || t == lexer.BOOL || t == lexer.ANY
-}
 
 func compositeTypeName(t lexer.TokenType) TypeName {
 	switch t {
@@ -47,13 +45,13 @@ type typeNameString struct {
 
 var typeNameStrings = map[TypeName]typeNameString{
 	ILLEGAL: {string: "ILLEGAL", format: "ILLEGAL"},
-	NUM:     {string: "NUM", format: "num"},
-	STRING:  {string: "STRING", format: "string"},
-	BOOL:    {string: "BOOL", format: "bool"},
-	ANY:     {string: "ANY", format: "any"},
-	ARRAY:   {string: "ARRAY", format: "[]"},
-	MAP:     {string: "MAP", format: "{}"},
-	NONE:    {string: "NONE", format: "none"},
+	NUM:     {string: "num", format: "num"},
+	STRING:  {string: "string", format: "string"},
+	BOOL:    {string: "bool", format: "bool"},
+	ANY:     {string: "any", format: "any"},
+	ARRAY:   {string: "array", format: "[]"},
+	MAP:     {string: "map", format: "[]"},
+	NONE:    {string: "none", format: "none"},
 }
 
 func (t TypeName) String() string {
@@ -101,10 +99,40 @@ func (t *Type) Accepts(t2 *Type) bool {
 	if n == ANY && n2 != ILLEGAL && n2 != NONE {
 		return true
 	}
+	// empty Array none array accepted by all arrays.
+	// empty Map of none_type accepted by all maps
 	return false
 }
 
-// any[] (ARRAY ANY) DOES NOT accept num[] (ARRAY NUM).
+func (t *Type) Equals(t2 *Type) bool {
+	if t == t2 {
+		return true
+	}
+	if t.Name != t2.Name {
+		return false
+	}
+	if t.Sub == t2.Sub {
+		return true
+	}
+	if t.Sub == nil || t2.Sub == nil {
+		return false
+	}
+	return t.Sub.Equals(t2.Sub)
+}
+
+func (t *Type) Infer() *Type {
+	if t.Name != ARRAY && t.Name != MAP {
+		return t
+	}
+	if t.Sub == NONE_TYPE {
+		t.Sub = ANY_TYPE
+		return t
+	}
+	t.Sub = t.Sub.Infer()
+	return t
+}
+
+// []any (ARRAY ANY) DOES NOT accept []num (ARRAY NUM).
 func (t *Type) acceptsStrict(t2 *Type) bool {
 	n, n2 := t.Name, t2.Name
 	if n == ILLEGAL || n2 == ILLEGAL {
@@ -115,6 +143,14 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 	}
 	if t.Sub == nil || t2.Sub == nil {
 		return t.Sub == nil && t2.Sub == nil
+	}
+	// all array types except empty array literal
+	if n == ARRAY && t2 == EMPTY_ARRAY {
+		return true
+	}
+	// all map types except empty map literal
+	if n == MAP && t2 == EMPTY_MAP {
+		return true
 	}
 	return t.Sub.acceptsStrict(t2.Sub)
 }

@@ -56,6 +56,14 @@ func New(input string, builtins map[string]*FuncDecl) *Parser {
 	var funcs []int
 	var token *lexer.Token
 	for token = l.Next(); token.Type != lexer.EOF; token = l.Next() {
+		if token.Type == lexer.ILLEGAL {
+			if token.Literal == `"` {
+				p.appendErrorForToken(`unterminated string, missing "`, token)
+			} else {
+				p.appendErrorForToken("illegal character '"+token.Literal+"'", token)
+			}
+			continue
+		}
 		p.tokens = append(p.tokens, token)
 		if token.Type == lexer.FUNC { // Collect all function names
 			funcs = append(funcs, len(p.tokens)-1)
@@ -189,7 +197,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 		return nil
 	case lexer.IDENT:
 		switch p.peek.Type {
-		case lexer.ASSIGN, lexer.LBRACKET, lexer.DOT:
+		case lexer.ASSIGN, lexer.DOT:
 			return p.parseAssignmentStatement(scope)
 		case lexer.COLON:
 			return p.parseTypedDeclStatement(scope)
@@ -198,6 +206,9 @@ func (p *Parser) parseStatement(scope *scope) Node {
 		}
 		if p.isFuncCall(p.cur) {
 			return p.parseFunCallStatement(scope)
+		}
+		if p.peek.Type == lexer.LBRACKET {
+			return p.parseAssignmentStatement(scope)
 		}
 		p.appendError("unknown function '" + p.cur.Literal + "'")
 		p.advancePastNL()
@@ -232,7 +243,7 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 	}
 	p.assertToken(lexer.ASSIGN)
 	p.advance()
-	value := p.parseTopLevelExpression(scope)
+	value := p.parseTopLevelExpr(scope)
 	if value == nil {
 		p.advancePastNL()
 		return nil
@@ -350,7 +361,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:=`
 	valToken := p.cur
-	val := p.parseTopLevelExpression(scope)
+	val := p.parseTopLevelExpr(scope)
 	defer p.advancePastNL()
 	if val == nil || val.Type() == nil {
 		p.appendError("invalid inferred declaration for '" + varName + "'")
@@ -360,7 +371,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
 		return nil
 	}
-	decl.Var.T = val.Type()
+	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
 	if !p.validateVarDecl(scope, decl.Var, decl.Token) {
 		return nil
 	}
@@ -368,45 +379,6 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	scope.set(varName, decl.Var)
 	p.assertEOL()
 	return decl
-}
-
-func (p *Parser) parseTopLevelExpression(scope *scope) Node {
-	tt := p.cur.TokenType()
-	if tt == lexer.IDENT && p.isFuncCall(p.cur) {
-		return p.parseFuncCall(scope)
-	}
-	return p.parseExpression(scope)
-}
-
-func (p *Parser) parseExpression(scope *scope) Node {
-	return p.parseTerm(scope)
-}
-
-func (p *Parser) parseTerm(scope *scope) Node {
-	// TODO: UNARY_OP Term; composite literals; assignable; slice; type_assertion; "(" toplevel_expr ")"
-	tt := p.cur.TokenType()
-	if tt == lexer.IDENT {
-		if p.isFuncCall(p.cur) {
-			p.appendError("function call must be parenthesized: (" + p.cur.Literal + " ...)")
-			p.advance()
-			return nil
-		}
-		assignable := p.parseAssignable(scope)
-		if v, ok := assignable.(*Var); ok {
-			v.isUsed = true
-		}
-		return assignable
-	}
-	if p.isLiteral() {
-		lit := p.parseLiteral(scope)
-		if lit == nil {
-			return nil
-		}
-		return lit
-	}
-	p.appendError("unexpected " + tt.FormatDetails())
-	p.advance()
-	return nil
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {
@@ -420,22 +392,6 @@ func (p *Parser) parseFunCallStatement(scope *scope) Node {
 	p.assertEOL()
 	p.advancePastNL()
 	return fc
-}
-
-func (p *Parser) parseFuncCall(scope *scope) Node {
-	funcToken := p.cur
-	funcName := p.cur.Literal
-	decl := p.funcs[funcName]
-	p.advance() // advance past function name IDENT
-	args := p.parseTerms(scope)
-	p.assertArgTypes(decl, args)
-	return &FunctionCall{
-		Name:      funcName,
-		Token:     funcToken,
-		Arguments: args,
-		FuncDecl:  decl,
-		T:         decl.ReturnType,
-	}
 }
 
 func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
@@ -460,22 +416,6 @@ func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
 			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
 		}
 	}
-}
-
-func (p *Parser) parseTerms(scope *scope) []Node {
-	var terms []Node
-	for !p.isTermsEnd() {
-		term := p.parseTerm(scope)
-		if term != nil {
-			terms = append(terms, term)
-		}
-	}
-	return terms
-}
-
-func (p *Parser) isTermsEnd() bool {
-	tt := p.cur.TokenType()
-	return p.isAtEOL() || tt == lexer.RBRACKET || tt == lexer.RCURLY || tt == lexer.RPAREN
 }
 
 func (p *Parser) advancePastNL() {
@@ -612,7 +552,7 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 	if p.isAtEOL() { // no return value
 		ret.T = NONE_TYPE
 	} else {
-		ret.Value = p.parseTopLevelExpression(scope)
+		ret.Value = p.parseTopLevelExpr(scope)
 		if ret.Value == nil {
 			ret.T = ILLEGAL_TYPE
 		} else {
@@ -706,7 +646,7 @@ func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
 
 func (p *Parser) parseCondition(scope *scope) Node {
 	tok := p.cur
-	condition := p.parseTopLevelExpression(scope)
+	condition := p.parseTopLevelExpr(scope)
 	if condition != nil {
 		p.assertEOL()
 		if condition.Type() != BOOL_TYPE {

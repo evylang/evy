@@ -41,8 +41,6 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalAssignment(scope, node)
 	case *parser.Var:
 		return e.evalVar(scope, node)
-	case *parser.Term:
-		return e.evalTerm(scope, node)
 	case *parser.NumLiteral:
 		return &Num{Val: node.Value}
 	case *parser.StringLiteral:
@@ -111,7 +109,7 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 }
 
 func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
-	args := e.evalTerms(scope, funcCall.Arguments)
+	args := e.evalExpressions(scope, funcCall.Arguments)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
 	}
@@ -203,11 +201,7 @@ func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {
 	return newError("cannot find variable " + v.Name)
 }
 
-func (e *Evaluator) evalTerm(scope *scope, term parser.Node) Value {
-	return e.Eval(scope, term)
-}
-
-func (e *Evaluator) evalTerms(scope *scope, terms []parser.Node) []Value {
+func (e *Evaluator) evalExpressions(scope *scope, terms []parser.Node) []Value {
 	result := make([]Value, len(terms))
 
 	for i, t := range terms {

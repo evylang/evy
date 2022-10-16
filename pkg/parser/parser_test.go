@@ -336,6 +336,14 @@ a:num
 b:any
 b = a
 print b
+`, `
+a := [0 2 3]
+a[0] = 1
+print a
+`, `
+a := {name: "mali"}
+a.sport = "climbing"
+print a
 `,
 	}
 	for _, input := range inputs {
@@ -350,7 +358,7 @@ func TestFuncAssignmentErr(t *testing.T) {
 		`
 b:num
 b = true
-`: "line 3 column 3: 'b' accepts values of type num, found bool",
+`: "line 3 column 1: 'b' accepts values of type num, found bool",
 		`
 a:= 1
 a = b
@@ -362,12 +370,12 @@ b = a
 		`
 a:= 1
 a = []
-`: "line 3 column 3: 'a' accepts values of type num, found any[]",
+`: "line 3 column 1: 'a' accepts values of type num, found any[]",
 		`
 a:num
 b:any
 a = b
-`: "line 4 column 3: 'a' accepts values of type num, found any",
+`: "line 4 column 1: 'a' accepts values of type num, found any",
 		`
 func fn:bool
 	return true

@@ -235,8 +235,8 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	}
-	target := p.parseAssignable(scope)
 	tok := p.cur
+	target := p.parseAssignmentTarget(scope)
 	if target == nil {
 		p.advancePastNL()
 		return nil
@@ -257,7 +257,7 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 	return &Assignment{Token: tok, Target: target, Value: value}
 }
 
-func (p *Parser) parseAssignable(scope *scope) Node {
+func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
@@ -265,6 +265,12 @@ func (p *Parser) parseAssignable(scope *scope) Node {
 	if !ok {
 		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
 		return nil
+	}
+	if p.cur.TokenType() == lexer.LBRACKET { // TODO: check for whitespace
+		return p.parserIndexExpr(scope, v)
+	}
+	if p.cur.TokenType() == lexer.DOT { // TODO: check for whitespace
+		return p.parserDotExpr(v)
 	}
 	return v
 }

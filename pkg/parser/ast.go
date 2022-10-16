@@ -22,13 +22,34 @@ type FunctionCall struct {
 	Name      string
 	Arguments []Node
 	FuncDecl  *FuncDecl
-	T         *Type
 }
 
-type Term struct {
-	Token *lexer.Token
-	Value Node
+type UnaryExpression struct {
+	Token *lexer.Token // The unary operation token, e.g. !
+	Op    Operator
+	Right Node
+}
+
+type BinaryExpression struct {
 	T     *Type
+	Token *lexer.Token // The binary operation token, e.g. +
+	Op    Operator
+	Left  Node
+	Right Node
+}
+
+type IndexExpression struct {
+	T     *Type
+	Token *lexer.Token // The [ token
+	Left  Node
+	Index Node
+}
+
+type DotExpression struct {
+	T     *Type
+	Token *lexer.Token // The . token
+	Left  Node
+	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
 type Declaration struct {
@@ -147,15 +168,42 @@ func (f *FunctionCall) String() string {
 }
 
 func (f *FunctionCall) Type() *Type {
-	return f.T
+	return f.FuncDecl.ReturnType
 }
 
-func (t *Term) String() string {
-	return t.Value.String()
+func (u *UnaryExpression) String() string {
+	return "(" + u.Op.String() + u.Right.String() + ")"
 }
 
-func (t *Term) Type() *Type {
-	return t.T
+func (u *UnaryExpression) Type() *Type {
+	return u.Right.Type()
+}
+
+func (b *BinaryExpression) String() string {
+	if b.Op == OP_AND || b.Op == OP_OR {
+		return "(" + b.Left.String() + " " + b.Op.String() + " " + b.Right.String() + ")"
+	}
+	return "(" + b.Left.String() + b.Op.String() + b.Right.String() + ")"
+}
+
+func (b *BinaryExpression) Type() *Type {
+	return b.T
+}
+
+func (i *IndexExpression) String() string {
+	return "(" + i.Left.String() + "[" + i.Index.String() + "])"
+}
+
+func (i *IndexExpression) Type() *Type {
+	return i.T
+}
+
+func (d *DotExpression) String() string {
+	return "(" + d.Left.String() + "." + d.Key + ")"
+}
+
+func (d *DotExpression) Type() *Type {
+	return d.T
 }
 
 func (d *Declaration) String() string {

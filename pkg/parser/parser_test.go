@@ -16,9 +16,9 @@ func TestParseDeclaration(t *testing.T) {
 		b:bool
 		c := true
 		print a b c`: {"a='abc'", "b=false", "c=true", "print(a, b, c)"},
-		"a:num[]":                            {"a=[]"},
-		"a:num[]{}":                          {"a={}"},
-		"a:any[]{}":                          {"a={}"},
+		"a:[]num":                            {"a=[]"},
+		"a:{}[]num":                          {"a={}"},
+		"a:{}[]any":                          {"a={}"},
 		"a := [true]":                        {"a=[true]"},
 		"a := []":                            {"a=[]"},
 		"a := [[1 2] ([3 4])]":               {"a=[[1, 2], [3, 4]]"},
@@ -70,7 +70,7 @@ func TestParseDeclarationError(t *testing.T) {
 		"a ://blabla\n": "line 1 column 1: invalid type declaration for 'a'",
 		"a :true":       "line 1 column 1: invalid type declaration for 'a'",
 		"a :[]":         "line 1 column 1: invalid type declaration for 'a'",
-		"a :[]num":      "line 1 column 1: invalid type declaration for 'a'",
+		"a :num[]":      "line 1 column 7: expected end of line, found '['",
 		"a :()":         "line 1 column 1: invalid type declaration for 'a'",
 		"a ::":          "line 1 column 1: invalid type declaration for 'a'",
 		"a := {}{":      "line 1 column 8: expected end of line, found '{'",
@@ -78,7 +78,7 @@ func TestParseDeclarationError(t *testing.T) {
 		"a := {":        "line 1 column 7: expected '}', got end of input",
 		"a := {}[":      "line 1 column 9: unexpected end of input",
 		"a :num num":    "line 1 column 8: expected end of line, found 'num'",
-		"a :num{}num":   "line 1 column 9: expected end of line, found 'num'",
+		"a :num{}num":   "line 1 column 7: expected end of line, found '{'",
 	}
 	for input, err1 := range tests {
 		parser := New(input, testBuiltins())

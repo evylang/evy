@@ -346,11 +346,6 @@ func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
 	return true
 }
 
-func matchParen(t1, t2 lexer.TokenType) bool {
-	return (t1 == lexer.LBRACKET && t2 == lexer.RBRACKET) ||
-		(t1 == lexer.LCURLY && t2 == lexer.RCURLY)
-}
-
 func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
@@ -654,4 +649,30 @@ func (p *Parser) parseCondition(scope *scope) Node {
 		}
 	}
 	return condition
+}
+
+// parseType parses `[]{}num` into
+// `{Name: ARRAY, Sub: {Name: MAP Sub: NUM_TYPE}}`.
+func (p *Parser) parseType() *Type {
+	tt := p.cur.TokenType()
+	p.advance()
+	switch tt {
+	case lexer.NUM:
+		return NUM_TYPE
+	case lexer.STRING:
+		return STRING_TYPE
+	case lexer.BOOL:
+		return BOOL_TYPE
+	case lexer.ANY:
+		return ANY_TYPE
+	case lexer.LBRACKET, lexer.LCURLY:
+		tt2 := p.cur.TokenType()
+		if (tt == lexer.LBRACKET && tt2 == lexer.RBRACKET) || (tt == lexer.LCURLY && tt2 == lexer.RCURLY) {
+			p.advance()
+			if sub := p.parseType(); sub != ILLEGAL_TYPE {
+				return &Type{Name: compositeTypeName(tt), Sub: sub}
+			}
+		}
+	}
+	return ILLEGAL_TYPE
 }

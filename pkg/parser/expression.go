@@ -24,7 +24,7 @@ const (
 	LESSGREATER            // > or <
 	SUM                    // +
 	PRODUCT                // *
-	PREFIX                 // -x  !x
+	UNARY                  // -x  !x
 	INDEX                  // array[i]
 )
 
@@ -100,7 +100,7 @@ func (p *Parser) parseUnaryExpr(scope *scope) Node {
 	tok := p.cur
 	unaryExp := &UnaryExpression{Token: tok, Op: op(tok)}
 	p.advance() // advance past operator
-	unaryExp.Right = p.parseExpr(scope, PREFIX)
+	unaryExp.Right = p.parseExpr(scope, UNARY)
 	if unaryExp.Right == nil {
 		return nil // previous error
 	}

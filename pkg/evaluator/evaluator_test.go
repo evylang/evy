@@ -291,6 +291,60 @@ func TestExpr(t *testing.T) {
 	}
 }
 
+func TestArrayLit(t *testing.T) {
+	tests := map[string]string{
+		"a := [1]":     "[1]",
+		"a := []":      "[]",
+		"a := [1 2]":   "[1 2]",
+		"a := [1 1+1]": "[1 2]",
+		`
+b := 3
+a := [1 1+1 b]`: "[1 2 3]",
+		`
+func three:num
+    return 3
+end
+a := [1 1+1 (three)]`: "[1 2 3]",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			in += "\n print a"
+			b := bytes.Buffer{}
+			fn := func(s string) { b.WriteString(s) }
+			Run(in, fn)
+			assert.Equal(t, want+"\n", b.String())
+		})
+	}
+}
+
+func TestMapLit(t *testing.T) {
+	tests := map[string]string{
+		"a := {n:1}":                 "{n:1}",
+		"a := {}":                    "{}",
+		`a := {name:"fox" age:42}`:   "{name:fox age:42}",
+		`a := {name:"fox" age:40+2}`: "{name:fox age:42}",
+		`
+b := 2
+a := {name:"fox" age:40+b}`: "{name:fox age:42}",
+		`
+func three:num
+    return 3
+end
+a := {name:"fox" age:39+(three)}`: "{name:fox age:42}",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			in += "\n print a"
+			b := bytes.Buffer{}
+			fn := func(s string) { b.WriteString(s) }
+			Run(in, fn)
+			assert.Equal(t, want+"\n", b.String())
+		})
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

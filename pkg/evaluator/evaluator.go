@@ -47,6 +47,10 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return &String{Val: node.Value}
 	case *parser.Bool:
 		return e.evalBool(node)
+	case *parser.ArrayLiteral:
+		return e.evalArrayLiteral(scope, node)
+	case *parser.MapLiteral:
+		return e.evalMapLiteral(scope, node)
 	case *parser.FunctionCall:
 		return e.evalFunctionCall(scope, node)
 	case *parser.Return:
@@ -110,6 +114,26 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	}
 	scope.set(name, val)
 	return nil
+}
+
+func (e *Evaluator) evalArrayLiteral(scope *scope, arr *parser.ArrayLiteral) Value {
+	elements := e.evalExprList(scope, arr.Elements)
+	if len(elements) == 1 && isError(elements[0]) {
+		return elements[0]
+	}
+	return &Array{Elements: elements}
+}
+
+func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
+	pairs := map[string]Value{}
+	for key, node := range m.Pairs {
+		val := e.Eval(scope, node)
+		if isError(val) {
+			return val
+		}
+		pairs[key] = val
+	}
+	return &Map{Pairs: pairs, Order: m.Order}
 }
 
 func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {

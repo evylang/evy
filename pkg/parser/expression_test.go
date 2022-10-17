@@ -82,6 +82,8 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"map.key+3":        "((map.key)+3)",
 		"map2.a.b":         "((map2.a).b)",
 		"map.key+map2.a.b": "((map.key)+((map2.a).b))",
+		"map3.ok[1]":       "((map3.ok)[1])",
+		"map3.ok[n1]":      "((map3.ok)[n1])",
 		"list[1].x":        "((list[1]).x)",
 		"list[n1][s]":      "((list[n1])[s])",
 
@@ -137,6 +139,8 @@ func TestParseTopLevelExpression(t *testing.T) {
 		scope.set("map2", &Var{Name: "map2", T: mapType2})
 		arrayMapType := &Type{Name: ARRAY, Sub: mapType}
 		scope.set("list", &Var{Name: "list", T: arrayMapType})
+		mapArrayType := &Type{Name: MAP, Sub: arrType}
+		scope.set("map3", &Var{Name: "map3", T: mapArrayType})
 
 		got := parser.parseTopLevelExpr(scope)
 		assertNoParseError(t, parser, input)

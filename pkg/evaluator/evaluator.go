@@ -59,6 +59,10 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalWhile(scope, node)
 	case *parser.BlockStatement:
 		return e.evalBlockStatment(scope, node)
+	case *parser.UnaryExpression:
+		return e.evalUnaryExpr(scope, node)
+	case *parser.BinaryExpression:
+		return e.evalBinaryExpr(scope, node)
 	}
 	return nil
 }
@@ -213,4 +217,98 @@ func (e *Evaluator) evalExprList(scope *scope, terms []parser.Node) []Value {
 	}
 
 	return result
+}
+
+func (e *Evaluator) evalUnaryExpr(scope *scope, expr *parser.UnaryExpression) Value {
+	right := e.Eval(scope, expr.Right)
+	if isError(right) {
+		return right
+	}
+	op := expr.Op
+	switch right := right.(type) {
+	case *Num:
+		if op == parser.OP_MINUS {
+			return &Num{Val: -right.Val}
+		}
+	case *Bool:
+		if op == parser.OP_BANG {
+			return &Bool{Val: !right.Val}
+		}
+	}
+	return newError("unknown unary operation: " + expr.String())
+}
+
+func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	right := e.Eval(scope, expr.Right)
+	if isError(right) {
+		return right
+	}
+	op := expr.Op
+	if op == parser.OP_EQ {
+		return boolVal(left.Equals(right))
+	}
+	if op == parser.OP_NOT_EQ {
+		return boolVal(!left.Equals(right))
+	}
+	switch left := left.(type) {
+	case *Num:
+		return evalBinaryNumExpr(op, left, right.(*Num))
+	case *String:
+		return evalBinaryStringExpr(op, left, right.(*String))
+	case *Bool:
+		return evalBinaryBoolExpr(op, left, right.(*Bool))
+	}
+	return newError("unknown binary operation: " + expr.String())
+}
+
+func evalBinaryNumExpr(op parser.Operator, left, right *Num) Value {
+	switch op {
+	case parser.OP_PLUS:
+		return &Num{Val: left.Val + right.Val}
+	case parser.OP_MINUS:
+		return &Num{Val: left.Val - right.Val}
+	case parser.OP_ASTERISK:
+		return &Num{Val: left.Val * right.Val}
+	case parser.OP_SLASH:
+		return &Num{Val: left.Val / right.Val}
+	case parser.OP_GT:
+		return boolVal(left.Val > right.Val)
+	case parser.OP_LT:
+		return boolVal(left.Val < right.Val)
+	case parser.OP_GTEQ:
+		return boolVal(left.Val >= right.Val)
+	case parser.OP_LTEQ:
+		return boolVal(left.Val <= right.Val)
+	}
+	return newError("unknown num operation: " + op.String())
+}
+
+func evalBinaryStringExpr(op parser.Operator, left, right *String) Value {
+	switch op {
+	case parser.OP_PLUS:
+		return &String{Val: left.Val + right.Val}
+	case parser.OP_GT:
+		return boolVal(left.Val > right.Val)
+	case parser.OP_LT:
+		return boolVal(left.Val < right.Val)
+	case parser.OP_GTEQ:
+		return boolVal(left.Val >= right.Val)
+	case parser.OP_LTEQ:
+		return boolVal(left.Val <= right.Val)
+	}
+	return newError("unknown string operation: " + op.String())
+}
+
+func evalBinaryBoolExpr(op parser.Operator, left, right *Bool) Value {
+	switch op {
+	case parser.OP_AND:
+		return &Bool{Val: left.Val && right.Val}
+	case parser.OP_OR:
+		return &Bool{Val: left.Val || right.Val}
+	}
+	return newError("unknown bool operation: " + op.String())
 }

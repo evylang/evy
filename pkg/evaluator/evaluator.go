@@ -87,16 +87,16 @@ func (e *Evaluator) evalStatments(scope *scope, statements []parser.Node) Value 
 }
 
 func (e *Evaluator) evalBool(b *parser.Bool) Value {
-	if b.Value {
-		return TRUE
-	}
-	return FALSE
+	return &Bool{Val: b.Value}
 }
 
 func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Value {
 	val := e.Eval(scope, decl.Value)
 	if isError(val) {
 		return val
+	}
+	if decl.Type() == parser.ANY_TYPE {
+		val = &Any{Val: val}
 	}
 	scope.set(decl.Var.Name, val)
 	return nil
@@ -107,12 +107,11 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	if isError(val) {
 		return val
 	}
-	name := assignment.Target.String()
-	// We need to update the variable in the scope it was defined.
-	if s, ok := scope.getScope(name); ok {
-		scope = s
+	target := e.Eval(scope, assignment.Target)
+	if isError(target) {
+		return target
 	}
-	scope.set(name, val)
+	target.Set(val)
 	return nil
 }
 
@@ -212,7 +211,11 @@ func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.Conditi
 	if isError(cond) {
 		return cond, false
 	}
-	if cond == TRUE {
+	boolCond, ok := cond.(*Bool)
+	if !ok {
+		return newError("conditional not a bool"), false
+	}
+	if boolCond.Val {
 		return e.Eval(scope, condBlock.Block), true
 	}
 	return nil, false
@@ -273,10 +276,10 @@ func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) 
 	}
 	op := expr.Op
 	if op == parser.OP_EQ {
-		return boolVal(left.Equals(right))
+		return &Bool{Val: left.Equals(right)}
 	}
 	if op == parser.OP_NOT_EQ {
-		return boolVal(!left.Equals(right))
+		return &Bool{Val: !left.Equals(right)}
 	}
 	switch left := left.(type) {
 	case *Num:
@@ -300,13 +303,13 @@ func evalBinaryNumExpr(op parser.Operator, left, right *Num) Value {
 	case parser.OP_SLASH:
 		return &Num{Val: left.Val / right.Val}
 	case parser.OP_GT:
-		return boolVal(left.Val > right.Val)
+		return &Bool{Val: left.Val > right.Val}
 	case parser.OP_LT:
-		return boolVal(left.Val < right.Val)
+		return &Bool{Val: left.Val < right.Val}
 	case parser.OP_GTEQ:
-		return boolVal(left.Val >= right.Val)
+		return &Bool{Val: left.Val >= right.Val}
 	case parser.OP_LTEQ:
-		return boolVal(left.Val <= right.Val)
+		return &Bool{Val: left.Val <= right.Val}
 	}
 	return newError("unknown num operation: " + op.String())
 }
@@ -316,13 +319,13 @@ func evalBinaryStringExpr(op parser.Operator, left, right *String) Value {
 	case parser.OP_PLUS:
 		return &String{Val: left.Val + right.Val}
 	case parser.OP_GT:
-		return boolVal(left.Val > right.Val)
+		return &Bool{left.Val > right.Val}
 	case parser.OP_LT:
-		return boolVal(left.Val < right.Val)
+		return &Bool{left.Val < right.Val}
 	case parser.OP_GTEQ:
-		return boolVal(left.Val >= right.Val)
+		return &Bool{left.Val >= right.Val}
 	case parser.OP_LTEQ:
-		return boolVal(left.Val <= right.Val)
+		return &Bool{left.Val <= right.Val}
 	}
 	return newError("unknown string operation: " + op.String())
 }

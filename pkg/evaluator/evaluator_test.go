@@ -144,7 +144,6 @@ f1 = f3
 f2 = f1
 f3 = 4
 print f1 f2 f3
-
 `
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }

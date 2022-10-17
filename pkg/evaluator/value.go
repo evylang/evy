@@ -7,16 +7,12 @@ import (
 
 type ValueType int
 
-var (
-	TRUE  Value = &Bool{Val: true}
-	FALSE Value = &Bool{Val: false}
-)
-
 const (
 	ERROR ValueType = iota
 	NUM
 	BOOL
 	STRING
+	ANY
 	ARRAY
 	MAP
 	RETURN_VALUE
@@ -30,6 +26,7 @@ var valueTypeStrings = map[ValueType]string{
 	NUM:          "NUM",
 	BOOL:         "BOOL",
 	STRING:       "STRING",
+	ANY:          "ANY",
 	ARRAY:        "ARRAY",
 	MAP:          "MAP",
 	RETURN_VALUE: "RETURN_VALUE",
@@ -50,8 +47,9 @@ func (t ValueType) GoString() string {
 
 type Value interface {
 	Type() ValueType
-	Equals(Value) bool
-	String() string
+	Equals(Value) bool // TODO: panic if wrong type
+	String() string    // TODO: panic if wrong type
+	Set(Value)
 }
 
 type Num struct {
@@ -64,6 +62,10 @@ type Bool struct {
 
 type String struct {
 	Val string
+}
+
+type Any struct {
+	Val Value
 }
 
 type Array struct {
@@ -91,7 +93,14 @@ func (n *Num) Equals(v Value) bool {
 	if n2, ok := v.(*Num); ok {
 		return n.Val == n2.Val
 	}
-	return false
+	return false // TODO: panic here when reworking ErrValue to panics; same in all Equals methods
+}
+
+func (n *Num) Set(v Value) {
+	if n2, ok := v.(*Num); ok {
+		*n = *n2
+	}
+	// TODO: panic here when reworking ErrValue to panics; same in all Set methods
 }
 
 func (s *String) Type() ValueType { return STRING }
@@ -101,6 +110,12 @@ func (s *String) Equals(v Value) bool {
 		return s.Val == s2.Val
 	}
 	return false
+}
+
+func (s *String) Set(v Value) {
+	if s2, ok := v.(*String); ok {
+		*s = *s2
+	}
 }
 
 func (*Bool) Type() ValueType { return BOOL }
@@ -115,17 +130,39 @@ func (b *Bool) Equals(v Value) bool {
 	return false
 }
 
+func (b *Bool) Set(v Value) {
+	if b2, ok := v.(*Bool); ok {
+		*b = *b2
+	}
+}
+
+func (*Any) Type() ValueType { return ANY }
+func (a *Any) String() string {
+	return a.Val.String()
+}
+
+func (a *Any) Equals(v Value) bool {
+	return a.Val.Equals(v)
+}
+
+func (a *Any) Set(v Value) {
+	a.Val = v
+}
+
 func (r *ReturnValue) Type() ValueType     { return RETURN_VALUE }
 func (r *ReturnValue) String() string      { return r.Val.String() }
 func (r *ReturnValue) Equals(v Value) bool { return r.Val.Equals(v) }
+func (r *ReturnValue) Set(v Value)         { r.Val.Set(v) }
 
 func (r *Break) Type() ValueType     { return BREAK }
 func (r *Break) String() string      { return "" }
 func (r *Break) Equals(_ Value) bool { return false }
+func (r *Break) Set(_ Value)         {}
 
 func (e *Error) Type() ValueType     { return ERROR }
 func (e *Error) String() string      { return "ERROR: " + e.Message }
 func (e *Error) Equals(_ Value) bool { return false }
+func (e *Error) Set(_ Value)         {}
 
 func (a *Array) Type() ValueType { return ARRAY }
 func (a *Array) String() string {
@@ -150,6 +187,12 @@ func (a *Array) Equals(v Value) bool {
 		return true
 	}
 	return false
+}
+
+func (a *Array) Set(v Value) {
+	if a2, ok := v.(*Array); ok {
+		*a = *a2
+	}
 }
 
 func (m *Map) Type() ValueType { return MAP }
@@ -177,6 +220,12 @@ func (m *Map) Equals(v Value) bool {
 	return false
 }
 
+func (m *Map) Set(v Value) {
+	if m2, ok := v.(*Map); ok {
+		*m = *m2
+	}
+}
+
 func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }
@@ -191,11 +240,4 @@ func isBreak(val Value) bool {
 
 func newError(msg string) *Error {
 	return &Error{Message: msg}
-}
-
-func boolVal(b bool) Value {
-	if b {
-		return TRUE
-	}
-	return FALSE
 }

@@ -109,7 +109,7 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 }
 
 func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
-	args := e.evalExpressions(scope, funcCall.Arguments)
+	args := e.evalExprList(scope, funcCall.Arguments)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
 	}
@@ -201,7 +201,7 @@ func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {
 	return newError("cannot find variable " + v.Name)
 }
 
-func (e *Evaluator) evalExpressions(scope *scope, terms []parser.Node) []Value {
+func (e *Evaluator) evalExprList(scope *scope, terms []parser.Node) []Value {
 	result := make([]Value, len(terms))
 
 	for i, t := range terms {

@@ -132,6 +132,12 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"[1] + []":             "([1]+[])",
 		"[] + [1]":             "([]+[1])",
 		"[] + []":              "([]+[])",
+
+		// Slices
+		"arr[1:2]": "(arr[1:2])",
+		"arr[1:]":  "(arr[1:])",
+		"arr[:2]":  "(arr[:2])",
+		"arr[:]":   "(arr[:])",
 	}
 	for input, want := range tests {
 		parser := New(input, testBuiltins())
@@ -183,9 +189,9 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"(1+]2":        "line 1 column 4: unexpected ']'",
 		"(1+2]":        "line 1 column 5: expected ')', got ']'",
 
-		`"abc"["a"]`:   "line 1 column 11: string index expects num, found string",
-		`[1 2 3]["a"]`: "line 1 column 13: array index expects num, found string",
-		"{a:2}[2]":     "line 1 column 9: map index expects string, found num",
+		`"abc"["a"]`:   "line 1 column 6: string index expects num, found string",
+		`[1 2 3]["a"]`: "line 1 column 8: array index expects num, found string",
+		"{a:2}[2]":     "line 1 column 6: map index expects string, found num",
 
 		"{a:}": "line 1 column 4: unexpected '}'",
 		"{:a}": "line 1 column 2: expected map key, found ':'",

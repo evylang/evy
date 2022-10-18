@@ -317,6 +317,60 @@ a := [1 1+1 (three)]`: "[1 2 3]",
 	}
 }
 
+func TestIndex(t *testing.T) {
+	tests := map[string]string{
+		// x := ["a","b","c"]; x = "abc"
+		"print x[0]":  "a",
+		"print x[1]":  "b",
+		"print x[2]":  "c",
+		"print x[-1]": "c",
+		"print x[-2]": "b",
+		"print x[-3]": "a",
+		`
+		n1 := 1
+		print x[n1 - 1] x[1 + n1]
+		`: "a c",
+		`
+		m := {a: "bingo"}
+		print m[x[0]]
+		`: "bingo",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
+			input := decl + "\n" + in
+			t.Run(input, func(t *testing.T) {
+				b := bytes.Buffer{}
+				fn := func(s string) { b.WriteString(s) }
+				Run(input, fn)
+				assert.Equal(t, want+"\n", b.String())
+			})
+		}
+	}
+}
+
+func TestIndexErr(t *testing.T) {
+	tests := map[string]string{
+		// x := ["a","b","c"]; x = "abc"
+		"print x[3]":  "ERROR: index 3 out of bounds, should be between -3 and 2",
+		"print x[-4]": "ERROR: index -4 out of bounds, should be between -3 and 2",
+		`m := {}
+		print m[x[1]]`: "ERROR: no value for key b",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
+			input := decl + "\n" + in
+			t.Run(input, func(t *testing.T) {
+				b := bytes.Buffer{}
+				fn := func(s string) { b.WriteString(s) }
+				Run(input, fn)
+				assert.Equal(t, want, b.String())
+			})
+		}
+	}
+}
+
 func TestMapLit(t *testing.T) {
 	tests := map[string]string{
 		"a := {n:1}":                 "{n:1}",
@@ -342,6 +396,38 @@ a := {name:"fox" age:39+(three)}`: "{name:fox age:42}",
 			assert.Equal(t, want+"\n", b.String())
 		})
 	}
+}
+
+func TestDot(t *testing.T) {
+	tests := map[string]string{
+		// m := {name: "Greta"}
+		"print m.name":    "Greta",
+		`print m["name"]`: "Greta",
+		`s := "name"
+		print m[s]`: "Greta",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		input := `m := {name: "Greta"}` + "\n" + in
+		t.Run(input, func(t *testing.T) {
+			b := bytes.Buffer{}
+			fn := func(s string) { b.WriteString(s) }
+			Run(input, fn)
+			assert.Equal(t, want+"\n", b.String())
+		})
+	}
+}
+
+func TestDotErr(t *testing.T) {
+	in := `
+m := {a:1}
+print m.missing_index
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(in, fn)
+	want := "ERROR: no value for key missing_index"
+	assert.Equal(t, want, b.String())
 }
 
 func TestDemo(t *testing.T) {

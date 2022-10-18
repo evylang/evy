@@ -67,6 +67,10 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalUnaryExpr(scope, node)
 	case *parser.BinaryExpression:
 		return e.evalBinaryExpr(scope, node)
+	case *parser.IndexExpression:
+		return e.evalIndexExpr(scope, node)
+	case *parser.DotExpression:
+		return e.evalDotExpr(scope, node)
 	}
 	return nil
 }
@@ -340,4 +344,41 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *Bool) Value {
 		return &Bool{Val: left.Val || right.Val}
 	}
 	return newError("unknown bool operation: " + op.String())
+}
+
+func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	index := e.Eval(scope, expr.Index)
+	if isError(index) {
+		return index
+	}
+
+	switch l := left.(type) {
+	case *Array:
+		return l.Index(index)
+	case *String:
+		return l.Index(index)
+	case *Map:
+		strIndex, ok := index.(*String)
+		if !ok {
+			return newError("expected string for map index, found " + index.String())
+		}
+		return l.Get(strIndex.Val)
+	}
+	return nil
+}
+
+func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	m, ok := left.(*Map)
+	if !ok {
+		return newError("expected map before '.', found " + left.String())
+	}
+	return m.Get(expr.Key)
 }

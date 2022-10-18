@@ -61,7 +61,8 @@ type Bool struct {
 }
 
 type String struct {
-	Val string
+	Val   string
+	runes []rune
 }
 
 type Any struct {
@@ -116,6 +117,17 @@ func (s *String) Set(v Value) {
 	if s2, ok := v.(*String); ok {
 		*s = *s2
 	}
+}
+
+func (s *String) Index(idx Value) Value {
+	if s.runes == nil {
+		s.runes = []rune(s.Val)
+	}
+	i, err := normalizeIndex(idx, len(s.runes))
+	if err != nil {
+		return err
+	}
+	return &String{Val: string(s.runes[i])}
 }
 
 func (*Bool) Type() ValueType { return BOOL }
@@ -196,6 +208,15 @@ func (a *Array) Set(v Value) {
 	}
 }
 
+func (a *Array) Index(idx Value) Value {
+	i, err := normalizeIndex(idx, len(*a.Elements))
+	if err != nil {
+		return err
+	}
+	elements := *a.Elements
+	return elements[i]
+}
+
 func (m *Map) Type() ValueType { return MAP }
 func (m *Map) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
@@ -227,6 +248,14 @@ func (m *Map) Set(v Value) {
 	}
 }
 
+func (m *Map) Get(key string) Value {
+	val, ok := m.Pairs[key]
+	if !ok {
+		return newError("no value for key " + key)
+	}
+	return val
+}
+
 func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }
@@ -241,4 +270,21 @@ func isBreak(val Value) bool {
 
 func newError(msg string) *Error {
 	return &Error{Message: msg}
+}
+
+func normalizeIndex(idx Value, length int) (int, Value) {
+	index, ok := idx.(*Num)
+	if !ok {
+		return 0, newError("expected index of type num, found " + idx.Type().String())
+	}
+	i := int(index.Val)
+	if i < -length || i >= length {
+		boundsStr := strconv.Itoa(-length) + " and " + strconv.Itoa(length-1)
+		msg := "index " + strconv.Itoa(i) + " out of bounds, should be between " + boundsStr
+		return 0, newError(msg)
+	}
+	if i < 0 {
+		return length + i, nil // -1 references len-1 i.e. last element
+	}
+	return i, nil
 }

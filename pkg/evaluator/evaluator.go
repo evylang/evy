@@ -294,6 +294,8 @@ func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) 
 		return evalBinaryStringExpr(op, l, right.(*String))
 	case *Bool:
 		return evalBinaryBoolExpr(op, l, right.(*Bool))
+	case *Array:
+		return evalBinaryArrayExpr(op, l, right.(*Array))
 	}
 	return newError("unknown binary operation: " + expr.String())
 }
@@ -344,6 +346,16 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *Bool) Value {
 		return &Bool{Val: left.Val || right.Val}
 	}
 	return newError("unknown bool operation: " + op.String())
+}
+
+func evalBinaryArrayExpr(op parser.Operator, left, right *Array) Value {
+	if op != parser.OP_PLUS {
+		return newError("unknown array operation: " + op.String())
+	}
+	result := left.Copy()
+	rightElemnts := *right.Copy().Elements
+	*result.Elements = append(*result.Elements, rightElemnts...)
+	return result
 }
 
 func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression) Value {

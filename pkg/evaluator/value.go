@@ -217,6 +217,33 @@ func (a *Array) Index(idx Value) Value {
 	return elements[i]
 }
 
+func (a *Array) Copy() *Array {
+	elements := make([]Value, len(*a.Elements))
+	for i, v := range *a.Elements {
+		elements[i] = passedVal(v)
+	}
+	return &Array{Elements: &elements}
+}
+
+// passedVal is a pass by reference or copy of the value depending on type.
+func passedVal(val Value) Value {
+	switch v := val.(type) {
+	case *Num:
+		return &Num{Val: v.Val}
+	case *String:
+		return &String{Val: v.Val}
+	case *Bool:
+		return &Bool{Val: v.Val}
+	case *Any:
+		return &Any{Val: passedVal(v.Val)}
+	case *Array:
+		return v
+	case *Map:
+		return v
+	}
+	return nil // TODO: panic
+}
+
 func (m *Map) Type() ValueType { return MAP }
 func (m *Map) String() string {
 	pairs := make([]string, 0, len(m.Pairs))

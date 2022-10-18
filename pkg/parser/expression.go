@@ -219,7 +219,7 @@ func (p *Parser) validateBinaryType(binaryExp *BinaryExpression) {
 
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
-	if !leftType.Equals(rightType) {
+	if !leftType.Matches(rightType) {
 		p.appendErrorForToken("mismatched type for "+op.String()+": "+leftType.Format()+", "+rightType.Format(), tok)
 		return
 	}

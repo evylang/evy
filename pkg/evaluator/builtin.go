@@ -67,7 +67,7 @@ func lenFunc(args []Value) Value {
 	case *Map:
 		return &Num{Val: float64(len(arg.Pairs))}
 	case *Array:
-		return &Num{Val: float64(len(arg.Elements))}
+		return &Num{Val: float64(len(*arg.Elements))}
 	case *String:
 		return &Num{Val: float64(len(arg.Val))}
 	}

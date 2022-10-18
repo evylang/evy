@@ -69,12 +69,12 @@ type Any struct {
 }
 
 type Array struct {
-	Elements []Value
+	Elements *[]Value
 }
 
 type Map struct {
 	Pairs map[string]Value
-	Order []string
+	Order *[]string
 }
 
 type ReturnValue struct {
@@ -166,8 +166,8 @@ func (e *Error) Set(_ Value)         {}
 
 func (a *Array) Type() ValueType { return ARRAY }
 func (a *Array) String() string {
-	elements := make([]string, len(a.Elements))
-	for i, e := range a.Elements {
+	elements := make([]string, len(*a.Elements))
+	for i, e := range *a.Elements {
 		elements[i] = e.String()
 	}
 	return "[" + strings.Join(elements, " ") + "]"
@@ -175,11 +175,12 @@ func (a *Array) String() string {
 
 func (a *Array) Equals(v Value) bool {
 	if a2, ok := v.(*Array); ok {
-		if len(a.Elements) != len(a2.Elements) {
+		if len(*a.Elements) != len(*a2.Elements) {
 			return false
 		}
-		for i, e := range a.Elements {
-			e2 := a2.Elements[i]
+		elements2 := *a2.Elements
+		for i, e := range *a.Elements {
+			e2 := elements2[i]
 			if !e.Equals(e2) {
 				return false
 			}
@@ -198,7 +199,7 @@ func (a *Array) Set(v Value) {
 func (m *Map) Type() ValueType { return MAP }
 func (m *Map) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
-	for _, key := range m.Order {
+	for _, key := range *m.Order {
 		pairs = append(pairs, key+":"+m.Pairs[key].String())
 	}
 	return "{" + strings.Join(pairs, " ") + "}"

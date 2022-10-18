@@ -120,7 +120,7 @@ func (e *Evaluator) evalArrayLiteral(scope *scope, arr *parser.ArrayLiteral) Val
 	if len(elements) == 1 && isError(elements[0]) {
 		return elements[0]
 	}
-	return &Array{Elements: elements}
+	return &Array{Elements: &elements}
 }
 
 func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
@@ -132,7 +132,9 @@ func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
 		}
 		pairs[key] = val
 	}
-	return &Map{Pairs: pairs, Order: m.Order}
+	order := make([]string, len(m.Order))
+	copy(order, m.Order)
+	return &Map{Pairs: pairs, Order: &order}
 }
 
 func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
@@ -158,7 +160,7 @@ func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope 
 		scope.set(param.Name, args[i])
 	}
 	if fd.VariadicParam != nil {
-		varArg := &Array{Elements: args}
+		varArg := &Array{Elements: &args}
 		scope.set(fd.VariadicParam.Name, varArg)
 	}
 	return scope

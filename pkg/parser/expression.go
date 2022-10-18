@@ -144,6 +144,9 @@ func (p *Parser) parserIndexExpr(scope *scope, left Node) Node {
 		return nil
 	}
 	index := p.parseTopLevelExpr(scope)
+	if index == nil {
+		return nil
+	}
 	if !p.assertToken(lexer.RBRACKET) {
 		return nil
 	}

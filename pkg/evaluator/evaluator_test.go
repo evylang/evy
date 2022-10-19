@@ -262,6 +262,35 @@ end
 	assert.Equal(t, "🍭\n🎈\n🎈\n", b.String())
 }
 
+func TestExpr(t *testing.T) {
+	tests := map[string]string{
+		"a := 1 + 2 * 2":                    "5",
+		"a := (1 + 2) * 2":                  "6",
+		"a := (1 + 2) / 2":                  "1.5",
+		"a := (1 + 2) / 2 > 1":              "true",
+		"a := (1 + 2) / 2 > 1 and 2 == 2*2": "false",
+		"a := (1 + 2) / 2 < 1 or 2 == 2*2":  "false",
+		"a := (1 + 2) / 2 < 1 or 2 != 2*2":  "true",
+		`a := "abc" + "d"`:                  "abcd",
+		`a := "abc" + "d" < "efg"`:          "true",
+		`a := "abc" + "d" == "abcd"`:        "true",
+		`a := "abc" + "d" != "abcd"`:        "false",
+		`a := !(1 == 1)`:                    "false",
+		`a := -(3 + 5)`:                     "-8",
+		`a := -3 +5`:                        "2",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			in += "\n print a"
+			b := bytes.Buffer{}
+			fn := func(s string) { b.WriteString(s) }
+			Run(in, fn)
+			assert.Equal(t, want+"\n", b.String())
+		})
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10
@@ -269,7 +298,7 @@ line 20 20
 
 x := 12
 print "x:" x
-if true //TODO: x > 10
+if x > 10
     print "🍦 big x"
 end`
 	b := bytes.Buffer{}

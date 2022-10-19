@@ -130,6 +130,18 @@ func (s *String) Index(idx Value) Value {
 	return &String{Val: string(s.runes[i])}
 }
 
+func (s *String) Slice(start, end Value) Value {
+	if s.runes == nil {
+		s.runes = []rune(s.Val)
+	}
+	length := len(s.runes)
+	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
+	if err != nil {
+		return err
+	}
+	return &String{Val: string(s.runes[startIdx:endIdx])}
+}
+
 func (*Bool) Type() ValueType { return BOOL }
 func (b *Bool) String() string {
 	return strconv.FormatBool(b.Val)
@@ -232,6 +244,21 @@ func (a *Array) Copy() *Array {
 	return &Array{Elements: &elements}
 }
 
+func (a *Array) Slice(start, end Value) Value {
+	length := len(*a.Elements)
+	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
+	if err != nil {
+		return err
+	}
+
+	elements := make([]Value, endIdx-startIdx)
+	for i := startIdx; i < endIdx; i++ {
+		v := (*a.Elements)[i]
+		elements[i-startIdx] = passedVal(v)
+	}
+	return &Array{Elements: &elements}
+}
+
 // passedVal is a pass by reference or copy of the value depending on type.
 func passedVal(val Value) Value {
 	switch v := val.(type) {
@@ -304,6 +331,32 @@ func isBreak(val Value) bool {
 
 func newError(msg string) *Error {
 	return &Error{Message: msg}
+}
+
+func normalizeSliceIndices(start, end Value, length int) (int, int, Value) {
+	startIdx := 0
+	var err Value
+	if start != nil {
+		startIdx, err = normalizeIndex(start, length)
+		if err != nil {
+			return 0, 0, err
+		}
+	}
+	endIdx := length
+	if end != nil {
+		// length is a valid end slice index, but not a valid ordinary index (out of bounds)
+		if endNum, ok := end.(*Num); ok && int(endNum.Val) != length {
+			endIdx, err = normalizeIndex(end, length)
+			if err != nil {
+				return 0, 0, err
+			}
+		}
+	}
+	if startIdx > endIdx {
+		msg := "invalid slice indices: " + strconv.Itoa(startIdx) + " > " + strconv.Itoa(endIdx)
+		return 0, 0, newError(msg)
+	}
+	return startIdx, endIdx, nil
 }
 
 func normalizeIndex(idx Value, length int) (int, Value) {

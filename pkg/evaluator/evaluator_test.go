@@ -504,6 +504,73 @@ print "2 arr5" arr5
 	}
 }
 
+func TestArraySlice(t *testing.T) {
+	prog := `
+arr := [1 2 3]
+print "1" arr[1:3]
+print "2" arr[1:]
+print "3" arr[1:2]
+print "4" arr[1:1]
+print "5" arr[:1]
+print
+
+arr2 := arr[:]
+arr2[0] = 11
+print "6" arr arr2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"1 [2 3]",
+		"2 [2 3]",
+		"3 [2]",
+		"4 []",
+		"5 [1]",
+		"",
+		"6 [1 2 3] [11 2 3]",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestStringSlice(t *testing.T) {
+	prog := `
+s := "abc"
+print "1" s[1:3]
+print "2" s[1:]
+print "3" s[1:2]
+print "4" s[1:1]
+print "5" s[:1]
+print
+
+s2 := "A" + s[1:]
+print "6" s s2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"1 bc",
+		"2 bc",
+		"3 b",
+		"4 ",
+		"5 a",
+		"",
+		"6 abc Abc",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

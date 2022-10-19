@@ -72,6 +72,7 @@ type Array struct {
 
 type Map struct {
 	Pairs map[string]Value
+	Order []string
 }
 
 type ReturnValue struct {
@@ -132,7 +133,7 @@ func (a *Array) String() string {
 	for i, e := range a.Elements {
 		elements[i] = e.String()
 	}
-	return "[" + strings.Join(elements, ", ") + "]"
+	return "[" + strings.Join(elements, " ") + "]"
 }
 
 func (a *Array) Equals(v Value) bool {
@@ -154,10 +155,10 @@ func (a *Array) Equals(v Value) bool {
 func (m *Map) Type() ValueType { return MAP }
 func (m *Map) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
-	for key, value := range m.Pairs {
-		pairs = append(pairs, key+":"+value.String())
+	for _, key := range m.Order {
+		pairs = append(pairs, key+":"+m.Pairs[key].String())
 	}
-	return "{" + strings.Join(pairs, ", ") + "}"
+	return "{" + strings.Join(pairs, " ") + "}"
 }
 
 func (m *Map) Equals(v Value) bool {

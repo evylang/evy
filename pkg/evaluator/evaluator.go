@@ -67,6 +67,10 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalUnaryExpr(scope, node)
 	case *parser.BinaryExpression:
 		return e.evalBinaryExpr(scope, node)
+	case *parser.IndexExpression:
+		return e.evalIndexExpr(scope, node)
+	case *parser.DotExpression:
+		return e.evalDotExpr(scope, node)
 	}
 	return nil
 }
@@ -87,16 +91,16 @@ func (e *Evaluator) evalStatments(scope *scope, statements []parser.Node) Value 
 }
 
 func (e *Evaluator) evalBool(b *parser.Bool) Value {
-	if b.Value {
-		return TRUE
-	}
-	return FALSE
+	return &Bool{Val: b.Value}
 }
 
 func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Value {
 	val := e.Eval(scope, decl.Value)
 	if isError(val) {
 		return val
+	}
+	if decl.Type() == parser.ANY_TYPE {
+		val = &Any{Val: val}
 	}
 	scope.set(decl.Var.Name, val)
 	return nil
@@ -107,12 +111,11 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	if isError(val) {
 		return val
 	}
-	name := assignment.Target.String()
-	// We need to update the variable in the scope it was defined.
-	if s, ok := scope.getScope(name); ok {
-		scope = s
+	target := e.Eval(scope, assignment.Target)
+	if isError(target) {
+		return target
 	}
-	scope.set(name, val)
+	target.Set(val)
 	return nil
 }
 
@@ -121,7 +124,7 @@ func (e *Evaluator) evalArrayLiteral(scope *scope, arr *parser.ArrayLiteral) Val
 	if len(elements) == 1 && isError(elements[0]) {
 		return elements[0]
 	}
-	return &Array{Elements: elements}
+	return &Array{Elements: &elements}
 }
 
 func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
@@ -133,7 +136,9 @@ func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
 		}
 		pairs[key] = val
 	}
-	return &Map{Pairs: pairs, Order: m.Order}
+	order := make([]string, len(m.Order))
+	copy(order, m.Order)
+	return &Map{Pairs: pairs, Order: &order}
 }
 
 func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
@@ -159,7 +164,7 @@ func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope 
 		scope.set(param.Name, args[i])
 	}
 	if fd.VariadicParam != nil {
-		varArg := &Array{Elements: args}
+		varArg := &Array{Elements: &args}
 		scope.set(fd.VariadicParam.Name, varArg)
 	}
 	return scope
@@ -212,7 +217,11 @@ func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.Conditi
 	if isError(cond) {
 		return cond, false
 	}
-	if cond == TRUE {
+	boolCond, ok := cond.(*Bool)
+	if !ok {
+		return newError("conditional not a bool"), false
+	}
+	if boolCond.Val {
 		return e.Eval(scope, condBlock.Block), true
 	}
 	return nil, false
@@ -273,18 +282,18 @@ func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) 
 	}
 	op := expr.Op
 	if op == parser.OP_EQ {
-		return boolVal(left.Equals(right))
+		return &Bool{Val: left.Equals(right)}
 	}
 	if op == parser.OP_NOT_EQ {
-		return boolVal(!left.Equals(right))
+		return &Bool{Val: !left.Equals(right)}
 	}
-	switch left := left.(type) {
+	switch l := left.(type) {
 	case *Num:
-		return evalBinaryNumExpr(op, left, right.(*Num))
+		return evalBinaryNumExpr(op, l, right.(*Num))
 	case *String:
-		return evalBinaryStringExpr(op, left, right.(*String))
+		return evalBinaryStringExpr(op, l, right.(*String))
 	case *Bool:
-		return evalBinaryBoolExpr(op, left, right.(*Bool))
+		return evalBinaryBoolExpr(op, l, right.(*Bool))
 	}
 	return newError("unknown binary operation: " + expr.String())
 }
@@ -300,13 +309,13 @@ func evalBinaryNumExpr(op parser.Operator, left, right *Num) Value {
 	case parser.OP_SLASH:
 		return &Num{Val: left.Val / right.Val}
 	case parser.OP_GT:
-		return boolVal(left.Val > right.Val)
+		return &Bool{Val: left.Val > right.Val}
 	case parser.OP_LT:
-		return boolVal(left.Val < right.Val)
+		return &Bool{Val: left.Val < right.Val}
 	case parser.OP_GTEQ:
-		return boolVal(left.Val >= right.Val)
+		return &Bool{Val: left.Val >= right.Val}
 	case parser.OP_LTEQ:
-		return boolVal(left.Val <= right.Val)
+		return &Bool{Val: left.Val <= right.Val}
 	}
 	return newError("unknown num operation: " + op.String())
 }
@@ -316,13 +325,13 @@ func evalBinaryStringExpr(op parser.Operator, left, right *String) Value {
 	case parser.OP_PLUS:
 		return &String{Val: left.Val + right.Val}
 	case parser.OP_GT:
-		return boolVal(left.Val > right.Val)
+		return &Bool{left.Val > right.Val}
 	case parser.OP_LT:
-		return boolVal(left.Val < right.Val)
+		return &Bool{left.Val < right.Val}
 	case parser.OP_GTEQ:
-		return boolVal(left.Val >= right.Val)
+		return &Bool{left.Val >= right.Val}
 	case parser.OP_LTEQ:
-		return boolVal(left.Val <= right.Val)
+		return &Bool{left.Val <= right.Val}
 	}
 	return newError("unknown string operation: " + op.String())
 }
@@ -335,4 +344,41 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *Bool) Value {
 		return &Bool{Val: left.Val || right.Val}
 	}
 	return newError("unknown bool operation: " + op.String())
+}
+
+func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	index := e.Eval(scope, expr.Index)
+	if isError(index) {
+		return index
+	}
+
+	switch l := left.(type) {
+	case *Array:
+		return l.Index(index)
+	case *String:
+		return l.Index(index)
+	case *Map:
+		strIndex, ok := index.(*String)
+		if !ok {
+			return newError("expected string for map index, found " + index.String())
+		}
+		return l.Get(strIndex.Val)
+	}
+	return nil
+}
+
+func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	m, ok := left.(*Map)
+	if !ok {
+		return newError("expected map before '.', found " + left.String())
+	}
+	return m.Get(expr.Key)
 }

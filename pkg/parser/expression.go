@@ -144,6 +144,9 @@ func (p *Parser) parserIndexExpr(scope *scope, left Node) Node {
 		return nil
 	}
 	index := p.parseTopLevelExpr(scope)
+	if index == nil {
+		return nil
+	}
 	if !p.assertToken(lexer.RBRACKET) {
 		return nil
 	}
@@ -157,7 +160,11 @@ func (p *Parser) parserIndexExpr(scope *scope, left Node) Node {
 		p.appendError("map index expects string, found " + index.Type().Format())
 		return nil
 	}
-	return &IndexExpression{Token: tok, Left: left, Index: index, T: left.Type().Sub}
+	t := left.Type().Sub
+	if leftType == STRING {
+		t = STRING_TYPE
+	}
+	return &IndexExpression{Token: tok, Left: left, Index: index, T: t}
 }
 
 func (p *Parser) parserDotExpr(left Node) Node {

@@ -79,6 +79,10 @@ func TestParseDeclarationError(t *testing.T) {
 		"a := {}[":      "line 1 column 9: unexpected end of input",
 		"a :num num":    "line 1 column 8: expected end of line, found 'num'",
 		"a :num{}num":   "line 1 column 7: expected end of line, found '{'",
+		`
+m := {name: "Greta"}
+s := name
+print m[s]`: "line 3 column 6: unknown variable name 'name'",
 	}
 	for input, err1 := range tests {
 		parser := New(input, testBuiltins())

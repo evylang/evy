@@ -66,6 +66,8 @@ func TestParseTopLevelExpression(t *testing.T) {
 		`print 1 (len "abc") 2`:       "print(1, len('abc'), 2)",
 		`print (len "abc") 2`:         "print(len('abc'), 2)",
 		`print (len "abc") (len "x")`: "print(len('abc'), len('x'))",
+		`print s[1]`:                  "print((s[1]))",
+		"print map2[s]":               "print((map2[s]))",
 
 		// Index expression
 		"arr[1]":        "(arr[1])",
@@ -76,6 +78,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"map[s]":        "(map[s])",
 		`map["key"]`:    "(map['key'])",
 		`"abc"[1]`:      "('abc'[1])",
+		`s[1]`:          "(s[1])",
 
 		// Map access - dot expressions
 		"map.key":          "(map.key)",
@@ -86,6 +89,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"map3.ok[n1]":      "((map3.ok)[n1])",
 		"list[1].x":        "((list[1]).x)",
 		"list[n1][s]":      "((list[n1])[s])",
+		"map2[s]":          "(map2[s])",
 
 		// Array literals
 		"[]":          "[]",

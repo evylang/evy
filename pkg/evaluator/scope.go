@@ -23,16 +23,6 @@ func (s *scope) get(name string) (Value, bool) {
 	return s.outer.get(name)
 }
 
-func (s *scope) getScope(name string) (*scope, bool) {
-	if s == nil {
-		return nil, false
-	}
-	if _, ok := s.values[name]; ok {
-		return s, true
-	}
-	return s.outer.getScope(name)
-}
-
 func (s *scope) set(name string, val Value) {
 	s.values[name] = val
 }

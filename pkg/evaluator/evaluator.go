@@ -287,13 +287,13 @@ func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) 
 	if op == parser.OP_NOT_EQ {
 		return &Bool{Val: !left.Equals(right)}
 	}
-	switch left := left.(type) {
+	switch l := left.(type) {
 	case *Num:
-		return evalBinaryNumExpr(op, left, right.(*Num))
+		return evalBinaryNumExpr(op, l, right.(*Num))
 	case *String:
-		return evalBinaryStringExpr(op, left, right.(*String))
+		return evalBinaryStringExpr(op, l, right.(*String))
 	case *Bool:
-		return evalBinaryBoolExpr(op, left, right.(*Bool))
+		return evalBinaryBoolExpr(op, l, right.(*Bool))
 	}
 	return newError("unknown binary operation: " + expr.String())
 }

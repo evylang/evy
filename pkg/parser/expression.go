@@ -82,7 +82,7 @@ func (p *Parser) parseExpr(scope *scope, prec precedence) Node {
 		case isBinaryOp(tt):
 			left = p.parseBinaryExpr(scope, left)
 		case tt == lexer.LBRACKET:
-			left = p.parserIndexExpr(scope, left)
+			left = p.parserIndexOrSliceExpr(scope, left, true)
 		case tt == lexer.DOT:
 			left = p.parserDotExpr(left)
 		default:
@@ -135,36 +135,74 @@ func (p *Parser) parseGroupedExpr(scope *scope) Node {
 	return exp
 }
 
-func (p *Parser) parserIndexExpr(scope *scope, left Node) Node {
+func (p *Parser) parserIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
 	tok := p.cur // TODO: ensure not prefixed by WS
 	p.advance()  // advance past [
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != MAP && leftType != STRING {
-		p.appendErrorForToken("only array, string and map type can be indexed, found "+left.Type().Format(), tok)
+		p.appendErrorForToken("only array, string and map type can be indexed found "+left.Type().Format(), tok)
 		return nil
+	}
+	if p.cur.TokenType() == lexer.COLON && allowSlice { // e.g. a[:2]
+		p.advance() //  advance past :
+		return p.parseSlice(scope, tok, left, nil)
 	}
 	index := p.parseTopLevelExpr(scope)
 	if index == nil {
 		return nil
 	}
-	if !p.assertToken(lexer.RBRACKET) {
+	tt := p.cur.TokenType()
+	if tt == lexer.COLON && allowSlice { // e.g. a[1:3] or a[1:]
+		p.advance() // advance past :
+		return p.parseSlice(scope, tok, left, index)
+	}
+	if !p.validateIndex(tok, leftType, index.Type()) {
 		return nil
 	}
 	p.advance() // advance past ]
-
-	if (leftType == ARRAY || leftType == STRING) && index.Type() != NUM_TYPE {
-		p.appendError(leftType.String() + " index expects num, found " + index.Type().Format())
-		return nil
-	}
-	if leftType == MAP && index.Type() != STRING_TYPE {
-		p.appendError("map index expects string, found " + index.Type().Format())
-		return nil
-	}
 	t := left.Type().Sub
 	if leftType == STRING {
 		t = STRING_TYPE
 	}
 	return &IndexExpression{Token: tok, Left: left, Index: index, T: t}
+}
+
+func (p *Parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *Type) bool {
+	if !p.assertToken(lexer.RBRACKET) {
+		return false
+	}
+	if (leftType == ARRAY || leftType == STRING) && indexType != NUM_TYPE {
+		p.appendErrorForToken(leftType.String()+" index expects num, found "+indexType.Format(), tok)
+		return false
+	}
+	if leftType == MAP && indexType != STRING_TYPE {
+		p.appendErrorForToken("map index expects string, found "+indexType.Format(), tok)
+		return false
+	}
+	return true
+}
+
+func (p *Parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) Node {
+	leftType := left.Type().Name
+	if leftType != ARRAY && leftType != STRING {
+		p.appendErrorForToken("only array and string be indexed sliced"+left.Type().Format(), tok)
+		return nil
+	}
+
+	t := left.Type()
+	if p.cur.Type == lexer.RBRACKET {
+		p.advance()
+		return &SliceExpression{Token: tok, Left: left, Start: start, End: nil, T: t}
+	}
+	end := p.parseTopLevelExpr(scope)
+	if end == nil {
+		return nil
+	}
+	if !p.assertToken(lexer.RBRACKET) {
+		return nil
+	}
+	p.advance()
+	return &SliceExpression{Token: tok, Left: left, Start: start, End: end, T: t}
 }
 
 func (p *Parser) parserDotExpr(left Node) Node {

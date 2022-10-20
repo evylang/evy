@@ -69,6 +69,8 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalBinaryExpr(scope, node)
 	case *parser.IndexExpression:
 		return e.evalIndexExpr(scope, node)
+	case *parser.SliceExpression:
+		return e.evalSliceExpr(scope, node)
 	case *parser.DotExpression:
 		return e.evalDotExpr(scope, node)
 	}
@@ -393,4 +395,26 @@ func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression) Value 
 		return newError("expected map before '.', found " + left.String())
 	}
 	return m.Get(expr.Key)
+}
+
+func (e *Evaluator) evalSliceExpr(scope *scope, expr *parser.SliceExpression) Value {
+	left := e.Eval(scope, expr.Left)
+	if isError(left) {
+		return left
+	}
+	start := e.Eval(scope, expr.Start)
+	if isError(start) {
+		return start
+	}
+	end := e.Eval(scope, expr.End)
+	if isError(end) {
+		return end
+	}
+	switch left := left.(type) {
+	case *Array:
+		return left.Slice(start, end)
+	case *String:
+		return left.Slice(start, end)
+	}
+	return newError("cannot slice " + left.String())
 }

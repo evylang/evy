@@ -45,6 +45,14 @@ type IndexExpression struct {
 	Index Node
 }
 
+type SliceExpression struct {
+	T     *Type
+	Token *lexer.Token // The [ token
+	Left  Node
+	Start Node
+	End   Node
+}
+
 type DotExpression struct {
 	T     *Type
 	Token *lexer.Token // The . token
@@ -196,6 +204,22 @@ func (i *IndexExpression) String() string {
 
 func (i *IndexExpression) Type() *Type {
 	return i.T
+}
+
+func (s *SliceExpression) String() string {
+	start := ""
+	if s.Start != nil {
+		start = s.Start.String()
+	}
+	end := ""
+	if s.End != nil {
+		end = s.End.String()
+	}
+	return "(" + s.Left.String() + "[" + start + ":" + end + "])"
+}
+
+func (s *SliceExpression) Type() *Type {
+	return s.T
 }
 
 func (d *DotExpression) String() string {

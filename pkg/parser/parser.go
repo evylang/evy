@@ -267,7 +267,11 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 		return nil
 	}
 	if p.cur.TokenType() == lexer.LBRACKET { // TODO: check for whitespace
-		return p.parserIndexExpr(scope, v)
+		if v.Type() == STRING_TYPE {
+			p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
+			return nil
+		}
+		return p.parserIndexOrSliceExpr(scope, v, false)
 	}
 	if p.cur.TokenType() == lexer.DOT { // TODO: check for whitespace
 		return p.parserDotExpr(v)

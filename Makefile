@@ -6,7 +6,7 @@ O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 
-all: build tiny test test-tiny check-coverage lint sh-lint frontend ## Build, test, check coverage and lint
+all: build test lint tiny test-tiny check-coverage sh-lint frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 

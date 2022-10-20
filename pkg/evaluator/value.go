@@ -154,11 +154,18 @@ func (a *Any) String() string {
 }
 
 func (a *Any) Equals(v Value) bool {
-	return a.Val.Equals(v)
+	if a2, ok := v.(*Any); ok {
+		return a.Val.Equals(a2.Val)
+	}
+	return false // panic
 }
 
 func (a *Any) Set(v Value) {
-	a.Val = v
+	if a2, ok := v.(*Any); ok {
+		a.Val = a2.Val
+	} else {
+		a.Val = v
+	}
 }
 
 func (r *ReturnValue) Type() ValueType     { return RETURN_VALUE }

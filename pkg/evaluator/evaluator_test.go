@@ -155,23 +155,48 @@ print f1 f2 f3
 
 func TestAssignmentAny(t *testing.T) {
 	prog := `
-f1:any
-f2:num
-print f1 f2
-f1 = f2
-print f1 f2
-f1 = fox
-print f1 f2
-
 func fox:string
     return "🦊"
 end
 
+func lol_any:any
+    return "🍭"
+end
+
+f1:any
+f2:num
+print "1" f1 f2
+
+f1 = f2
+print "2" f1 f2
+
+f1 = fox
+print "3" f1 f2
+
+f1 = lol_any
+print "4" f1
+
+f3 := f1
+print "5" f3==f1
+
+f4:any
+f4 = f1
+print "6" f4==f1
 `
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "false 0\n0 0\n🦊 0\n"
+	wants := []string{
+		"1 false 0",
+		"2 0 0",
+		"3 🦊 0",
+		"4 🍭",
+		"5 true",
+		"6 true",
+		"",
+	}
+	want := strings.Join(wants, "\n")
+
 	assert.Equal(t, want, b.String())
 }
 

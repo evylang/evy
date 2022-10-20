@@ -99,7 +99,7 @@ func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Valu
 	if isError(val) {
 		return val
 	}
-	if decl.Type() == parser.ANY_TYPE {
+	if decl.Type() == parser.ANY_TYPE && val.Type() != ANY {
 		val = &Any{Val: val}
 	}
 	scope.set(decl.Var.Name, val)

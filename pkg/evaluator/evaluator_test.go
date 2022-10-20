@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"foxygo.at/evy/pkg/assert"
@@ -428,6 +429,54 @@ print m.missing_index
 	Run(in, fn)
 	want := "ERROR: no value for key missing_index"
 	assert.Equal(t, want, b.String())
+}
+
+func TestArrayConcatenation(t *testing.T) {
+	prog := `
+arr1 := [1]
+arr2 := arr1
+arr3 := arr1 + arr1
+arr4 := arr1 + [2]
+arr5 := arr1 + []
+arr6 := [] + []
+print "1 arr1" arr1
+print "1 arr2" arr2
+print "1 arr3" arr3
+print "1 arr4" arr4
+print "1 arr5" arr5
+print "1 arr6" arr6
+print
+
+arr1[0] = 2
+print "2 arr1" arr1
+print "2 arr2" arr2
+print "2 arr3" arr3
+print "2 arr4" arr4
+print "2 arr5" arr5
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"1 arr1 [1]",
+		"1 arr2 [1]",
+		"1 arr3 [1 1]",
+		"1 arr4 [1 2]",
+		"1 arr5 [1]",
+		"1 arr6 []",
+		"",
+		"2 arr1 [2]",
+		"2 arr2 [2]",
+		"2 arr3 [1 1]",
+		"2 arr4 [1 2]",
+		"2 arr5 [1]",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
 }
 
 func TestDemo(t *testing.T) {

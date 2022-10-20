@@ -124,6 +124,14 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"{a: [1] b:2+n2 c: 1+2}": "{a:[1], b:(2+n2), c:(1+2)}",
 		"{a: 1}.a":               "({a:1}.a)",
 		`{a: 1}["a"]`:            "({a:1}['a'])",
+
+		// Array concatenation
+		"[1] + [2]":            "([1]+[2])",
+		"[true] + [false]":     "([true]+[false])",
+		"[1 true] + [2 false]": "([1, true]+[2, false])",
+		"[1] + []":             "([1]+[])",
+		"[] + [1]":             "([]+[1])",
+		"[] + []":              "([]+[])",
 	}
 	for input, want := range tests {
 		parser := New(input, testBuiltins())
@@ -179,9 +187,10 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		`[1 2 3]["a"]`: "line 1 column 13: array index expects num, found string",
 		"{a:2}[2]":     "line 1 column 9: map index expects string, found num",
 
-		"{a:}":    "line 1 column 4: unexpected '}'",
-		"{:a}":    "line 1 column 2: expected map key, found ':'",
-		"[1 [2]]": "line 1 column 4: only array, string and map type can be indexed, found num",
+		"{a:}": "line 1 column 4: unexpected '}'",
+		"{:a}": "line 1 column 2: expected map key, found ':'",
+
+		"[1] + [false]": "line 1 column 5: mismatched type for +: num[], bool[]",
 	}
 	for input, wantErr := range tests {
 		parser := New(input, testBuiltins())

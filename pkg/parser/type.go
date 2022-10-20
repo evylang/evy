@@ -104,7 +104,7 @@ func (t *Type) Accepts(t2 *Type) bool {
 	return false
 }
 
-func (t *Type) Equals(t2 *Type) bool {
+func (t *Type) Matches(t2 *Type) bool {
 	if t == t2 {
 		return true
 	}
@@ -117,7 +117,10 @@ func (t *Type) Equals(t2 *Type) bool {
 	if t.Sub == nil || t2.Sub == nil {
 		return false
 	}
-	return t.Sub.Equals(t2.Sub)
+	if t == EMPTY_ARRAY || t == EMPTY_MAP || t2 == EMPTY_ARRAY || t2 == EMPTY_MAP {
+		return true
+	}
+	return t.Sub.Matches(t2.Sub)
 }
 
 func (t *Type) Infer() *Type {

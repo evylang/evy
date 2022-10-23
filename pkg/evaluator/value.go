@@ -3,6 +3,8 @@ package evaluator
 import (
 	"strconv"
 	"strings"
+
+	"foxygo.at/evy/pkg/parser"
 )
 
 type ValueType int
@@ -61,8 +63,8 @@ type Bool struct {
 }
 
 type String struct {
-	Val   string
-	runes []rune
+	Val       string
+	runeSlice []rune
 }
 
 type Any struct {
@@ -119,27 +121,30 @@ func (s *String) Set(v Value) {
 	}
 }
 
-func (s *String) Index(idx Value) Value {
-	if s.runes == nil {
-		s.runes = []rune(s.Val)
+func (s *String) runes() []rune {
+	if s.runeSlice == nil {
+		s.runeSlice = []rune(s.Val)
 	}
-	i, err := normalizeIndex(idx, len(s.runes))
+	return s.runeSlice
+}
+
+func (s *String) Index(idx Value) Value {
+	runes := s.runes()
+	i, err := normalizeIndex(idx, len(runes))
 	if err != nil {
 		return err
 	}
-	return &String{Val: string(s.runes[i])}
+	return &String{Val: string(runes[i])}
 }
 
 func (s *String) Slice(start, end Value) Value {
-	if s.runes == nil {
-		s.runes = []rune(s.Val)
-	}
-	length := len(s.runes)
+	runes := s.runes()
+	length := len(runes)
 	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
 	if err != nil {
 		return err
 	}
-	return &String{Val: string(s.runes[startIdx:endIdx])}
+	return &String{Val: string(runes[startIdx:endIdx])}
 }
 
 func (*Bool) Type() ValueType { return BOOL }
@@ -239,7 +244,7 @@ func (a *Array) Index(idx Value) Value {
 func (a *Array) Copy() *Array {
 	elements := make([]Value, len(*a.Elements))
 	for i, v := range *a.Elements {
-		elements[i] = passedVal(v)
+		elements[i] = copyOrRef(v)
 	}
 	return &Array{Elements: &elements}
 }
@@ -254,13 +259,14 @@ func (a *Array) Slice(start, end Value) Value {
 	elements := make([]Value, endIdx-startIdx)
 	for i := startIdx; i < endIdx; i++ {
 		v := (*a.Elements)[i]
-		elements[i-startIdx] = passedVal(v)
+		elements[i-startIdx] = copyOrRef(v)
 	}
 	return &Array{Elements: &elements}
 }
 
-// passedVal is a pass by reference or copy of the value depending on type.
-func passedVal(val Value) Value {
+// copyOrRef is a copy of the input value for basic types and a
+// reference to the value for composite types (arrays and maps).
+func copyOrRef(val Value) Value {
 	switch v := val.(type) {
 	case *Num:
 		return &Num{Val: v.Val}
@@ -269,7 +275,7 @@ func passedVal(val Value) Value {
 	case *Bool:
 		return &Bool{Val: v.Val}
 	case *Any:
-		return &Any{Val: passedVal(v.Val)}
+		return &Any{Val: copyOrRef(v.Val)}
 	case *Array:
 		return v
 	case *Map:
@@ -374,4 +380,24 @@ func normalizeIndex(idx Value, length int) (int, Value) {
 		return length + i, nil // -1 references len-1 i.e. last element
 	}
 	return i, nil
+}
+
+func zero(t *parser.Type) Value {
+	switch {
+	case t == parser.NUM_TYPE:
+		return &Num{}
+	case t == parser.STRING_TYPE:
+		return &String{}
+	case t == parser.BOOL_TYPE:
+		return &Bool{}
+	case t == parser.ANY_TYPE:
+		return &Any{Val: &Bool{}}
+	case t.Name == parser.ARRAY:
+		elements := []Value{}
+		return &Array{Elements: &elements}
+	case t.Name == parser.MAP:
+		order := []string{}
+		return &Map{Pairs: map[string]Value{}, Order: &order}
+	}
+	return newError("cannot create zero value for type " + t.String())
 }

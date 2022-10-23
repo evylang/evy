@@ -61,6 +61,8 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 		return e.evalIf(scope, node)
 	case *parser.While:
 		return e.evalWhile(scope, node)
+	case *parser.For:
+		return e.evalFor(scope, node)
 	case *parser.BlockStatement:
 		return e.evalBlockStatment(scope, node)
 	case *parser.UnaryExpression:
@@ -74,7 +76,7 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	case *parser.DotExpression:
 		return e.evalDotExpr(scope, node)
 	}
-	return nil
+	return nil // TODO: panic?
 }
 
 func (e *Evaluator) evalProgram(scope *scope, program *parser.Program) Value {
@@ -211,6 +213,97 @@ func (e *Evaluator) evalWhile(scope *scope, w *parser.While) Value {
 		val, ok = e.evalConditionalBlock(scope, whileBlock)
 	}
 	return val
+}
+
+func (e *Evaluator) evalFor(scope *scope, f *parser.For) Value {
+	scope = newInnerScope(scope)
+	r, err := e.newRange(scope, f)
+	if err != nil {
+		return err
+	}
+	for r.next() {
+		val := e.Eval(scope, f.Block)
+		if isError(val) || isBreak(val) || isReturn(val) {
+			return val
+		}
+	}
+	return nil
+}
+
+func (e *Evaluator) newRange(scope *scope, f *parser.For) (ranger, Value) {
+	if r, ok := f.Range.(*parser.StepRange); ok {
+		return e.newStepRange(scope, r, f.LoopVar)
+	}
+	rangeVal := e.Eval(scope, f.Range)
+	if isError(rangeVal) {
+		return nil, rangeVal
+	}
+
+	switch v := rangeVal.(type) {
+	case *Array:
+		loopVar := zero(f.LoopVar.Type())
+		scope.set(f.LoopVar.Name, loopVar)
+		return &arrayRange{loopVar: loopVar, array: v, cur: 0}, nil
+	case *String:
+		loopVar := &String{}
+		scope.set(f.LoopVar.Name, loopVar)
+		return &stringRange{loopVar: loopVar, str: v, cur: 0}, nil
+	case *Map:
+		loopVar := &String{}
+		scope.set(f.LoopVar.Name, loopVar)
+		order := make([]string, len(*v.Order))
+		copy(order, *v.Order)
+		m := &mapRange{loopVar: loopVar, mapVal: v, cur: 0, order: order}
+		return m, nil
+	}
+	return nil, newError("cannot create range for " + f.Range.String())
+}
+
+func (e *Evaluator) newStepRange(scope *scope, r *parser.StepRange, loopVar *parser.Var) (ranger, Value) {
+	start, errValue := e.numValWithDefault(scope, r.Start, 0.0)
+	if errValue != nil {
+		return nil, errValue
+	}
+	stop, errValue := e.numVal(scope, r.Stop)
+	if errValue != nil {
+		return nil, errValue
+	}
+	step, errValue := e.numValWithDefault(scope, r.Step, 1.0)
+	if errValue != nil {
+		return nil, errValue
+	}
+	if step == 0 {
+		return nil, newError("step cannot by 0, infinite loop")
+	}
+	loopVarVal := &Num{}
+	scope.set(loopVar.Name, loopVarVal)
+
+	ranger := &stepRange{
+		loopVar: loopVarVal,
+		cur:     start,
+		stop:    stop,
+		step:    step,
+	}
+	return ranger, nil
+}
+
+func (e *Evaluator) numVal(scope *scope, n parser.Node) (float64, Value) {
+	v := e.Eval(scope, n)
+	if isError(v) {
+		return 0, v
+	}
+	numVal, ok := v.(*Num)
+	if !ok {
+		return 0, newError("expected number, found " + v.String())
+	}
+	return numVal.Val, nil
+}
+
+func (e *Evaluator) numValWithDefault(scope *scope, n parser.Node, defaultVal float64) (float64, Value) {
+	if n == nil {
+		return defaultVal, nil
+	}
+	return e.numVal(scope, n)
 }
 
 func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) (Value, bool) {

@@ -571,6 +571,125 @@ print "6" s s2
 	}
 }
 
+func TestForStepRange(t *testing.T) {
+	prog := `
+for i := range 2
+	print "🎈" i
+end
+for i := range -1 1
+	print "🐣" i
+end
+for i := range 2 6 2
+	print "🍭" i
+end
+for i := range 5 3 (-1) // TODO: should work 5 3 -1 !
+	print "🦊" i
+end
+for i := range 3 5 (-1)
+	print "1💣" i
+end
+for i := range 3 (-1) 1
+	print "2💣" i
+end
+for i := range 3 (-1)
+	print "3💣" i
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"🎈 0",
+		"🎈 1",
+		"🐣 -1",
+		"🐣 0",
+		"🍭 2",
+		"🍭 4",
+		"🦊 5",
+		"🦊 4",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestForArray(t *testing.T) {
+	prog := `
+for x := range [0 1]
+	print "🎈" x
+end
+for i := range []
+	print "💣" i
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"🎈 0",
+		"🎈 1",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestForString(t *testing.T) {
+	prog := `
+for x := range "abc"
+	print "🎈" x
+end
+for i := range ""
+	print "💣" i
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"🎈 a",
+		"🎈 b",
+		"🎈 c",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestForMap(t *testing.T) {
+	prog := `
+m := {a:1 b:2}
+for x := range m
+	print "🎈" x  m[x]
+end
+for i := range {}
+	print "💣" i
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"🎈 a 1",
+		"🎈 b 2",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

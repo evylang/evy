@@ -218,7 +218,7 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	case lexer.BREAK:
 		return p.parseBreakStatement(scope)
 	case lexer.FOR:
-		return p.parseForStatement(scope) // TODO
+		return p.parseForStatement(scope)
 	case lexer.WHILE:
 		return p.parseWhileStatement(scope)
 	case lexer.IF:
@@ -587,14 +587,75 @@ func (p *Parser) parseBreakStatement(scope *scope) Node {
 	return breakStmt
 }
 
-// TODO: implemented.
 func (p *Parser) parseForStatement(scope *scope) Node {
-	scope = newScope(scope, nil)
+	forNode := &For{Token: p.cur}
+	scope = newScope(scope, forNode)
+	p.advance() // advance past FOR token
+
+	if p.cur.TokenType() != lexer.IDENT {
+		p.appendError("expected variable, found " + p.cur.FormatDetails())
+		p.advancePastNL()
+		return nil
+	}
+	forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
+	scope.set(forNode.LoopVar.Name, forNode.LoopVar)
+	p.advance() // advance past loopVarName
+
+	p.assertToken(lexer.DECLARE)
+	p.advance() // advance past :=
+	if !p.assertToken(lexer.RANGE) {
+		p.advancePastNL()
+		return nil
+	}
+	p.advance() // advance past range
+
+	n := p.parseExpr(scope, LOWEST)
+	if n == nil {
+		return nil
+	}
+	t := n.Type()
+	switch t.Name {
+	case STRING, MAP:
+		forNode.LoopVar.T = STRING_TYPE
+		forNode.Range = n
+		p.assertEOL()
+	case ARRAY:
+		forNode.LoopVar.T = t.Sub
+		forNode.Range = n
+		p.assertEOL()
+	case NUM:
+		forNode.LoopVar.T = NUM_TYPE
+		forNode.Range = p.parseStepRange(scope, n)
+	default:
+		p.appendError("expected num, string, array or map after range, found " + t.Format())
+	}
 	p.advancePastNL()
-	p.parseBlock(scope)
+	forNode.Block = p.parseBlock(scope)
 	p.assertEnd()
 	p.advancePastNL()
-	return nil
+	return forNode
+}
+
+func (p *Parser) parseStepRange(scope *scope, n Node) *StepRange {
+	tok := p.cur
+	if p.isAtEOL() {
+		return &StepRange{Token: tok, Start: nil, Stop: n, Step: nil}
+	}
+	stop := p.parseExpr(scope, LOWEST)
+	if stop.Type() != NUM_TYPE {
+		p.appendError("expected stop value of num, found " + stop.Type().Format())
+		return nil
+	}
+	if p.isAtEOL() {
+		return &StepRange{Token: tok, Start: n, Stop: stop, Step: nil}
+	}
+	step := p.parseExpr(scope, LOWEST)
+	if step.Type() != NUM_TYPE {
+		p.appendError("expected step value of num, found " + step.Type().Format())
+		return nil
+	}
+	p.assertEOL()
+	return &StepRange{Token: tok, Start: n, Stop: stop, Step: step}
 }
 
 func (p *Parser) parseWhileStatement(scope *scope) Node {
@@ -612,7 +673,8 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 
 func inLoop(s *scope) bool {
 	for ; s != nil; s = s.outer {
-		if _, ok := s.block.(*While); ok {
+		switch s.block.(type) {
+		case *While, *For:
 			return true
 		}
 	}

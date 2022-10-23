@@ -489,13 +489,13 @@ print x
 x := 1
 for i := range 10
 	x := 2
-	print x
+	print i x
 end
 `: "line 2 column 1: 'x' declared but not used",
 		`
 x := 1
 for i := range 10
-	x := 2
+	x := 2 * i
 end
 print x
 `: "line 4 column 2: 'x' declared but not used",
@@ -532,7 +532,7 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1), input)
 	}
 }
 
@@ -858,6 +858,82 @@ func a:num
 	end
 end
 `: "line 9 column 3: unreachable code",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+	}
+}
+
+func TestFor(t *testing.T) {
+	inputs := []string{
+		`
+for i:= range 3
+	print i
+end`,
+		`
+for i:= range 3 5
+	print i
+end`,
+		`
+for i:= range 3 15 -1
+	print i
+end`,
+		`
+for i:= range "abc"
+	print i
+end`,
+		`
+for i:= range {}
+	print i
+end`,
+		`
+for i:= range []
+	print i
+end`,
+		`
+for i:= range []
+	print i
+	break
+end`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestForErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+for
+	print "X"
+end
+`: "line 2 column 4: expected variable, found end of line",
+		`
+for true
+	print "X"
+end
+`: "line 2 column 5: expected variable, found 'true'",
+		`
+x := 0
+for x = range 5
+	print "X"
+end
+`: "line 3 column 7: expected ':=', got '='",
+		`
+for x := range 1 2 3 4
+	print "X"
+end
+`: "line 2 column 22: expected end of line, found 4",
+		`
+for x := range true
+	print "X"
+end
+`: "line 2 column 20: expected num, string, array or map after range, found bool",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

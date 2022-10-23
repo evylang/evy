@@ -102,6 +102,23 @@ type While struct {
 	ConditionalBlock
 }
 
+type For struct {
+	Token *lexer.Token
+
+	LoopVar *Var
+	Range   Node // StepRange or array/map/string expression
+
+	Block *BlockStatement
+}
+
+type StepRange struct {
+	Token *lexer.Token
+
+	Start Node // num expression or nil
+	Stop  Node // num expression
+	Step  Node // num expression or nil
+}
+
 type ConditionalBlock struct {
 	Token     *lexer.Token
 	Condition Node // must be of type bool
@@ -370,6 +387,36 @@ func (w *While) Type() *Type {
 }
 
 func (*While) AlwaysTerminates() bool {
+	return false
+}
+
+func (f *For) String() string {
+	header := "for " + f.LoopVar.Name + " := " + f.Range.String()
+	return header + " {\n" + f.Block.String() + "}"
+}
+
+func (f *For) Type() *Type {
+	return f.Block.Type()
+}
+
+func (s *StepRange) String() string {
+	start := "0"
+	if s.Start != nil {
+		start = s.Start.String()
+	}
+	stop := s.Stop.String()
+	step := "1"
+	if s.Step != nil {
+		step = s.Step.String()
+	}
+	return start + " " + stop + " " + step
+}
+
+func (s *StepRange) Type() *Type {
+	return NUM_TYPE
+}
+
+func (*For) AlwaysTerminates() bool {
 	return false
 }
 

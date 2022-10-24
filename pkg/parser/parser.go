@@ -266,17 +266,23 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
 		return nil
 	}
-	if p.cur.TokenType() == lexer.LBRACKET { // TODO: check for whitespace
-		if v.Type() == STRING_TYPE {
-			p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
-			return nil
+	v.isUsed = true
+	tt := p.cur.TokenType()
+	var n Node = v
+	for tt == lexer.LBRACKET || tt == lexer.DOT {
+		if p.cur.TokenType() == lexer.LBRACKET { // TODO: check for whitespace
+			if n.Type() == STRING_TYPE {
+				p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
+				return nil
+			}
+			n = p.parserIndexOrSliceExpr(scope, n, false)
 		}
-		return p.parserIndexOrSliceExpr(scope, v, false)
+		if p.cur.TokenType() == lexer.DOT { // TODO: check for whitespace
+			n = p.parserDotExpr(n)
+		}
+		tt = p.cur.TokenType()
 	}
-	if p.cur.TokenType() == lexer.DOT { // TODO: check for whitespace
-		return p.parserDotExpr(v)
-	}
-	return v
+	return n
 }
 
 func (p *Parser) parseFuncDeclSignature() *FuncDecl {

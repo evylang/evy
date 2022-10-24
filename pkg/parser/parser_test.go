@@ -345,6 +345,10 @@ a := [0 2 3]
 a[0] = 1
 print a
 `, `
+a :=  [ [0 2 3] ([4 5]) ]
+a[0][1] = 1
+print a
+`, `
 a := {name: "mali"}
 a.sport = "climbing"
 print a
@@ -430,6 +434,11 @@ if true
 	print x
 end
 print x
+`, `
+a := [ ([1 2 3]) ([4 5 6]) ]
+b := a[0]
+b[1] = 7
+print a
 `,
 	}
 	for _, input := range inputs {

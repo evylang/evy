@@ -375,6 +375,24 @@ func TestIndex(t *testing.T) {
 	}
 }
 
+func TestDoubleIndex(t *testing.T) {
+	tests := map[string]string{
+		`
+		x := [ [1 2 3] ([4 5 6]) ]
+		x[0][1] = 99
+		print x
+		`: "[[1 99 3] [4 5 6]]",
+	}
+	for in, want := range tests {
+		t.Run(in, func(t *testing.T) {
+			b := bytes.Buffer{}
+			fn := func(s string) { b.WriteString(s) }
+			Run(in, fn)
+			assert.Equal(t, want+"\n", b.String())
+		})
+	}
+}
+
 func TestIndexErr(t *testing.T) {
 	tests := map[string]string{
 		// x := ["a","b","c"]; x = "abc"

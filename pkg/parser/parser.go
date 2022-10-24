@@ -266,6 +266,7 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
 		return nil
 	}
+	v.isUsed = true
 	tt := p.cur.TokenType()
 	var n Node = v
 	for tt == lexer.LBRACKET || tt == lexer.DOT {

@@ -34,6 +34,7 @@ func DefaultBuiltins(printFn func(string)) Builtins {
 		"move":  {Func: moveFunc(printFn), Decl: moveDecl},
 		"line":  {Func: lineFunc(printFn), Decl: lineDecl},
 		"has":   {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
+		"del":   {Func: BuiltinFunc(delFunc), Decl: delDecl},
 	}
 }
 
@@ -89,6 +90,22 @@ func hasFunc(args []Value) Value {
 	key := args[1].(*String)
 	_, ok := m.Pairs[key.Val]
 	return &Bool{Val: ok}
+}
+
+var delDecl = &parser.FuncDecl{
+	Name: "del",
+	Params: []*parser.Var{
+		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "key", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func delFunc(args []Value) Value {
+	m := args[0].(*Map)
+	keyStr := args[1].(*String)
+	m.Delete(keyStr.Val)
+	return nil
 }
 
 var moveDecl = &parser.FuncDecl{

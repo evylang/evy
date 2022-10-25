@@ -804,6 +804,47 @@ has ["a"] "a" // cannot run 'has' on array
 	assert.Equal(t, want, got)
 }
 
+func TestDel(t *testing.T) {
+	prog := `
+m1 := {a:1 b:2}
+m2 := m1
+print "1" m1 m2
+del m1 "a"
+print "2" m1 m2
+del m1 "MISSING"
+print "3" m1 m2
+del m2 "b"
+print "4" m1 m2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"1 {a:1 b:2} {a:1 b:2}",
+		"2 {b:2} {b:2}",
+		"3 {b:2} {b:2}",
+		"4 {} {}",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestDelErr(t *testing.T) {
+	prog := `
+del ["a"] "a" // cannot delete from array
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "line 2 column 15: 'del' takes 1st argument of type '{}', found 'string[]'"
+	got := b.String()
+	assert.Equal(t, want, got)
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

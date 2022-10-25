@@ -331,6 +331,19 @@ func (m *Map) InsertKey(key string, t *parser.Type) {
 	m.Pairs[key] = zero(t)
 }
 
+func (m *Map) Delete(key string) {
+	if _, ok := m.Pairs[key]; !ok {
+		return
+	}
+	delete(m.Pairs, key)
+	for i, k := range *m.Order {
+		if k == key {
+			*m.Order = append((*m.Order)[:i], (*m.Order)[i+1:]...)
+			break
+		}
+	}
+}
+
 func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }

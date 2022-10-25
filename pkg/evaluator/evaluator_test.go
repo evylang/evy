@@ -708,6 +708,69 @@ end
 	}
 }
 
+func TestMap(t *testing.T) {
+	prog := `
+m1 := {a:1 b:2}
+m2 := m1
+print "1" m1 m2
+
+m2.a = 10
+m1["b"] = 20
+print "2" m1 m2
+
+m2.c = 3
+m1["d"] = 4
+print "3" m1 m2
+
+m4 := {}
+m4.a = 1
+m4["b"] = 2
+print "4" m4
+
+m5 := {}
+m5.a = 1
+m5.b = {c:99}
+//m5.b.c = 2 // parse error: need to cast any to map...
+print "5" m5
+
+m6:{}{}num
+m6.a = {A :1}
+m6.b = {}
+m6.b.c = 2
+print "6" m6
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"1 {a:1 b:2} {a:1 b:2}",
+		"2 {a:10 b:20} {a:10 b:20}",
+		"3 {a:10 b:20 c:3 d:4} {a:10 b:20 c:3 d:4}",
+		"4 {a:1 b:2}",
+		"5 {a:1 b:{c:99}}",
+		"6 {a:{A:1} b:{c:2}}",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestMapErr(t *testing.T) {
+	in := `
+m := {}
+m.a = 1
+m.b.c = 2
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(in, fn)
+	want := "line 4 column 4: field access with '.' expects map type, found any"
+	assert.Equal(t, want, b.String())
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

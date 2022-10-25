@@ -70,11 +70,11 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	case *parser.BinaryExpression:
 		return e.evalBinaryExpr(scope, node)
 	case *parser.IndexExpression:
-		return e.evalIndexExpr(scope, node)
+		return e.evalIndexExpr(scope, node, false /* forAssign */)
 	case *parser.SliceExpression:
 		return e.evalSliceExpr(scope, node)
 	case *parser.DotExpression:
-		return e.evalDotExpr(scope, node)
+		return e.evalDotExpr(scope, node, false /* forAssign */)
 	}
 	return nil // TODO: panic?
 }
@@ -115,7 +115,7 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	if isError(val) {
 		return val
 	}
-	target := e.Eval(scope, assignment.Target)
+	target := e.evalTarget(scope, assignment.Target)
 	if isError(target) {
 		return target
 	}
@@ -453,7 +453,19 @@ func evalBinaryArrayExpr(op parser.Operator, left, right *Array) Value {
 	return result
 }
 
-func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression) Value {
+func (e *Evaluator) evalTarget(scope *scope, node parser.Node) Value {
+	switch n := node.(type) {
+	case *parser.Var:
+		return e.evalVar(scope, n)
+	case *parser.IndexExpression:
+		return e.evalIndexExpr(scope, n, true /* forAssign */)
+	case *parser.DotExpression:
+		return e.evalDotExpr(scope, n, true /* forAssign */)
+	}
+	return newError("invalid assignment target " + node.String())
+}
+
+func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression, forAssign bool) Value {
 	left := e.Eval(scope, expr.Left)
 	if isError(left) {
 		return left
@@ -473,12 +485,15 @@ func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression) Va
 		if !ok {
 			return newError("expected string for map index, found " + index.String())
 		}
+		if forAssign {
+			l.InsertKey(strIndex.Val, expr.Type())
+		}
 		return l.Get(strIndex.Val)
 	}
 	return nil
 }
 
-func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression) Value {
+func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression, forAssign bool) Value {
 	left := e.Eval(scope, expr.Left)
 	if isError(left) {
 		return left
@@ -486,6 +501,9 @@ func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression) Value 
 	m, ok := left.(*Map)
 	if !ok {
 		return newError("expected map before '.', found " + left.String())
+	}
+	if forAssign {
+		m.InsertKey(expr.Key, expr.Type())
 	}
 	return m.Get(expr.Key)
 }

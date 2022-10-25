@@ -24,16 +24,16 @@ const (
 )
 
 var valueTypeStrings = map[ValueType]string{
-	ERROR:        "ERROR",
-	NUM:          "NUM",
-	BOOL:         "BOOL",
-	STRING:       "STRING",
-	ANY:          "ANY",
-	ARRAY:        "ARRAY",
-	MAP:          "MAP",
-	RETURN_VALUE: "RETURN_VALUE",
-	FUNCTION:     "FUNCTION",
-	BUILTIN:      "BUILTIN",
+	ERROR:        "error",
+	NUM:          "num",
+	BOOL:         "bool",
+	STRING:       "string",
+	ANY:          "any",
+	ARRAY:        "array",
+	MAP:          "map",
+	RETURN_VALUE: "return_value",
+	FUNCTION:     "function",
+	BUILTIN:      "builtin",
 }
 
 func (t ValueType) String() string {

@@ -771,6 +771,39 @@ m.b.c = 2
 	assert.Equal(t, want, b.String())
 }
 
+func TestHas(t *testing.T) {
+	prog := `
+m := {a:1 b:2}
+print (has m "a")
+print (has m "MISSING")
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := []string{
+		"true",
+		"false",
+		"",
+	}
+	got := strings.Split(b.String(), "\n")
+	assert.Equal(t, len(want), len(got), b.String())
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestHasErr(t *testing.T) {
+	prog := `
+has ["a"] "a" // cannot run 'has' on array
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "line 2 column 15: 'has' takes 1st argument of type '{}', found 'string[]'"
+	got := b.String()
+	assert.Equal(t, want, got)
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

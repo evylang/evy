@@ -33,6 +33,7 @@ func DefaultBuiltins(printFn func(string)) Builtins {
 		"len":   {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"move":  {Func: moveFunc(printFn), Decl: moveDecl},
 		"line":  {Func: lineFunc(printFn), Decl: lineDecl},
+		"has":   {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
 	}
 }
 
@@ -72,6 +73,22 @@ func lenFunc(args []Value) Value {
 		return &Num{Val: float64(len(arg.Val))}
 	}
 	return newError("'len' takes 1 argument of type 'string', array '[]' or map '{}' not " + args[0].Type().String())
+}
+
+var hasDecl = &parser.FuncDecl{
+	Name: "has",
+	Params: []*parser.Var{
+		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "key", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func hasFunc(args []Value) Value {
+	m := args[0].(*Map)
+	key := args[1].(*String)
+	_, ok := m.Pairs[key.Val]
+	return &Bool{Val: ok}
 }
 
 var moveDecl = &parser.FuncDecl{

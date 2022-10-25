@@ -378,7 +378,7 @@ b = a
 		`
 a:= 1
 a = []
-`: "line 3 column 1: 'a' accepts values of type num, found any[]",
+`: "line 3 column 1: 'a' accepts values of type num, found []",
 		`
 a:num
 b:any

@@ -410,8 +410,9 @@ func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
-			if !paramType.Accepts(arg.Type()) {
-				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.Format() + "', found '" + arg.Type().Format() + "'")
+			argType := arg.Type()
+			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
+				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
 			}
 		}
 		return
@@ -423,7 +424,7 @@ func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
 	for i := range args {
 		paramType := decl.Params[i].Type()
 		argType := args[i].Type()
-		if !paramType.Accepts(argType) {
+		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
 			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
 		}
 	}

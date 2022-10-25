@@ -323,6 +323,14 @@ func (m *Map) Get(key string) Value {
 	return val
 }
 
+func (m *Map) InsertKey(key string, t *parser.Type) {
+	if _, ok := m.Pairs[key]; ok {
+		return
+	}
+	*m.Order = append(*m.Order, key)
+	m.Pairs[key] = zero(t)
+}
+
 func isError(val Value) bool { // TODO: replace with panic flow
 	return val != nil && val.Type() == ERROR
 }

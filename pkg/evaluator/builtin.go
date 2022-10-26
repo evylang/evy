@@ -33,6 +33,8 @@ func DefaultBuiltins(printFn func(string)) Builtins {
 		"len":   {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"move":  {Func: moveFunc(printFn), Decl: moveDecl},
 		"line":  {Func: lineFunc(printFn), Decl: lineDecl},
+		"has":   {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
+		"del":   {Func: BuiltinFunc(delFunc), Decl: delDecl},
 	}
 }
 
@@ -72,6 +74,38 @@ func lenFunc(args []Value) Value {
 		return &Num{Val: float64(len(arg.Val))}
 	}
 	return newError("'len' takes 1 argument of type 'string', array '[]' or map '{}' not " + args[0].Type().String())
+}
+
+var hasDecl = &parser.FuncDecl{
+	Name: "has",
+	Params: []*parser.Var{
+		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "key", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func hasFunc(args []Value) Value {
+	m := args[0].(*Map)
+	key := args[1].(*String)
+	_, ok := m.Pairs[key.Val]
+	return &Bool{Val: ok}
+}
+
+var delDecl = &parser.FuncDecl{
+	Name: "del",
+	Params: []*parser.Var{
+		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "key", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func delFunc(args []Value) Value {
+	m := args[0].(*Map)
+	keyStr := args[1].(*String)
+	m.Delete(keyStr.Val)
+	return nil
 }
 
 var moveDecl = &parser.FuncDecl{

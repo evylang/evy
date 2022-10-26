@@ -320,7 +320,7 @@ func (p *Parser) parseArrayLiteral(scope *scope) Node {
 	}
 	p.advance() // advance past ]
 	if len(elements) == 0 {
-		return &ArrayLiteral{Token: tok, T: EMPTY_ARRAY}
+		return &ArrayLiteral{Token: tok, T: GENERIC_ARRAY}
 	}
 	types := make([]*Type, len(elements))
 	for i, e := range elements {
@@ -371,7 +371,7 @@ func (p *Parser) parseMapLiteral(scope *scope) Node {
 	}
 	p.advance() // advance past }
 	if len(pairs) == 0 {
-		return &MapLiteral{Token: tok, T: EMPTY_MAP}
+		return &MapLiteral{Token: tok, T: GENERIC_MAP}
 	}
 	types := make([]*Type, 0, len(pairs))
 	for _, n := range pairs {

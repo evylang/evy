@@ -18,14 +18,14 @@ const (
 )
 
 var (
-	ILLEGAL_TYPE = &Type{Name: ILLEGAL}
-	NUM_TYPE     = &Type{Name: NUM}
-	BOOL_TYPE    = &Type{Name: BOOL}
-	STRING_TYPE  = &Type{Name: STRING}
-	ANY_TYPE     = &Type{Name: ANY}
-	NONE_TYPE    = &Type{Name: NONE}
-	EMPTY_ARRAY  = &Type{Name: ARRAY, Sub: NONE_TYPE}
-	EMPTY_MAP    = &Type{Name: MAP, Sub: NONE_TYPE}
+	ILLEGAL_TYPE  = &Type{Name: ILLEGAL}
+	NUM_TYPE      = &Type{Name: NUM}
+	BOOL_TYPE     = &Type{Name: BOOL}
+	STRING_TYPE   = &Type{Name: STRING}
+	ANY_TYPE      = &Type{Name: ANY}
+	NONE_TYPE     = &Type{Name: NONE}
+	GENERIC_ARRAY = &Type{Name: ARRAY, Sub: NONE_TYPE}
+	GENERIC_MAP   = &Type{Name: MAP, Sub: NONE_TYPE}
 )
 
 func compositeTypeName(t lexer.TokenType) TypeName {
@@ -50,7 +50,7 @@ var typeNameStrings = map[TypeName]typeNameString{
 	BOOL:    {string: "bool", format: "bool"},
 	ANY:     {string: "any", format: "any"},
 	ARRAY:   {string: "array", format: "[]"},
-	MAP:     {string: "map", format: "[]"},
+	MAP:     {string: "map", format: "{}"},
 	NONE:    {string: "none", format: "none"},
 }
 
@@ -78,14 +78,14 @@ type Type struct {
 }
 
 func (t *Type) String() string {
-	if t.Sub == nil {
+	if t.Sub == nil || t == GENERIC_ARRAY || t == GENERIC_MAP {
 		return t.Name.String()
 	}
 	return t.Name.String() + " " + t.Sub.String()
 }
 
 func (t *Type) Format() string {
-	if t.Sub == nil {
+	if t.Sub == nil || t == GENERIC_ARRAY || t == GENERIC_MAP {
 		return t.Name.Format()
 	}
 	return t.Sub.Format() + t.Name.Format()
@@ -117,7 +117,7 @@ func (t *Type) Matches(t2 *Type) bool {
 	if t.Sub == nil || t2.Sub == nil {
 		return false
 	}
-	if t == EMPTY_ARRAY || t == EMPTY_MAP || t2 == EMPTY_ARRAY || t2 == EMPTY_MAP {
+	if t == GENERIC_ARRAY || t == GENERIC_MAP || t2 == GENERIC_ARRAY || t2 == GENERIC_MAP {
 		return true
 	}
 	return t.Sub.Matches(t2.Sub)
@@ -148,11 +148,11 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 		return t.Sub == nil && t2.Sub == nil
 	}
 	// all array types except empty array literal
-	if n == ARRAY && t2 == EMPTY_ARRAY {
+	if n == ARRAY && t2 == GENERIC_ARRAY {
 		return true
 	}
 	// all map types except empty map literal
-	if n == MAP && t2 == EMPTY_MAP {
+	if n == MAP && t2 == GENERIC_MAP {
 		return true
 	}
 	return t.Sub.acceptsStrict(t2.Sub)

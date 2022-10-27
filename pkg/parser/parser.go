@@ -35,6 +35,8 @@ type Parser struct {
 
 	tokens []*lexer.Token
 	funcs  map[string]*FuncDecl // all function declaration by name and index in tokens.
+
+	wssStack []bool
 }
 
 // Error is an Evy parse error.
@@ -49,7 +51,7 @@ func (e Error) String() string {
 
 func New(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
-	p := &Parser{funcs: builtins}
+	p := &Parser{funcs: builtins, wssStack: []bool{false}}
 
 	// Read all tokens, collect function declaration tokens by index
 	// funcs temporarily holds FUNC token indices for further processing
@@ -273,14 +275,14 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 	tt := p.cur.TokenType()
 	var n Node = v
 	for tt == lexer.LBRACKET || tt == lexer.DOT {
-		if p.cur.TokenType() == lexer.LBRACKET { // TODO: check for whitespace
+		if p.cur.TokenType() == lexer.LBRACKET {
 			if n.Type() == STRING_TYPE {
 				p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
 				return nil
 			}
 			n = p.parserIndexOrSliceExpr(scope, n, false)
 		}
-		if p.cur.TokenType() == lexer.DOT { // TODO: check for whitespace
+		if p.cur.TokenType() == lexer.DOT {
 			n = p.parserDotExpr(n)
 		}
 		tt = p.cur.TokenType()
@@ -523,11 +525,33 @@ func (p *Parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 
 func (p *Parser) advance() {
 	p.advanceWSS()
+	if p.isWSS() {
+		return
+	}
+	p.advanceIfWS()
+	if p.peek.Type == lexer.WS {
+		p.peek = p.lookAt(p.pos + 2)
+	}
+}
+
+func (p *Parser) advanceIfWS() {
 	if p.cur.Type == lexer.WS {
 		p.advanceWSS()
 	}
-	if p.peek.Type == lexer.WS {
-		p.peek = p.lookAt(p.pos + 2)
+}
+
+func (p *Parser) isWSS() bool {
+	return p.wssStack[len(p.wssStack)-1]
+}
+
+func (p *Parser) pushWSS(wss bool) {
+	p.wssStack = append(p.wssStack, wss)
+}
+
+func (p *Parser) popWSS() {
+	p.wssStack = p.wssStack[:len(p.wssStack)-1]
+	if !p.isWSS() && p.cur.Type == lexer.WS {
+		p.advance()
 	}
 }
 
@@ -548,7 +572,7 @@ func (p *Parser) advanceTo(pos int) {
 }
 
 func (p *Parser) lookAt(pos int) *lexer.Token {
-	if pos >= len(p.tokens) {
+	if pos >= len(p.tokens) || pos < 0 {
 		return p.tokens[len(p.tokens)-1] // EOF with pos
 	}
 	return p.tokens[pos]

@@ -40,9 +40,9 @@ make_jwt() {
 	exp=$((now + 600 - drift))
 	iss=${GITHUB_APP_ID}
 
-	header=$(printf '%s' '{"alg":"RS256"}' | b64)
-	payload=$(printf '{"iat":%s,"exp":%s,"iss":%s}' "${iat}" "${exp}" "${iss}" | b64)
-	signature=$(printf '%s.%s' "${header}" "${payload}" | openssl dgst -sha256 -sign <(printenv GITHUB_APP_PEM) | b64)
+	header=$(printf '%s' '{"alg":"RS256"}' | base64url)
+	payload=$(printf '{"iat":%s,"exp":%s,"iss":"%s"}' "${iat}" "${exp}" "${iss}" | base64url)
+	signature=$(printf '%s.%s' "${header}" "${payload}" | openssl dgst -sha256 -sign <(printenv GITHUB_APP_PEM) | base64url)
 	echo "${header}.${payload}.${signature}"
 }
 
@@ -55,10 +55,12 @@ exit_error() {
 	exit 1
 }
 
-# b64 encodes with base64 encoding then replaces `+` with `-`,
+# base64url encodes with base64 encoding then replaces `+` with `-`,
 # `/` with `_` and strips trailing `=`
-b64() {
-	base64 | sed -e 'y|+/|-_|' -e 's/=*$//'
+base64url() {
+	# Use `openssl enc -A -base64` instead of `base64` because `base64`
+	# adds linebreaks on linux but not on mac. The flag to change this doesn't work on mac.
+	openssl enc -A -base64 | sed -e 'y|+/|-_|' -e 's/=*$//'
 }
 
 validate_installation_jq='

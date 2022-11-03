@@ -10,23 +10,30 @@ main() {
 	on_ci && set -x
 	validate_env
 
-	jwt=$(make_jwt)
-	resp=$(curl -s -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations)
+	jwt="$(make_jwt)"
+	resp=$(curl -fsSLv \
+		-H "Accept: application/vnd.github+json" \
+		-H "Authorization: Bearer ${jwt}" \
+		https://api.github.com/app/installations)
 	installation_id=$(jq "${validate_installation_jq}" <<<"${resp}")
 
-	resp=$(curl -s -X POST -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github+json" "https://api.github.com/app/installations/${installation_id}/access_tokens")
+	resp=$(curl -fsSLv -X POST \
+		-H "Authorization: Bearer ${jwt}" \
+		-H "Accept: application/vnd.github+json" \
+		"https://api.github.com/app/installations/${installation_id}/access_tokens")
 	jq -r "${validate_token_jq}" <<<"${resp}"
+	exit 1
 }
 
 validate_env() {
-	if [[ -z ${GITHUB_APP_ID:-} ]]; then
+	if ! printenv GITHUB_APP_ID >/dev/null; then
 		exit_error "GITHUB_APP_ID is not set"
+	fi
+	if ! printenv GITHUB_APP_PEM >/dev/null; then
+		exit_error "GITHUB_APP_PEM is not set"
 	fi
 	if ! [[ ${GITHUB_APP_ID:-} =~ ^[0-9]+$ ]]; then
 		exit_error "GITHUB_APP_ID is not a number"
-	fi
-	if [[ -z ${GITHUB_APP_PEM:-} ]]; then
-		exit_error "GITHUB_APP_PEM is not set"
 	fi
 }
 
@@ -41,8 +48,8 @@ make_jwt() {
 	iss=${GITHUB_APP_ID}
 
 	header=$(printf '%s' '{"alg":"RS256"}' | b64)
-	payload=$(printf '{"iat":%s,"exp":%s,"iss":%s}' "${iat}" "${exp}" "${iss}" | b64)
-	signature=$(printf '%s.%s' "${header}" "${payload}" | openssl dgst -sha256 -sign <(printenv GITHUB_APP_PEM) | b64)
+	payload=$(printf '{"iat":%s,"exp":%s,"iss":"%s"}' "${iat}" "${exp}" "${iss}" | b64)
+	signature=$(printf '%s.%s' "${header}" "${payload}" | openssl dgst -binary -sha256 -sign <(printenv GITHUB_APP_PEM) | b64)
 	echo "${header}.${payload}.${signature}"
 }
 
@@ -58,7 +65,7 @@ exit_error() {
 # b64 encodes with base64 encoding then replaces `+` with `-`,
 # `/` with `_` and strips trailing `=`
 b64() {
-	base64 | sed -e 'y|+/|-_|' -e 's/=*$//'
+	openssl enc -A -base64 | sed -e 'y|+/|-_|' -e 's/=*$//'
 }
 
 validate_installation_jq='

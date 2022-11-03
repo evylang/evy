@@ -1,0 +1,14 @@
+brews:
+  - tap:
+      owner: foxygoat
+      name: homebrew-tap
+      branch: master
+
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+
+    commit_msg_template: "Update brew formula for {{ .ProjectName }} version {{ .Tag }}"
+    homepage: "https://evy.dev"
+    description: "Evy is a simple programming language."
+    license: "Apache-2.0"

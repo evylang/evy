@@ -27,14 +27,11 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - id: app_token
-      uses: peter-murray/workflow-application-token-action@v1
-      with:
-        application_id: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
-        application_private_key: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}        
     - run: ./bin/make release
       env:
-        GITHUB_TOKEN: ${{ steps.app_token.outputs.token }}
+        GITHUB_APP_ID: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
+        GITHUB_APP_PEM: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: ./bin/make firebase-deploy-prod
       env:
         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}

@@ -30,6 +30,8 @@ jobs:
     - run: ./bin/make release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_APP_ID: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
+        GITHUB_APP_PEM: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}
     - run: ./bin/make firebase-deploy-prod
       env:
         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}

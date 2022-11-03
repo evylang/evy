@@ -102,7 +102,7 @@ firebase-public: frontend
 .PHONY: firebase-deploy firebase-deploy-prod firebase-emulate firebase-public
 
 # --- scripts ------------------------------------------------------------------
-SCRIPTS = firebase/deploy
+SCRIPTS = firebase/deploy .github/scripts/app_token
 
 sh-lint: ## Lint script files with shellcheck and shfmt
 	shellcheck $(SCRIPTS)
@@ -117,6 +117,7 @@ sh-fmt:  ## Format script files
 release: nexttag ## Tag and release binaries for different OS on GitHub release
 	git tag $(NEXTTAG)
 	git push origin $(NEXTTAG)
+	[ -z "$(CI)" ] || GITHUB_TOKEN=$$(.github/scripts/app_token) || exit 1; \
 	goreleaser release --rm-dist
 
 nexttag:

@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# Generate temporary installation token for GitHub App
+#
+# The following environment variables are required
+# 1. GITHUB_APP_ID:  number
+# 2. GITHUB_APP_PEM: contents of the App's private key.
+main() {
+	set -euo pipefail
+	on_ci && set -x
+	validate_env
+
+	jwt=$(make_jwt)
+	resp=$(curl -s -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations)
+	installation_id=$(jq "${validate_installation_jq}" <<<"${resp}")
+
+	resp=$(curl -s -X POST -H "Authorization: Bearer ${jwt}" -H "Accept: application/vnd.github+json" "https://api.github.com/app/installations/${installation_id}/access_tokens")
+	jq -r "${validate_token_jq}" <<<"${resp}"
+}
+
+validate_env() {
+	if [[ -z ${GITHUB_APP_ID:-} ]]; then
+		exit_error "GITHUB_APP_ID is not set"
+	fi
+	if ! [[ ${GITHUB_APP_ID:-} =~ ^[0-9]+$ ]]; then
+		exit_error "GITHUB_APP_ID is not a number"
+	fi
+	if [[ -z ${GITHUB_APP_PEM:-} ]]; then
+		exit_error "GITHUB_APP_PEM is not set"
+	fi
+}
+
+make_jwt() {
+	local now drift iat exp iss header payload signature
+	now=$(date +%s)
+	drift=10
+	# iat is the "issued at time".
+	iat=$((now - drift))
+	# exp is the JWT expiration time (max 10m).
+	exp=$((now + 600 - drift))
+	iss=${GITHUB_APP_ID}
+
+	header=$(printf '%s' '{"alg":"RS256"}' | b64)
+	payload=$(printf '{"iat":%s,"exp":%s,"iss":%s}' "${iat}" "${exp}" "${iss}" | b64)
+	signature=$(printf '%s.%s' "${header}" "${payload}" | openssl dgst -sha256 -sign <(printenv GITHUB_APP_PEM) | b64)
+	echo "${header}.${payload}.${signature}"
+}
+
+on_ci() {
+	[[ -n "${CI:-}" ]]
+}
+
+exit_error() {
+	echo "$1" >&2
+	exit 1
+}
+
+# b64 encodes with base64 encoding then replaces `+` with `-`,
+# `/` with `_` and strips trailing `=`
+b64() {
+	base64 | sed -e 'y|+/|-_|' -e 's/=*$//'
+}
+
+validate_installation_jq='
+if type != "array" then
+	"installations response is not array.\n" | halt_error
+elif length != 1 then
+	"expected exactly 1 installation\n" | halt_error
+elif .[0].id | type != "number" then
+	"installation id is not a number\n" | halt_error
+else
+	.[0].id
+end'
+
+validate_token_jq='
+if .token | type != "string" then
+	"token is not a string.\n" | halt_error
+else
+	.token
+end'
+
+# Only run main if executed as a script and not sourced.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi

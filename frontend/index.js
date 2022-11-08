@@ -29,12 +29,12 @@ function jsPrint(ptr, len) {
   }
 }
 
-// handleRun retrieves the input string from the source pane and
+// handleRun retrieves the input string from the code pane and
 // converts it to wasm memory bytes. It then calls the evy evaluate
 // function.
 function handleRun(event) {
-  const source = document.getElementById('source').value
-  const bytes = new TextEncoder('utf8').encode(source)
+  const code = document.getElementById('code').value
+  const bytes = new TextEncoder('utf8').encode(code)
   const ptr = wasm.exports.alloc(bytes.length)
   const mem = new Uint8Array(wasm.exports.memory.buffer, ptr, bytes.length)
   mem.set(new Uint8Array(bytes))
@@ -47,7 +47,7 @@ initWasm()
 
 // --------------------------------------------------
 // confetti easter egg
-// When source input string contains the sub string "confetti"
+// When code input string contains the sub string "confetti"
 // show confetti when clicking Run button.
 function showConfetti() {
   const names = ['🦊', '🐐']

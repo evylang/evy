@@ -120,11 +120,15 @@ main {
 }
 .code, .out {
   flex: 1;
-  padding: 12px 16px;
   overflow: scroll;
 }
 .code {
+  padding: 12px 16px;
   border-right: 1px solid var(--primary-color-dimmer);
+}
+.out {
+  display: flex;
+  flex-direction: column;
 }
 textarea {
   font-family: var(--font-family-code);
@@ -137,6 +141,19 @@ textarea {
   border: none;
   background: var(--code-background);
   resize: none;
+  outline: none;
+}
+
+.output {
+  padding: 12px 16px;;
+}
+.canvas {
+  flex:  0 1 50%;
+  border-bottom: 1px solid var(--primary-color-dimmer);
+}
+#canvas {
+  border-right: 1px solid var(--primary-color-dimmer);
+  display: none;
 }
 
 .confetti {
@@ -176,6 +193,7 @@ textarea {
       flex-direction: column;
     }
     .code {
+      flex: 0 1 30%;
       border-right: none;
       border-bottom: 1px solid var(--primary-color-dimmer);
     }

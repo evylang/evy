@@ -8,21 +8,22 @@ import (
 )
 
 func Run(input string, printFn func(string)) {
-	RunWithBuiltins(input, printFn, DefaultBuiltins(printFn))
+	rt := Runtime{Print: printFn}
+	RunWithBuiltins(input, DefaultBuiltins(rt))
 }
 
-func RunWithBuiltins(input string, printFn func(string), builtins Builtins) {
+func RunWithBuiltins(input string, builtins Builtins) {
 	p := parser.New(input, builtins.Decls())
 	prog := p.Parse()
 	if p.HasErrors() {
-		printFn(p.MaxErrorsString(8))
+		builtins.Print(p.MaxErrorsString(8))
 		return
 	}
-	e := &Evaluator{print: printFn}
-	e.builtins = builtins
+	e := &Evaluator{print: builtins.Print}
+	e.builtins = builtins.Funcs
 	val := e.Eval(newScope(), prog)
 	if isError(val) {
-		printFn(val.String())
+		builtins.Print(val.String())
 	}
 }
 

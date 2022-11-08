@@ -13,16 +13,19 @@
     <header>
       <div>
         <button id="evaluate" disabled>Run</button>
-        <button id="tokenize" disabled>Tokenize</button>
-        <button id="parse" disabled>Parse</button>
+        <button id="tokenize" disabled class="hidden">Tokenize</button>
+        <button id="parse" disabled class="hidden">Parse</button>
       </div>
       <img src="logo.svg" alt="evy logo" height="100%" />
     </header>
     <main>
       <div class="code">
-        <textarea id="code">
-move 10 10
-line 20 20
+        <textarea id="code" spellcheck="false" autocapitalize="none">
+move 10 20
+line 50 50
+rect 25 25
+color "lime"
+circle 10
 
 x := 12
 print "x:" x
@@ -32,7 +35,12 @@ end
         </textarea>
       </div>
       <div class="out">
-        <textarea id="output" disabled></textarea>
+        <div class="canvas">
+          <canvas id="canvas"></canvas>
+        </div>
+        <div class="output">
+          <textarea id="output" disabled></textarea>
+        </div>
       </div>
     </main>
   </body>

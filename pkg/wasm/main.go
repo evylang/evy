@@ -19,6 +19,36 @@ func main() {
 // jsPrint is imported from JS
 func jsPrint(string)
 
+// move is imported from JS
+func move(x, y float64)
+
+// line is imported from JS
+func line(x, y float64)
+
+// rect is imported from JS
+func rect(dx, dy float64)
+
+// circle is imported from JS
+func circle(r float64)
+
+// width is imported from JS, setting the lineWidth
+func width(w float64)
+
+// color is imported from JS
+func color(s string)
+
+var jsRuntime evaluator.Runtime = evaluator.Runtime{
+	Print: jsPrint,
+	Graphics: evaluator.GraphicsRuntime{
+		Move:   move,
+		Line:   line,
+		Rect:   rect,
+		Circle: circle,
+		Width:  width,
+		Color:  color,
+	},
+}
+
 // evaluate evaluates an evy program, after tokenizing and parsing. It
 // is exported to wasm and JS. Strings cannot be passed to wasm
 // directly so we need to use linear memory arithmetic as workaround.
@@ -29,7 +59,8 @@ func jsPrint(string)
 //export evaluate
 func jsEvaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	evaluator.Run(s, jsPrint)
+	builtins := evaluator.DefaultBuiltins(jsRuntime)
+	evaluator.RunWithBuiltins(s, builtins)
 }
 
 //export tokenize
@@ -41,7 +72,7 @@ func jsTokenize(ptr *uint32, length int) {
 //export parse
 func jsParse(ptr *uint32, length int) {
 	s := getString(ptr, length)
-	builtins := evaluator.DefaultBuiltins(jsPrint).Decls()
+	builtins := evaluator.DefaultBuiltins(jsRuntime).Decls()
 	jsPrint(parser.Run(s, builtins))
 }
 

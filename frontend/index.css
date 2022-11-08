@@ -118,15 +118,15 @@ main {
   background: var(--code-background);
   flex: 1;
 }
-.pane {
+.code, .out {
   flex: 1;
   padding: 12px 16px;
   overflow: scroll;
 }
-.pane.code {
+.code {
   border-right: 1px solid var(--primary-color-dimmer);
 }
-.pane textarea {
+textarea {
   font-family: var(--font-family-code);
   color: var(--code-color);
   line-height: 1.4;
@@ -168,14 +168,14 @@ main {
     font-size: 0.75rem;
     box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6), 5px 2px 15px 3px rgb(255 255 255 / 15%);
   }
-  .pane textarea {
+  textarea {
     padding: 4px;
   }
   @media (orientation: portrait) {
     .play main {
       flex-direction: column;
     }
-    .pane.code {
+    .code {
       border-right: none;
       border-bottom: 1px solid var(--primary-color-dimmer);
     }

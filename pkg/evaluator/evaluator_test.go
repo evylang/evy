@@ -600,16 +600,16 @@ end
 for i := range 2 6 2
 	print "🍭" i
 end
-for i := range 5 3 (-1) // TODO: should work 5 3 -1 !
+for i := range 5 3 -1
 	print "🦊" i
 end
-for i := range 3 5 (-1)
+for i := range 3 5 -1
 	print "1💣" i
 end
-for i := range 3 (-1) 1
+for i := range 3 -1 1
 	print "2💣" i
 end
-for i := range 3 (-1)
+for i := range 3 -1
 	print "3💣" i
 end
 `

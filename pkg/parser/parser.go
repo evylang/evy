@@ -655,25 +655,30 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		p.advancePastNL()
 		return nil
 	}
+	tok := p.cur
 	p.advance() // advance past range
-
-	n := p.parseExpr(scope, LOWEST)
-	if n == nil {
+	nodes := p.parseExprList(scope)
+	if len(nodes) == 0 {
+		p.appendError("range cannot be empty")
+		return nil // previous error
+	}
+	n := nodes[0]
+	t := n.Type()
+	if len(nodes) > 1 && t.Name != NUM {
+		p.appendError("range with more than one argument must be num, found " + t.String())
 		return nil
 	}
-	t := n.Type()
+	p.assertEOL()
 	switch t.Name {
 	case STRING, MAP:
 		forNode.LoopVar.T = STRING_TYPE
 		forNode.Range = n
-		p.assertEOL()
 	case ARRAY:
 		forNode.LoopVar.T = t.Sub
 		forNode.Range = n
-		p.assertEOL()
 	case NUM:
 		forNode.LoopVar.T = NUM_TYPE
-		forNode.Range = p.parseStepRange(scope, n)
+		forNode.Range = p.parseStepRange(nodes, tok)
 	default:
 		p.appendError("expected num, string, array or map after range, found " + t.Format())
 	}
@@ -684,26 +689,31 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	return forNode
 }
 
-func (p *Parser) parseStepRange(scope *scope, n Node) *StepRange {
-	tok := p.cur
-	if p.isAtEOL() {
-		return &StepRange{Token: tok, Start: nil, Stop: n, Step: nil}
-	}
-	stop := p.parseExpr(scope, LOWEST)
-	if stop.Type() != NUM_TYPE {
-		p.appendError("expected stop value of num, found " + stop.Type().Format())
+func (p *Parser) parseStepRange(nodes []Node, tok *lexer.Token) *StepRange {
+	if len(nodes) > 3 {
+		p.appendErrorForToken("range can take up to 3 num arguments, found "+strconv.Itoa(len(nodes)), tok)
 		return nil
 	}
-	if p.isAtEOL() {
-		return &StepRange{Token: tok, Start: n, Stop: stop, Step: nil}
+	for i, n := range nodes {
+		if i >= 3 {
+			break
+		}
+		if n.Type() != NUM_TYPE {
+			p.appendErrorForToken("range expects num type for "+ordinalize(i+1)+" argument, found "+n.Type().String(), tok)
+			return nil
+		}
 	}
-	step := p.parseExpr(scope, LOWEST)
-	if step.Type() != NUM_TYPE {
-		p.appendError("expected step value of num, found " + step.Type().Format())
+	switch len(nodes) {
+	case 1:
+		return &StepRange{Token: tok, Start: nil, Stop: nodes[0], Step: nil}
+	case 2:
+		return &StepRange{Token: tok, Start: nodes[0], Stop: nodes[1], Step: nil}
+	case 3:
+		return &StepRange{Token: tok, Start: nodes[0], Stop: nodes[1], Step: nodes[2]}
+	default:
+		p.appendErrorForToken("range can take up to 3 num arguments, found "+strconv.Itoa(len(nodes)), tok)
 		return nil
 	}
-	p.assertEOL()
-	return &StepRange{Token: tok, Start: n, Stop: stop, Step: step}
 }
 
 func (p *Parser) parseWhileStatement(scope *scope) Node {

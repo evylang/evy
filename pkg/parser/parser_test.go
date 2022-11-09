@@ -937,12 +937,17 @@ end
 for x := range 1 2 3 4
 	print "X"
 end
-`: "line 2 column 22: expected end of line, found 4",
+`: "line 2 column 10: range can take up to 3 num arguments, found 4",
 		`
 for x := range true
 	print "X"
 end
 `: "line 2 column 20: expected num, string, array or map after range, found bool",
+		`
+for x := range 1 true
+	print "X"
+end
+`: "line 2 column 10: range expects num type for 2nd argument, found bool",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

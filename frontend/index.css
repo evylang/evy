@@ -118,15 +118,19 @@ main {
   background: var(--code-background);
   flex: 1;
 }
-.pane {
+.code, .out {
   flex: 1;
-  padding: 12px 16px;
   overflow: scroll;
 }
-.pane.code {
+.code {
+  padding: 12px 16px;
   border-right: 1px solid var(--primary-color-dimmer);
 }
-.pane textarea {
+.out {
+  display: flex;
+  flex-direction: column;
+}
+textarea {
   font-family: var(--font-family-code);
   color: var(--code-color);
   line-height: 1.4;
@@ -137,6 +141,19 @@ main {
   border: none;
   background: var(--code-background);
   resize: none;
+  outline: none;
+}
+
+.output {
+  padding: 12px 16px;;
+}
+.canvas {
+  flex:  0 1 50%;
+  border-bottom: 1px solid var(--primary-color-dimmer);
+}
+#canvas {
+  border-right: 1px solid var(--primary-color-dimmer);
+  display: none;
 }
 
 .confetti {
@@ -168,14 +185,15 @@ main {
     font-size: 0.75rem;
     box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6), 5px 2px 15px 3px rgb(255 255 255 / 15%);
   }
-  .pane textarea {
+  textarea {
     padding: 4px;
   }
   @media (orientation: portrait) {
     .play main {
       flex-direction: column;
     }
-    .pane.code {
+    .code {
+      flex: 0 1 30%;
       border-right: none;
       border-bottom: 1px solid var(--primary-color-dimmer);
     }

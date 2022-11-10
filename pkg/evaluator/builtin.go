@@ -12,11 +12,14 @@ type Builtin struct {
 	Decl *parser.FuncDecl
 }
 
-type Builtins map[string]Builtin
+type Builtins struct {
+	Funcs map[string]Builtin
+	Print func(s string)
+}
 
 func (b Builtins) Decls() map[string]*parser.FuncDecl {
-	decls := make(map[string]*parser.FuncDecl, len(b))
-	for name, builtin := range b {
+	decls := make(map[string]*parser.FuncDecl, len(b.Funcs))
+	for name, builtin := range b.Funcs {
 		decls[name] = builtin.Decl
 	}
 	return decls
@@ -27,15 +30,36 @@ type BuiltinFunc func(args []Value) Value
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
 
-func DefaultBuiltins(printFn func(string)) Builtins {
-	return Builtins{
-		"print": {Func: printFunc(printFn), Decl: printDecl},
-		"len":   {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
-		"move":  {Func: moveFunc(printFn), Decl: moveDecl},
-		"line":  {Func: lineFunc(printFn), Decl: lineDecl},
-		"has":   {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
-		"del":   {Func: BuiltinFunc(delFunc), Decl: delDecl},
+func DefaultBuiltins(rt Runtime) Builtins {
+	funcs := map[string]Builtin{
+		"print": {Func: printFunc(rt.Print), Decl: printDecl},
+
+		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
+		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
+		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
+
+		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
+		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
+		"rect":   xyBuiltin("rect", rt.Graphics.Rect, rt.Print),
+		"circle": numBuiltin("circle", rt.Graphics.Circle, rt.Print),
+		"width":  numBuiltin("width", rt.Graphics.Width, rt.Print),
+		"color":  stringBuiltin("color", rt.Graphics.Color, rt.Print),
 	}
+	return Builtins{Funcs: funcs, Print: rt.Print}
+}
+
+type Runtime struct {
+	Print    func(string)
+	Graphics GraphicsRuntime
+}
+
+type GraphicsRuntime struct {
+	Move   func(x, y float64)
+	Line   func(x, y float64)
+	Rect   func(dx, dy float64)
+	Circle func(radius float64)
+	Width  func(w float64)
+	Color  func(s string)
 }
 
 var printDecl = &parser.FuncDecl{
@@ -108,34 +132,83 @@ func delFunc(args []Value) Value {
 	return nil
 }
 
-var moveDecl = &parser.FuncDecl{
-	Name: "move",
-	Params: []*parser.Var{
-		{Name: "x", T: parser.NUM_TYPE},
-		{Name: "y", T: parser.NUM_TYPE},
-	},
-	ReturnType: parser.NUM_TYPE,
-}
-
-func moveFunc(printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
-		printFn("'move' not yet implemented\n")
-		return nil
+func xyDecl(name string) *parser.FuncDecl {
+	return &parser.FuncDecl{
+		Name: name,
+		Params: []*parser.Var{
+			{Name: "x", T: parser.NUM_TYPE},
+			{Name: "y", T: parser.NUM_TYPE},
+		},
+		ReturnType: parser.NONE_TYPE,
 	}
 }
 
-var lineDecl = &parser.FuncDecl{
-	Name: "line",
-	Params: []*parser.Var{
-		{Name: "x", T: parser.NUM_TYPE},
-		{Name: "y", T: parser.NUM_TYPE},
-	},
-	ReturnType: parser.NUM_TYPE,
+func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin {
+	result := Builtin{Decl: xyDecl(name)}
+	if fn == nil {
+		result.Func = notImplementedFunc(name, printFn)
+		return result
+	}
+	result.Func = func(args []Value) Value {
+		x := args[0].(*Num)
+		y := args[1].(*Num)
+		fn(x.Val, y.Val)
+		return nil
+	}
+	return result
 }
 
-func lineFunc(printFn func(string)) BuiltinFunc {
+func numDecl(name string) *parser.FuncDecl {
+	return &parser.FuncDecl{
+		Name: name,
+		Params: []*parser.Var{
+			{Name: "n", T: parser.NUM_TYPE},
+		},
+		ReturnType: parser.NONE_TYPE,
+	}
+}
+
+func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
+	result := Builtin{Decl: numDecl(name)}
+	if fn == nil {
+		result.Func = notImplementedFunc(name, printFn)
+		return result
+	}
+	result.Func = func(args []Value) Value {
+		n := args[0].(*Num)
+		fn(n.Val)
+		return nil
+	}
+	return result
+}
+
+func stringDecl(name string) *parser.FuncDecl {
+	return &parser.FuncDecl{
+		Name: name,
+		Params: []*parser.Var{
+			{Name: "str", T: parser.STRING_TYPE},
+		},
+		ReturnType: parser.NONE_TYPE,
+	}
+}
+
+func stringBuiltin(name string, fn func(str string), printFn func(string)) Builtin {
+	result := Builtin{Decl: stringDecl(name)}
+	if fn == nil {
+		result.Func = notImplementedFunc(name, printFn)
+		return result
+	}
+	result.Func = func(args []Value) Value {
+		str := args[0].(*String)
+		fn(str.Val)
+		return nil
+	}
+	return result
+}
+
+func notImplementedFunc(name string, printFn func(string)) BuiltinFunc {
 	return func(args []Value) Value {
-		printFn("'line' not yet implemented\n")
+		printFn("'" + name + "' not yet implemented\n")
 		return nil
 	}
 }

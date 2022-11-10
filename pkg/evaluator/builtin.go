@@ -47,6 +47,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"circle": numBuiltin("circle", rt.Graphics.Circle, rt.Print),
 		"width":  numBuiltin("width", rt.Graphics.Width, rt.Print),
 		"color":  stringBuiltin("color", rt.Graphics.Color, rt.Print),
+		"colour": stringBuiltin("colour", rt.Graphics.Color, rt.Print),
 	}
 	return Builtins{Funcs: funcs, Print: rt.Print}
 }

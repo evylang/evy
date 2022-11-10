@@ -868,6 +868,22 @@ print (s)
 	assert.Equal(t, want, b.String())
 }
 
+func TestParamAssign(t *testing.T) {
+	prog := `
+f 3
+
+func f n:num
+	n = n + 1
+	print n
+end
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "4\n"
+	assert.Equal(t, want, b.String())
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

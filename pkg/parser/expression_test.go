@@ -60,6 +60,10 @@ func TestParseTopLevelExpression(t *testing.T) {
 
 		// Function calls
 		`print (1+2)`:                 "print((1+2))",
+		`print 1+2`:                   "print((1+2))",
+		`print 1+2 3+4`:               "print((1+2), (3+4))",
+		`print 1-2`:                   "print((1-2))",
+		`print 1 -2`:                  "print(1, (-2))",
 		`len "abc"`:                   "len('abc')",
 		`print (len "abc")`:           "print(len('abc'))",
 		`print 1 (len "abc")`:         "print(1, len('abc'))",
@@ -69,7 +73,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		`print s[1]`:                  "print((s[1]))",
 		"print map2[s]":               "print((map2[s]))",
 
-		// Index expression
+		// // Index expression
 		"arr[1]":        "(arr[1])",
 		"arr2[1][2]":    "((arr2[1])[2])",
 		"arr2[1][n2]":   "((arr2[1])[n2])",
@@ -104,16 +108,20 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"[(1)]":       "[1]",
 
 		// Combined array literals
-		"[[] 1]":         "[[], 1]",
-		"[[] [1]]":       "[([][1])]",
-		"[[]]":           "[[]]",
-		"[[1]]":          "[[1]]",
-		"[[1] ([])]":     "[[1], []]",
-		"[[] ([])]":      "[[], []]",
-		"[[] ([1])]":     "[[], [1]]",
-		"[[] 1 true n2]": "[[], 1, true, n2]",
-		"[1 2 3][1]":     "([1, 2, 3][1])",
-		"len []":         "len([])",
+		"[[] 1]":             "[[], 1]",
+		"[ [] 1 ]":           "[[], 1]",
+		"[[] [1]]":           "[[], [1]]",
+		"[[1 2][1]]":         "[([1, 2][1])]",
+		"[[]]":               "[[]]",
+		"[[1]]":              "[[1]]",
+		"[[1] ([])]":         "[[1], []]",
+		"[[] ([])]":          "[[], []]",
+		"[[] ([1])]":         "[[], [1]]",
+		"[[] 1 true n2]":     "[[], 1, true, n2]",
+		"[1 2 3][1]":         "([1, 2, 3][1])",
+		"[ 3+5 n1*2]":        "[(3+5), (n1*2)]",
+		"len []":             "len([])",
+		"[ [] { a : 2+3 } ]": "[[], {a:(2+3)}]",
 
 		// Map literals
 		"{}":                     "{}",
@@ -197,12 +205,26 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"{:a}": "line 1 column 2: expected map key, found ':'",
 
 		"[1] + [false]": "line 1 column 5: mismatched type for +: num[], bool[]",
+
+		"a. b":        "line 1 column 2: unexpected whitespace after '.'",
+		"a .b":        "line 1 column 3: unexpected whitespace before '.'",
+		"- 5":         "line 1 column 1: unexpected whitespace after '-'",
+		"- n1":        "line 1 column 1: unexpected whitespace after '-'",
+		"[3 +5]":      "line 1 column 4: unexpected whitespace before '+'",
+		"[3+ 5]":      "line 1 column 3: unexpected whitespace after '+'",
+		"[ 3+ 5]":     "line 1 column 4: unexpected whitespace after '+'",
+		"print 1 - 2": "line 1 column 9: unexpected whitespace after '-'",
+
+		"- 2":    "line 1 column 1: unexpected whitespace after '-'",
+		"! true": "line 1 column 1: unexpected whitespace after '!'",
 	}
 	for input, wantErr := range tests {
 		parser := New(input, testBuiltins())
 		parser.advanceTo(0)
 		scope := newScope(nil, &Program{})
 		scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
+		mapType := &Type{Name: MAP, Sub: NUM_TYPE}
+		scope.set("a", &Var{Name: "a", T: mapType})
 
 		_ = parser.parseTopLevelExpr(scope)
 		assertParseError(t, parser, input)

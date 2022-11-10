@@ -50,6 +50,7 @@ const (
 	RCURLY   // }
 
 	COLON // :
+	WS    // ' '
 	NL    // '\n'
 	DOT   // .
 	DOT3  // ...
@@ -134,6 +135,7 @@ var tokenStrings = map[TokenType]tokenString{
 	NOT_EQ:     {string: "NOT_EQ", format: "!="},
 	COLON:      {string: "COLON", format: ":"},
 	NL:         {string: "NL", format: "\n"},
+	WS:         {string: "WS", format: " "},
 	LPAREN:     {string: "LPAREN", format: "("},
 	RPAREN:     {string: "RPAREN", format: ")"},
 	LBRACKET:   {string: "LBRACKET", format: "["},

@@ -74,7 +74,7 @@ func (p *Parser) parseExpr(scope *scope, prec precedence) Node {
 	case lexer.LPAREN:
 		left = p.parseGroupedExpr(scope)
 	default:
-		p.appendError("unexpected " + p.cur.FormatDetails())
+		p.unexpectedLeftTokenError()
 	}
 	for left != nil && !p.isAtExprEnd() && prec < precedences[p.cur.Type] {
 		tt := p.cur.Type
@@ -82,9 +82,9 @@ func (p *Parser) parseExpr(scope *scope, prec precedence) Node {
 		case isBinaryOp(tt):
 			left = p.parseBinaryExpr(scope, left)
 		case tt == lexer.LBRACKET:
-			left = p.parserIndexOrSliceExpr(scope, left, true)
+			left = p.parseIndexOrSliceExpr(scope, left, true)
 		case tt == lexer.DOT:
-			left = p.parserDotExpr(left)
+			left = p.parseDotExpr(left)
 		default:
 			return left
 		}
@@ -92,14 +92,37 @@ func (p *Parser) parseExpr(scope *scope, prec precedence) Node {
 	return left // nil for previous error
 }
 
+func (p *Parser) unexpectedLeftTokenError() {
+	if p.isWSS() {
+		tt := p.cur.Type
+		prevTT := p.lookAt(p.pos - 1).Type
+		if isBinaryOp(tt) && prevTT == lexer.WS {
+			p.appendError("unexpected whitespace before " + p.cur.FormatDetails())
+			return
+		}
+		if tt == lexer.WS && isBinaryOp(prevTT) {
+			prevToken := p.lookAt(p.pos - 1)
+			p.appendErrorForToken("unexpected whitespace after "+prevToken.FormatDetails(), prevToken)
+			return
+		}
+	}
+	p.appendError("unexpected " + p.cur.FormatDetails())
+}
+
 func (p *Parser) isAtExprEnd() bool {
-	return p.isAtEOL() // TODO: in WS mode include WS.
+	if p.isWSS() && p.cur.Type == lexer.WS {
+		return true
+	}
+	return p.isAtEOL()
 }
 
 func (p *Parser) parseUnaryExpr(scope *scope) Node {
 	tok := p.cur
 	unaryExp := &UnaryExpression{Token: tok, Op: op(tok)}
 	p.advance() // advance past operator
+	if p.lookAt(p.pos-1).Type == lexer.WS {
+		p.appendErrorForToken("unexpected whitespace after '"+unaryExp.Op.String()+"'", tok)
+	}
 	unaryExp.Right = p.parseExpr(scope, UNARY)
 	if unaryExp.Right == nil {
 		return nil // previous error
@@ -126,6 +149,8 @@ func (p *Parser) parseBinaryExpr(scope *scope, left Node) Node {
 }
 
 func (p *Parser) parseGroupedExpr(scope *scope) Node {
+	p.pushWSS(false)
+	defer p.popWSS()
 	p.advance() // advance past (
 	exp := p.parseTopLevelExpr(scope)
 	if !p.assertToken(lexer.RPAREN) {
@@ -135,9 +160,15 @@ func (p *Parser) parseGroupedExpr(scope *scope) Node {
 	return exp
 }
 
-func (p *Parser) parserIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
-	tok := p.cur // TODO: ensure not prefixed by WS
-	p.advance()  // advance past [
+func (p *Parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
+	p.pushWSS(false)
+	defer p.popWSS()
+	tok := p.cur
+	if p.lookAt(p.pos-1).Type == lexer.WS {
+		p.appendError("unexpected whitespace before '['")
+		return nil
+	}
+	p.advance() // advance past [
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != MAP && leftType != STRING {
 		p.appendErrorForToken("only array, string and map type can be indexed found "+left.Type().Format(), tok)
@@ -205,9 +236,17 @@ func (p *Parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) No
 	return &SliceExpression{Token: tok, Left: left, Start: start, End: end, T: t}
 }
 
-func (p *Parser) parserDotExpr(left Node) Node {
-	tok := p.cur // TODO: ensure not prefixed by WS
-	p.advance()  // advance past .
+func (p *Parser) parseDotExpr(left Node) Node {
+	tok := p.cur
+	if p.lookAt(p.pos-1).Type == lexer.WS {
+		p.appendError("unexpected whitespace before '.'")
+		return nil
+	}
+	if p.lookAt(p.pos+1).Type == lexer.WS {
+		p.appendError("unexpected whitespace after '.'")
+		return nil
+	}
+	p.advance() // advance past .
 	leftType := left.Type().Name
 	if leftType != MAP {
 		p.appendErrorForToken("field access with '.' expects map type, found "+left.Type().Format(), tok)
@@ -310,8 +349,10 @@ func (p *Parser) parseLiteral(scope *scope) Node {
 
 func (p *Parser) parseArrayLiteral(scope *scope) Node {
 	tok := p.cur
-	p.advance() // advance past [
+	p.advance()     // advance past [
+	p.advanceIfWS() // allow whitespace after `[`, eg [ 1 2 3 ]
 	elements := p.parseExprList(scope)
+
 	if elements == nil {
 		return nil // previous error
 	}
@@ -334,14 +375,21 @@ func (p *Parser) parseExprList(scope *scope) []Node {
 	list := []Node{}
 	tt := p.cur.TokenType()
 	for !p.isAtEOL() && tt != lexer.RPAREN && tt != lexer.RBRACKET {
-		n := p.parseExpr(scope, LOWEST)
+		n := p.parseExprWSS(scope, LOWEST)
 		if n == nil {
 			return nil // previous error
 		}
 		list = append(list, n)
+		p.advanceIfWS()
 		tt = p.cur.TokenType()
 	}
 	return list
+}
+
+func (p *Parser) parseExprWSS(scope *scope, prec precedence) Node {
+	p.pushWSS(true)
+	defer p.popWSS()
+	return p.parseExpr(scope, prec)
 }
 
 func (p *Parser) combineTypes(types []*Type) *Type {
@@ -360,6 +408,8 @@ func (p *Parser) combineTypes(types []*Type) *Type {
 }
 
 func (p *Parser) parseMapLiteral(scope *scope) Node {
+	p.pushWSS(false)
+	defer p.popWSS()
 	tok := p.cur
 	p.advance() // advance past {
 	pairs, order := p.parseMapPairs(scope)
@@ -399,7 +449,7 @@ func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 		p.assertToken(lexer.COLON)
 		p.advance() // advance past COLON
 
-		n := p.parseExpr(scope, LOWEST)
+		n := p.parseExprWSS(scope, LOWEST)
 		if n == nil {
 			return nil, nil // previous error
 		}

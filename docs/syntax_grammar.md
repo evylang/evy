@@ -374,7 +374,7 @@ In order to distinguish between array literals and array indices, there
 cannot be any whitespace between array variable and index.
 
     arr := ["a" "b"]
-    print arr[1]  // index:   a
+    print arr[1]  // index: b
     print arr [1] // literal: [a b] [1]
     arr[0] = "A"
     arr [1] = "B" // invalid

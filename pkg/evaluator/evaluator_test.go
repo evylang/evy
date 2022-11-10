@@ -875,12 +875,22 @@ f 3
 func f n:num
 	n = n + 1
 	print n
-end
-`
+end`
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
 	want := "4\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestSplit(t *testing.T) {
+	prog := `
+print (split "a, b, c" ", ")
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "[a b c]\n"
 	assert.Equal(t, want, b.String())
 }
 

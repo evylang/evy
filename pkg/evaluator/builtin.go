@@ -32,7 +32,9 @@ func (b BuiltinFunc) String() string  { return "builtin function" }
 
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
-		"print": {Func: printFunc(rt.Print), Decl: printDecl},
+		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
+		"sprint": {Func: sprintFunc, Decl: sprintDecl},
+		"join":   {Func: joinFunc, Decl: joinDecl},
 
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
@@ -70,13 +72,43 @@ var printDecl = &parser.FuncDecl{
 
 func printFunc(printFn func(string)) BuiltinFunc {
 	return func(args []Value) Value {
-		argList := make([]string, len(args))
-		for i, arg := range args {
-			argList[i] = arg.String()
-		}
-		printFn(strings.Join(argList, " ") + "\n")
+		printFn(join(args, " ") + "\n")
 		return nil
 	}
+}
+
+var sprintDecl = &parser.FuncDecl{
+	Name:          "sprint",
+	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
+	ReturnType:    parser.STRING_TYPE,
+}
+
+func sprintFunc(args []Value) Value {
+	return &String{Val: join(args, " ")}
+}
+
+var joinDecl = &parser.FuncDecl{
+	Name: "join",
+	Params: []*parser.Var{
+		{Name: "arr", T: parser.GENERIC_ARRAY},
+		{Name: "sep", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func joinFunc(args []Value) Value {
+	arr := args[0].(*Array)
+	sep := args[1].(*String)
+	s := join(*arr.Elements, sep.Val)
+	return &String{Val: s}
+}
+
+func join(args []Value, sep string) string {
+	argStrings := make([]string, len(args))
+	for i, arg := range args {
+		argStrings[i] = arg.String()
+	}
+	return strings.Join(argStrings, sep)
 }
 
 var lenDecl = &parser.FuncDecl{

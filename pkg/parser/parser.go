@@ -280,10 +280,10 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 				p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
 				return nil
 			}
-			n = p.parserIndexOrSliceExpr(scope, n, false)
+			n = p.parseIndexOrSliceExpr(scope, n, false)
 		}
 		if p.cur.TokenType() == lexer.DOT {
-			n = p.parserDotExpr(n)
+			n = p.parseDotExpr(n)
 		}
 		tt = p.cur.TokenType()
 	}

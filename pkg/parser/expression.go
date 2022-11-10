@@ -82,9 +82,9 @@ func (p *Parser) parseExpr(scope *scope, prec precedence) Node {
 		case isBinaryOp(tt):
 			left = p.parseBinaryExpr(scope, left)
 		case tt == lexer.LBRACKET:
-			left = p.parserIndexOrSliceExpr(scope, left, true)
+			left = p.parseIndexOrSliceExpr(scope, left, true)
 		case tt == lexer.DOT:
-			left = p.parserDotExpr(left)
+			left = p.parseDotExpr(left)
 		default:
 			return left
 		}
@@ -160,7 +160,7 @@ func (p *Parser) parseGroupedExpr(scope *scope) Node {
 	return exp
 }
 
-func (p *Parser) parserIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
+func (p *Parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
@@ -236,7 +236,7 @@ func (p *Parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) No
 	return &SliceExpression{Token: tok, Left: left, Start: start, End: end, T: t}
 }
 
-func (p *Parser) parserDotExpr(left Node) Node {
+func (p *Parser) parseDotExpr(left Node) Node {
 	tok := p.cur
 	if p.lookAt(p.pos-1).Type == lexer.WS {
 		p.appendError("unexpected whitespace before '.'")

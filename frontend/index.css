@@ -130,7 +130,7 @@ main {
   display: flex;
   flex-direction: column;
 }
-textarea {
+textarea, textarea[disabled] {
   font-family: var(--font-family-code);
   color: var(--code-color);
   line-height: 1.4;

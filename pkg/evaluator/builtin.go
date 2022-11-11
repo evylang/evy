@@ -35,6 +35,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
 		"sprint": {Func: sprintFunc, Decl: sprintDecl},
 		"join":   {Func: joinFunc, Decl: joinDecl},
+		"split":  {Func: splitFunc, Decl: splitDecl},
 
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
@@ -46,6 +47,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"circle": numBuiltin("circle", rt.Graphics.Circle, rt.Print),
 		"width":  numBuiltin("width", rt.Graphics.Width, rt.Print),
 		"color":  stringBuiltin("color", rt.Graphics.Color, rt.Print),
+		"colour": stringBuiltin("colour", rt.Graphics.Color, rt.Print),
 	}
 	return Builtins{Funcs: funcs, Print: rt.Print}
 }
@@ -109,6 +111,31 @@ func join(args []Value, sep string) string {
 		argStrings[i] = arg.String()
 	}
 	return strings.Join(argStrings, sep)
+}
+
+var stringArrayType *parser.Type = &parser.Type{
+	Name: parser.ARRAY,
+	Sub:  parser.STRING_TYPE,
+}
+
+var splitDecl = &parser.FuncDecl{
+	Name: "split",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "sep", T: parser.STRING_TYPE},
+	},
+	ReturnType: stringArrayType,
+}
+
+func splitFunc(args []Value) Value {
+	s := args[0].(*String)
+	sep := args[1].(*String)
+	slice := strings.Split(s.Val, sep.Val)
+	elements := make([]Value, len(slice))
+	for i, s := range slice {
+		elements[i] = &String{Val: s}
+	}
+	return &Array{Elements: &elements}
 }
 
 var lenDecl = &parser.FuncDecl{

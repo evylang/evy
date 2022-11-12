@@ -107,7 +107,7 @@ func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Valu
 	if decl.Type() == parser.ANY_TYPE && val.Type() != ANY {
 		val = &Any{Val: val}
 	}
-	scope.set(decl.Var.Name, val)
+	scope.set(decl.Var.Name, copyOrRef(val))
 	return nil
 }
 
@@ -166,11 +166,11 @@ func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall
 func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope {
 	scope = newInnerScope(scope)
 	for i, param := range fd.Params {
-		scope.set(param.Name, args[i])
+		scope.set(param.Name, copyOrRef(args[i]))
 	}
 	if fd.VariadicParam != nil {
 		varArg := &Array{Elements: &args}
-		scope.set(fd.VariadicParam.Name, varArg)
+		scope.set(fd.VariadicParam.Name, copyOrRef(varArg))
 	}
 	return scope
 }

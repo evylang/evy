@@ -17,35 +17,45 @@ func main() {
 }
 
 // jsPrint is imported from JS
+//export jsPrint
 func jsPrint(string)
 
 // move is imported from JS
+//export move
 func move(x, y float64)
 
 // line is imported from JS
+//export line
 func line(x, y float64)
 
 // rect is imported from JS
+//export rect
 func rect(dx, dy float64)
 
 // circle is imported from JS
+//export circle
 func circle(r float64)
 
 // width is imported from JS, setting the lineWidth
+//export width
 func width(w float64)
 
 // color is imported from JS
+//export color
 func color(s string)
 
+// We cannot take the address of external/exported functions
+// (https://golang.org/cmd/cgo/#hdr-Passing_pointers) so we must wrap them in a
+// Go function first to put them in this Runtime struct.
 var jsRuntime evaluator.Runtime = evaluator.Runtime{
-	Print: jsPrint,
+	Print: func(s string) { jsPrint(s) },
 	Graphics: evaluator.GraphicsRuntime{
-		Move:   move,
-		Line:   line,
-		Rect:   rect,
-		Circle: circle,
-		Width:  width,
-		Color:  color,
+		Move:   func(x, y float64) { move(x, y) },
+		Line:   func(x, y float64) { line(x, y) },
+		Rect:   func(dx, dy float64) { rect(dx, dy) },
+		Circle: func(r float64) { circle(r) },
+		Width:  func(w float64) { width(w) },
+		Color:  func(s string) { color(s) },
 	},
 }
 

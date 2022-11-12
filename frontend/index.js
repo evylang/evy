@@ -10,13 +10,13 @@ function initWasm() {
     go.run(wasm)
   })
   go.importObject.env = {
-    'main.jsPrint': jsPrint,
-    'main.move': move,
-    'main.line': line,
-    'main.width': width,
-    'main.circle': circle,
-    'main.rect': rect,
-    'main.color': color,
+    'jsPrint': jsPrint,
+    'move': move,
+    'line': line,
+    'width': width,
+    'circle': circle,
+    'rect': rect,
+    'color': color,
   }
   document.querySelectorAll('header button').forEach((button) => {
     button.onclick = handleRun

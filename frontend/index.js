@@ -127,10 +127,10 @@ const canvas = {
 function initCanvas() {
   const c = document.getElementById("canvas")
   const b = c.parentElement.getBoundingClientRect()
-  const side = b.width < b.height ? b.width : b.height
   c.width = Math.abs(scaleX(canvas.width))
   c.height = Math.abs(scaleY(canvas.height))
-  c.style.width = `${side}px`
+  c.style.width = `40vh`
+  c.style.height = `40vh`
   c.style.display = 'block'
   canvas.ctx = c.getContext("2d")
 }

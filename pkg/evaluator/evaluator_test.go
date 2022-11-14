@@ -870,16 +870,50 @@ print (s)
 
 func TestParamAssign(t *testing.T) {
 	prog := `
-f 3
+x := 1
+f x
+x = x + 1
+f x
 
 func f n:num
-	n = n + 1
-	print n
+	n = n*10
+	print n x
 end`
+
 	b := bytes.Buffer{}
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
-	want := "4\n"
+	want := "10 1\n20 2\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestAssign2(t *testing.T) {
+	prog := `
+x := 1
+n := x
+n = n * 10
+print x
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "1\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestAssign3(t *testing.T) {
+	prog := `
+x:num
+x = 1
+n:num
+n = x
+n = n * 10
+print x
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "1\n"
 	assert.Equal(t, want, b.String())
 }
 
@@ -891,6 +925,35 @@ print (split "a, b, c" ", ")
 	fn := func(s string) { b.WriteString(s) }
 	Run(prog, fn)
 	want := "[a b c]\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestAnyAssignment(t *testing.T) {
+	prog := `
+a := 1
+b:any
+b = a
+a = 2
+print a b
+`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "2 1\n"
+	assert.Equal(t, want, b.String())
+}
+
+func TestCompositeAssignment(t *testing.T) {
+	prog := `
+n := 1
+a := [n n]
+m := {n: n}
+n = 2
+print n a m`
+	b := bytes.Buffer{}
+	fn := func(s string) { b.WriteString(s) }
+	Run(prog, fn)
+	want := "2 [1 1] {n:1}\n"
 	assert.Equal(t, want, b.String())
 }
 

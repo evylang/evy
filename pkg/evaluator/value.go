@@ -179,9 +179,9 @@ func (a *Any) Equals(v Value) bool {
 
 func (a *Any) Set(v Value) {
 	if a2, ok := v.(*Any); ok {
-		a.Val = a2.Val
+		a.Val = copyOrRef(a2.Val)
 	} else {
-		a.Val = v
+		a.Val = copyOrRef(v)
 	}
 }
 

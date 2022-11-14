@@ -107,7 +107,7 @@ func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Valu
 	if decl.Type() == parser.ANY_TYPE && val.Type() != ANY {
 		val = &Any{Val: val}
 	}
-	scope.set(decl.Var.Name, val)
+	scope.set(decl.Var.Name, copyOrRef(val))
 	return nil
 }
 
@@ -139,7 +139,7 @@ func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
 		if isError(val) {
 			return val
 		}
-		pairs[key] = val
+		pairs[key] = copyOrRef(val)
 	}
 	order := make([]string, len(m.Order))
 	copy(order, m.Order)
@@ -342,7 +342,7 @@ func (e *Evaluator) evalExprList(scope *scope, terms []parser.Node) []Value {
 		if isError(evaluated) {
 			return []Value{evaluated}
 		}
-		result[i] = evaluated
+		result[i] = copyOrRef(evaluated)
 	}
 
 	return result

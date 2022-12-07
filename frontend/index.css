@@ -130,7 +130,7 @@ main {
   display: flex;
   flex-direction: column;
 }
-textarea, textarea[disabled] {
+textarea, textarea:disabled {
   font-family: var(--font-family-code);
   color: var(--code-color);
   line-height: 1.4;
@@ -142,6 +142,8 @@ textarea, textarea[disabled] {
   background: var(--code-background);
   resize: none;
   outline: none;
+  -webkit-text-fill-color: var(--code-color);
+  opacity: 1;
 }
 
 .output {

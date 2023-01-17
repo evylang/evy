@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="css/styles.min.css">
+<link rel="shortcut icon" type="image/png" href="img/favicon.ico"/>
+<link rel="icon" type="image/x-icon" href="img/favicon.ico"/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+
+<title>EVY</title>
+
+<meta name="title" content="Evy">
+
+</head>
+
+
+<body class="">
+    <!-- define symbol in hidden svg document -->
+<svg style="display: none" version="2.0">
+    <symbol id="icon-user" xmlns="http://www.w3.org/2000/svg">
+        <path
+            d="M12 0C5.82239 0 0.799988 5.0224 0.799988 11.2C0.799988 17.3776 5.82239 22.4 12 22.4C18.1776 22.4 23.2 17.3776 23.2 11.2C23.2 5.0224 18.1776 0 12 0ZM12 21C6.59679 21 2.19999 16.6032 2.19999 11.2C2.19999 5.7968 6.59679 1.4 12 1.4C17.4032 1.4 21.8 5.7968 21.8 11.2C21.8 16.6032 17.4032 21 12 21ZM12 10.4824C9.72935 10.4824 7.88759 12.3286 7.88759 14.5948V16.1173C7.88759 16.5023 8.20259 16.8173 8.58759 16.8173H15.4124C15.7974 16.8173 16.1124 16.5023 16.1124 16.1173V14.5948C16.1124 12.3286 14.2661 10.4824 12 10.4824ZM14.7125 15.4216H9.28327V14.5991C9.28327 13.1029 10.4995 11.8866 11.9957 11.8866C13.492 11.8866 14.7082 13.1029 14.7082 14.5991V15.4216H14.7125ZM12 10.2328C13.2819 10.2328 14.3275 9.18716 14.3275 7.90528C14.3275 6.6234 13.2819 5.57776 12 5.57776C10.7181 5.57776 9.67247 6.6234 9.67247 7.90528C9.67247 9.18716 10.7137 10.2328 12 10.2328ZM12 6.9778C12.5119 6.9778 12.9275 7.39344 12.9275 7.90532C12.9275 8.4172 12.5119 8.83284 12 8.83284C11.4881 8.83284 11.0725 8.4172 11.0725 7.90532C11.0725 7.39344 11.4881 6.9778 12 6.9778Z"
+            fill-opacity="1" />
+    </symbol>
+    <symbol id="icon-arrow-down" viewBox="0 0 13 6" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M1.33737 0.48456C1.37511 0.449637 1.41994 0.42193 1.46929 0.403025C1.51865 0.38412 1.57156 0.37439 1.62499 0.37439C1.67843 0.37439 1.73134 0.38412 1.7807 0.403025C1.83005 0.42193 1.87488 0.449637 1.91262 0.48456L6.49999 4.71981L11.0874 0.48456C11.1251 0.449694 11.17 0.422037 11.2193 0.403167C11.2687 0.384298 11.3216 0.374586 11.375 0.374586C11.4284 0.374586 11.4813 0.384298 11.5307 0.403167C11.58 0.422037 11.6248 0.449694 11.6626 0.48456C11.7004 0.519426 11.7304 0.560818 11.7508 0.606372C11.7712 0.651927 11.7818 0.700752 11.7818 0.75006C11.7818 0.799368 11.7712 0.848193 11.7508 0.893748C11.7304 0.939302 11.7004 0.980694 11.6626 1.01556L6.78762 5.51556C6.74988 5.55048 6.70505 5.57819 6.6557 5.59709C6.60634 5.616 6.55343 5.62573 6.49999 5.62573C6.44656 5.62573 6.39365 5.616 6.34429 5.59709C6.29494 5.57819 6.25011 5.55048 6.21237 5.51556L1.33737 1.01556C1.29954 0.980726 1.26952 0.939344 1.24904 0.893785C1.22856 0.848226 1.21802 0.799385 1.21802 0.75006C1.21802 0.700734 1.22856 0.651893 1.24904 0.606335C1.26952 0.560776 1.29954 0.519394 1.33737 0.48456Z"
+            fill-opacity="0.6" stroke="#333333" stroke-width="0.5" />
+    </symbol>
+
+    <symbol id="icon-close"  viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+        <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M7.40903 8.99999L1.25765 2.84861L0.462158 2.05312L2.05315 0.462128L2.84864 1.25762L9.00002 7.409L14.9545 1.4545L15.75 0.659003L17.341 2.24999L16.5455 3.04549L10.591 8.99999L16.7424 15.1514L17.5379 15.9469L15.9469 17.5379L15.1514 16.7424L9.00002 10.591L3.04552 16.5455L2.25002 17.341L0.659033 15.75L1.45453 14.9545L7.40903 8.99999Z"
+            fill="white" fill-opacity="0.6" />
+
+
+    </symbol>
+
+    <symbol id="icon-eye" viewBox="0 0 22 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C6 0 1.73 3.11 0 7.5C1.73 11.89 6 15 11 15C16 15 20.27 11.89 22 7.5C20.27 3.11 16 0 11 0ZM11 12.5C8.24 12.5 6 10.26 6 7.5C6 4.74 8.24 2.5 11 2.5C13.76 2.5 16 4.74 16 7.5C16 10.26 13.76 12.5 11 12.5ZM11 4.5C9.34 4.5 8 5.84 8 7.5C8 9.16 9.34 10.5 11 10.5C12.66 10.5 14 9.16 14 7.5C14 5.84 12.66 4.5 11 4.5Z" fill="black" fill-opacity="0.6"/>
+        </symbol>
+        
+
+</svg>
+    <header id="header" class="sticky-top">
+    <div class="col-auto course-setting">
+        <ul class="breadcrumb">
+            <li><a href="course.html">Courses</a></li>
+            <li><a href="course.html">Course name </a></li>
+        </ul>
+    </div>
+    <div class="col-auto logo"><a href="index.html"><img src="img/logo.svg" alt="Evy" height="16" width="74" /></a></div>
+    <div class="col-auto account-setting">
+        <div class="dropdown  ">
+            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg width="24" height="23">
+                    <use href="#icon-user" />
+                </svg>
+                <span class="username">Jason Strachan</span>
+            </a>
+            
+            <ul class="dropdown-menu ">
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="#">Invite User</a></li>
+                <li><a class="dropdown-item" href="login.html">Log out</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+    
+<div class="main">
+    <div class="editor editor-hide">
+        
+        <pre  spellcheck="false" contenteditable="true">
+    <span class="line-no">1</span><span class="function">move</span> <span>10</span> <span>20</span>
+    <span class="line-no">2</span><span class="function">rect</span> <span>10</span> <span>20</span>
+    <span class="line-no">3</span><span class="function">color</span> <span>"lime"</span> 
+    <span class="line-no">4</span><span class="function">circle</span> <span>10</span> <span>20</span>
+    <span class="line-no">5</span><span  class="function">rect</span><span> 25 25</span>
+    <span class="line-no">6</span>
+    <span class="line-no">7</span><span>x := 12</span>
+    <span class="line-no">8</span><span>print "x:" x</span>
+    <span class="line-no">9</span><span>if x > 10</span>
+    <span class="line-no">10</span><span>   print "🍦 big x"</span>
+    <span class="line-no">11</span><span>end</span>
+    <span class="line-no">12</span>
+    <span class="line-no">13</span><span>n = 8;</span>
+    <span class="line-no">14</span><span><span class="function">function setup</span>() {</span>
+    <span class="line-no ">15 </span><span>   c = 0.95 * min(windowWidth, windowHeight);</span>
+    <span class="line-no ">16</span><span>   <span class="function">createCanvas(c / 2, c);</span>
+    <span class="line-no">17</span><span>   noStroke();</span>
+    <span class="line-no">18</span><span>}</span>
+    <span class="line-no">19</span><span>for (let i = 1; i < n; i++) {</span>
+    <span class="line-no ">20</span><span>   push();</span>
+    <span class="line-no">21</span><span>   translate(0, -c / 2 + w / 10 + (i * c) / (n + 1));</span>
+    <span class="line-no">22</span><span>   pot();</span>
+    <span class="line-no">23</span><span>   pop();</span>
+    <span class="line-no ">24</span><span>}</span>
+    
+    </pre>
+    </div>
+    <div class="output output-show">
+        <div class="canvas">
+            <img src="img/canv.png" alt="" >
+        </div>
+        <div class="console">
+            x: 12 <br>
+            🍦 big x
+        </div>
+        <div class="execute">
+            <a class="btn btn-primary btn-code" href="editor.html"><span class="txt">Code</span></a>
+            <button class="btn btn-primary btn-loading" ><span class="txt">Run</span> <span class="onplay"><span></span><span></span><span></span><span></span></span></button>
+        </div>
+    </div>
+</div>
+
+    <div class="loader">
+        <img src="img/e-logo.svg" alt="watermark" width="241" height="254" class="logo-char">
+        <img src="img/logo.svg" alt="logo" width="165" height="27">
+    </div>
+</body>
+
+
+</html>

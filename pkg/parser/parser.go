@@ -98,7 +98,7 @@ func (p *Parser) Parse() *Program {
 	return p.parseProgram()
 }
 
-// function names matching `parsePROCUTION` align with production names
+// function names matching `parsePRODUCTION` align with production names
 // in grammar doc/syntax_grammar.md.
 func (p *Parser) parseProgram() *Program {
 	program := &Program{}
@@ -135,7 +135,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 	tok := p.cur // function name
 	funcName := p.cur.Literal
 
-	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
+	p.advancePastNL() // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
 	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
 	p.addParamsToScope(scope, fd)

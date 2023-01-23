@@ -14,9 +14,12 @@ func Run(input string, builtins Builtins) {
 		builtins.Print(p.MaxErrorsString(8))
 		return
 	}
-	e := &Evaluator{print: builtins.Print}
-	e.builtins = builtins.Funcs
-	val := e.Eval(newScope(), prog)
+	e := &Evaluator{
+		print:    builtins.Print,
+		builtins: builtins.Funcs,
+		scope:    newScope(),
+	}
+	val := e.Eval(prog)
 	if isError(val) {
 		builtins.Print(val.String())
 	}
@@ -25,18 +28,20 @@ func Run(input string, builtins Builtins) {
 type Evaluator struct {
 	print    func(string)
 	builtins map[string]Builtin
+
+	scope *scope // Current top of scope stack
 }
 
-func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
+func (e *Evaluator) Eval(node parser.Node) Value {
 	switch node := node.(type) {
 	case *parser.Program:
-		return e.evalProgram(scope, node)
+		return e.evalProgram(node)
 	case *parser.Declaration:
-		return e.evalDeclaration(scope, node)
+		return e.evalDeclaration(node)
 	case *parser.Assignment:
-		return e.evalAssignment(scope, node)
+		return e.evalAssignment(node)
 	case *parser.Var:
-		return e.evalVar(scope, node)
+		return e.evalVar(node)
 	case *parser.NumLiteral:
 		return &Num{Val: node.Value}
 	case *parser.StringLiteral:
@@ -44,45 +49,45 @@ func (e *Evaluator) Eval(scope *scope, node parser.Node) Value {
 	case *parser.Bool:
 		return e.evalBool(node)
 	case *parser.ArrayLiteral:
-		return e.evalArrayLiteral(scope, node)
+		return e.evalArrayLiteral(node)
 	case *parser.MapLiteral:
-		return e.evalMapLiteral(scope, node)
+		return e.evalMapLiteral(node)
 	case *parser.FunctionCall:
-		return e.evalFunctionCall(scope, node)
+		return e.evalFunctionCall(node)
 	case *parser.Return:
-		return e.evalReturn(scope, node)
+		return e.evalReturn(node)
 	case *parser.Break:
-		return e.evalBreak(scope, node)
+		return e.evalBreak(node)
 	case *parser.If:
-		return e.evalIf(scope, node)
+		return e.evalIf(node)
 	case *parser.While:
-		return e.evalWhile(scope, node)
+		return e.evalWhile(node)
 	case *parser.For:
-		return e.evalFor(scope, node)
+		return e.evalFor(node)
 	case *parser.BlockStatement:
-		return e.evalBlockStatment(scope, node)
+		return e.evalBlockStatment(node)
 	case *parser.UnaryExpression:
-		return e.evalUnaryExpr(scope, node)
+		return e.evalUnaryExpr(node)
 	case *parser.BinaryExpression:
-		return e.evalBinaryExpr(scope, node)
+		return e.evalBinaryExpr(node)
 	case *parser.IndexExpression:
-		return e.evalIndexExpr(scope, node, false /* forAssign */)
+		return e.evalIndexExpr(node, false /* forAssign */)
 	case *parser.SliceExpression:
-		return e.evalSliceExpr(scope, node)
+		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
-		return e.evalDotExpr(scope, node, false /* forAssign */)
+		return e.evalDotExpr(node, false /* forAssign */)
 	}
 	return nil // TODO: panic?
 }
 
-func (e *Evaluator) evalProgram(scope *scope, program *parser.Program) Value {
-	return e.evalStatments(scope, program.Statements)
+func (e *Evaluator) evalProgram(program *parser.Program) Value {
+	return e.evalStatments(program.Statements)
 }
 
-func (e *Evaluator) evalStatments(scope *scope, statements []parser.Node) Value {
+func (e *Evaluator) evalStatments(statements []parser.Node) Value {
 	var result Value
 	for _, statement := range statements {
-		result = e.Eval(scope, statement)
+		result = e.Eval(statement)
 		if isError(result) || isReturn(result) || isBreak(result) {
 			return result
 		}
@@ -94,24 +99,24 @@ func (e *Evaluator) evalBool(b *parser.Bool) Value {
 	return &Bool{Val: b.Value}
 }
 
-func (e *Evaluator) evalDeclaration(scope *scope, decl *parser.Declaration) Value {
-	val := e.Eval(scope, decl.Value)
+func (e *Evaluator) evalDeclaration(decl *parser.Declaration) Value {
+	val := e.Eval(decl.Value)
 	if isError(val) {
 		return val
 	}
 	if decl.Type() == parser.ANY_TYPE && val.Type() != ANY {
 		val = &Any{Val: val}
 	}
-	scope.set(decl.Var.Name, copyOrRef(val))
+	e.scope.set(decl.Var.Name, copyOrRef(val))
 	return nil
 }
 
-func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) Value {
-	val := e.Eval(scope, assignment.Value)
+func (e *Evaluator) evalAssignment(assignment *parser.Assignment) Value {
+	val := e.Eval(assignment.Value)
 	if isError(val) {
 		return val
 	}
-	target := e.evalTarget(scope, assignment.Target)
+	target := e.evalTarget(assignment.Target)
 	if isError(target) {
 		return target
 	}
@@ -119,18 +124,18 @@ func (e *Evaluator) evalAssignment(scope *scope, assignment *parser.Assignment) 
 	return nil
 }
 
-func (e *Evaluator) evalArrayLiteral(scope *scope, arr *parser.ArrayLiteral) Value {
-	elements := e.evalExprList(scope, arr.Elements)
+func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) Value {
+	elements := e.evalExprList(arr.Elements)
 	if len(elements) == 1 && isError(elements[0]) {
 		return elements[0]
 	}
 	return &Array{Elements: &elements}
 }
 
-func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
+func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) Value {
 	pairs := map[string]Value{}
 	for key, node := range m.Pairs {
-		val := e.Eval(scope, node)
+		val := e.Eval(node)
 		if isError(val) {
 			return val
 		}
@@ -141,8 +146,8 @@ func (e *Evaluator) evalMapLiteral(scope *scope, m *parser.MapLiteral) Value {
 	return &Map{Pairs: pairs, Order: &order}
 }
 
-func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall) Value {
-	args := e.evalExprList(scope, funcCall.Arguments)
+func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall) Value {
+	args := e.evalExprList(funcCall.Arguments)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
 	}
@@ -150,75 +155,78 @@ func (e *Evaluator) evalFunctionCall(scope *scope, funcCall *parser.FunctionCall
 	if ok {
 		return builtin.Func(args)
 	}
-	scope = innerScopeWithArgs(scope, funcCall.FuncDecl, args)
-	funcResult := e.Eval(scope, funcCall.FuncDecl.Body)
+	e.pushScope()
+	defer e.popScope()
+
+	// Add func args to scope
+	fd := funcCall.FuncDecl
+	for i, param := range fd.Params {
+		e.scope.set(param.Name, args[i])
+	}
+	if fd.VariadicParam != nil {
+		varArg := &Array{Elements: &args}
+		e.scope.set(fd.VariadicParam.Name, varArg)
+	}
+
+	funcResult := e.Eval(fd.Body)
 	if returnValue, ok := funcResult.(*ReturnValue); ok {
 		return returnValue.Val
 	}
 	return funcResult // error or nil
 }
 
-func innerScopeWithArgs(scope *scope, fd *parser.FuncDecl, args []Value) *scope {
-	scope = newInnerScope(scope)
-	for i, param := range fd.Params {
-		scope.set(param.Name, args[i])
-	}
-	if fd.VariadicParam != nil {
-		varArg := &Array{Elements: &args}
-		scope.set(fd.VariadicParam.Name, varArg)
-	}
-	return scope
-}
-
-func (e *Evaluator) evalReturn(scope *scope, ret *parser.Return) Value {
+func (e *Evaluator) evalReturn(ret *parser.Return) Value {
 	if ret.Value == nil {
 		return &ReturnValue{}
 	}
-	val := e.Eval(scope, ret.Value)
+	val := e.Eval(ret.Value)
 	if isError(val) {
 		return val
 	}
 	return &ReturnValue{Val: val}
 }
 
-func (e *Evaluator) evalBreak(scope *scope, ret *parser.Break) Value {
+func (e *Evaluator) evalBreak(ret *parser.Break) Value {
 	return &Break{}
 }
 
-func (e *Evaluator) evalIf(scope *scope, i *parser.If) Value {
-	val, ok := e.evalConditionalBlock(scope, i.IfBlock)
+func (e *Evaluator) evalIf(i *parser.If) Value {
+	val, ok := e.evalConditionalBlock(i.IfBlock)
 	if ok || isError(val) {
 		return val
 	}
 	for _, elseif := range i.ElseIfBlocks {
-		val, ok := e.evalConditionalBlock(scope, elseif)
+		val, ok := e.evalConditionalBlock(elseif)
 		if ok || isError(val) {
 			return val
 		}
 	}
 	if i.Else != nil {
-		return e.Eval(newInnerScope(scope), i.Else)
+		e.pushScope()
+		defer e.popScope()
+		return e.Eval(i.Else)
 	}
 	return nil
 }
 
-func (e *Evaluator) evalWhile(scope *scope, w *parser.While) Value {
+func (e *Evaluator) evalWhile(w *parser.While) Value {
 	whileBlock := &w.ConditionalBlock
-	val, ok := e.evalConditionalBlock(scope, whileBlock)
+	val, ok := e.evalConditionalBlock(whileBlock)
 	for ok && !isError(val) && !isReturn(val) && !isBreak(val) {
-		val, ok = e.evalConditionalBlock(scope, whileBlock)
+		val, ok = e.evalConditionalBlock(whileBlock)
 	}
 	return val
 }
 
-func (e *Evaluator) evalFor(scope *scope, f *parser.For) Value {
-	scope = newInnerScope(scope)
-	r, err := e.newRange(scope, f)
+func (e *Evaluator) evalFor(f *parser.For) Value {
+	e.pushScope()
+	defer e.popScope()
+	r, err := e.newRange(f)
 	if err != nil {
 		return err
 	}
 	for r.next() {
-		val := e.Eval(scope, f.Block)
+		val := e.Eval(f.Block)
 		if isError(val) || isBreak(val) || isReturn(val) {
 			return val
 		}
@@ -226,11 +234,11 @@ func (e *Evaluator) evalFor(scope *scope, f *parser.For) Value {
 	return nil
 }
 
-func (e *Evaluator) newRange(scope *scope, f *parser.For) (ranger, Value) {
+func (e *Evaluator) newRange(f *parser.For) (ranger, Value) {
 	if r, ok := f.Range.(*parser.StepRange); ok {
-		return e.newStepRange(scope, r, f.LoopVar)
+		return e.newStepRange(r, f.LoopVar)
 	}
-	rangeVal := e.Eval(scope, f.Range)
+	rangeVal := e.Eval(f.Range)
 	if isError(rangeVal) {
 		return nil, rangeVal
 	}
@@ -238,15 +246,15 @@ func (e *Evaluator) newRange(scope *scope, f *parser.For) (ranger, Value) {
 	switch v := rangeVal.(type) {
 	case *Array:
 		loopVar := zero(f.LoopVar.Type())
-		scope.set(f.LoopVar.Name, loopVar)
+		e.scope.set(f.LoopVar.Name, loopVar)
 		return &arrayRange{loopVar: loopVar, array: v, cur: 0}, nil
 	case *String:
 		loopVar := &String{}
-		scope.set(f.LoopVar.Name, loopVar)
+		e.scope.set(f.LoopVar.Name, loopVar)
 		return &stringRange{loopVar: loopVar, str: v, cur: 0}, nil
 	case *Map:
 		loopVar := &String{}
-		scope.set(f.LoopVar.Name, loopVar)
+		e.scope.set(f.LoopVar.Name, loopVar)
 		order := make([]string, len(*v.Order))
 		copy(order, *v.Order)
 		m := &mapRange{loopVar: loopVar, mapVal: v, cur: 0, order: order}
@@ -255,16 +263,16 @@ func (e *Evaluator) newRange(scope *scope, f *parser.For) (ranger, Value) {
 	return nil, newError("cannot create range for " + f.Range.String())
 }
 
-func (e *Evaluator) newStepRange(scope *scope, r *parser.StepRange, loopVar *parser.Var) (ranger, Value) {
-	start, errValue := e.numValWithDefault(scope, r.Start, 0.0)
+func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (ranger, Value) {
+	start, errValue := e.numValWithDefault(r.Start, 0.0)
 	if errValue != nil {
 		return nil, errValue
 	}
-	stop, errValue := e.numVal(scope, r.Stop)
+	stop, errValue := e.numVal(r.Stop)
 	if errValue != nil {
 		return nil, errValue
 	}
-	step, errValue := e.numValWithDefault(scope, r.Step, 1.0)
+	step, errValue := e.numValWithDefault(r.Step, 1.0)
 	if errValue != nil {
 		return nil, errValue
 	}
@@ -272,7 +280,7 @@ func (e *Evaluator) newStepRange(scope *scope, r *parser.StepRange, loopVar *par
 		return nil, newError("step cannot by 0, infinite loop")
 	}
 	loopVarVal := &Num{}
-	scope.set(loopVar.Name, loopVarVal)
+	e.scope.set(loopVar.Name, loopVarVal)
 
 	ranger := &stepRange{
 		loopVar: loopVarVal,
@@ -283,8 +291,8 @@ func (e *Evaluator) newStepRange(scope *scope, r *parser.StepRange, loopVar *par
 	return ranger, nil
 }
 
-func (e *Evaluator) numVal(scope *scope, n parser.Node) (float64, Value) {
-	v := e.Eval(scope, n)
+func (e *Evaluator) numVal(n parser.Node) (float64, Value) {
+	v := e.Eval(n)
 	if isError(v) {
 		return 0, v
 	}
@@ -295,16 +303,17 @@ func (e *Evaluator) numVal(scope *scope, n parser.Node) (float64, Value) {
 	return numVal.Val, nil
 }
 
-func (e *Evaluator) numValWithDefault(scope *scope, n parser.Node, defaultVal float64) (float64, Value) {
+func (e *Evaluator) numValWithDefault(n parser.Node, defaultVal float64) (float64, Value) {
 	if n == nil {
 		return defaultVal, nil
 	}
-	return e.numVal(scope, n)
+	return e.numVal(n)
 }
 
-func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.ConditionalBlock) (Value, bool) {
-	scope = newInnerScope(scope)
-	cond := e.Eval(scope, condBlock.Condition)
+func (e *Evaluator) evalConditionalBlock(condBlock *parser.ConditionalBlock) (Value, bool) {
+	e.pushScope()
+	defer e.popScope()
+	cond := e.Eval(condBlock.Condition)
 	if isError(cond) {
 		return cond, false
 	}
@@ -313,27 +322,27 @@ func (e *Evaluator) evalConditionalBlock(scope *scope, condBlock *parser.Conditi
 		return newError("conditional not a bool"), false
 	}
 	if boolCond.Val {
-		return e.Eval(scope, condBlock.Block), true
+		return e.Eval(condBlock.Block), true
 	}
 	return nil, false
 }
 
-func (e *Evaluator) evalBlockStatment(scope *scope, block *parser.BlockStatement) Value {
-	return e.evalStatments(scope, block.Statements)
+func (e *Evaluator) evalBlockStatment(block *parser.BlockStatement) Value {
+	return e.evalStatments(block.Statements)
 }
 
-func (e *Evaluator) evalVar(scope *scope, v *parser.Var) Value {
-	if val, ok := scope.get(v.Name); ok {
+func (e *Evaluator) evalVar(v *parser.Var) Value {
+	if val, ok := e.scope.get(v.Name); ok {
 		return val
 	}
 	return newError("cannot find variable " + v.Name)
 }
 
-func (e *Evaluator) evalExprList(scope *scope, terms []parser.Node) []Value {
+func (e *Evaluator) evalExprList(terms []parser.Node) []Value {
 	result := make([]Value, len(terms))
 
 	for i, t := range terms {
-		evaluated := e.Eval(scope, t)
+		evaluated := e.Eval(t)
 		if isError(evaluated) {
 			return []Value{evaluated}
 		}
@@ -343,8 +352,8 @@ func (e *Evaluator) evalExprList(scope *scope, terms []parser.Node) []Value {
 	return result
 }
 
-func (e *Evaluator) evalUnaryExpr(scope *scope, expr *parser.UnaryExpression) Value {
-	right := e.Eval(scope, expr.Right)
+func (e *Evaluator) evalUnaryExpr(expr *parser.UnaryExpression) Value {
+	right := e.Eval(expr.Right)
 	if isError(right) {
 		return right
 	}
@@ -362,12 +371,12 @@ func (e *Evaluator) evalUnaryExpr(scope *scope, expr *parser.UnaryExpression) Va
 	return newError("unknown unary operation: " + expr.String())
 }
 
-func (e *Evaluator) evalBinaryExpr(scope *scope, expr *parser.BinaryExpression) Value {
-	left := e.Eval(scope, expr.Left)
+func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) Value {
+	left := e.Eval(expr.Left)
 	if isError(left) {
 		return left
 	}
-	right := e.Eval(scope, expr.Right)
+	right := e.Eval(expr.Right)
 	if isError(right) {
 		return right
 	}
@@ -449,24 +458,24 @@ func evalBinaryArrayExpr(op parser.Operator, left, right *Array) Value {
 	return result
 }
 
-func (e *Evaluator) evalTarget(scope *scope, node parser.Node) Value {
+func (e *Evaluator) evalTarget(node parser.Node) Value {
 	switch n := node.(type) {
 	case *parser.Var:
-		return e.evalVar(scope, n)
+		return e.evalVar(n)
 	case *parser.IndexExpression:
-		return e.evalIndexExpr(scope, n, true /* forAssign */)
+		return e.evalIndexExpr(n, true /* forAssign */)
 	case *parser.DotExpression:
-		return e.evalDotExpr(scope, n, true /* forAssign */)
+		return e.evalDotExpr(n, true /* forAssign */)
 	}
 	return newError("invalid assignment target " + node.String())
 }
 
-func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression, forAssign bool) Value {
-	left := e.Eval(scope, expr.Left)
+func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) Value {
+	left := e.Eval(expr.Left)
 	if isError(left) {
 		return left
 	}
-	index := e.Eval(scope, expr.Index)
+	index := e.Eval(expr.Index)
 	if isError(index) {
 		return index
 	}
@@ -489,8 +498,8 @@ func (e *Evaluator) evalIndexExpr(scope *scope, expr *parser.IndexExpression, fo
 	return nil
 }
 
-func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression, forAssign bool) Value {
-	left := e.Eval(scope, expr.Left)
+func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) Value {
+	left := e.Eval(expr.Left)
 	if isError(left) {
 		return left
 	}
@@ -504,16 +513,16 @@ func (e *Evaluator) evalDotExpr(scope *scope, expr *parser.DotExpression, forAss
 	return m.Get(expr.Key)
 }
 
-func (e *Evaluator) evalSliceExpr(scope *scope, expr *parser.SliceExpression) Value {
-	left := e.Eval(scope, expr.Left)
+func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) Value {
+	left := e.Eval(expr.Left)
 	if isError(left) {
 		return left
 	}
-	start := e.Eval(scope, expr.Start)
+	start := e.Eval(expr.Start)
 	if isError(start) {
 		return start
 	}
-	end := e.Eval(scope, expr.End)
+	end := e.Eval(expr.End)
 	if isError(end) {
 		return end
 	}
@@ -524,4 +533,12 @@ func (e *Evaluator) evalSliceExpr(scope *scope, expr *parser.SliceExpression) Va
 		return left.Slice(start, end)
 	}
 	return newError("cannot slice " + left.String())
+}
+
+func (e *Evaluator) pushScope() {
+	e.scope = newInnerScope(e.scope)
+}
+
+func (e *Evaluator) popScope() {
+	e.scope = e.scope.outer
 }

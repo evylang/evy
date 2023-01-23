@@ -102,7 +102,7 @@ func (p *Parser) Parse() *Program {
 // in grammar doc/syntax_grammar.md.
 func (p *Parser) parseProgram() *Program {
 	program := &Program{}
-	scope := newScope(nil, program)
+	scope := newScope(nil, program) // TODO: model scope as stack like evaluator.
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node

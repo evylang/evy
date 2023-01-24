@@ -70,7 +70,7 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 func jsEvaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
-	evaluator.RunWithBuiltins(s, builtins)
+	evaluator.Run(s, builtins)
 }
 
 //export tokenize

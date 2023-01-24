@@ -43,8 +43,10 @@ func (c *cmdRun) Run() error {
 	if err != nil {
 		return err
 	}
-	printFunc := func(s string) { fmt.Print(s) }
-	evaluator.Run(string(b), printFunc)
+	printFn := func(s string) { fmt.Print(s) }
+	rt := evaluator.Runtime{Print: printFn}
+	builtins := evaluator.DefaultBuiltins(rt)
+	evaluator.Run(string(b), builtins)
 	return nil
 }
 

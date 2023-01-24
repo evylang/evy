@@ -8,13 +8,19 @@ import (
 	"foxygo.at/evy/pkg/assert"
 )
 
+func run(input string) string {
+	b := bytes.Buffer{}
+	printFn := func(s string) { b.WriteString(s) }
+	rt := Runtime{Print: printFn}
+	Run(input, DefaultBuiltins(rt))
+	return b.String()
+}
+
 func TestBasicEval(t *testing.T) {
 	in := "a:=1\n print a 2"
 	want := "1 2\n"
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(in, fn)
-	assert.Equal(t, want, b.String())
+	got := run(in)
+	assert.Equal(t, want, got)
 }
 
 func TestParseDeclaration(t *testing.T) {
@@ -28,10 +34,8 @@ func TestParseDeclaration(t *testing.T) {
 		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(in, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -55,11 +59,9 @@ print f
 print f f
 fox2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "🦊\n🦊 🦊\n🦊2\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestReturnScope(t *testing.T) {
@@ -81,11 +83,9 @@ print f1
 f2 := fox2
 print f2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "1\n🦊\n🦊\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestBreak(t *testing.T) {
@@ -125,11 +125,9 @@ end
 `,
 	}
 	for _, input := range tests {
-		b := bytes.Buffer{}
-		fn := func(s string) { b.WriteString(s) }
-		Run(input, fn)
 		want := "🎈\n"
-		assert.Equal(t, want, b.String(), input)
+		got := run(input)
+		assert.Equal(t, want, got, input)
 	}
 }
 
@@ -146,11 +144,9 @@ f2 = f1
 f3 = 4
 print f1 f2 f3
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "0 0 3\n1 0 3\n3 3 4\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestAssignmentAny(t *testing.T) {
@@ -183,9 +179,6 @@ f4:any
 f4 = f1
 print "6" f4==f1
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	wants := []string{
 		"1 false 0",
 		"2 0 0",
@@ -196,8 +189,9 @@ print "6" f4==f1
 		"",
 	}
 	want := strings.Join(wants, "\n")
+	got := run(prog)
 
-	assert.Equal(t, want, b.String())
+	assert.Equal(t, want, got)
 }
 
 func TestIf(t *testing.T) {
@@ -242,10 +236,8 @@ end
 `,
 	}
 	for _, input := range tests {
-		b := bytes.Buffer{}
-		fn := func(s string) { b.WriteString(s) }
-		Run(input, fn)
-		assert.Equal(t, "🎈\n", b.String(), "input: %s", input)
+		got := run(input)
+		assert.Equal(t, "🎈\n", got, "input: %s", input)
 	}
 }
 
@@ -281,10 +273,8 @@ while has_more
 	print "💣"
 end
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(input, fn)
-	assert.Equal(t, "🍭\n🎈\n🎈\n", b.String())
+	got := run(input)
+	assert.Equal(t, "🍭\n🎈\n🎈\n", got)
 }
 
 func TestExpr(t *testing.T) {
@@ -308,10 +298,8 @@ func TestExpr(t *testing.T) {
 		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(in, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -335,10 +323,8 @@ a := [1 1+1 (three)]`: "[1 2 3]",
 		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(in, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -366,10 +352,8 @@ func TestIndex(t *testing.T) {
 		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
 			input := decl + "\n" + in
 			t.Run(input, func(t *testing.T) {
-				b := bytes.Buffer{}
-				fn := func(s string) { b.WriteString(s) }
-				Run(input, fn)
-				assert.Equal(t, want+"\n", b.String())
+				got := run(input)
+				assert.Equal(t, want+"\n", got)
 			})
 		}
 	}
@@ -385,10 +369,8 @@ func TestDoubleIndex(t *testing.T) {
 	}
 	for in, want := range tests {
 		t.Run(in, func(t *testing.T) {
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(in, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -406,10 +388,8 @@ func TestIndexErr(t *testing.T) {
 		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
 			input := decl + "\n" + in
 			t.Run(input, func(t *testing.T) {
-				b := bytes.Buffer{}
-				fn := func(s string) { b.WriteString(s) }
-				Run(input, fn)
-				assert.Equal(t, want, b.String())
+				got := run(input)
+				assert.Equal(t, want, got)
 			})
 		}
 	}
@@ -434,10 +414,8 @@ a := {name:"fox" age:39+(three)}`: "{name:fox age:42}",
 		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(in, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -454,10 +432,8 @@ func TestDot(t *testing.T) {
 		in, want := in, want
 		input := `m := {name: "Greta"}` + "\n" + in
 		t.Run(input, func(t *testing.T) {
-			b := bytes.Buffer{}
-			fn := func(s string) { b.WriteString(s) }
-			Run(input, fn)
-			assert.Equal(t, want+"\n", b.String())
+			got := run(input)
+			assert.Equal(t, want+"\n", got)
 		})
 	}
 }
@@ -467,11 +443,9 @@ func TestDotErr(t *testing.T) {
 m := {a:1}
 print m.missing_index
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(in, fn)
 	want := "ERROR: no value for key missing_index"
-	assert.Equal(t, want, b.String())
+	got := run(in)
+	assert.Equal(t, want, got)
 }
 
 func TestArrayConcatenation(t *testing.T) {
@@ -497,9 +471,7 @@ print "2 arr3" arr3
 print "2 arr4" arr4
 print "2 arr5" arr5
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"1 arr1 [1]",
 		"1 arr2 [1]",
@@ -515,8 +487,8 @@ print "2 arr5" arr5
 		"2 arr5 [1]",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -536,9 +508,7 @@ arr2 := arr[:]
 arr2[0] = 11
 print "6" arr arr2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"1 [2 3]",
 		"2 [2 3]",
@@ -549,8 +519,8 @@ print "6" arr arr2
 		"6 [1 2 3] [11 2 3]",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -569,9 +539,7 @@ print
 s2 := "A" + s[1:]
 print "6" s s2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"1 bc",
 		"2 bc",
@@ -582,8 +550,8 @@ print "6" s s2
 		"6 abc Abc",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -613,9 +581,7 @@ for i := range 3 -1
 	print "3💣" i
 end
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"🎈 0",
 		"🎈 1",
@@ -627,8 +593,8 @@ end
 		"🦊 4",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -643,16 +609,14 @@ for i := range []
 	print "💣" i
 end
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"🎈 0",
 		"🎈 1",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -667,17 +631,15 @@ for i := range ""
 	print "💣" i
 end
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"🎈 a",
 		"🎈 b",
 		"🎈 c",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -693,16 +655,14 @@ for i := range {}
 	print "💣" i
 end
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"🎈 a 1",
 		"🎈 b 2",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -739,9 +699,7 @@ m6.b = {}
 m6.b.c = 2
 print "6" m6
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"1 {a:1 b:2} {a:1 b:2}",
 		"2 {a:10 b:20} {a:10 b:20}",
@@ -751,8 +709,8 @@ print "6" m6
 		"6 {a:{A:1} b:{c:2}}",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -764,11 +722,9 @@ m := {}
 m.a = 1
 m.b.c = 2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(in, fn)
+	got := run(in)
 	want := "line 4 column 4: field access with '.' expects map type, found any"
-	assert.Equal(t, want, b.String())
+	assert.Equal(t, want, got)
 }
 
 func TestHas(t *testing.T) {
@@ -777,16 +733,14 @@ m := {a:1 b:2}
 print (has m "a")
 print (has m "MISSING")
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"true",
 		"false",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -796,11 +750,8 @@ func TestHasErr(t *testing.T) {
 	prog := `
 has ["a"] "a" // cannot run 'has' on array
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "line 2 column 15: 'has' takes 1st argument of type '{}', found 'string[]'"
-	got := b.String()
+	got := run(prog)
 	assert.Equal(t, want, got)
 }
 
@@ -816,9 +767,7 @@ print "3" m1 m2
 del m2 "b"
 print "4" m1 m2
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
+	out := run(prog)
 	want := []string{
 		"1 {a:1 b:2} {a:1 b:2}",
 		"2 {b:2} {b:2}",
@@ -826,8 +775,8 @@ print "4" m1 m2
 		"4 {} {}",
 		"",
 	}
-	got := strings.Split(b.String(), "\n")
-	assert.Equal(t, len(want), len(got), b.String())
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), got)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -837,11 +786,8 @@ func TestDelErr(t *testing.T) {
 	prog := `
 del ["a"] "a" // cannot delete from array
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "line 2 column 15: 'del' takes 1st argument of type '{}', found 'string[]'"
-	got := b.String()
+	got := run(prog)
 	assert.Equal(t, want, got)
 }
 
@@ -849,11 +795,9 @@ func TestJoin(t *testing.T) {
 	prog := `
 print (join [1 true "x"] ", ")
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "1, true, x\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestSprint(t *testing.T) {
@@ -861,11 +805,9 @@ func TestSprint(t *testing.T) {
 s := sprint 1 [2] "x"
 print (s)
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "1 [2] x\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestParamAssign(t *testing.T) {
@@ -880,11 +822,9 @@ func f n:num
 	print n x
 end`
 
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "10 1\n20 2\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestAssign2(t *testing.T) {
@@ -894,11 +834,9 @@ n := x
 n = n * 10
 print x
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "1\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestAssign3(t *testing.T) {
@@ -910,22 +848,18 @@ n = x
 n = n * 10
 print x
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "1\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestSplit(t *testing.T) {
 	prog := `
 print (split "a, b, c" ", ")
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "[a b c]\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestAnyAssignment(t *testing.T) {
@@ -936,11 +870,9 @@ b = a
 a = 2
 print a b
 `
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "2 1\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestCompositeAssignment(t *testing.T) {
@@ -950,11 +882,9 @@ a := [n n]
 m := {n: n}
 n = 2
 print n a m`
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := "2 [1 1] {n:1}\n"
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }
 
 func TestDemo(t *testing.T) {
@@ -967,14 +897,12 @@ print "x:" x
 if x > 10
     print "🍦 big x"
 end`
-	b := bytes.Buffer{}
-	fn := func(s string) { b.WriteString(s) }
-	Run(prog, fn)
 	want := `
 'move' not yet implemented
 'line' not yet implemented
 x: 12
 🍦 big x
 `[1:]
-	assert.Equal(t, want, b.String())
+	got := run(prog)
+	assert.Equal(t, want, got)
 }

@@ -7,12 +7,7 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-func Run(input string, printFn func(string)) {
-	rt := Runtime{Print: printFn}
-	RunWithBuiltins(input, DefaultBuiltins(rt))
-}
-
-func RunWithBuiltins(input string, builtins Builtins) {
+func Run(input string, builtins Builtins) {
 	p := parser.New(input, builtins.Decls())
 	prog := p.Parse()
 	if p.HasErrors() {

@@ -21,7 +21,7 @@ func Run(input string, builtins map[string]*FuncDecl) string {
 		for i, e := range parser.errors {
 			errs[i] = e.String()
 		}
-		return parser.MaxErrorsString(8) + "\n\n" + prog.String()
+		return MaxErrorsString(parser.Errors(), 8) + "\n\n" + prog.String()
 	}
 	return prog.String()
 }
@@ -578,19 +578,14 @@ func (p *Parser) lookAt(pos int) *lexer.Token {
 	return p.tokens[pos]
 }
 
-func (p *Parser) MaxErrorsString(n int) string {
-	errs := p.errors
+func MaxErrorsString(errs []Error, n int) string {
 	if n != -1 && len(errs) > n {
 		errs = errs[:n]
 	}
-	return errString(errs)
+	return ErrorsString(errs)
 }
 
-func (p *Parser) ErrorsString() string {
-	return errString(p.errors)
-}
-
-func errString(errs []Error) string {
+func ErrorsString(errs []Error) string {
 	errsSrings := make([]string, len(errs))
 	for i, err := range errs {
 		errsSrings[i] = err.String()

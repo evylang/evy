@@ -11,7 +11,7 @@ func Run(input string, builtins Builtins) {
 	p := parser.New(input, builtins.Decls())
 	prog := p.Parse()
 	if p.HasErrors() {
-		builtins.Print(p.MaxErrorsString(8))
+		builtins.Print(parser.MaxErrorsString(p.Errors(), 8))
 		return
 	}
 	e := &Evaluator{

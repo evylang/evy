@@ -88,7 +88,8 @@ print m[s]`: "line 3 column 6: unknown variable name 'name'",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.MaxErrorsString(1), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
+		got := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
 	}
 }
 
@@ -142,7 +143,8 @@ func TestFunctionCallError(t *testing.T) {
 		parser := New(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, err1, parser.MaxErrorsString(1), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
+		got := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
 	}
 }
 
@@ -319,7 +321,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr)
 	}
 }
 
@@ -395,7 +398,8 @@ fn = 3
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr)
 	}
 }
 
@@ -541,7 +545,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, input)
 	}
 }
 
@@ -613,7 +618,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1))
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr)
 	}
 }
 
@@ -707,7 +713,8 @@ end`: "line 7 column 4: expected 'end', got end of input",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
 	}
 }
 
@@ -763,7 +770,8 @@ end`: "line 2 column 6: unexpected end of line",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
 	}
 }
 
@@ -872,7 +880,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
 	}
 }
 
@@ -953,7 +962,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s", input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
 	}
 }
 
@@ -970,7 +980,8 @@ end`
 	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertParseError(t, parser, input)
-	assert.Equal(t, "line 2 column 1: unknown function 'move'", parser.MaxErrorsString(1))
+	gotErr := MaxErrorsString(parser.Errors(), 1)
+	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr)
 	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
 	want := `
 x=12
@@ -989,7 +1000,7 @@ func assertParseError(t *testing.T, parser *Parser, input string) {
 
 func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	t.Helper()
-	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.ErrorsString())
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
 }
 
 func testBuiltins() map[string]*FuncDecl {

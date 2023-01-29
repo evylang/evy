@@ -228,6 +228,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 
 		_ = parser.parseTopLevelExpr(scope)
 		assertParseError(t, parser, input)
-		assert.Equal(t, wantErr, parser.MaxErrorsString(1), "input: %s\nerrors:\n%s", input, parser.ErrorsString())
+		got := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
 	}
 }

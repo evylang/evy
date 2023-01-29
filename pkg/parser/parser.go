@@ -21,7 +21,7 @@ func Run(input string, builtins map[string]*FuncDecl) string {
 		for i, e := range parser.errors {
 			errs[i] = e.String()
 		}
-		return parser.MaxErrorsString(8) + "\n\n" + prog.String()
+		return MaxErrorsString(parser.Errors(), 8) + "\n\n" + prog.String()
 	}
 	return prog.String()
 }
@@ -98,11 +98,11 @@ func (p *Parser) Parse() *Program {
 	return p.parseProgram()
 }
 
-// function names matching `parsePROCUTION` align with production names
+// function names matching `parsePRODUCTION` align with production names
 // in grammar doc/syntax_grammar.md.
 func (p *Parser) parseProgram() *Program {
 	program := &Program{}
-	scope := newScope(nil, program)
+	scope := newScope(nil, program) // TODO: model scope as stack like evaluator.
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
@@ -135,7 +135,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 	tok := p.cur // function name
 	funcName := p.cur.Literal
 
-	p.advancePastNL() // // advance past signature, already parsed into p.funcs earlier
+	p.advancePastNL() // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
 	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
 	p.addParamsToScope(scope, fd)
@@ -578,19 +578,14 @@ func (p *Parser) lookAt(pos int) *lexer.Token {
 	return p.tokens[pos]
 }
 
-func (p *Parser) MaxErrorsString(n int) string {
-	errs := p.errors
+func MaxErrorsString(errs []Error, n int) string {
 	if n != -1 && len(errs) > n {
 		errs = errs[:n]
 	}
-	return errString(errs)
+	return ErrorsString(errs)
 }
 
-func (p *Parser) ErrorsString() string {
-	return errString(p.errors)
-}
-
-func errString(errs []Error) string {
+func ErrorsString(errs []Error) string {
 	errsSrings := make([]string, len(errs))
 	for i, err := range errs {
 		errsSrings[i] = err.String()

@@ -24,7 +24,7 @@ clean:: ## Remove generated files
 GO_LDFLAGS = -X main.version=$(VERSION)
 CMDS = .
 
-build: | $(O) ## Build reflect binaries
+build: | $(O) ## Build evy binaries
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 install: ## Build and install binaries in $GOBIN

@@ -6,7 +6,7 @@ O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 
-all: build test lint tiny test-tiny check-coverage sh-lint frontend ## Build, test, check coverage and lint
+all: build test lint tiny test-tiny check-coverage sh-lint check-prettier frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -75,6 +75,8 @@ lint: ## Lint go source code
 .PHONY: lint
 
 # --- frontend -----------------------------------------------------------------
+NODELIB = .hermit/node/lib
+
 frontend: tiny | $(O) ## Build frontend, typically iterate with npm and inside frontend
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
@@ -82,7 +84,16 @@ frontend: tiny | $(O) ## Build frontend, typically iterate with npm and inside f
 frontend-serve: frontend ## Build frontend and serve on free port
 	servedir $(O)/public
 
-.PHONY: frontend frontend-serve
+prettier: | $(NODELIB) ## Format frontend code with prettier
+	npx -y prettier --write frontend
+
+check-prettier: | $(NODELIB)  ## Ensure frontend code is formatted with prettier
+	npx -y prettier --check frontend
+
+$(NODELIB):
+	@mkdir -p $@
+
+.PHONY: check-prettier frontend frontend-serve prettier
 
 # --- firebase -----------------------------------------------------------------
 

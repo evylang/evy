@@ -1,3 +1,4 @@
+/.hermit/
 /firebase/*.log
 /firebase/.firebase/
 /firebase/public/

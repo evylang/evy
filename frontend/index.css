@@ -4,7 +4,8 @@
   --primary-color-dimmed: hsl(235, 12%, 73%);
   --primary-color-dimmer: hsl(235, 12%, 78%);
   --secondary-color: hsl(120, 100%, 50%);
-  --font-family-code: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-family-code: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono",
+    Menlo, monospace;
   --code-color: hsl(235, 43%, 22%);
   --code-background: hsl(45, 100%, 98%);
 }
@@ -23,8 +24,8 @@ html {
 }
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji';
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 code,
 kbd,
@@ -47,9 +48,9 @@ button,
 select {
   text-transform: none;
 }
-[type='button'],
-[type='reset'],
-[type='submit'],
+[type="button"],
+[type="reset"],
+[type="submit"],
 button {
   -webkit-appearance: button;
 }
@@ -92,7 +93,8 @@ header button {
   color: var(--primary-color);
   border: none;
   border-radius: 0.25rem;
-  box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.7), 8px 4px 20px 6px rgb(255 255 255 / 20%);
+  box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.7),
+    8px 4px 20px 6px rgb(255 255 255 / 20%);
   cursor: pointer;
 }
 header button:hover:enabled {
@@ -118,7 +120,8 @@ main {
   background: var(--code-background);
   flex: 1;
 }
-.code, .out {
+.code,
+.out {
   flex: 1;
   overflow: scroll;
 }
@@ -130,7 +133,8 @@ main {
   display: flex;
   flex-direction: column;
 }
-textarea, textarea:disabled {
+textarea,
+textarea:disabled {
   font-family: var(--font-family-code);
   color: var(--code-color);
   line-height: 1.4;
@@ -151,7 +155,7 @@ textarea, textarea:disabled {
   height: 100%;
 }
 .canvas {
-  flex:  0 1 50%;
+  flex: 0 1 50%;
   border-bottom: 1px solid var(--primary-color-dimmer);
 }
 #canvas {
@@ -186,7 +190,8 @@ textarea, textarea:disabled {
     height: 1.75rem;
     padding: 4px 24px;
     font-size: 0.75rem;
-    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6), 5px 2px 15px 3px rgb(255 255 255 / 15%);
+    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.6),
+      5px 2px 15px 3px rgb(255 255 255 / 15%);
   }
   textarea {
     padding: 4px;

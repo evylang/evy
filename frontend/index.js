@@ -5,12 +5,24 @@ var wasm
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
   const go = new Go() // see wasm_exec.js
-  WebAssembly.instantiateStreaming(fetch("evy.wasm"), go.importObject).then(
-    function (obj) {
+  const evyEnv = {
+    jsPrint: jsPrint,
+    move: move,
+    line: line,
+    width: width,
+    circle: circle,
+    rect: rect,
+    color: color,
+  }
+  go.importObject.env = Object.assign(go.importObject.env, evyEnv)
+  WebAssembly.instantiateStreaming(fetch("evy.wasm"), go.importObject)
+    .then(function (obj) {
       wasm = obj.instance
       go.run(wasm)
-    }
-  )
+    })
+    .catch((err) => {
+      console.error(err)
+    })
   go.importObject.env = {
     jsPrint: jsPrint,
     move: move,

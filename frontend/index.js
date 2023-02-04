@@ -23,15 +23,6 @@ function initWasm() {
     .catch((err) => {
       console.error(err)
     })
-  go.importObject.env = {
-    jsPrint: jsPrint,
-    move: move,
-    line: line,
-    width: width,
-    circle: circle,
-    rect: rect,
-    color: color,
-  }
   document.querySelectorAll("header button").forEach((button) => {
     button.onclick = handleRun
     button.disabled = false

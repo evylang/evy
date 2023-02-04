@@ -7,8 +7,6 @@ import (
 	"unsafe"
 
 	"foxygo.at/evy/pkg/evaluator"
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
 )
 
 var version string
@@ -71,19 +69,6 @@ func jsEvaluate(ptr *uint32, length int) {
 	s := getString(ptr, length)
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	evaluator.Run(s, builtins)
-}
-
-//export tokenize
-func jsTokenize(ptr *uint32, length int) {
-	s := getString(ptr, length)
-	jsPrint(lexer.Run(s))
-}
-
-//export parse
-func jsParse(ptr *uint32, length int) {
-	s := getString(ptr, length)
-	builtins := evaluator.DefaultBuiltins(jsRuntime).Decls()
-	jsPrint(parser.Run(s, builtins))
 }
 
 // alloc pre-allocates memory used in string parameter passing.

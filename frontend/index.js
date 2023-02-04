@@ -23,11 +23,9 @@ function initWasm() {
     .catch((err) => {
       console.error(err)
     })
-  document.querySelectorAll("header button").forEach((button) => {
-    button.onclick = handleRun
-    button.disabled = false
-    window.location.hash.includes("debug") && button.classList.remove("hidden")
-  })
+  const button = document.getElementById("run")
+  button.onclick = handleRun
+  button.disabled = false
 }
 
 // jsPrint converts wasm memory bytes from ptr to ptr+len to string and
@@ -58,8 +56,7 @@ function handleRun(event) {
   mem.set(new Uint8Array(bytes))
   document.getElementById("output").textContent = ""
   resetCanvas()
-  const fn = wasm.exports[event.target.id] // evaluate, tokenize or parse
-  fn(ptr, bytes.length)
+  wasm.exports.evaluate(ptr, bytes.length)
 }
 
 // --------------------------------------------------

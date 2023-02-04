@@ -6,13 +6,13 @@ var wasm
 function initWasm() {
   const go = new Go() // see wasm_exec.js
   const evyEnv = {
-    jsPrint: jsPrint,
-    move: move,
-    line: line,
-    width: width,
-    circle: circle,
-    rect: rect,
-    color: color,
+    jsPrint,
+    move,
+    line,
+    width,
+    circle,
+    rect,
+    color,
   }
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
   WebAssembly.instantiateStreaming(fetch("evy.wasm"), go.importObject)

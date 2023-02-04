@@ -2,6 +2,7 @@
 
 let wasmModule, wasmInst
 let sourcePtr, sourceLength
+const go = newEvyGo() // see wasm_exec.js
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
@@ -34,7 +35,6 @@ function memString(ptr, len) {
 // converts it to wasm memory bytes. It then calls the evy main()
 // function running the evaluator after parsing.
 async function handleRun(event) {
-  const go = newEvyGo() // see wasm_exec.js
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   prepareSourceAccess()
   clearOutput()

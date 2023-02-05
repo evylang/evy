@@ -3,6 +3,7 @@ package evaluator
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"foxygo.at/evy/pkg/parser"
 )
@@ -40,6 +41,8 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
+
+		"sleep": {Func: BuiltinFunc(sleepFunc), Decl: sleepDecl},
 
 		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
 		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
@@ -188,6 +191,19 @@ func delFunc(args []Value) Value {
 	m := args[0].(*Map)
 	keyStr := args[1].(*String)
 	m.Delete(keyStr.Val)
+	return nil
+}
+
+var sleepDecl = &parser.FuncDecl{
+	Name:       "sleep",
+	Params:     []*parser.Var{{Name: "seconds", T: parser.NUM_TYPE}},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func sleepFunc(args []Value) Value {
+	secs := args[0].(*Num)
+	dur := time.Duration(secs.Val * float64(time.Second))
+	time.Sleep(dur)
 	return nil
 }
 

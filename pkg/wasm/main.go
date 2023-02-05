@@ -7,13 +7,26 @@ import (
 	"unsafe"
 
 	"foxygo.at/evy/pkg/evaluator"
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
 )
 
 var version string
 
 func main() {
+	builtins := evaluator.DefaultBuiltins(jsRuntime)
+	source := getSource()
+	evaluator.Run(source, builtins)
+}
+
+//export sourcePtr
+func sourcePtr() *uint32
+
+//export sourceLength
+func sourceLength() int
+
+func getSource() string {
+	ptr := sourcePtr()
+	length := sourceLength()
+	return getString(ptr, length)
 }
 
 // jsPrint is imported from JS
@@ -59,33 +72,6 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	},
 }
 
-// evaluate evaluates an evy program, after tokenizing and parsing. It
-// is exported to wasm and JS. Strings cannot be passed to wasm
-// directly so we need to use linear memory arithmetic as workaround.
-// See:
-// * https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
-// * https://www.alcarney.me/blog/2020/passing-strings-between-tinygo-wasm/
-//
-//export evaluate
-func jsEvaluate(ptr *uint32, length int) {
-	s := getString(ptr, length)
-	builtins := evaluator.DefaultBuiltins(jsRuntime)
-	evaluator.Run(s, builtins)
-}
-
-//export tokenize
-func jsTokenize(ptr *uint32, length int) {
-	s := getString(ptr, length)
-	jsPrint(lexer.Run(s))
-}
-
-//export parse
-func jsParse(ptr *uint32, length int) {
-	s := getString(ptr, length)
-	builtins := evaluator.DefaultBuiltins(jsRuntime).Decls()
-	jsPrint(parser.Run(s, builtins))
-}
-
 // alloc pre-allocates memory used in string parameter passing.
 //
 //export alloc
@@ -94,8 +80,12 @@ func alloc(size uint32) *byte {
 	return &buf[0]
 }
 
-// getString turns pointers in linear memory into string, see comments
-// for evaluate.
+// getString turns pointer and length in linear memory into string
+// Strings cannot be passed to or returned from wasm directly so we
+// need to use linear memory arithmetic as workaround.
+// See:
+// * https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
+// * https://www.alcarney.me/blog/2020/passing-strings-between-tinygo-wasm
 func getString(ptr *uint32, length int) string {
 	var builder strings.Builder
 	uptr := uintptr(unsafe.Pointer(ptr))

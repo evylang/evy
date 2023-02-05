@@ -1,45 +1,19 @@
 "use strict"
 
-var wasm
+let wasmModule, wasmInst
+let sourcePtr, sourceLength
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
-  const go = new Go() // see wasm_exec.js
-  const evyEnv = {
-    jsPrint: jsPrint,
-    move: move,
-    line: line,
-    width: width,
-    circle: circle,
-    rect: rect,
-    color: color,
-  }
-  go.importObject.env = Object.assign(go.importObject.env, evyEnv)
-  WebAssembly.instantiateStreaming(fetch("evy.wasm"), go.importObject)
-    .then(function (obj) {
-      wasm = obj.instance
-      go.run(wasm)
-    })
-    .catch((err) => {
-      console.error(err)
-    })
-  go.importObject.env = {
-    jsPrint: jsPrint,
-    move: move,
-    line: line,
-    width: width,
-    circle: circle,
-    rect: rect,
-    color: color,
-  }
-  document.querySelectorAll("header button").forEach((button) => {
-    button.onclick = handleRun
-    button.disabled = false
-    window.location.hash.includes("debug") && button.classList.remove("hidden")
-  })
+  WebAssembly.compileStreaming(fetch("evy.wasm"))
+    .then((obj) => (wasmModule = obj))
+    .catch((err) => console.error(err))
+  const runButton = document.getElementById("run")
+  runButton.onclick = handleRun
+  runButton.disabled = false
 }
 
-// jsPrint converts wasm memory bytes from ptr to ptr+len to string and
+// jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
   const s = memString(ptr, len)
@@ -51,24 +25,53 @@ function jsPrint(ptr, len) {
 }
 
 function memString(ptr, len) {
-  const buf = new Uint8Array(wasm.exports.memory.buffer, ptr, len)
+  const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
   const s = new TextDecoder("utf8").decode(buf)
   return s
 }
 
 // handleRun retrieves the input string from the code pane and
-// converts it to wasm memory bytes. It then calls the evy evaluate
-// function.
-function handleRun(event) {
+// converts it to wasm memory bytes. It then calls the evy main()
+// function running the evaluator after parsing.
+async function handleRun(event) {
+  const go = newEvyGo() // see wasm_exec.js
+  wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
+  prepareSourceAccess()
+  clearOutput()
+  go.run(wasmInst)
+}
+
+function newEvyGo() {
+  const evyEnv = {
+    jsPrint,
+    move,
+    line,
+    width,
+    circle,
+    rect,
+    color,
+    sourcePtr: () => sourcePtr,
+    sourceLength: () => sourceLength,
+  }
+  const go = new Go() // see wasm_exec.js
+  go.importObject.env = Object.assign(go.importObject.env, evyEnv)
+  return go
+}
+
+function prepareSourceAccess() {
   const code = document.getElementById("code").value
   const bytes = new TextEncoder("utf8").encode(code)
-  const ptr = wasm.exports.alloc(bytes.length)
-  const mem = new Uint8Array(wasm.exports.memory.buffer, ptr, bytes.length)
+  const e = wasmInst.exports
+  const ptr = e.alloc(bytes.length)
+  const mem = new Uint8Array(e.memory.buffer, ptr, bytes.length)
   mem.set(new Uint8Array(bytes))
+  sourcePtr = ptr
+  sourceLength = bytes.length
+}
+
+function clearOutput() {
   document.getElementById("output").textContent = ""
   resetCanvas()
-  const fn = wasm.exports[event.target.id] // evaluate, tokenize or parse
-  fn(ptr, bytes.length)
 }
 
 // --------------------------------------------------
@@ -126,7 +129,6 @@ function showConfetti() {
 }
 
 // graphics
-
 const canvas = {
   x: 0,
   y: 0,

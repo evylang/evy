@@ -18,9 +18,9 @@ type Builtins struct {
 	Print func(s string)
 }
 
-func (b Builtins) Decls() map[string]*parser.FuncDecl {
-	decls := make(map[string]*parser.FuncDecl, len(b.Funcs))
-	for name, builtin := range b.Funcs {
+func newFuncDecls(funcs map[string]Builtin) map[string]*parser.FuncDecl {
+	decls := make(map[string]*parser.FuncDecl, len(funcs))
+	for name, builtin := range funcs {
 		decls[name] = builtin.Decl
 	}
 	return decls
@@ -53,6 +53,11 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"colour": stringBuiltin("colour", rt.Graphics.Color, rt.Print),
 	}
 	return Builtins{Funcs: funcs, Print: rt.Print}
+}
+
+func DefaultDecls(rt Runtime) map[string]*parser.FuncDecl {
+	db := DefaultBuiltins(rt)
+	return newFuncDecls(db.Funcs)
 }
 
 type Runtime struct {

@@ -12,7 +12,8 @@ func run(input string) string {
 	b := bytes.Buffer{}
 	printFn := func(s string) { b.WriteString(s) }
 	rt := Runtime{Print: printFn}
-	Run(input, DefaultBuiltins(rt))
+	eval := NewEvaluator(DefaultBuiltins(rt))
+	eval.Run(input)
 	return b.String()
 }
 

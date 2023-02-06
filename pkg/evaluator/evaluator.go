@@ -7,21 +7,11 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-func Run(input string, builtins Builtins) {
-	p := parser.New(input, builtins.Decls())
-	prog := p.Parse()
-	if p.HasErrors() {
-		builtins.Print(parser.MaxErrorsString(p.Errors(), 8))
-		return
-	}
-	e := &Evaluator{
+func NewEvaluator(builtins Builtins) *Evaluator {
+	return &Evaluator{
 		print:    builtins.Print,
 		builtins: builtins.Funcs,
 		scope:    newScope(),
-	}
-	val := e.Eval(prog)
-	if isError(val) {
-		builtins.Print(val.String())
 	}
 }
 
@@ -30,6 +20,19 @@ type Evaluator struct {
 	builtins map[string]Builtin
 
 	scope *scope // Current top of scope stack
+}
+
+func (e *Evaluator) Run(input string) {
+	p := parser.New(input, newFuncDecls(e.builtins))
+	prog := p.Parse()
+	if p.HasErrors() {
+		e.print(parser.MaxErrorsString(p.Errors(), 8))
+		return
+	}
+	val := e.Eval(prog)
+	if isError(val) {
+		e.print(val.String())
+	}
 }
 
 func (e *Evaluator) Eval(node parser.Node) Value {

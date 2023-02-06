@@ -10,24 +10,27 @@ import (
 )
 
 var version string
+var eval *evaluator.Evaluator
 
 func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
-	source := getSource()
-	evaluator.Run(source, builtins)
+	eval = evaluator.NewEvaluator(builtins)
+	eval.Run(getSource())
 }
-
-//export sourcePtr
-func sourcePtr() *uint32
-
-//export sourceLength
-func sourceLength() int
 
 func getSource() string {
 	ptr := sourcePtr()
 	length := sourceLength()
 	return getString(ptr, length)
 }
+
+// --- JS function exported to Go/WASM ---------------------------------
+
+//export sourcePtr
+func sourcePtr() *uint32
+
+//export sourceLength
+func sourceLength() int
 
 // jsPrint is imported from JS
 //export jsPrint
@@ -71,6 +74,8 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 		Color:  func(s string) { color(s) },
 	},
 }
+
+// --- Go function exported to JS/WASM runtime -------------------------
 
 // alloc pre-allocates memory used in string parameter passing.
 //

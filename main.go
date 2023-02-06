@@ -46,7 +46,8 @@ func (c *cmdRun) Run() error {
 	printFn := func(s string) { fmt.Print(s) }
 	rt := evaluator.Runtime{Print: printFn}
 	builtins := evaluator.DefaultBuiltins(rt)
-	evaluator.Run(string(b), builtins)
+	eval := evaluator.NewEvaluator(builtins)
+	eval.Run(string(b))
 	return nil
 }
 
@@ -65,10 +66,11 @@ func (c *cmdParse) Run() error {
 	if err != nil {
 		return err
 	}
-	printFunc := func(s string) { fmt.Print(s) }
-	rt := evaluator.Runtime{Print: printFunc}
-	builtins := evaluator.DefaultBuiltins(rt).Decls()
-	result := parser.Run(string(b), builtins)
+	rt := evaluator.Runtime{
+		Print: func(s string) { fmt.Print(s) },
+	}
+	builtinDecls := evaluator.DefaultDecls(rt)
+	result := parser.Run(string(b), builtinDecls)
 	fmt.Println(result)
 	return nil
 }

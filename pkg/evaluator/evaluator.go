@@ -16,10 +16,21 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 }
 
 type Evaluator struct {
+	Stopped  bool
+	Yielder  Yielder
 	print    func(string)
 	builtins map[string]Builtin
 
 	scope *scope // Current top of scope stack
+}
+
+// Yielder abstracts the method of yielding the CPU so that
+// JavaScript/browser events get a chance to be processed. Currently
+// (Feb 2023) it seems that you can only yield to JS by sleeping for at
+// least 1ms but having that delay is not ideal. Other methods of
+// yielding can be explored by implementing a different Yielder.
+type Yielder interface {
+	Yield()
 }
 
 func (e *Evaluator) Run(input string) {
@@ -35,7 +46,13 @@ func (e *Evaluator) Run(input string) {
 	}
 }
 
+var ErrStopped = newError("stopped")
+
 func (e *Evaluator) Eval(node parser.Node) Value {
+	if e.Stopped {
+		return ErrStopped
+	}
+	e.yield() // Yield to give JavaScript/browser events a chance to run.
 	switch node := node.(type) {
 	case *parser.Program:
 		return e.evalProgram(node)
@@ -81,6 +98,12 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalDotExpr(node, false /* forAssign */)
 	}
 	return nil // TODO: panic?
+}
+
+func (e *Evaluator) yield() {
+	if e.Yielder != nil {
+		e.Yielder.Yield()
+	}
 }
 
 func (e *Evaluator) evalProgram(program *parser.Program) Value {

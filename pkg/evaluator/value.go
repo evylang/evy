@@ -49,8 +49,8 @@ func (t ValueType) GoString() string {
 
 type Value interface {
 	Type() ValueType
-	Equals(Value) bool // TODO: panic if wrong type
-	String() string    // TODO: panic if wrong type
+	Equals(Value) bool
+	String() string
 	Set(Value)
 }
 
@@ -93,32 +93,37 @@ type Error struct {
 func (n *Num) Type() ValueType { return NUM }
 func (n *Num) String() string  { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
 func (n *Num) Equals(v Value) bool {
-	if n2, ok := v.(*Num); ok {
-		return n.Val == n2.Val
+	n2, ok := v.(*Num)
+	if !ok {
+		panic("internal error: Num.Equals called with non-Num Value")
 	}
-	return false // TODO: panic here when reworking ErrValue to panics; same in all Equals methods
+	return n.Val == n2.Val
 }
 
 func (n *Num) Set(v Value) {
-	if n2, ok := v.(*Num); ok {
-		*n = *n2
+	n2, ok := v.(*Num)
+	if !ok {
+		panic("internal error: Num.Set called with with non-Num Value")
 	}
-	// TODO: panic here when reworking ErrValue to panics; same in all Set methods
+	*n = *n2
 }
 
 func (s *String) Type() ValueType { return STRING }
 func (s *String) String() string  { return s.Val }
 func (s *String) Equals(v Value) bool {
-	if s2, ok := v.(*String); ok {
-		return s.Val == s2.Val
+	s2, ok := v.(*String)
+	if !ok {
+		panic("internal error: String.Equals called with non-String Value")
 	}
-	return false
+	return s.Val == s2.Val
 }
 
 func (s *String) Set(v Value) {
-	if s2, ok := v.(*String); ok {
-		*s = *s2
+	s2, ok := v.(*String)
+	if !ok {
+		panic("internal error: String.Set called with with non-String Value")
 	}
+	*s = *s2
 }
 
 func (s *String) runes() []rune {
@@ -153,16 +158,19 @@ func (b *Bool) String() string {
 }
 
 func (b *Bool) Equals(v Value) bool {
-	if b2, ok := v.(*Bool); ok {
-		return b.Val == b2.Val
+	b2, ok := v.(*Bool)
+	if !ok {
+		panic("internal error: Bool.Equals called with non-Bool Value")
 	}
-	return false
+	return b.Val == b2.Val
 }
 
 func (b *Bool) Set(v Value) {
-	if b2, ok := v.(*Bool); ok {
-		*b = *b2
+	b2, ok := v.(*Bool)
+	if !ok {
+		panic("internal error: Bool.Set called with with non-Bool Value")
 	}
+	*b = *b2
 }
 
 func (*Any) Type() ValueType { return ANY }
@@ -171,10 +179,11 @@ func (a *Any) String() string {
 }
 
 func (a *Any) Equals(v Value) bool {
-	if a2, ok := v.(*Any); ok {
-		return a.Val.Equals(a2.Val)
+	a2, ok := v.(*Any)
+	if !ok {
+		panic("internal error: Any.Equals called with non-Any Value")
 	}
-	return false // panic
+	return a.Val.Equals(a2.Val)
 }
 
 func (a *Any) Set(v Value) {
@@ -215,26 +224,29 @@ func (a *Array) String() string {
 }
 
 func (a *Array) Equals(v Value) bool {
-	if a2, ok := v.(*Array); ok {
-		if len(*a.Elements) != len(*a2.Elements) {
+	a2, ok := v.(*Array)
+	if !ok {
+		panic("internal error: Array.Equals called with non-Array Value")
+	}
+	if len(*a.Elements) != len(*a2.Elements) {
+		return false
+	}
+	elements2 := *a2.Elements
+	for i, e := range *a.Elements {
+		e2 := elements2[i]
+		if !e.Equals(e2) {
 			return false
 		}
-		elements2 := *a2.Elements
-		for i, e := range *a.Elements {
-			e2 := elements2[i]
-			if !e.Equals(e2) {
-				return false
-			}
-		}
-		return true
 	}
-	return false
+	return true
 }
 
 func (a *Array) Set(v Value) {
-	if a2, ok := v.(*Array); ok {
-		*a = *a2
+	a2, ok := v.(*Array)
+	if !ok {
+		panic("internal error: Array.Set called with with non-Array Value")
 	}
+	*a = *a2
 }
 
 func (a *Array) Index(idx Value) Value {
@@ -286,7 +298,7 @@ func copyOrRef(val Value) Value {
 	case *Map:
 		return v
 	}
-	return nil // TODO: panic
+	panic("internal error: copyOrRef called with with invalid Value")
 }
 
 func (m *Map) Type() ValueType { return MAP }
@@ -299,25 +311,28 @@ func (m *Map) String() string {
 }
 
 func (m *Map) Equals(v Value) bool {
-	if m2, ok := v.(*Map); ok {
-		if len(m.Pairs) != len(m2.Pairs) {
+	m2, ok := v.(*Map)
+	if !ok {
+		panic("internal error: Map.Equals called with non-Map Value")
+	}
+	if len(m.Pairs) != len(m2.Pairs) {
+		return false
+	}
+	for key, val := range m.Pairs {
+		val2 := m2.Pairs[key]
+		if val2 == nil || !val.Equals(val2) {
 			return false
 		}
-		for key, val := range m.Pairs {
-			val2 := m2.Pairs[key]
-			if val2 == nil || !val.Equals(val2) {
-				return false
-			}
-		}
-		return true
 	}
-	return false
+	return true
 }
 
 func (m *Map) Set(v Value) {
-	if m2, ok := v.(*Map); ok {
-		*m = *m2
+	m2, ok := v.(*Map)
+	if !ok {
+		panic("internal error: Map.Set called with with non-Map Value")
 	}
+	*m = *m2
 }
 
 func (m *Map) Get(key string) Value {
@@ -349,7 +364,7 @@ func (m *Map) Delete(key string) {
 	}
 }
 
-func isError(val Value) bool { // TODO: replace with panic flow
+func isError(val Value) bool {
 	return val != nil && val.Type() == ERROR
 }
 

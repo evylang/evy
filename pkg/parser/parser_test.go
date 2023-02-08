@@ -967,6 +967,32 @@ end
 	}
 }
 
+func TestFuncDeclErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+func len s:string
+   print "len:" s
+end
+`: "line 2 column 1: cannot override builtin function len",
+		`
+func fox
+   print "fox"
+end
+
+func fox
+   print "fox overridden"
+end
+`: "line 6 column 1: redeclaration of function fox",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

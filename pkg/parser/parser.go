@@ -51,7 +51,11 @@ func (e Error) String() string {
 
 func New(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
-	p := &Parser{funcs: builtins, wssStack: []bool{false}}
+
+	p := &Parser{funcs: map[string]*FuncDecl{}, wssStack: []bool{false}}
+	for name, funcDecl := range builtins {
+		p.funcs[name] = funcDecl
+	}
 
 	// Read all tokens, collect function declaration tokens by index
 	// funcs temporarily holds FUNC token indices for further processing
@@ -79,8 +83,13 @@ func New(input string, builtins map[string]*FuncDecl) *Parser {
 	for _, i := range funcs {
 		p.advanceTo(i)
 		fd := p.parseFuncDeclSignature()
-		if fd != nil {
+		switch {
+		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
+		case builtins[fd.Name] == nil:
+			p.appendErrorForToken("redeclaration of function "+fd.Name, fd.Token)
+		case builtins[fd.Name] != nil:
+			p.appendErrorForToken("cannot override builtin function "+fd.Name, fd.Token)
 		}
 	}
 	return p

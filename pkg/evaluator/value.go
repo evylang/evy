@@ -195,8 +195,13 @@ func (r *Break) String() string      { return "" }
 func (r *Break) Equals(_ Value) bool { return false }
 func (r *Break) Set(_ Value)         {}
 
-func (e *Error) Type() ValueType     { return ERROR }
-func (e *Error) String() string      { return "ERROR: " + e.Message }
+func (e *Error) Type() ValueType { return ERROR }
+func (e *Error) String() string {
+	if e == ErrStopped {
+		return "Stopped"
+	}
+	return "ERROR: " + e.Message
+}
 func (e *Error) Equals(_ Value) bool { return false }
 func (e *Error) Set(_ Value)         {}
 

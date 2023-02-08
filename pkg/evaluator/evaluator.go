@@ -7,32 +7,52 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-func Run(input string, builtins Builtins) {
-	p := parser.New(input, builtins.Decls())
-	prog := p.Parse()
-	if p.HasErrors() {
-		builtins.Print(parser.MaxErrorsString(p.Errors(), 8))
-		return
-	}
-	e := &Evaluator{
+func NewEvaluator(builtins Builtins) *Evaluator {
+	return &Evaluator{
 		print:    builtins.Print,
 		builtins: builtins.Funcs,
 		scope:    newScope(),
 	}
-	val := e.Eval(prog)
-	if isError(val) {
-		builtins.Print(val.String())
-	}
 }
 
 type Evaluator struct {
+	Stopped  bool
+	Yielder  Yielder
 	print    func(string)
 	builtins map[string]Builtin
 
 	scope *scope // Current top of scope stack
 }
 
+// Yielder abstracts the method of yielding the CPU so that
+// JavaScript/browser events get a chance to be processed. Currently
+// (Feb 2023) it seems that you can only yield to JS by sleeping for at
+// least 1ms but having that delay is not ideal. Other methods of
+// yielding can be explored by implementing a different Yielder.
+type Yielder interface {
+	Yield()
+}
+
+func (e *Evaluator) Run(input string) {
+	p := parser.New(input, newFuncDecls(e.builtins))
+	prog := p.Parse()
+	if p.HasErrors() {
+		e.print(parser.MaxErrorsString(p.Errors(), 8))
+		return
+	}
+	val := e.Eval(prog)
+	if isError(val) {
+		e.print(val.String())
+	}
+}
+
+var ErrStopped = newError("stopped")
+
 func (e *Evaluator) Eval(node parser.Node) Value {
+	if e.Stopped {
+		return ErrStopped
+	}
+	e.yield() // Yield to give JavaScript/browser events a chance to run.
 	switch node := node.(type) {
 	case *parser.Program:
 		return e.evalProgram(node)
@@ -78,6 +98,12 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalDotExpr(node, false /* forAssign */)
 	}
 	return nil // TODO: panic?
+}
+
+func (e *Evaluator) yield() {
+	if e.Yielder != nil {
+		e.Yielder.Yield()
+	}
 }
 
 func (e *Evaluator) evalProgram(program *parser.Program) Value {

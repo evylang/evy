@@ -2,14 +2,14 @@
 
 let wasmModule, wasmInst
 let sourcePtr, sourceLength
-const go = newEvyGo() // see wasm_exec.js
+const go = newEvyGo()
+const runButton = document.getElementById("run")
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
   WebAssembly.compileStreaming(fetch("evy.wasm"))
     .then((obj) => (wasmModule = obj))
     .catch((err) => console.error(err))
-  const runButton = document.getElementById("run")
   runButton.onclick = handleRun
   runButton.disabled = false
 }
@@ -35,10 +35,20 @@ function memString(ptr, len) {
 // converts it to wasm memory bytes. It then calls the evy main()
 // function running the evaluator after parsing.
 async function handleRun(event) {
+  if (runButton.innerText === "Stop") {
+    wasmInst.exports.stop()
+    onExit()
+    return
+  }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   prepareSourceAccess()
   clearOutput()
+  runButton.innerText = "Stop"
   go.run(wasmInst)
+}
+
+function onExit() {
+  runButton.innerText = "Run"
 }
 
 function newEvyGo() {
@@ -50,6 +60,7 @@ function newEvyGo() {
     circle,
     rect,
     color,
+    onExit,
     sourcePtr: () => sourcePtr,
     sourceLength: () => sourceLength,
   }

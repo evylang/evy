@@ -4,24 +4,22 @@ package main
 
 import (
 	"strings"
+	"time"
 	"unsafe"
 
 	"foxygo.at/evy/pkg/evaluator"
 )
 
 var version string
+var eval *evaluator.Evaluator
 
 func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
-	source := getSource()
-	evaluator.Run(source, builtins)
+	eval = evaluator.NewEvaluator(builtins)
+	eval.Yielder = newSleepingYielder()
+	eval.Run(getSource())
+	onExit()
 }
-
-//export sourcePtr
-func sourcePtr() *uint32
-
-//export sourceLength
-func sourceLength() int
 
 func getSource() string {
 	ptr := sourcePtr()
@@ -29,9 +27,41 @@ func getSource() string {
 	return getString(ptr, length)
 }
 
+type sleepingYielder struct {
+	start time.Time
+	count int
+}
+
+func (y *sleepingYielder) Yield() {
+	y.count++
+	if y.count > 1000 && time.Since(y.start) > 100*time.Millisecond {
+		time.Sleep(time.Millisecond)
+		y.start = time.Now()
+		y.count = 0
+	}
+}
+
+func newSleepingYielder() *sleepingYielder {
+	return &sleepingYielder{
+		start: time.Now(),
+	}
+}
+
+// --- JS function exported to Go/WASM ---------------------------------
+
+//export sourcePtr
+func sourcePtr() *uint32
+
+//export sourceLength
+func sourceLength() int
+
 // jsPrint is imported from JS
 //export jsPrint
 func jsPrint(string)
+
+// onExit is imported from JS
+//export onExit
+func onExit()
 
 // move is imported from JS
 //export move
@@ -72,6 +102,8 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	},
 }
 
+// --- Go function exported to JS/WASM runtime -------------------------
+
 // alloc pre-allocates memory used in string parameter passing.
 //
 //export alloc
@@ -94,4 +126,12 @@ func getString(ptr *uint32, length int) string {
 		builder.WriteByte(byte(s))
 	}
 	return builder.String()
+}
+
+//export stop
+func stop() {
+	// unsynchronized access to eval.Stopped - ok in WASM as single threaded.
+	if eval != nil {
+		eval.Stopped = true
+	}
 }

@@ -204,7 +204,7 @@ func nums1:num n1:num n2:num
 	end
 	return n2
 end
-on mousedown
+on down
 	if c > 10
 	    print c
 	end
@@ -991,6 +991,53 @@ func fox
    print "fox overridden"
 end
 `: "line 6 column 1: redeclaration of function fox",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+	}
+}
+
+func TestEventHandler(t *testing.T) {
+	inputs := []string{
+		`
+on down x:num y:num
+   print "pointer down:" x y
+end`,
+		`
+on down x:num y:num
+   print "pointer down:" x y
+   if x > 100
+      return
+   end
+end`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestEventHandlerErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+on down x:num y:num
+   print "pointer down:" x y
+`: "line 4 column 1: expected 'end', got end of input",
+		`
+on x:num y:num
+   print "pointer down:" x y
+end
+`: "line 2 column 5: expected identifier, got ':'",
+		`
+on down x:num y:num
+return "abc"
+end
+`: "line 3 column 8: expected no return value, found string",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

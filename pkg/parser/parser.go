@@ -33,8 +33,9 @@ type Parser struct {
 	cur  *lexer.Token // current token under examination
 	peek *lexer.Token // next token after current token
 
-	tokens []*lexer.Token
-	funcs  map[string]*FuncDecl // all function declaration by name and index in tokens.
+	tokens        []*lexer.Token
+	funcs         map[string]*FuncDecl     // all function declarations by name
+	eventHandlers map[string]*EventHandler // all event handler declarations by name
 
 	wssStack []bool
 }
@@ -52,7 +53,11 @@ func (e Error) String() string {
 func New(input string, builtins map[string]*FuncDecl) *Parser {
 	l := lexer.New(input)
 
-	p := &Parser{funcs: map[string]*FuncDecl{}, wssStack: []bool{false}}
+	p := &Parser{
+		funcs:         map[string]*FuncDecl{},
+		eventHandlers: map[string]*EventHandler{},
+		wssStack:      []bool{false},
+	}
 	for name, funcDecl := range builtins {
 		p.funcs[name] = funcDecl
 	}
@@ -179,18 +184,42 @@ func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 }
 
 func (p *Parser) parseEventHandler(scope *scope) Node {
+	e := &EventHandler{Token: p.cur}
 	p.advance() // advance past ON token
-	e := &EventHandler{}
-	if p.assertToken(lexer.IDENT) {
-		e.Name = p.cur.Literal
-		p.advance() // advance past event name IDENT
-		p.assertEOL()
+	if !p.assertToken(lexer.IDENT) {
+		p.advancePastNL()
+		return nil
 	}
-	p.advancePastNL() // advance past `on EVENT_NAME`
+
+	e.Name = p.cur.Literal
+	if p.eventHandlers[e.Name] != nil {
+		p.appendError("redeclaration of on " + e.Name)
+	} else {
+		p.eventHandlers[e.Name] = e
+	}
+	p.advance() // advance past event name IDENT
+	for !p.isAtEOL() {
+		p.assertToken(lexer.IDENT)
+		decl := p.parseTypedDecl()
+		e.Params = append(e.Params, decl.Var)
+	}
+	p.advancePastNL()
+
+	// TODO: ensure expected name and decl (update builtin)
+
+	scope = newScopeWithReturnType(scope, e, NONE_TYPE) // only bare returns
+	p.addEventParamsToScope(scope, e)
 	e.Body = p.parseBlock(scope)
 	p.assertEnd()
 	p.advancePastNL()
 	return e
+}
+
+func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandler) {
+	for _, param := range e.Params {
+		p.validateVarDecl(scope, param, param.Token)
+		scope.set(param.Name, param)
+	}
 }
 
 func (p *Parser) parseStatement(scope *scope) Node {

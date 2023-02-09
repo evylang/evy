@@ -118,10 +118,10 @@ func TestFunctionCall(t *testing.T) {
 
 func TestFunctionCallError(t *testing.T) {
 	builtins := testBuiltins()
-	builtins["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
-	builtins["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins["f2"] = &FuncDecl{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
-	builtins["f3"] = &FuncDecl{
+	builtins.Funcs["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
+	builtins.Funcs["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f2"] = &FuncDecl{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f3"] = &FuncDecl{
 		Name:       "f3",
 		Params:     []*Var{{Name: "a", T: NUM_TYPE}, {Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
@@ -234,7 +234,7 @@ end
 	parser := New(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
-	builtinCnt := len(testBuiltins())
+	builtinCnt := len(testBuiltins().Funcs)
 	assert.Equal(t, builtinCnt+4, len(parser.funcs))
 	got := parser.funcs["nums1"]
 	assert.Equal(t, "nums1", got.Name)
@@ -1008,6 +1008,10 @@ on down x:num y:num
    print "pointer down:" x y
 end`,
 		`
+on down
+   print "down"
+end`,
+		`
 on down x:num y:num
    print "pointer down:" x y
    if x > 100
@@ -1029,15 +1033,24 @@ on down x:num y:num
    print "pointer down:" x y
 `: "line 4 column 1: expected 'end', got end of input",
 		`
-on x:num y:num
-   print "pointer down:" x y
+on down:num
+   print "down:" down
 end
-`: "line 2 column 5: expected identifier, got ':'",
+`: "line 2 column 8: expected identifier, got ':'",
 		`
 on down x:num y:num
 return "abc"
 end
 `: "line 3 column 8: expected no return value, found string",
+		`
+on down2 x:num y:num
+   print "down:" down
+end
+`: "line 2 column 4: unknown event name down2",
+		`
+on down x:num
+   print "pointer down:" x
+end`: "line 3 column 4: wrong number of parameters expected 2, got 1",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())
@@ -1084,8 +1097,8 @@ func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
 }
 
-func testBuiltins() map[string]*FuncDecl {
-	return map[string]*FuncDecl{
+func testBuiltins() Builtins {
+	funcs := map[string]*FuncDecl{
 		"print": {
 			Name:          "print",
 			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
@@ -1097,4 +1110,15 @@ func testBuiltins() map[string]*FuncDecl {
 			ReturnType: NUM_TYPE,
 		},
 	}
+	eventHandlers := map[string]*EventHandler{
+		"down": {
+			Name: "down",
+			Params: []*Var{
+				{Name: "x", T: NUM_TYPE},
+				{Name: "y", T: NUM_TYPE},
+			},
+		},
+	}
+
+	return Builtins{Funcs: funcs, EventHandlers: eventHandlers}
 }

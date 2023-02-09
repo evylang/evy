@@ -69,7 +69,7 @@ func (c *cmdParse) Run() error {
 	rt := evaluator.Runtime{
 		Print: func(s string) { fmt.Print(s) },
 	}
-	builtinDecls := evaluator.DefaultDecls(rt)
+	builtinDecls := evaluator.DefaulParserBuiltins(rt)
 	result := parser.Run(string(b), builtinDecls)
 	fmt.Println(result)
 	return nil

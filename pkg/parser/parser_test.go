@@ -957,6 +957,14 @@ for x := range 1 true
 	print "X"
 end
 `: "line 2 column 10: range expects num type for 2nd argument, found bool",
+		`
+func x
+   print "func x"
+end
+for x := range 10
+	print "x" x
+end
+`: "line 5 column 5: invalid declaration of 'x', already used as function name",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

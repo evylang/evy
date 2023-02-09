@@ -96,8 +96,10 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
 		return e.evalDotExpr(node, false /* forAssign */)
+	case *parser.FuncDecl:
+		return nil
 	}
-	return nil // TODO: panic?
+	return newError("internal error: unknown node type")
 }
 
 func (e *Evaluator) yield() {
@@ -114,6 +116,7 @@ func (e *Evaluator) evalStatments(statements []parser.Node) Value {
 	var result Value
 	for _, statement := range statements {
 		result = e.Eval(statement)
+
 		if isError(result) || isReturn(result) || isBreak(result) {
 			return result
 		}
@@ -544,11 +547,11 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) Value {
 	if isError(left) {
 		return left
 	}
-	start := e.Eval(expr.Start)
+	start := e.evalIfNotNil(expr.Start)
 	if isError(start) {
 		return start
 	}
-	end := e.Eval(expr.End)
+	end := e.evalIfNotNil(expr.End)
 	if isError(end) {
 		return end
 	}
@@ -559,6 +562,13 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) Value {
 		return left.Slice(start, end)
 	}
 	return newError("cannot slice " + left.String())
+}
+
+func (e *Evaluator) evalIfNotNil(n parser.Node) Value {
+	if n == nil {
+		return nil
+	}
+	return e.Eval(n)
 }
 
 func (e *Evaluator) pushScope() {

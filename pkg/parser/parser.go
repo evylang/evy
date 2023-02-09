@@ -650,6 +650,10 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		return nil
 	}
 	forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
+	if !p.validateVarDecl(scope, forNode.LoopVar, p.cur) {
+		p.advancePastNL()
+		return nil
+	}
 	scope.set(forNode.LoopVar.Name, forNode.LoopVar)
 	p.advance() // advance past loopVarName
 

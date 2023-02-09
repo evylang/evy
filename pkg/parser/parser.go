@@ -168,19 +168,12 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 	for _, param := range fd.Params {
-		if scope.inLocalScope(param.Name) {
-			p.appendErrorForToken("redeclaration of parameter '"+param.Name+"'", param.Token)
-		}
-		if _, ok := p.funcs[param.Name]; ok {
-			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
-		}
+		p.validateVarDecl(scope, param, param.Token)
 		scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
 		param := fd.VariadicParam
-		if _, ok := p.funcs[param.Name]; ok {
-			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
-		}
+		p.validateVarDecl(scope, param, param.Token)
 		scope.set(param.Name, param)
 	}
 }

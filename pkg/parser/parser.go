@@ -7,13 +7,19 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"foxygo.at/evy/pkg/lexer"
 )
 
-func Run(input string, builtins map[string]*FuncDecl) string {
+type Builtins struct {
+	Funcs         map[string]*FuncDecl
+	EventHandlers map[string]*EventHandler
+}
+
+func Run(input string, builtins Builtins) string {
 	parser := New(input, builtins)
 	prog := parser.Parse()
 	if len(parser.errors) > 0 {
@@ -34,6 +40,7 @@ type Parser struct {
 	peek *lexer.Token // next token after current token
 
 	tokens        []*lexer.Token
+	builtins      Builtins
 	funcs         map[string]*FuncDecl     // all function declarations by name
 	eventHandlers map[string]*EventHandler // all event handler declarations by name
 
@@ -50,15 +57,16 @@ func (e Error) String() string {
 	return e.token.Location() + ": " + e.message
 }
 
-func New(input string, builtins map[string]*FuncDecl) *Parser {
+func New(input string, builtins Builtins) *Parser {
 	l := lexer.New(input)
 
 	p := &Parser{
 		funcs:         map[string]*FuncDecl{},
 		eventHandlers: map[string]*EventHandler{},
 		wssStack:      []bool{false},
+		builtins:      builtins,
 	}
-	for name, funcDecl := range builtins {
+	for name, funcDecl := range builtins.Funcs {
 		p.funcs[name] = funcDecl
 	}
 
@@ -91,9 +99,9 @@ func New(input string, builtins map[string]*FuncDecl) *Parser {
 		switch {
 		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
-		case builtins[fd.Name] == nil:
+		case builtins.Funcs[fd.Name] == nil:
 			p.appendErrorForToken("redeclaration of function "+fd.Name, fd.Token)
-		case builtins[fd.Name] != nil:
+		case builtins.Funcs[fd.Name] != nil:
 			p.appendErrorForToken("cannot override builtin function "+fd.Name, fd.Token)
 		}
 	}
@@ -192,9 +200,12 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 	}
 
 	e.Name = p.cur.Literal
-	if p.eventHandlers[e.Name] != nil {
+	switch {
+	case p.eventHandlers[e.Name] != nil:
 		p.appendError("redeclaration of on " + e.Name)
-	} else {
+	case p.builtins.EventHandlers[e.Name] == nil:
+		p.appendError("unknown event name " + e.Name)
+	default:
 		p.eventHandlers[e.Name] = e
 	}
 	p.advance() // advance past event name IDENT
@@ -205,8 +216,6 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 	}
 	p.advancePastNL()
 
-	// TODO: ensure expected name and decl (update builtin)
-
 	scope = newScopeWithReturnType(scope, e, NONE_TYPE) // only bare returns
 	p.addEventParamsToScope(scope, e)
 	e.Body = p.parseBlock(scope)
@@ -216,8 +225,19 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 }
 
 func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandler) {
-	for _, param := range e.Params {
+	if len(e.Params) == 0 || p.builtins.EventHandlers[e.Name] == nil {
+		return
+	}
+	expectedParams := p.builtins.EventHandlers[e.Name].Params
+	if len(e.Params) != len(expectedParams) {
+		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
+	}
+	for i, param := range e.Params {
 		p.validateVarDecl(scope, param, param.Token)
+		exptectedType := expectedParams[i].Type()
+		if !param.Type().Matches(exptectedType) {
+			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
+		}
 		scope.set(param.Name, param)
 	}
 }

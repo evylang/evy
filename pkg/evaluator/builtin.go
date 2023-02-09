@@ -14,16 +14,18 @@ type Builtin struct {
 }
 
 type Builtins struct {
-	Funcs map[string]Builtin
-	Print func(s string)
+	Funcs         map[string]Builtin
+	Print         func(s string)
+	EventHandlers map[string]*parser.EventHandler
 }
 
-func newFuncDecls(funcs map[string]Builtin) map[string]*parser.FuncDecl {
-	decls := make(map[string]*parser.FuncDecl, len(funcs))
-	for name, builtin := range funcs {
-		decls[name] = builtin.Decl
+func newParserBuiltins(builtins Builtins) parser.Builtins {
+	funcs := make(map[string]*parser.FuncDecl, len(builtins.Funcs))
+
+	for name, builtin := range builtins.Funcs {
+		funcs[name] = builtin.Decl
 	}
-	return decls
+	return parser.Builtins{Funcs: funcs, EventHandlers: builtins.EventHandlers}
 }
 
 type BuiltinFunc func(args []Value) Value
@@ -52,12 +54,27 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"color":  stringBuiltin("color", rt.Graphics.Color, rt.Print),
 		"colour": stringBuiltin("colour", rt.Graphics.Color, rt.Print),
 	}
-	return Builtins{Funcs: funcs, Print: rt.Print}
+	xyParams := []*parser.Var{
+		{Name: "x", T: parser.NUM_TYPE},
+		{Name: "y", T: parser.NUM_TYPE},
+	}
+	stringParam := []*parser.Var{{Name: "c", T: parser.STRING_TYPE}}
+	eventHandlers := map[string]*parser.EventHandler{
+		"down": {Name: "down", Params: xyParams},
+		"up":   {Name: "up", Params: xyParams},
+		"move": {Name: "move", Params: xyParams},
+		"key":  {Name: "key", Params: stringParam},
+	}
+	return Builtins{
+		EventHandlers: eventHandlers,
+		Funcs:         funcs,
+		Print:         rt.Print,
+	}
 }
 
-func DefaultDecls(rt Runtime) map[string]*parser.FuncDecl {
-	db := DefaultBuiltins(rt)
-	return newFuncDecls(db.Funcs)
+func DefaulParserBuiltins(rt Runtime) parser.Builtins {
+	builtins := DefaultBuiltins(rt)
+	return newParserBuiltins(builtins)
 }
 
 type Runtime struct {

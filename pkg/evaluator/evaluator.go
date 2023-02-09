@@ -10,7 +10,7 @@ import (
 func NewEvaluator(builtins Builtins) *Evaluator {
 	return &Evaluator{
 		print:    builtins.Print,
-		builtins: builtins.Funcs,
+		builtins: builtins,
 		scope:    newScope(),
 	}
 }
@@ -19,13 +19,13 @@ type Evaluator struct {
 	Stopped  bool
 	Yielder  Yielder // Yield to give JavaScript/browser events a chance to run.
 	print    func(string)
-	builtins map[string]Builtin
+	builtins Builtins
 
 	scope *scope // Current top of scope stack
 }
 
 func (e *Evaluator) Run(input string) {
-	p := parser.New(input, newFuncDecls(e.builtins))
+	p := parser.New(input, newParserBuiltins(e.builtins))
 	prog := p.Parse()
 	if p.HasErrors() {
 		e.print(parser.MaxErrorsString(p.Errors(), 8))
@@ -175,7 +175,7 @@ func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall) Value {
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]
 	}
-	builtin, ok := e.builtins[funcCall.Name]
+	builtin, ok := e.builtins.Funcs[funcCall.Name]
 	if ok {
 		return builtin.Func(args)
 	}

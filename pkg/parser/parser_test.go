@@ -602,17 +602,17 @@ end
 func x in:string in:string
    print in
 end
-`: "line 2 column 18: redeclaration of parameter 'in'",
+`: "line 2 column 18: redeclaration of 'in'",
 		`
 func x x:string
    print x
 end
-`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+`: "line 2 column 8: invalid declaration of 'x', already used as function name",
 		`
 func x x:string...
    print x
 end
-`: "line 2 column 8: invalid declaration of parameter 'x', already used as function name",
+`: "line 2 column 8: invalid declaration of 'x', already used as function name",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

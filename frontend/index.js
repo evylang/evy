@@ -47,7 +47,6 @@ function stringToMem(s) {
 async function handleRun(event) {
   if (runButton.innerText === "Stop") {
     wasmInst.exports.stop()
-    onExit()
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
@@ -57,7 +56,8 @@ async function handleRun(event) {
   go.run(wasmInst)
 }
 
-function onExit() {
+// onStopped is exported to evy go/wasm and called when execution finishes
+function onStopped() {
   runButton.innerText = "Run"
 }
 
@@ -70,7 +70,7 @@ function newEvyGo() {
     circle,
     rect,
     color,
-    onExit,
+    onStopped,
     sourcePtr: () => sourcePtr,
     sourceLength: () => sourceLength,
   }
@@ -193,6 +193,7 @@ function transformY(y) {
   return scaleY(y + canvas.offset.y)
 }
 
+// move is exported to evy go/wasm
 function move(x, y) {
   movePhysical(transformX(x), transformY(y))
 }
@@ -202,6 +203,7 @@ function movePhysical(px, py) {
   canvas.y = py
 }
 
+// line is exported to evy go/wasm
 function line(x2, y2) {
   const { ctx, x, y } = canvas
   const px2 = transformX(x2)
@@ -213,16 +215,19 @@ function line(x2, y2) {
   movePhysical(px2, py2)
 }
 
+// color is exported to evy go/wasm
 function color(ptr, len) {
   const s = memToString(ptr, len)
   canvas.ctx.fillStyle = s
   canvas.ctx.strokeStyle = s
 }
 
+// width is exported to evy go/wasm
 function width(n) {
   canvas.ctx.lineWidth = scaleX(n)
 }
 
+// rect is exported to evy go/wasm
 function rect(dx, dy) {
   const { ctx, x, y } = canvas
   const sDX = scaleX(dx)
@@ -231,6 +236,7 @@ function rect(dx, dy) {
   movePhysical(x + sDX, y + sDY)
 }
 
+// circle is exported to evy go/wasm
 function circle(r) {
   const { x, y, ctx } = canvas
   ctx.beginPath()

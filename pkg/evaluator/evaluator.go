@@ -4,6 +4,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"foxygo.at/evy/pkg/parser"
 )
 
@@ -16,12 +18,18 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 }
 
 type Evaluator struct {
-	Stopped  bool
-	Yield    func() // Yield to give JavaScript/browser events a chance to run.
-	print    func(string)
-	builtins Builtins
+	Stopped       bool
+	Yield         func() // Yield to give JavaScript/browser events a chance to run.
+	print         func(string)
+	builtins      Builtins
+	eventHandlers map[string]*parser.EventHandler //
 
 	scope *scope // Current top of scope stack
+}
+
+type Event interface {
+	Name() string
+	Params() []any
 }
 
 func (e *Evaluator) Run(input string) {
@@ -31,6 +39,7 @@ func (e *Evaluator) Run(input string) {
 		e.print(parser.MaxErrorsString(p.Errors(), 8))
 		return
 	}
+	e.eventHandlers = p.EventHandlers
 	val := e.Eval(prog)
 	if isError(val) {
 		e.print(val.String())
@@ -87,10 +96,40 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
 		return e.evalDotExpr(node, false /* forAssign */)
-	case *parser.FuncDecl:
+	case *parser.FuncDecl, *parser.EventHandler:
 		return nil
 	}
-	return newError("internal error: unknown node type")
+	return newError(fmt.Sprintf("internal error: unknown node type %v", node))
+}
+
+func (e *Evaluator) EventHandlerNames() []string {
+	names := make([]string, 0, len(e.eventHandlers))
+	for name := range e.eventHandlers {
+		names = append(names, name)
+	}
+	return names
+}
+
+func (e *Evaluator) HandleEvent(ev Event) {
+	eh := e.eventHandlers[ev.Name()]
+	if eh == nil {
+		panic("no event handler for " + ev.Name())
+	}
+	e.pushScope()
+	defer e.popScope()
+	args := ev.Params()
+	if len(args) < len(eh.Params) {
+		panic("not enough arguments for " + ev.Name())
+	}
+	for i, param := range eh.Params {
+		arg := valueFromAny(param.Type(), args[i])
+		e.scope.set(param.Name, arg)
+	}
+	result := e.Eval(eh.Body)
+
+	if isError(result) {
+		e.print(result.String())
+	}
 }
 
 func (e *Evaluator) yield() {

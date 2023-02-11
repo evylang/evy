@@ -42,7 +42,7 @@ type Parser struct {
 	tokens        []*lexer.Token
 	builtins      Builtins
 	funcs         map[string]*FuncDecl     // all function declarations by name
-	eventHandlers map[string]*EventHandler // all event handler declarations by name
+	EventHandlers map[string]*EventHandler // all event handler declarations by name
 
 	wssStack []bool
 }
@@ -62,7 +62,7 @@ func New(input string, builtins Builtins) *Parser {
 
 	p := &Parser{
 		funcs:         map[string]*FuncDecl{},
-		eventHandlers: map[string]*EventHandler{},
+		EventHandlers: map[string]*EventHandler{},
 		wssStack:      []bool{false},
 		builtins:      builtins,
 	}
@@ -201,12 +201,12 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 
 	e.Name = p.cur.Literal
 	switch {
-	case p.eventHandlers[e.Name] != nil:
+	case p.EventHandlers[e.Name] != nil:
 		p.appendError("redeclaration of on " + e.Name)
 	case p.builtins.EventHandlers[e.Name] == nil:
 		p.appendError("unknown event name " + e.Name)
 	default:
-		p.eventHandlers[e.Name] = e
+		p.EventHandlers[e.Name] = e
 	}
 	p.advance() // advance past event name IDENT
 	for !p.isAtEOL() {

@@ -12,12 +12,16 @@ import (
 
 var version string
 var eval *evaluator.Evaluator
+var events []evaluator.Event
+
+const minSleepDur = time.Millisecond
 
 func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yield = newSleepingYielder()
 	eval.Run(getSource())
+	handleEvents()
 	onStopped()
 }
 
@@ -35,7 +39,7 @@ type sleepingYielder struct {
 func (y *sleepingYielder) Yield() {
 	y.count++
 	if y.count > 1000 && time.Since(y.start) > 100*time.Millisecond {
-		time.Sleep(time.Millisecond)
+		time.Sleep(minSleepDur)
 		y.start = time.Now()
 		y.count = 0
 	}
@@ -56,6 +60,57 @@ func newSleepingYielder() func() {
 			count = 0
 		}
 	}
+}
+
+func handleEvents() {
+	if eval == nil || len(eval.EventHandlerNames()) == 0 {
+		return
+	}
+	for _, name := range eval.EventHandlerNames() {
+		registerEventHandler(name)
+	}
+	for {
+		if eval.Stopped {
+			return
+		}
+		// unsynchronized access to events - ok in WASM as single threaded.
+		if len(events) > 0 {
+			event := events[0]
+			events = events[1:]
+			eval.HandleEvent(event)
+		} else {
+			time.Sleep(minSleepDur)
+		}
+	}
+}
+
+// xyEvent implements evaluator.Event.
+type xyEvent struct {
+	name string
+	x    float64
+	y    float64
+}
+
+func (e *xyEvent) Name() string {
+	return e.name
+}
+
+func (e *xyEvent) Params() []any {
+	return []any{e.x, e.y}
+}
+
+// stringEvent implements evaluator.Event.
+type stringEvent struct {
+	name string
+	str  string
+}
+
+func (e *stringEvent) Name() string {
+	return e.name
+}
+
+func (e *stringEvent) Params() []any {
+	return []any{e.str}
 }
 
 // --- JS function exported to Go/WASM ---------------------------------
@@ -113,6 +168,9 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	},
 }
 
+//export registerEventHandler
+func registerEventHandler(eventName string)
+
 // --- Go function exported to JS/WASM runtime -------------------------
 
 // alloc pre-allocates memory used in string parameter passing.
@@ -145,4 +203,29 @@ func stop() {
 	if eval != nil {
 		eval.Stopped = true
 	}
+}
+
+//export onUp
+func onUp(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, &xyEvent{name: "up", x: x, y: y})
+}
+
+//export onDown
+func onDown(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, &xyEvent{name: "down", x: x, y: y})
+}
+
+//export onMove
+func onMove(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, &xyEvent{name: "move", x: x, y: y})
+}
+
+//export onKey
+func onKey(ptr *uint32, length int) {
+	str := getString(ptr, length)
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, &stringEvent{name: "key", str: str})
 }

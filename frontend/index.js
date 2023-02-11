@@ -244,5 +244,26 @@ function circle(r) {
   ctx.fill()
 }
 
+async function initSource() {
+  // parse url fragment into object
+  // e.g. https://exmple.com#a=1&b=2 into {a: "1", b"2"}
+  // then fetch source from URL and write it to code input.
+  const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
+  const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
+  const opts = Object.fromEntries(entries)
+  const sourceURL = opts["source"]
+  if (!sourceURL) {
+    return
+  }
+  try {
+    const response = await fetch(sourceURL)
+    const source = await response.text()
+    document.getElementById("code").value = source
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+initSource()
 initWasm()
 initCanvas()

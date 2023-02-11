@@ -150,7 +150,8 @@ const canvas = {
   x: 0,
   y: 0,
   ctx: null,
-  scale: { x: 10, y: -10 },
+  factor: 10,
+  scale: { x: 1, y: -1 },
   width: 100,
   height: 100,
 
@@ -178,11 +179,11 @@ function resetCanvas() {
 }
 
 function scaleX(x) {
-  return canvas.scale.x * x
+  return canvas.scale.x * canvas.factor * x
 }
 
 function scaleY(y) {
-  return canvas.scale.y * y
+  return canvas.scale.y * canvas.factor * y
 }
 
 function transformX(x) {

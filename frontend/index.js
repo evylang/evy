@@ -58,6 +58,7 @@ async function handleRun(event) {
 
 // onStopped is exported to evy go/wasm and called when execution finishes
 function onStopped() {
+  removeEventHandlers()
   runButton.innerText = "Run"
 }
 
@@ -71,6 +72,7 @@ function newEvyGo() {
     rect,
     color,
     onStopped,
+    registerEventHandler,
     sourcePtr: () => sourcePtr,
     sourceLength: () => sourceLength,
   }
@@ -243,6 +245,48 @@ function circle(r) {
   ctx.beginPath()
   ctx.arc(x, y, scaleX(r), 0, Math.PI * 2, true)
   ctx.fill()
+}
+
+// registerEventHandler is exported to evy go/wasm
+function registerEventHandler(ptr, len) {
+  const c = document.getElementById("canvas")
+  const s = memToString(ptr, len)
+  const exp = wasmInst.exports
+  if (s === "down") {
+    c.onpointerdown = (e) => exp.onDown(logicalX(e), logicalY(e))
+  } else if (s === "up") {
+    c.onpointerup = (e) => exp.onUp(logicalX(e), logicalY(e))
+  } else if (s === "move") {
+    c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
+  } else if (s === "key") {
+    document.addEventListener("keydown", keydownListener)
+  } else {
+    console.error("cannot register unknown event", s)
+  }
+}
+
+function logicalX(e) {
+  const scaleX = (canvas.width * canvas.scale.x) / e.target.offsetWidth
+  return e.offsetX * scaleX - canvas.offset.x
+}
+
+function logicalY(e) {
+  const scaleY = (canvas.height * canvas.scale.y) / e.target.offsetHeight
+  return e.offsetY * scaleY - canvas.offset.y
+}
+
+function keydownListener(e) {
+  if (e.target.id == "code") return // skip for source code input
+  const { ptr, len } = stringToMem(e.key)
+  wasmInst.exports.onKey(ptr, len)
+}
+
+function removeEventHandlers() {
+  const c = document.getElementById("canvas")
+  c.onpointerdown = null
+  c.onpointerup = null
+  c.onpointermove = null
+  document.removeEventListener("keydown", keydownListener)
 }
 
 async function initUI() {

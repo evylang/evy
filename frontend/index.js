@@ -17,7 +17,7 @@ function initWasm() {
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
-  const s = memString(ptr, len)
+  const s = memToString(ptr, len)
   const output = document.getElementById("output")
   output.textContent += s
   if (s.toLowerCase().includes("confetti")) {
@@ -25,10 +25,20 @@ function jsPrint(ptr, len) {
   }
 }
 
-function memString(ptr, len) {
+function memToString(ptr, len) {
   const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
   const s = new TextDecoder("utf8").decode(buf)
   return s
+}
+
+function stringToMem(s) {
+  const bytes = new TextEncoder("utf8").encode(s)
+  const e = wasmInst.exports
+  const len = bytes.length
+  const ptr = e.alloc(len)
+  const mem = new Uint8Array(e.memory.buffer, ptr, len)
+  mem.set(new Uint8Array(bytes))
+  return { ptr, len }
 }
 
 // handleRun retrieves the input string from the code pane and
@@ -71,13 +81,9 @@ function newEvyGo() {
 
 function prepareSourceAccess() {
   const code = document.getElementById("code").value
-  const bytes = new TextEncoder("utf8").encode(code)
-  const e = wasmInst.exports
-  const ptr = e.alloc(bytes.length)
-  const mem = new Uint8Array(e.memory.buffer, ptr, bytes.length)
-  mem.set(new Uint8Array(bytes))
+  const { ptr, len } = stringToMem(code)
   sourcePtr = ptr
-  sourceLength = bytes.length
+  sourceLength = len
 }
 
 function clearOutput() {
@@ -208,7 +214,7 @@ function line(x2, y2) {
 }
 
 function color(ptr, len) {
-  const s = memString(ptr, len)
+  const s = memToString(ptr, len)
   canvas.ctx.fillStyle = s
   canvas.ctx.strokeStyle = s
 }

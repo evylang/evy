@@ -18,7 +18,7 @@ func main() {
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yield = newSleepingYielder()
 	eval.Run(getSource())
-	onExit()
+	onStopped()
 }
 
 func getSource() string {
@@ -70,9 +70,9 @@ func sourceLength() int
 //export jsPrint
 func jsPrint(string)
 
-// onExit is imported from JS
-//export onExit
-func onExit()
+// onStopped is imported from JS
+//export onStopped
+func onStopped()
 
 // move is imported from JS
 //export move

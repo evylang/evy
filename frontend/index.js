@@ -244,5 +244,43 @@ function circle(r) {
   ctx.fill()
 }
 
+async function initUI() {
+  document.addEventListener("keydown", ctrlEnterListener)
+  document.addEventListener("hashchange", fetchSource)
+  fetchSource()
+}
+
+function ctrlEnterListener(e) {
+  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    handleRun()
+  }
+}
+
+async function fetchSource() {
+  // parse url fragment into object
+  // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
+  // then fetch source from URL and write it to code input.
+  const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
+  const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
+  let sourceURL
+  if (entries.length === 1 && entries[0].length === 1 && entries[0][0]) {
+    // shortcut for example.com#draw loading example.com/samples/draw.evy
+    sourceURL = `samples/${entries[0][0]}.evy`
+  } else {
+    sourceURL = Object.fromEntries(entries).source
+  }
+  if (!sourceURL) {
+    return
+  }
+  try {
+    const response = await fetch(sourceURL)
+    const source = await response.text()
+    document.getElementById("code").value = source
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+initUI()
 initWasm()
 initCanvas()

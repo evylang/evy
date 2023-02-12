@@ -19,12 +19,16 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 
 type Evaluator struct {
 	Stopped       bool
-	Yield         func() // Yield to give JavaScript/browser events a chance to run.
+	Yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	print         func(string)
 	builtins      Builtins
 	eventHandlers map[string]*parser.EventHandler //
 
 	scope *scope // Current top of scope stack
+}
+
+type Yielder interface {
+	Yield()
 }
 
 type Event interface {
@@ -133,8 +137,8 @@ func (e *Evaluator) HandleEvent(ev Event) {
 }
 
 func (e *Evaluator) yield() {
-	if e.Yield != nil {
-		e.Yield()
+	if e.Yielder != nil {
+		e.Yielder.Yield()
 	}
 }
 

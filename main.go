@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"foxygo.at/evy/pkg/evaluator"
 	"foxygo.at/evy/pkg/lexer"
@@ -44,7 +45,7 @@ func (c *cmdRun) Run() error {
 		return err
 	}
 	printFn := func(s string) { fmt.Print(s) }
-	rt := evaluator.Runtime{Print: printFn}
+	rt := evaluator.Runtime{Print: printFn, Sleep: time.Sleep}
 	builtins := evaluator.DefaultBuiltins(rt)
 	eval := evaluator.NewEvaluator(builtins)
 	eval.Run(string(b))

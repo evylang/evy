@@ -17,9 +17,11 @@ var events []evaluator.Event
 const minSleepDur = time.Millisecond
 
 func main() {
+	yielder := newSleepingYielder()
+	jsRuntime.Sleep = yielder.Sleep
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	eval = evaluator.NewEvaluator(builtins)
-	eval.Yield = newSleepingYielder()
+	eval.Yielder = yielder
 	eval.Run(getSource())
 	handleEvents()
 	onStopped()
@@ -31,6 +33,11 @@ func getSource() string {
 	return getString(ptr, length)
 }
 
+// sleepingYielder yields the CPU so that JavaScript/browser events get
+// a chance to be processed. Currently(Feb 2023) it seems that you can
+// only yield to JS by sleeping for at least 1ms but having that delay
+// is not ideal. Other methods of yielding can be explored by
+// implementing a different yield function.
 type sleepingYielder struct {
 	start time.Time
 	count int
@@ -45,21 +52,14 @@ func (y *sleepingYielder) Yield() {
 	}
 }
 
-// newSleepingYielder yields the CPU so that JavaScript/browser events
-// get a chance to be processed. Currently(Feb 2023) it seems that you
-// can only yield to JS by sleeping for at least 1ms but having that
-// delay is not ideal. Other methods of yielding can be explored by
-// implementing a different yield function.
-func newSleepingYielder() func() {
-	count := 0
-	start := time.Now()
-	return func() {
-		if count > 1000 && time.Since(start) > 100*time.Millisecond {
-			time.Sleep(time.Millisecond)
-			start = time.Now()
-			count = 0
-		}
-	}
+func (y *sleepingYielder) Sleep(dur time.Duration) {
+	time.Sleep(minSleepDur)
+	y.start = time.Now()
+	y.count = 0
+}
+
+func newSleepingYielder() *sleepingYielder {
+	return &sleepingYielder{start: time.Now()}
 }
 
 func handleEvents() {

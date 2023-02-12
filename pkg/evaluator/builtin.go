@@ -44,7 +44,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
 
-		"sleep": {Func: BuiltinFunc(sleepFunc), Decl: sleepDecl},
+		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
 
 		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
 		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
@@ -79,6 +79,7 @@ func DefaulParserBuiltins(rt Runtime) parser.Builtins {
 
 type Runtime struct {
 	Print    func(string)
+	Sleep    func(time.Duration)
 	Graphics GraphicsRuntime
 }
 
@@ -222,11 +223,13 @@ var sleepDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func sleepFunc(args []Value) Value {
-	secs := args[0].(*Num)
-	dur := time.Duration(secs.Val * float64(time.Second))
-	time.Sleep(dur)
-	return nil
+func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
+	return func(args []Value) Value {
+		secs := args[0].(*Num)
+		dur := time.Duration(secs.Val * float64(time.Second))
+		sleepFn(dur)
+		return nil
+	}
 }
 
 func xyDecl(name string) *parser.FuncDecl {

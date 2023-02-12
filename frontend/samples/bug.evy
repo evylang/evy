@@ -1,0 +1,13 @@
+func target x:num y:num
+  move x y
+  colors := ["yellow" "gold" "orange" "red" "maroon"]
+  radius := 5
+
+  for c := range colors
+    color c
+    circle radius
+    radius = radius - 1
+  end
+end
+
+target 40 40

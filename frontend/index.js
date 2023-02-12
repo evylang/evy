@@ -293,17 +293,35 @@ function removeEventHandlers() {
   document.removeEventListener("keydown", keydownListener)
 }
 
-async function initSource() {
+function commandEnterListener(e) {
+  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    handleRun()
+  }
+}
+
+async function initUI() {
+  document.addEventListener("keydown", commandEnterListener)
+  document.addEventListener("hashchange", fetchSource)
+  fetchSource()
+}
+
+async function fetchSource() {
   // parse url fragment into object
   // e.g. https://exmple.com#a=1&b=2 into {a: "1", b"2"}
   // then fetch source from URL and write it to code input.
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
-  const opts = Object.fromEntries(entries)
-  if (!opts["source"] && !opts["s"]) {
+  let sourceURL
+  console.log("fetchSource entries", entries)
+  if (entries.length === 1 && entries[0].length) {
+    // shortcut to source
+    sourceURL = `samples/${entries[0][0]}.evy`
+  } else {
+    sourceURL = Object.fromEntries(entries).source
+  }
+  if (!sourceURL) {
     return
   }
-  const sourceURL = opts["source"] || `samples/${opts["s"]}.evy`
   try {
     const response = await fetch(sourceURL)
     const source = await response.text()
@@ -313,6 +331,6 @@ async function initSource() {
   }
 }
 
-initSource()
+initUI()
 initWasm()
 initCanvas()

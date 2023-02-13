@@ -14,23 +14,6 @@ function initWasm() {
   runButton.disabled = false
 }
 
-// jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
-// writes it to the output textarea.
-function jsPrint(ptr, len) {
-  const s = memString(ptr, len)
-  const output = document.getElementById("output")
-  output.textContent += s
-  if (s.toLowerCase().includes("confetti")) {
-    showConfetti()
-  }
-}
-
-function memString(ptr, len) {
-  const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
-  const s = new TextDecoder("utf8").decode(buf)
-  return s
-}
-
 // handleRun retrieves the input string from the code pane and
 // converts it to wasm memory bytes. It then calls the evy main()
 // function running the evaluator after parsing.
@@ -41,7 +24,6 @@ async function handleRun(event) {
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
-  prepareSourceAccess()
   clearOutput()
   runButton.innerText = "Stop"
   go.run(wasmInst)
@@ -52,32 +34,10 @@ function onExit() {
 }
 
 function newEvyGo() {
-  const evyEnv = {
-    jsPrint,
-    move,
-    line,
-    width,
-    circle,
-    rect,
-    color,
-    onExit,
-    sourcePtr: () => sourcePtr,
-    sourceLength: () => sourceLength,
-  }
+  const evyEnv = {}
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
   return go
-}
-
-function prepareSourceAccess() {
-  const code = document.getElementById("code").value
-  const bytes = new TextEncoder("utf8").encode(code)
-  const e = wasmInst.exports
-  const ptr = e.alloc(bytes.length)
-  const mem = new Uint8Array(e.memory.buffer, ptr, bytes.length)
-  mem.set(new Uint8Array(bytes))
-  sourcePtr = ptr
-  sourceLength = bytes.length
 }
 
 function clearOutput() {
@@ -205,12 +165,6 @@ function line(x2, y2) {
   ctx.lineTo(px2, py2)
   ctx.stroke()
   movePhysical(px2, py2)
-}
-
-function color(ptr, len) {
-  const s = memString(ptr, len)
-  canvas.ctx.fillStyle = s
-  canvas.ctx.strokeStyle = s
 }
 
 function width(n) {

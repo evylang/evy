@@ -17,7 +17,7 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 
 type Evaluator struct {
 	Stopped  bool
-	Yield    func() // Yield to give JavaScript/browser events a chance to run.
+	Yielder  Yielder // Yield to give JavaScript/browser events a chance to run.
 	print    func(string)
 	builtins map[string]Builtin
 
@@ -35,6 +35,10 @@ func (e *Evaluator) Run(input string) {
 	if isError(val) {
 		e.print(val.String())
 	}
+}
+
+type Yielder interface {
+	Yield()
 }
 
 var ErrStopped = newError("stopped")
@@ -94,8 +98,8 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 }
 
 func (e *Evaluator) yield() {
-	if e.Yield != nil {
-		e.Yield()
+	if e.Yielder != nil {
+		e.Yielder.Yield()
 	}
 }
 

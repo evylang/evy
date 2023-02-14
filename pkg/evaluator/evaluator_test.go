@@ -489,7 +489,7 @@ print "2 arr5" arr5
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -521,7 +521,7 @@ print "6" arr arr2
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -552,7 +552,7 @@ print "6" s s2
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -595,7 +595,7 @@ end
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -617,7 +617,7 @@ end
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -640,7 +640,7 @@ end
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -663,7 +663,7 @@ end
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -711,7 +711,7 @@ print "6" m6
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -741,7 +741,7 @@ print (has m "MISSING")
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}
@@ -777,7 +777,7 @@ print "4" m1 m2
 		"",
 	}
 	got := strings.Split(out, "\n")
-	assert.Equal(t, len(want), len(got), got)
+	assert.Equal(t, len(want), len(got), out)
 	for i := range want {
 		assert.Equal(t, want[i], got[i])
 	}

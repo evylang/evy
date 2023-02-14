@@ -981,7 +981,7 @@ func TestFuncDeclErr(t *testing.T) {
 func len s:string
    print "len:" s
 end
-`: "line 2 column 1: cannot override builtin function len",
+`: "line 2 column 1: cannot override builtin function 'len'",
 		`
 func fox
    print "fox"
@@ -990,7 +990,7 @@ end
 func fox
    print "fox overridden"
 end
-`: "line 6 column 1: redeclaration of function fox",
+`: "line 6 column 1: redeclaration of function 'fox'",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())

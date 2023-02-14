@@ -100,9 +100,9 @@ func New(input string, builtins Builtins) *Parser {
 		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
 		case builtins.Funcs[fd.Name] == nil:
-			p.appendErrorForToken("redeclaration of function "+fd.Name, fd.Token)
+			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.Token)
 		case builtins.Funcs[fd.Name] != nil:
-			p.appendErrorForToken("cannot override builtin function "+fd.Name, fd.Token)
+			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.Token)
 		}
 	}
 	return p

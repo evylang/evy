@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -35,10 +36,12 @@ func (b BuiltinFunc) String() string  { return "builtin function" }
 
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
-		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
-		"sprint": {Func: sprintFunc, Decl: sprintDecl},
-		"join":   {Func: joinFunc, Decl: joinDecl},
-		"split":  {Func: splitFunc, Decl: splitDecl},
+		"print":   {Func: printFunc(rt.Print), Decl: printDecl},
+		"printf":  {Func: printfFunc(rt.Print), Decl: printDecl},
+		"sprint":  {Func: sprintFunc, Decl: sprintDecl},
+		"sprintf": {Func: sprintfFunc, Decl: sprintDecl},
+		"join":    {Func: joinFunc, Decl: joinDecl},
+		"split":   {Func: splitFunc, Decl: splitDecl},
 
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
@@ -104,6 +107,21 @@ func printFunc(printFn func(string)) BuiltinFunc {
 	}
 }
 
+func printfFunc(printFn func(string)) BuiltinFunc {
+	return func(args []Value) Value {
+		if len(args) < 1 {
+			return newError("'printf' takes at least 1 argument")
+		}
+		format, ok := args[0].(*String)
+		if !ok {
+			return newError("first argument of 'printf' must be a string")
+		}
+		s := sprintf(format.Val, args[1:])
+		printFn(s)
+		return nil
+	}
+}
+
 var sprintDecl = &parser.FuncDecl{
 	Name:          "sprint",
 	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
@@ -112,6 +130,25 @@ var sprintDecl = &parser.FuncDecl{
 
 func sprintFunc(args []Value) Value {
 	return &String{Val: join(args, " ")}
+}
+
+func sprintfFunc(args []Value) Value {
+	if len(args) < 1 {
+		return newError("'sprintf' takes at least 1 argument")
+	}
+	format, ok := args[0].(*String)
+	if !ok {
+		return newError("first argument of 'sprintf' must be a string")
+	}
+	return &String{Val: sprintf(format.Val, args[1:])}
+}
+
+func sprintf(s string, vals []Value) string {
+	args := make([]any, len(vals))
+	for i, val := range vals {
+		args[i] = unwrapBasicValue(val)
+	}
+	return fmt.Sprintf(s, args...)
 }
 
 var joinDecl = &parser.FuncDecl{

@@ -467,3 +467,18 @@ func valueFromAny(t *parser.Type, v any) Value {
 	}
 	return newError("cannot create value for type " + t.String())
 }
+
+func unwrapBasicValue(val Value) any {
+	switch v := val.(type) {
+	case *Num:
+		return v.Val
+	case *String:
+		return v.Val
+	case *Bool:
+		return v.Val
+	case *Any:
+		return unwrapBasicValue(v.Val)
+	default:
+		return v.String()
+	}
+}

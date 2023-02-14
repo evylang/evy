@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,15 +18,19 @@ type Builtins struct {
 	Funcs         map[string]Builtin
 	Print         func(s string)
 	EventHandlers map[string]*parser.EventHandler
+	Globals       map[string]*parser.Var
 }
 
 func newParserBuiltins(builtins Builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDecl, len(builtins.Funcs))
-
 	for name, builtin := range builtins.Funcs {
 		funcs[name] = builtin.Decl
 	}
-	return parser.Builtins{Funcs: funcs, EventHandlers: builtins.EventHandlers}
+	return parser.Builtins{
+		Funcs:         funcs,
+		EventHandlers: builtins.EventHandlers,
+		Globals:       builtins.Globals,
+	}
 }
 
 type BuiltinFunc func(scope *scope, args []Value) Value
@@ -41,6 +46,9 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"sprintf": {Func: sprintfFunc, Decl: sprintDecl},
 		"join":    {Func: joinFunc, Decl: joinDecl},
 		"split":   {Func: splitFunc, Decl: splitDecl},
+
+		"str2num":  {Func: BuiltinFunc(str2numFunc), Decl: str2numDecl},
+		"str2bool": {Func: BuiltinFunc(str2boolFunc), Decl: str2boolDecl},
 
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
@@ -67,10 +75,15 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"move": {Name: "move", Params: xyParams},
 		"key":  {Name: "key", Params: stringParam},
 	}
+	globals := map[string]*parser.Var{
+		"err":    {Name: "err", T: parser.BOOL_TYPE},
+		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
+	}
 	return Builtins{
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
 		Print:         rt.Print,
+		Globals:       globals,
 	}
 }
 
@@ -197,6 +210,59 @@ func splitFunc(_ *scope, args []Value) Value {
 		elements[i] = &String{Val: s}
 	}
 	return &Array{Elements: &elements}
+}
+
+var str2numDecl = &parser.FuncDecl{
+	Name:       "str2num",
+	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
+	ReturnType: parser.NUM_TYPE,
+}
+
+func str2numFunc(scope *scope, args []Value) Value {
+	resetGlobalErr(scope)
+	s := args[0].(*String)
+	n, err := strconv.ParseFloat(s.Val, 64)
+	if err != nil {
+		setGlobalErr(scope, "str2num: cannot parse "+s.Val)
+	}
+	return &Num{Val: n}
+}
+
+var str2boolDecl = &parser.FuncDecl{
+	Name:       "str2bool",
+	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func str2boolFunc(scope *scope, args []Value) Value {
+	resetGlobalErr(scope)
+	s := args[0].(*String)
+	b, err := strconv.ParseBool(s.Val)
+	if err != nil {
+		setGlobalErr(scope, "str2bool: cannot parse "+s.Val)
+	}
+	return &Bool{Val: b}
+}
+
+func setGlobalErr(scope *scope, msg string) {
+	globalErr(scope, true, msg)
+}
+
+func resetGlobalErr(scope *scope) {
+	globalErr(scope, false, "")
+}
+
+func globalErr(scope *scope, isErr bool, msg string) {
+	val, ok := scope.get("err")
+	if !ok {
+		panic("cannot find global err")
+	}
+	val.Set(&Bool{Val: isErr})
+	val, ok = scope.get("errmsg")
+	if !ok {
+		panic("cannot find global errmsg")
+	}
+	val.Set(&String{Val: msg})
 }
 
 var lenDecl = &parser.FuncDecl{

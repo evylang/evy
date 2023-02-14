@@ -10,10 +10,14 @@ import (
 )
 
 func NewEvaluator(builtins Builtins) *Evaluator {
+	scope := newScope()
+	for _, global := range builtins.Globals {
+		scope.set(global.Name, zero(global.Type()))
+	}
 	return &Evaluator{
 		print:    builtins.Print,
 		builtins: builtins,
-		scope:    newScope(),
+		scope:    scope,
 	}
 }
 

@@ -2,7 +2,6 @@ package evaluator
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -29,7 +28,7 @@ func newParserBuiltins(builtins Builtins) parser.Builtins {
 	return parser.Builtins{Funcs: funcs, EventHandlers: builtins.EventHandlers}
 }
 
-type BuiltinFunc func(args []Value) Value
+type BuiltinFunc func(scope *scope, args []Value) Value
 
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
@@ -101,14 +100,14 @@ var printDecl = &parser.FuncDecl{
 }
 
 func printFunc(printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		printFn(join(args, " ") + "\n")
 		return nil
 	}
 }
 
 func printfFunc(printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		if len(args) < 1 {
 			return newError("'printf' takes at least 1 argument")
 		}
@@ -128,11 +127,11 @@ var sprintDecl = &parser.FuncDecl{
 	ReturnType:    parser.STRING_TYPE,
 }
 
-func sprintFunc(args []Value) Value {
+func sprintFunc(_ *scope, args []Value) Value {
 	return &String{Val: join(args, " ")}
 }
 
-func sprintfFunc(args []Value) Value {
+func sprintfFunc(_ *scope, args []Value) Value {
 	if len(args) < 1 {
 		return newError("'sprintf' takes at least 1 argument")
 	}
@@ -160,7 +159,7 @@ var joinDecl = &parser.FuncDecl{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func joinFunc(args []Value) Value {
+func joinFunc(_ *scope, args []Value) Value {
 	arr := args[0].(*Array)
 	sep := args[1].(*String)
 	s := join(*arr.Elements, sep.Val)
@@ -189,7 +188,7 @@ var splitDecl = &parser.FuncDecl{
 	ReturnType: stringArrayType,
 }
 
-func splitFunc(args []Value) Value {
+func splitFunc(_ *scope, args []Value) Value {
 	s := args[0].(*String)
 	sep := args[1].(*String)
 	slice := strings.Split(s.Val, sep.Val)
@@ -206,10 +205,7 @@ var lenDecl = &parser.FuncDecl{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func lenFunc(args []Value) Value {
-	if len(args) != 1 {
-		return newError("'len' takes 1 argument not " + strconv.Itoa(len(args)))
-	}
+func lenFunc(_ *scope, args []Value) Value {
 	switch arg := args[0].(type) {
 	case *Map:
 		return &Num{Val: float64(len(arg.Pairs))}
@@ -230,7 +226,7 @@ var hasDecl = &parser.FuncDecl{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func hasFunc(args []Value) Value {
+func hasFunc(_ *scope, args []Value) Value {
 	m := args[0].(*Map)
 	key := args[1].(*String)
 	_, ok := m.Pairs[key.Val]
@@ -246,7 +242,7 @@ var delDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func delFunc(args []Value) Value {
+func delFunc(_ *scope, args []Value) Value {
 	m := args[0].(*Map)
 	keyStr := args[1].(*String)
 	m.Delete(keyStr.Val)
@@ -259,7 +255,7 @@ var sleepDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func sleepFunc(args []Value) Value {
+func sleepFunc(_ *scope, args []Value) Value {
 	secs := args[0].(*Num)
 	dur := time.Duration(secs.Val * float64(time.Second))
 	time.Sleep(dur)
@@ -283,7 +279,7 @@ func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
 		fn(x.Val, y.Val)
@@ -308,7 +304,7 @@ func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		n := args[0].(*Num)
 		fn(n.Val)
 		return nil
@@ -332,7 +328,7 @@ func stringBuiltin(name string, fn func(str string), printFn func(string)) Built
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		str := args[0].(*String)
 		fn(str.Val)
 		return nil
@@ -341,7 +337,7 @@ func stringBuiltin(name string, fn func(str string), printFn func(string)) Built
 }
 
 func notImplementedFunc(name string, printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		printFn("'" + name + "' not yet implemented\n")
 		return nil
 	}

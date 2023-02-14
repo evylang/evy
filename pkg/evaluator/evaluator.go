@@ -216,7 +216,7 @@ func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall) Value {
 	}
 	builtin, ok := e.builtins.Funcs[funcCall.Name]
 	if ok {
-		return builtin.Func(args)
+		return builtin.Func(e.scope, args)
 	}
 	e.pushScope()
 	defer e.popScope()

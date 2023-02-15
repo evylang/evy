@@ -31,6 +31,20 @@ func getEvySource() string {
 	return getString(ptr, length)
 }
 
+func read() string {
+	for {
+		if eval.Stopped {
+			return ""
+		}
+		addr := jsRead()
+		if addr != 0 {
+			ptr, length := decodePtrLen(uint64(addr))
+			return getString(ptr, length)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
 // newSleepingYielder yields the CPU so that JavaScript/browser events
 // get a chance to be processed. Currently(Feb 2023) it seems that you
 // can only yield to JS by sleeping for at least 1ms but having that
@@ -97,6 +111,12 @@ func newStringEvent(name, str string) evaluator.Event {
 //export evySource
 func evySource() float64
 
+// jsRead is imported from JS. The float64 return value encodes the
+// ptr (high 32 bits) and length (low 32 bts) of the read string or
+// return 0 if no string was read.
+//export jsRead
+func jsRead() float64
+
 // jsPrint is imported from JS
 //export jsPrint
 func jsPrint(string)
@@ -134,6 +154,7 @@ func color(s string)
 // Go function first to put them in this Runtime struct.
 var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	Print: func(s string) { jsPrint(s) },
+	Read:  read,
 	Graphics: evaluator.GraphicsRuntime{
 		Move:   func(x, y float64) { move(x, y) },
 		Line:   func(x, y float64) { line(x, y) },

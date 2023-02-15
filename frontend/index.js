@@ -25,6 +25,21 @@ function jsPrint(ptr, len) {
   }
 }
 
+// jsRead reads the content of the "read" textarea. If the textarea
+// contains a newline jsRead extracts the string up until the newline
+// and empties the textarea. The read stream is written to shared wasm
+// memory and the address returned.
+function jsRead() {
+  const el = document.getElementById("read")
+  const s = el.value
+  const idx = s.indexOf("\n")
+  if (idx === -1) {
+    return 0
+  }
+  el.value = ""
+  return stringToMemAddr(s.slice(0, idx))
+}
+
 // evySource writes the evy source code into wasm memory as bytes
 // and returns pointer and length encoded into a single 64 bit number
 function evySource() {
@@ -81,6 +96,7 @@ function onStopped() {
 
 function newEvyGo() {
   const evyEnv = {
+    jsRead,
     jsPrint,
     evySource,
     move,

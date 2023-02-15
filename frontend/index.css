@@ -109,9 +109,6 @@ header button:disabled {
   box-shadow: none;
   cursor: not-allowed;
 }
-.hidden {
-  display: none;
-}
 
 main {
   width: 100%;
@@ -150,6 +147,27 @@ textarea:disabled {
   opacity: 1;
 }
 
+.read {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  border-bottom: 1px solid var(--primary-color-dimmer);
+}
+
+.read textarea {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+.read label {
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 .output {
   padding: 12px 16px;
   height: 100%;
@@ -177,6 +195,10 @@ textarea:disabled {
 .confetti.fadeout {
   opacity: 0;
   transition: opacity 1.5s ease-in-out;
+}
+
+.hidden {
+  display: none;
 }
 
 /* mobile */

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -43,8 +44,11 @@ func (c *cmdRun) Run() error {
 	if err != nil {
 		return err
 	}
-	printFn := func(s string) { fmt.Print(s) }
-	rt := evaluator.Runtime{Print: printFn}
+	reader := bufio.NewReader(os.Stdin)
+	rt := evaluator.Runtime{
+		Print: func(s string) { fmt.Print(s) },
+		Read:  func() string { s, _ := reader.ReadString('\n'); return s },
+	}
 	builtins := evaluator.DefaultBuiltins(rt)
 	eval := evaluator.NewEvaluator(builtins)
 	eval.Run(string(b))

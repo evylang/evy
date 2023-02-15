@@ -126,8 +126,10 @@ type ConditionalBlock struct {
 }
 
 type EventHandler struct {
-	Name string
-	Body *BlockStatement
+	Token  *lexer.Token // The 'on' token
+	Name   string
+	Params []*Var
+	Body   *BlockStatement
 }
 
 type Var struct {

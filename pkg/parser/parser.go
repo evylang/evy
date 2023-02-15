@@ -7,13 +7,19 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"foxygo.at/evy/pkg/lexer"
 )
 
-func Run(input string, builtins map[string]*FuncDecl) string {
+type Builtins struct {
+	Funcs         map[string]*FuncDecl
+	EventHandlers map[string]*EventHandler
+}
+
+func Run(input string, builtins Builtins) string {
 	parser := New(input, builtins)
 	prog := parser.Parse()
 	if len(parser.errors) > 0 {
@@ -33,8 +39,10 @@ type Parser struct {
 	cur  *lexer.Token // current token under examination
 	peek *lexer.Token // next token after current token
 
-	tokens []*lexer.Token
-	funcs  map[string]*FuncDecl // all function declaration by name and index in tokens.
+	tokens        []*lexer.Token
+	builtins      Builtins
+	funcs         map[string]*FuncDecl     // all function declarations by name
+	eventHandlers map[string]*EventHandler // all event handler declarations by name
 
 	wssStack []bool
 }
@@ -49,11 +57,16 @@ func (e Error) String() string {
 	return e.token.Location() + ": " + e.message
 }
 
-func New(input string, builtins map[string]*FuncDecl) *Parser {
+func New(input string, builtins Builtins) *Parser {
 	l := lexer.New(input)
 
-	p := &Parser{funcs: map[string]*FuncDecl{}, wssStack: []bool{false}}
-	for name, funcDecl := range builtins {
+	p := &Parser{
+		funcs:         map[string]*FuncDecl{},
+		eventHandlers: map[string]*EventHandler{},
+		wssStack:      []bool{false},
+		builtins:      builtins,
+	}
+	for name, funcDecl := range builtins.Funcs {
 		p.funcs[name] = funcDecl
 	}
 
@@ -86,9 +99,9 @@ func New(input string, builtins map[string]*FuncDecl) *Parser {
 		switch {
 		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
-		case builtins[fd.Name] == nil:
+		case builtins.Funcs[fd.Name] == nil:
 			p.appendErrorForToken("redeclaration of function "+fd.Name, fd.Token)
-		case builtins[fd.Name] != nil:
+		case builtins.Funcs[fd.Name] != nil:
 			p.appendErrorForToken("cannot override builtin function "+fd.Name, fd.Token)
 		}
 	}
@@ -168,36 +181,65 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 	for _, param := range fd.Params {
-		if scope.inLocalScope(param.Name) {
-			p.appendErrorForToken("redeclaration of parameter '"+param.Name+"'", param.Token)
-		}
-		if _, ok := p.funcs[param.Name]; ok {
-			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
-		}
+		p.validateVarDecl(scope, param, param.Token)
 		scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
 		param := fd.VariadicParam
-		if _, ok := p.funcs[param.Name]; ok {
-			p.appendErrorForToken("invalid declaration of parameter '"+param.Name+"', already used as function name", param.Token)
-		}
+		p.validateVarDecl(scope, param, param.Token)
 		scope.set(param.Name, param)
 	}
 }
 
 func (p *Parser) parseEventHandler(scope *scope) Node {
+	e := &EventHandler{Token: p.cur}
 	p.advance() // advance past ON token
-	e := &EventHandler{}
-	if p.assertToken(lexer.IDENT) {
-		e.Name = p.cur.Literal
-		p.advance() // advance past event name IDENT
-		p.assertEOL()
+	if !p.assertToken(lexer.IDENT) {
+		p.advancePastNL()
+		return nil
 	}
-	p.advancePastNL() // advance past `on EVENT_NAME`
+
+	e.Name = p.cur.Literal
+	switch {
+	case p.eventHandlers[e.Name] != nil:
+		p.appendError("redeclaration of on " + e.Name)
+	case p.builtins.EventHandlers[e.Name] == nil:
+		p.appendError("unknown event name " + e.Name)
+	default:
+		p.eventHandlers[e.Name] = e
+	}
+	p.advance() // advance past event name IDENT
+	for !p.isAtEOL() {
+		p.assertToken(lexer.IDENT)
+		decl := p.parseTypedDecl()
+		e.Params = append(e.Params, decl.Var)
+	}
+	p.advancePastNL()
+
+	scope = newScopeWithReturnType(scope, e, NONE_TYPE) // only bare returns
+	p.addEventParamsToScope(scope, e)
 	e.Body = p.parseBlock(scope)
 	p.assertEnd()
 	p.advancePastNL()
 	return e
+}
+
+func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandler) {
+	if len(e.Params) == 0 || p.builtins.EventHandlers[e.Name] == nil {
+		return
+	}
+	expectedParams := p.builtins.EventHandlers[e.Name].Params
+	if len(e.Params) != len(expectedParams) {
+		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
+	}
+	for i, param := range e.Params {
+		p.validateVarDecl(scope, param, param.Token)
+		exptectedType := expectedParams[i].Type()
+		if !param.Type().Matches(exptectedType) {
+			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
+		}
+		scope.set(param.Name, param)
+	}
 }
 
 func (p *Parser) parseStatement(scope *scope) Node {
@@ -650,6 +692,10 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		return nil
 	}
 	forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
+	if !p.validateVarDecl(scope, forNode.LoopVar, p.cur) {
+		p.advancePastNL()
+		return nil
+	}
 	scope.set(forNode.LoopVar.Name, forNode.LoopVar)
 	p.advance() // advance past loopVarName
 

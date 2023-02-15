@@ -189,6 +189,9 @@ func (t TokenType) FormatDetails() string {
 	if t == NL {
 		return "end of line"
 	}
+	if t == IDENT {
+		return "identifier"
+	}
 	return "'" + t.Format() + "'"
 }
 

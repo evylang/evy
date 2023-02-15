@@ -5,6 +5,7 @@
 package lexer
 
 import (
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -107,10 +108,10 @@ func (l *Lexer) Next() *Token {
 		}
 		return tok.SetType(DOT)
 	case '"':
-		literal := l.readString()
-		// EOF or NL before closing `"`
-		if l.cur != '"' {
-			return tok.SetType(ILLEGAL).SetLiteral(`"`)
+		literal, err := l.readString()
+		// strconv.Unquote error
+		if err != nil {
+			return tok.SetType(ILLEGAL).SetLiteral("invalid string")
 		}
 		return tok.SetType(STRING_LIT).SetLiteral(literal)
 	case 0:
@@ -186,21 +187,26 @@ func (l *Lexer) readIdent() string {
 	return l.readWhile(func(r rune) bool { return isLetter(r) || unicode.IsDigit(r) })
 }
 
-func (l *Lexer) readString() string {
-	pos := l.pos + 1
+func (l *Lexer) readString() (string, error) {
+	pos := l.pos
 	for {
 		l.advance()
 		pr := l.peekRune()
 		if pr == '"' && l.cur != '\\' {
-			l.advance()
+			l.advance() // end of string
 			break
 		}
 		if pr == 0 || pr == '\n' {
-			break
+			break // error case
 		}
 	}
-	s := string(l.input[pos:l.pos])
-	return strings.ReplaceAll(s, `\"`, `"`)
+	s := string(l.input[pos : l.pos+1])
+	r, err := strconv.Unquote(s)
+	if err != nil {
+		return "", err
+	}
+
+	return r, nil
 }
 
 func isLetter(r rune) bool {

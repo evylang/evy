@@ -274,9 +274,10 @@ func TestIllegal(t *testing.T) {
 		want Token
 	}{
 		{in: ",  ", want: Token{Offset: 0, Literal: ",", Line: 1, Col: 1}},
-		{in: `"unterminated`, want: Token{Offset: 0, Literal: `"`, Line: 1, Col: 1}},
+		{in: `"unterminated`, want: Token{Offset: 0, Literal: "invalid string", Line: 1, Col: 1}},
 		{in: `"newline in the
-		middle "`, want: Token{Offset: 0, Literal: `"`, Line: 1, Col: 1}},
+		middle "`, want: Token{Offset: 0, Literal: "invalid string", Line: 1, Col: 1}},
+		{in: `"bad escape: \X"`, want: Token{Offset: 0, Literal: "invalid string", Line: 1, Col: 1}},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -298,7 +299,7 @@ func TestRun(t *testing.T) {
 		{in: "\n", want: "NL\n"},
 		{in: ` "abc"`, want: "WS\nSTRING_LIT 'abc'\n"},
 		{in: ",", want: "ILLEGAL 💥 ',' at line 1 column 1\n"},
-		{in: `"asdf `, want: "ILLEGAL 💥 '\"' at line 1 column 1\n"},
+		{in: `"asdf `, want: "ILLEGAL 💥 'invalid string' at line 1 column 1\n"},
 	}
 
 	for _, tt := range tests {

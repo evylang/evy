@@ -9,6 +9,8 @@ linters:
   enable-all: true
   disable:
     - cyclop
+    - deadcode
+    - dupword
     - exhaustive
     - exhaustivestruct
     - exhaustruct
@@ -36,6 +38,7 @@ linters:
     - sqlclosecheck
     - structcheck
     - testpackage
+    - varcheck
     - varnamelen
     - wastedassign
     - wrapcheck

@@ -12,13 +12,17 @@ import (
 
 var version string
 var eval *evaluator.Evaluator
+var events []evaluator.Event
+
+const minSleepDur = time.Millisecond
 
 func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yielder = newSleepingYielder()
 	eval.Run(getSource())
-	onExit()
+	handleEvents()
+	onStopped()
 }
 
 func getSource() string {
@@ -44,9 +48,45 @@ type sleepingYielder struct {
 func (y *sleepingYielder) Yield() {
 	y.count++
 	if y.count > 1000 && time.Since(y.start) > 100*time.Millisecond {
-		time.Sleep(time.Millisecond)
+		time.Sleep(minSleepDur)
 		y.start = time.Now()
 		y.count = 0
+	}
+}
+
+func handleEvents() {
+	if eval == nil || len(eval.EventHandlerNames()) == 0 {
+		return
+	}
+	for _, name := range eval.EventHandlerNames() {
+		registerEventHandler(name)
+	}
+	for {
+		if eval.Stopped {
+			return
+		}
+		// unsynchronized access to events - ok in WASM as single threaded.
+		if len(events) > 0 {
+			event := events[0]
+			events = events[1:]
+			eval.HandleEvent(event)
+		} else {
+			time.Sleep(minSleepDur)
+		}
+	}
+}
+
+func newXYEvent(name string, x, y float64) evaluator.Event {
+	return evaluator.Event{
+		Name:   name,
+		Params: []any{x, y},
+	}
+}
+
+func newStringEvent(name, str string) evaluator.Event {
+	return evaluator.Event{
+		Name:   name,
+		Params: []any{str},
 	}
 }
 
@@ -62,9 +102,9 @@ func sourceLength() int
 //export jsPrint
 func jsPrint(string)
 
-// onExit is imported from JS
-//export onExit
-func onExit()
+// onStopped is imported from JS
+//export onStopped
+func onStopped()
 
 // move is imported from JS
 //export move
@@ -105,6 +145,9 @@ var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	},
 }
 
+//export registerEventHandler
+func registerEventHandler(eventName string)
+
 // --- Go function exported to JS/WASM runtime -------------------------
 
 // alloc pre-allocates memory used in string parameter passing.
@@ -137,4 +180,29 @@ func stop() {
 	if eval != nil {
 		eval.Stopped = true
 	}
+}
+
+//export onUp
+func onUp(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, newXYEvent("up", x, y))
+}
+
+//export onDown
+func onDown(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, newXYEvent("down", x, y))
+}
+
+//export onMove
+func onMove(x, y float64) {
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, newXYEvent("move", x, y))
+}
+
+//export onKey
+func onKey(ptr *uint32, length int) {
+	str := getString(ptr, length)
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, newStringEvent("key", str))
 }

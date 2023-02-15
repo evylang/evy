@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -441,4 +442,28 @@ func zero(t *parser.Type) Value {
 		return &Map{Pairs: map[string]Value{}, Order: &order}
 	}
 	return newError("cannot create zero value for type " + t.String())
+}
+
+func valueFromAny(t *parser.Type, v any) Value {
+	switch {
+	case t == parser.NUM_TYPE:
+		val, ok := v.(float64)
+		if !ok {
+			return newError(fmt.Sprintf("expected number, found %v", val))
+		}
+		return &Num{Val: val}
+	case t == parser.STRING_TYPE:
+		val, ok := v.(string)
+		if !ok {
+			return newError(fmt.Sprintf("expected string, found %v", val))
+		}
+		return &String{Val: val}
+	case t == parser.BOOL_TYPE:
+		val, ok := v.(bool)
+		if !ok {
+			return newError(fmt.Sprintf("expected bool, found %v", val))
+		}
+		return &Bool{Val: val}
+	}
+	return newError("cannot create value for type " + t.String())
 }

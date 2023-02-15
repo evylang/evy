@@ -17,7 +17,7 @@ function initWasm() {
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
-  const s = memString(ptr, len)
+  const s = memToString(ptr, len)
   const output = document.getElementById("output")
   output.textContent += s
   if (s.toLowerCase().includes("confetti")) {
@@ -25,10 +25,20 @@ function jsPrint(ptr, len) {
   }
 }
 
-function memString(ptr, len) {
+function memToString(ptr, len) {
   const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
   const s = new TextDecoder("utf8").decode(buf)
   return s
+}
+
+function stringToMem(s) {
+  const bytes = new TextEncoder("utf8").encode(s)
+  const e = wasmInst.exports
+  const len = bytes.length
+  const ptr = e.alloc(len)
+  const mem = new Uint8Array(e.memory.buffer, ptr, len)
+  mem.set(new Uint8Array(bytes))
+  return { ptr, len }
 }
 
 // handleRun retrieves the input string from the code pane and
@@ -37,7 +47,6 @@ function memString(ptr, len) {
 async function handleRun(event) {
   if (runButton.innerText === "Stop") {
     wasmInst.exports.stop()
-    onExit()
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
@@ -47,7 +56,9 @@ async function handleRun(event) {
   go.run(wasmInst)
 }
 
-function onExit() {
+// onStopped is exported to evy go/wasm and called when execution finishes
+function onStopped() {
+  removeEventHandlers()
   runButton.innerText = "Run"
 }
 
@@ -60,7 +71,8 @@ function newEvyGo() {
     circle,
     rect,
     color,
-    onExit,
+    onStopped,
+    registerEventHandler,
     sourcePtr: () => sourcePtr,
     sourceLength: () => sourceLength,
   }
@@ -71,13 +83,9 @@ function newEvyGo() {
 
 function prepareSourceAccess() {
   const code = document.getElementById("code").value
-  const bytes = new TextEncoder("utf8").encode(code)
-  const e = wasmInst.exports
-  const ptr = e.alloc(bytes.length)
-  const mem = new Uint8Array(e.memory.buffer, ptr, bytes.length)
-  mem.set(new Uint8Array(bytes))
+  const { ptr, len } = stringToMem(code)
   sourcePtr = ptr
-  sourceLength = bytes.length
+  sourceLength = len
 }
 
 function clearOutput() {
@@ -144,7 +152,8 @@ const canvas = {
   x: 0,
   y: 0,
   ctx: null,
-  scale: { x: 10, y: -10 },
+  factor: 10,
+  scale: { x: 1, y: -1 },
   width: 100,
   height: 100,
 
@@ -172,11 +181,11 @@ function resetCanvas() {
 }
 
 function scaleX(x) {
-  return canvas.scale.x * x
+  return canvas.scale.x * canvas.factor * x
 }
 
 function scaleY(y) {
-  return canvas.scale.y * y
+  return canvas.scale.y * canvas.factor * y
 }
 
 function transformX(x) {
@@ -187,6 +196,7 @@ function transformY(y) {
   return scaleY(y + canvas.offset.y)
 }
 
+// move is exported to evy go/wasm
 function move(x, y) {
   movePhysical(transformX(x), transformY(y))
 }
@@ -196,6 +206,7 @@ function movePhysical(px, py) {
   canvas.y = py
 }
 
+// line is exported to evy go/wasm
 function line(x2, y2) {
   const { ctx, x, y } = canvas
   const px2 = transformX(x2)
@@ -207,16 +218,19 @@ function line(x2, y2) {
   movePhysical(px2, py2)
 }
 
+// color is exported to evy go/wasm
 function color(ptr, len) {
-  const s = memString(ptr, len)
+  const s = memToString(ptr, len)
   canvas.ctx.fillStyle = s
   canvas.ctx.strokeStyle = s
 }
 
+// width is exported to evy go/wasm
 function width(n) {
   canvas.ctx.lineWidth = scaleX(n)
 }
 
+// rect is exported to evy go/wasm
 function rect(dx, dy) {
   const { ctx, x, y } = canvas
   const sDX = scaleX(dx)
@@ -225,6 +239,7 @@ function rect(dx, dy) {
   movePhysical(x + sDX, y + sDY)
 }
 
+// circle is exported to evy go/wasm
 function circle(r) {
   const { x, y, ctx } = canvas
   ctx.beginPath()
@@ -232,5 +247,85 @@ function circle(r) {
   ctx.fill()
 }
 
+// registerEventHandler is exported to evy go/wasm
+function registerEventHandler(ptr, len) {
+  const c = document.getElementById("canvas")
+  const s = memToString(ptr, len)
+  const exp = wasmInst.exports
+  if (s === "down") {
+    c.onpointerdown = (e) => exp.onDown(logicalX(e), logicalY(e))
+  } else if (s === "up") {
+    c.onpointerup = (e) => exp.onUp(logicalX(e), logicalY(e))
+  } else if (s === "move") {
+    c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
+  } else if (s === "key") {
+    document.addEventListener("keydown", keydownListener)
+  } else {
+    console.error("cannot register unknown event", s)
+  }
+}
+
+function logicalX(e) {
+  const scaleX = (canvas.width * canvas.scale.x) / e.target.offsetWidth
+  return e.offsetX * scaleX - canvas.offset.x
+}
+
+function logicalY(e) {
+  const scaleY = (canvas.height * canvas.scale.y) / e.target.offsetHeight
+  return e.offsetY * scaleY - canvas.offset.y
+}
+
+function keydownListener(e) {
+  if (e.target.id == "code") return // skip for source code input
+  const { ptr, len } = stringToMem(e.key)
+  wasmInst.exports.onKey(ptr, len)
+}
+
+function removeEventHandlers() {
+  const c = document.getElementById("canvas")
+  c.onpointerdown = null
+  c.onpointerup = null
+  c.onpointermove = null
+  document.removeEventListener("keydown", keydownListener)
+}
+
+async function initUI() {
+  document.addEventListener("keydown", ctrlEnterListener)
+  document.addEventListener("hashchange", fetchSource)
+  fetchSource()
+}
+
+function ctrlEnterListener(e) {
+  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    handleRun()
+  }
+}
+
+async function fetchSource() {
+  // parse url fragment into object
+  // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
+  // then fetch source from URL and write it to code input.
+  const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
+  const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
+  let sourceURL
+  if (entries.length === 1 && entries[0].length === 1 && entries[0][0]) {
+    // shortcut for example.com#draw loading example.com/samples/draw.evy
+    sourceURL = `samples/${entries[0][0]}.evy`
+  } else {
+    sourceURL = Object.fromEntries(entries).source
+  }
+  if (!sourceURL) {
+    return
+  }
+  try {
+    const response = await fetch(sourceURL)
+    const source = await response.text()
+    document.getElementById("code").value = source
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+initUI()
 initWasm()
 initCanvas()

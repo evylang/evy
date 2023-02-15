@@ -20,14 +20,14 @@ func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yielder = newSleepingYielder()
-	eval.Run(getSource())
+	eval.Run(getEvySource())
 	handleEvents()
 	onStopped()
 }
 
-func getSource() string {
-	ptr := sourcePtr()
-	length := sourceLength()
+func getEvySource() string {
+	addr := evySource()
+	ptr, length := decodePtrLen(uint64(addr))
 	return getString(ptr, length)
 }
 
@@ -92,11 +92,10 @@ func newStringEvent(name, str string) evaluator.Event {
 
 // --- JS function exported to Go/WASM ---------------------------------
 
-//export sourcePtr
-func sourcePtr() *uint32
-
-//export sourceLength
-func sourceLength() int
+// evySource is imported from JS. The float64 return value encodes the
+// ptr (high 32 bits) and length (low 32 bts) of the source string.
+//export evySource
+func evySource() float64
 
 // jsPrint is imported from JS
 //export jsPrint
@@ -172,6 +171,12 @@ func getString(ptr *uint32, length int) string {
 		builder.WriteByte(byte(s))
 	}
 	return builder.String()
+}
+
+func decodePtrLen(ptrLen uint64) (ptr *uint32, length int) {
+	ptr = (*uint32)(unsafe.Pointer(uintptr(ptrLen >> 32)))
+	length = int(uint32(ptrLen))
+	return
 }
 
 //export stop

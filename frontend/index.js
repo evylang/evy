@@ -3,7 +3,7 @@
 let wasmModule, wasmInst
 let sourcePtr, sourceLength
 const go = newEvyGo()
-const runButton = document.getElementById("run")
+const runButton = document.querySelector("#run")
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
@@ -18,7 +18,7 @@ function initWasm() {
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
   const s = memToString(ptr, len)
-  const output = document.getElementById("output")
+  const output = document.querySelector("#output")
   output.textContent += s
   if (s.toLowerCase().includes("confetti")) {
     showConfetti()
@@ -30,7 +30,7 @@ function jsPrint(ptr, len) {
 // and empties the textarea. The read stream is written to shared wasm
 // memory and the address returned.
 function jsRead() {
-  const el = document.getElementById("read")
+  const el = document.querySelector("#read")
   const s = el.value
   const idx = s.indexOf("\n")
   if (idx === -1) {
@@ -43,7 +43,7 @@ function jsRead() {
 // evySource writes the evy source code into wasm memory as bytes
 // and returns pointer and length encoded into a single 64 bit number
 function evySource() {
-  const code = document.getElementById("code").value
+  const code = document.querySelector("#code").value
   return stringToMemAddr(code)
 }
 
@@ -116,7 +116,7 @@ function newEvyGo() {
 }
 
 function clearOutput() {
-  document.getElementById("output").textContent = ""
+  document.querySelector("#output").textContent = ""
   resetCanvas()
 }
 
@@ -188,7 +188,7 @@ const canvas = {
 }
 
 function initCanvas() {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   const b = c.parentElement.getBoundingClientRect()
   c.width = Math.abs(scaleX(canvas.width))
   c.height = Math.abs(scaleY(canvas.height))
@@ -276,7 +276,7 @@ function circle(r) {
 
 // registerEventHandler is exported to evy go/wasm
 function registerEventHandler(ptr, len) {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   const s = memToString(ptr, len)
   const exp = wasmInst.exports
   if (s === "down") {
@@ -287,6 +287,8 @@ function registerEventHandler(ptr, len) {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
   } else if (s === "key") {
     document.addEventListener("keydown", keydownListener)
+  } else if (s === "input") {
+    addInputHandlers()
   } else {
     console.error("cannot register unknown event", s)
   }
@@ -308,17 +310,34 @@ function keydownListener(e) {
   wasmInst.exports.onKey(ptr, len)
 }
 
+const inputQuerySelector = "input#sliderx,input#slidery"
+
+function addInputHandlers() {
+  const exp = wasmInst.exports
+  for (const el of document.querySelectorAll(inputQuerySelector)) {
+    el.onchange = (e) => {
+      const id = stringToMem(e.target.id)
+      const val = stringToMem(e.target.value)
+      wasmInst.exports.onInput(id.ptr, id.len, val.ptr, val.len)
+    }
+  }
+}
+
 function removeEventHandlers() {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   c.onpointerdown = null
   c.onpointerup = null
   c.onpointermove = null
+  for (const el of document.querySelectorAll(inputQuerySelector)) {
+    el.onchange = null
+  }
   document.removeEventListener("keydown", keydownListener)
 }
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
   document.addEventListener("hashchange", fetchSource)
+  showHideControls()
   fetchSource()
 }
 
@@ -328,29 +347,54 @@ function ctrlEnterListener(e) {
   }
 }
 
+async function showHideControls() {
+  const opts = parseHash()
+
+  for (const el of getElements(opts.show)) {
+    el.classList.remove("hidden")
+  }
+  for (const el of getElements(opts.hide)) {
+    el.classList.add("hidden")
+  }
+}
+
+function getElements(q) {
+  if (!q) {
+    return []
+  }
+  try {
+    return Array.from(document.querySelectorAll(q))
+  } catch (error) {
+    consol.error("getElements", error)
+    return []
+  }
+}
+
 async function fetchSource() {
+  const opts = parseHash()
+  if (!opts.source) {
+    return
+  }
+  try {
+    const response = await fetch(opts.source)
+    const source = await response.text()
+    document.querySelector("#code").value = source
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function parseHash() {
   // parse url fragment into object
   // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
   // then fetch source from URL and write it to code input.
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
-  let sourceURL
   if (entries.length === 1 && entries[0].length === 1 && entries[0][0]) {
     // shortcut for example.com#draw loading example.com/samples/draw.evy
-    sourceURL = `samples/${entries[0][0]}.evy`
-  } else {
-    sourceURL = Object.fromEntries(entries).source
+    return { source: `samples/${entries[0][0]}.evy` }
   }
-  if (!sourceURL) {
-    return
-  }
-  try {
-    const response = await fetch(sourceURL)
-    const source = await response.text()
-    document.getElementById("code").value = source
-  } catch (err) {
-    console.error(err)
-  }
+  return Object.fromEntries(entries)
 }
 
 initUI()

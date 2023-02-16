@@ -71,16 +71,18 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		{Name: "y", T: parser.NUM_TYPE},
 	}
 	stringParam := []*parser.Var{{Name: "s", T: parser.STRING_TYPE}}
+	numParam := []*parser.Var{{Name: "n", T: parser.NUM_TYPE}}
 	inputParams := []*parser.Var{
 		{Name: "id", T: parser.STRING_TYPE},
 		{Name: "val", T: parser.STRING_TYPE},
 	}
 	eventHandlers := map[string]*parser.EventHandler{
-		"down":  {Name: "down", Params: xyParams},
-		"up":    {Name: "up", Params: xyParams},
-		"move":  {Name: "move", Params: xyParams},
-		"key":   {Name: "key", Params: stringParam},
-		"input": {Name: "input", Params: inputParams},
+		"down":    {Name: "down", Params: xyParams},
+		"up":      {Name: "up", Params: xyParams},
+		"move":    {Name: "move", Params: xyParams},
+		"key":     {Name: "key", Params: stringParam},
+		"input":   {Name: "input", Params: inputParams},
+		"animate": {Name: "animate", Params: numParam},
 	}
 	globals := map[string]*parser.Var{
 		"err":    {Name: "err", T: parser.BOOL_TYPE},

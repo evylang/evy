@@ -74,23 +74,28 @@ function ptrLenToBigInt({ ptr, len }) {
   return ptrLenNum
 }
 
+let stopped = true
 // handleRun retrieves the input string from the code pane and
 // converts it to wasm memory bytes. It then calls the evy main()
 // function running the evaluator after parsing.
 async function handleRun(event) {
   if (runButton.innerText === "Stop") {
+    stopped = true
     wasmInst.exports.stop()
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   clearOutput()
   runButton.innerText = "Stop"
+  stopped = false
   go.run(wasmInst)
 }
 
 // onStopped is exported to evy go/wasm and called when execution finishes
 function onStopped() {
   removeEventHandlers()
+  stopped = true
+  animationStart = undefined
   runButton.innerText = "Run"
 }
 
@@ -289,6 +294,8 @@ function registerEventHandler(ptr, len) {
     document.addEventListener("keydown", keydownListener)
   } else if (s === "input") {
     addInputHandlers()
+  } else if (s === "animate") {
+    window.requestAnimationFrame(animationLoop)
   } else {
     console.error("cannot register unknown event", s)
   }
@@ -332,6 +339,18 @@ function removeEventHandlers() {
     el.onchange = null
   }
   document.removeEventListener("keydown", keydownListener)
+}
+
+let animationStart
+function animationLoop(ts) {
+  if (stopped) {
+    return
+  }
+  if (animationStart === undefined) {
+    animationStart = ts
+  }
+  wasmInst.exports.onAnimate(ts - animationStart)
+  window.requestAnimationFrame(animationLoop)
 }
 
 async function initUI() {

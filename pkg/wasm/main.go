@@ -97,10 +97,10 @@ func newXYEvent(name string, x, y float64) evaluator.Event {
 	}
 }
 
-func newStringEvent(name, str string) evaluator.Event {
+func newKeyEvent(key string) evaluator.Event {
 	return evaluator.Event{
-		Name:   name,
-		Params: []any{str},
+		Name:   "key",
+		Params: []any{key},
 	}
 }
 
@@ -237,7 +237,7 @@ func onMove(x, y float64) {
 func onKey(ptr *uint32, length int) {
 	str := getString(ptr, length)
 	// unsynchronized access to events - ok in WASM as single threaded.
-	events = append(events, newStringEvent("key", str))
+	events = append(events, newKeyEvent(str))
 }
 
 //export onInput

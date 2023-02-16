@@ -40,8 +40,10 @@ func (b BuiltinFunc) String() string  { return "builtin function" }
 
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
-		"print":   {Func: printFunc(rt.Print), Decl: printDecl},
-		"printf":  {Func: printfFunc(rt.Print), Decl: printDecl},
+		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
+		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
+		"printf": {Func: printfFunc(rt.Print), Decl: printDecl},
+
 		"sprint":  {Func: sprintFunc, Decl: sprintDecl},
 		"sprintf": {Func: sprintfFunc, Decl: sprintDecl},
 		"join":    {Func: joinFunc, Decl: joinDecl},
@@ -94,6 +96,7 @@ func DefaulParserBuiltins(rt Runtime) parser.Builtins {
 
 type Runtime struct {
 	Print    func(string)
+	Read     func() string
 	Graphics GraphicsRuntime
 }
 
@@ -104,6 +107,18 @@ type GraphicsRuntime struct {
 	Circle func(radius float64)
 	Width  func(w float64)
 	Color  func(s string)
+}
+
+var readDecl = &parser.FuncDecl{
+	Name:       "read",
+	ReturnType: parser.STRING_TYPE,
+}
+
+func readFunc(readFn func() string) BuiltinFunc {
+	return func(_ *scope, args []Value) Value {
+		s := readFn()
+		return &String{Val: s}
+	}
 }
 
 var printDecl = &parser.FuncDecl{

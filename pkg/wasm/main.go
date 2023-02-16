@@ -20,15 +20,29 @@ func main() {
 	builtins := evaluator.DefaultBuiltins(jsRuntime)
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yielder = newSleepingYielder()
-	eval.Run(getSource())
+	eval.Run(getEvySource())
 	handleEvents()
 	onStopped()
 }
 
-func getSource() string {
-	ptr := sourcePtr()
-	length := sourceLength()
+func getEvySource() string {
+	addr := evySource()
+	ptr, length := decodePtrLen(uint64(addr))
 	return getString(ptr, length)
+}
+
+func read() string {
+	for {
+		if eval.Stopped {
+			return ""
+		}
+		addr := jsRead()
+		if addr != 0 {
+			ptr, length := decodePtrLen(uint64(addr))
+			return getString(ptr, length)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 }
 
 // newSleepingYielder yields the CPU so that JavaScript/browser events
@@ -92,11 +106,16 @@ func newStringEvent(name, str string) evaluator.Event {
 
 // --- JS function exported to Go/WASM ---------------------------------
 
-//export sourcePtr
-func sourcePtr() *uint32
+// evySource is imported from JS. The float64 return value encodes the
+// ptr (high 32 bits) and length (low 32 bts) of the source string.
+//export evySource
+func evySource() float64
 
-//export sourceLength
-func sourceLength() int
+// jsRead is imported from JS. The float64 return value encodes the
+// ptr (high 32 bits) and length (low 32 bts) of the read string or
+// return 0 if no string was read.
+//export jsRead
+func jsRead() float64
 
 // jsPrint is imported from JS
 //export jsPrint
@@ -135,6 +154,7 @@ func color(s string)
 // Go function first to put them in this Runtime struct.
 var jsRuntime evaluator.Runtime = evaluator.Runtime{
 	Print: func(s string) { jsPrint(s) },
+	Read:  read,
 	Graphics: evaluator.GraphicsRuntime{
 		Move:   func(x, y float64) { move(x, y) },
 		Line:   func(x, y float64) { line(x, y) },
@@ -172,6 +192,12 @@ func getString(ptr *uint32, length int) string {
 		builder.WriteByte(byte(s))
 	}
 	return builder.String()
+}
+
+func decodePtrLen(ptrLen uint64) (ptr *uint32, length int) {
+	ptr = (*uint32)(unsafe.Pointer(uintptr(ptrLen >> 32)))
+	length = int(uint32(ptrLen))
+	return
 }
 
 //export stop

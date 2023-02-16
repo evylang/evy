@@ -25,6 +25,28 @@ function jsPrint(ptr, len) {
   }
 }
 
+// jsRead reads the content of the "read" textarea. If the textarea
+// contains a newline jsRead extracts the string up until the newline
+// and empties the textarea. The read stream is written to shared wasm
+// memory and the address returned.
+function jsRead() {
+  const el = document.getElementById("read")
+  const s = el.value
+  const idx = s.indexOf("\n")
+  if (idx === -1) {
+    return 0
+  }
+  el.value = ""
+  return stringToMemAddr(s.slice(0, idx))
+}
+
+// evySource writes the evy source code into wasm memory as bytes
+// and returns pointer and length encoded into a single 64 bit number
+function evySource() {
+  const code = document.getElementById("code").value
+  return stringToMemAddr(code)
+}
+
 function memToString(ptr, len) {
   const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
   const s = new TextDecoder("utf8").decode(buf)
@@ -41,6 +63,17 @@ function stringToMem(s) {
   return { ptr, len }
 }
 
+function stringToMemAddr(s) {
+  const ptrLen = stringToMem(s)
+  return ptrLenToBigInt(ptrLen)
+}
+
+function ptrLenToBigInt({ ptr, len }) {
+  const ptrLen = (BigInt(ptr) << 32n) | (BigInt(len) & 0x00000000ffffffffn)
+  const ptrLenNum = Number(ptrLen)
+  return ptrLenNum
+}
+
 // handleRun retrieves the input string from the code pane and
 // converts it to wasm memory bytes. It then calls the evy main()
 // function running the evaluator after parsing.
@@ -50,7 +83,6 @@ async function handleRun(event) {
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
-  prepareSourceAccess()
   clearOutput()
   runButton.innerText = "Stop"
   go.run(wasmInst)
@@ -64,7 +96,9 @@ function onStopped() {
 
 function newEvyGo() {
   const evyEnv = {
+    jsRead,
     jsPrint,
+    evySource,
     move,
     line,
     width,
@@ -79,13 +113,6 @@ function newEvyGo() {
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
   return go
-}
-
-function prepareSourceAccess() {
-  const code = document.getElementById("code").value
-  const { ptr, len } = stringToMem(code)
-  sourcePtr = ptr
-  sourceLength = len
 }
 
 function clearOutput() {

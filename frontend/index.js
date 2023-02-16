@@ -3,7 +3,7 @@
 let wasmModule, wasmInst
 let sourcePtr, sourceLength
 const go = newEvyGo()
-const runButton = document.getElementById("run")
+const runButton = document.querySelector("#run")
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
@@ -18,7 +18,7 @@ function initWasm() {
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
   const s = memToString(ptr, len)
-  const output = document.getElementById("output")
+  const output = document.querySelector("#output")
   output.textContent += s
   if (s.toLowerCase().includes("confetti")) {
     showConfetti()
@@ -30,7 +30,7 @@ function jsPrint(ptr, len) {
 // and empties the textarea. The read stream is written to shared wasm
 // memory and the address returned.
 function jsRead() {
-  const el = document.getElementById("read")
+  const el = document.querySelector("#read")
   const s = el.value
   const idx = s.indexOf("\n")
   if (idx === -1) {
@@ -43,7 +43,7 @@ function jsRead() {
 // evySource writes the evy source code into wasm memory as bytes
 // and returns pointer and length encoded into a single 64 bit number
 function evySource() {
-  const code = document.getElementById("code").value
+  const code = document.querySelector("#code").value
   return stringToMemAddr(code)
 }
 
@@ -116,7 +116,7 @@ function newEvyGo() {
 }
 
 function clearOutput() {
-  document.getElementById("output").textContent = ""
+  document.querySelector("#output").textContent = ""
   resetCanvas()
 }
 
@@ -188,7 +188,7 @@ const canvas = {
 }
 
 function initCanvas() {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   const b = c.parentElement.getBoundingClientRect()
   c.width = Math.abs(scaleX(canvas.width))
   c.height = Math.abs(scaleY(canvas.height))
@@ -276,7 +276,7 @@ function circle(r) {
 
 // registerEventHandler is exported to evy go/wasm
 function registerEventHandler(ptr, len) {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   const s = memToString(ptr, len)
   const exp = wasmInst.exports
   if (s === "down") {
@@ -309,7 +309,7 @@ function keydownListener(e) {
 }
 
 function removeEventHandlers() {
-  const c = document.getElementById("canvas")
+  const c = document.querySelector("#canvas")
   c.onpointerdown = null
   c.onpointerup = null
   c.onpointermove = null

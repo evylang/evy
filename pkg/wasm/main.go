@@ -104,6 +104,13 @@ func newStringEvent(name, str string) evaluator.Event {
 	}
 }
 
+func newInputEvent(id, val string) evaluator.Event {
+	return evaluator.Event{
+		Name:   "input",
+		Params: []any{id, val},
+	}
+}
+
 // --- JS function exported to Go/WASM ---------------------------------
 
 // evySource is imported from JS. The float64 return value encodes the
@@ -231,4 +238,12 @@ func onKey(ptr *uint32, length int) {
 	str := getString(ptr, length)
 	// unsynchronized access to events - ok in WASM as single threaded.
 	events = append(events, newStringEvent("key", str))
+}
+
+//export onInput
+func onInput(idPtr *uint32, idLength int, valPtr *uint32, valLength int) {
+	id := getString(idPtr, idLength)
+	val := getString(valPtr, valLength)
+	// unsynchronized access to events - ok in WASM as single threaded.
+	events = append(events, newInputEvent(id, val))
 }

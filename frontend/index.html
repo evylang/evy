@@ -42,9 +42,13 @@ end
         <div class="canvas">
           <canvas id="canvas"></canvas>
         </div>
-        <div class="read">
+        <div class="read hidden">
           <label>input&gt;</label>
           <textarea id="read" rows="1"></textarea>
+        </div>
+        <div class="slider hidden">
+          <input type="range" id="sliderx" min="0" max="100" />
+          <input type="range" id="slidery" min="0" max="100" />
         </div>
         <div class="output">
           <textarea id="output" disabled></textarea>

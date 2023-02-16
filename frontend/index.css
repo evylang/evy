@@ -168,6 +168,18 @@ textarea:disabled {
   font-weight: bold;
 }
 
+.slider {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--primary-color-dimmer);
+}
+
+.slider input {
+  margin: 0.5rem;
+  max-width: 10rem;
+}
+
 .output {
   padding: 12px 16px;
   height: 100%;

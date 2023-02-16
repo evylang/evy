@@ -287,6 +287,8 @@ function registerEventHandler(ptr, len) {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
   } else if (s === "key") {
     document.addEventListener("keydown", keydownListener)
+  } else if (s === "input") {
+    addInputHandlers()
   } else {
     console.error("cannot register unknown event", s)
   }
@@ -308,11 +310,27 @@ function keydownListener(e) {
   wasmInst.exports.onKey(ptr, len)
 }
 
+const inputQuerySelector = "input#sliderx,input#slidery"
+
+function addInputHandlers() {
+  const exp = wasmInst.exports
+  for (const el of document.querySelectorAll(inputQuerySelector)) {
+    el.onchange = (e) => {
+      const id = stringToMem(e.target.id)
+      const val = stringToMem(e.target.value)
+      wasmInst.exports.onInput(id.ptr, id.len, val.ptr, val.len)
+    }
+  }
+}
+
 function removeEventHandlers() {
   const c = document.querySelector("#canvas")
   c.onpointerdown = null
   c.onpointerup = null
   c.onpointermove = null
+  for (const el of document.querySelectorAll(inputQuerySelector)) {
+    el.onchange = null
+  }
   document.removeEventListener("keydown", keydownListener)
 }
 

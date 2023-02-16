@@ -981,7 +981,7 @@ func TestFuncDeclErr(t *testing.T) {
 func len s:string
    print "len:" s
 end
-`: "line 2 column 1: cannot override builtin function len",
+`: "line 2 column 1: cannot override builtin function 'len'",
 		`
 func fox
    print "fox"
@@ -990,7 +990,7 @@ end
 func fox
    print "fox overridden"
 end
-`: "line 6 column 1: redeclaration of function fox",
+`: "line 6 column 1: redeclaration of function 'fox'",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())
@@ -1061,6 +1061,29 @@ end`: "line 3 column 4: wrong number of parameters expected 2, got 1",
 	}
 }
 
+func TestGlobalErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+err := true
+`: "line 2 column 1: redeclaration of builtin variable 'err'",
+		`
+errmsg := 5
+`: "line 2 column 1: redeclaration of builtin variable 'errmsg'",
+		`
+func errmsg
+   print "💣"
+end
+`: "line 2 column 1: cannot override builtin variable 'errmsg'",
+	}
+	for input, wantErr := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertParseError(t, parser, input)
+		gotErr := MaxErrorsString(parser.Errors(), 1)
+		assert.Equal(t, wantErr, gotErr)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10
@@ -1119,6 +1142,14 @@ func testBuiltins() Builtins {
 			},
 		},
 	}
+	globals := map[string]*Var{
+		"err":    {Name: "err", T: BOOL_TYPE},
+		"errmsg": {Name: "errmsg", T: STRING_TYPE},
+	}
 
-	return Builtins{Funcs: funcs, EventHandlers: eventHandlers}
+	return Builtins{
+		Funcs:         funcs,
+		EventHandlers: eventHandlers,
+		Globals:       globals,
+	}
 }

@@ -18,18 +18,22 @@ type Builtins struct {
 	Funcs         map[string]Builtin
 	Print         func(s string)
 	EventHandlers map[string]*parser.EventHandler
+	Globals       map[string]*parser.Var
 }
 
 func newParserBuiltins(builtins Builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDecl, len(builtins.Funcs))
-
 	for name, builtin := range builtins.Funcs {
 		funcs[name] = builtin.Decl
 	}
-	return parser.Builtins{Funcs: funcs, EventHandlers: builtins.EventHandlers}
+	return parser.Builtins{
+		Funcs:         funcs,
+		EventHandlers: builtins.EventHandlers,
+		Globals:       builtins.Globals,
+	}
 }
 
-type BuiltinFunc func(args []Value) Value
+type BuiltinFunc func(scope *scope, args []Value) Value
 
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
@@ -42,6 +46,9 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"sprintf": {Func: sprintfFunc, Decl: sprintDecl},
 		"join":    {Func: joinFunc, Decl: joinDecl},
 		"split":   {Func: splitFunc, Decl: splitDecl},
+
+		"str2num":  {Func: BuiltinFunc(str2numFunc), Decl: str2numDecl},
+		"str2bool": {Func: BuiltinFunc(str2boolFunc), Decl: str2boolDecl},
 
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
@@ -68,10 +75,15 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"move": {Name: "move", Params: xyParams},
 		"key":  {Name: "key", Params: stringParam},
 	}
+	globals := map[string]*parser.Var{
+		"err":    {Name: "err", T: parser.BOOL_TYPE},
+		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
+	}
 	return Builtins{
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
 		Print:         rt.Print,
+		Globals:       globals,
 	}
 }
 
@@ -101,14 +113,14 @@ var printDecl = &parser.FuncDecl{
 }
 
 func printFunc(printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		printFn(join(args, " ") + "\n")
 		return nil
 	}
 }
 
 func printfFunc(printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		if len(args) < 1 {
 			return newError("'printf' takes at least 1 argument")
 		}
@@ -128,11 +140,11 @@ var sprintDecl = &parser.FuncDecl{
 	ReturnType:    parser.STRING_TYPE,
 }
 
-func sprintFunc(args []Value) Value {
+func sprintFunc(_ *scope, args []Value) Value {
 	return &String{Val: join(args, " ")}
 }
 
-func sprintfFunc(args []Value) Value {
+func sprintfFunc(_ *scope, args []Value) Value {
 	if len(args) < 1 {
 		return newError("'sprintf' takes at least 1 argument")
 	}
@@ -160,7 +172,7 @@ var joinDecl = &parser.FuncDecl{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func joinFunc(args []Value) Value {
+func joinFunc(_ *scope, args []Value) Value {
 	arr := args[0].(*Array)
 	sep := args[1].(*String)
 	s := join(*arr.Elements, sep.Val)
@@ -189,7 +201,7 @@ var splitDecl = &parser.FuncDecl{
 	ReturnType: stringArrayType,
 }
 
-func splitFunc(args []Value) Value {
+func splitFunc(_ *scope, args []Value) Value {
 	s := args[0].(*String)
 	sep := args[1].(*String)
 	slice := strings.Split(s.Val, sep.Val)
@@ -200,16 +212,66 @@ func splitFunc(args []Value) Value {
 	return &Array{Elements: &elements}
 }
 
+var str2numDecl = &parser.FuncDecl{
+	Name:       "str2num",
+	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
+	ReturnType: parser.NUM_TYPE,
+}
+
+func str2numFunc(scope *scope, args []Value) Value {
+	resetGlobalErr(scope)
+	s := args[0].(*String)
+	n, err := strconv.ParseFloat(s.Val, 64)
+	if err != nil {
+		setGlobalErr(scope, "str2num: cannot parse "+s.Val)
+	}
+	return &Num{Val: n}
+}
+
+var str2boolDecl = &parser.FuncDecl{
+	Name:       "str2bool",
+	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func str2boolFunc(scope *scope, args []Value) Value {
+	resetGlobalErr(scope)
+	s := args[0].(*String)
+	b, err := strconv.ParseBool(s.Val)
+	if err != nil {
+		setGlobalErr(scope, "str2bool: cannot parse "+s.Val)
+	}
+	return &Bool{Val: b}
+}
+
+func setGlobalErr(scope *scope, msg string) {
+	globalErr(scope, true, msg)
+}
+
+func resetGlobalErr(scope *scope) {
+	globalErr(scope, false, "")
+}
+
+func globalErr(scope *scope, isErr bool, msg string) {
+	val, ok := scope.get("err")
+	if !ok {
+		panic("cannot find global err")
+	}
+	val.Set(&Bool{Val: isErr})
+	val, ok = scope.get("errmsg")
+	if !ok {
+		panic("cannot find global errmsg")
+	}
+	val.Set(&String{Val: msg})
+}
+
 var lenDecl = &parser.FuncDecl{
 	Name:       "len",
 	Params:     []*parser.Var{{Name: "a", T: parser.ANY_TYPE}},
 	ReturnType: parser.NUM_TYPE,
 }
 
-func lenFunc(args []Value) Value {
-	if len(args) != 1 {
-		return newError("'len' takes 1 argument not " + strconv.Itoa(len(args)))
-	}
+func lenFunc(_ *scope, args []Value) Value {
 	switch arg := args[0].(type) {
 	case *Map:
 		return &Num{Val: float64(len(arg.Pairs))}
@@ -230,7 +292,7 @@ var hasDecl = &parser.FuncDecl{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func hasFunc(args []Value) Value {
+func hasFunc(_ *scope, args []Value) Value {
 	m := args[0].(*Map)
 	key := args[1].(*String)
 	_, ok := m.Pairs[key.Val]
@@ -246,7 +308,7 @@ var delDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func delFunc(args []Value) Value {
+func delFunc(_ *scope, args []Value) Value {
 	m := args[0].(*Map)
 	keyStr := args[1].(*String)
 	m.Delete(keyStr.Val)
@@ -259,7 +321,7 @@ var sleepDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func sleepFunc(args []Value) Value {
+func sleepFunc(_ *scope, args []Value) Value {
 	secs := args[0].(*Num)
 	dur := time.Duration(secs.Val * float64(time.Second))
 	time.Sleep(dur)
@@ -283,7 +345,7 @@ func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
 		fn(x.Val, y.Val)
@@ -308,7 +370,7 @@ func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		n := args[0].(*Num)
 		fn(n.Val)
 		return nil
@@ -332,7 +394,7 @@ func stringBuiltin(name string, fn func(str string), printFn func(string)) Built
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(args []Value) Value {
+	result.Func = func(_ *scope, args []Value) Value {
 		str := args[0].(*String)
 		fn(str.Val)
 		return nil
@@ -341,7 +403,7 @@ func stringBuiltin(name string, fn func(str string), printFn func(string)) Built
 }
 
 func notImplementedFunc(name string, printFn func(string)) BuiltinFunc {
-	return func(args []Value) Value {
+	return func(_ *scope, args []Value) Value {
 		printFn("'" + name + "' not yet implemented\n")
 		return nil
 	}

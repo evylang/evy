@@ -17,6 +17,7 @@ import (
 type Builtins struct {
 	Funcs         map[string]*FuncDecl
 	EventHandlers map[string]*EventHandler
+	Globals       map[string]*Var
 }
 
 func Run(input string, builtins Builtins) string {
@@ -59,7 +60,6 @@ func (e Error) String() string {
 
 func New(input string, builtins Builtins) *Parser {
 	l := lexer.New(input)
-
 	p := &Parser{
 		funcs:         map[string]*FuncDecl{},
 		EventHandlers: map[string]*EventHandler{},
@@ -96,13 +96,18 @@ func New(input string, builtins Builtins) *Parser {
 	for _, i := range funcs {
 		p.advanceTo(i)
 		fd := p.parseFuncDeclSignature()
+		if p.builtins.Globals[fd.Name] != nil {
+			// We still go on to add `fd` to the funcs map so that the
+			// function can be parsed correctly even though it has an invalid name.
+			p.appendErrorForToken("cannot override builtin variable '"+fd.Name+"'", fd.Token)
+		}
 		switch {
 		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
 		case builtins.Funcs[fd.Name] == nil:
-			p.appendErrorForToken("redeclaration of function "+fd.Name, fd.Token)
+			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.Token)
 		case builtins.Funcs[fd.Name] != nil:
-			p.appendErrorForToken("cannot override builtin function "+fd.Name, fd.Token)
+			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.Token)
 		}
 	}
 	return p
@@ -125,6 +130,10 @@ func (p *Parser) Parse() *Program {
 func (p *Parser) parseProgram() *Program {
 	program := &Program{}
 	scope := newScope(nil, program) // TODO: model scope as stack like evaluator.
+	for _, global := range p.builtins.Globals {
+		global.isUsed = true
+		scope.set(global.Name, global)
+	}
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
@@ -407,6 +416,10 @@ func (p *Parser) parseTypedDecl() *Declaration {
 }
 
 func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
+	if _, ok := p.builtins.Globals[v.Name]; ok {
+		p.appendErrorForToken("redeclaration of builtin variable '"+v.Name+"'", tok)
+		return false
+	}
 	if scope.inLocalScope(v.Name) { // already declared in current scope
 		p.appendErrorForToken("redeclaration of '"+v.Name+"'", tok)
 		return false

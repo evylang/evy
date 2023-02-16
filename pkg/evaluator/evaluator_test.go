@@ -925,6 +925,57 @@ print n a m`
 	assert.Equal(t, want, got)
 }
 
+func TestStr2BoolNum(t *testing.T) {
+	prog := `
+print 1 (str2bool "1") err
+print 2 (str2bool "TRUE") err
+print 3 (str2bool "true") err
+print 4 (str2bool "False") err
+print 5 (str2num "1") err
+print 6 (str2num "-1.7") err
+`
+	out := run(prog)
+	want := []string{
+		"1 true false",
+		"2 true false",
+		"3 true false",
+		"4 false false",
+		"5 1 false",
+		"6 -1.7 false",
+		"",
+	}
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), out)
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestStr2BoolNumErr(t *testing.T) {
+	prog := `
+print 1 (str2bool "BAD") err
+print 2 errmsg
+str2bool "true"
+print 3 err  // check reset
+print 4 (str2num "BAD") err
+print 5 errmsg
+`
+	out := run(prog)
+	want := []string{
+		"1 false true",
+		"2 str2bool: cannot parse BAD",
+		"3 false",
+		"4 0 true",
+		"5 str2num: cannot parse BAD",
+		"",
+	}
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), out)
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

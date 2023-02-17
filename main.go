@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"foxygo.at/evy/pkg/evaluator"
 	"foxygo.at/evy/pkg/lexer"
@@ -44,12 +45,7 @@ func (c *cmdRun) Run() error {
 	if err != nil {
 		return err
 	}
-	reader := bufio.NewReader(os.Stdin)
-	rt := evaluator.Runtime{
-		Print: func(s string) { fmt.Print(s) },
-		Read:  func() string { s, _ := reader.ReadString('\n'); return s },
-	}
-	builtins := evaluator.DefaultBuiltins(rt)
+	builtins := evaluator.DefaultBuiltins(newRuntime())
 	eval := evaluator.NewEvaluator(builtins)
 	eval.Run(string(b))
 	return nil
@@ -70,10 +66,7 @@ func (c *cmdParse) Run() error {
 	if err != nil {
 		return err
 	}
-	rt := evaluator.Runtime{
-		Print: func(s string) { fmt.Print(s) },
-	}
-	builtinDecls := evaluator.DefaulParserBuiltins(rt)
+	builtinDecls := evaluator.DefaulParserBuiltins(newRuntime())
 	result := parser.Run(string(b), builtinDecls)
 	fmt.Println(result)
 	return nil
@@ -92,4 +85,13 @@ func fileBytes(filename string) ([]byte, error) {
 		return io.ReadAll(os.Stdin)
 	}
 	return os.ReadFile(filename)
+}
+
+func newRuntime() *evaluator.Runtime {
+	reader := bufio.NewReader(os.Stdin)
+	return &evaluator.Runtime{
+		Print: func(s string) { fmt.Print(s) },
+		Read:  func() string { s, _ := reader.ReadString('\n'); return s },
+		Sleep: time.Sleep,
+	}
 }

@@ -17,11 +17,13 @@ var events []evaluator.Event
 const minSleepDur = time.Millisecond
 
 func main() {
-	builtins := evaluator.DefaultBuiltins(jsRuntime)
+	yielder := newSleepingYielder()
+	rt := newJSRuntime(yielder)
+	builtins := evaluator.DefaultBuiltins(rt)
 	eval = evaluator.NewEvaluator(builtins)
-	eval.Yielder = newSleepingYielder()
+	eval.Yielder = yielder
 	eval.Run(getEvySource())
-	handleEvents()
+	handleEvents(yielder)
 	onStopped()
 }
 
@@ -29,20 +31,6 @@ func getEvySource() string {
 	addr := evySource()
 	ptr, length := decodePtrLen(uint64(addr))
 	return getString(ptr, length)
-}
-
-func read() string {
-	for {
-		if eval.Stopped {
-			return ""
-		}
-		addr := jsRead()
-		if addr != 0 {
-			ptr, length := decodePtrLen(uint64(addr))
-			return getString(ptr, length)
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
 }
 
 // newSleepingYielder yields the CPU so that JavaScript/browser events
@@ -63,12 +51,35 @@ func (y *sleepingYielder) Yield() {
 	y.count++
 	if y.count > 1000 && time.Since(y.start) > 100*time.Millisecond {
 		time.Sleep(minSleepDur)
-		y.start = time.Now()
-		y.count = 0
+		y.Reset()
 	}
 }
 
-func handleEvents() {
+func (y *sleepingYielder) Sleep(dur time.Duration) {
+	time.Sleep(dur)
+	y.Reset()
+}
+
+func (y *sleepingYielder) Read() string {
+	for {
+		if eval.Stopped {
+			return ""
+		}
+		addr := jsRead()
+		if addr != 0 {
+			ptr, length := decodePtrLen(uint64(addr))
+			return getString(ptr, length)
+		}
+		y.Sleep(50 * time.Millisecond)
+	}
+}
+
+func (y *sleepingYielder) Reset() {
+	y.start = time.Now()
+	y.count = 0
+}
+
+func handleEvents(yielder *sleepingYielder) {
 	if eval == nil || len(eval.EventHandlerNames()) == 0 {
 		return
 	}
@@ -83,9 +94,10 @@ func handleEvents() {
 		if len(events) > 0 {
 			event := events[0]
 			events = events[1:]
+			yielder.Reset()
 			eval.HandleEvent(event)
 		} else {
-			time.Sleep(minSleepDur)
+			yielder.Sleep(minSleepDur)
 		}
 	}
 }
@@ -166,17 +178,20 @@ func color(s string)
 // We cannot take the address of external/exported functions
 // (https://golang.org/cmd/cgo/#hdr-Passing_pointers) so we must wrap them in a
 // Go function first to put them in this Runtime struct.
-var jsRuntime evaluator.Runtime = evaluator.Runtime{
-	Print: func(s string) { jsPrint(s) },
-	Read:  read,
-	Graphics: evaluator.GraphicsRuntime{
-		Move:   func(x, y float64) { move(x, y) },
-		Line:   func(x, y float64) { line(x, y) },
-		Rect:   func(dx, dy float64) { rect(dx, dy) },
-		Circle: func(r float64) { circle(r) },
-		Width:  func(w float64) { width(w) },
-		Color:  func(s string) { color(s) },
-	},
+func newJSRuntime(yielder *sleepingYielder) *evaluator.Runtime {
+	return &evaluator.Runtime{
+		Print: func(s string) { jsPrint(s) },
+		Read:  yielder.Read,
+		Sleep: yielder.Sleep,
+		Graphics: evaluator.GraphicsRuntime{
+			Move:   func(x, y float64) { move(x, y) },
+			Line:   func(x, y float64) { line(x, y) },
+			Rect:   func(dx, dy float64) { rect(dx, dy) },
+			Circle: func(r float64) { circle(r) },
+			Width:  func(w float64) { width(w) },
+			Color:  func(s string) { color(s) },
+		},
+	}
 }
 
 //export registerEventHandler

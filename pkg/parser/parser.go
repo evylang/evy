@@ -699,21 +699,18 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	scope = newScope(scope, forNode)
 	p.advance() // advance past FOR token
 
-	if p.cur.TokenType() != lexer.IDENT {
-		p.appendError("expected variable, found " + p.cur.FormatDetails())
-		p.advancePastNL()
-		return nil
-	}
-	forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
-	if !p.validateVarDecl(scope, forNode.LoopVar, p.cur) {
-		p.advancePastNL()
-		return nil
-	}
-	scope.set(forNode.LoopVar.Name, forNode.LoopVar)
-	p.advance() // advance past loopVarName
+	if p.cur.TokenType() == lexer.IDENT {
+		forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
+		if !p.validateVarDecl(scope, forNode.LoopVar, p.cur) {
+			p.advancePastNL()
+			return nil
+		}
+		scope.set(forNode.LoopVar.Name, forNode.LoopVar)
+		p.advance() // advance past loopVarName
 
-	p.assertToken(lexer.DECLARE)
-	p.advance() // advance past :=
+		p.assertToken(lexer.DECLARE)
+		p.advance() // advance past :=
+	}
 	if !p.assertToken(lexer.RANGE) {
 		p.advancePastNL()
 		return nil
@@ -734,13 +731,19 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	p.assertEOL()
 	switch t.Name {
 	case STRING, MAP:
-		forNode.LoopVar.T = STRING_TYPE
+		if forNode.LoopVar != nil {
+			forNode.LoopVar.T = STRING_TYPE
+		}
 		forNode.Range = n
 	case ARRAY:
-		forNode.LoopVar.T = t.Sub
+		if forNode.LoopVar != nil {
+			forNode.LoopVar.T = t.Sub
+		}
 		forNode.Range = n
 	case NUM:
-		forNode.LoopVar.T = NUM_TYPE
+		if forNode.LoopVar != nil {
+			forNode.LoopVar.T = NUM_TYPE
+		}
 		forNode.Range = p.parseStepRange(nodes, tok)
 	default:
 		p.appendError("expected num, string, array or map after range, found " + t.Format())

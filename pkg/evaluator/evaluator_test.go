@@ -565,6 +565,9 @@ func TestForStepRange(t *testing.T) {
 for i := range 2
 	print "🎈" i
 end
+for range 2
+	print "🦈"
+end
 for i := range -1 1
 	print "🐣" i
 end
@@ -588,6 +591,8 @@ end
 	want := []string{
 		"🎈 0",
 		"🎈 1",
+		"🦈",
+		"🦈",
 		"🐣 -1",
 		"🐣 0",
 		"🍭 2",
@@ -608,6 +613,9 @@ func TestForArray(t *testing.T) {
 for x := range [0 1]
 	print "🎈" x
 end
+for range [0 1]
+	print "🦊"
+end
 for i := range []
 	print "💣" i
 end
@@ -616,6 +624,8 @@ end
 	want := []string{
 		"🎈 0",
 		"🎈 1",
+		"🦊",
+		"🦊",
 		"",
 	}
 	got := strings.Split(out, "\n")
@@ -630,6 +640,9 @@ func TestForString(t *testing.T) {
 for x := range "abc"
 	print "🎈" x
 end
+for range "ab"
+	print "🦊"
+end
 for i := range ""
 	print "💣" i
 end
@@ -639,6 +652,8 @@ end
 		"🎈 a",
 		"🎈 b",
 		"🎈 c",
+		"🦊",
+		"🦊",
 		"",
 	}
 	got := strings.Split(out, "\n")
@@ -654,6 +669,9 @@ m := {a:1 b:2}
 for x := range m
 	print "🎈" x  m[x]
 end
+for range m
+	print "🦊"
+end
 for i := range {}
 	print "💣" i
 end
@@ -662,6 +680,8 @@ end
 	want := []string{
 		"🎈 a 1",
 		"🎈 b 2",
+		"🦊",
+		"🦊",
 		"",
 	}
 	got := strings.Split(out, "\n")

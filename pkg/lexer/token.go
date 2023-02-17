@@ -33,6 +33,7 @@ const (
 	BANG     // !
 	ASTERISK // *
 	SLASH    // /
+	PERCENT  // %
 
 	EQ     // ==
 	NOT_EQ // !=
@@ -126,6 +127,7 @@ var tokenStrings = map[TokenType]tokenString{
 	MINUS:      {string: "MINUS", format: "-"},
 	BANG:       {string: "BANG", format: "!"},
 	ASTERISK:   {string: "ASTERISK", format: "*"},
+	PERCENT:    {string: "PERCENT", format: "%"},
 	SLASH:      {string: "SLASH", format: "/"},
 	LT:         {string: "LT", format: "<"},
 	GT:         {string: "GT", format: ">"},

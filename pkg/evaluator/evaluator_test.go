@@ -281,6 +281,8 @@ end
 func TestExpr(t *testing.T) {
 	tests := map[string]string{
 		"a := 1 + 2 * 2":                    "5",
+		"a := 6 % 4":                        "2",
+		"a := 6.3 % 4.1":                    "2.2",
 		"a := (1 + 2) * 2":                  "6",
 		"a := (1 + 2) / 2":                  "1.5",
 		"a := (1 + 2) / 2 > 1":              "true",

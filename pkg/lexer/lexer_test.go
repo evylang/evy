@@ -18,6 +18,7 @@ func TestSingleToken(t *testing.T) {
 		{in: "!", want: BANG},
 		{in: "*", want: ASTERISK},
 		{in: "/", want: SLASH},
+		{in: "%", want: PERCENT},
 		{in: "==", want: EQ},
 		{in: "!=", want: NOT_EQ},
 		{in: "<", want: LT},

@@ -40,6 +40,7 @@ var precedences = map[lexer.TokenType]precedence{
 	lexer.OR:       OR,
 	lexer.SLASH:    PRODUCT,
 	lexer.ASTERISK: PRODUCT,
+	lexer.PERCENT:  PRODUCT,
 	lexer.AND:      AND,
 	lexer.LBRACKET: INDEX,
 	lexer.DOT:      INDEX,
@@ -262,7 +263,7 @@ func (p *Parser) parseDotExpr(left Node) Node {
 }
 
 func isBinaryOp(tt lexer.TokenType) bool {
-	return isComparisonOp(tt) || tt == lexer.PLUS || tt == lexer.MINUS || tt == lexer.SLASH || tt == lexer.ASTERISK || tt == lexer.OR || tt == lexer.AND
+	return isComparisonOp(tt) || tt == lexer.PLUS || tt == lexer.MINUS || tt == lexer.SLASH || tt == lexer.ASTERISK || tt == lexer.PERCENT || tt == lexer.OR || tt == lexer.AND
 }
 
 func isComparisonOp(tt lexer.TokenType) bool {
@@ -306,7 +307,7 @@ func (p *Parser) validateBinaryType(binaryExp *BinaryExpression) {
 		if leftType != NUM_TYPE && leftType != STRING_TYPE && leftType.Name != ARRAY {
 			p.appendErrorForToken("'+' takes num, string or array type, found "+leftType.Format(), tok)
 		}
-	case OP_MINUS, OP_SLASH, OP_ASTERISK:
+	case OP_MINUS, OP_SLASH, OP_ASTERISK, OP_PERCENT:
 		if leftType != NUM_TYPE {
 			p.appendErrorForToken("'"+op.String()+"' takes num type, found "+leftType.Format(), tok)
 		}

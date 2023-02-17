@@ -45,10 +45,17 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
 		"printf": {Func: printfFunc(rt.Print), Decl: printDecl},
 
-		"sprint":  {Func: sprintFunc, Decl: sprintDecl},
-		"sprintf": {Func: sprintfFunc, Decl: sprintDecl},
-		"join":    {Func: joinFunc, Decl: joinDecl},
-		"split":   {Func: splitFunc, Decl: splitDecl},
+		"sprint":     {Func: sprintFunc, Decl: sprintDecl},
+		"sprintf":    {Func: sprintfFunc, Decl: sprintDecl},
+		"join":       {Func: joinFunc, Decl: joinDecl},
+		"split":      {Func: splitFunc, Decl: splitDecl},
+		"upper":      {Func: upperFunc, Decl: upperDecl},
+		"lower":      {Func: lowerFunc, Decl: lowerDecl},
+		"index":      {Func: indexFunc, Decl: indexDecl},
+		"startswith": {Func: startswithFunc, Decl: startswithDecl},
+		"endswith":   {Func: endswithFunc, Decl: endswithDecl},
+		"trim":       {Func: trimFunc, Decl: trimDecl},
+		"replace":    {Func: replaceFunc, Decl: replaceDecl},
 
 		"str2num":  {Func: BuiltinFunc(str2numFunc), Decl: str2numDecl},
 		"str2bool": {Func: BuiltinFunc(str2boolFunc), Decl: str2boolDecl},
@@ -237,6 +244,109 @@ func splitFunc(_ *scope, args []Value) Value {
 		elements[i] = &String{Val: s}
 	}
 	return &Array{Elements: &elements}
+}
+
+var upperDecl = &parser.FuncDecl{
+	Name: "upper",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func upperFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	return &String{Val: strings.ToUpper(s)}
+}
+
+var lowerDecl = &parser.FuncDecl{
+	Name: "lower",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func lowerFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	return &String{Val: strings.ToLower(s)}
+}
+
+var indexDecl = &parser.FuncDecl{
+	Name: "index",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "substr", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.NUM_TYPE,
+}
+
+func indexFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	substr := args[1].(*String).Val
+	return &Num{Val: float64(strings.Index(s, substr))}
+}
+
+var startswithDecl = &parser.FuncDecl{
+	Name: "startswith",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "startstr", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func startswithFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	prefix := args[1].(*String).Val
+	return &Bool{Val: strings.HasPrefix(s, prefix)}
+}
+
+var endswithDecl = &parser.FuncDecl{
+	Name: "endswith",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "endstr", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func endswithFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	suffix := args[1].(*String).Val
+	return &Bool{Val: strings.HasSuffix(s, suffix)}
+}
+
+var trimDecl = &parser.FuncDecl{
+	Name: "trim",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "cutset", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func trimFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	cutset := args[1].(*String).Val
+	return &String{Val: strings.Trim(s, cutset)}
+}
+
+var replaceDecl = &parser.FuncDecl{
+	Name: "replace",
+	Params: []*parser.Var{
+		{Name: "s", T: parser.STRING_TYPE},
+		{Name: "old", T: parser.STRING_TYPE},
+		{Name: "new", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func replaceFunc(_ *scope, args []Value) Value {
+	s := args[0].(*String).Val
+	oldStr := args[1].(*String).Val
+	newStr := args[2].(*String).Val
+	return &String{Val: strings.ReplaceAll(s, oldStr, newStr)}
 }
 
 var str2numDecl = &parser.FuncDecl{

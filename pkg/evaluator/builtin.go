@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -57,6 +58,9 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
 
 		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+
+		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
+		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
 
 		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
 		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
@@ -351,6 +355,27 @@ func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
 		sleepFn(dur)
 		return nil
 	}
+}
+
+var randDecl = &parser.FuncDecl{
+	Name:       "rand",
+	Params:     []*parser.Var{{Name: "upper", T: parser.NUM_TYPE}},
+	ReturnType: parser.NUM_TYPE,
+}
+
+func randFunc(_ *scope, args []Value) Value {
+	upper := int32(args[0].(*Num).Val)
+	return &Num{Val: float64(rand.Int31n(upper))} //nolint: gosec
+}
+
+var rand1Decl = &parser.FuncDecl{
+	Name:       "rand",
+	Params:     []*parser.Var{},
+	ReturnType: parser.NUM_TYPE,
+}
+
+func rand1Func(_ *scope, args []Value) Value {
+	return &Num{Val: rand.Float64()} //nolint: gosec
 }
 
 func xyDecl(name string) *parser.FuncDecl {

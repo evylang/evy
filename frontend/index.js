@@ -31,6 +31,7 @@ function jsPrint(ptr, len) {
 // memory and the address returned.
 function jsRead() {
   const el = document.querySelector("#read")
+  el.focus()
   const s = el.value
   const idx = s.indexOf("\n")
   if (idx === -1) {

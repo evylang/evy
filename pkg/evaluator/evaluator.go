@@ -5,11 +5,14 @@ package evaluator
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"foxygo.at/evy/pkg/parser"
 )
 
 func NewEvaluator(builtins Builtins) *Evaluator {
+	rand.Seed(time.Now().UnixNano()) //nolint: staticcheck //still required in tinygo
 	scope := newScope()
 	for _, global := range builtins.Globals {
 		scope.set(global.Name, zero(global.Type()))

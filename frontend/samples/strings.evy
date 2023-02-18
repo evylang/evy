@@ -1,0 +1,11 @@
+s := "Hello World!"
+
+print "upper" (upper s)
+print "lower" (lower s)
+print "index" (index s "e")
+print "startswith" (startswith s "Hello")
+print "startswith2" (startswith s "hello")
+print "endswith" (endswith s "World!")
+print "endswith2" (endswith s "World")
+print "replace" (replace s "l" "L")
+print "trim" (trim s "H!")

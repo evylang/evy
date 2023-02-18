@@ -31,6 +31,7 @@ function jsPrint(ptr, len) {
 // memory and the address returned.
 function jsRead() {
   const el = document.querySelector("#read")
+  el.focus()
   const s = el.value
   const idx = s.indexOf("\n")
   if (idx === -1) {
@@ -396,6 +397,9 @@ async function fetchSource() {
   }
   try {
     const response = await fetch(opts.source)
+    if (response.status < 200 || response.status > 299) {
+      throw new Error("invalid reponse status", response.status)
+    }
     const source = await response.text()
     document.querySelector("#code").value = source
   } catch (err) {

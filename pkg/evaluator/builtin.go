@@ -38,7 +38,7 @@ type BuiltinFunc func(scope *scope, args []Value) Value
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
 
-func DefaultBuiltins(rt Runtime) Builtins {
+func DefaultBuiltins(rt *Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
@@ -56,7 +56,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
 
-		"sleep": {Func: BuiltinFunc(sleepFunc), Decl: sleepDecl},
+		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
 
 		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
 		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
@@ -71,16 +71,18 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		{Name: "y", T: parser.NUM_TYPE},
 	}
 	stringParam := []*parser.Var{{Name: "s", T: parser.STRING_TYPE}}
+	numParam := []*parser.Var{{Name: "n", T: parser.NUM_TYPE}}
 	inputParams := []*parser.Var{
 		{Name: "id", T: parser.STRING_TYPE},
 		{Name: "val", T: parser.STRING_TYPE},
 	}
 	eventHandlers := map[string]*parser.EventHandler{
-		"down":  {Name: "down", Params: xyParams},
-		"up":    {Name: "up", Params: xyParams},
-		"move":  {Name: "move", Params: xyParams},
-		"key":   {Name: "key", Params: stringParam},
-		"input": {Name: "input", Params: inputParams},
+		"down":    {Name: "down", Params: xyParams},
+		"up":      {Name: "up", Params: xyParams},
+		"move":    {Name: "move", Params: xyParams},
+		"key":     {Name: "key", Params: stringParam},
+		"input":   {Name: "input", Params: inputParams},
+		"animate": {Name: "animate", Params: numParam},
 	}
 	globals := map[string]*parser.Var{
 		"err":    {Name: "err", T: parser.BOOL_TYPE},
@@ -94,7 +96,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 	}
 }
 
-func DefaulParserBuiltins(rt Runtime) parser.Builtins {
+func DefaulParserBuiltins(rt *Runtime) parser.Builtins {
 	builtins := DefaultBuiltins(rt)
 	return newParserBuiltins(builtins)
 }
@@ -102,6 +104,7 @@ func DefaulParserBuiltins(rt Runtime) parser.Builtins {
 type Runtime struct {
 	Print    func(string)
 	Read     func() string
+	Sleep    func(dur time.Duration)
 	Graphics GraphicsRuntime
 }
 
@@ -341,11 +344,13 @@ var sleepDecl = &parser.FuncDecl{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func sleepFunc(_ *scope, args []Value) Value {
-	secs := args[0].(*Num)
-	dur := time.Duration(secs.Val * float64(time.Second))
-	time.Sleep(dur)
-	return nil
+func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
+	return func(_ *scope, args []Value) Value {
+		secs := args[0].(*Num)
+		dur := time.Duration(secs.Val * float64(time.Second))
+		sleepFn(dur)
+		return nil
+	}
 }
 
 func xyDecl(name string) *parser.FuncDecl {

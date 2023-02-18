@@ -19,7 +19,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		// binary expressions, arithmetic
 		"1+1":   "(1+1)",
 		"1* n1": "(1*n1)",
-		"1*2*3": "((1*2)*3)",
+		"1*2%3": "((1*2)%3)",
 		"1*2/3": "((1*2)/3)",
 		"1+2*3": "(1+(2*3))",
 		"n1/n2": "(n1/n2)",

@@ -10,6 +10,7 @@ const (
 	OP_MINUS
 	OP_SLASH
 	OP_ASTERISK
+	OP_PERCENT
 
 	OP_OR
 	OP_AND
@@ -32,6 +33,7 @@ var operatorStrings = map[Operator]string{
 	OP_MINUS:    "-",
 	OP_SLASH:    "/",
 	OP_ASTERISK: "*",
+	OP_PERCENT:  "%",
 	OP_OR:       "or",
 	OP_AND:      "and",
 	OP_EQ:       "==",
@@ -55,6 +57,8 @@ func op(tok *lexer.Token) Operator {
 		return OP_SLASH
 	case lexer.ASTERISK:
 		return OP_ASTERISK
+	case lexer.PERCENT:
+		return OP_PERCENT
 	case lexer.OR:
 		return OP_OR
 	case lexer.AND:

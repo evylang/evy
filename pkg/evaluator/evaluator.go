@@ -5,6 +5,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -478,6 +479,8 @@ func evalBinaryNumExpr(op parser.Operator, left, right *Num) Value {
 		return &Num{Val: left.Val - right.Val}
 	case parser.OP_ASTERISK:
 		return &Num{Val: left.Val * right.Val}
+	case parser.OP_PERCENT:
+		return &Num{Val: math.Mod(left.Val, right.Val)}
 	case parser.OP_SLASH:
 		return &Num{Val: left.Val / right.Val}
 	case parser.OP_GT:

@@ -68,6 +68,8 @@ func (l *Lexer) Next() *Token {
 		return tok.SetType(SLASH)
 	case '*':
 		return tok.SetType(ASTERISK)
+	case '%':
+		return tok.SetType(PERCENT)
 	case '<':
 		if l.peekRune() == '=' {
 			l.advance()

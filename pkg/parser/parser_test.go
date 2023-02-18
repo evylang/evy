@@ -930,12 +930,12 @@ func TestForErr(t *testing.T) {
 for
 	print "X"
 end
-`: "line 2 column 4: expected variable, found end of line",
+`: "line 2 column 4: expected 'range', got end of line",
 		`
 for true
 	print "X"
 end
-`: "line 2 column 5: expected variable, found 'true'",
+`: "line 2 column 5: expected 'range', got 'true'",
 		`
 x := 0
 for x = range 5

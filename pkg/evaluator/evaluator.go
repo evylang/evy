@@ -316,20 +316,28 @@ func (e *Evaluator) newRange(f *parser.For) (ranger, Value) {
 
 	switch v := rangeVal.(type) {
 	case *Array:
-		loopVar := zero(f.LoopVar.Type())
-		e.scope.set(f.LoopVar.Name, loopVar)
-		return &arrayRange{loopVar: loopVar, array: v, cur: 0}, nil
+		aRange := &arrayRange{array: v, cur: 0}
+		if f.LoopVar != nil {
+			aRange.loopVar = zero(f.LoopVar.Type())
+			e.scope.set(f.LoopVar.Name, aRange.loopVar)
+		}
+		return aRange, nil
 	case *String:
-		loopVar := &String{}
-		e.scope.set(f.LoopVar.Name, loopVar)
-		return &stringRange{loopVar: loopVar, str: v, cur: 0}, nil
+		sRange := &stringRange{str: v, cur: 0}
+		if f.LoopVar != nil {
+			sRange.loopVar = &String{}
+			e.scope.set(f.LoopVar.Name, sRange.loopVar)
+		}
+		return sRange, nil
 	case *Map:
-		loopVar := &String{}
-		e.scope.set(f.LoopVar.Name, loopVar)
 		order := make([]string, len(*v.Order))
 		copy(order, *v.Order)
-		m := &mapRange{loopVar: loopVar, mapVal: v, cur: 0, order: order}
-		return m, nil
+		mapRange := &mapRange{mapVal: v, cur: 0, order: order}
+		if f.LoopVar != nil {
+			mapRange.loopVar = &String{}
+			e.scope.set(f.LoopVar.Name, mapRange.loopVar)
+		}
+		return mapRange, nil
 	}
 	return nil, newError("cannot create range for " + f.Range.String())
 }
@@ -350,16 +358,18 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 	if step == 0 {
 		return nil, newError("step cannot by 0, infinite loop")
 	}
-	loopVarVal := &Num{}
-	e.scope.set(loopVar.Name, loopVarVal)
 
-	ranger := &stepRange{
-		loopVar: loopVarVal,
-		cur:     start,
-		stop:    stop,
-		step:    step,
+	sRange := &stepRange{
+		cur:  start,
+		stop: stop,
+		step: step,
 	}
-	return ranger, nil
+	if loopVar != nil {
+		loopVarVal := &Num{}
+		e.scope.set(loopVar.Name, loopVarVal)
+		sRange.loopVar = loopVarVal
+	}
+	return sRange, nil
 }
 
 func (e *Evaluator) numVal(n parser.Node) (float64, Value) {

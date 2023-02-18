@@ -126,6 +126,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		// Map literals
 		"{}":                     "{}",
 		"{a: 1}":                 "{a:1}",
+		"{ a: 1 }":               "{a:1}",
 		"{a: 1 b:2}":             "{a:1, b:2}",
 		"{a: [1] b:2}":           "{a:[1], b:2}",
 		"{a: [1] b:2 c: 1+2}":    "{a:[1], b:2, c:(1+2)}",
@@ -159,6 +160,18 @@ func TestParseTopLevelExpression(t *testing.T) {
 		   1
 		   2
 		 ]`: "[1, 2]",
+		`{ a:1
+		   b:2 }`: "{a:1, b:2}",
+		`{
+		   a:1
+		   b:2
+		}`: "{a:1, b:2}",
+		"{  " + `
+		   a:1
+
+		   b:2   ` + `
+
+		}`: "{a:1, b:2}",
 	}
 	for input, want := range tests {
 		parser := New(input, testBuiltins())

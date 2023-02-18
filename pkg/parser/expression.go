@@ -441,9 +441,10 @@ func (p *Parser) parseMapLiteral(scope *scope) Node {
 func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 	pairs := map[string]Node{}
 	var order []string
+	p.advanceIfWSEOL()
 	tt := p.cur.TokenType()
 
-	for !p.isAtEOL() && tt != lexer.RCURLY {
+	for tt != lexer.RCURLY && tt != lexer.EOF {
 		if tt != lexer.IDENT {
 			p.appendError("expected map key, found " + p.cur.FormatDetails())
 		}
@@ -462,6 +463,7 @@ func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 		}
 		pairs[key] = n
 		order = append(order, key)
+		p.advanceIfWSEOL()
 		tt = p.cur.TokenType()
 	}
 	return pairs, order

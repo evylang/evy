@@ -126,6 +126,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		// Map literals
 		"{}":                     "{}",
 		"{a: 1}":                 "{a:1}",
+		"{ a: 1 }":               "{a:1}",
 		"{a: 1 b:2}":             "{a:1, b:2}",
 		"{a: [1] b:2}":           "{a:[1], b:2}",
 		"{a: [1] b:2 c: 1+2}":    "{a:[1], b:2, c:(1+2)}",
@@ -146,6 +147,31 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"arr[1:]":  "(arr[1:])",
 		"arr[:2]":  "(arr[:2])",
 		"arr[:]":   "(arr[:])",
+
+		// Multiline declarations
+		`[ 1
+		   2 ]`: "[1, 2]",
+		"[  " + `
+		   1
+
+		   2
+		 ]`: "[1, 2]",
+		`[
+		   1
+		   2
+		 ]`: "[1, 2]",
+		`{ a:1
+		   b:2 }`: "{a:1, b:2}",
+		`{
+		   a:1
+		   b:2
+		}`: "{a:1, b:2}",
+		"{  " + `
+		   a:1
+
+		   b:2   ` + `
+
+		}`: "{a:1, b:2}",
 	}
 	for input, want := range tests {
 		parser := New(input, testBuiltins())
@@ -221,6 +247,11 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"{a: _}":   "line 1 column 5: anonymous variable '_' cannot be read",
 		"[_]":      "line 1 column 2: anonymous variable '_' cannot be read",
 		"{a:1}[_]": "line 1 column 7: anonymous variable '_' cannot be read",
+
+		"[1":    "line 1 column 3: expected ']', got end of input",
+		"[1)":   "line 1 column 3: unexpected ')'",
+		"[1(]":  "line 1 column 4: unexpected ']'",
+		"[1()]": "line 1 column 4: unexpected ')'",
 	}
 	for input, wantErr := range tests {
 		parser := New(input, testBuiltins())

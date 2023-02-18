@@ -350,12 +350,18 @@ func (p *Parser) parseLiteral(scope *scope) Node {
 
 func (p *Parser) parseArrayLiteral(scope *scope) Node {
 	tok := p.cur
-	p.advance()     // advance past [
-	p.advanceIfWS() // allow whitespace after `[`, eg [ 1 2 3 ]
-	elements := p.parseExprList(scope)
-
-	if elements == nil {
-		return nil // previous error
+	p.advance()        // advance past [
+	p.advanceIfWSEOL() // allow whitespace after `[`, eg [ 1 2 3 ]
+	elements := []Node{}
+	tt := p.cur.TokenType()
+	for tt != lexer.RBRACKET && tt != lexer.EOF {
+		n := p.parseExprWSS(scope)
+		if n == nil {
+			return nil // previous error
+		}
+		elements = append(elements, n)
+		p.advanceIfWSEOL()
+		tt = p.cur.TokenType()
 	}
 	if !p.assertToken(lexer.RBRACKET) {
 		return nil
@@ -375,8 +381,8 @@ func (p *Parser) parseArrayLiteral(scope *scope) Node {
 func (p *Parser) parseExprList(scope *scope) []Node {
 	list := []Node{}
 	tt := p.cur.TokenType()
-	for !p.isAtEOL() && tt != lexer.RPAREN && tt != lexer.RBRACKET {
-		n := p.parseExprWSS(scope, LOWEST)
+	for tt != lexer.RPAREN && tt != lexer.RBRACKET && tt != lexer.EOF && !p.isAtEOL() {
+		n := p.parseExprWSS(scope)
 		if n == nil {
 			return nil // previous error
 		}
@@ -387,10 +393,10 @@ func (p *Parser) parseExprList(scope *scope) []Node {
 	return list
 }
 
-func (p *Parser) parseExprWSS(scope *scope, prec precedence) Node {
+func (p *Parser) parseExprWSS(scope *scope) Node {
 	p.pushWSS(true)
 	defer p.popWSS()
-	return p.parseExpr(scope, prec)
+	return p.parseExpr(scope, LOWEST)
 }
 
 func (p *Parser) combineTypes(types []*Type) *Type {
@@ -435,9 +441,10 @@ func (p *Parser) parseMapLiteral(scope *scope) Node {
 func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 	pairs := map[string]Node{}
 	var order []string
+	p.advanceIfWSEOL()
 	tt := p.cur.TokenType()
 
-	for !p.isAtEOL() && tt != lexer.RCURLY {
+	for tt != lexer.RCURLY && tt != lexer.EOF {
 		if tt != lexer.IDENT {
 			p.appendError("expected map key, found " + p.cur.FormatDetails())
 		}
@@ -450,12 +457,13 @@ func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 		p.assertToken(lexer.COLON)
 		p.advance() // advance past COLON
 
-		n := p.parseExprWSS(scope, LOWEST)
+		n := p.parseExprWSS(scope)
 		if n == nil {
 			return nil, nil // previous error
 		}
 		pairs[key] = n
 		order = append(order, key)
+		p.advanceIfWSEOL()
 		tt = p.cur.TokenType()
 	}
 	return pairs, order

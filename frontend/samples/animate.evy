@@ -3,17 +3,22 @@
 s := 0.5
 radius := 5
 
-dot0 := {x:(pos 0) y:(pos 2) dx:s  dy:s  radius:radius color:0}
-dot1 := {x:(pos 1) y:(pos 3) dx:s  dy:s  radius:radius color:1}
-dot2 := {x:(pos 2) y:(pos 4) dx:s  dy:-s radius:radius color:2}
-dot3 := {x:(pos 3) y:(pos 3) dx:s  dy:-s radius:radius color:3}
-dot4 := {x:(pos 4) y:(pos 2) dx:-s dy:-s radius:radius color:4}
-dot5 := {x:(pos 3) y:(pos 1) dx:-s dy:-s radius:radius color:5}
-dot6 := {x:(pos 2) y:(pos 0) dx:-s dy:s  radius:radius color:6}
-dot7 := {x:(pos 1) y:(pos 1) dx:-s dy:s  radius:radius color:7}
-
-dots := [dot0 dot1 dot2 dot3 dot4 dot5 dot6 dot7]
 colors := ["red" "orange" "gold" "forestgreen" "blue" "indigo"  "purple" "deeppink"]
+dots := [
+  { x:(pos 0) y:(pos 2) dx:s  dy:s  }
+  { x:(pos 1) y:(pos 3) dx:s  dy:s  }
+  { x:(pos 2) y:(pos 4) dx:s  dy:-s }
+  { x:(pos 3) y:(pos 3) dx:s  dy:-s }
+  { x:(pos 4) y:(pos 2) dx:-s dy:-s }
+  { x:(pos 3) y:(pos 1) dx:-s dy:-s }
+  { x:(pos 2) y:(pos 0) dx:-s dy:s  }
+  { x:(pos 1) y:(pos 1) dx:-s dy:s  }
+]
+
+for i := range (len dots)
+  dots[i].radius = radius
+  dots[i].color = i
+end
 
 func pos:num i:num
   l := (100 - 2*radius)/4

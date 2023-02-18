@@ -612,6 +612,14 @@ func (p *Parser) advanceIfWS() {
 	}
 }
 
+func (p *Parser) advanceIfWSEOL() {
+	tt := p.cur.Type
+	for tt == lexer.NL || tt == lexer.COMMENT || tt == lexer.WS {
+		p.advanceWSS()
+		tt = p.cur.Type
+	}
+}
+
 func (p *Parser) isWSS() bool {
 	return p.wssStack[len(p.wssStack)-1]
 }

@@ -217,6 +217,10 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 
 		"- 2":    "line 1 column 1: unexpected whitespace after '-'",
 		"! true": "line 1 column 1: unexpected whitespace after '!'",
+
+		"{a: _}":   "line 1 column 5: anonymous variable '_' cannot be read",
+		"[_]":      "line 1 column 2: anonymous variable '_' cannot be read",
+		"{a:1}[_]": "line 1 column 7: anonymous variable '_' cannot be read",
 	}
 	for input, wantErr := range tests {
 		parser := New(input, testBuiltins())

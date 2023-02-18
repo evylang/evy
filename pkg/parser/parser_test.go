@@ -79,6 +79,8 @@ func TestParseDeclarationError(t *testing.T) {
 		"a := {}[":      "line 1 column 9: unexpected end of input",
 		"a :num num":    "line 1 column 8: expected end of line, found 'num'",
 		"a :num{}num":   "line 1 column 7: expected end of line, found '{'",
+		"_ :num":        "line 1 column 1: declaration of anonymous variable '_' not allowed here",
+		"_ := 0":        "line 1 column 1: declaration of anonymous variable '_' not allowed here",
 		`
 m := {name: "Greta"}
 s := name
@@ -230,12 +232,15 @@ func nums4:num
 	print a "reachable"
 	return 0
 end
+func nums5 _:num
+	print "nums5 not yet implemented"
+end
 `
 	parser := New(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
 	builtinCnt := len(testBuiltins().Funcs)
-	assert.Equal(t, builtinCnt+4, len(parser.funcs))
+	assert.Equal(t, builtinCnt+5, len(parser.funcs))
 	got := parser.funcs["nums1"]
 	assert.Equal(t, "nums1", got.Name)
 	assert.Equal(t, NUM_TYPE, got.ReturnType)
@@ -965,6 +970,11 @@ for x := range 10
 	print "x" x
 end
 `: "line 5 column 5: invalid declaration of 'x', already used as function name",
+		`
+for _ := range 10
+	print "hi"
+end
+`: "line 2 column 5: declaration of anonymous variable '_' not allowed here",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())
@@ -991,6 +1001,11 @@ func fox
    print "fox overridden"
 end
 `: "line 6 column 1: redeclaration of function 'fox'",
+		`
+func fox _:string
+   print "fox" _
+end
+`: "line 3 column 16: anonymous variable '_' cannot be read",
 	}
 	for input, wantErr := range inputs {
 		parser := New(input, testBuiltins())
@@ -1006,6 +1021,10 @@ func TestEventHandler(t *testing.T) {
 		`
 on down x:num y:num
    print "pointer down:" x y
+end`,
+		`
+on down x:num _:num
+   print "pointer down x:" x
 end`,
 		`
 on down

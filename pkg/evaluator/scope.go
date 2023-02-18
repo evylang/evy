@@ -14,7 +14,7 @@ func newInnerScope(outer *scope) *scope {
 }
 
 func (s *scope) get(name string) (Value, bool) {
-	if s == nil {
+	if s == nil || name == "_" {
 		return nil, false
 	}
 	if val, ok := s.values[name]; ok {
@@ -24,5 +24,7 @@ func (s *scope) get(name string) (Value, bool) {
 }
 
 func (s *scope) set(name string, val Value) {
-	s.values[name] = val
+	if name != "_" {
+		s.values[name] = val
+	}
 }

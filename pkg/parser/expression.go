@@ -469,6 +469,10 @@ func (p *Parser) lookupVar(scope *scope) Node {
 	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
+	if name == "_" {
+		p.appendErrorForToken("anonymous variable '_' cannot be read", tok)
+		return nil
+	}
 	if v, ok := scope.get(name); ok {
 		v.isUsed = true
 		return v

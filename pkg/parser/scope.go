@@ -29,7 +29,7 @@ func (s *scope) inLocalScope(name string) bool {
 }
 
 func (s *scope) get(name string) (*Var, bool) {
-	if s == nil {
+	if s == nil || name == "_" {
 		return nil, false
 	}
 	if v, ok := s.vars[name]; ok {
@@ -39,5 +39,7 @@ func (s *scope) get(name string) (*Var, bool) {
 }
 
 func (s *scope) set(name string, v *Var) {
-	s.vars[name] = v
+	if name != "_" {
+		s.vars[name] = v
+	}
 }

@@ -190,12 +190,12 @@ func (p *Parser) parseFunc(scope *scope) Node {
 
 func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 	for _, param := range fd.Params {
-		p.validateVarDecl(scope, param, param.Token)
+		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
 		scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
 		param := fd.VariadicParam
-		p.validateVarDecl(scope, param, param.Token)
+		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
 		scope.set(param.Name, param)
 	}
 }
@@ -242,7 +242,7 @@ func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandler) {
 		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
 	}
 	for i, param := range e.Params {
-		p.validateVarDecl(scope, param, param.Token)
+		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
 		if !param.Type().Matches(exptectedType) {
 			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
@@ -326,6 +326,10 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
+	if name == "_" {
+		p.appendErrorForToken("assignment to '_' not allowed", tok)
+		return nil
+	}
 	v, ok := scope.get(name)
 	if !ok {
 		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
@@ -387,7 +391,7 @@ func (p *Parser) parseFuncDeclSignature() *FuncDecl {
 
 func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.Token) {
+	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.Token, false /* allowUnderscore */) {
 		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
@@ -415,7 +419,7 @@ func (p *Parser) parseTypedDecl() *Declaration {
 	return decl
 }
 
-func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
+func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUnderscore bool) bool {
 	if _, ok := p.builtins.Globals[v.Name]; ok {
 		p.appendErrorForToken("redeclaration of builtin variable '"+v.Name+"'", tok)
 		return false
@@ -426,6 +430,10 @@ func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token) bool {
 	}
 	if _, ok := p.funcs[v.Name]; ok {
 		p.appendErrorForToken("invalid declaration of '"+v.Name+"', already used as function name", tok)
+		return false
+	}
+	if !allowUnderscore && v.Name == "_" {
+		p.appendErrorForToken("declaration of anonymous variable '_' not allowed here", tok)
 		return false
 	}
 	return true
@@ -452,7 +460,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 		return nil
 	}
 	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
-	if !p.validateVarDecl(scope, decl.Var, decl.Token) {
+	if !p.validateVarDecl(scope, decl.Var, decl.Token, false /* allowUnderscore */) {
 		return nil
 	}
 	decl.Value = val
@@ -701,13 +709,12 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 
 	if p.cur.TokenType() == lexer.IDENT {
 		forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
-		if !p.validateVarDecl(scope, forNode.LoopVar, p.cur) {
+		if !p.validateVarDecl(scope, forNode.LoopVar, p.cur, false /* allowUnderscore */) {
 			p.advancePastNL()
 			return nil
 		}
 		scope.set(forNode.LoopVar.Name, forNode.LoopVar)
 		p.advance() // advance past loopVarName
-
 		p.assertToken(lexer.DECLARE)
 		p.advance() // advance past :=
 	}

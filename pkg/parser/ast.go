@@ -17,6 +17,11 @@ type Program struct {
 	alwaysTerminates bool
 }
 
+type FuncCallStmt struct {
+	Token    *lexer.Token // The IDENT of the function
+	FuncCall *FuncCall
+}
+
 type FuncCall struct {
 	Token     *lexer.Token // The IDENT of the function
 	Name      string
@@ -196,6 +201,14 @@ func (f *FuncCall) String() string {
 
 func (f *FuncCall) Type() *Type {
 	return f.FuncDecl.ReturnType
+}
+
+func (f *FuncCallStmt) String() string {
+	return f.FuncCall.String()
+}
+
+func (f *FuncCallStmt) Type() *Type {
+	return f.FuncCall.FuncDecl.ReturnType
 }
 
 func (u *UnaryExpression) String() string {

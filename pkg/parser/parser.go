@@ -482,10 +482,10 @@ func (p *Parser) isFuncCall(tok *lexer.Token) bool {
 }
 
 func (p *Parser) parseFunCallStatement(scope *scope) Node {
-	fc := p.parseFuncCall(scope)
+	fc := p.parseFuncCall(scope).(*FuncCall)
 	p.assertEOL()
 	p.advancePastNL()
-	return fc
+	return &FuncCallStmt{Token: fc.Token, FuncCall: fc}
 }
 
 func (p *Parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {

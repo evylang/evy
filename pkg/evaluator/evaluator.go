@@ -85,7 +85,9 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 	case *parser.MapLiteral:
 		return e.evalMapLiteral(node)
 	case *parser.FuncCall:
-		return e.evalFunctionCall(node)
+		return e.evalFunccall(node)
+	case *parser.FuncCallStmt:
+		return e.evalFunccall(node.FuncCall)
 	case *parser.ReturnStmt:
 		return e.evalReturn(node)
 	case *parser.BreakStmt:
@@ -217,7 +219,7 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) Value {
 	return &Map{Pairs: pairs, Order: &order}
 }
 
-func (e *Evaluator) evalFunctionCall(funcCall *parser.FuncCall) Value {
+func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) Value {
 	args := e.evalExprList(funcCall.Arguments)
 	if len(args) == 1 && isError(args[0]) {
 		return args[0]

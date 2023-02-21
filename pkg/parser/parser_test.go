@@ -95,7 +95,7 @@ print m[s]`: "line 3 column 6: unknown variable name 'name'",
 	}
 }
 
-func TestFunctionCall(t *testing.T) {
+func TestFunccall(t *testing.T) {
 	tests := map[string][]string{
 		"print":                          {"print()"},
 		"print 123":                      {"print(123)"},
@@ -118,7 +118,7 @@ func TestFunctionCall(t *testing.T) {
 	}
 }
 
-func TestFunctionCallError(t *testing.T) {
+func TestFunccallError(t *testing.T) {
 	builtins := testBuiltins()
 	builtins.Funcs["f0"] = &FuncDeclStmt{Name: "f0", ReturnType: NONE_TYPE}
 	builtins.Funcs["f1"] = &FuncDeclStmt{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}

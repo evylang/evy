@@ -68,8 +68,8 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 	switch node := node.(type) {
 	case *parser.Program:
 		return e.evalProgram(node)
-	case *parser.Declaration:
-		return e.evalDeclaration(node)
+	case *parser.Decl:
+		return e.evalDecl(node)
 	case *parser.AssignmentStmt:
 		return e.evalAssignment(node)
 	case *parser.Var:
@@ -170,7 +170,7 @@ func (e *Evaluator) evalBool(b *parser.Bool) Value {
 	return &Bool{Val: b.Value}
 }
 
-func (e *Evaluator) evalDeclaration(decl *parser.Declaration) Value {
+func (e *Evaluator) evalDecl(decl *parser.Decl) Value {
 	val := e.Eval(decl.Value)
 	if isError(val) {
 		return val

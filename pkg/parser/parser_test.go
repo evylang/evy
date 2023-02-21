@@ -7,7 +7,7 @@ import (
 	"foxygo.at/evy/pkg/assert"
 )
 
-func TestParseDeclaration(t *testing.T) {
+func TestParseDecl(t *testing.T) {
 	tests := map[string][]string{
 		"a := 1":     {"a=1"},
 		"a:bool":     {"a=false"},
@@ -62,7 +62,7 @@ func TestEmptyProgram(t *testing.T) {
 	}
 }
 
-func TestParseDeclarationError(t *testing.T) {
+func TestParseDeclError(t *testing.T) {
 	tests := map[string]string{
 		"a :invalid":    "line 1 column 1: invalid type declaration for 'a'",
 		"a :":           "line 1 column 1: invalid type declaration for 'a'",

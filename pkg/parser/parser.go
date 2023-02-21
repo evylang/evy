@@ -407,10 +407,10 @@ func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 
 // parseTypedDecl parses declarations like
 // `x:num` or `y:any[]{}`.
-func (p *Parser) parseTypedDecl() *Declaration {
+func (p *Parser) parseTypedDecl() *Decl {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
-	decl := &Declaration{
+	decl := &Decl{
 		Token: p.cur,
 		Var:   &Var{Token: p.cur, Name: varName},
 	}
@@ -448,7 +448,7 @@ func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUn
 func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
-	decl := &Declaration{
+	decl := &Decl{
 		Token: p.cur,
 		Var:   &Var{Token: p.cur, Name: varName},
 	}

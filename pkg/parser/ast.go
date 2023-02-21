@@ -60,7 +60,7 @@ type DotExpression struct {
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
-type Declaration struct {
+type Decl struct {
 	Token *lexer.Token
 	Var   *Var
 	Value Node // literal, expression, assignable, ...
@@ -249,14 +249,14 @@ func (d *DotExpression) Type() *Type {
 	return d.T
 }
 
-func (d *Declaration) String() string {
+func (d *Decl) String() string {
 	if d.Value == nil {
 		return d.Var.String()
 	}
 	return d.Var.String() + "=" + d.Value.String()
 }
 
-func (d *Declaration) Type() *Type {
+func (d *Decl) Type() *Type {
 	return d.Var.T
 }
 

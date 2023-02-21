@@ -24,7 +24,7 @@ func TestBasicEval(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestParseDeclaration(t *testing.T) {
+func TestParseDecl(t *testing.T) {
 	tests := map[string]string{
 		"a:=1":          "1",
 		`a:="abc"`:      "abc",

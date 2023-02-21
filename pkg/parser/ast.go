@@ -17,7 +17,7 @@ type Program struct {
 	alwaysTerminates bool
 }
 
-type FunctionCall struct {
+type FuncCall struct {
 	Token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
@@ -185,7 +185,7 @@ func (p *Program) AlwaysTerminates() bool {
 	return p.alwaysTerminates
 }
 
-func (f *FunctionCall) String() string {
+func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))
 	for i, arg := range f.Arguments {
 		s[i] = arg.String()
@@ -194,7 +194,7 @@ func (f *FunctionCall) String() string {
 	return f.Name + "(" + args + ")"
 }
 
-func (f *FunctionCall) Type() *Type {
+func (f *FuncCall) Type() *Type {
 	return f.FuncDecl.ReturnType
 }
 

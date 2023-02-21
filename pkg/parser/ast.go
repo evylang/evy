@@ -65,6 +65,11 @@ type DotExpression struct {
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
+type GroupExpression struct {
+	Token *lexer.Token
+	Expr  Node
+}
+
 type Decl struct {
 	Token *lexer.Token
 	Var   *Var
@@ -270,6 +275,14 @@ func (d *DotExpression) String() string {
 
 func (d *DotExpression) Type() *Type {
 	return d.T
+}
+
+func (d *GroupExpression) String() string {
+	return d.Expr.String()
+}
+
+func (d *GroupExpression) Type() *Type {
+	return d.Expr.Type()
 }
 
 func (d *Decl) String() string {

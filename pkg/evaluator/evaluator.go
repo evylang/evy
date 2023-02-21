@@ -114,6 +114,8 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
 		return e.evalDotExpr(node, false /* forAssign */)
+	case *parser.GroupExpression:
+		return e.Eval(node.Expr)
 	case *parser.FuncDeclStmt, *parser.EventHandlerStmt:
 		return nil
 	}

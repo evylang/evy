@@ -152,13 +152,14 @@ func (p *Parser) parseBinaryExpr(scope *scope, left Node) Node {
 func (p *Parser) parseGroupedExpr(scope *scope) Node {
 	p.pushWSS(false)
 	defer p.popWSS()
+	tok := p.cur
 	p.advance() // advance past (
 	exp := p.parseTopLevelExpr(scope)
-	if !p.assertToken(lexer.RPAREN) {
+	if !p.assertToken(lexer.RPAREN) || exp == nil {
 		return nil
 	}
 	p.advance() // advance past )
-	return exp
+	return &GroupExpression{Token: tok, Expr: exp}
 }
 
 func (p *Parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {

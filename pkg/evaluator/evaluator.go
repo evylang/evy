@@ -30,7 +30,7 @@ type Evaluator struct {
 	Yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	print         func(string)
 	builtins      Builtins
-	eventHandlers map[string]*parser.EventHandler
+	eventHandlers map[string]*parser.EventHandlerStmt
 
 	scope *scope // Current top of scope stack
 }
@@ -70,7 +70,7 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalProgram(node)
 	case *parser.Declaration:
 		return e.evalDeclaration(node)
-	case *parser.Assignment:
+	case *parser.AssignmentStmt:
 		return e.evalAssignment(node)
 	case *parser.Var:
 		return e.evalVar(node)
@@ -86,15 +86,15 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalMapLiteral(node)
 	case *parser.FunctionCall:
 		return e.evalFunctionCall(node)
-	case *parser.Return:
+	case *parser.ReturnStmt:
 		return e.evalReturn(node)
-	case *parser.Break:
+	case *parser.BreakStmt:
 		return e.evalBreak(node)
-	case *parser.If:
+	case *parser.IfStmt:
 		return e.evalIf(node)
-	case *parser.While:
+	case *parser.WhileStmt:
 		return e.evalWhile(node)
-	case *parser.For:
+	case *parser.ForStmt:
 		return e.evalFor(node)
 	case *parser.BlockStatement:
 		return e.evalBlockStatment(node)
@@ -108,7 +108,7 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
 		return e.evalDotExpr(node, false /* forAssign */)
-	case *parser.FuncDecl, *parser.EventHandler:
+	case *parser.FuncDeclStmt, *parser.EventHandlerStmt:
 		return nil
 	}
 	return newError(fmt.Sprintf("internal error: unknown node type %v", node))
@@ -182,7 +182,7 @@ func (e *Evaluator) evalDeclaration(decl *parser.Declaration) Value {
 	return nil
 }
 
-func (e *Evaluator) evalAssignment(assignment *parser.Assignment) Value {
+func (e *Evaluator) evalAssignment(assignment *parser.AssignmentStmt) Value {
 	val := e.Eval(assignment.Value)
 	if isError(val) {
 		return val
@@ -246,7 +246,7 @@ func (e *Evaluator) evalFunctionCall(funcCall *parser.FunctionCall) Value {
 	return funcResult // error or nil
 }
 
-func (e *Evaluator) evalReturn(ret *parser.Return) Value {
+func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) Value {
 	if ret.Value == nil {
 		return &ReturnValue{}
 	}
@@ -257,11 +257,11 @@ func (e *Evaluator) evalReturn(ret *parser.Return) Value {
 	return &ReturnValue{Val: val}
 }
 
-func (e *Evaluator) evalBreak(ret *parser.Break) Value {
+func (e *Evaluator) evalBreak(ret *parser.BreakStmt) Value {
 	return &Break{}
 }
 
-func (e *Evaluator) evalIf(i *parser.If) Value {
+func (e *Evaluator) evalIf(i *parser.IfStmt) Value {
 	val, ok := e.evalConditionalBlock(i.IfBlock)
 	if ok || isError(val) {
 		return val
@@ -280,7 +280,7 @@ func (e *Evaluator) evalIf(i *parser.If) Value {
 	return nil
 }
 
-func (e *Evaluator) evalWhile(w *parser.While) Value {
+func (e *Evaluator) evalWhile(w *parser.WhileStmt) Value {
 	whileBlock := &w.ConditionalBlock
 	val, ok := e.evalConditionalBlock(whileBlock)
 	for ok && !isError(val) && !isReturn(val) && !isBreak(val) {
@@ -289,7 +289,7 @@ func (e *Evaluator) evalWhile(w *parser.While) Value {
 	return val
 }
 
-func (e *Evaluator) evalFor(f *parser.For) Value {
+func (e *Evaluator) evalFor(f *parser.ForStmt) Value {
 	e.pushScope()
 	defer e.popScope()
 	r, err := e.newRange(f)
@@ -305,7 +305,7 @@ func (e *Evaluator) evalFor(f *parser.For) Value {
 	return nil
 }
 
-func (e *Evaluator) newRange(f *parser.For) (ranger, Value) {
+func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, Value) {
 	if r, ok := f.Range.(*parser.StepRange); ok {
 		return e.newStepRange(r, f.LoopVar)
 	}

@@ -70,6 +70,10 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalProgram(node)
 	case *parser.Decl:
 		return e.evalDecl(node)
+	case *parser.TypedDeclStmt:
+		return e.evalDecl(node.Decl)
+	case *parser.InferredDeclStmt:
+		return e.evalDecl(node.Decl)
 	case *parser.AssignmentStmt:
 		return e.evalAssignment(node)
 	case *parser.Var:

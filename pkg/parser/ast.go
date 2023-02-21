@@ -71,6 +71,16 @@ type Decl struct {
 	Value Node // literal, expression, assignable, ...
 }
 
+type TypedDeclStmt struct {
+	Token *lexer.Token
+	Decl  *Decl
+}
+
+type InferredDeclStmt struct {
+	Token *lexer.Token
+	Decl  *Decl
+}
+
 type AssignmentStmt struct {
 	Token  *lexer.Token
 	Target Node // Variable, index or field expression
@@ -271,6 +281,22 @@ func (d *Decl) String() string {
 
 func (d *Decl) Type() *Type {
 	return d.Var.T
+}
+
+func (d *TypedDeclStmt) String() string {
+	return d.Decl.String()
+}
+
+func (d *TypedDeclStmt) Type() *Type {
+	return d.Decl.Var.T
+}
+
+func (d *InferredDeclStmt) String() string {
+	return d.Decl.String()
+}
+
+func (d *InferredDeclStmt) Type() *Type {
+	return d.Decl.Var.T
 }
 
 func (r *ReturnStmt) String() string {

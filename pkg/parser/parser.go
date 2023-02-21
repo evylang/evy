@@ -402,7 +402,7 @@ func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 		p.assertEOL()
 	}
 	p.advancePastNL()
-	return decl
+	return &TypedDeclStmt{Token: decl.Token, Decl: decl}
 }
 
 // parseTypedDecl parses declarations like
@@ -472,7 +472,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	decl.Value = val
 	scope.set(varName, decl.Var)
 	p.assertEOL()
-	return decl
+	return &InferredDeclStmt{Token: decl.Token, Decl: decl}
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {

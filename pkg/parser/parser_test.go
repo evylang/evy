@@ -255,6 +255,26 @@ end
 	assert.Equal(t, "return n2", returnStmt.String())
 }
 
+func TestVariadicFuncDecl(t *testing.T) {
+	inputs := []string{
+		`
+func fox nums:num...
+  test nums
+end
+
+func test nums:[]num
+  print nums
+end
+
+fox 1 2 3`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
 func TestReturnErr(t *testing.T) {
 	inputs := map[string]string{
 		`

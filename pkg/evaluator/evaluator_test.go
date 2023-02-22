@@ -998,6 +998,48 @@ print 5 errmsg
 	}
 }
 
+func TestVariadic(t *testing.T) {
+	prog := `
+func fox nums:num...
+  for n := range nums
+    print n "🦊"
+  end
+end
+
+func fox2 strings:string...
+  for s := range strings
+    print s "🦊"
+  end
+end
+
+func fox3 anys:any...
+  for a := range anys
+    print a "🦊"
+  end
+end
+
+fox 1 2 3
+fox2 "a" "b"
+fox3 [1 2] true
+`
+	out := run(prog)
+	want := []string{
+		"1 🦊",
+		"2 🦊",
+		"3 🦊",
+		"a 🦊",
+		"b 🦊",
+		"[1 2] 🦊",
+		"true 🦊",
+		"",
+	}
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), out)
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

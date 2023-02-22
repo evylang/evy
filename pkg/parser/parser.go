@@ -194,9 +194,15 @@ func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 		scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
-		param := fd.VariadicParam
-		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
-		scope.set(param.Name, param)
+		vParam := fd.VariadicParam
+		p.validateVarDecl(scope, vParam, vParam.Token, true /* allowUnderscore */)
+
+		vParamAsArray := &Var{
+			Name:  vParam.Name,
+			Token: vParam.Token,
+			T:     &Type{Name: ARRAY, Sub: vParam.Type()},
+		}
+		scope.set(vParam.Name, vParamAsArray)
 	}
 }
 

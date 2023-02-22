@@ -128,8 +128,9 @@ func (t *Type) Infer() *Type {
 		return t
 	}
 	if t.Sub == NONE_TYPE {
-		t.Sub = ANY_TYPE
-		return t
+		t2 := *t
+		t2.Sub = ANY_TYPE
+		return &t2
 	}
 	t.Sub = t.Sub.Infer()
 	return t

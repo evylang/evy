@@ -752,7 +752,7 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		forNode.Range = n
 	case ARRAY:
 		if forNode.LoopVar != nil {
-			forNode.LoopVar.T = t.Sub
+			forNode.LoopVar.T = t.Infer().Sub
 		}
 		forNode.Range = n
 	case NUM:

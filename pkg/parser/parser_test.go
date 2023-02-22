@@ -985,6 +985,61 @@ end
 	}
 }
 
+func TestEmptyArray(t *testing.T) {
+	inputs := []string{
+		`print []`,
+		`print [[]]`,
+		`print []+[]`,
+		`print [[]]+[[]]`,
+		`
+for i := range []
+	print i
+end`,
+
+		`
+arr := []
+for i := range arr
+	print i
+end`,
+		`
+a := []
+b := []+[]
+print a b`,
+		`
+func nums n:[]num
+	print n
+end
+
+nums []`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+
+		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+	}
+}
+
+func TestEmptyMap(t *testing.T) {
+	inputs := []string{
+		`print {}`,
+		`
+m := {}
+
+for k := range m
+   print k m[k]
+end`,
+	}
+	for _, input := range inputs {
+		parser := New(input, testBuiltins())
+		_ = parser.Parse()
+		assertNoParseError(t, parser, input)
+
+		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+	}
+}
+
 func TestFuncDeclErr(t *testing.T) {
 	inputs := map[string]string{
 		`

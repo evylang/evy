@@ -773,7 +773,7 @@ func TestHasErr(t *testing.T) {
 	prog := `
 has ["a"] "a" // cannot run 'has' on array
 `
-	want := "line 2 column 15: 'has' takes 1st argument of type '{}', found 'string[]'"
+	want := "line 2 column 15: 'has' takes 1st argument of type '{}', found '[]string'"
 	got := run(prog)
 	assert.Equal(t, want, got)
 }
@@ -809,7 +809,7 @@ func TestDelErr(t *testing.T) {
 	prog := `
 del ["a"] "a" // cannot delete from array
 `
-	want := "line 2 column 15: 'del' takes 1st argument of type '{}', found 'string[]'"
+	want := "line 2 column 15: 'del' takes 1st argument of type '{}', found '[]string'"
 	got := run(prog)
 	assert.Equal(t, want, got)
 }

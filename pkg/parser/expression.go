@@ -173,7 +173,7 @@ func (p *Parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool)
 	p.advance() // advance past [
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != MAP && leftType != STRING {
-		p.appendErrorForToken("only array, string and map type can be indexed found "+left.Type().Format(), tok)
+		p.appendErrorForToken("only array, string and map type can be indexed found "+left.Type().String(), tok)
 		return nil
 	}
 	if p.cur.TokenType() == lexer.COLON && allowSlice { // e.g. a[:2]
@@ -205,11 +205,11 @@ func (p *Parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *T
 		return false
 	}
 	if (leftType == ARRAY || leftType == STRING) && indexType != NUM_TYPE {
-		p.appendErrorForToken(leftType.String()+" index expects num, found "+indexType.Format(), tok)
+		p.appendErrorForToken(leftType.Name()+" index expects num, found "+indexType.String(), tok)
 		return false
 	}
 	if leftType == MAP && indexType != STRING_TYPE {
-		p.appendErrorForToken("map index expects string, found "+indexType.Format(), tok)
+		p.appendErrorForToken("map index expects string, found "+indexType.String(), tok)
 		return false
 	}
 	return true
@@ -218,7 +218,7 @@ func (p *Parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *T
 func (p *Parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) Node {
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != STRING {
-		p.appendErrorForToken("only array and string be indexed sliced"+left.Type().Format(), tok)
+		p.appendErrorForToken("only array and string be indexed sliced"+left.Type().String(), tok)
 		return nil
 	}
 
@@ -251,11 +251,11 @@ func (p *Parser) parseDotExpr(left Node) Node {
 	p.advance() // advance past .
 	leftType := left.Type().Name
 	if leftType != MAP {
-		p.appendErrorForToken("field access with '.' expects map type, found "+left.Type().Format(), tok)
+		p.appendErrorForToken("field access with '.' expects map type, found "+left.Type().String(), tok)
 		return nil
 	}
 	if p.cur.TokenType() != lexer.IDENT {
-		p.appendErrorForToken("expected map key, found "+p.cur.TokenType().Format(), tok)
+		p.appendErrorForToken("expected map key, found "+p.cur.TokenType().String(), tok)
 		return nil
 	}
 	expr := &DotExpression{Token: tok, Left: left, T: left.Type().Sub, Key: p.cur.Literal}
@@ -299,26 +299,26 @@ func (p *Parser) validateBinaryType(binaryExp *BinaryExpression) {
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
 	if !leftType.Matches(rightType) {
-		p.appendErrorForToken("mismatched type for "+op.String()+": "+leftType.Format()+", "+rightType.Format(), tok)
+		p.appendErrorForToken("mismatched type for "+op.String()+": "+leftType.String()+", "+rightType.String(), tok)
 		return
 	}
 
 	switch op {
 	case OP_PLUS:
 		if leftType != NUM_TYPE && leftType != STRING_TYPE && leftType.Name != ARRAY {
-			p.appendErrorForToken("'+' takes num, string or array type, found "+leftType.Format(), tok)
+			p.appendErrorForToken("'+' takes num, string or array type, found "+leftType.String(), tok)
 		}
 	case OP_MINUS, OP_SLASH, OP_ASTERISK, OP_PERCENT:
 		if leftType != NUM_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes num type, found "+leftType.Format(), tok)
+			p.appendErrorForToken("'"+op.String()+"' takes num type, found "+leftType.String(), tok)
 		}
 	case OP_LT, OP_GT, OP_LTEQ, OP_GTEQ:
 		if leftType != NUM_TYPE && leftType != STRING_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes num or string type, found "+leftType.Format(), tok)
+			p.appendErrorForToken("'"+op.String()+"' takes num or string type, found "+leftType.String(), tok)
 		}
 	case OP_AND, OP_OR:
 		if leftType != BOOL_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes bool type, found "+leftType.Format(), tok)
+			p.appendErrorForToken("'"+op.String()+"' takes bool type, found "+leftType.String(), tok)
 		}
 	}
 }

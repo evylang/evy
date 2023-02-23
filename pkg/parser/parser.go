@@ -320,7 +320,7 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 		return nil
 	}
 	if !target.Type().Accepts(value.Type()) {
-		msg := "'" + target.String() + "' accepts values of type " + target.Type().Format() + ", found " + value.Type().Format()
+		msg := "'" + target.String() + "' accepts values of type " + target.Type().String() + ", found " + value.Type().String()
 		p.appendErrorForToken(msg, tok)
 	}
 	p.assertEOL()
@@ -495,7 +495,7 @@ func (p *Parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 		for _, arg := range args {
 			argType := arg.Type()
 			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
+				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.String() + "', found '" + argType.String() + "'")
 			}
 		}
 		return
@@ -508,7 +508,7 @@ func (p *Parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 		paramType := decl.Params[i].Type()
 		argType := args[i].Type()
 		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
+			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.String() + "', found '" + argType.String() + "'")
 		}
 	}
 }
@@ -695,9 +695,9 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 		}
 	}
 	if !scope.returnType.Accepts(ret.T) {
-		msg := "expected return value of type " + scope.returnType.Format() + ", found " + ret.T.Format()
+		msg := "expected return value of type " + scope.returnType.String() + ", found " + ret.T.String()
 		if scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
-			msg = "expected no return value, found " + ret.T.Format()
+			msg = "expected no return value, found " + ret.T.String()
 		}
 		p.appendErrorForToken(msg, retValueToken)
 	}
@@ -767,7 +767,7 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		}
 		forNode.Range = p.parseStepRange(nodes, tok)
 	default:
-		p.appendError("expected num, string, array or map after range, found " + t.Format())
+		p.appendError("expected num, string, array or map after range, found " + t.String())
 	}
 	p.advancePastNL()
 	forNode.Block = p.parseBlock(scope)
@@ -862,7 +862,7 @@ func (p *Parser) parseCondition(scope *scope) Node {
 	if condition != nil {
 		p.assertEOL()
 		if condition.Type() != BOOL_TYPE {
-			p.appendErrorForToken("expected condition of type bool, found "+condition.Type().Format(), tok)
+			p.appendErrorForToken("expected condition of type bool, found "+condition.Type().String(), tok)
 		}
 	}
 	return condition

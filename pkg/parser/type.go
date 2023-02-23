@@ -39,33 +39,27 @@ func compositeTypeName(t lexer.TokenType) TypeName {
 }
 
 type typeNameString struct {
-	string string
+	name   string
 	format string
 }
 
 var typeNameStrings = map[TypeName]typeNameString{
-	ILLEGAL: {string: "ILLEGAL", format: "ILLEGAL"},
-	NUM:     {string: "num", format: "num"},
-	STRING:  {string: "string", format: "string"},
-	BOOL:    {string: "bool", format: "bool"},
-	ANY:     {string: "any", format: "any"},
-	ARRAY:   {string: "array", format: "[]"},
-	MAP:     {string: "map", format: "{}"},
-	NONE:    {string: "none", format: "none"},
+	ILLEGAL: {name: "ILLEGAL", format: "ILLEGAL"},
+	NUM:     {name: "num", format: "num"},
+	STRING:  {name: "string", format: "string"},
+	BOOL:    {name: "bool", format: "bool"},
+	ANY:     {name: "any", format: "any"},
+	ARRAY:   {name: "array", format: "[]"},
+	MAP:     {name: "map", format: "{}"},
+	NONE:    {name: "none", format: "none"},
 }
 
 func (t TypeName) String() string {
-	if s, ok := typeNameStrings[t]; ok {
-		return s.string
-	}
-	return "UNKNOWN"
+	return typeNameStrings[t].format
 }
 
-func (t TypeName) Format() string {
-	if s, ok := typeNameStrings[t]; ok {
-		return s.format
-	}
-	return "<unknown>"
+func (t TypeName) Name() string {
+	return typeNameStrings[t].name
 }
 
 func (t TypeName) GoString() string {
@@ -81,14 +75,7 @@ func (t *Type) String() string {
 	if t.Sub == nil || t == GENERIC_ARRAY || t == GENERIC_MAP {
 		return t.Name.String()
 	}
-	return t.Name.String() + " " + t.Sub.String()
-}
-
-func (t *Type) Format() string {
-	if t.Sub == nil || t == GENERIC_ARRAY || t == GENERIC_MAP {
-		return t.Name.Format()
-	}
-	return t.Sub.Format() + t.Name.Format()
+	return t.Name.String() + t.Sub.String()
 }
 
 func (t *Type) Accepts(t2 *Type) bool {

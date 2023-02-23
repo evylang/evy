@@ -356,7 +356,7 @@ function animationLoop(ts) {
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
-  document.addEventListener("hashchange", fetchSource)
+  window.addEventListener("hashchange", fetchSource)
   showHideControls()
   fetchSource()
 }

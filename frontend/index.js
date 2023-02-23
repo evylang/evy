@@ -25,13 +25,18 @@ function jsPrint(ptr, len) {
   }
 }
 
+let jsReadInitialised = false
 // jsRead reads the content of the "read" textarea. If the textarea
 // contains a newline jsRead extracts the string up until the newline
 // and empties the textarea. The read stream is written to shared wasm
 // memory and the address returned.
 function jsRead() {
   const el = document.querySelector("#read")
-  el.focus()
+  if (!jsReadInitialised) {
+    el.focus()
+    getElements(".read").map((el) => el.classList.remove("hidden"))
+    readInitialised = true
+  }
   const s = el.value
   const idx = s.indexOf("\n")
   if (idx === -1) {
@@ -97,6 +102,7 @@ function onStopped() {
   removeEventHandlers()
   stopped = true
   animationStart = undefined
+  jsReadInitialised = false
   runButton.innerText = "Run"
 }
 

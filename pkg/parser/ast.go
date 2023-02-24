@@ -208,10 +208,11 @@ type ArrayLiteral struct {
 }
 
 type MapLiteral struct {
-	Token *lexer.Token
-	Pairs map[string]Node
-	Order []string // Track insertion order of keys for deterministic output.
-	T     *Type
+	Token      *lexer.Token
+	Pairs      map[string]Node
+	Order      []string // Track insertion order of keys for deterministic output.
+	T          *Type
+	multilines []multilineItem
 }
 
 func (p *Program) String() string {

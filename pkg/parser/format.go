@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"io"
 	"strings"
 )
@@ -111,7 +112,7 @@ func (f *formatting) format(n Node) {
 	case *MapLiteral:
 		f.formatMapLiteral(n)
 	default:
-		f.write("format unimplemented for " + n.String())
+		f.write(fmt.Sprintf("format unimplemented for %v", n))
 	}
 }
 
@@ -241,7 +242,7 @@ func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
 		if i+1 == length || !multi[i+1].isNL() { // next is element, comment or `]`
 			f.indent()
 			if i+1 < length {
-				f.write(indentStr) // indent one extra for element or comment
+				f.write(indentStr) // one extra indent for element or comment
 			}
 		}
 	}
@@ -249,14 +250,34 @@ func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
 }
 
 func (f *formatting) formatMapLiteral(n *MapLiteral) {
-	// TODO: handle multilines
+	multi := formatMultiline(n.multilines)
+	if len(multi) == 0 {
+		f.write("{}")
+		return
+	}
 	f.write("{")
-	length := len(n.Pairs)
-	for i, key := range n.Order {
-		f.writes(key, ":")
-		f.format(n.Pairs[key])
-		if i+1 < length {
-			f.write(" ")
+	if multi[0].isComment() {
+		f.write(" ")
+	}
+
+	length := len(multi)
+	for i, m := range multi {
+		if m.isKey() { // key
+			key := string(m)
+			f.writes(key, ":")
+			f.format(n.Pairs[key])
+			if i+1 < length && !multi[i+1].isNL() {
+				f.write(" ") // add space before next pair or comment
+			}
+			continue
+		}
+		// newline or comment
+		f.writes(string(m))
+		if i+1 == length || !multi[i+1].isNL() { // next is pair, comment or `}`
+			f.indent()
+			if i+1 < length {
+				f.write(indentStr) // one extra indent for pair or comment
+			}
 		}
 	}
 	f.write("}")

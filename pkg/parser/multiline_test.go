@@ -32,3 +32,31 @@ func TestArrayLiteralMultiline(t *testing.T) {
 		assert.Equal(t, want, got)
 	}
 }
+
+func TestMapLiteralMultiline(t *testing.T) {
+	tests := map[string][]multilineItem{
+		"{a:1}":     {"a"},
+		"{a:1 b:2}": {"a", "b"},
+		`{a:1
+		b:2}`: {"a", multilineNL, "b"},
+		`{
+		a:1
+
+		b:2
+		}`: {multilineNL, "a", multilineNL, multilineNL, "b", multilineNL},
+		`{ a:1 // comment 1
+		// comment 2
+		b:2}`: {"a", multilineComment(" // comment 1 "), multilineComment("// comment 2"), "b"},
+	}
+	for input, want := range tests {
+		parser := New(input, testBuiltins())
+		parser.formatting = newFormatting()
+		parser.advanceTo(0)
+		scope := newScope(nil, &Program{})
+
+		mapLit := parser.parseMapLiteral(scope).(*MapLiteral)
+		assertNoParseError(t, parser, input)
+		got := mapLit.multilines
+		assert.Equal(t, want, got)
+	}
+}

@@ -17,6 +17,10 @@ type Program struct {
 	alwaysTerminates bool
 }
 
+type EmptyStmt struct {
+	Token *lexer.Token // The NL token
+}
+
 type FuncCallStmt struct {
 	Token    *lexer.Token // The IDENT of the function
 	FuncCall *FuncCall
@@ -204,6 +208,12 @@ func (*Program) Type() *Type {
 func (p *Program) AlwaysTerminates() bool {
 	return p.alwaysTerminates
 }
+
+func (e *EmptyStmt) String() string {
+	return ""
+}
+
+func (*EmptyStmt) Type() *Type { return NONE_TYPE }
 
 func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))

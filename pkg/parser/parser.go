@@ -255,13 +255,11 @@ func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandlerStmt) {
 
 func (p *Parser) parseStatement(scope *scope) Node {
 	switch p.cur.TokenType() {
-	// empty statement
-	case lexer.NL, lexer.EOF, lexer.COMMENT:
-		p.advancePastNL()
-		return nil
 	case lexer.WS:
 		p.advance()
 		return nil
+	case lexer.NL, lexer.COMMENT:
+		return p.parseEmptyStmt()
 	case lexer.IDENT:
 		switch p.peek.Type {
 		case lexer.ASSIGN, lexer.DOT:
@@ -294,6 +292,21 @@ func (p *Parser) parseStatement(scope *scope) Node {
 	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
 	return nil
+}
+
+func (p *Parser) parseEmptyStmt() Node {
+	empty := &EmptyStmt{Token: p.cur}
+	switch p.cur.Type {
+	case lexer.NL:
+		p.advance()
+		return empty
+	case lexer.COMMENT:
+		p.advance() // COMMENT
+		p.advance() // NL
+		return empty
+	default:
+		panic("internal error: parseEmptyStmt of invalid type")
+	}
 }
 
 func (p *Parser) parseAssignmentStatement(scope *scope) Node {

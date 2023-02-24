@@ -9,6 +9,7 @@ func newFormatting() *formatting {
 	return &formatting{
 		wss:         map[*BinaryExpression]bool{},
 		comments:    map[Node]string{},
+		multiline:   map[Node][]multilineItem{},
 		indentLevel: -1,
 	}
 }
@@ -18,6 +19,7 @@ type formatting struct {
 
 	wss         map[*BinaryExpression]bool
 	comments    map[Node]string
+	multiline   map[Node][]multilineItem
 	indentLevel int
 }
 
@@ -27,6 +29,10 @@ func (f *formatting) recordComment(n Node, comment string) {
 
 func (f *formatting) recordWSS(n *BinaryExpression) {
 	f.wss[n] = true
+}
+
+func (f *formatting) recordMultiline(n Node, multiline []multilineItem) {
+	f.multiline[n] = multiline
 }
 
 func (f *formatting) format(n Node) {
@@ -227,13 +233,35 @@ func (f *formatting) formatFuncCall(n *FuncCall) {
 }
 
 func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
-	// TODO: handle multilines
+	multi := formatMultiline(f.multiline[n])
+	if len(multi) == 0 {
+		f.write("[]")
+		return
+	}
 	f.write("[")
-	length := len(n.Elements)
-	for i, el := range n.Elements {
-		f.format(el)
-		if i+1 < length {
-			f.write(" ")
+	if multi[0].isComment() {
+		f.write(" ")
+	}
+
+	length := len(multi)
+	idx := 0
+	for i, m := range multi {
+		if m == multilineEl {
+			f.format(n.Elements[idx])
+			idx++
+			if i+1 < length && !multi[i+1].isNL() {
+				f.write(" ") // add space before next element or comment
+			}
+			continue
+		}
+		// newline or comment
+		f.write(string(m))
+
+		if i+1 == length || !multi[i+1].isNL() { // next is element, comment or `]`
+			f.indent()
+			if i+1 < length {
+				f.write(indentStr) // indent one extra for element or comment
+			}
 		}
 	}
 	f.write("]")
@@ -299,9 +327,11 @@ func (f *formatting) writeDecl(n *Var) {
 	f.formatType(n.Type())
 }
 
+const indentStr = "    "
+
 func (f *formatting) indent() {
 	for i := 0; i < f.indentLevel; i++ {
-		f.write("    ")
+		f.write(indentStr)
 	}
 }
 

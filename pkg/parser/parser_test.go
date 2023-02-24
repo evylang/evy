@@ -11,7 +11,7 @@ func TestParseDecl(t *testing.T) {
 	tests := map[string][]string{
 		"a := 1":     {"a=1"},
 		"a:bool":     {"a=false"},
-		"\na:bool\n": {"a=false"},
+		"\na:bool\n": {"\na=false\n"},
 		`a := "abc"
 		b:bool
 		c := true
@@ -43,22 +43,22 @@ func TestParseDecl(t *testing.T) {
 }
 
 func TestEmptyProgram(t *testing.T) {
-	tests := []string{
-		"",
-		"\n",
-		"\n\n\n",
-		" ",
-		" \n //adf \n",
-		"//blabla",
-		"//blabla\n",
-		" \n //blabla \n",
-		" \n //blabla",
+	tests := map[string]string{
+		"":                "\n",
+		"\n":              "\n",
+		"\n\n\n":          "\n\n\n",
+		" ":               "\n",
+		" \n //adf \n":    "\n\n",
+		"//blabla":        "\n",
+		"//blabla\n":      "\n",
+		" \n //blabla \n": "\n\n",
+		" \n //blabla":    "\n\n",
 	}
-	for _, input := range tests {
+	for input, want := range tests {
 		parser := New(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
-		assert.Equal(t, "\n", got.String())
+		assert.Equal(t, want, got.String(), input)
 	}
 }
 
@@ -152,16 +152,14 @@ func TestFunccallError(t *testing.T) {
 
 func TestBlock(t *testing.T) {
 	tests := map[string]string{
-		`
-if true
+		`if true
 	print "TRUE"
 end`: `
 if (true) {
 print('TRUE')
 }
 `[1:],
-		`
-if true
+		`if true
 	if true
 		print "TRUE"
 	end
@@ -192,7 +190,7 @@ print x
 	want := `
 x=len('123')
 print(x)
-`[1:]
+`
 	assert.Equal(t, want, got.String())
 }
 
@@ -1195,12 +1193,13 @@ end`
 	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr)
 	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
 	want := `
+
 x=12
 print('x:', x)
 if ((x>10)) {
 print('🍦 big x')
 }
-`[1:]
+`
 	assert.Equal(t, want, got.String())
 }
 

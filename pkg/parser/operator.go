@@ -86,10 +86,7 @@ func op(tok *lexer.Token) Operator {
 }
 
 func (o Operator) String() string {
-	if s, ok := operatorStrings[o]; ok {
-		return s
-	}
-	return "UNKNOWN"
+	return operatorStrings[o]
 }
 
 func (o Operator) GoString() string {

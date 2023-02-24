@@ -3,28 +3,57 @@
 package main
 
 import (
+	"errors"
 	"strings"
 	"time"
 	"unsafe"
 
 	"foxygo.at/evy/pkg/evaluator"
+	"foxygo.at/evy/pkg/parser"
 )
 
-var version string
-var eval *evaluator.Evaluator
-var events []evaluator.Event
+var (
+	version string
+	eval    *evaluator.Evaluator
+	events  []evaluator.Event
+)
 
 const minSleepDur = time.Millisecond
 
 func main() {
 	yielder := newSleepingYielder()
-	rt := newJSRuntime(yielder)
-	builtins := evaluator.DefaultBuiltins(rt)
+	builtins := evaluator.DefaultBuiltins(newJSRuntime(yielder))
+
+	defer onStopped()
+	source, err := format(builtins)
+	if err != nil {
+		builtins.Print(err.Error())
+		return
+	}
+	evaluate(source, builtins, yielder)
+}
+
+func format(builtins evaluator.Builtins) (string, error) {
+	input := getEvySource()
+
+	p := parser.New(input, evaluator.NewParserBuiltins(builtins))
+	prog := p.Parse()
+	if p.HasErrors() {
+		return "", errors.New(parser.MaxErrorsString(p.Errors(), 8))
+	}
+	formattedInput := prog.Format()
+	if formattedInput != input {
+		setEvySource(formattedInput)
+	}
+	return formattedInput, nil
+}
+
+func evaluate(input string, builtins evaluator.Builtins, yielder *sleepingYielder) {
 	eval = evaluator.NewEvaluator(builtins)
 	eval.Yielder = yielder
-	eval.Run(getEvySource())
+
+	eval.Run(input)
 	handleEvents(yielder)
-	onStopped()
 }
 
 func getEvySource() string {
@@ -174,6 +203,10 @@ func width(w float64)
 // color is imported from JS
 //export color
 func color(s string)
+
+// setEvySource is imported from JS
+//export setEvySource
+func setEvySource(s string)
 
 // We cannot take the address of external/exported functions
 // (https://golang.org/cmd/cgo/#hdr-Passing_pointers) so we must wrap them in a

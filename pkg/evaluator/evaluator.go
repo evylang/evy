@@ -41,7 +41,7 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) {
-	p := parser.New(input, newParserBuiltins(e.builtins))
+	p := parser.New(input, NewParserBuiltins(e.builtins))
 	prog := p.Parse()
 	if p.HasErrors() {
 		e.print(parser.MaxErrorsString(p.Errors(), 8))

@@ -53,6 +53,12 @@ function evySource() {
   return stringToMemAddr(code)
 }
 
+// setEvySource is exported to evy go/wasm and called after formatting
+function setEvySource(ptr, len) {
+  const source = memToString(ptr, len)
+  document.querySelector("#code").value = source
+}
+
 function memToString(ptr, len) {
   const buf = new Uint8Array(wasmInst.exports.memory.buffer, ptr, len)
   const s = new TextDecoder("utf8").decode(buf)
@@ -116,6 +122,7 @@ function newEvyGo() {
     jsRead,
     jsPrint,
     evySource,
+    setEvySource,
     move,
     line,
     width,

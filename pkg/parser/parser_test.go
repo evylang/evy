@@ -7,7 +7,7 @@ import (
 	"foxygo.at/evy/pkg/assert"
 )
 
-func TestParseDeclaration(t *testing.T) {
+func TestParseDecl(t *testing.T) {
 	tests := map[string][]string{
 		"a := 1":     {"a=1"},
 		"a:bool":     {"a=false"},
@@ -62,7 +62,7 @@ func TestEmptyProgram(t *testing.T) {
 	}
 }
 
-func TestParseDeclarationError(t *testing.T) {
+func TestParseDeclError(t *testing.T) {
 	tests := map[string]string{
 		"a :invalid":    "line 1 column 1: invalid type declaration for 'a'",
 		"a :":           "line 1 column 1: invalid type declaration for 'a'",
@@ -95,7 +95,7 @@ print m[s]`: "line 3 column 6: unknown variable name 'name'",
 	}
 }
 
-func TestFunctionCall(t *testing.T) {
+func TestFunccall(t *testing.T) {
 	tests := map[string][]string{
 		"print":                          {"print()"},
 		"print 123":                      {"print(123)"},
@@ -118,12 +118,12 @@ func TestFunctionCall(t *testing.T) {
 	}
 }
 
-func TestFunctionCallError(t *testing.T) {
+func TestFunccallError(t *testing.T) {
 	builtins := testBuiltins()
-	builtins.Funcs["f0"] = &FuncDecl{Name: "f0", ReturnType: NONE_TYPE}
-	builtins.Funcs["f1"] = &FuncDecl{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins.Funcs["f2"] = &FuncDecl{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
-	builtins.Funcs["f3"] = &FuncDecl{
+	builtins.Funcs["f0"] = &FuncDeclStmt{Name: "f0", ReturnType: NONE_TYPE}
+	builtins.Funcs["f1"] = &FuncDeclStmt{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f2"] = &FuncDeclStmt{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f3"] = &FuncDeclStmt{
 		Name:       "f3",
 		Params:     []*Var{{Name: "a", T: NUM_TYPE}, {Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
@@ -1215,7 +1215,7 @@ func assertNoParseError(t *testing.T, parser *Parser, input string) {
 }
 
 func testBuiltins() Builtins {
-	funcs := map[string]*FuncDecl{
+	funcs := map[string]*FuncDeclStmt{
 		"print": {
 			Name:          "print",
 			VariadicParam: &Var{Name: "a", T: ANY_TYPE},
@@ -1227,7 +1227,7 @@ func testBuiltins() Builtins {
 			ReturnType: NUM_TYPE,
 		},
 	}
-	eventHandlers := map[string]*EventHandler{
+	eventHandlers := map[string]*EventHandlerStmt{
 		"down": {
 			Name: "down",
 			Params: []*Var{

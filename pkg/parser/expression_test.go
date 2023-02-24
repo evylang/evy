@@ -230,7 +230,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"{a:}": "line 1 column 4: unexpected '}'",
 		"{:a}": "line 1 column 2: expected map key, found ':'",
 
-		"[1] + [false]": "line 1 column 5: mismatched type for +: num[], bool[]",
+		"[1] + [false]": "line 1 column 5: mismatched type for +: []num, []bool",
 
 		"a. b":        "line 1 column 2: unexpected whitespace after '.'",
 		"a .b":        "line 1 column 3: unexpected whitespace before '.'",

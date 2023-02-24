@@ -15,8 +15,8 @@ import (
 )
 
 type Builtins struct {
-	Funcs         map[string]*FuncDecl
-	EventHandlers map[string]*EventHandler
+	Funcs         map[string]*FuncDeclStmt
+	EventHandlers map[string]*EventHandlerStmt
 	Globals       map[string]*Var
 }
 
@@ -42,8 +42,8 @@ type Parser struct {
 
 	tokens        []*lexer.Token
 	builtins      Builtins
-	funcs         map[string]*FuncDecl     // all function declarations by name
-	EventHandlers map[string]*EventHandler // all event handler declarations by name
+	funcs         map[string]*FuncDeclStmt     // all function declarations by name
+	EventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
 
 	wssStack []bool
 }
@@ -61,8 +61,8 @@ func (e Error) String() string {
 func New(input string, builtins Builtins) *Parser {
 	l := lexer.New(input)
 	p := &Parser{
-		funcs:         map[string]*FuncDecl{},
-		EventHandlers: map[string]*EventHandler{},
+		funcs:         map[string]*FuncDeclStmt{},
+		EventHandlers: map[string]*EventHandlerStmt{},
 		wssStack:      []bool{false},
 		builtins:      builtins,
 	}
@@ -188,7 +188,7 @@ func (p *Parser) parseFunc(scope *scope) Node {
 	return fd
 }
 
-func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
+func (p *Parser) addParamsToScope(scope *scope, fd *FuncDeclStmt) {
 	for _, param := range fd.Params {
 		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
 		scope.set(param.Name, param)
@@ -207,7 +207,7 @@ func (p *Parser) addParamsToScope(scope *scope, fd *FuncDecl) {
 }
 
 func (p *Parser) parseEventHandler(scope *scope) Node {
-	e := &EventHandler{Token: p.cur}
+	e := &EventHandlerStmt{Token: p.cur}
 	p.advance() // advance past ON token
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -239,7 +239,7 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 	return e
 }
 
-func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandler) {
+func (p *Parser) addEventParamsToScope(scope *scope, e *EventHandlerStmt) {
 	if len(e.Params) == 0 || p.builtins.EventHandlers[e.Name] == nil {
 		return
 	}
@@ -320,12 +320,12 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 		return nil
 	}
 	if !target.Type().Accepts(value.Type()) {
-		msg := "'" + target.String() + "' accepts values of type " + target.Type().Format() + ", found " + value.Type().Format()
+		msg := "'" + target.String() + "' accepts values of type " + target.Type().String() + ", found " + value.Type().String()
 		p.appendErrorForToken(msg, tok)
 	}
 	p.assertEOL()
 	p.advancePastNL()
-	return &Assignment{Token: tok, Target: target, Value: value}
+	return &AssignmentStmt{Token: tok, Target: target, Value: value}
 }
 
 func (p *Parser) parseAssignmentTarget(scope *scope) Node {
@@ -360,8 +360,8 @@ func (p *Parser) parseAssignmentTarget(scope *scope) Node {
 	return n
 }
 
-func (p *Parser) parseFuncDeclSignature() *FuncDecl {
-	fd := &FuncDecl{Token: p.cur, ReturnType: NONE_TYPE}
+func (p *Parser) parseFuncDeclSignature() *FuncDeclStmt {
+	fd := &FuncDeclStmt{Token: p.cur, ReturnType: NONE_TYPE}
 	p.advance() // advance past FUNC
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -402,15 +402,15 @@ func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 		p.assertEOL()
 	}
 	p.advancePastNL()
-	return decl
+	return &TypedDeclStmt{Token: decl.Token, Decl: decl}
 }
 
 // parseTypedDecl parses declarations like
 // `x:num` or `y:any[]{}`.
-func (p *Parser) parseTypedDecl() *Declaration {
+func (p *Parser) parseTypedDecl() *Decl {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
-	decl := &Declaration{
+	decl := &Decl{
 		Token: p.cur,
 		Var:   &Var{Token: p.cur, Name: varName},
 	}
@@ -448,7 +448,7 @@ func (p *Parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUn
 func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
-	decl := &Declaration{
+	decl := &Decl{
 		Token: p.cur,
 		Var:   &Var{Token: p.cur, Name: varName},
 	}
@@ -472,7 +472,7 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	decl.Value = val
 	scope.set(varName, decl.Var)
 	p.assertEOL()
-	return decl
+	return &InferredDeclStmt{Token: decl.Token, Decl: decl}
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {
@@ -482,20 +482,20 @@ func (p *Parser) isFuncCall(tok *lexer.Token) bool {
 }
 
 func (p *Parser) parseFunCallStatement(scope *scope) Node {
-	fc := p.parseFuncCall(scope)
+	fc := p.parseFuncCall(scope).(*FuncCall)
 	p.assertEOL()
 	p.advancePastNL()
-	return fc
+	return &FuncCallStmt{Token: fc.Token, FuncCall: fc}
 }
 
-func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
+func (p *Parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 	funcName := decl.Name
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
 			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
+				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.String() + "', found '" + argType.String() + "'")
 			}
 		}
 		return
@@ -508,7 +508,7 @@ func (p *Parser) assertArgTypes(decl *FuncDecl, args []Node) {
 		paramType := decl.Params[i].Type()
 		argType := args[i].Type()
 		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.Format() + "', found '" + argType.Format() + "'")
+			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.String() + "', found '" + argType.String() + "'")
 		}
 	}
 }
@@ -680,7 +680,7 @@ func ErrorsString(errs []Error) string {
 }
 
 func (p *Parser) parseReturnStatement(scope *scope) Node {
-	ret := &Return{Token: p.cur}
+	ret := &ReturnStmt{Token: p.cur}
 	p.advance() // advance past RETURN token
 	retValueToken := p.cur
 	if p.isAtEOL() { // no return value
@@ -695,9 +695,9 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 		}
 	}
 	if !scope.returnType.Accepts(ret.T) {
-		msg := "expected return value of type " + scope.returnType.Format() + ", found " + ret.T.Format()
+		msg := "expected return value of type " + scope.returnType.String() + ", found " + ret.T.String()
 		if scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
-			msg = "expected no return value, found " + ret.T.Format()
+			msg = "expected no return value, found " + ret.T.String()
 		}
 		p.appendErrorForToken(msg, retValueToken)
 	}
@@ -706,7 +706,7 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseBreakStatement(scope *scope) Node {
-	breakStmt := &Break{Token: p.cur}
+	breakStmt := &BreakStmt{Token: p.cur}
 	if !inLoop(scope) {
 		p.appendError("break is not in a loop")
 	}
@@ -717,7 +717,7 @@ func (p *Parser) parseBreakStatement(scope *scope) Node {
 }
 
 func (p *Parser) parseForStatement(scope *scope) Node {
-	forNode := &For{Token: p.cur}
+	forNode := &ForStmt{Token: p.cur}
 	scope = newScope(scope, forNode)
 	p.advance() // advance past FOR token
 
@@ -767,7 +767,7 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 		}
 		forNode.Range = p.parseStepRange(nodes, tok)
 	default:
-		p.appendError("expected num, string, array or map after range, found " + t.Format())
+		p.appendError("expected num, string, array or map after range, found " + t.String())
 	}
 	p.advancePastNL()
 	forNode.Block = p.parseBlock(scope)
@@ -804,7 +804,7 @@ func (p *Parser) parseStepRange(nodes []Node, tok *lexer.Token) *StepRange {
 }
 
 func (p *Parser) parseWhileStatement(scope *scope) Node {
-	while := &While{}
+	while := &WhileStmt{}
 	while.Token = p.cur
 	p.advance() // advance past WHILE token
 	scope = newScope(scope, while)
@@ -819,7 +819,7 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 func inLoop(s *scope) bool {
 	for ; s != nil; s = s.outer {
 		switch s.block.(type) {
-		case *While, *For:
+		case *WhileStmt, *ForStmt:
 			return true
 		}
 	}
@@ -827,7 +827,7 @@ func inLoop(s *scope) bool {
 }
 
 func (p *Parser) parseIfStatement(scope *scope) Node {
-	ifStmt := &If{Token: p.cur}
+	ifStmt := &IfStmt{Token: p.cur}
 	ifStmt.IfBlock = p.parseIfConditionalBlock(newScope(scope, ifStmt))
 	// else if blocks
 	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
@@ -862,7 +862,7 @@ func (p *Parser) parseCondition(scope *scope) Node {
 	if condition != nil {
 		p.assertEOL()
 		if condition.Type() != BOOL_TYPE {
-			p.appendErrorForToken("expected condition of type bool, found "+condition.Type().Format(), tok)
+			p.appendErrorForToken("expected condition of type bool, found "+condition.Type().String(), tok)
 		}
 	}
 	return condition

@@ -17,11 +17,16 @@ type Program struct {
 	alwaysTerminates bool
 }
 
-type FunctionCall struct {
+type FuncCallStmt struct {
+	Token    *lexer.Token // The IDENT of the function
+	FuncCall *FuncCall
+}
+
+type FuncCall struct {
 	Token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
-	FuncDecl  *FuncDecl
+	FuncDecl  *FuncDeclStmt
 }
 
 type UnaryExpression struct {
@@ -60,29 +65,44 @@ type DotExpression struct {
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
-type Declaration struct {
+type GroupExpression struct {
+	Token *lexer.Token
+	Expr  Node
+}
+
+type Decl struct {
 	Token *lexer.Token
 	Var   *Var
 	Value Node // literal, expression, assignable, ...
 }
 
-type Assignment struct {
+type TypedDeclStmt struct {
+	Token *lexer.Token
+	Decl  *Decl
+}
+
+type InferredDeclStmt struct {
+	Token *lexer.Token
+	Decl  *Decl
+}
+
+type AssignmentStmt struct {
 	Token  *lexer.Token
 	Target Node // Variable, index or field expression
 	Value  Node // literal, expression, assignable, ...
 }
 
-type Return struct {
+type ReturnStmt struct {
 	Token *lexer.Token
 	Value Node // literal, expression, assignable, ...
 	T     *Type
 }
 
-type Break struct {
+type BreakStmt struct {
 	Token *lexer.Token
 }
 
-type FuncDecl struct {
+type FuncDeclStmt struct {
 	Token         *lexer.Token // The 'func' token
 	Name          string
 	Params        []*Var
@@ -91,18 +111,18 @@ type FuncDecl struct {
 	Body          *BlockStatement
 }
 
-type If struct {
+type IfStmt struct {
 	Token        *lexer.Token
 	IfBlock      *ConditionalBlock
 	ElseIfBlocks []*ConditionalBlock
 	Else         *BlockStatement
 }
 
-type While struct {
+type WhileStmt struct {
 	ConditionalBlock
 }
 
-type For struct {
+type ForStmt struct {
 	Token *lexer.Token
 
 	LoopVar *Var
@@ -125,7 +145,7 @@ type ConditionalBlock struct {
 	Block     *BlockStatement
 }
 
-type EventHandler struct {
+type EventHandlerStmt struct {
 	Token  *lexer.Token // The 'on' token
 	Name   string
 	Params []*Var
@@ -185,7 +205,7 @@ func (p *Program) AlwaysTerminates() bool {
 	return p.alwaysTerminates
 }
 
-func (f *FunctionCall) String() string {
+func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))
 	for i, arg := range f.Arguments {
 		s[i] = arg.String()
@@ -194,8 +214,16 @@ func (f *FunctionCall) String() string {
 	return f.Name + "(" + args + ")"
 }
 
-func (f *FunctionCall) Type() *Type {
+func (f *FuncCall) Type() *Type {
 	return f.FuncDecl.ReturnType
+}
+
+func (f *FuncCallStmt) String() string {
+	return f.FuncCall.String()
+}
+
+func (f *FuncCallStmt) Type() *Type {
+	return f.FuncCall.FuncDecl.ReturnType
 }
 
 func (u *UnaryExpression) String() string {
@@ -249,53 +277,77 @@ func (d *DotExpression) Type() *Type {
 	return d.T
 }
 
-func (d *Declaration) String() string {
+func (d *GroupExpression) String() string {
+	return d.Expr.String()
+}
+
+func (d *GroupExpression) Type() *Type {
+	return d.Expr.Type()
+}
+
+func (d *Decl) String() string {
 	if d.Value == nil {
 		return d.Var.String()
 	}
 	return d.Var.String() + "=" + d.Value.String()
 }
 
-func (d *Declaration) Type() *Type {
+func (d *Decl) Type() *Type {
 	return d.Var.T
 }
 
-func (r *Return) String() string {
+func (d *TypedDeclStmt) String() string {
+	return d.Decl.String()
+}
+
+func (d *TypedDeclStmt) Type() *Type {
+	return d.Decl.Var.T
+}
+
+func (d *InferredDeclStmt) String() string {
+	return d.Decl.String()
+}
+
+func (d *InferredDeclStmt) Type() *Type {
+	return d.Decl.Var.T
+}
+
+func (r *ReturnStmt) String() string {
 	if r.Value == nil {
 		return "return"
 	}
 	return "return " + r.Value.String()
 }
 
-func (r *Return) Type() *Type {
+func (r *ReturnStmt) Type() *Type {
 	return r.T
 }
 
-func (*Return) AlwaysTerminates() bool {
+func (*ReturnStmt) AlwaysTerminates() bool {
 	return true
 }
 
-func (*Break) String() string {
+func (*BreakStmt) String() string {
 	return "break"
 }
 
-func (*Break) Type() *Type {
+func (*BreakStmt) Type() *Type {
 	return NONE_TYPE
 }
 
-func (b *Break) AlwaysTerminates() bool {
+func (b *BreakStmt) AlwaysTerminates() bool {
 	return true
 }
 
-func (a *Assignment) String() string {
+func (a *AssignmentStmt) String() string {
 	return a.Target.String() + " = " + a.Value.String()
 }
 
-func (a *Assignment) Type() *Type {
+func (a *AssignmentStmt) Type() *Type {
 	return a.Target.Type()
 }
 
-func (f *FuncDecl) String() string {
+func (f *FuncDeclStmt) String() string {
 	s := make([]string, len(f.Params))
 	for i, param := range f.Params {
 		s[i] = param.String()
@@ -312,11 +364,11 @@ func (f *FuncDecl) String() string {
 	return signature + "{\n" + body + "}\n"
 }
 
-func (f *FuncDecl) Type() *Type {
+func (f *FuncDeclStmt) Type() *Type {
 	return f.ReturnType
 }
 
-func (i *If) String() string {
+func (i *IfStmt) String() string {
 	result := "if " + i.IfBlock.String()
 	for _, elseif := range i.ElseIfBlocks {
 		result += "else if" + elseif.String()
@@ -327,11 +379,11 @@ func (i *If) String() string {
 	return result
 }
 
-func (i *If) Type() *Type {
+func (i *IfStmt) Type() *Type {
 	return NONE_TYPE
 }
 
-func (i *If) AlwaysTerminates() bool {
+func (i *IfStmt) AlwaysTerminates() bool {
 	if i.Else == nil || !i.Else.AlwaysTerminates() {
 		return false
 	}
@@ -346,12 +398,12 @@ func (i *If) AlwaysTerminates() bool {
 	return true
 }
 
-func (e *EventHandler) String() string {
+func (e *EventHandlerStmt) String() string {
 	body := e.Body.String()
 	return "on " + e.Name + " {\n" + body + "}\n"
 }
 
-func (e *EventHandler) Type() *Type {
+func (e *EventHandlerStmt) Type() *Type {
 	return NONE_TYPE
 }
 
@@ -380,24 +432,24 @@ func alwaysTerminates(n Node) bool {
 	return ok && r.AlwaysTerminates()
 }
 
-func (w *While) String() string {
+func (w *WhileStmt) String() string {
 	return "while " + w.ConditionalBlock.String()
 }
 
-func (w *While) Type() *Type {
+func (w *WhileStmt) Type() *Type {
 	return w.ConditionalBlock.Type()
 }
 
-func (*While) AlwaysTerminates() bool {
+func (*WhileStmt) AlwaysTerminates() bool {
 	return false
 }
 
-func (f *For) String() string {
+func (f *ForStmt) String() string {
 	header := "for " + f.LoopVar.Name + " := " + f.Range.String()
 	return header + " {\n" + f.Block.String() + "}"
 }
 
-func (f *For) Type() *Type {
+func (f *ForStmt) Type() *Type {
 	return f.Block.Type()
 }
 
@@ -418,7 +470,7 @@ func (s *StepRange) Type() *Type {
 	return NUM_TYPE
 }
 
-func (*For) AlwaysTerminates() bool {
+func (*ForStmt) AlwaysTerminates() bool {
 	return false
 }
 

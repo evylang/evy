@@ -41,7 +41,8 @@ type Parser struct {
 	funcs         map[string]*FuncDeclStmt     // all function declarations by name
 	EventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
 
-	wssStack []bool
+	wssStack   []bool
+	formatting *formatting
 }
 
 // Error is an Evy parse error.
@@ -61,6 +62,7 @@ func New(input string, builtins Builtins) *Parser {
 		EventHandlers: map[string]*EventHandlerStmt{},
 		wssStack:      []bool{false},
 		builtins:      builtins,
+		formatting:    newFormatting(),
 	}
 	for name, funcDecl := range builtins.Funcs {
 		p.funcs[name] = funcDecl
@@ -124,7 +126,7 @@ func (p *Parser) Parse() *Program {
 // function names matching `parsePRODUCTION` align with production names
 // in grammar doc/syntax_grammar.md.
 func (p *Parser) parseProgram() *Program {
-	program := &Program{}
+	program := &Program{formatting: p.formatting}
 	scope := newScope(nil, program) // TODO: model scope as stack like evaluator.
 	for _, global := range p.builtins.Globals {
 		global.isUsed = true
@@ -179,6 +181,8 @@ func (p *Parser) parseFunc(scope *scope) Node {
 		p.appendError("missing return")
 	}
 	p.assertEnd()
+	p.advance()
+	block.comment = p.curComment()
 	p.advancePastNL()
 	fd.Body = block
 	return fd
@@ -225,12 +229,15 @@ func (p *Parser) parseEventHandler(scope *scope) Node {
 		decl := p.parseTypedDecl()
 		e.Params = append(e.Params, decl.Var)
 	}
+	e.comment = p.curComment()
 	p.advancePastNL()
 
 	scope = newScopeWithReturnType(scope, e, NONE_TYPE) // only bare returns
 	p.addEventParamsToScope(scope, e)
 	e.Body = p.parseBlock(scope)
 	p.assertEnd()
+	p.advance()
+	e.Body.comment = p.curComment()
 	p.advancePastNL()
 	return e
 }
@@ -301,6 +308,7 @@ func (p *Parser) parseEmptyStmt() Node {
 		p.advance()
 		return empty
 	case lexer.COMMENT:
+		empty.comment = p.curComment()
 		p.advance() // COMMENT
 		p.advance() // NL
 		return empty
@@ -333,8 +341,10 @@ func (p *Parser) parseAssignmentStatement(scope *scope) Node {
 		p.appendErrorForToken(msg, tok)
 	}
 	p.assertEOL()
+	stmt := &AssignmentStmt{Token: tok, Target: target, Value: value}
+	stmt.comment = p.curComment()
 	p.advancePastNL()
-	return &AssignmentStmt{Token: tok, Target: target, Value: value}
+	return stmt
 }
 
 func (p *Parser) parseAssignmentTarget(scope *scope) Node {
@@ -400,6 +410,7 @@ func (p *Parser) parseFuncDeclSignature() *FuncDeclStmt {
 		}
 	}
 	p.assertEOL()
+	fd.comment = p.curComment()
 	p.advancePastNL()
 	return fd
 }
@@ -410,8 +421,9 @@ func (p *Parser) parseTypedDeclStatement(scope *scope) Node {
 		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
+	typeDecl := &TypedDeclStmt{Token: decl.Token, Decl: decl, comment: p.curComment()}
 	p.advancePastNL()
-	return &TypedDeclStmt{Token: decl.Token, Decl: decl}
+	return typeDecl
 }
 
 // parseTypedDecl parses declarations like
@@ -481,7 +493,9 @@ func (p *Parser) parseInferredDeclStatement(scope *scope) Node {
 	decl.Value = val
 	scope.set(varName, decl.Var)
 	p.assertEOL()
-	return &InferredDeclStmt{Token: decl.Token, Decl: decl}
+
+	inferredDecl := &InferredDeclStmt{Token: decl.Token, Decl: decl, comment: p.curComment()}
+	return inferredDecl
 }
 
 func (p *Parser) isFuncCall(tok *lexer.Token) bool {
@@ -493,8 +507,9 @@ func (p *Parser) isFuncCall(tok *lexer.Token) bool {
 func (p *Parser) parseFunCallStatement(scope *scope) Node {
 	fc := p.parseFuncCall(scope).(*FuncCall)
 	p.assertEOL()
+	fcs := &FuncCallStmt{Token: fc.Token, FuncCall: fc, comment: p.curComment()}
 	p.advancePastNL()
-	return &FuncCallStmt{Token: fc.Token, FuncCall: fc}
+	return fcs
 }
 
 func (p *Parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
@@ -630,6 +645,10 @@ func (p *Parser) advanceIfWS() {
 func (p *Parser) advanceIfWSEOL() {
 	tt := p.cur.Type
 	for tt == lexer.NL || tt == lexer.COMMENT || tt == lexer.WS {
+		if tt == lexer.COMMENT {
+			p.advanceWSS() // advance past NL
+			p.assertToken(lexer.NL)
+		}
 		p.advanceWSS()
 		tt = p.cur.Type
 	}
@@ -710,6 +729,7 @@ func (p *Parser) parseReturnStatement(scope *scope) Node {
 		}
 		p.appendErrorForToken(msg, retValueToken)
 	}
+	ret.comment = p.curComment()
 	p.advancePastNL()
 	return ret
 }
@@ -721,6 +741,7 @@ func (p *Parser) parseBreakStatement(scope *scope) Node {
 	}
 	p.advance() // advance past BREAK token
 	p.assertEOL()
+	breakStmt.comment = p.curComment()
 	p.advancePastNL()
 	return breakStmt
 }
@@ -778,9 +799,12 @@ func (p *Parser) parseForStatement(scope *scope) Node {
 	default:
 		p.appendError("expected num, string, array or map after range, found " + t.String())
 	}
+	forNode.comment = p.curComment()
 	p.advancePastNL()
 	forNode.Block = p.parseBlock(scope)
 	p.assertEnd()
+	p.advance()
+	forNode.Block.comment = p.curComment()
 	p.advancePastNL()
 	return forNode
 }
@@ -818,9 +842,13 @@ func (p *Parser) parseWhileStatement(scope *scope) Node {
 	p.advance() // advance past WHILE token
 	scope = newScope(scope, while)
 	while.Condition = p.parseCondition(scope)
+	comment := p.curComment()
 	p.advancePastNL()
 	while.Block = p.parseBlock(scope)
+	while.ConditionalBlock.comment = comment
 	p.assertEnd()
+	p.advance()
+	while.ConditionalBlock.Block.comment = p.curComment()
 	p.advancePastNL()
 	return while
 }
@@ -848,10 +876,15 @@ func (p *Parser) parseIfStatement(scope *scope) Node {
 	if p.cur.TokenType() == lexer.ELSE {
 		p.advance() // advance past ELSE token
 		p.assertEOL()
+		comment := p.curComment()
 		p.advancePastNL()
-		ifStmt.Else = p.parseBlock(newScope(scope, ifStmt))
+		elseBlock := p.parseBlock(newScope(scope, ifStmt))
+		elseBlock.comment = comment
+		ifStmt.Else = elseBlock
 	}
 	p.assertEnd()
+	p.advance()
+	ifStmt.comment = p.curComment()
 	p.advancePastNL()
 	return ifStmt
 }
@@ -860,6 +893,7 @@ func (p *Parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
 	ifBlock := &ConditionalBlock{Token: p.cur}
 	p.advance() // advance past IF token
 	ifBlock.Condition = p.parseCondition(scope)
+	ifBlock.comment = p.curComment()
 	p.advancePastNL()
 	ifBlock.Block = p.parseIfBlock(scope)
 	return ifBlock
@@ -901,4 +935,11 @@ func (p *Parser) parseType() *Type {
 		}
 	}
 	return ILLEGAL_TYPE
+}
+
+func (p *Parser) curComment() string {
+	if p.cur.Type == lexer.COMMENT {
+		return p.cur.Literal
+	}
+	return ""
 }

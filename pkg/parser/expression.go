@@ -146,6 +146,8 @@ func (p *Parser) parseBinaryExpr(scope *scope, left Node) Node {
 		return nil // previous error
 	}
 	p.validateBinaryType(binaryExp)
+	binaryExp.wss = p.isWSS()
+
 	return binaryExp
 }
 

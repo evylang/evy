@@ -15,15 +15,18 @@ type Node interface {
 type Program struct {
 	Statements       []Node
 	alwaysTerminates bool
+	formatting       *formatting
 }
 
 type EmptyStmt struct {
-	Token *lexer.Token // The NL token
+	Token   *lexer.Token // The NL token
+	comment string
 }
 
 type FuncCallStmt struct {
 	Token    *lexer.Token // The IDENT of the function
 	FuncCall *FuncCall
+	comment  string
 }
 
 type FuncCall struct {
@@ -45,6 +48,8 @@ type BinaryExpression struct {
 	Op    Operator
 	Left  Node
 	Right Node
+
+	wss bool
 }
 
 type IndexExpression struct {
@@ -81,29 +86,34 @@ type Decl struct {
 }
 
 type TypedDeclStmt struct {
-	Token *lexer.Token
-	Decl  *Decl
+	Token   *lexer.Token
+	Decl    *Decl
+	comment string
 }
 
 type InferredDeclStmt struct {
-	Token *lexer.Token
-	Decl  *Decl
+	Token   *lexer.Token
+	Decl    *Decl
+	comment string
 }
 
 type AssignmentStmt struct {
-	Token  *lexer.Token
-	Target Node // Variable, index or field expression
-	Value  Node // literal, expression, assignable, ...
+	Token   *lexer.Token
+	Target  Node // Variable, index or field expression
+	Value   Node // literal, expression, assignable, ...
+	comment string
 }
 
 type ReturnStmt struct {
-	Token *lexer.Token
-	Value Node // literal, expression, assignable, ...
-	T     *Type
+	Token   *lexer.Token
+	Value   Node // literal, expression, assignable, ...
+	T       *Type
+	comment string
 }
 
 type BreakStmt struct {
-	Token *lexer.Token
+	Token   *lexer.Token
+	comment string
 }
 
 type FuncDeclStmt struct {
@@ -113,6 +123,7 @@ type FuncDeclStmt struct {
 	VariadicParam *Var
 	ReturnType    *Type
 	Body          *BlockStatement
+	comment       string
 }
 
 type IfStmt struct {
@@ -120,6 +131,7 @@ type IfStmt struct {
 	IfBlock      *ConditionalBlock
 	ElseIfBlocks []*ConditionalBlock
 	Else         *BlockStatement
+	comment      string
 }
 
 type WhileStmt struct {
@@ -132,7 +144,8 @@ type ForStmt struct {
 	LoopVar *Var
 	Range   Node // StepRange or array/map/string expression
 
-	Block *BlockStatement
+	Block   *BlockStatement
+	comment string
 }
 
 type StepRange struct {
@@ -147,13 +160,15 @@ type ConditionalBlock struct {
 	Token     *lexer.Token
 	Condition Node // must be of type bool
 	Block     *BlockStatement
+	comment   string
 }
 
 type EventHandlerStmt struct {
-	Token  *lexer.Token // The 'on' token
-	Name   string
-	Params []*Var
-	Body   *BlockStatement
+	Token   *lexer.Token // The 'on' token
+	Name    string
+	Params  []*Var
+	Body    *BlockStatement
+	comment string
 }
 
 type Var struct {
@@ -167,6 +182,7 @@ type BlockStatement struct {
 	Token            *lexer.Token // the NL before the first statement
 	Statements       []Node
 	alwaysTerminates bool
+	comment          string
 }
 
 type Bool struct {
@@ -199,6 +215,13 @@ type MapLiteral struct {
 
 func (p *Program) String() string {
 	return newlineList(p.Statements)
+}
+
+func (p *Program) Format() string {
+	var sb strings.Builder
+	p.formatting.w = &sb
+	p.formatting.format(p)
+	return sb.String()
 }
 
 func (*Program) Type() *Type {

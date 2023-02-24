@@ -46,6 +46,10 @@ func (m multilineItem) isNL() bool {
 	return m == multilineNL
 }
 
+func (m multilineItem) isKey() bool {
+	return !m.isNL() && !m.isComment()
+}
+
 const (
 	multilineEl = multilineItem("el")
 	multilineNL = multilineItem("\n")

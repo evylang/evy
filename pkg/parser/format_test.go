@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"foxygo.at/evy/pkg/assert"
@@ -472,6 +473,134 @@ print x
 			assert.Equal(t, want, got)
 		})
 	}
+}
+
+func TestMapLiteralFormat(t *testing.T) {
+	tests := map[string]string{
+		"x:={   }":            "x := {}",
+		"x:= { a : 1 b:2   }": "x := {a:1 b:2}",
+		`
+x:= {
+			a : 1
+			b:2
+		}`: `
+x := {
+    a:1
+    b:2
+}`,
+		`
+x:= {			a : 1
+			b:2	}`: `
+x := {a:1
+    b:2}`,
+		`
+x:{}num
+if true
+  x= {
+			    a : 1
+			    b:2
+		  }
+end`: `
+x:{}num
+if true
+    x = {
+        a:1
+        b:2
+    }
+end`,
+		`
+x:= {			a : 1 // comment 1
+			b:2	} // comment 2`: `
+x := {a:1 // comment 1
+    b:2} // comment 2`,
+		`
+x:= {
+
+
+	  a : 1
+
+
+	  b:2
+
+
+}`: `
+x := {
+
+    a:1
+
+    b:2
+
+}`,
+		`
+x:= {
+
+    // comment 1
+	  a : 1
+
+    // comment 2
+
+	  b:2
+	  // comment 3
+	  // comment 4
+}`: `
+x := {
+
+    // comment 1
+    a:1
+
+    // comment 2
+
+    b:2
+    // comment 3
+    // comment 4
+}`,
+	}
+
+	for input, want := range tests {
+		input, want := input+"\nprint x", want+"\nprint x\n"
+		t.Run(input, func(t *testing.T) {
+			got := testFormat(t, input)
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
+func TestArrayMapLiteralFormat(t *testing.T) {
+	input := `x := [
+  { x:1}
+  { x:2}
+  { x:3}
+  { x:4}
+  { x:3}
+  { x:2}
+  { x:1}
+]
+print x`
+	want := `
+x := [
+    {x:1}
+    {x:2}
+    {x:3}
+    {x:4}
+    {x:3}
+    {x:2}
+    {x:1}
+]
+print x
+`[1:]
+	parser := New(input, testBuiltins())
+	prog := parser.Parse()
+	m := prog.formatting.multiline
+	for key, val := range m {
+		if _, ok := key.(*MapLiteral); ok {
+			continue
+		}
+		fmt.Printf("key: %p: val %v\n", key, len(val))
+		fmt.Printf("map[%p]: %v (expected %v)\n", key, len(m[key]), len(val))
+	}
+	assertNoParseError(t, parser, input)
+	got := prog.Format()
+	assert.Equal(t, want, got)
 }
 
 func testFormat(t *testing.T, input string) string {

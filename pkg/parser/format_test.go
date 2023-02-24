@@ -384,6 +384,96 @@ end
 	}
 }
 
+func TestArrayLiteralFormat(t *testing.T) {
+	tests := map[string]string{
+		`x := [1 2 3]
+		print x
+`: `
+x := [1 2 3]
+print x
+`[1:],
+		`x := [  1  2    3    ]
+		print    x
+`: `
+x := [1 2 3]
+print x
+`[1:],
+		`x := [
+		1
+		2
+		 ]
+		print    x
+`: `
+x := [
+    1
+    2
+]
+print x
+`[1:],
+		`x := [1
+		1.5
+		2]
+		print    x
+`: `
+x := [1
+    1.5
+    2]
+print x
+`[1:],
+		`x := [
+
+
+		    1
+
+
+		    2
+
+		  ]
+		  print    x
+`: `
+x := [
+
+    1
+
+    2
+
+]
+print x
+`[1:],
+		`x := [ // comment
+// line comment 1
+		1 // comment 1
+
+// line comment 2
+
+
+		2 // comment 2
+// line comment 3
+		 ]
+		print    x
+`: `
+x := [ // comment
+    // line comment 1
+    1 // comment 1
+
+    // line comment 2
+
+    2 // comment 2
+    // line comment 3
+]
+print x
+`[1:],
+	}
+
+	for input, want := range tests {
+		input, want := input, want
+		t.Run(input, func(t *testing.T) {
+			got := testFormat(t, input)
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
 func testFormat(t *testing.T, input string) string {
 	t.Helper()
 	parser := New(input, testBuiltins())

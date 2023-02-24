@@ -201,9 +201,10 @@ type StringLiteral struct {
 }
 
 type ArrayLiteral struct {
-	Token    *lexer.Token
-	Elements []Node
-	T        *Type
+	Token      *lexer.Token
+	Elements   []Node
+	T          *Type
+	multilines []multilineItem
 }
 
 type MapLiteral struct {

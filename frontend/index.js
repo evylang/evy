@@ -33,9 +33,9 @@ let jsReadInitialised = false
 function jsRead() {
   const el = document.querySelector("#read")
   if (!jsReadInitialised) {
-    el.focus()
     getElements(".read").map((el) => el.classList.remove("hidden"))
-    readInitialised = true
+    el.focus()
+    jsReadInitialised = true
   }
   const s = el.value
   const idx = s.indexOf("\n")
@@ -86,8 +86,7 @@ let stopped = true
 // function running the evaluator after parsing.
 async function handleRun(event) {
   if (runButton.innerText === "Stop") {
-    stopped = true
-    wasmInst.exports.stop()
+    stop()
     return
   }
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
@@ -97,6 +96,11 @@ async function handleRun(event) {
   go.run(wasmInst)
 }
 
+function stop() {
+  stopped = true
+  wasmInst ? wasmInst.exports.stop() : onStopped()
+}
+
 // onStopped is exported to evy go/wasm and called when execution finishes
 function onStopped() {
   removeEventHandlers()
@@ -104,6 +108,7 @@ function onStopped() {
   animationStart = undefined
   jsReadInitialised = false
   runButton.innerText = "Run"
+  wasmInst = undefined
 }
 
 function newEvyGo() {
@@ -327,6 +332,7 @@ function keydownListener(e) {
 const inputQuerySelector = "input#sliderx,input#slidery"
 
 function addInputHandlers() {
+  getElements(".input").map((el) => el.classList.remove("hidden"))
   const exp = wasmInst.exports
   for (const el of document.querySelectorAll(inputQuerySelector)) {
     el.onchange = (e) => {
@@ -408,6 +414,8 @@ async function fetchSource() {
     }
     const source = await response.text()
     document.querySelector("#code").value = source
+    stop()
+    clearOutput()
   } catch (err) {
     console.error(err)
   }

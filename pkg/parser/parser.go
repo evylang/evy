@@ -24,10 +24,6 @@ func Run(input string, builtins Builtins) string {
 	parser := New(input, builtins)
 	prog := parser.Parse()
 	if len(parser.errors) > 0 {
-		errs := make([]string, len(parser.errors))
-		for i, e := range parser.errors {
-			errs[i] = e.String()
-		}
 		return MaxErrorsString(parser.Errors(), 8) + "\n\n" + prog.String()
 	}
 	return prog.String()

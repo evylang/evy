@@ -445,7 +445,11 @@ func (*WhileStmt) AlwaysTerminates() bool {
 }
 
 func (f *ForStmt) String() string {
-	header := "for " + f.LoopVar.Name + " := " + f.Range.String()
+	header := "for "
+	if f.LoopVar != nil {
+		header += f.LoopVar.Name + " := "
+	}
+	header += f.Range.String()
 	return header + " {\n" + f.Block.String() + "}"
 }
 

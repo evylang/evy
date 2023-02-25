@@ -33,9 +33,9 @@ let jsReadInitialised = false
 function jsRead() {
   const el = document.querySelector("#read")
   if (!jsReadInitialised) {
-    el.focus()
     getElements(".read").map((el) => el.classList.remove("hidden"))
-    readInitialised = true
+    el.focus()
+    jsReadInitialised = true
   }
   const s = el.value
   const idx = s.indexOf("\n")

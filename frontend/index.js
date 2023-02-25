@@ -327,6 +327,7 @@ function keydownListener(e) {
 const inputQuerySelector = "input#sliderx,input#slidery"
 
 function addInputHandlers() {
+  getElements(".input").map((el) => el.classList.remove("hidden"))
   const exp = wasmInst.exports
   for (const el of document.querySelectorAll(inputQuerySelector)) {
     el.onchange = (e) => {

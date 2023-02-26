@@ -24,8 +24,8 @@ evy is a tool for managing evy source code.
 type config struct {
 	Version  kong.VersionFlag `short:"V" help:"Print version information"`
 	Run      runCmd           `cmd:"" help:"Run evy program"`
-	Tokenize tokenizeCmd      `cmd:"" help:"Tokenize evy program"`
-	Parse    parseCmd         `cmd:"" help:"Parse evy program"`
+	Tokenize tokenizeCmd      `cmd:"" help:"Tokenize evy program" hidden:""`
+	Parse    parseCmd         `cmd:"" help:"Parse evy program" hidden:""`
 }
 
 type runCmd struct {

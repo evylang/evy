@@ -60,3 +60,62 @@ func TestMapLiteralMultiline(t *testing.T) {
 		assert.Equal(t, want, got)
 	}
 }
+
+func TestNLIndices(t *testing.T) {
+	tests := map[string]map[int]bool{
+		`func f1
+			print 1
+		end // needs nl after this line, stmt IDX 0
+		func f2
+			print 2
+		end`: {0: true},
+		`
+		func f1
+			print 1
+		end // needs nl after this line, stmt IDX 0
+		func f2
+			print 2
+		end`: {1: true},
+		`
+		func f1
+			print 1
+		end // needs nl after this line, stmt IDX 0
+		// f2 comment
+		func f2
+			print 2
+		end`: {1: true},
+		`
+		func f1
+			print 1
+		end // needs nl after this line, stmt IDX 0
+		// f2 comment
+		// f2 comment continued
+		on down
+			print 2
+		end`: {1: true},
+		`
+		// f1 comment
+		func f1
+			print 1
+		end // needs nl after this line, stmt IDX 0
+		print 1
+		// f2 comment
+		// f2 comment continued
+		on down
+			print 2
+		end`: {2: true, 3: true},
+	}
+	for input, want := range tests {
+		parser := New(input, testBuiltins())
+		prog := parser.Parse()
+		assertNoParseError(t, parser, input)
+		got := nlAfter(prog.Statements, prog.formatting.comments)
+		// cannot equality test maps in tinygo
+		// panic: unimplemented: (reflect.Value).MapKeys()
+		// so test maps entries individually.
+		assert.Equal(t, len(want), len(got))
+		for key := range got {
+			assert.Equal(t, want[key], got[key])
+		}
+	}
+}

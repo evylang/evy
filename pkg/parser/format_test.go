@@ -594,6 +594,108 @@ print x
 	assert.Equal(t, want, got)
 }
 
+func TestNLInsertion(t *testing.T) {
+	tests := map[string]string{
+		`func f1
+	print 1
+end // needs nl after this line, stmt IDX 0
+func f2
+    print 2
+end`: `
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+
+func f2
+    print 2
+end
+`[1:],
+		`
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+func f2
+    print 2
+end`: `
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+
+func f2
+    print 2
+end
+`,
+		`
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+// f2 comment
+func f2
+    print 2
+end
+`: `
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+
+// f2 comment
+func f2
+    print 2
+end
+`,
+		`
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+// f2 comment
+// f2 comment continued
+on down
+    print 2
+end`: `
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+
+// f2 comment
+// f2 comment continued
+on down
+    print 2
+end
+`,
+		`
+// f1 comment
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+print 1
+// f2 comment
+// f2 comment continued
+on down
+    print 2
+end`: `
+// f1 comment
+func f1
+    print 1
+end // needs nl after this line, stmt IDX 0
+
+print 1
+
+// f2 comment
+// f2 comment continued
+on down
+    print 2
+end
+`,
+	}
+	for input, want := range tests {
+		input, want := input, want
+		t.Run(input, func(t *testing.T) {
+			got := testFormat(t, input)
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
 func testFormat(t *testing.T, input string) string {
 	t.Helper()
 	parser := New(input, testBuiltins())

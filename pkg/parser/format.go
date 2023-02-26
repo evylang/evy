@@ -47,8 +47,7 @@ func (f *formatting) recordMultiline(n Node, multiline []multilineItem) {
 func (f *formatting) format(n Node) {
 	switch n := n.(type) {
 	case *Program:
-		f.indentLevel = -1
-		f.writeStmts(n.Statements)
+		f.formatProgram(n)
 	case *EmptyStmt:
 		f.writeComment(n)
 	case *TypedDeclStmt:
@@ -140,6 +139,27 @@ func (f *formatting) format(n Node) {
 		f.formatMapLiteral(n)
 	default:
 		f.write(fmt.Sprintf("format unimplemented for %v", n))
+	}
+}
+
+func (f *formatting) formatProgram(p *Program) {
+	if len(p.Statements) == 0 {
+		f.write("\n")
+		return
+	}
+	nl := nlAfter(p.Statements, f.comments)
+
+	empty := false
+	for i, stmt := range p.Statements {
+		if empty = f.writeBlankLine(stmt, empty); empty {
+			continue
+		}
+		f.indent()
+		f.format(stmt)
+		f.writeLn()
+		if nl[i] {
+			f.writeLn() // write newline after func / on decl
+		}
 	}
 }
 
@@ -366,14 +386,9 @@ func (f *formatting) indent() {
 
 func (f *formatting) writeStmts(stmts []Node) {
 	f.indentLevel++
-
-	if len(stmts) == 0 {
-		stmts = []Node{&EmptyStmt{}} // write at least a single new line
-	}
-
 	empty := false
 	for _, stmt := range stmts {
-		if empty = f.writeEmptyStmt(stmt, empty); empty {
+		if empty = f.writeBlankLine(stmt, empty); empty {
 			continue
 		}
 		f.indent()
@@ -384,15 +399,15 @@ func (f *formatting) writeStmts(stmts []Node) {
 	f.indentLevel--
 }
 
-func (f *formatting) writeEmptyStmt(n Node, lastEmpty bool) bool {
+func (f *formatting) writeBlankLine(n Node, lastEmpty bool) bool {
 	_, ok := n.(*EmptyStmt)
-	if ok && f.comments[ptr(n)] == "" {
-		if !lastEmpty {
-			f.writeLn()
-		}
-		return true
+	if !ok || f.comments[ptr(n)] != "" {
+		return false
 	}
-	return false
+	if !lastEmpty {
+		f.writeLn()
+	}
+	return true
 }
 
 func (f *formatting) writeWSS(n *BinaryExpression) {

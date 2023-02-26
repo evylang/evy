@@ -23,24 +23,24 @@ evy is a tool for managing evy source code.
 
 type config struct {
 	Version  kong.VersionFlag `short:"V" help:"Print version information"`
-	Run      cmdRun           `cmd:"" help:"Run evy program"`
-	Tokenize cmdTokenize      `cmd:"" help:"Tokenize evy program"`
-	Parse    cmdParse         `cmd:"" help:"Parse evy program"`
+	Run      runCmd           `cmd:"" help:"Run evy program"`
+	Tokenize tokenizeCmd      `cmd:"" help:"Tokenize evy program"`
+	Parse    parseCmd         `cmd:"" help:"Parse evy program"`
 }
 
-type cmdRun struct {
+type runCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-type cmdTokenize struct {
+type tokenizeCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-type cmdParse struct {
+type parseCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-func (c *cmdRun) Run() error {
+func (c *runCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (c *cmdRun) Run() error {
 	return nil
 }
 
-func (c *cmdTokenize) Run() error {
+func (c *tokenizeCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (c *cmdTokenize) Run() error {
 	return nil
 }
 
-func (c *cmdParse) Run() error {
+func (c *parseCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err

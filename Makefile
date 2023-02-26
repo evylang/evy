@@ -6,7 +6,7 @@ O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 
-all: build test lint tiny test-tiny check-coverage sh-lint check-prettier frontend ## Build, test, check coverage and lint
+all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -72,7 +72,13 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 lint: ## Lint go source code
 	golangci-lint run
 
-.PHONY: lint
+evy-fmt: ## Format evy sample code
+	go run . fmt --write frontend/samples/*.evy
+
+check-evy-fmt:
+	go run . fmt --check frontend/samples/*.evy
+
+.PHONY: check-evy-fmt evy-fmt lint
 
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib

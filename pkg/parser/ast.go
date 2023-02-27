@@ -15,6 +15,7 @@ type Node interface {
 type Program struct {
 	Statements       []Node
 	alwaysTerminates bool
+	formatting       *formatting
 }
 
 type EmptyStmt struct {
@@ -199,6 +200,13 @@ type MapLiteral struct {
 
 func (p *Program) String() string {
 	return newlineList(p.Statements)
+}
+
+func (p *Program) Format() string {
+	var sb strings.Builder
+	p.formatting.w = &sb
+	p.formatting.format(p)
+	return sb.String()
 }
 
 func (*Program) Type() *Type {

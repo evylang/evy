@@ -116,7 +116,7 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalDotExpr(node, false /* forAssign */)
 	case *parser.GroupExpression:
 		return e.Eval(node.Expr)
-	case *parser.FuncDeclStmt, *parser.EventHandlerStmt:
+	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
 		return nil
 	}
 	return newError(fmt.Sprintf("internal error: unknown node type %v", node))

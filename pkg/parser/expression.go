@@ -355,8 +355,8 @@ func (p *Parser) parseLiteral(scope *scope) Node {
 
 func (p *Parser) parseArrayLiteral(scope *scope) Node {
 	tok := p.cur
-	p.advance()        // advance past [
-	p.advanceIfWSEOL() // allow whitespace after `[`, eg [ 1 2 3 ]
+	p.advance()                   // advance past [
+	multi := p.parseMulitlineWS() // allow whitespace after `[`, eg [ 1 2 3 ]
 	elements := []Node{}
 	tt := p.cur.TokenType()
 	for tt != lexer.RBRACKET && tt != lexer.EOF {
@@ -365,22 +365,26 @@ func (p *Parser) parseArrayLiteral(scope *scope) Node {
 			return nil // previous error
 		}
 		elements = append(elements, n)
-		p.advanceIfWSEOL()
+		multi = append(multi, multilineEl)
+		multi = append(multi, p.parseMulitlineWS()...)
 		tt = p.cur.TokenType()
 	}
 	if !p.assertToken(lexer.RBRACKET) {
 		return nil
 	}
 	p.advance() // advance past ]
+	arrayLit := &ArrayLiteral{Token: tok, T: GENERIC_ARRAY}
+	p.formatting.recordMultiline(arrayLit, multi)
 	if len(elements) == 0 {
-		return &ArrayLiteral{Token: tok, T: GENERIC_ARRAY}
+		return arrayLit
 	}
 	types := make([]*Type, len(elements))
 	for i, e := range elements {
 		types[i] = e.Type()
 	}
-	t := &Type{Name: ARRAY, Sub: p.combineTypes(types)}
-	return &ArrayLiteral{Token: tok, Elements: elements, T: t}
+	arrayLit.T = &Type{Name: ARRAY, Sub: p.combineTypes(types)}
+	arrayLit.Elements = elements
+	return arrayLit
 }
 
 func (p *Parser) parseExprList(scope *scope) []Node {
@@ -446,7 +450,7 @@ func (p *Parser) parseMapLiteral(scope *scope) Node {
 func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 	pairs := map[string]Node{}
 	var order []string
-	p.advanceIfWSEOL()
+	p.parseMulitlineWS()
 	tt := p.cur.TokenType()
 
 	for tt != lexer.RCURLY && tt != lexer.EOF {
@@ -468,7 +472,7 @@ func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 		}
 		pairs[key] = n
 		order = append(order, key)
-		p.advanceIfWSEOL()
+		p.parseMulitlineWS()
 		tt = p.cur.TokenType()
 	}
 	return pairs, order

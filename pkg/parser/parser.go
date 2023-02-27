@@ -646,16 +646,23 @@ func (p *Parser) advanceIfWS() {
 	}
 }
 
-func (p *Parser) advanceIfWSEOL() {
+// parseMultilineWS parses multiline whitespace and comments as needed
+// for formatting in Array and Map literals.
+func (p *Parser) parseMulitlineWS() []multilineItem {
 	tt := p.cur.Type
+	var multi []multilineItem
 	for tt == lexer.NL || tt == lexer.COMMENT || tt == lexer.WS {
-		if tt == lexer.COMMENT {
+		if tt == lexer.NL {
+			multi = append(multi, multilineNL)
+		} else if tt == lexer.COMMENT {
+			multi = append(multi, multilineComment(p.cur.Literal))
 			p.advanceWSS() // advance past NL
 			p.assertToken(lexer.NL)
 		}
 		p.advanceWSS()
 		tt = p.cur.Type
 	}
+	return multi
 }
 
 func (p *Parser) isWSS() bool {

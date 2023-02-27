@@ -427,30 +427,29 @@ func (p *Parser) parseMapLiteral(scope *scope) Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
+	mapLit := &MapLiteral{Token: tok, Pairs: map[string]Node{}, T: GENERIC_MAP}
 	p.advance() // advance past {
-	pairs, order := p.parseMapPairs(scope)
-	if pairs == nil {
+
+	if ok := p.parseMapPairs(scope, mapLit); !ok {
 		return nil // previous error
 	}
 	if !p.assertToken(lexer.RCURLY) {
 		return nil
 	}
 	p.advance() // advance past }
-	if len(pairs) == 0 {
-		return &MapLiteral{Token: tok, T: GENERIC_MAP}
+	if len(mapLit.Pairs) == 0 {
+		return mapLit
 	}
-	types := make([]*Type, 0, len(pairs))
-	for _, n := range pairs {
+	types := make([]*Type, 0, len(mapLit.Pairs))
+	for _, n := range mapLit.Pairs {
 		types = append(types, n.Type())
 	}
-	t := &Type{Name: MAP, Sub: p.combineTypes(types)}
-	return &MapLiteral{Token: tok, Pairs: pairs, Order: order, T: t}
+	mapLit.T = &Type{Name: MAP, Sub: p.combineTypes(types)}
+	return mapLit
 }
 
-func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
-	pairs := map[string]Node{}
-	var order []string
-	p.parseMulitlineWS()
+func (p *Parser) parseMapPairs(scope *scope, mapLit *MapLiteral) bool {
+	multi := p.parseMulitlineWS()
 	tt := p.cur.TokenType()
 
 	for tt != lexer.RCURLY && tt != lexer.EOF {
@@ -459,23 +458,25 @@ func (p *Parser) parseMapPairs(scope *scope) (map[string]Node, []string) {
 		}
 		key := p.cur.Literal
 		p.advance() // advance past key IDENT
-		if _, ok := pairs[key]; ok {
+		if _, ok := mapLit.Pairs[key]; ok {
 			p.appendError("duplicated map key'" + key + "'")
-			return nil, nil
+			return false
 		}
 		p.assertToken(lexer.COLON)
 		p.advance() // advance past COLON
 
 		n := p.parseExprWSS(scope)
 		if n == nil {
-			return nil, nil // previous error
+			return false // previous error
 		}
-		pairs[key] = n
-		order = append(order, key)
-		p.parseMulitlineWS()
+		mapLit.Pairs[key] = n
+		mapLit.Order = append(mapLit.Order, key)
+		multi = append(multi, multilineItem(key))
+		multi = append(multi, p.parseMulitlineWS()...)
 		tt = p.cur.TokenType()
 	}
-	return pairs, order
+	p.formatting.recordMultiline(mapLit, multi)
+	return true
 }
 
 // lookupVar looks up current token literal (IDENT) in scope.

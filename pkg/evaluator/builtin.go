@@ -22,7 +22,7 @@ type Builtins struct {
 	Globals       map[string]*parser.Var
 }
 
-func newParserBuiltins(builtins Builtins) parser.Builtins {
+func NewParserBuiltins(builtins Builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDeclStmt, len(builtins.Funcs))
 	for name, builtin := range builtins.Funcs {
 		funcs[name] = builtin.Decl
@@ -109,7 +109,7 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 
 func DefaulParserBuiltins(rt *Runtime) parser.Builtins {
 	builtins := DefaultBuiltins(rt)
-	return newParserBuiltins(builtins)
+	return NewParserBuiltins(builtins)
 }
 
 type Runtime struct {

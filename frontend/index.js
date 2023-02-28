@@ -4,22 +4,26 @@ let wasmModule, wasmInst
 let sourcePtr, sourceLength
 const go = newEvyGo()
 const runButton = document.querySelector("#run")
+const runButtonMob = document.querySelector("#run-mob")
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
   WebAssembly.compileStreaming(fetch("evy.wasm"))
     .then((obj) => (wasmModule = obj))
     .catch((err) => console.error(err))
-  runButton.onclick = handleRun
+  runButton.onclick = handle
   runButton.disabled = false
+  runButtonMob.onclick = handleMob
+  runButtonMob.disabled = false
 }
 
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
 // writes it to the output textarea.
 function jsPrint(ptr, len) {
   const s = memToString(ptr, len)
-  const output = document.querySelector("#output")
+  const output = document.querySelector("#console")
   output.textContent += s
+  output.scrollTo({ behavior: "smooth", left: 0, top: output.scrollHeight })
   if (s.toLowerCase().includes("confetti")) {
     showConfetti()
   }
@@ -86,22 +90,55 @@ function ptrLenToBigInt({ ptr, len }) {
   return ptrLenNum
 }
 
+function onCodeScreen() {
+  return !document.querySelector("main").classList.contains("view-output")
+}
+async function slide() {
+  const el = document.querySelector("main")
+  const cl = el.classList
+  return new Promise((resolve) => {
+    el.ontransitionend = resolve
+    onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
+  })
+}
+
 let stopped = true
-// handleRun retrieves the input string from the code pane and
-// converts it to wasm memory bytes. It then calls the evy main()
-// function running the evaluator after parsing.
-async function handleRun(event) {
-  if (runButton.innerText === "Stop") {
-    stop()
+async function handle() {
+  stopped ? start() : stop()
+}
+
+async function handleMob() {
+  if (onCodeScreen()) {
+    // we need to wait for the slide transition to finish otherwise
+    // el.focus() in jsRead() messes up the layout
+    await slide()
+    start()
     return
   }
+  // on output screen
+  if (stopped) {
+    runButtonMob.innerText = "Run"
+    slide()
+    return
+  }
+  stop()
+}
+
+// start retrieves the input string from the code pane and
+// converts it to wasm memory bytes. It then calls the evy main()
+// function running the evaluator after parsing.
+async function start() {
+  stopped = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   clearOutput()
   runButton.innerText = "Stop"
-  stopped = false
+  runButton.classList.add("running")
+  runButtonMob.innerText = "Stop"
+  runButtonMob.classList.add("running")
   go.run(wasmInst)
 }
 
+// stop terminates program in execution via exports.stop
 function stop() {
   stopped = true
   wasmInst ? wasmInst.exports.stop() : onStopped()
@@ -113,8 +150,11 @@ function onStopped() {
   stopped = true
   animationStart = undefined
   jsReadInitialised = false
-  runButton.innerText = "Run"
   wasmInst = undefined
+  runButton.classList.remove("running")
+  runButton.innerText = "Run"
+  runButtonMob.classList.remove("running")
+  runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
 }
 
 function newEvyGo() {
@@ -140,7 +180,7 @@ function newEvyGo() {
 }
 
 function clearOutput() {
-  document.querySelector("#output").textContent = ""
+  document.querySelector("#console").textContent = ""
   resetCanvas()
 }
 
@@ -216,9 +256,6 @@ function initCanvas() {
   const b = c.parentElement.getBoundingClientRect()
   c.width = Math.abs(scaleX(canvas.width))
   c.height = Math.abs(scaleY(canvas.height))
-  c.style.width = `40vh`
-  c.style.height = `40vh`
-  c.style.display = "block"
   canvas.ctx = c.getContext("2d")
 }
 
@@ -382,7 +419,7 @@ async function initUI() {
 
 function ctrlEnterListener(e) {
   if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
-    handleRun()
+    handle()
   }
 }
 

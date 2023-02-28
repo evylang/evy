@@ -1,6 +1,0 @@
-<svg viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg">
-	<!-- 	<circle fill="#202451" cx="6.5" cy="6.5" r="6.5"/> -->
-	<rect fill="#202451" width="100%" height="100%"/>
-	<path   fill="#00ff00" d="M4,4 h5 v1 h1 v2 h-5 v1 h4 v1 h-5 v-1 h-1 v-3 h1 z m1 1 v1 h3 v-1 h-3 z"/>
-</svg>
-<!-- Generate favicon.png with rsvg-convert -h 128 favicon.svg > favicon.png -->

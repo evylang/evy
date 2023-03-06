@@ -41,7 +41,7 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) {
-	p := parser.New(input, newParserBuiltins(e.builtins))
+	p := parser.New(input, NewParserBuiltins(e.builtins))
 	prog := p.Parse()
 	if p.HasErrors() {
 		e.print(parser.MaxErrorsString(p.Errors(), 8))
@@ -116,7 +116,7 @@ func (e *Evaluator) Eval(node parser.Node) Value {
 		return e.evalDotExpr(node, false /* forAssign */)
 	case *parser.GroupExpression:
 		return e.Eval(node.Expr)
-	case *parser.FuncDeclStmt, *parser.EventHandlerStmt:
+	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
 		return nil
 	}
 	return newError(fmt.Sprintf("internal error: unknown node type %v", node))

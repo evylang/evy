@@ -175,6 +175,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 	}
 	for input, want := range tests {
 		parser := New(input, testBuiltins())
+		parser.formatting = newFormatting()
 		parser.advanceTo(0)
 		scope := newScope(nil, &Program{})
 		scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
@@ -256,6 +257,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 	for input, wantErr := range tests {
 		parser := New(input, testBuiltins())
 		parser.advanceTo(0)
+		parser.formatting = newFormatting()
 		scope := newScope(nil, &Program{})
 		scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
 		mapType := &Type{Name: MAP, Sub: NUM_TYPE}

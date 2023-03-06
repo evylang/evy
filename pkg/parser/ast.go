@@ -15,6 +15,11 @@ type Node interface {
 type Program struct {
 	Statements       []Node
 	alwaysTerminates bool
+	formatting       *formatting
+}
+
+type EmptyStmt struct {
+	Token *lexer.Token // The NL token
 }
 
 type FuncCallStmt struct {
@@ -197,6 +202,13 @@ func (p *Program) String() string {
 	return newlineList(p.Statements)
 }
 
+func (p *Program) Format() string {
+	var sb strings.Builder
+	p.formatting.w = &sb
+	p.formatting.format(p)
+	return sb.String()
+}
+
 func (*Program) Type() *Type {
 	return NONE_TYPE
 }
@@ -204,6 +216,12 @@ func (*Program) Type() *Type {
 func (p *Program) AlwaysTerminates() bool {
 	return p.alwaysTerminates
 }
+
+func (e *EmptyStmt) String() string {
+	return ""
+}
+
+func (*EmptyStmt) Type() *Type { return NONE_TYPE }
 
 func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))

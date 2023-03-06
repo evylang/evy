@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,32 +16,44 @@ import (
 	"github.com/alecthomas/kong"
 )
 
-var version string = "v0.0.0"
+var (
+	version      string = "v0.0.0"
+	errNotFormat        = errors.New("not formatted")
+	errParse            = errors.New("parse error")
+)
 
 const description = `
 evy is a tool for managing evy source code.
 `
 
 type config struct {
-	Version  kong.VersionFlag `short:"V" help:"Print version information"`
-	Run      cmdRun           `cmd:"" help:"Run evy program"`
-	Tokenize cmdTokenize      `cmd:"" help:"Tokenize evy program"`
-	Parse    cmdParse         `cmd:"" help:"Parse evy program"`
+	Version kong.VersionFlag `short:"V" help:"Print version information"`
+	Run     runCmd           `cmd:"" help:"Run evy program"`
+	Fmt     fmtCmd           `cmd:"" help:"Fmt evy files"`
+
+	Tokenize tokenizeCmd `cmd:"" help:"Tokenize evy program" hidden:""`
+	Parse    parseCmd    `cmd:"" help:"Parse evy program" hidden:""`
 }
 
-type cmdRun struct {
+type runCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-type cmdTokenize struct {
+type fmtCmd struct {
+	Write bool     `short:"w" help:"update .evy file" xor:"mode"`
+	Check bool     `short:"c" help:"check if already formatted" xor:"mode"`
+	Files []string `arg:"" help:"Source files. Default stdin"`
+}
+
+type tokenizeCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-type cmdParse struct {
+type parseCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
-func (c *cmdRun) Run() error {
+func (c *runCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err
@@ -51,7 +64,67 @@ func (c *cmdRun) Run() error {
 	return nil
 }
 
-func (c *cmdTokenize) Run() error {
+func (c *fmtCmd) Run() error {
+	if len(c.Files) == 0 {
+		return format(os.Stdin, os.Stdout, c.Check)
+	}
+	var out io.StringWriter = os.Stdout
+	for _, filename := range c.Files {
+		in, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		if c.Write {
+			out, err = os.CreateTemp("", "evy")
+			if err != nil {
+				return fmt.Errorf("%s: %w", filename, err)
+			}
+		}
+		if err := format(in, out, !c.Write); err != nil {
+			return fmt.Errorf("%s: %w", filename, err)
+		}
+		if err := in.Close(); err != nil {
+			return err
+		}
+		if c.Write {
+			tempFile := out.(*os.File)
+			if err := tempFile.Close(); err != nil {
+				return fmt.Errorf("%s: %w", filename, err)
+			}
+			if err := os.Rename(tempFile.Name(), filename); err != nil {
+				return fmt.Errorf("%s: %w", filename, err)
+			}
+		}
+	}
+	return nil
+}
+
+func format(r io.Reader, w io.StringWriter, exitError bool) error {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	builtins := evaluator.DefaultBuiltins(newRuntime())
+	in := string(b)
+	p := parser.New(in, evaluator.NewParserBuiltins(builtins))
+	prog := p.Parse()
+	if p.HasErrors() {
+		return fmt.Errorf("%w: %s", errParse, parser.MaxErrorsString(p.Errors(), 8))
+	}
+	out := prog.Format()
+	if exitError {
+		if in != out {
+			return errNotFormat
+		}
+		return nil
+	}
+	if _, err := w.WriteString(out); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *tokenizeCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err
@@ -61,7 +134,7 @@ func (c *cmdTokenize) Run() error {
 	return nil
 }
 
-func (c *cmdParse) Run() error {
+func (c *parseCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
 		return err

@@ -3,15 +3,15 @@ y := 50
 dot x y
 
 on input id:string val:string
-  if id == "sliderx"
-    x = str2num val
-  else
-    y = str2num val
-  end
-  dot x y
+    if id == "sliderx"
+        x = str2num val
+    else
+        y = str2num val
+    end
+    dot x y
 end
 
 func dot x:num y:num
-  move x y
-  circle 1
+    move x y
+    circle 1
 end

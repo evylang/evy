@@ -17,9 +17,10 @@ import (
 )
 
 var (
-	version      string = "v0.0.0"
-	errNotFormat        = errors.New("not formatted")
-	errParse            = errors.New("parse error")
+	version         string = "v0.0.0"
+	errBadWriteFlag        = errors.New("cannot use -w without files")
+	errNotFormatted        = errors.New("not formatted")
+	errParse               = errors.New("parse error")
 )
 
 const description = `
@@ -42,7 +43,7 @@ type runCmd struct {
 type fmtCmd struct {
 	Write bool     `short:"w" help:"update .evy file" xor:"mode"`
 	Check bool     `short:"c" help:"check if already formatted" xor:"mode"`
-	Files []string `arg:"" help:"Source files. Default stdin"`
+	Files []string `arg:"" optional:"" help:"Source files. Default stdin"`
 }
 
 type tokenizeCmd struct {
@@ -66,6 +67,9 @@ func (c *runCmd) Run() error {
 
 func (c *fmtCmd) Run() error {
 	if len(c.Files) == 0 {
+		if c.Write {
+			return errBadWriteFlag
+		}
 		return format(os.Stdin, os.Stdout, c.Check)
 	}
 	var out io.StringWriter = os.Stdout
@@ -80,7 +84,7 @@ func (c *fmtCmd) Run() error {
 				return fmt.Errorf("%s: %w", filename, err)
 			}
 		}
-		if err := format(in, out, !c.Write); err != nil {
+		if err := format(in, out, c.Check); err != nil {
 			return fmt.Errorf("%s: %w", filename, err)
 		}
 		if err := in.Close(); err != nil {
@@ -99,7 +103,7 @@ func (c *fmtCmd) Run() error {
 	return nil
 }
 
-func format(r io.Reader, w io.StringWriter, exitError bool) error {
+func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	b, err := io.ReadAll(r)
 	if err != nil {
 		return err
@@ -112,9 +116,9 @@ func format(r io.Reader, w io.StringWriter, exitError bool) error {
 		return fmt.Errorf("%w: %s", errParse, parser.MaxErrorsString(p.Errors(), 8))
 	}
 	out := prog.Format()
-	if exitError {
+	if checkOnly {
 		if in != out {
-			return errNotFormat
+			return errNotFormatted
 		}
 		return nil
 	}

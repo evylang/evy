@@ -1,5 +1,4 @@
 "use strict"
-
 let wasmModule, wasmInst
 let sourcePtr, sourceLength
 const go = newEvyGo()
@@ -410,27 +409,62 @@ function animationLoop(ts) {
   window.requestAnimationFrame(animationLoop)
 }
 
-async function initUI() {
-  document.addEventListener("keydown", ctrlEnterListener)
-  window.addEventListener("hashchange", fetchSource)
-  showHideControls()
-  fetchSource()
+function hideModal() {
+  const el = document.querySelector(".modal")
+  el.classList.add("hidden")
 }
 
+function showModal() {
+  const el = document.querySelector(".modal")
+  el.classList.remove("hidden")
+}
+
+let samples
+async function initUI() {
+  document.addEventListener("keydown", ctrlEnterListener)
+  window.addEventListener("hashchange", handleHashChange)
+  getElements(".modal a").map((el) => (el.onclick = hideModal))
+  document.querySelector("#modal-close").onclick = hideModal
+  await fetchSamples()
+  handleHashChange()
+  initModal()
+}
+
+async function fetchSamples() {
+  const resp = await fetch("samples/samples.json")
+  samples = await resp.json()
+  samples.byID = {}
+  for (const course of samples.courses) {
+    for (const lesson of course.lessons) {
+      samples.byID[lesson.id] = { ...lesson, course: course.title }
+    }
+  }
+}
+
+function initModal() {
+  const modalMain = document.querySelector(".modal-main")
+  modalMain.textContent = ""
+  for (const course of samples.courses) {
+    const item = document.createElement("div")
+    item.classList.add("item")
+    const h2 = document.createElement("h2")
+    h2.textContent = `${course.emoji} ${course.title}`
+    const ul = document.createElement("ul")
+    item.replaceChildren(h2, ul)
+    for (const lesson of course.lessons) {
+      const li = document.createElement("li")
+      const a = document.createElement("a")
+      a.textContent = lesson.title
+      a.href = `#${lesson.id}`
+      li.appendChild(a)
+      ul.appendChild(li)
+    }
+    modalMain.appendChild(item)
+  }
+}
 function ctrlEnterListener(e) {
   if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
     handle()
-  }
-}
-
-async function showHideControls() {
-  const opts = parseHash()
-
-  for (const el of getElements(opts.show)) {
-    el.classList.remove("hidden")
-  }
-  for (const el of getElements(opts.hide)) {
-    el.classList.add("hidden")
   }
 }
 
@@ -446,23 +480,46 @@ function getElements(q) {
   }
 }
 
-async function fetchSource() {
+async function handleHashChange() {
+  hideModal()
   const opts = parseHash()
-  if (!opts.source) {
+  if (!opts.source && !opts.sample) {
     return
+  }
+  let crumbs = ["Sample"]
+  if (opts.sample) {
+    opts.source = `samples/${opts.sample}.evy`
+    const sample = samples.byID[opts.sample]
+    crumbs = [sample.course, sample.title]
   }
   try {
     const response = await fetch(opts.source)
     if (response.status < 200 || response.status > 299) {
-      throw new Error("invalid reponse status", response.status)
+      throw new Error("invalid response status", response.status)
     }
     const source = await response.text()
     document.querySelector("#code").value = source
+    updateBreadcrumbs(crumbs)
     stop()
     clearOutput()
   } catch (err) {
     console.error(err)
   }
+}
+
+function updateBreadcrumbs(crumbs) {
+  const ul = document.querySelector("header ul.breadcrumbs")
+  const breadcrumbs = crumbs.map((c) => breadcrumb(c))
+  ul.replaceChildren(...breadcrumbs)
+}
+
+function breadcrumb(s) {
+  const btn = document.createElement("button")
+  btn.textContent = s
+  btn.onclick = showModal
+  const li = document.createElement("li")
+  li.appendChild(btn)
+  return li
 }
 
 function parseHash() {
@@ -471,9 +528,12 @@ function parseHash() {
   // then fetch source from URL and write it to code input.
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
-  if (entries.length === 1 && entries[0].length === 1 && entries[0][0]) {
+  if (entries.length === 1 && entries[0].length === 1) {
     // shortcut for example.com#draw loading example.com/samples/draw.evy
-    return { source: `samples/${entries[0][0]}.evy` }
+    const sample = entries[0][0]
+    if (samples && samples.byID[sample]) {
+      return { sample: sample }
+    }
   }
   return Object.fromEntries(entries)
 }

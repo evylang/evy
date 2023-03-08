@@ -21,6 +21,11 @@
   --btn-bg: hsl(0deg 0% 92%);
   --btn-bg-hover: hsl(0deg 0% 80%);
 
+  --modal-bg: hsl(210deg 5% 15% / 95%);
+  --modal-color: hsl(0deg 0% 100% / 80%);
+  --modal-color-hover: hsl(0deg 0% 100% / 100%);
+  --modal-circle-color: hsl(0deg 0% 35%);
+  --modal-circle-bg: hsl(0deg 0% 13%);
   --slide-transition-duration: 0.3s;
 
   /* responsive desktop */
@@ -33,6 +38,8 @@
   --header-logo-order: 2;
   --header-logo-flex: 2;
   --header-logo-align: center;
+  --header-padding: 16px;
+  --header-height: calc(var(--header-padding) * 2 + 1.5rem + 1px);
   --main-width: 100%;
   --main-translate: none;
   --editor-width: auto;
@@ -47,6 +54,7 @@
   --output-border-top-width: 23px;
   --output-border-radius: 6px;
   --output-border-width: 1px;
+  --modal-item-width: 18rem;
   --slide: 0;
 }
 
@@ -75,6 +83,7 @@
     --editor-padding: 16px;
     --canvas-size: min(100vw, 60vh);
     --console-width: 100vw;
+    --modal-item-width: 100vw;
     --slide: -100vw;
   }
 }
@@ -117,18 +126,25 @@ a {
 /* --- Header --------------------------------------------------------*/
 header {
   background: #34393f;
-  padding: 15px;
+  padding: var(--header-padding);
   font-family: var(--ff);
+  height: var(--header-height);
 
   display: flex;
   flex-direction: row;
 }
-header a {
+header button {
   color: var(--color);
+  text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
 }
-header a:hover {
+header button:hover {
   color: var(--color-hover);
 }
 header .breadcrumbs {
@@ -362,6 +378,91 @@ main.view-output {
   to {
     background-position: calc(var(--output-width) - 17px);
   }
+}
+
+/* --- Sample selection modal ----------------------------------------*/
+.modal {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: var(--modal-bg);
+  overflow: clip;
+}
+
+.modal header {
+  border-bottom: 1px solid hsl(0deg 0% 100% / 30%);
+  color: hsl(0deg 0% 70%);
+  background: none;
+  justify-content: right;
+}
+
+#modal-close {
+  position: relative;
+  top: 0.2em;
+  right: 0.2em;
+  cursor: pointer;
+}
+
+.modal-main {
+  padding: 36px 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+.modal-main .item {
+  width: var(--modal-item-width);
+  padding-bottom: 16px;
+}
+.modal-main h2 {
+  font-family: var(--ff);
+  font-weight: 700;
+  font-size: 1rem;
+  padding-bottom: 8px;
+}
+.modal-main ul {
+  padding-left: 6px;
+  margin-bottom: 0;
+  list-style: none;
+}
+.modal-main ul li {
+  padding-bottom: 6px;
+  line-height: 1.6;
+}
+.modal ul li a {
+  font-family: var(--ff);
+  color: var(--modal-color);
+  padding-left: 1.5rem;
+  text-decoration: none;
+  position: relative;
+}
+.modal ul li a:hover {
+  color: var(--modal-color-hover);
+}
+
+.modal ul li a::before {
+  content: "";
+  position: absolute;
+  height: 1rem;
+  left: 0;
+  top: 0.125rem;
+  width: 1rem;
+  border: 2px solid var(--modal-circle-color);
+  border-radius: 50%;
+  background: var(--modal-circle-bg);
+  display: inline-block;
+  z-index: 1;
+}
+.modal ul li:not(:last-child) a::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  left: 0.42rem;
+  top: 1rem;
+  width: 2px;
+  background: var(--modal-circle-color);
 }
 
 /* --- Easter egg ----------------------------------------------------*/

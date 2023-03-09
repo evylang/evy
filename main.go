@@ -37,10 +37,11 @@ type config struct {
 }
 
 func main() {
-	kctx := kong.Parse(&config{},
+	kopts := []kong.Option{
 		kong.Description(description),
 		kong.Vars{"version": version},
-	)
+	}
+	kctx := kong.Parse(&config{}, kopts...)
 	kctx.FatalIfErrorf(kctx.Run())
 }
 

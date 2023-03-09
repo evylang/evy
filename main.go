@@ -36,6 +36,14 @@ type config struct {
 	Parse    parseCmd    `cmd:"" help:"Parse evy program" hidden:""`
 }
 
+func main() {
+	kctx := kong.Parse(&config{},
+		kong.Description(description),
+		kong.Vars{"version": version},
+	)
+	kctx.FatalIfErrorf(kctx.Run())
+}
+
 type runCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
@@ -147,14 +155,6 @@ func (c *parseCmd) Run() error {
 	result := parser.Run(string(b), builtinDecls)
 	fmt.Println(result)
 	return nil
-}
-
-func main() {
-	kctx := kong.Parse(&config{},
-		kong.Description(description),
-		kong.Vars{"version": version},
-	)
-	kctx.FatalIfErrorf(kctx.Run())
 }
 
 func fileBytes(filename string) ([]byte, error) {

@@ -47,7 +47,6 @@ func (e *Evaluator) Run(input string) {
 		e.print(parser.MaxErrorsString(p.Errors(), 8))
 		return
 	}
-	e.eventHandlers = p.EventHandlers
 	val := e.Eval(prog)
 	if isError(val) {
 		e.print(val.String())
@@ -159,6 +158,7 @@ func (e *Evaluator) yield() {
 }
 
 func (e *Evaluator) evalProgram(program *parser.Program) Value {
+	e.eventHandlers = program.EventHandlers
 	return e.evalStatments(program.Statements)
 }
 

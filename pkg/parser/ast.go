@@ -13,7 +13,9 @@ type Node interface {
 }
 
 type Program struct {
-	Statements       []Node
+	Statements    []Node
+	EventHandlers map[string]*EventHandlerStmt
+
 	alwaysTerminates bool
 	formatting       *formatting
 }

@@ -36,6 +36,15 @@ type config struct {
 	Parse    parseCmd    `cmd:"" help:"Parse evy program" hidden:""`
 }
 
+func main() {
+	kopts := []kong.Option{
+		kong.Description(description),
+		kong.Vars{"version": version},
+	}
+	kctx := kong.Parse(&config{}, kopts...)
+	kctx.FatalIfErrorf(kctx.Run())
+}
+
 type runCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
@@ -61,8 +70,7 @@ func (c *runCmd) Run() error {
 	}
 	builtins := evaluator.DefaultBuiltins(newRuntime())
 	eval := evaluator.NewEvaluator(builtins)
-	eval.Run(string(b))
-	return nil
+	return eval.Run(string(b))
 }
 
 func (c *fmtCmd) Run() error {
@@ -108,12 +116,11 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	if err != nil {
 		return err
 	}
-	builtins := evaluator.DefaultBuiltins(newRuntime())
 	in := string(b)
-	p := parser.New(in, evaluator.NewParserBuiltins(builtins))
-	prog := p.Parse()
-	if p.HasErrors() {
-		return fmt.Errorf("%w: %s", errParse, parser.MaxErrorsString(p.Errors(), 8))
+	parserBuiltins := evaluator.DefaultParserBuiltins(newRuntime())
+	prog, err := parser.Parse(in, parserBuiltins)
+	if err != nil {
+		return fmt.Errorf("%w: %s", errParse, parser.TruncateError(err, 8))
 	}
 	out := prog.Format()
 	if checkOnly {
@@ -144,17 +151,12 @@ func (c *parseCmd) Run() error {
 		return err
 	}
 	builtinDecls := evaluator.DefaulParserBuiltins(newRuntime())
-	result := parser.Run(string(b), builtinDecls)
-	fmt.Println(result)
+	ast, err := parser.Parse(string(b), builtinDecls)
+	if err != nil {
+		return fmt.Errorf("%w: %s", errParse, parser.TruncateError(err, 8))
+	}
+	fmt.Println(ast.String())
 	return nil
-}
-
-func main() {
-	kctx := kong.Parse(&config{},
-		kong.Description(description),
-		kong.Vars{"version": version},
-	)
-	kctx.FatalIfErrorf(kctx.Run())
 }
 
 func fileBytes(filename string) ([]byte, error) {

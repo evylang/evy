@@ -3,7 +3,6 @@
 package main
 
 import (
-	"errors"
 	"strings"
 	"time"
 	"unsafe"
@@ -33,13 +32,13 @@ func main() {
 	evaluate(source, builtins, yielder)
 }
 
-func format(builtins evaluator.Builtins) (string, error) {
+func format(evalBuiltins evaluator.Builtins) (string, error) {
 	input := getEvySource()
 
-	p := parser.New(input, evaluator.NewParserBuiltins(builtins))
-	prog := p.Parse()
-	if p.HasErrors() {
-		return "", errors.New(parser.MaxErrorsString(p.Errors(), 8))
+	builtins := evaluator.ParserBuiltins(evalBuiltins)
+	prog, err := parser.Parse(input, builtins)
+	if err != nil {
+		return "", parser.TruncateError(err, 8)
 	}
 	formattedInput := prog.Format()
 	if formattedInput != input {

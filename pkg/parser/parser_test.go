@@ -35,7 +35,7 @@ func TestParseDecl(t *testing.T) {
 		input += "\n print a"
 		wantSlice = append(wantSlice, "print(a)")
 		want := strings.Join(wantSlice, "\n") + "\n"
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -55,7 +55,7 @@ func TestEmptyProgram(t *testing.T) {
 		" \n //blabla":    "\n\n",
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String(), input)
@@ -87,11 +87,11 @@ s := name
 print m[s]`: "line 3 column 6: unknown variable name 'name'",
 	}
 	for input, err1 := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		got := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
 	}
 }
 
@@ -111,7 +111,7 @@ func TestFunccall(t *testing.T) {
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -142,11 +142,11 @@ func TestFunccallError(t *testing.T) {
 		`foo 0`:      "line 1 column 1: unknown function 'foo'",
 	}
 	for input, err1 := range tests {
-		parser := New(input, builtins)
+		parser := newParser(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		got := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
 	}
 }
 
@@ -174,7 +174,7 @@ print('TRUE')
 `,
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		got := parser.Parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
@@ -186,7 +186,7 @@ func TestToplevelExprFuncCall(t *testing.T) {
 x := len "123"
 print x
 `
-	parser := New(input, testBuiltins())
+	parser := newParser(input, testBuiltins())
 	got := parser.Parse()
 	assertNoParseError(t, parser, input)
 	want := `
@@ -236,7 +236,7 @@ func nums5 _:num
 	print "nums5 not yet implemented"
 end
 `
-	parser := New(input, testBuiltins())
+	parser := newParser(input, testBuiltins())
 	_ = parser.Parse()
 	assertNoParseError(t, parser, input)
 	builtinCnt := len(testBuiltins().Funcs)
@@ -269,7 +269,7 @@ end
 fox 1 2 3`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -343,11 +343,11 @@ end
 `: "line 6 column 1: missing return",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -383,7 +383,7 @@ print a
 `,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -420,11 +420,11 @@ fn = 3
 `: "line 5 column 1: cannot assign to 'fn' as it is a function not a variable",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -471,7 +471,7 @@ print a
 `,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -567,11 +567,11 @@ end
 `: "line 2 column 1: 'x' declared but not used",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), input)
 	}
 }
 
@@ -640,11 +640,11 @@ end
 `: "line 2 column 8: invalid declaration of 'x', already used as function name",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -687,7 +687,7 @@ func TestIf(t *testing.T) {
 		 end`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -735,11 +735,11 @@ else
 end`: "line 7 column 4: expected 'end', got end of input",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -771,7 +771,7 @@ end
 `,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -792,11 +792,11 @@ while
 end`: "line 2 column 6: unexpected end of line",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -825,7 +825,7 @@ func foo
 end`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -902,11 +902,11 @@ end
 `: "line 9 column 3: unreachable code",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -943,7 +943,7 @@ for i:= range []
 end`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -997,11 +997,11 @@ end
 `: "line 2 column 5: declaration of anonymous variable '_' not allowed here",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1033,7 +1033,7 @@ end
 nums []`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 
@@ -1052,7 +1052,7 @@ for k := range m
 end`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 
@@ -1083,11 +1083,11 @@ end
 `: "line 3 column 16: anonymous variable '_' cannot be read",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1114,7 +1114,7 @@ on down x:num y:num
 end`,
 	}
 	for _, input := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertNoParseError(t, parser, input)
 	}
@@ -1147,11 +1147,11 @@ on down x:num
 end`: "line 3 column 4: wrong number of parameters expected 2, got 1",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1170,11 +1170,11 @@ end
 `: "line 2 column 1: cannot override builtin variable 'errmsg'",
 	}
 	for input, wantErr := range inputs {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -1188,12 +1188,12 @@ print "x:" x
 if x > 10
     print "🍦 big x"
 end`
-	parser := New(input, testBuiltins())
+	parser := newParser(input, testBuiltins())
 	got := parser.Parse()
 	assertParseError(t, parser, input)
-	gotErr := MaxErrorsString(parser.Errors(), 1)
-	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr)
-	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
+	gotErr := parser.errors.Truncate(1)
+	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr.Error())
+	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].Error())
 	want := `
 
 x=12
@@ -1205,14 +1205,14 @@ print('🍦 big x')
 	assert.Equal(t, want, got.String())
 }
 
-func assertParseError(t *testing.T, parser *Parser, input string) {
+func assertParseError(t *testing.T, parser *parser, input string) {
 	t.Helper()
 	assert.Equal(t, true, len(parser.errors) > 0, "expected parser errors, got none: input: %s\n", input)
 }
 
-func assertNoParseError(t *testing.T, parser *Parser, input string) {
+func assertNoParseError(t *testing.T, parser *parser, input string) {
 	t.Helper()
-	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.errors)
 }
 
 func testBuiltins() Builtins {

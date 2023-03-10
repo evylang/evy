@@ -13,7 +13,10 @@ func run(input string) string {
 	printFn := func(s string) { b.WriteString(s) }
 	rt := &Runtime{Print: printFn}
 	eval := NewEvaluator(DefaultBuiltins(rt))
-	eval.Run(input)
+	err := eval.Run(input)
+	if err != nil {
+		return err.Error()
+	}
 	return b.String()
 }
 
@@ -104,7 +107,8 @@ while true
     end
     print "💣"
 end
-`, `
+`,
+		`
 stop := false
 while true
     if stop
@@ -381,10 +385,10 @@ func TestDoubleIndex(t *testing.T) {
 func TestIndexErr(t *testing.T) {
 	tests := map[string]string{
 		// x := ["a","b","c"]; x = "abc"
-		"print x[3]":  "ERROR: index 3 out of bounds, should be between -3 and 2",
-		"print x[-4]": "ERROR: index -4 out of bounds, should be between -3 and 2",
+		"print x[3]":  "runtime error: invalid slice: 3 out of bounds (-3 to 2)",
+		"print x[-4]": "runtime error: invalid slice: -4 out of bounds (-3 to 2)",
 		`m := {}
-		print m[x[1]]`: "ERROR: no value for key b",
+		print m[x[1]]`: `runtime error: no value for map key: "b"`,
 	}
 	for in, want := range tests {
 		in, want := in, want
@@ -446,7 +450,7 @@ func TestDotErr(t *testing.T) {
 m := {a:1}
 print m.missing_index
 `
-	want := "ERROR: no value for key missing_index"
+	want := `runtime error: no value for map key: "missing_index"`
 	got := run(in)
 	assert.Equal(t, want, got)
 }

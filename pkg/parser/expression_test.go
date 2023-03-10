@@ -174,7 +174,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		}`: "{a:1, b:2}",
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
 		scope := newScope(nil, &Program{})
@@ -255,7 +255,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"[1()]": "line 1 column 4: unexpected ')'",
 	}
 	for input, wantErr := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		parser.advanceTo(0)
 		parser.formatting = newFormatting()
 		scope := newScope(nil, &Program{})
@@ -265,7 +265,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 
 		_ = parser.parseTopLevelExpr(scope)
 		assertParseError(t, parser, input)
-		got := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
 	}
 }

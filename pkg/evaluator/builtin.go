@@ -22,7 +22,7 @@ type Builtins struct {
 	Globals       map[string]*parser.Var
 }
 
-func NewParserBuiltins(builtins Builtins) parser.Builtins {
+func ParserBuiltins(builtins Builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDeclStmt, len(builtins.Funcs))
 	for name, builtin := range builtins.Funcs {
 		funcs[name] = builtin.Decl
@@ -34,7 +34,11 @@ func NewParserBuiltins(builtins Builtins) parser.Builtins {
 	}
 }
 
-type BuiltinFunc func(scope *scope, args []Value) Value
+func DefaultParserBuiltins(rt *Runtime) parser.Builtins {
+	return ParserBuiltins(DefaultBuiltins(rt))
+}
+
+type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
@@ -109,7 +113,7 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 
 func DefaulParserBuiltins(rt *Runtime) parser.Builtins {
 	builtins := DefaultBuiltins(rt)
-	return NewParserBuiltins(builtins)
+	return ParserBuiltins(builtins)
 }
 
 type Runtime struct {
@@ -134,9 +138,9 @@ var readDecl = &parser.FuncDeclStmt{
 }
 
 func readFunc(readFn func() string) BuiltinFunc {
-	return func(_ *scope, args []Value) Value {
+	return func(_ *scope, args []Value) (Value, error) {
 		s := readFn()
-		return &String{Val: s}
+		return &String{Val: s}, nil
 	}
 }
 
@@ -147,24 +151,24 @@ var printDecl = &parser.FuncDeclStmt{
 }
 
 func printFunc(printFn func(string)) BuiltinFunc {
-	return func(_ *scope, args []Value) Value {
+	return func(_ *scope, args []Value) (Value, error) {
 		printFn(join(args, " ") + "\n")
-		return nil
+		return nil, nil
 	}
 }
 
 func printfFunc(printFn func(string)) BuiltinFunc {
-	return func(_ *scope, args []Value) Value {
+	return func(_ *scope, args []Value) (Value, error) {
 		if len(args) < 1 {
-			return newError("'printf' takes at least 1 argument")
+			return nil, fmt.Errorf("%w: 'printf' takes at least 1 argument", ErrBadArguments)
 		}
 		format, ok := args[0].(*String)
 		if !ok {
-			return newError("first argument of 'printf' must be a string")
+			return nil, fmt.Errorf("%w: first argument of 'printf' must be a string", ErrBadArguments)
 		}
 		s := sprintf(format.Val, args[1:])
 		printFn(s)
-		return nil
+		return nil, nil
 	}
 }
 
@@ -174,19 +178,19 @@ var sprintDecl = &parser.FuncDeclStmt{
 	ReturnType:    parser.STRING_TYPE,
 }
 
-func sprintFunc(_ *scope, args []Value) Value {
-	return &String{Val: join(args, " ")}
+func sprintFunc(_ *scope, args []Value) (Value, error) {
+	return &String{Val: join(args, " ")}, nil
 }
 
-func sprintfFunc(_ *scope, args []Value) Value {
+func sprintfFunc(_ *scope, args []Value) (Value, error) {
 	if len(args) < 1 {
-		return newError("'sprintf' takes at least 1 argument")
+		return nil, fmt.Errorf("%w: 'sprintf' takes at least 1 argument", ErrBadArguments)
 	}
 	format, ok := args[0].(*String)
 	if !ok {
-		return newError("first argument of 'sprintf' must be a string")
+		return nil, fmt.Errorf("%w: first argument of 'sprintf' must be a string", ErrBadArguments)
 	}
-	return &String{Val: sprintf(format.Val, args[1:])}
+	return &String{Val: sprintf(format.Val, args[1:])}, nil
 }
 
 func sprintf(s string, vals []Value) string {
@@ -206,11 +210,11 @@ var joinDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func joinFunc(_ *scope, args []Value) Value {
+func joinFunc(_ *scope, args []Value) (Value, error) {
 	arr := args[0].(*Array)
 	sep := args[1].(*String)
 	s := join(*arr.Elements, sep.Val)
-	return &String{Val: s}
+	return &String{Val: s}, nil
 }
 
 func join(args []Value, sep string) string {
@@ -235,7 +239,7 @@ var splitDecl = &parser.FuncDeclStmt{
 	ReturnType: stringArrayType,
 }
 
-func splitFunc(_ *scope, args []Value) Value {
+func splitFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String)
 	sep := args[1].(*String)
 	slice := strings.Split(s.Val, sep.Val)
@@ -243,7 +247,7 @@ func splitFunc(_ *scope, args []Value) Value {
 	for i, s := range slice {
 		elements[i] = &String{Val: s}
 	}
-	return &Array{Elements: &elements}
+	return &Array{Elements: &elements}, nil
 }
 
 var upperDecl = &parser.FuncDeclStmt{
@@ -254,9 +258,9 @@ var upperDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func upperFunc(_ *scope, args []Value) Value {
+func upperFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
-	return &String{Val: strings.ToUpper(s)}
+	return &String{Val: strings.ToUpper(s)}, nil
 }
 
 var lowerDecl = &parser.FuncDeclStmt{
@@ -267,9 +271,9 @@ var lowerDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func lowerFunc(_ *scope, args []Value) Value {
+func lowerFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
-	return &String{Val: strings.ToLower(s)}
+	return &String{Val: strings.ToLower(s)}, nil
 }
 
 var indexDecl = &parser.FuncDeclStmt{
@@ -281,10 +285,10 @@ var indexDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func indexFunc(_ *scope, args []Value) Value {
+func indexFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
 	substr := args[1].(*String).Val
-	return &Num{Val: float64(strings.Index(s, substr))}
+	return &Num{Val: float64(strings.Index(s, substr))}, nil
 }
 
 var startswithDecl = &parser.FuncDeclStmt{
@@ -296,10 +300,10 @@ var startswithDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func startswithFunc(_ *scope, args []Value) Value {
+func startswithFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
 	prefix := args[1].(*String).Val
-	return &Bool{Val: strings.HasPrefix(s, prefix)}
+	return &Bool{Val: strings.HasPrefix(s, prefix)}, nil
 }
 
 var endswithDecl = &parser.FuncDeclStmt{
@@ -311,10 +315,10 @@ var endswithDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func endswithFunc(_ *scope, args []Value) Value {
+func endswithFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
 	suffix := args[1].(*String).Val
-	return &Bool{Val: strings.HasSuffix(s, suffix)}
+	return &Bool{Val: strings.HasSuffix(s, suffix)}, nil
 }
 
 var trimDecl = &parser.FuncDeclStmt{
@@ -326,10 +330,10 @@ var trimDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func trimFunc(_ *scope, args []Value) Value {
+func trimFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
 	cutset := args[1].(*String).Val
-	return &String{Val: strings.Trim(s, cutset)}
+	return &String{Val: strings.Trim(s, cutset)}, nil
 }
 
 var replaceDecl = &parser.FuncDeclStmt{
@@ -342,11 +346,11 @@ var replaceDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func replaceFunc(_ *scope, args []Value) Value {
+func replaceFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
 	oldStr := args[1].(*String).Val
 	newStr := args[2].(*String).Val
-	return &String{Val: strings.ReplaceAll(s, oldStr, newStr)}
+	return &String{Val: strings.ReplaceAll(s, oldStr, newStr)}, nil
 }
 
 var str2numDecl = &parser.FuncDeclStmt{
@@ -355,14 +359,14 @@ var str2numDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func str2numFunc(scope *scope, args []Value) Value {
+func str2numFunc(scope *scope, args []Value) (Value, error) {
 	resetGlobalErr(scope)
 	s := args[0].(*String)
 	n, err := strconv.ParseFloat(s.Val, 64)
 	if err != nil {
 		setGlobalErr(scope, "str2num: cannot parse "+s.Val)
 	}
-	return &Num{Val: n}
+	return &Num{Val: n}, nil
 }
 
 var str2boolDecl = &parser.FuncDeclStmt{
@@ -371,14 +375,14 @@ var str2boolDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func str2boolFunc(scope *scope, args []Value) Value {
+func str2boolFunc(scope *scope, args []Value) (Value, error) {
 	resetGlobalErr(scope)
 	s := args[0].(*String)
 	b, err := strconv.ParseBool(s.Val)
 	if err != nil {
 		setGlobalErr(scope, "str2bool: cannot parse "+s.Val)
 	}
-	return &Bool{Val: b}
+	return &Bool{Val: b}, nil
 }
 
 func setGlobalErr(scope *scope, msg string) {
@@ -408,16 +412,16 @@ var lenDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func lenFunc(_ *scope, args []Value) Value {
+func lenFunc(_ *scope, args []Value) (Value, error) {
 	switch arg := args[0].(type) {
 	case *Map:
-		return &Num{Val: float64(len(arg.Pairs))}
+		return &Num{Val: float64(len(arg.Pairs))}, nil
 	case *Array:
-		return &Num{Val: float64(len(*arg.Elements))}
+		return &Num{Val: float64(len(*arg.Elements))}, nil
 	case *String:
-		return &Num{Val: float64(len(arg.Val))}
+		return &Num{Val: float64(len(arg.Val))}, nil
 	}
-	return newError("'len' takes 1 argument of type 'string', array '[]' or map '{}' not " + args[0].Type().String())
+	return nil, fmt.Errorf("%w: 'len' takes 1 argument of type 'string', array '[]' or map '{}' not %s", ErrBadArguments, args[0].Type())
 }
 
 var hasDecl = &parser.FuncDeclStmt{
@@ -429,11 +433,11 @@ var hasDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.BOOL_TYPE,
 }
 
-func hasFunc(_ *scope, args []Value) Value {
+func hasFunc(_ *scope, args []Value) (Value, error) {
 	m := args[0].(*Map)
 	key := args[1].(*String)
 	_, ok := m.Pairs[key.Val]
-	return &Bool{Val: ok}
+	return &Bool{Val: ok}, nil
 }
 
 var delDecl = &parser.FuncDeclStmt{
@@ -445,11 +449,11 @@ var delDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func delFunc(_ *scope, args []Value) Value {
+func delFunc(_ *scope, args []Value) (Value, error) {
 	m := args[0].(*Map)
 	keyStr := args[1].(*String)
 	m.Delete(keyStr.Val)
-	return nil
+	return nil, nil
 }
 
 var sleepDecl = &parser.FuncDeclStmt{
@@ -459,11 +463,11 @@ var sleepDecl = &parser.FuncDeclStmt{
 }
 
 func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
-	return func(_ *scope, args []Value) Value {
+	return func(_ *scope, args []Value) (Value, error) {
 		secs := args[0].(*Num)
 		dur := time.Duration(secs.Val * float64(time.Second))
 		sleepFn(dur)
-		return nil
+		return nil, nil
 	}
 }
 
@@ -473,9 +477,9 @@ var randDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func randFunc(_ *scope, args []Value) Value {
+func randFunc(_ *scope, args []Value) (Value, error) {
 	upper := int32(args[0].(*Num).Val)
-	return &Num{Val: float64(rand.Int31n(upper))} //nolint: gosec
+	return &Num{Val: float64(rand.Int31n(upper))}, nil //nolint: gosec
 }
 
 var rand1Decl = &parser.FuncDeclStmt{
@@ -484,8 +488,8 @@ var rand1Decl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func rand1Func(_ *scope, args []Value) Value {
-	return &Num{Val: rand.Float64()} //nolint: gosec
+func rand1Func(_ *scope, args []Value) (Value, error) {
+	return &Num{Val: rand.Float64()}, nil //nolint: gosec
 }
 
 func xyDecl(name string) *parser.FuncDeclStmt {
@@ -505,11 +509,11 @@ func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(_ *scope, args []Value) Value {
+	result.Func = func(_ *scope, args []Value) (Value, error) {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
 		fn(x.Val, y.Val)
-		return nil
+		return nil, nil
 	}
 	return result
 }
@@ -530,10 +534,10 @@ func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(_ *scope, args []Value) Value {
+	result.Func = func(_ *scope, args []Value) (Value, error) {
 		n := args[0].(*Num)
 		fn(n.Val)
-		return nil
+		return nil, nil
 	}
 	return result
 }
@@ -554,17 +558,17 @@ func stringBuiltin(name string, fn func(str string), printFn func(string)) Built
 		result.Func = notImplementedFunc(name, printFn)
 		return result
 	}
-	result.Func = func(_ *scope, args []Value) Value {
+	result.Func = func(_ *scope, args []Value) (Value, error) {
 		str := args[0].(*String)
 		fn(str.Val)
-		return nil
+		return nil, nil
 	}
 	return result
 }
 
 func notImplementedFunc(name string, printFn func(string)) BuiltinFunc {
-	return func(_ *scope, args []Value) Value {
+	return func(_ *scope, args []Value) (Value, error) {
 		printFn("'" + name + "' not yet implemented\n")
-		return nil
+		return nil, nil
 	}
 }

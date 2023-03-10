@@ -21,7 +21,7 @@ func TestArrayLiteralMultiline(t *testing.T) {
 		2]`: {multilineEl, multilineComment("// comment 1\n"), multilineComment("  // comment 2   "), multilineEl},
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
 		scope := newScope(nil, &Program{})
@@ -49,7 +49,7 @@ func TestMapLiteralMultiline(t *testing.T) {
 		b:2}`: {"a", multilineComment(" // comment 1 "), multilineComment("// comment 2"), "b"},
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
 		scope := newScope(nil, &Program{})
@@ -106,7 +106,7 @@ func TestNLIndices(t *testing.T) {
 		end`: {2: true, 3: true},
 	}
 	for input, want := range tests {
-		parser := New(input, testBuiltins())
+		parser := newParser(input, testBuiltins())
 		prog := parser.Parse()
 		assertNoParseError(t, parser, input)
 		got := nlAfter(prog.Statements, prog.formatting.comments)

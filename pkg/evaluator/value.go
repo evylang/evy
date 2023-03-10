@@ -11,8 +11,7 @@ import (
 type ValueType int
 
 const (
-	ERROR ValueType = iota
-	NUM
+	NUM ValueType = iota
 	BOOL
 	STRING
 	ANY
@@ -25,7 +24,6 @@ const (
 )
 
 var valueTypeStrings = map[ValueType]string{
-	ERROR:        "error",
 	NUM:          "num",
 	BOOL:         "bool",
 	STRING:       "string",
@@ -134,23 +132,23 @@ func (s *String) runes() []rune {
 	return s.runeSlice
 }
 
-func (s *String) Index(idx Value) Value {
+func (s *String) Index(idx Value) (Value, error) {
 	runes := s.runes()
 	i, err := normalizeIndex(idx, len(runes))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return &String{Val: string(runes[i])}
+	return &String{Val: string(runes[i])}, nil
 }
 
-func (s *String) Slice(start, end Value) Value {
+func (s *String) Slice(start, end Value) (Value, error) {
 	runes := s.runes()
 	length := len(runes)
 	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return &String{Val: string(runes[startIdx:endIdx])}
+	return &String{Val: string(runes[startIdx:endIdx])}, nil
 }
 
 func (*Bool) Type() ValueType { return BOOL }
@@ -205,16 +203,6 @@ func (r *Break) String() string      { return "" }
 func (r *Break) Equals(_ Value) bool { return false }
 func (r *Break) Set(_ Value)         {}
 
-func (e *Error) Type() ValueType { return ERROR }
-func (e *Error) String() string {
-	if e == ErrStopped {
-		return "Stopped"
-	}
-	return "ERROR: " + e.Message
-}
-func (e *Error) Equals(_ Value) bool { return false }
-func (e *Error) Set(_ Value)         {}
-
 func (a *Array) Type() ValueType { return ARRAY }
 func (a *Array) String() string {
 	elements := make([]string, len(*a.Elements))
@@ -250,13 +238,13 @@ func (a *Array) Set(v Value) {
 	*a = *a2
 }
 
-func (a *Array) Index(idx Value) Value {
+func (a *Array) Index(idx Value) (Value, error) {
 	i, err := normalizeIndex(idx, len(*a.Elements))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	elements := *a.Elements
-	return elements[i]
+	return elements[i], nil
 }
 
 func (a *Array) Copy() *Array {
@@ -267,11 +255,11 @@ func (a *Array) Copy() *Array {
 	return &Array{Elements: &elements}
 }
 
-func (a *Array) Slice(start, end Value) Value {
+func (a *Array) Slice(start, end Value) (Value, error) {
 	length := len(*a.Elements)
 	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	elements := make([]Value, endIdx-startIdx)
@@ -279,7 +267,7 @@ func (a *Array) Slice(start, end Value) Value {
 		v := (*a.Elements)[i]
 		elements[i-startIdx] = copyOrRef(v)
 	}
-	return &Array{Elements: &elements}
+	return &Array{Elements: &elements}, nil
 }
 
 // copyOrRef is a copy of the input value for basic types and a
@@ -336,12 +324,12 @@ func (m *Map) Set(v Value) {
 	*m = *m2
 }
 
-func (m *Map) Get(key string) Value {
+func (m *Map) Get(key string) (Value, error) {
 	val, ok := m.Pairs[key]
 	if !ok {
-		return newError("no value for key " + key)
+		return nil, fmt.Errorf("%w: %q", ErrMapKey, key)
 	}
-	return val
+	return val, nil
 }
 
 func (m *Map) InsertKey(key string, t *parser.Type) {
@@ -365,10 +353,6 @@ func (m *Map) Delete(key string) {
 	}
 }
 
-func isError(val Value) bool {
-	return val != nil && val.Type() == ERROR
-}
-
 func isReturn(val Value) bool {
 	return val != nil && val.Type() == RETURN_VALUE
 }
@@ -377,13 +361,9 @@ func isBreak(val Value) bool {
 	return val != nil && val.Type() == BREAK
 }
 
-func newError(msg string) *Error {
-	return &Error{Message: msg}
-}
-
-func normalizeSliceIndices(start, end Value, length int) (int, int, Value) {
+func normalizeSliceIndices(start, end Value, length int) (int, int, error) {
 	startIdx := 0
-	var err Value
+	var err error
 	if start != nil {
 		startIdx, err = normalizeIndex(start, length)
 		if err != nil {
@@ -401,22 +381,19 @@ func normalizeSliceIndices(start, end Value, length int) (int, int, Value) {
 		}
 	}
 	if startIdx > endIdx {
-		msg := "invalid slice indices: " + strconv.Itoa(startIdx) + " > " + strconv.Itoa(endIdx)
-		return 0, 0, newError(msg)
+		return 0, 0, fmt.Errorf("%w: %d > %d", ErrSlice, startIdx, endIdx)
 	}
 	return startIdx, endIdx, nil
 }
 
-func normalizeIndex(idx Value, length int) (int, Value) {
+func normalizeIndex(idx Value, length int) (int, error) {
 	index, ok := idx.(*Num)
 	if !ok {
-		return 0, newError("expected index of type num, found " + idx.Type().String())
+		return 0, fmt.Errorf("%w: expected num, found %v", ErrType, idx.Type())
 	}
 	i := int(index.Val)
 	if i < -length || i >= length {
-		boundsStr := strconv.Itoa(-length) + " and " + strconv.Itoa(length-1)
-		msg := "index " + strconv.Itoa(i) + " out of bounds, should be between " + boundsStr
-		return 0, newError(msg)
+		return 0, fmt.Errorf("%w: %d out of bounds (%d to %d)", ErrSlice, i, -length, length-1)
 	}
 	if i < 0 {
 		return length + i, nil // -1 references len-1 i.e. last element
@@ -441,31 +418,31 @@ func zero(t *parser.Type) Value {
 		order := []string{}
 		return &Map{Pairs: map[string]Value{}, Order: &order}
 	}
-	return newError("cannot create zero value for type " + t.String())
+	panic("cannot create zero value for type " + t.String())
 }
 
-func valueFromAny(t *parser.Type, v any) Value {
+func valueFromAny(t *parser.Type, v any) (Value, error) {
 	switch {
 	case t == parser.NUM_TYPE:
 		val, ok := v.(float64)
 		if !ok {
-			return newError(fmt.Sprintf("expected number, found %v", val))
+			return nil, fmt.Errorf("%w: expected number, found %v", ErrAnyConversion, val)
 		}
-		return &Num{Val: val}
+		return &Num{Val: val}, nil
 	case t == parser.STRING_TYPE:
 		val, ok := v.(string)
 		if !ok {
-			return newError(fmt.Sprintf("expected string, found %v", val))
+			return nil, fmt.Errorf("%w: expected string, found %v", ErrAnyConversion, val)
 		}
-		return &String{Val: val}
+		return &String{Val: val}, nil
 	case t == parser.BOOL_TYPE:
 		val, ok := v.(bool)
 		if !ok {
-			return newError(fmt.Sprintf("expected bool, found %v", val))
+			return nil, fmt.Errorf("%w: expected bool, found %v", ErrAnyConversion, val)
 		}
-		return &Bool{Val: val}
+		return &Bool{Val: val}, nil
 	}
-	return newError("cannot create value for type " + t.String())
+	return nil, fmt.Errorf("%w: cannot create value for type %v", ErrAnyConversion, t)
 }
 
 func unwrapBasicValue(val Value) any {

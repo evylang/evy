@@ -587,7 +587,7 @@ x := [
 ]
 print x
 `[1:]
-	parser := New(input, testBuiltins())
+	parser := newParser(input, testBuiltins())
 	prog := parser.Parse()
 	assertNoParseError(t, parser, input)
 	got := prog.Format()
@@ -698,7 +698,7 @@ end
 
 func testFormat(t *testing.T, input string) string {
 	t.Helper()
-	parser := New(input, testBuiltins())
+	parser := newParser(input, testBuiltins())
 	prog := parser.Parse()
 	assertNoParseError(t, parser, input)
 	return prog.Format()

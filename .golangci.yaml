@@ -30,6 +30,7 @@ linters:
     - lll
     - maligned
     - nlreturn
+    - nilnil
     - nosnakecase
     - paralleltest
     - revive

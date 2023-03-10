@@ -70,8 +70,7 @@ func (c *runCmd) Run() error {
 	}
 	builtins := evaluator.DefaultBuiltins(newRuntime())
 	eval := evaluator.NewEvaluator(builtins)
-	eval.Run(string(b))
-	return nil
+	return eval.Run(string(b))
 }
 
 func (c *fmtCmd) Run() error {

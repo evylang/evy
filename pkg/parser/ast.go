@@ -205,7 +205,7 @@ func (p *Program) String() string {
 func (p *Program) Format() string {
 	var sb strings.Builder
 	p.formatting.w = &sb
-	p.formatting.format(p)
+	p.formatting.format(p) // todo: maybe formatting.formatProgram(prog, w)
 	return sb.String()
 }
 

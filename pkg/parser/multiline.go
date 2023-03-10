@@ -1,6 +1,8 @@
 package parser
 
-import "strings"
+import (
+	"strings"
+)
 
 // multilineItem is used to represent multiline array and map literals
 // as used in formatting. It does not explicitly store array or map
@@ -84,4 +86,62 @@ func formatMultiline(multilineItems []multilineItem) []multilineItem {
 		}
 	}
 	return formatted
+}
+
+// accumulation classifies statements into "empty", "comment", "stmt"
+// and "func". It is used for newline insertion before function and
+// eventHandler declarations taking leading comments into account.
+type accumulation struct {
+	stmtType string // "empty", "comment", "stmt, "func"
+	idx      int
+}
+
+// nlAfter returns a map (set) of statements that need to be
+// followed by a newline.
+func nlAfter(stmts []Node, comments map[uintptr]string) map[int]bool {
+	accums := newAccumulations(stmts, comments)
+	indices := map[int]bool{}
+	length := len(accums)
+	if length == 0 {
+		return indices
+	}
+	for i, accum := range accums[:length-1] {
+		switch {
+		case accum.stmtType == "empty" || accum.stmtType == "comment":
+			// do nothing for empty lines and comments
+		case accum.stmtType == "func" && accums[i+1].stmtType == "stmt":
+			// add NL after func decl directly followed by stmt
+			indices[accum.idx] = true
+		case accums[i+1].stmtType == "func":
+			// add NL before func decl (after stmt or other func decl)
+			indices[accum.idx] = true
+		case i+2 < length && accums[i+1].stmtType == "comment" && accums[i+2].stmtType == "func":
+			// add NL before comments of func decl (after stmt or other func decl)
+			indices[accum.idx] = true
+		}
+	}
+	return indices
+}
+
+func newAccumulations(stmts []Node, comments map[uintptr]string) []accumulation {
+	lastStmtType := ""
+	var accums []accumulation
+	for i, stmt := range stmts {
+		stmtType := "stmt"
+		switch s := stmt.(type) {
+		case *EmptyStmt:
+			stmtType = "empty"
+			if comments[ptr(s)] != "" {
+				stmtType = "comment"
+			}
+		case *FuncDeclStmt, *EventHandlerStmt:
+			stmtType = "func"
+		}
+		if stmtType != lastStmtType || stmtType == "func" {
+			accum := accumulation{stmtType: stmtType, idx: i}
+			accums = append(accums, accum)
+			lastStmtType = stmtType
+		}
+	}
+	return accums
 }

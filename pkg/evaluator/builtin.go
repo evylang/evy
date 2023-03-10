@@ -22,7 +22,7 @@ type Builtins struct {
 	Globals       map[string]*parser.Var
 }
 
-func NewParserBuiltins(builtins Builtins) parser.Builtins {
+func ParserBuiltins(builtins Builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDeclStmt, len(builtins.Funcs))
 	for name, builtin := range builtins.Funcs {
 		funcs[name] = builtin.Decl
@@ -32,6 +32,10 @@ func NewParserBuiltins(builtins Builtins) parser.Builtins {
 		EventHandlers: builtins.EventHandlers,
 		Globals:       builtins.Globals,
 	}
+}
+
+func DefaultParserBuiltins(rt *Runtime) parser.Builtins {
+	return ParserBuiltins(DefaultBuiltins(rt))
 }
 
 type BuiltinFunc func(scope *scope, args []Value) Value
@@ -109,7 +113,7 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 
 func DefaulParserBuiltins(rt *Runtime) parser.Builtins {
 	builtins := DefaultBuiltins(rt)
-	return NewParserBuiltins(builtins)
+	return ParserBuiltins(builtins)
 }
 
 type Runtime struct {

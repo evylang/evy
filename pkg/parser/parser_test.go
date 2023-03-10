@@ -90,8 +90,8 @@ print m[s]`: "line 3 column 6: unknown variable name 'name'",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		got := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
 	}
 }
 
@@ -145,8 +145,8 @@ func TestFunccallError(t *testing.T) {
 		parser := New(input, builtins)
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		got := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, err1, got, "input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
 	}
 }
 
@@ -346,8 +346,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -423,8 +423,8 @@ fn = 3
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -570,8 +570,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), input)
 	}
 }
 
@@ -643,8 +643,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -738,8 +738,8 @@ end`: "line 7 column 4: expected 'end', got end of input",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -795,8 +795,8 @@ end`: "line 2 column 6: unexpected end of line",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -905,8 +905,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1000,8 +1000,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1086,8 +1086,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1150,8 +1150,8 @@ end`: "line 3 column 4: wrong number of parameters expected 2, got 1",
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr, "input: %s", input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
 	}
 }
 
@@ -1173,8 +1173,8 @@ end
 		parser := New(input, testBuiltins())
 		_ = parser.Parse()
 		assertParseError(t, parser, input)
-		gotErr := MaxErrorsString(parser.Errors(), 1)
-		assert.Equal(t, wantErr, gotErr)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 
@@ -1191,9 +1191,9 @@ end`
 	parser := New(input, testBuiltins())
 	got := parser.Parse()
 	assertParseError(t, parser, input)
-	gotErr := MaxErrorsString(parser.Errors(), 1)
-	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr)
-	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].String())
+	gotErr := parser.errors.Truncate(1)
+	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr.Error())
+	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].Error())
 	want := `
 
 x=12
@@ -1212,7 +1212,7 @@ func assertParseError(t *testing.T, parser *Parser, input string) {
 
 func assertNoParseError(t *testing.T, parser *Parser, input string) {
 	t.Helper()
-	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, ErrorsString(parser.Errors()))
+	assert.Equal(t, 0, len(parser.errors), "Unexpected parser error\n input: %s\nerrors:\n%s", input, parser.errors)
 }
 
 func testBuiltins() Builtins {

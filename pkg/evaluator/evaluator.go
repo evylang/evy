@@ -4,6 +4,7 @@
 package evaluator
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -41,10 +42,14 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) {
-	p := parser.New(input, NewParserBuiltins(e.builtins))
-	prog := p.Parse()
-	if p.HasErrors() {
-		e.print(parser.MaxErrorsString(p.Errors(), 8))
+	builtins := ParserBuiltins(e.builtins)
+	prog, err := parser.Parse(input, builtins)
+	if err != nil {
+		var parseErrors parser.Errors
+		if errors.As(err, &parseErrors) {
+			err = parseErrors.Truncate(8)
+		}
+		e.print(err.Error())
 		return
 	}
 	val := e.Eval(prog)

@@ -117,12 +117,11 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	if err != nil {
 		return err
 	}
-	builtins := evaluator.DefaultBuiltins(newRuntime())
 	in := string(b)
-	p := parser.New(in, evaluator.NewParserBuiltins(builtins))
-	prog := p.Parse()
-	if p.HasErrors() {
-		return fmt.Errorf("%w: %s", errParse, parser.MaxErrorsString(p.Errors(), 8))
+	parserBuiltins := evaluator.DefaultParserBuiltins(newRuntime())
+	prog, err := parser.Parse(in, parserBuiltins)
+	if err != nil {
+		return fmt.Errorf("%w: %s", errParse, parser.TruncateError(err, 8))
 	}
 	out := prog.Format()
 	if checkOnly {
@@ -153,8 +152,11 @@ func (c *parseCmd) Run() error {
 		return err
 	}
 	builtinDecls := evaluator.DefaulParserBuiltins(newRuntime())
-	result := parser.Run(string(b), builtinDecls)
-	fmt.Println(result)
+	ast, err := parser.Parse(string(b), builtinDecls)
+	if err != nil {
+		return fmt.Errorf("%w: %s", errParse, parser.TruncateError(err, 8))
+	}
+	fmt.Println(ast.String())
 	return nil
 }
 

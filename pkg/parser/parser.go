@@ -7,6 +7,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,17 +21,17 @@ type Builtins struct {
 	Globals       map[string]*Var
 }
 
-func Run(input string, builtins Builtins) string {
+func Parse(input string, builtins Builtins) (*Program, error) {
 	parser := New(input, builtins)
 	prog := parser.Parse()
-	if len(parser.errors) > 0 {
-		return MaxErrorsString(parser.Errors(), 8) + "\n\n" + prog.String()
+	if parser.errors != nil {
+		return nil, parser.errors
 	}
-	return prog.String()
+	return prog, nil
 }
 
 type Parser struct {
-	errors []Error
+	errors Errors
 
 	pos  int          // current position in token slice (points to current token)
 	cur  *lexer.Token // current token under examination
@@ -45,13 +46,41 @@ type Parser struct {
 	formatting *formatting
 }
 
+// Errors is a list of parse errors as we typically report more than a
+// single parser error at a time to the end user. Errors itself also
+// implements the error interfaced and can be treated like a single Error.
+type Errors []*Error
+
+func (e Errors) Error() string {
+	s := make([]string, len(e))
+	for i, err := range e {
+		s[i] = err.Error()
+	}
+	return strings.Join(s, "\n")
+}
+
+func (e Errors) Truncate(length int) Errors {
+	if len(e) <= length {
+		return e
+	}
+	return e[:length]
+}
+
+func TruncateError(err error, length int) error {
+	var parseErrors Errors
+	if errors.As(err, &parseErrors) {
+		return parseErrors.Truncate(8)
+	}
+	return err
+}
+
 // Error is an Evy parse error.
 type Error struct {
 	message string
 	token   *lexer.Token
 }
 
-func (e Error) String() string {
+func (e *Error) Error() string {
 	return e.token.Location() + ": " + e.message
 }
 
@@ -109,14 +138,6 @@ func New(input string, builtins Builtins) *Parser {
 		}
 	}
 	return p
-}
-
-func (p *Parser) Errors() []Error {
-	return p.errors
-}
-
-func (p *Parser) HasErrors() bool {
-	return len(p.errors) != 0
 }
 
 func (p *Parser) Parse() *Program {
@@ -580,11 +601,11 @@ func (p *Parser) assertEnd() {
 }
 
 func (p *Parser) appendError(message string) {
-	p.errors = append(p.errors, Error{message: message, token: p.cur})
+	p.errors = append(p.errors, &Error{message: message, token: p.cur})
 }
 
 func (p *Parser) appendErrorForToken(message string, token *lexer.Token) {
-	p.errors = append(p.errors, Error{message: message, token: token})
+	p.errors = append(p.errors, &Error{message: message, token: token})
 }
 
 // validateScope ensures all variables in scope have been used.
@@ -702,21 +723,6 @@ func (p *Parser) lookAt(pos int) *lexer.Token {
 		return p.tokens[len(p.tokens)-1] // EOF with pos
 	}
 	return p.tokens[pos]
-}
-
-func MaxErrorsString(errs []Error, n int) string {
-	if n != -1 && len(errs) > n {
-		errs = errs[:n]
-	}
-	return ErrorsString(errs)
-}
-
-func ErrorsString(errs []Error) string {
-	errsSrings := make([]string, len(errs))
-	for i, err := range errs {
-		errsSrings[i] = err.String()
-	}
-	return strings.Join(errsSrings, "\n")
 }
 
 func (p *Parser) parseReturnStatement(scope *scope) Node {

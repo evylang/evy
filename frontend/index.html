@@ -3,27 +3,37 @@
   <head>
     <meta charset="utf-8" />
     <title>evy | Playground</title>
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" href="favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/img/favicon.png" />
     <link rel="stylesheet" href="index.css" type="text/css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700&display=swap"
+    />
     <script src="wasm_exec.js" defer></script>
     <script src="index.js" defer></script>
   </head>
-  <body class="play">
-    <header>
-      <div>
-        <button id="run" disabled>Run</button>
-      </div>
-      <img src="logo.svg" alt="evy logo" height="100%" />
-    </header>
-    <main>
-      <div class="code">
-        <textarea
-          id="code"
-          spellcheck="false"
-          autocorrect="off"
-          autocapitalize="none"
-        >
+  <body>
+    <div class="max-width-wrapper">
+      <header>
+        <ul class="breadcrumbs">
+          <li><button onclick="showModal()">Getting Started</button></li>
+          <li><button onclick="showModal()">Welcome</button></li>
+        </ul>
+        <a href="/" class="logo">
+          <img src="img/logo.svg" alt="Evy logo" class="desktop" />
+          <img src="img/logo-sm.svg" alt="Small evy logo" class="mobile" width="20" height="20" />
+        </a>
+        <div class="share">
+          <svg width="1.2em" height="1.2em"><use href="#icon-share" /></svg>
+          <span>Share</span>
+        </div>
+      </header>
+      <main>
+        <div class="editor">
+          <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="none" wrap="off">
 move 10 20
 line 50 50
 rect 25 25
@@ -36,24 +46,67 @@ if x > 10
     print "🍦 big x"
 end
 </textarea
-        >
-      </div>
-      <div class="out">
-        <div class="canvas">
-          <canvas id="canvas"></canvas>
-        </div>
-        <div class="read hidden">
-          <label>input&gt;</label>
-          <textarea id="read" rows="1"></textarea>
-        </div>
-        <div class="input slider hidden">
-          <input type="range" id="sliderx" min="0" max="100" />
-          <input type="range" id="slidery" min="0" max="100" />
+          >
         </div>
         <div class="output">
-          <textarea id="output" disabled></textarea>
+          <div class="canvas">
+            <canvas id="canvas"></canvas>
+          </div>
+          <div class="read hidden">
+            <label>input&gt;</label>
+            <textarea id="read" rows="1"></textarea>
+          </div>
+          <div class="input slider hidden">
+            <input type="range" id="sliderx" min="0" max="100" />
+            <input type="range" id="slidery" min="0" max="100" />
+          </div>
+          <div class="console" id="console"></div>
+          <div class="run desktop">
+            <button id="run" disabled>Run</button>
+          </div>
+        </div>
+      </main>
+      <!-- Add separate mobile button because of position:fixed and output transform -->
+      <div class="run mobile">
+        <button id="run-mob" disabled>Run</button>
+      </div>
+    </div>
+
+    <!-- Modal evy code sample selection, hidden on load, showed on breadcrumb click-->
+    <div class="modal hidden">
+      <div class="max-width-wrapper">
+        <header>
+          <button id="modal-close">
+            <svg width="1.2em" height="1.2em"><use href="#icon-close" class="close" /></svg>
+          </button>
+        </header>
+        <div class="modal-main">
+          <div class="item">
+            <h2>🌱 Getting Started</h2>
+            <ul>
+              <li><a href="#helloworld">Hello, World</a></li>
+              <li><a href="#welcome">Welcome</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
+
+    <!-- icons in hidden svg tag for styling and performance -->
+    <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="icon-share" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+        />
+      </symbol>
+      <symbol id="icon-close" fill="none" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+        <g stroke-linecap="round">
+          <path d="M3,3 L21,21" />
+          <path d="M3,21 L21,3" />
+        </g>
+      </symbol>
+    </svg>
   </body>
 </html>

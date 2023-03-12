@@ -1,0 +1,44 @@
+{
+  "courses": [
+    {
+      "title": "Getting Started",
+      "emoji": "🌱",
+      "lessons": [
+        { "id": "welcome", "title": "Welcome" },
+        { "id": "helloworld", "title": "Hello, world!" },
+        { "id": "echo", "title": "Echo" },
+        { "id": "rand", "title": "Guess my Number" },
+        { "id": "strings", "title": "String Functions" }
+      ]
+    },
+    {
+      "title": "Drawing",
+      "emoji": "🎨",
+      "lessons": [
+        { "id": "movingdot", "title": "Red Dot" },
+        { "id": "lines", "title": "tbd: Lines" },
+        { "id": "rainbow", "title": "tbd: Rainbow" },
+        { "id": "squares", "title": "tbd: Squares" }
+      ]
+    },
+    {
+      "title": "Animation",
+      "emoji": "🤹‍♀️",
+      "lessons": [
+        { "id": "movingdot", "title": "Moving Red Dot" },
+        { "id": "juggle", "title": "Juggle" },
+        { "id": "lines", "title": "tbd: Moving Lines" },
+        { "id": "tree", "title": "tbd: Growing Tree" }
+      ]
+    },
+    {
+      "title": "Algorithms",
+      "emoji": "📚",
+      "lessons": [
+        { "id": "search", "title": "tbd: Binary Search" },
+        { "id": "bubblesort", "title": "tbd: Bubble Sort" },
+        { "id": "insertionsort", "title": "tbd: Insertion Sort" }
+      ]
+    }
+  ]
+}

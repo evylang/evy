@@ -1,4 +1,20 @@
 {
 	"semi": false,
-	"singleQuote": false
+	"singleQuote": false,
+	"htmlWhitespaceSensitivity": "ignore",
+	"printWidth": 100,
+	"overrides": [
+	{
+		"files": "*.svg",
+		"options": {
+			"parser": "html"
+		}
+	},
+	{
+		"files": "*.html",
+		"options": {
+			"printWidth": 115
+		}
+	}
+  ]
 }

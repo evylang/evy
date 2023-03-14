@@ -424,7 +424,6 @@ async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
   await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
-  getElements(".modal a").map((el) => (el.onclick = hideModal))
   document.querySelector("#modal-close").onclick = hideModal
   initModal()
   window.location.hash && handleHashChange()
@@ -456,6 +455,7 @@ function initModal() {
       const a = document.createElement("a")
       a.textContent = lesson.title
       a.href = `#${lesson.id}`
+      a.onclick = hideModal
       li.appendChild(a)
       ul.appendChild(li)
     }

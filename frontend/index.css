@@ -216,8 +216,8 @@ main.view-output {
   flex-direction: column;
   height: 100%;
   overflow: clip;
-  background: var(--bg);
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   font-size: 1rem;
 }
 
@@ -236,6 +236,7 @@ main.view-output {
   background: var(--bg);
   font-size: 1rem;
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   overflow: auto;
 
   resize: none;
@@ -281,6 +282,7 @@ main.view-output {
   background: var(--output-bg);
   color: var(--output-color);
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   border-top: 1px solid var(--output-border-dark);
   border-bottom: 1px solid var(--output-border-light);
   width: var(--console-size);
@@ -291,6 +293,7 @@ main.view-output {
 .output .read textarea {
   font-size: 1rem;
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   color: var(--output-color);
   -webkit-text-fill-color: var(--output-color);
   line-height: 1.5;
@@ -388,14 +391,13 @@ main.view-output {
   left: 0;
   bottom: 0;
   right: 0;
-  background: var(--modal-bg);
   overflow: clip;
 }
 
 .modal header {
   border-bottom: 1px solid hsl(0deg 0% 100% / 30%);
   color: hsl(0deg 0% 70%);
-  background: none;
+  background: var(--modal-bg);
   justify-content: right;
 }
 
@@ -410,7 +412,9 @@ main.view-output {
   padding: 36px 32px;
   overflow-y: auto;
   display: flex;
+  background: var(--modal-bg);
   flex-wrap: wrap;
+  height: 100%;
 }
 .modal-main .item {
   width: var(--modal-item-width);

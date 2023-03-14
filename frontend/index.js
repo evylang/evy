@@ -156,6 +156,13 @@ function onStopped() {
   runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
 }
 
+async function stopAndSlide() {
+  if (!onCodeScreen()) {
+    await slide()
+  }
+  stop()
+}
+
 function newEvyGo() {
   const evyEnv = {
     jsRead,
@@ -422,12 +429,11 @@ function showModal() {
 let samples
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
-  window.addEventListener("hashchange", handleHashChange)
-  getElements(".modal a").map((el) => (el.onclick = hideModal))
-  document.querySelector("#modal-close").onclick = hideModal
   await fetchSamples()
-  handleHashChange()
+  window.addEventListener("hashchange", handleHashChange)
+  document.querySelector("#modal-close").onclick = hideModal
   initModal()
+  window.location.hash && handleHashChange()
 }
 
 async function fetchSamples() {
@@ -456,6 +462,7 @@ function initModal() {
       const a = document.createElement("a")
       a.textContent = lesson.title
       a.href = `#${lesson.id}`
+      a.onclick = hideModal
       li.appendChild(a)
       ul.appendChild(li)
     }
@@ -482,9 +489,9 @@ function getElements(q) {
 
 async function handleHashChange() {
   hideModal()
-  const opts = parseHash()
+  let opts = parseHash()
   if (!opts.source && !opts.sample) {
-    return
+    opts = { sample: "welcome" }
   }
   let crumbs = ["Sample"]
   if (opts.sample) {
@@ -500,8 +507,8 @@ async function handleHashChange() {
     const source = await response.text()
     document.querySelector("#code").value = source
     updateBreadcrumbs(crumbs)
-    stop()
     clearOutput()
+    await stopAndSlide() // go to code screen for new code
   } catch (err) {
     console.error(err)
   }

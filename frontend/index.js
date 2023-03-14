@@ -422,12 +422,12 @@ function showModal() {
 let samples
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
+  await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
   getElements(".modal a").map((el) => (el.onclick = hideModal))
   document.querySelector("#modal-close").onclick = hideModal
-  await fetchSamples()
-  handleHashChange()
   initModal()
+  window.location.hash && handleHashChange()
 }
 
 async function fetchSamples() {
@@ -482,9 +482,9 @@ function getElements(q) {
 
 async function handleHashChange() {
   hideModal()
-  const opts = parseHash()
+  let opts = parseHash()
   if (!opts.source && !opts.sample) {
-    return
+    opts = { sample: "welcome" }
   }
   let crumbs = ["Sample"]
   if (opts.sample) {

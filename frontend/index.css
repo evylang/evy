@@ -218,6 +218,7 @@ main.view-output {
   overflow: clip;
   background: var(--bg);
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   font-size: 1rem;
 }
 
@@ -236,6 +237,7 @@ main.view-output {
   background: var(--bg);
   font-size: 1rem;
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   overflow: auto;
 
   resize: none;
@@ -281,6 +283,7 @@ main.view-output {
   background: var(--output-bg);
   color: var(--output-color);
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   border-top: 1px solid var(--output-border-dark);
   border-bottom: 1px solid var(--output-border-light);
   width: var(--console-size);
@@ -291,6 +294,7 @@ main.view-output {
 .output .read textarea {
   font-size: 1rem;
   font-family: var(--ff-code);
+  font-variant-ligatures: none;
   color: var(--output-color);
   -webkit-text-fill-color: var(--output-color);
   line-height: 1.5;

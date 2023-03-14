@@ -156,6 +156,13 @@ function onStopped() {
   runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
 }
 
+async function stopAndSlide() {
+  if (!onCodeScreen()) {
+    await slide()
+  }
+  stop()
+}
+
 function newEvyGo() {
   const evyEnv = {
     jsRead,
@@ -500,8 +507,8 @@ async function handleHashChange() {
     const source = await response.text()
     document.querySelector("#code").value = source
     updateBreadcrumbs(crumbs)
-    stop()
     clearOutput()
+    await stopAndSlide() // go to code screen for new code
   } catch (err) {
     console.error(err)
   }

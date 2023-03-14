@@ -594,6 +594,37 @@ print x
 	assert.Equal(t, want, got)
 }
 
+func TestNLStringLit(t *testing.T) {
+	input := `
+x := "a\nb"
+print x
+`[1:]
+	want := input
+	parser := newParser(input, testBuiltins())
+	prog := parser.Parse()
+	assertNoParseError(t, parser, input)
+	got := prog.Format()
+	assert.Equal(t, want, got)
+}
+
+func TestUnaryOP(t *testing.T) {
+	input := `
+func check:bool
+    return false
+end
+
+while !(check)
+    print "x"
+end
+`[1:]
+	want := input
+	parser := newParser(input, testBuiltins())
+	prog := parser.Parse()
+	assertNoParseError(t, parser, input)
+	got := prog.Format()
+	assert.Equal(t, want, got)
+}
+
 func TestNLInsertion(t *testing.T) {
 	tests := map[string]string{
 		`func f1

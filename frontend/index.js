@@ -143,7 +143,7 @@ async function handleRun() {
   stopped ? start() : stop()
 }
 
-// handleMob handles three states for mobile devices:
+// handleMobRun handles three states for mobile devices:
 // run -> stop -> code
 async function handleMobRun() {
   if (onCodeScreen()) {

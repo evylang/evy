@@ -28,6 +28,7 @@
       "lessons": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "juggle", "title": "Juggle" },
+        { "id": "draw", "title": "Draw" },
         { "id": "lines", "title": "tbd: Moving Lines" },
         { "id": "tree", "title": "tbd: Growing Tree" }
       ]

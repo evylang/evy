@@ -1,0 +1,23 @@
+// Variables are names or placeholders
+// that store values.
+// Variables have types:
+
+s:string
+
+// We call this a "declaration".
+
+// `s` is a variable of type string.
+// It can hold _any_ string.
+
+// You can give a variable a new value
+// with the equal sign `=`.
+// We call this "assignment".
+s = "Hello, World"
+
+// Assignments of a variable are only
+// allowed _after_ its declaration.
+
+// What does this program print❓
+print s
+
+// Change the assignment to your name.

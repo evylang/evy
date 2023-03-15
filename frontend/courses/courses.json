@@ -39,9 +39,15 @@
       "title": "Learn Coding",
       "emoji": "🌱",
       "units": [
-        { "id": "search", "title": "tbd: Binary Search" },
-        { "id": "bubblesort", "title": "tbd: Bubble Sort" },
-        { "id": "insertionsort", "title": "tbd: Insertion Sort" }
+        { "id": "targetboard", "title": "Target board" },
+        { "id": "types-string", "title": "String type" },
+        { "id": "print", "title": "Print" },
+        { "id": "variable-decl", "title": "Variable declaration" },
+        { "id": "variable-inference", "title": "Type inference" },
+        { "id": "print-multi", "title": "Print many" },
+        { "id": "read", "title": "Read" },
+        { "id": "concat", "title": "String concatenation" },
+        { "id": "concat2", "title": "More concatenation" }
       ]
     }
   ]

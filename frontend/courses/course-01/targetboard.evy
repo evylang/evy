@@ -1,0 +1,10 @@
+// Finish the target board 🎯.
+
+move 50 50
+
+color "red"
+circle 45
+
+color "white"
+circle 35
+

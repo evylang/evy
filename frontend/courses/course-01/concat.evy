@@ -1,0 +1,8 @@
+// You can glue two strings together
+// with `+`.
+s := "a" + "b" + "c"
+
+// We call this "concatenation".
+
+// What does this program print❓
+print s

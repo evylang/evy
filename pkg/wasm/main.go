@@ -23,7 +23,7 @@ func main() {
 	yielder := newSleepingYielder()
 	builtins := evaluator.DefaultBuiltins(newJSRuntime(yielder))
 
-	defer onStopped()
+	defer afterStop()
 	source, err := format(builtins)
 	if err != nil {
 		builtins.Print(err.Error())
@@ -175,9 +175,9 @@ func jsRead() float64
 //export jsPrint
 func jsPrint(string)
 
-// onStopped is imported from JS
-//export onStopped
-func onStopped()
+// afterStop is imported from JS
+//export afterStop
+func afterStop()
 
 // move is imported from JS
 //export move

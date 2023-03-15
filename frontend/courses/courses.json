@@ -2,8 +2,8 @@
   "courseList": [
     {
       "id": "sample/tour",
-      "title": "Getting Started",
-      "emoji": "🌱",
+      "title": "Tour",
+      "emoji": "🚌",
       "units": [
         { "id": "welcome", "title": "Welcome" },
         { "id": "helloworld", "title": "Hello, world!" },
@@ -31,14 +31,13 @@
       "units": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "juggle", "title": "Juggle" },
-        { "id": "lines", "title": "tbd: Moving Lines" },
-        { "id": "tree", "title": "tbd: Growing Tree" }
+        { "id": "draw", "title": "Draw" }
       ]
     },
     {
       "id": "course-01",
-      "title": "Algorithms",
-      "emoji": "📚",
+      "title": "Learn Coding",
+      "emoji": "🌱",
       "units": [
         { "id": "search", "title": "tbd: Binary Search" },
         { "id": "bubblesort", "title": "tbd: Bubble Sort" },

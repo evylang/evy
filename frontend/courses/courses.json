@@ -1,6 +1,7 @@
 {
-  "courses": [
+  "courseList": [
     {
+      "id": "sample/tour",
       "title": "Getting Started",
       "emoji": "🌱",
       "units": [
@@ -13,6 +14,7 @@
       ]
     },
     {
+      "id": "sample/draw",
       "title": "Drawing",
       "emoji": "🎨",
       "units": [
@@ -23,17 +25,18 @@
       ]
     },
     {
+      "id": "sample/animate",
       "title": "Animation",
       "emoji": "🤹‍♀️",
       "units": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "juggle", "title": "Juggle" },
-        { "id": "draw", "title": "Draw" },
         { "id": "lines", "title": "tbd: Moving Lines" },
         { "id": "tree", "title": "tbd: Growing Tree" }
       ]
     },
     {
+      "id": "course-01",
       "title": "Algorithms",
       "emoji": "📚",
       "units": [

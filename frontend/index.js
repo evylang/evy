@@ -9,7 +9,7 @@ const canvas = newCanvas()
 let jsReadInitialised = false
 let stopped = true
 let animationStart
-let samples
+let courses
 
 // --- Initialise ------------------------------------------------------
 
@@ -232,20 +232,20 @@ function clearOutput() {
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
-  await fetchSamples()
+  await fetchCourses()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   initModal()
   window.location.hash && handleHashChange()
 }
 
-async function fetchSamples() {
-  const resp = await fetch("samples/samples.json")
-  samples = await resp.json()
-  samples.byID = {}
-  for (const course of samples.courses) {
+async function fetchCourses() {
+  const resp = await fetch("courses/courses.json")
+  courses = await resp.json()
+  courses.units = {}
+  for (const course of courses.courseList) {
     for (const unit of course.units) {
-      samples.byID[unit.id] = { ...unit, course: course.title }
+      courses.units[unit.id] = { ...unit, courseTitle: course.title, courseID: course.id }
     }
   }
 }
@@ -261,14 +261,14 @@ function ctrlEnterListener(e) {
 async function handleHashChange() {
   hideModal()
   let opts = parseHash()
-  if (!opts.source && !opts.sample) {
-    opts = { sample: "welcome" }
+  if (!opts.source && !opts.unit) {
+    opts = { unit: "welcome" }
   }
-  let crumbs = ["Sample"]
-  if (opts.sample) {
-    opts.source = `samples/${opts.sample}.evy`
-    const sample = samples.byID[opts.sample]
-    crumbs = [sample.course, sample.title]
+  let crumbs = ["Evy"]
+  if (opts.unit) {
+    const unit = courses.units[opts.unit]
+    opts.source = `courses/${unit.courseID}/${opts.unit}.evy`
+    crumbs = [unit.courseTitle, unit.title]
   }
   try {
     const response = await fetch(opts.source)
@@ -292,10 +292,10 @@ function parseHash() {
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
   if (entries.length === 1 && entries[0].length === 1) {
-    // shortcut for example.com#draw loading example.com/samples/draw.evy
-    const sample = entries[0][0]
-    if (samples && samples.byID[sample]) {
-      return { sample: sample }
+    // shortcut for evy.dev#draw loading evy.dev/courses/sample/draw/draw.evy
+    const unit = entries[0][0]
+    if (courses && courses.units[unit]) {
+      return { unit }
     }
   }
   return Object.fromEntries(entries)
@@ -482,7 +482,7 @@ function animationLoop(ts) {
 function initModal() {
   const modalMain = document.querySelector(".modal-main")
   modalMain.textContent = ""
-  for (const course of samples.courses) {
+  for (const course of courses.courseList) {
     const item = document.createElement("div")
     item.classList.add("item")
     const h2 = document.createElement("h2")

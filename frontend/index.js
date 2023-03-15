@@ -244,8 +244,8 @@ async function fetchSamples() {
   samples = await resp.json()
   samples.byID = {}
   for (const course of samples.courses) {
-    for (const lesson of course.lessons) {
-      samples.byID[lesson.id] = { ...lesson, course: course.title }
+    for (const unit of course.units) {
+      samples.byID[unit.id] = { ...unit, course: course.title }
     }
   }
 }
@@ -489,11 +489,11 @@ function initModal() {
     h2.textContent = `${course.emoji} ${course.title}`
     const ul = document.createElement("ul")
     item.replaceChildren(h2, ul)
-    for (const lesson of course.lessons) {
+    for (const unit of course.units) {
       const li = document.createElement("li")
       const a = document.createElement("a")
-      a.textContent = lesson.title
-      a.href = `#${lesson.id}`
+      a.textContent = unit.title
+      a.href = `#${unit.id}`
       a.onclick = hideModal
       li.appendChild(a)
       ul.appendChild(li)

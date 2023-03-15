@@ -3,7 +3,7 @@
     {
       "title": "Getting Started",
       "emoji": "🌱",
-      "lessons": [
+      "units": [
         { "id": "welcome", "title": "Welcome" },
         { "id": "helloworld", "title": "Hello, world!" },
         { "id": "echo", "title": "Echo" },
@@ -15,7 +15,7 @@
     {
       "title": "Drawing",
       "emoji": "🎨",
-      "lessons": [
+      "units": [
         { "id": "movingdot", "title": "Red Dot" },
         { "id": "lines", "title": "tbd: Lines" },
         { "id": "rainbow", "title": "tbd: Rainbow" },
@@ -25,7 +25,7 @@
     {
       "title": "Animation",
       "emoji": "🤹‍♀️",
-      "lessons": [
+      "units": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "juggle", "title": "Juggle" },
         { "id": "draw", "title": "Draw" },
@@ -36,7 +36,7 @@
     {
       "title": "Algorithms",
       "emoji": "📚",
-      "lessons": [
+      "units": [
         { "id": "search", "title": "tbd: Binary Search" },
         { "id": "bubblesort", "title": "tbd: Bubble Sort" },
         { "id": "insertionsort", "title": "tbd: Insertion Sort" }

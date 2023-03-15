@@ -1,19 +1,56 @@
 "use strict"
+
+// --- Globals ---------------------------------------------------------
+
 let wasmModule, wasmInst
-let sourcePtr, sourceLength
 const go = newEvyGo()
-const runButton = document.querySelector("#run")
-const runButtonMob = document.querySelector("#run-mob")
+const canvas = newCanvas()
+
+let jsReadInitialised = false
+let stopped = true
+let animationStart
+let samples
+
+// --- Initialise ------------------------------------------------------
+
+initWasm()
+initUI()
+initCanvas()
+
+// --- Wasm ------------------------------------------------------------
 
 // initWasm loads bytecode and initialises execution environment.
 function initWasm() {
   WebAssembly.compileStreaming(fetch("evy.wasm"))
     .then((obj) => (wasmModule = obj))
     .catch((err) => console.error(err))
-  runButton.onclick = handle
+  const runButton = document.querySelector("#run")
+  const runButtonMob = document.querySelector("#run-mob")
+  runButton.onclick = handleRun
   runButton.disabled = false
-  runButtonMob.onclick = handleMob
+  runButtonMob.onclick = handleMobRun
   runButtonMob.disabled = false
+}
+
+function newEvyGo() {
+  // evyEnv contains JS functions from this file exported to wasm/go
+  const evyEnv = {
+    jsPrint,
+    jsRead,
+    evySource,
+    setEvySource,
+    move,
+    line,
+    width,
+    circle,
+    rect,
+    color,
+    afterStop,
+    registerEventHandler,
+  }
+  const go = new Go() // see wasm_exec.js
+  go.importObject.env = Object.assign(go.importObject.env, evyEnv)
+  return go
 }
 
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
@@ -28,7 +65,6 @@ function jsPrint(ptr, len) {
   }
 }
 
-let jsReadInitialised = false
 // jsRead reads the content of the "read" textarea. If the textarea
 // contains a newline jsRead extracts the string up until the newline
 // and empties the textarea. The read stream is written to shared wasm
@@ -89,24 +125,27 @@ function ptrLenToBigInt({ ptr, len }) {
   return ptrLenNum
 }
 
-function onCodeScreen() {
-  return !document.querySelector("main").classList.contains("view-output")
-}
-async function slide() {
-  const el = document.querySelector("main")
-  const cl = el.classList
-  return new Promise((resolve) => {
-    el.ontransitionend = resolve
-    onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
-  })
+function getElements(q) {
+  if (!q) {
+    return []
+  }
+  try {
+    return Array.from(document.querySelectorAll(q))
+  } catch (error) {
+    consol.error("getElements", error)
+    return []
+  }
 }
 
-let stopped = true
-async function handle() {
+// --- UI: handle run --------------------------------------------------
+
+async function handleRun() {
   stopped ? start() : stop()
 }
 
-async function handleMob() {
+// handleMob handles three states for mobile devices:
+// run -> stop -> code
+async function handleMobRun() {
   if (onCodeScreen()) {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
@@ -116,6 +155,7 @@ async function handleMob() {
   }
   // on output screen
   if (stopped) {
+    const runButtonMob = document.querySelector("#run-mob")
     runButtonMob.innerText = "Run"
     slide()
     return
@@ -123,13 +163,15 @@ async function handleMob() {
   stop()
 }
 
-// start retrieves the input string from the code pane and
-// converts it to wasm memory bytes. It then calls the evy main()
-// function running the evaluator after parsing.
+// start calls the evy main() wasm/go code parsing, formatting and
+// evaluating evy code.
 async function start() {
   stopped = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   clearOutput()
+
+  const runButton = document.querySelector("#run")
+  const runButtonMob = document.querySelector("#run-mob")
   runButton.innerText = "Stop"
   runButton.classList.add("running")
   runButtonMob.innerText = "Stop"
@@ -137,23 +179,41 @@ async function start() {
   go.run(wasmInst)
 }
 
-// stop terminates program in execution via exports.stop
+// stop terminates program in execution via exports.stop wasm/go then
+// calls afterStop to reset UI. However, to ensure consistent state
+// execute afterStop if program is already stopped.
 function stop() {
   stopped = true
-  wasmInst ? wasmInst.exports.stop() : onStopped()
+  wasmInst ? wasmInst.exports.stop() : afterStop()
 }
 
-// onStopped is exported to evy go/wasm and called when execution finishes
-function onStopped() {
+// afterStop is exported to evy go/wasm and called when execution finishes
+function afterStop() {
   removeEventHandlers()
   stopped = true
   animationStart = undefined
   jsReadInitialised = false
   wasmInst = undefined
+
+  const runButton = document.querySelector("#run")
+  const runButtonMob = document.querySelector("#run-mob")
   runButton.classList.remove("running")
   runButton.innerText = "Run"
   runButtonMob.classList.remove("running")
   runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
+}
+
+function onCodeScreen() {
+  return !document.querySelector("main").classList.contains("view-output")
+}
+
+async function slide() {
+  const el = document.querySelector("main")
+  const cl = el.classList
+  return new Promise((resolve) => {
+    el.ontransitionend = resolve
+    onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
+  })
 }
 
 async function stopAndSlide() {
@@ -163,98 +223,98 @@ async function stopAndSlide() {
   stop()
 }
 
-function newEvyGo() {
-  const evyEnv = {
-    jsRead,
-    jsPrint,
-    evySource,
-    setEvySource,
-    move,
-    line,
-    width,
-    circle,
-    rect,
-    color,
-    onStopped,
-    registerEventHandler,
-    sourcePtr: () => sourcePtr,
-    sourceLength: () => sourceLength,
-  }
-  const go = new Go() // see wasm_exec.js
-  go.importObject.env = Object.assign(go.importObject.env, evyEnv)
-  return go
-}
-
 function clearOutput() {
   document.querySelector("#console").textContent = ""
   resetCanvas()
 }
 
-// --------------------------------------------------
-// confetti easter egg
-// When code input string contains the sub string "confetti"
-// show confetti when clicking Run button.
-function showConfetti() {
-  const names = ["🦊", "🐐"]
-  const colors = ["red", "purple", "blue", "orange", "gold", "green"]
-  let confetti = new Array(100)
-    .fill()
-    .map((_, i) => {
-      return {
-        name: names[i % names.length],
-        x: Math.random() * 100,
-        y: -20 - Math.random() * 100,
-        r: 0.1 + Math.random() * 1,
-        color: colors[i % colors.length],
-      }
-    })
-    .sort((a, b) => a.r - b.r)
+// --- UI: initialisation ----------------------------------------------
 
-  const cssText = (c) =>
-    `background: ${c.color}; left: ${c.x}%; top: ${c.y}%; transform: scale(${c.r})`
-  const confettiDivs = confetti.map((c) => {
-    const div = document.createElement("div")
-    div.style.cssText = cssText(c)
-    div.classList.add("confetti")
-    div.textContent = c.name
-    document.body.appendChild(div)
-    return div
-  })
-
-  let frame
-
-  function loop() {
-    frame = requestAnimationFrame(loop)
-    confetti = confetti.map((c, i) => {
-      c.y += 0.7 * c.r
-      if (c.y > 120) c.y = -20
-      const div = confettiDivs[i]
-      div.style.cssText = cssText(c)
-      return c
-    })
-  }
-
-  loop()
-  setTimeout(() => {
-    cancelAnimationFrame(frame)
-    confettiDivs.forEach((div) => div.remove())
-  }, 10000)
-  setTimeout(() => {
-    confettiDivs.forEach((div) => div.classList.add("fadeout"))
-  }, 8500)
+async function initUI() {
+  document.addEventListener("keydown", ctrlEnterListener)
+  await fetchSamples()
+  window.addEventListener("hashchange", handleHashChange)
+  document.querySelector("#modal-close").onclick = hideModal
+  initModal()
+  window.location.hash && handleHashChange()
 }
 
-// graphics
-const canvas = {
-  x: 0,
-  y: 0,
-  ctx: null,
-  factor: 10,
-  scale: { x: 1, y: -1 },
-  width: 100,
-  height: 100,
+async function fetchSamples() {
+  const resp = await fetch("samples/samples.json")
+  samples = await resp.json()
+  samples.byID = {}
+  for (const course of samples.courses) {
+    for (const lesson of course.lessons) {
+      samples.byID[lesson.id] = { ...lesson, course: course.title }
+    }
+  }
+}
 
-  offset: { x: 0, y: -100 }, // height
+function ctrlEnterListener(e) {
+  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    handleRun()
+  }
+}
+
+// --- UI: URL-hash change handling ------------------------------------
+
+async function handleHashChange() {
+  hideModal()
+  let opts = parseHash()
+  if (!opts.source && !opts.sample) {
+    opts = { sample: "welcome" }
+  }
+  let crumbs = ["Sample"]
+  if (opts.sample) {
+    opts.source = `samples/${opts.sample}.evy`
+    const sample = samples.byID[opts.sample]
+    crumbs = [sample.course, sample.title]
+  }
+  try {
+    const response = await fetch(opts.source)
+    if (response.status < 200 || response.status > 299) {
+      throw new Error("invalid response status", response.status)
+    }
+    const source = await response.text()
+    document.querySelector("#code").value = source
+    updateBreadcrumbs(crumbs)
+    clearOutput()
+    await stopAndSlide() // go to code screen for new code
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function parseHash() {
+  // parse url fragment into object
+  // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
+  // then fetch source from URL and write it to code input.
+  const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
+  const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
+  if (entries.length === 1 && entries[0].length === 1) {
+    // shortcut for example.com#draw loading example.com/samples/draw.evy
+    const sample = entries[0][0]
+    if (samples && samples.byID[sample]) {
+      return { sample: sample }
+    }
+  }
+  return Object.fromEntries(entries)
+}
+
+// --- Canvas graphics -------------------------------------------------
+
+function newCanvas() {
+  return {
+    x: 0,
+    y: 0,
+    ctx: null,
+    factor: 10,
+    scale: { x: 1, y: -1 },
+    width: 100,
+    height: 100,
+
+    offset: { x: 0, y: -100 }, // height
+  }
 }
 
 function initCanvas() {
@@ -341,6 +401,18 @@ function circle(r) {
   ctx.fill()
 }
 
+function logicalX(e) {
+  const scaleX = (canvas.width * canvas.scale.x) / e.target.offsetWidth
+  return e.offsetX * scaleX - canvas.offset.x
+}
+
+function logicalY(e) {
+  const scaleY = (canvas.height * canvas.scale.y) / e.target.offsetHeight
+  return e.offsetY * scaleY - canvas.offset.y
+}
+
+// --- eventHandlers, evy `on` -----------------------------------------
+
 // registerEventHandler is exported to evy go/wasm
 function registerEventHandler(ptr, len) {
   const c = document.querySelector("#canvas")
@@ -363,28 +435,17 @@ function registerEventHandler(ptr, len) {
   }
 }
 
-function logicalX(e) {
-  const scaleX = (canvas.width * canvas.scale.x) / e.target.offsetWidth
-  return e.offsetX * scaleX - canvas.offset.x
-}
-
-function logicalY(e) {
-  const scaleY = (canvas.height * canvas.scale.y) / e.target.offsetHeight
-  return e.offsetY * scaleY - canvas.offset.y
-}
-
 function keydownListener(e) {
   if (e.target.id == "code") return // skip for source code input
   const { ptr, len } = stringToMem(e.key)
   wasmInst.exports.onKey(ptr, len)
 }
 
-const inputQuerySelector = "input#sliderx,input#slidery"
-
 function addInputHandlers() {
   getElements(".input").map((el) => el.classList.remove("hidden"))
   const exp = wasmInst.exports
-  for (const el of document.querySelectorAll(inputQuerySelector)) {
+  const els = document.querySelectorAll("input#sliderx,input#slidery")
+  for (const el of els) {
     el.onchange = (e) => {
       const id = stringToMem(e.target.id)
       const val = stringToMem(e.target.value)
@@ -398,13 +459,13 @@ function removeEventHandlers() {
   c.onpointerdown = null
   c.onpointerup = null
   c.onpointermove = null
-  for (const el of document.querySelectorAll(inputQuerySelector)) {
+  const els = document.querySelectorAll("input#sliderx,input#slidery")
+  for (const el of els) {
     el.onchange = null
   }
   document.removeEventListener("keydown", keydownListener)
 }
 
-let animationStart
 function animationLoop(ts) {
   if (stopped) {
     return
@@ -416,36 +477,7 @@ function animationLoop(ts) {
   window.requestAnimationFrame(animationLoop)
 }
 
-function hideModal() {
-  const el = document.querySelector(".modal")
-  el.classList.add("hidden")
-}
-
-function showModal() {
-  const el = document.querySelector(".modal")
-  el.classList.remove("hidden")
-}
-
-let samples
-async function initUI() {
-  document.addEventListener("keydown", ctrlEnterListener)
-  await fetchSamples()
-  window.addEventListener("hashchange", handleHashChange)
-  document.querySelector("#modal-close").onclick = hideModal
-  initModal()
-  window.location.hash && handleHashChange()
-}
-
-async function fetchSamples() {
-  const resp = await fetch("samples/samples.json")
-  samples = await resp.json()
-  samples.byID = {}
-  for (const course of samples.courses) {
-    for (const lesson of course.lessons) {
-      samples.byID[lesson.id] = { ...lesson, course: course.title }
-    }
-  }
-}
+// --- UI: modal navigation --------------------------------------------
 
 function initModal() {
   const modalMain = document.querySelector(".modal-main")
@@ -469,49 +501,15 @@ function initModal() {
     modalMain.appendChild(item)
   }
 }
-function ctrlEnterListener(e) {
-  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
-    handle()
-  }
+
+function hideModal() {
+  const el = document.querySelector(".modal")
+  el.classList.add("hidden")
 }
 
-function getElements(q) {
-  if (!q) {
-    return []
-  }
-  try {
-    return Array.from(document.querySelectorAll(q))
-  } catch (error) {
-    consol.error("getElements", error)
-    return []
-  }
-}
-
-async function handleHashChange() {
-  hideModal()
-  let opts = parseHash()
-  if (!opts.source && !opts.sample) {
-    opts = { sample: "welcome" }
-  }
-  let crumbs = ["Sample"]
-  if (opts.sample) {
-    opts.source = `samples/${opts.sample}.evy`
-    const sample = samples.byID[opts.sample]
-    crumbs = [sample.course, sample.title]
-  }
-  try {
-    const response = await fetch(opts.source)
-    if (response.status < 200 || response.status > 299) {
-      throw new Error("invalid response status", response.status)
-    }
-    const source = await response.text()
-    document.querySelector("#code").value = source
-    updateBreadcrumbs(crumbs)
-    clearOutput()
-    await stopAndSlide() // go to code screen for new code
-  } catch (err) {
-    console.error(err)
-  }
+function showModal() {
+  const el = document.querySelector(".modal")
+  el.classList.remove("hidden")
 }
 
 function updateBreadcrumbs(crumbs) {
@@ -529,22 +527,57 @@ function breadcrumb(s) {
   return li
 }
 
-function parseHash() {
-  // parse url fragment into object
-  // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
-  // then fetch source from URL and write it to code input.
-  const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
-  const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
-  if (entries.length === 1 && entries[0].length === 1) {
-    // shortcut for example.com#draw loading example.com/samples/draw.evy
-    const sample = entries[0][0]
-    if (samples && samples.byID[sample]) {
-      return { sample: sample }
-    }
-  }
-  return Object.fromEntries(entries)
-}
+// --- UI: Confetti Easter Egg -----------------------------------------
+//
+// When code input string contains the sub string "confetti" show
+// confetti on Run button click.
 
-initUI()
-initWasm()
-initCanvas()
+function showConfetti() {
+  const names = ["🦊", "🐐"]
+  const colors = ["red", "purple", "blue", "orange", "gold", "green"]
+  let confetti = new Array(100)
+    .fill()
+    .map((_, i) => {
+      return {
+        name: names[i % names.length],
+        x: Math.random() * 100,
+        y: -20 - Math.random() * 100,
+        r: 0.1 + Math.random() * 1,
+        color: colors[i % colors.length],
+      }
+    })
+    .sort((a, b) => a.r - b.r)
+
+  const cssText = (c) =>
+    `background: ${c.color}; left: ${c.x}%; top: ${c.y}%; transform: scale(${c.r})`
+  const confettiDivs = confetti.map((c) => {
+    const div = document.createElement("div")
+    div.style.cssText = cssText(c)
+    div.classList.add("confetti")
+    div.textContent = c.name
+    document.body.appendChild(div)
+    return div
+  })
+
+  let frame
+
+  function loop() {
+    frame = requestAnimationFrame(loop)
+    confetti = confetti.map((c, i) => {
+      c.y += 0.7 * c.r
+      if (c.y > 120) c.y = -20
+      const div = confettiDivs[i]
+      div.style.cssText = cssText(c)
+      return c
+    })
+  }
+
+  loop()
+  setTimeout(() => {
+    cancelAnimationFrame(frame)
+    confettiDivs.forEach((div) => div.remove())
+  }, 10000)
+  setTimeout(() => {
+    confettiDivs.forEach((div) => div.classList.add("fadeout"))
+  }, 8500)
+}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -101,7 +102,8 @@ func (f *formatting) format(n Node) {
 	case *FuncCall:
 		f.formatFuncCall(n)
 	case *UnaryExpression:
-		f.writes(n.Op.String(), n.Right.String())
+		f.write(n.Op.String())
+		f.format(n.Right)
 	case *BinaryExpression:
 		f.format(n.Left)
 		f.writeWSS(n)
@@ -132,7 +134,7 @@ func (f *formatting) format(n Node) {
 	case *NumLiteral:
 		f.write(n.String())
 	case *StringLiteral:
-		f.writes(`"`, n.Value, `"`)
+		f.write(strconv.Quote(n.Value))
 	case *ArrayLiteral:
 		f.formatArrayLiteral(n)
 	case *MapLiteral:

@@ -8,7 +8,8 @@
         { "id": "helloworld", "title": "Hello, world!" },
         { "id": "echo", "title": "Echo" },
         { "id": "rand", "title": "Guess my Number" },
-        { "id": "strings", "title": "String Functions" }
+        { "id": "strings", "title": "String Functions" },
+        { "id": "sliders", "title": "Events" }
       ]
     },
     {

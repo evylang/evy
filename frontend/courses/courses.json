@@ -18,10 +18,10 @@
       "title": "Drawing",
       "emoji": "🎨",
       "units": [
-        { "id": "movingdot", "title": "Red Dot" },
-        { "id": "lines", "title": "tbd: Lines" },
-        { "id": "rainbow", "title": "tbd: Rainbow" },
-        { "id": "squares", "title": "tbd: Squares" }
+        { "id": "dot", "title": "Red Dot" },
+        { "id": "lines", "title": "Lines" },
+        { "id": "squares", "title": "Squares" },
+        { "id": "rainbow", "title": "Rainbow" }
       ]
     },
     {

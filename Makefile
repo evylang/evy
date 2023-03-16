@@ -69,14 +69,15 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 .PHONY: check-coverage cover test test-tiny
 
 # --- Lint ---------------------------------------------------------------------
+EVY_FILES = $(shell find frontend/courses -name '*.evy')
 lint: ## Lint go source code
 	golangci-lint run
 
 evy-fmt: ## Format evy sample code
-	go run . fmt --write frontend/samples/*.evy
+	go run . fmt --write $(EVY_FILES)
 
 check-evy-fmt:
-	go run . fmt --check frontend/samples/*.evy
+	go run . fmt --check $(EVY_FILES)
 
 .PHONY: check-evy-fmt evy-fmt lint
 

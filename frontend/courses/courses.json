@@ -1,0 +1,54 @@
+{
+  "courseList": [
+    {
+      "id": "sample/tour",
+      "title": "Tour",
+      "emoji": "🚌",
+      "units": [
+        { "id": "welcome", "title": "Welcome" },
+        { "id": "helloworld", "title": "Hello, world!" },
+        { "id": "echo", "title": "Echo" },
+        { "id": "rand", "title": "Guess my Number" },
+        { "id": "strings", "title": "String Functions" },
+        { "id": "sliders", "title": "Events" }
+      ]
+    },
+    {
+      "id": "sample/draw",
+      "title": "Drawing",
+      "emoji": "🎨",
+      "units": [
+        { "id": "dot", "title": "Red Dot" },
+        { "id": "lines", "title": "Lines" },
+        { "id": "squares", "title": "Squares" },
+        { "id": "rainbow", "title": "Rainbow" }
+      ]
+    },
+    {
+      "id": "sample/animate",
+      "title": "Animation",
+      "emoji": "🤹‍♀️",
+      "units": [
+        { "id": "movingdot", "title": "Moving Red Dot" },
+        { "id": "juggle", "title": "Juggle" },
+        { "id": "draw", "title": "Draw" }
+      ]
+    },
+    {
+      "id": "course-01",
+      "title": "Learn Coding",
+      "emoji": "🌱",
+      "units": [
+        { "id": "targetboard", "title": "Target board" },
+        { "id": "types-string", "title": "String type" },
+        { "id": "print", "title": "Print" },
+        { "id": "variable-decl", "title": "Variable declaration" },
+        { "id": "variable-inference", "title": "Type inference" },
+        { "id": "print-multi", "title": "Print many" },
+        { "id": "read", "title": "Read" },
+        { "id": "concat", "title": "String concatenation" },
+        { "id": "concat2", "title": "More concatenation" }
+      ]
+    }
+  ]
+}

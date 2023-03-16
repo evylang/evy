@@ -201,6 +201,9 @@ function afterStop() {
   runButton.innerText = "Run"
   runButtonMob.classList.remove("running")
   runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
+
+  const readEl = document.querySelector("#read")
+  document.activeElement === readEl && readEl.blur()
 }
 
 function onCodeScreen() {

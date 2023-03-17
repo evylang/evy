@@ -11,7 +11,7 @@
         { "id": "rand", "title": "Guess my Number" },
         { "id": "strings", "title": "String Functions" },
         { "id": "math", "title": "Math Functions" },
-        { "id": "sliders", "title": "Events" }
+        { "id": "events", "title": "Events" }
       ]
     },
     {

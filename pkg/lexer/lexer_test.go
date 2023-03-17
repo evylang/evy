@@ -332,3 +332,24 @@ func TestRunWS(t *testing.T) {
 		})
 	}
 }
+
+func TestString(t *testing.T) {
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{in: `"abc" `, want: "STRING_LIT 'abc'"},
+		{in: `"abc\"" `, want: `STRING_LIT 'abc"'`},
+		{in: `"abc\\" `, want: `STRING_LIT 'abc\'`},
+		{in: `"abc\\\"" `, want: `STRING_LIT 'abc\"'`},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.in, func(t *testing.T) {
+			got := Run(tt.in)
+			want := tt.want + "\nWS\nEOF\n"
+			assert.Equal(t, want, got)
+		})
+	}
+}

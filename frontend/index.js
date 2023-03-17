@@ -255,6 +255,7 @@ async function fetchCourses() {
 
 function ctrlEnterListener(e) {
   if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    document.querySelector("#code").blur()
     handleRun()
   }
 }

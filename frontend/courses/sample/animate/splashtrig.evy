@@ -1,0 +1,88 @@
+sa := -0.007
+sb := -0.006
+sc := -0.005
+sd := -0.004
+se := -0.003
+radius := 5
+
+pi := 3.141593
+tau := 2 * pi
+
+colors := [
+    "red" "orange" "gold" "forestgreen" "blue" "indigo" "purple" "deeppink"
+]
+dots := [
+    {phase:(0 / 8) orbit:10 s:sa}
+    {phase:(1 / 8) orbit:10 s:sa}
+    {phase:(2 / 8) orbit:10 s:sa}
+    {phase:(3 / 8) orbit:10 s:sa}
+    {phase:(4 / 8) orbit:10 s:sa}
+    {phase:(5 / 8) orbit:10 s:sa}
+    {phase:(6 / 8) orbit:10 s:sa}
+    {phase:(7 / 8) orbit:10 s:sa}
+    {phase:(0 / 8) orbit:20 s:sb}
+    {phase:(1 / 8) orbit:20 s:sb}
+    {phase:(2 / 8) orbit:20 s:sb}
+    {phase:(3 / 8) orbit:20 s:sb}
+    {phase:(4 / 8) orbit:20 s:sb}
+    {phase:(5 / 8) orbit:20 s:sb}
+    {phase:(6 / 8) orbit:20 s:sb}
+    {phase:(7 / 8) orbit:20 s:sb}
+    {phase:(0 / 8) orbit:30 s:sc}
+    {phase:(1 / 8) orbit:30 s:sc}
+    {phase:(2 / 8) orbit:30 s:sc}
+    {phase:(3 / 8) orbit:30 s:sc}
+    {phase:(4 / 8) orbit:30 s:sc}
+    {phase:(5 / 8) orbit:30 s:sc}
+    {phase:(6 / 8) orbit:30 s:sc}
+    {phase:(7 / 8) orbit:30 s:sc}
+    {phase:(0 / 8) orbit:40 s:sd}
+    {phase:(1 / 8) orbit:40 s:sd}
+    {phase:(2 / 8) orbit:40 s:sd}
+    {phase:(3 / 8) orbit:40 s:sd}
+    {phase:(4 / 8) orbit:40 s:sd}
+    {phase:(5 / 8) orbit:40 s:sd}
+    {phase:(6 / 8) orbit:40 s:sd}
+    {phase:(7 / 8) orbit:40 s:sd}
+    {phase:(0 / 8) orbit:50 s:se}
+    {phase:(1 / 8) orbit:50 s:se}
+    {phase:(2 / 8) orbit:50 s:se}
+    {phase:(3 / 8) orbit:50 s:se}
+    {phase:(4 / 8) orbit:50 s:se}
+    {phase:(5 / 8) orbit:50 s:se}
+    {phase:(6 / 8) orbit:50 s:se}
+    {phase:(7 / 8) orbit:50 s:se}
+]
+
+for i := range (len dots)
+    dots[i].radius = radius
+    dots[i].color = i
+end
+
+on animate
+    clear
+
+    for dot := range dots
+        update dot
+        draw dot colors[dot.color % (len colors)]
+    end
+end
+
+func update dot:{}num
+    dot.phase = dot.phase + dot.s
+end
+
+func clear
+    // 2% opacity leaves trails on movement
+    color "hsl(0deg 100% 100% / 2%)"
+    move 0 0
+    rect 100 100
+end
+
+func draw dot:{}num col:string
+    color col
+    x := 50 + dot.orbit * (cos (tau * dot.phase))
+    y := 50 + dot.orbit * (sin (tau * dot.phase))
+    move x y
+    circle dot.radius
+end

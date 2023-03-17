@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -72,6 +73,18 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 
 		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
+
+		"min":   xyRetBuiltin("min", math.Min),
+		"max":   xyRetBuiltin("max", math.Max),
+		"floor": numRetBuiltin("floor", math.Floor),
+		"ceil":  numRetBuiltin("ceil", math.Ceil),
+		"round": numRetBuiltin("round", math.Round),
+		"pow":   xyRetBuiltin("pow", math.Pow),
+		"log":   numRetBuiltin("log", math.Log),
+		"sqrt":  numRetBuiltin("sqrt", math.Sqrt),
+		"sin":   numRetBuiltin("sin", math.Sin),
+		"cos":   numRetBuiltin("cos", math.Cos),
+		"atan2": xyRetBuiltin("atan2", math.Atan2),
 
 		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
 		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
@@ -518,6 +531,28 @@ func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin
 	return result
 }
 
+func xyRetDecl(name string) *parser.FuncDeclStmt {
+	return &parser.FuncDeclStmt{
+		Name: name,
+		Params: []*parser.Var{
+			{Name: "x", T: parser.NUM_TYPE},
+			{Name: "y", T: parser.NUM_TYPE},
+		},
+		ReturnType: parser.NUM_TYPE,
+	}
+}
+
+func xyRetBuiltin(name string, fn func(x, y float64) float64) Builtin {
+	result := Builtin{Decl: xyRetDecl(name)}
+	result.Func = func(_ *scope, args []Value) (Value, error) {
+		x := args[0].(*Num)
+		y := args[1].(*Num)
+		result := fn(x.Val, y.Val)
+		return &Num{Val: result}, nil
+	}
+	return result
+}
+
 func numDecl(name string) *parser.FuncDeclStmt {
 	return &parser.FuncDeclStmt{
 		Name: name,
@@ -538,6 +573,26 @@ func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
 		n := args[0].(*Num)
 		fn(n.Val)
 		return nil, nil
+	}
+	return result
+}
+
+func numRetDecl(name string) *parser.FuncDeclStmt {
+	return &parser.FuncDeclStmt{
+		Name: name,
+		Params: []*parser.Var{
+			{Name: "n", T: parser.NUM_TYPE},
+		},
+		ReturnType: parser.NUM_TYPE,
+	}
+}
+
+func numRetBuiltin(name string, fn func(n float64) float64) Builtin {
+	result := Builtin{Decl: numRetDecl(name)}
+	result.Func = func(_ *scope, args []Value) (Value, error) {
+		n := args[0].(*Num)
+		result := fn(n.Val)
+		return &Num{Val: result}, nil
 	}
 	return result
 }

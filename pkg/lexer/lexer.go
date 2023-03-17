@@ -191,10 +191,16 @@ func (l *Lexer) readIdent() string {
 
 func (l *Lexer) readString() (string, error) {
 	pos := l.pos
+	backslashCnt := 0
 	for {
 		l.advance()
+		if l.cur == '\\' {
+			backslashCnt++
+		} else {
+			backslashCnt = 0
+		}
 		pr := l.peekRune()
-		if pr == '"' && l.cur != '\\' {
+		if pr == '"' && backslashCnt%2 == 0 {
 			l.advance() // end of string
 			break
 		}

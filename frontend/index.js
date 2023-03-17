@@ -255,6 +255,7 @@ async function fetchCourses() {
 
 function ctrlEnterListener(e) {
   if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+    document.querySelector("#code").blur()
     handleRun()
   }
 }
@@ -428,6 +429,7 @@ function registerEventHandler(ptr, len) {
   } else if (s === "move") {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
   } else if (s === "key") {
+    unfocusRunBotton()
     document.addEventListener("keydown", keydownListener)
   } else if (s === "input") {
     addInputHandlers()
@@ -436,6 +438,13 @@ function registerEventHandler(ptr, len) {
   } else {
     console.error("cannot register unknown event", s)
   }
+}
+
+function unfocusRunBotton() {
+  const runButton = document.querySelector("#run")
+  const runButtonMob = document.querySelector("#run-mob")
+  document.activeElement === runButton && runButton.blur()
+  document.activeElement === runButtonMob && runButtonMob.blur()
 }
 
 function keydownListener(e) {

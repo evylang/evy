@@ -94,7 +94,8 @@ func newParser(input string, builtins Builtins) *parser {
 		formatting:    newFormatting(),
 	}
 	for name, funcDecl := range builtins.Funcs {
-		p.funcs[name] = funcDecl
+		fd := *funcDecl
+		p.funcs[name] = &fd
 	}
 
 	// Read all tokens, collect function declaration tokens by index
@@ -178,6 +179,7 @@ func (p *parser) parseProgram() *Program {
 	}
 	p.validateScope(scope)
 	program.EventHandlers = p.eventHandlers
+	program.CalledBuiltinFuncs = p.calledBuiltinFuncs()
 	return program
 }
 
@@ -972,4 +974,22 @@ func (p *parser) curComment() string {
 		return p.cur.Literal
 	}
 	return ""
+}
+
+func (p *parser) calledBuiltinFuncs() []string {
+	var funcs []string
+	for name, funcDecl := range p.funcs {
+		if _, ok := p.builtins.Funcs[name]; ok && funcDecl.isCalled {
+			funcs = append(funcs, name)
+		}
+	}
+	return funcs
+}
+
+func EventHandlerNames(eventHandlers map[string]*EventHandlerStmt) []string {
+	names := make([]string, 0, len(eventHandlers))
+	for name := range eventHandlers {
+		names = append(names, name)
+	}
+	return names
 }

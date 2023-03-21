@@ -139,11 +139,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 }
 
 func (e *Evaluator) EventHandlerNames() []string {
-	names := make([]string, 0, len(e.eventHandlers))
-	for name := range e.eventHandlers {
-		names = append(names, name)
-	}
-	return names
+	return parser.EventHandlerNames(e.eventHandlers)
 }
 
 func (e *Evaluator) HandleEvent(ev Event) error {

@@ -57,7 +57,9 @@ func (p *parser) parseTopLevelExpr(scope *scope) Node {
 func (p *parser) parseFuncCall(scope *scope) Node {
 	fc := &FuncCall{Token: p.cur, Name: p.cur.Literal}
 	p.advance() // advance past function name IDENT
-	fc.FuncDecl = p.funcs[fc.Name]
+	funcDecl := p.funcs[fc.Name]
+	funcDecl.isCalled = true
+	fc.FuncDecl = funcDecl
 	fc.Arguments = p.parseExprList(scope)
 	p.assertArgTypes(fc.FuncDecl, fc.Arguments)
 	return fc

@@ -10,6 +10,7 @@ let jsReadInitialised = false
 let stopped = true
 let animationStart
 let courses
+let actions = "fmt,ui,eval"
 
 // --- Initialise ------------------------------------------------------
 
@@ -37,6 +38,8 @@ function newEvyGo() {
   const evyEnv = {
     jsPrint,
     jsRead,
+    jsActions,
+    jsPrepareUI,
     evySource,
     setEvySource,
     move,
@@ -51,6 +54,25 @@ function newEvyGo() {
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
   return go
+}
+// jsActions returns the comma separated evy actions to executed, e.g.
+// fmt,ui,eval. The result string is written to wasm memory
+// bytes. jsActions return the pointer and length of these bytes
+// encoded into a single 64 bit number
+function jsActions() {
+  return stringToMemAddr(actions)
+}
+
+function jsPrepareUI(ptr, len) {
+  const arr = memToString(ptr, len).split(",")
+  const names = Object.fromEntries(arr.map((k) => [k, true]))
+  names["read"] ? showElements(".read") : hideElements(".read")
+  names["input"] ? showElements(".input") : hideElements(".input")
+  needsCanvas(names) ? showElements(".canvas") : hideElements(".canvas")
+}
+
+function needsCanvas(f) {
+  return f.move || f.line || f.width || f.circle || f.rect || f.color || f.colour
 }
 
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
@@ -125,18 +147,6 @@ function ptrLenToBigInt({ ptr, len }) {
   return ptrLenNum
 }
 
-function getElements(q) {
-  if (!q) {
-    return []
-  }
-  try {
-    return Array.from(document.querySelectorAll(q))
-  } catch (error) {
-    consol.error("getElements", error)
-    return []
-  }
-}
-
 // --- UI: handle run --------------------------------------------------
 
 async function handleRun() {
@@ -163,8 +173,8 @@ async function handleMobRun() {
   stop()
 }
 
-// start calls the evy main() wasm/go code parsing, formatting and
-// evaluating evy code.
+// start calls evy wasm/go main(). It parses, formats and evaluates evy
+// code and initialises the output ui.
 async function start() {
   stopped = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
@@ -176,6 +186,14 @@ async function start() {
   runButton.classList.add("running")
   runButtonMob.innerText = "Stop"
   runButtonMob.classList.add("running")
+  actions = "fmt,ui,eval"
+  go.run(wasmInst)
+}
+
+// format calls evy wasm/go main() but doesn't evaluate.
+async function format() {
+  wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
+  actions = "fmt,ui"
   go.run(wasmInst)
 }
 
@@ -264,6 +282,7 @@ function ctrlEnterListener(e) {
 
 async function handleHashChange() {
   hideModal()
+  await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
   if (!opts.source && !opts.unit) {
     opts = { unit: "welcome" }
@@ -283,7 +302,7 @@ async function handleHashChange() {
     document.querySelector("#code").value = source
     updateBreadcrumbs(crumbs)
     clearOutput()
-    await stopAndSlide() // go to code screen for new code
+    format()
   } catch (err) {
     console.error(err)
   }
@@ -592,4 +611,26 @@ function showConfetti() {
   setTimeout(() => {
     confettiDivs.forEach((div) => div.classList.add("fadeout"))
   }, 8500)
+}
+
+// --- Utilities -------------------------------------------------------
+
+function getElements(q) {
+  if (!q) {
+    return []
+  }
+  try {
+    return Array.from(document.querySelectorAll(q))
+  } catch (error) {
+    consol.error("getElements", error)
+    return []
+  }
+}
+
+function showElements(q) {
+  getElements(q).map((el) => el.classList.remove("hidden"))
+}
+
+function hideElements(q) {
+  getElements(q).map((el) => el.classList.add("hidden"))
 }

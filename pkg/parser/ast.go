@@ -13,8 +13,9 @@ type Node interface {
 }
 
 type Program struct {
-	Statements    []Node
-	EventHandlers map[string]*EventHandlerStmt
+	Statements         []Node
+	EventHandlers      map[string]*EventHandlerStmt
+	CalledBuiltinFuncs []string
 
 	alwaysTerminates bool
 	formatting       *formatting
@@ -116,6 +117,8 @@ type FuncDeclStmt struct {
 	VariadicParam *Var
 	ReturnType    *Type
 	Body          *BlockStatement
+
+	isCalled bool
 }
 
 type IfStmt struct {

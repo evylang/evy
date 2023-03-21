@@ -3,6 +3,8 @@
 package main
 
 import (
+	"strings"
+
 	"foxygo.at/evy/pkg/evaluator"
 	"foxygo.at/evy/pkg/parser"
 )
@@ -14,43 +16,72 @@ var (
 )
 
 func main() {
-	rt := newJSRuntime()
-	builtins := evaluator.DefaultBuiltins(rt)
-
 	defer afterStop()
-	source, err := format(builtins)
+	actions := getActions()
+
+	rt := newJSRuntime()
+	input := getEvySource()
+	ast, err := parse(input, rt)
 	if err != nil {
 		rt.Print(err.Error())
 		return
 	}
-	evaluate(source, builtins, rt.yielder)
+	if actions["fmt"] {
+		formattedInput := ast.Format()
+		if formattedInput != input {
+			setEvySource(formattedInput)
+		}
+	}
+	if actions["ui"] {
+		prepareUI(ast)
+	}
+	if actions["eval"] {
+		// The ast does not correspond to the formatted source code. For
+		// now this is acceptable because evaluator errors don't output
+		// source code locations.
+		evaluate(ast, rt)
+	}
 }
 
-func format(evalBuiltins evaluator.Builtins) (string, error) {
-	input := getEvySource()
-
-	builtins := evalBuiltins.ParserBuiltins()
-	prog, err := parser.Parse(input, builtins)
-	if err != nil {
-		return "", parser.TruncateError(err, 8)
+func getActions() map[string]bool {
+	m := map[string]bool{}
+	addr := jsActions()
+	s := getStringFromAddr(addr)
+	actions := strings.Split(s, ",")
+	for _, action := range actions {
+		if action != "" {
+			m[action] = true
+		}
 	}
-	formattedInput := prog.Format()
-	if formattedInput != input {
-		setEvySource(formattedInput)
-	}
-	return formattedInput, nil
-}
-
-func evaluate(input string, builtins evaluator.Builtins, yielder *sleepingYielder) {
-	eval = evaluator.NewEvaluator(builtins)
-
-	eval.Run(input)
-	handleEvents(yielder)
+	return m
 }
 
 func getEvySource() string {
 	addr := evySource()
 	return getStringFromAddr(addr)
+}
+
+func parse(input string, rt evaluator.Runtime) (*parser.Program, error) {
+	builtins := evaluator.DefaultBuiltins(rt).ParserBuiltins()
+	prog, err := parser.Parse(input, builtins)
+	if err != nil {
+		return nil, parser.TruncateError(err, 8)
+	}
+	return prog, nil
+}
+
+func prepareUI(prog *parser.Program) {
+	funcNames := prog.CalledBuiltinFuncs
+	eventHandlerNames := parser.EventHandlerNames(prog.EventHandlers)
+	names := append(funcNames, eventHandlerNames...)
+	jsPrepareUI(strings.Join(names, ","))
+}
+
+func evaluate(prog *parser.Program, rt *jsRuntime) {
+	builtins := evaluator.DefaultBuiltins(rt)
+	eval = evaluator.NewEvaluator(builtins)
+	eval.Eval(prog)
+	handleEvents(rt.yielder)
 }
 
 func handleEvents(yielder *sleepingYielder) {
@@ -71,7 +102,7 @@ func handleEvents(yielder *sleepingYielder) {
 			yielder.Reset()
 			eval.HandleEvent(event)
 		} else {
-			yielder.Sleep(minSleepDur)
+			yielder.ForceYield()
 		}
 	}
 }

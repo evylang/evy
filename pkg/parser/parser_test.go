@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"sort"
 	"strings"
 	"testing"
 
@@ -1176,6 +1177,17 @@ end
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
 	}
+}
+
+func TestCalledBuiltinFuncs(t *testing.T) {
+	input := `print (len "ABC")`
+	parser := newParser(input, testBuiltins())
+	prog := parser.Parse()
+	assertNoParseError(t, parser, input)
+	got := prog.CalledBuiltinFuncs
+	sort.Strings(got)
+	want := []string{"len", "print"}
+	assert.Equal(t, want, got)
 }
 
 func TestDemo(t *testing.T) {

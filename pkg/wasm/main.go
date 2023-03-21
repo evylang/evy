@@ -32,6 +32,9 @@ func main() {
 			setEvySource(formattedInput)
 		}
 	}
+	if actions["ui"] {
+		prepareUI(ast)
+	}
 	if actions["eval"] {
 		// The ast does not correspond to the formatted source code. For
 		// now this is acceptable because evaluator errors don't output
@@ -65,6 +68,13 @@ func parse(input string, rt evaluator.Runtime) (*parser.Program, error) {
 		return nil, parser.TruncateError(err, 8)
 	}
 	return prog, nil
+}
+
+func prepareUI(prog *parser.Program) {
+	funcNames := prog.CalledBuiltinFuncs
+	eventHandlerNames := parser.EventHandlerNames(prog.EventHandlers)
+	names := append(funcNames, eventHandlerNames...)
+	jsPrepareUI(strings.Join(names, ","))
 }
 
 func evaluate(prog *parser.Program, rt *jsRuntime) {

@@ -57,8 +57,7 @@ func evaluate(input string, builtins evaluator.Builtins, yielder *sleepingYielde
 
 func getEvySource() string {
 	addr := evySource()
-	ptr, length := decodePtrLen(uint64(addr))
-	return getString(ptr, length)
+	return getStringFromAddr(addr)
 }
 
 // newSleepingYielder yields the CPU so that JavaScript/browser events
@@ -95,8 +94,7 @@ func (y *sleepingYielder) Read() string {
 		}
 		addr := jsRead()
 		if addr != 0 {
-			ptr, length := decodePtrLen(uint64(addr))
-			return getString(ptr, length)
+			return getStringFromAddr(addr)
 		}
 		y.Sleep(50 * time.Millisecond)
 	}
@@ -264,6 +262,11 @@ func getString(ptr *uint32, length int) string {
 		builder.WriteByte(byte(s))
 	}
 	return builder.String()
+}
+
+func getStringFromAddr(ptrLen float64) string {
+	ptr, length := decodePtrLen(uint64(ptrLen))
+	return getString(ptr, length)
 }
 
 func decodePtrLen(ptrLen uint64) (ptr *uint32, length int) {

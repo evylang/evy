@@ -18,9 +18,9 @@ type Builtin struct {
 
 type Builtins struct {
 	Funcs         map[string]Builtin
-	Print         func(s string)
 	EventHandlers map[string]*parser.EventHandlerStmt
 	Globals       map[string]*parser.Var
+	Runtime       Runtime
 }
 
 func (b Builtins) ParserBuiltins() parser.Builtins {
@@ -40,7 +40,7 @@ type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 func (b BuiltinFunc) Type() ValueType { return BUILTIN }
 func (b BuiltinFunc) String() string  { return "builtin function" }
 
-func DefaultBuiltins(rt *Runtime) Builtins {
+func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
@@ -82,13 +82,13 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 		"cos":   numRetBuiltin("cos", math.Cos),
 		"atan2": xyRetBuiltin("atan2", math.Atan2),
 
-		"move":   xyBuiltin("move", rt.Graphics.Move, rt.Print),
-		"line":   xyBuiltin("line", rt.Graphics.Line, rt.Print),
-		"rect":   xyBuiltin("rect", rt.Graphics.Rect, rt.Print),
-		"circle": numBuiltin("circle", rt.Graphics.Circle, rt.Print),
-		"width":  numBuiltin("width", rt.Graphics.Width, rt.Print),
-		"color":  stringBuiltin("color", rt.Graphics.Color, rt.Print),
-		"colour": stringBuiltin("colour", rt.Graphics.Color, rt.Print),
+		"move":   xyBuiltin("move", rt.Move),
+		"line":   xyBuiltin("line", rt.Line),
+		"rect":   xyBuiltin("rect", rt.Rect),
+		"circle": numBuiltin("circle", rt.Circle),
+		"width":  numBuiltin("width", rt.Width),
+		"color":  stringBuiltin("color", rt.Color),
+		"colour": stringBuiltin("colour", rt.Color),
 	}
 	xyParams := []*parser.Var{
 		{Name: "x", T: parser.NUM_TYPE},
@@ -115,26 +115,53 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 	return Builtins{
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
-		Print:         rt.Print,
 		Globals:       globals,
+		Runtime:       rt,
 	}
 }
 
-type Runtime struct {
-	Print    func(string)
-	Read     func() string
-	Sleep    func(dur time.Duration)
-	Graphics GraphicsRuntime
+type Runtime interface {
+	GraphicsRuntime
+	Print(string)
+	Read() string
+	Sleep(dur time.Duration)
+	Yielder() Yielder
 }
 
-type GraphicsRuntime struct {
-	Move   func(x, y float64)
-	Line   func(x, y float64)
-	Rect   func(dx, dy float64)
-	Circle func(radius float64)
-	Width  func(w float64)
-	Color  func(s string)
+type GraphicsRuntime interface {
+	Move(x, y float64)
+	Line(x, y float64)
+	Rect(dx, dy float64)
+	Circle(radius float64)
+	Width(w float64)
+	Color(s string)
 }
+
+type UnimplementedRuntime struct {
+	print func(string)
+}
+
+func (rt *UnimplementedRuntime) Print(s string) {
+	if rt.print != nil {
+		rt.print(s)
+	} else {
+		print(s)
+	}
+}
+
+func (rt *UnimplementedRuntime) Unimplemented(s string) {
+	rt.Print(fmt.Sprintf("%q not implemented\n", s))
+}
+
+func (rt *UnimplementedRuntime) Read() string          { rt.Unimplemented("read"); return "" }
+func (rt *UnimplementedRuntime) Sleep(_ time.Duration) { rt.Unimplemented("sleep") }
+func (rt *UnimplementedRuntime) Yielder() Yielder      { rt.Unimplemented("yielder"); return nil }
+func (rt *UnimplementedRuntime) Move(x, y float64)     { rt.Unimplemented("move") }
+func (rt *UnimplementedRuntime) Line(x, y float64)     { rt.Unimplemented("line") }
+func (rt *UnimplementedRuntime) Rect(x, y float64)     { rt.Unimplemented("rect") }
+func (rt *UnimplementedRuntime) Circle(r float64)      { rt.Unimplemented("circle") }
+func (rt *UnimplementedRuntime) Width(w float64)       { rt.Unimplemented("width") }
+func (rt *UnimplementedRuntime) Color(s string)        { rt.Unimplemented("color") }
 
 var readDecl = &parser.FuncDeclStmt{
 	Name:       "read",
@@ -507,12 +534,8 @@ func xyDecl(name string) *parser.FuncDeclStmt {
 	}
 }
 
-func xyBuiltin(name string, fn func(x, y float64), printFn func(string)) Builtin {
+func xyBuiltin(name string, fn func(x, y float64)) Builtin {
 	result := Builtin{Decl: xyDecl(name)}
-	if fn == nil {
-		result.Func = notImplementedFunc(name, printFn)
-		return result
-	}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
@@ -554,12 +577,8 @@ func numDecl(name string) *parser.FuncDeclStmt {
 	}
 }
 
-func numBuiltin(name string, fn func(n float64), printFn func(string)) Builtin {
+func numBuiltin(name string, fn func(n float64)) Builtin {
 	result := Builtin{Decl: numDecl(name)}
-	if fn == nil {
-		result.Func = notImplementedFunc(name, printFn)
-		return result
-	}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		n := args[0].(*Num)
 		fn(n.Val)
@@ -598,23 +617,12 @@ func stringDecl(name string) *parser.FuncDeclStmt {
 	}
 }
 
-func stringBuiltin(name string, fn func(str string), printFn func(string)) Builtin {
+func stringBuiltin(name string, fn func(str string)) Builtin {
 	result := Builtin{Decl: stringDecl(name)}
-	if fn == nil {
-		result.Func = notImplementedFunc(name, printFn)
-		return result
-	}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		str := args[0].(*String)
 		fn(str.Val)
 		return nil, nil
 	}
 	return result
-}
-
-func notImplementedFunc(name string, printFn func(string)) BuiltinFunc {
-	return func(_ *scope, args []Value) (Value, error) {
-		printFn("'" + name + "' not yet implemented\n")
-		return nil, nil
-	}
 }

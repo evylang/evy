@@ -23,6 +23,32 @@ var (
 	errParse               = errors.New("parse error")
 )
 
+// cliRuntime implements evaluator.Runtime.
+type cliRuntime struct {
+	evaluator.UnimplementedRuntime
+	reader *bufio.Reader
+}
+
+func newCLIRuntime() *cliRuntime {
+	return &cliRuntime{reader: bufio.NewReader(os.Stdin)}
+}
+
+func (*cliRuntime) Print(s string) {
+	fmt.Print(s)
+}
+
+func (rt *cliRuntime) Read() string {
+	s, err := rt.reader.ReadString('\n')
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+func (*cliRuntime) Sleep(dur time.Duration) {
+	time.Sleep(dur)
+}
+
 const description = `
 evy is a tool for managing evy source code.
 `
@@ -68,7 +94,7 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	builtins := evaluator.DefaultBuiltins(newRuntime())
+	builtins := evaluator.DefaultBuiltins(newCLIRuntime())
 	eval := evaluator.NewEvaluator(builtins)
 	return eval.Run(string(b))
 }
@@ -117,7 +143,7 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 		return err
 	}
 	in := string(b)
-	parserBuiltins := evaluator.DefaultBuiltins(newRuntime()).ParserBuiltins()
+	parserBuiltins := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
 	prog, err := parser.Parse(in, parserBuiltins)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, parser.TruncateError(err, 8))
@@ -150,7 +176,7 @@ func (c *parseCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	builtinDecls := evaluator.DefaultBuiltins(newRuntime()).ParserBuiltins()
+	builtinDecls := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
 	ast, err := parser.Parse(string(b), builtinDecls)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, parser.TruncateError(err, 8))
@@ -164,13 +190,4 @@ func fileBytes(filename string) ([]byte, error) {
 		return io.ReadAll(os.Stdin)
 	}
 	return os.ReadFile(filename)
-}
-
-func newRuntime() *evaluator.Runtime {
-	reader := bufio.NewReader(os.Stdin)
-	return &evaluator.Runtime{
-		Print: func(s string) { fmt.Print(s) },
-		Read:  func() string { s, _ := reader.ReadString('\n'); return s },
-		Sleep: time.Sleep,
-	}
 }

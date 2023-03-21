@@ -15,24 +15,25 @@ import (
 
 const minSleepDur = time.Millisecond
 
-// We cannot take the address of external/exported functions
-// (https://golang.org/cmd/cgo/#hdr-Passing_pointers) so we must wrap them in a
-// Go function first to put them in this Runtime struct.
-func newJSRuntime(yielder *sleepingYielder) *evaluator.Runtime {
-	return &evaluator.Runtime{
-		Print: func(s string) { jsPrint(s) },
-		Read:  yielder.Read,
-		Sleep: yielder.Sleep,
-		Graphics: evaluator.GraphicsRuntime{
-			Move:   func(x, y float64) { move(x, y) },
-			Line:   func(x, y float64) { line(x, y) },
-			Rect:   func(dx, dy float64) { rect(dx, dy) },
-			Circle: func(r float64) { circle(r) },
-			Width:  func(w float64) { width(w) },
-			Color:  func(s string) { color(s) },
-		},
-	}
+// jsRuntime implements evaluator.Runtime.
+type jsRuntime struct {
+	yielder *sleepingYielder
 }
+
+func newJSRuntime() *jsRuntime {
+	return &jsRuntime{yielder: newSleepingYielder()}
+}
+
+func (*jsRuntime) Print(s string)                { jsPrint(s) }
+func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
+func (rt *jsRuntime) Sleep(dur time.Duration)    { rt.yielder.Sleep(dur) }
+func (rt *jsRuntime) Move(x, y float64)          { move(x, y) }
+func (rt *jsRuntime) Line(x, y float64)          { line(x, y) }
+func (rt *jsRuntime) Rect(x, y float64)          { rect(x, y) }
+func (rt *jsRuntime) Circle(r float64)           { circle(r) }
+func (rt *jsRuntime) Width(w float64)            { width(w) }
+func (rt *jsRuntime) Color(s string)             { color(s) }
+func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
 
 // sleepingYielder yields the CPU so that JavaScript/browser events
 // get a chance to be processed. Currently(Feb 2023) it seems that you

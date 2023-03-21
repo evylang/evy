@@ -33,7 +33,7 @@ var (
 )
 
 func NewEvaluator(builtins Builtins) *Evaluator {
-	rand.Seed(time.Now().UnixNano()) //nolint: staticcheck //still required in tinygo
+	rand.Seed(time.Now().UnixNano())
 	scope := newScope()
 	for _, global := range builtins.Globals {
 		z := zero(global.Type())
@@ -62,7 +62,7 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) error {
-	builtins := ParserBuiltins(e.builtins)
+	builtins := e.builtins.ParserBuiltins()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		return err

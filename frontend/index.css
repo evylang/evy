@@ -15,6 +15,14 @@
   --output-border-mid: hsl(0deg 0% 85%);
   --output-border-light: hsl(0deg 0% 92%);
 
+  --syntax-num: hsl(204deg 100% 75%);
+  --syntax-string: hsl(203deg 100% 86%);
+  --syntax-func: hsl(266deg 100% 86%);
+  --syntax-builtin: hsl(27deg 100% 74%);
+  --syntax-keyword: hsl(359deg 100% 75%);
+  --syntax-comment: hsl(210deg, 13%, 72%);
+  --syntax-error-bg: hsl(209deg 100% 33%);
+
   --btn-color: hsl(0deg 0% 33%);
   --btn-color-active: hsl(0deg 0% 100%);
   --btn-color-disabled: hsl(0deg 0% 33% / 50%);
@@ -222,30 +230,110 @@ main.view-output {
 }
 
 /* --- Editor --------------------------------------------------------*/
-.editor {
-  padding-top: var(--editor-padding);
-  font-size: 1rem;
-  flex: 1;
-  overflow: clip;
-  width: var(--editor-width);
-}
-.editor textarea {
+.editor-wrap {
+  margin-top: var(--editor-padding);
   padding-left: var(--editor-padding);
   padding-right: var(--editor-padding);
+  padding-bottom: var(--editor-padding-bottom);
+  font-size: 1rem;
+  flex: 1;
+  overflow: auto;
+  width: var(--editor-width);
+}
+.editor {
   color: var(--color);
   background: var(--bg);
   font-size: 1rem;
   font-family: var(--ff-code);
   font-variant-ligatures: none;
-  overflow: auto;
-
-  resize: none;
-  outline: none;
-  -webkit-text-fill-color: var(--ccolor);
-  height: 100%;
+  position: relative;
+  overflow: hidden;
+  width: max-content;
+}
+.editor textarea {
+  line-height: inherit;
+  white-space: pre-wrap;
+  background: none;
+  position: absolute;
   width: 100%;
+  height: 100%;
+  z-index: 1;
+  resize: none;
+  caret-color: var(--color);
+  padding: inherit;
+  outline: none;
+  font-size: inherit;
+  font-family: inherit;
+  font-variant-ligatures: inherit;
+  letter-spacing: inherit;
   border: none;
-  padding-bottom: var(--editor-padding-bottom);
+  top: 0px;
+  left: 0px;
+  color: transparent;
+  overflow: hidden;
+}
+.editor pre {
+  line-height: inherit;
+  position: relative;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  padding: 0;
+  width: max-content;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  font-variant-ligatures: inherit;
+  letter-spacing: inherit;
+  pointer-events: none;
+  font-family: inherit;
+  overflow: hidden;
+}
+.editor pre.lines {
+  position: absolute;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  pointer-events: none;
+  overflow: auto;
+}
+.editor pre.lines .num {
+  position: aboslute;
+  color: hsl(212deg 8% 47%);
+  left: 0;
+}
+.editor pre.lines .txt {
+  padding-left: 1ch;
+  color: transparent;
+  pointer-events: none;
+}
+.editor .num,
+.editor .bool {
+  color: var(--syntax-num);
+}
+.editor .str {
+  color: var(--syntax-string);
+}
+.editor .func {
+  color: var(--syntax-func);
+}
+.editor .builtin {
+  color: var(--syntax-builtin);
+}
+.editor .keyword {
+  color: var(--syntax-keyword);
+}
+.editor .error {
+  background: var(--syntax-error-bg);
+  color: var(--color);
+  font-style: italic;
+}
+.editor .op {
+  color: var(--syntax-keyword);
+}
+.editor .comment {
+  color: var(--syntax-comment);
+  font-style: italic;
+  font-weight: 300;
 }
 
 /* --- Output --------------------------------------------------------*/

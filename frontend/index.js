@@ -1,4 +1,5 @@
 "use strict"
+import Yace from "./module/yace-editor.js"
 
 // --- Globals ---------------------------------------------------------
 
@@ -11,7 +12,7 @@ let stopped = true
 let animationStart
 let courses
 let actions = "fmt,ui,eval"
-
+let editor
 // --- Initialise ------------------------------------------------------
 
 initWasm()
@@ -110,14 +111,14 @@ function jsRead() {
 // evySource writes the evy source code into wasm memory as bytes
 // and returns pointer and length encoded into a single 64 bit number
 function evySource() {
-  const code = document.querySelector("#code").value
+  const code = editor.value
   return stringToMemAddr(code)
 }
 
 // setEvySource is exported to evy go/wasm and called after formatting
 function setEvySource(ptr, len) {
   const source = memToString(ptr, len)
-  document.querySelector("#code").value = source
+  editor.update({ value: source })
 }
 
 function memToString(ptr, len) {
@@ -257,7 +258,8 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   initModal()
-  window.location.hash && handleHashChange()
+  handleHashChange()
+  initEditor()
 }
 
 async function fetchCourses() {
@@ -273,7 +275,7 @@ async function fetchCourses() {
 
 function ctrlEnterListener(e) {
   if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
-    document.querySelector("#code").blur()
+    document.querySelector(".editor textarea").blur()
     handleRun()
   }
 }
@@ -299,7 +301,8 @@ async function handleHashChange() {
       throw new Error("invalid response status", response.status)
     }
     const source = await response.text()
-    document.querySelector("#code").value = source
+    editor.update({ value: source })
+    document.querySelector(".editor-wrap").scrollTo(0, 0)
     updateBreadcrumbs(crumbs)
     clearOutput()
     format()
@@ -434,6 +437,21 @@ function logicalY(e) {
   return e.offsetY * scaleY - canvas.offset.y
 }
 
+function initEditor() {
+  const value = `move 10 20
+line 50 50
+rect 25 25
+color "red"
+circle 10
+
+x := 12
+print "x:" x
+if x > 10
+    print "🍦 big x"
+end`
+  editor = new Yace(".editor", { value })
+}
+
 // --- eventHandlers, evy `on` -----------------------------------------
 
 // registerEventHandler is exported to evy go/wasm
@@ -552,7 +570,7 @@ function updateBreadcrumbs(crumbs) {
 function breadcrumb(s) {
   const btn = document.createElement("button")
   btn.textContent = s
-  btn.onclick = showModal
+  btn.onclick = () => showModal()
   const li = document.createElement("li")
   li.appendChild(btn)
   return li

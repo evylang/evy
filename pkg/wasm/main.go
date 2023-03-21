@@ -162,48 +162,59 @@ func newAnimateEvent(elapsed float64) evaluator.Event {
 
 // evySource is imported from JS. The float64 return value encodes the
 // ptr (high 32 bits) and length (low 32 bts) of the source string.
+//
 //export evySource
 func evySource() float64
 
 // jsRead is imported from JS. The float64 return value encodes the
 // ptr (high 32 bits) and length (low 32 bts) of the read string or
 // return 0 if no string was read.
+//
 //export jsRead
 func jsRead() float64
 
 // jsPrint is imported from JS
+//
 //export jsPrint
 func jsPrint(string)
 
 // afterStop is imported from JS
+//
 //export afterStop
 func afterStop()
 
 // move is imported from JS
+//
 //export move
 func move(x, y float64)
 
 // line is imported from JS
+//
 //export line
 func line(x, y float64)
 
 // rect is imported from JS
+//
 //export rect
 func rect(dx, dy float64)
 
 // circle is imported from JS
+//
 //export circle
 func circle(r float64)
 
 // width is imported from JS, setting the lineWidth
+//
 //export width
 func width(w float64)
 
 // color is imported from JS
+//
 //export color
 func color(s string)
 
 // setEvySource is imported from JS
+//
 //export setEvySource
 func setEvySource(s string)
 

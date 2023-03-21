@@ -5,6 +5,7 @@
 O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
+GOFILES= $(shell find . -name '*.go')
 
 all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend ## Build, test, check coverage and lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
@@ -12,8 +13,8 @@ all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-
 
 ci: clean check-uptodate all ## Full clean build and up-to-date checks as run on CI
 
-check-uptodate: tidy
-	test -z "$$(git status --porcelain -- go.mod go.sum)" || { git status; false; }
+check-uptodate: tidy gofumpt
+	test -z "$$(git status --porcelain -- go.mod go.sum $(GOFILES))" || { git status; false; }
 
 clean:: ## Remove generated files
 	-rm -rf $(O)
@@ -41,6 +42,9 @@ tiny: go-version | $(O) ## Build for tinygo / wasm
 
 tidy: ## Tidy go modules with "go mod tidy"
 	go mod tidy
+
+gofumpt: ## Format all go files with gofumpt, a stricter gofmt
+	gofumpt -w $(GOFILES)
 
 clean::
 	-rm -f frontend/evy.wasm

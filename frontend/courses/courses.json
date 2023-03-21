@@ -32,6 +32,7 @@
       "units": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "juggle", "title": "Juggle" },
+        { "id": "splashtrig", "title": "Splash of Trig" },
         { "id": "draw", "title": "Draw" }
       ]
     },

@@ -10,6 +10,7 @@ let jsReadInitialised = false
 let stopped = true
 let animationStart
 let courses
+let actions = "fmt,eval"
 
 // --- Initialise ------------------------------------------------------
 
@@ -37,6 +38,7 @@ function newEvyGo() {
   const evyEnv = {
     jsPrint,
     jsRead,
+    jsActions,
     evySource,
     setEvySource,
     move,
@@ -51,6 +53,13 @@ function newEvyGo() {
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
   return go
+}
+// jsActions returns the comma separated evy actions to executed, e.g.
+// fmt,ui,eval. The result string is written to wasm memory
+// bytes. jsActions return the pointer and length of these bytes
+// encoded into a single 64 bit number
+function jsActions() {
+  return stringToMemAddr(actions)
 }
 
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and

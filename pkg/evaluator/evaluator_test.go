@@ -8,16 +8,28 @@ import (
 	"foxygo.at/evy/pkg/assert"
 )
 
+type testRT struct {
+	UnimplementedRuntime
+	b bytes.Buffer
+}
+
+func (rt *testRT) Print(s string) {
+	rt.b.WriteString(s)
+}
+
+func (*testRT) Yielder() Yielder {
+	return nil
+}
+
 func run(input string) string {
-	b := bytes.Buffer{}
-	printFn := func(s string) { b.WriteString(s) }
-	rt := &Runtime{Print: printFn}
+	rt := &testRT{}
+	rt.UnimplementedRuntime.print = rt.Print
 	eval := NewEvaluator(DefaultBuiltins(rt))
 	err := eval.Run(input)
 	if err != nil {
 		return err.Error()
 	}
-	return b.String()
+	return rt.b.String()
 }
 
 func TestBasicEval(t *testing.T) {
@@ -1055,8 +1067,8 @@ if x > 10
     print "🍦 big x"
 end`
 	want := `
-'move' not yet implemented
-'line' not yet implemented
+"move" not implemented
+"line" not implemented
 x: 12
 🍦 big x
 `[1:]

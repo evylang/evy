@@ -40,16 +40,15 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 		scope.set(global.Name, z)
 	}
 	return &Evaluator{
-		print:    builtins.Print,
 		builtins: builtins,
 		scope:    scope,
+		yielder:  builtins.Runtime.Yielder(),
 	}
 }
 
 type Evaluator struct {
 	Stopped       bool
-	Yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
-	print         func(string)
+	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	builtins      Builtins
 	eventHandlers map[string]*parser.EventHandlerStmt
 
@@ -170,8 +169,8 @@ func (e *Evaluator) HandleEvent(ev Event) error {
 }
 
 func (e *Evaluator) yield() {
-	if e.Yielder != nil {
-		e.Yielder.Yield()
+	if e.yielder != nil {
+		e.yielder.Yield()
 	}
 }
 

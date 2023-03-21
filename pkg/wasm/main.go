@@ -14,16 +14,16 @@ var (
 )
 
 func main() {
-	yielder := newSleepingYielder()
-	builtins := evaluator.DefaultBuiltins(newJSRuntime(yielder))
+	rt := newJSRuntime()
+	builtins := evaluator.DefaultBuiltins(rt)
 
 	defer afterStop()
 	source, err := format(builtins)
 	if err != nil {
-		builtins.Print(err.Error())
+		rt.Print(err.Error())
 		return
 	}
-	evaluate(source, builtins, yielder)
+	evaluate(source, builtins, rt.yielder)
 }
 
 func format(evalBuiltins evaluator.Builtins) (string, error) {
@@ -43,7 +43,6 @@ func format(evalBuiltins evaluator.Builtins) (string, error) {
 
 func evaluate(input string, builtins evaluator.Builtins, yielder *sleepingYielder) {
 	eval = evaluator.NewEvaluator(builtins)
-	eval.Yielder = yielder
 
 	eval.Run(input)
 	handleEvents(yielder)

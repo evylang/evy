@@ -23,20 +23,16 @@ type Builtins struct {
 	Globals       map[string]*parser.Var
 }
 
-func ParserBuiltins(builtins Builtins) parser.Builtins {
-	funcs := make(map[string]*parser.FuncDeclStmt, len(builtins.Funcs))
-	for name, builtin := range builtins.Funcs {
+func (b Builtins) ParserBuiltins() parser.Builtins {
+	funcs := make(map[string]*parser.FuncDeclStmt, len(b.Funcs))
+	for name, builtin := range b.Funcs {
 		funcs[name] = builtin.Decl
 	}
 	return parser.Builtins{
 		Funcs:         funcs,
-		EventHandlers: builtins.EventHandlers,
-		Globals:       builtins.Globals,
+		EventHandlers: b.EventHandlers,
+		Globals:       b.Globals,
 	}
-}
-
-func DefaultParserBuiltins(rt *Runtime) parser.Builtins {
-	return ParserBuiltins(DefaultBuiltins(rt))
 }
 
 type BuiltinFunc func(scope *scope, args []Value) (Value, error)
@@ -122,11 +118,6 @@ func DefaultBuiltins(rt *Runtime) Builtins {
 		Print:         rt.Print,
 		Globals:       globals,
 	}
-}
-
-func DefaulParserBuiltins(rt *Runtime) parser.Builtins {
-	builtins := DefaultBuiltins(rt)
-	return ParserBuiltins(builtins)
 }
 
 type Runtime struct {

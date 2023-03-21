@@ -62,7 +62,7 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) error {
-	builtins := ParserBuiltins(e.builtins)
+	builtins := e.builtins.ParserBuiltins()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		return err

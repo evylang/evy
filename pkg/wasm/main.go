@@ -35,7 +35,7 @@ func main() {
 func format(evalBuiltins evaluator.Builtins) (string, error) {
 	input := getEvySource()
 
-	builtins := evaluator.ParserBuiltins(evalBuiltins)
+	builtins := evalBuiltins.ParserBuiltins()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		return "", parser.TruncateError(err, 8)

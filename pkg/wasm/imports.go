@@ -52,9 +52,12 @@ func newSleepingYielder() *sleepingYielder {
 func (y *sleepingYielder) Yield() {
 	y.count++
 	if y.count > 1000 && time.Since(y.start) > 100*time.Millisecond {
-		time.Sleep(minSleepDur)
-		y.Reset()
+		y.ForceYield()
 	}
+}
+
+func (y *sleepingYielder) ForceYield() {
+	y.Sleep(minSleepDur)
 }
 
 func (y *sleepingYielder) Sleep(dur time.Duration) {

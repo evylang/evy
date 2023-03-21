@@ -102,7 +102,7 @@ func handleEvents(yielder *sleepingYielder) {
 			yielder.Reset()
 			eval.HandleEvent(event)
 		} else {
-			yielder.Sleep(minSleepDur)
+			yielder.ForceYield()
 		}
 	}
 }

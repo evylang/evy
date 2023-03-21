@@ -1,6 +1,6 @@
 // https://github.com/petersolopov/yace - MIT licensed
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/index.js
-class Yace {
+export default class Yace {
   constructor(selector, options = {}) {
     if (!selector) {
       throw new Error("selector is not defined")
@@ -14,9 +14,10 @@ class Yace {
 
     const defaultOptions = {
       value: "",
+      lineNumbers: true,
       styles: {},
-      plugins: [],
-      highlighter: (value) => escape(value),
+      plugins: [preserveIndent(), history(), tab()],
+      highlighter: highlightEvy,
     }
 
     this.options = {
@@ -29,11 +30,13 @@ class Yace {
 
   init() {
     this.textarea = document.createElement("textarea")
-    this.pre = document.createElement("pre")
+    this.textarea.spellcheck = false
+    this.textarea.autocorrect = false
+    this.textarea.autocomplete = false
+    this.textarea.autocapitalize = false
+    this.textarea.wrap = "off"
 
-    Object.assign(this.root.style, rootStyles, this.options.styles)
-    Object.assign(this.textarea.style, textareaStyles)
-    Object.assign(this.pre.style, preStyles)
+    this.pre = document.createElement("pre")
 
     this.root.appendChild(this.textarea)
     this.root.appendChild(this.pre)
@@ -92,20 +95,21 @@ class Yace {
     if (!this.lines) {
       this.lines = document.createElement("pre")
       this.root.appendChild(this.lines)
-      Object.assign(this.lines.style, linesStyles)
+      this.lines.classList.add("lines")
     }
 
     const lines = this.value.split("\n")
     const length = lines.length.toString().length
 
-    this.root.style.paddingLeft = `${length + 1}ch`
+    this.root.style.paddingLeft = `${length + 2}ch`
 
     this.lines.innerHTML = lines
       .map((line, number) => {
         // prettier-ignore
-        const lineNumber = `<span class="yace-line" style="position: absolute; opacity: .3; left: 0">${1 + number}</span>`
+        const num = `${number+1}`.padStart(length)
+        const lineNumber = `<span class="num"> ${num}</span>`
         // prettier-ignore
-        const lineText = `<span style="color: transparent; pointer-events: none">${escape(line)}</span>`;
+        const lineText = `<span class="txt">${escape(line)}</span>`;
         return `${lineNumber}${lineText}`
       })
       .join("\n")
@@ -137,14 +141,12 @@ function runPlugins(plugins, event) {
 
 function escape(unsafe) {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
 }
-
-export default Yace
 
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/plugins/isKey.js
 const CODES = {
@@ -348,7 +350,7 @@ const preserveIndent = () => (textareaProps, event) => {
 
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/plugins/tab.js
 const tab =
-  (tabCharacter = "  ") =>
+  (tabCharacter = "    ") =>
   (textareaProps, event) => {
     const { value, selectionStart, selectionEnd } = textareaProps
 
@@ -424,3 +426,216 @@ const tab =
       }
     }
   }
+// evy highlighter
+function highlightEvy(val) {
+  const { tokens, funcs } = tokenize(val)
+  const type = (t) => (t.type === "ident" && funcs.has(t.val) ? "func" : t.type)
+
+  const span = (t) => `<span class="${type(t)}">${escape(t.val)}</span>`
+  const result = tokens.map((t) => span(t)).join("")
+  return result
+}
+
+const builtins = new Set([
+  "print",
+  "printf",
+  "read",
+  "sprint",
+  "sprintf",
+  "join",
+  "split",
+  "upper",
+  "lower",
+  "index",
+  "startswith",
+  "endswith",
+  "trim",
+  "replace",
+  "str2num",
+  "str2bool",
+  "len",
+  "has",
+  "del",
+  "sleep",
+  "rand",
+  "rand1",
+  "move",
+  "read",
+  "line",
+  "rect",
+  "circle",
+  "width",
+  "color",
+  "colour",
+])
+
+const keywords = new Set([
+  "num",
+  "string",
+  "bool",
+  "any",
+  "true",
+  "false",
+  "and",
+  "or",
+  "if",
+  "else",
+  "func",
+  "return",
+  "on",
+  "for",
+  "range",
+  "while",
+  "break",
+  "end",
+])
+
+function tokenize(str) {
+  let tokens = []
+  let i = 0
+  let prev = ""
+  let funcs = new Set()
+  while (i < str.length) {
+    const start = i
+    const c = str[i]
+    let type
+    i++
+    if (isWS(c)) {
+      type = "ws"
+      i = readWS(str, i)
+    } else if (isOP(c)) {
+      type = "op"
+      str[i] === "=" && i++
+    } else if (c === ":" && str[i] === "=") {
+      i++
+      type = "op"
+    } else if (isPunc(c) || (c === ":" && str[i] !== "=")) {
+      type = "punc"
+    } else if (c === "/" && str[i] == "/") {
+      type = "comment"
+      i = readComment(str, i)
+    } else if (c === "/" && str[i] != "/") {
+      type = "op"
+    } else if (c === '"') {
+      type = "str"
+      i = readString(str, i)
+    } else if (isDigit(c)) {
+      type = "num"
+      i = readNum(str, i)
+    } else if (isLetter(c)) {
+      type = "ident"
+      i = readIdent(str, i)
+    } else if (c === "\n") {
+      type = "nl"
+    } else {
+      type = "error"
+    }
+    const val = str.substring(start, i)
+    if (type == "ident") {
+      type = identType(val, prev, funcs)
+    }
+    tokens.push({ type, val })
+    if (type !== "ws") {
+      prev = val
+    }
+  }
+  return { tokens, funcs }
+}
+
+function isWS(s) {
+  return s === " " || s === "\t" || s === "\r"
+}
+
+function readWS(s, i) {
+  while (isWS(s[i])) {
+    i++
+  }
+  return i
+}
+
+function isOP(s) {
+  return (
+    s === "+" ||
+    s === "-" ||
+    s === "*" ||
+    s === "%" ||
+    s === "!" ||
+    s === "<" ||
+    s === ">" ||
+    s === "!" ||
+    s === "="
+  )
+}
+
+function isPunc(s) {
+  return s === "(" || s === ")" || s === "[" || s === "]" || s === "{" || s === "}" || s === "."
+}
+
+function isDigit(s) {
+  return s >= "0" && s <= "9"
+}
+
+function readNum(s, i) {
+  while (isDigit(s[i]) || s[i] === ".") {
+    i++
+  }
+  return i
+}
+
+function isLetter(s) {
+  return (s >= "a" && s <= "z") || (s >= "A" && s <= "Z") || s === "_" || /\p{L}/u.test(s)
+}
+
+function readIdent(s, i) {
+  while ((isLetter(s[i]) || isDigit(s[i])) && i < s.length) {
+    i++
+  }
+  return i
+}
+
+function readString(s, i) {
+  let backslashCnt = 0
+  while (i < s.length) {
+    const c = s[i]
+    if (c === "\\") {
+      backslashCnt++
+    } else {
+      backslashCnt = 0
+    }
+    if (c === '"' && backslashCnt % 2 == 0) {
+      return i + 1
+    }
+    if (c === "\n") {
+      return i
+    }
+    i++
+  }
+  return i
+}
+
+function readComment(s, i) {
+  while (s[i] !== "\n" && i < s.length) {
+    i++
+  }
+  return i
+}
+
+function identType(val, prev, funcs) {
+  if (keywords.has(val)) {
+    return "keyword"
+  }
+  if (builtins.has(val) && prev !== ".") {
+    return "builtin"
+  }
+  if (prev === "func") {
+    funcs.add(val)
+    return "func"
+  }
+  if (prev === "on") {
+    return "func"
+  }
+  if (funcs.has(val)) {
+    return "func"
+  }
+  return "ident"
+}

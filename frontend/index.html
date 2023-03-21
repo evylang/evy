@@ -13,14 +13,14 @@
       href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700&display=swap"
     />
     <script src="wasm_exec.js" defer></script>
-    <script src="index.js" defer></script>
+    <script src="index.js" type="module" defer></script>
   </head>
   <body>
     <div class="max-width-wrapper">
       <header>
         <ul class="breadcrumbs">
-          <li><button onclick="showModal()">Getting Started</button></li>
-          <li><button onclick="showModal()">Welcome</button></li>
+          <li><button>Tour</button></li>
+          <li><button>Welcome</button></li>
         </ul>
         <a href="/" class="logo">
           <img src="img/logo.svg" alt="Evy logo" class="desktop" />
@@ -32,21 +32,8 @@
         </div>
       </header>
       <main>
-        <div class="editor">
-          <textarea id="code" spellcheck="false" autocorrect="off" autocapitalize="none" wrap="off">
-move 10 20
-line 50 50
-rect 25 25
-color "red"
-circle 10
-
-x := 12
-print "x:" x
-if x > 10
-    print "🍦 big x"
-end
-</textarea
-          >
+        <div class="editor-wrap">
+          <div class="editor"></div>
         </div>
         <div class="output">
           <div class="canvas">

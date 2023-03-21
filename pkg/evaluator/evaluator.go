@@ -33,7 +33,7 @@ var (
 )
 
 func NewEvaluator(builtins Builtins) *Evaluator {
-	rand.Seed(time.Now().UnixNano()) //nolint: staticcheck //still required in tinygo
+	rand.Seed(time.Now().UnixNano())
 	scope := newScope()
 	for _, global := range builtins.Globals {
 		z := zero(global.Type())

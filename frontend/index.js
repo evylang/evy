@@ -529,7 +529,7 @@ function animationLoop(ts) {
 // --- UI: modal navigation --------------------------------------------
 
 function initModal() {
-  const modalMain = document.querySelector(".modal-main")
+  const modalMain = document.querySelector("#modal .modal-main")
   modalMain.textContent = ""
   for (const course of courses.courseList) {
     const item = document.createElement("div")
@@ -552,12 +552,12 @@ function initModal() {
 }
 
 function hideModal() {
-  const el = document.querySelector(".modal")
+  const el = document.querySelector("#modal")
   el.classList.add("hidden")
 }
 
 function showModal() {
-  const el = document.querySelector(".modal")
+  const el = document.querySelector("#modal")
   el.classList.remove("hidden")
 }
 

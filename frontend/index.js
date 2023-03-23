@@ -41,6 +41,7 @@ function newEvyGo() {
     jsRead,
     jsActions,
     jsPrepareUI,
+    jsError,
     evySource,
     setEvySource,
     move,
@@ -108,6 +109,24 @@ function jsRead() {
   return stringToMemAddr(s.slice(0, idx))
 }
 
+function jsError(ptr, len) {
+  const code = editor.value
+  const lines = code.split("\n")
+  const errs = memToString(ptr, len).split("\n")
+  const re = /line (?<line>\d+) column (?<col>\d+): (?<msg>.*)/
+  let msgs = ""
+  const errorLines = {}
+  for (const err of errs) {
+    const g = err.match(re).groups
+    errorLines[g.line] = { col: g.col, text: lines[g.line - 1] }
+    msgs += `line ${g.line}: ${g.msg}\n`
+  }
+  const output = document.querySelector("#console")
+  output.textContent = msgs
+  output.scrollTo({ behavior: "smooth", left: 0, top: 0 })
+  editor.update({ errorLines })
+}
+
 // evySource writes the evy source code into wasm memory as bytes
 // and returns pointer and length encoded into a single 64 bit number
 function evySource() {
@@ -118,7 +137,7 @@ function evySource() {
 // setEvySource is exported to evy go/wasm and called after formatting
 function setEvySource(ptr, len) {
   const source = memToString(ptr, len)
-  editor.update({ value: source })
+  editor.update({ value: source, errorLines: {} })
 }
 
 function memToString(ptr, len) {
@@ -301,7 +320,7 @@ async function handleHashChange() {
       throw new Error("invalid response status", response.status)
     }
     const source = await response.text()
-    editor.update({ value: source })
+    editor.update({ value: source, errorLines: {} })
     document.querySelector(".editor-wrap").scrollTo(0, 0)
     updateBreadcrumbs(crumbs)
     clearOutput()

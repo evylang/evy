@@ -11,12 +11,14 @@
   --output-border-dark: hsl(0deg 0% 80%);
   --output-border-mid: hsl(0deg 0% 85%);
   --output-border-light: hsl(0deg 0% 92%);
+  --line-num-color: hsl(212deg 8% 47%);
   --syntax-num: hsl(204deg 100% 75%);
   --syntax-string: hsl(203deg 100% 86%);
   --syntax-func: hsl(266deg 100% 86%);
   --syntax-builtin: hsl(27deg 100% 74%);
   --syntax-keyword: hsl(359deg 100% 75%);
   --syntax-comment: hsl(210deg 13% 72%);
+  --syntax-error-line-bg: hsl(210deg 7% 20%);
   --syntax-error-bg: hsl(209deg 100% 33%);
   --btn-color: hsl(0deg 0% 33%);
   --btn-color-active: hsl(0deg 0% 100%);
@@ -223,7 +225,6 @@ main.view-output {
 /* --- Editor -------------------------------------------------------- */
 .editor-wrap {
   margin-top: var(--editor-padding);
-  padding-right: var(--editor-padding);
   padding-bottom: var(--editor-padding-bottom);
   font-size: 1rem;
   flex: 1;
@@ -239,6 +240,7 @@ main.view-output {
   position: relative;
   overflow: hidden;
   width: max-content;
+  min-width: 100%;
 }
 .editor textarea {
   line-height: inherit;
@@ -259,12 +261,11 @@ main.view-output {
   border: none;
   top: 0;
   left: 0;
-  color: transparent;
   overflow: hidden;
+  color: transparent;
 }
 .editor pre {
   line-height: inherit;
-  position: relative;
   white-space: pre-wrap;
   word-break: keep-all;
   padding: 0;
@@ -275,6 +276,9 @@ main.view-output {
   letter-spacing: inherit;
   pointer-events: none;
   font-family: inherit;
+}
+.editor pre.highlighted {
+  position: relative;
   overflow: hidden;
 }
 .editor pre.lines {
@@ -284,6 +288,11 @@ main.view-output {
   left: 0;
   pointer-events: none;
   overflow: auto;
+  min-width: 100%;
+}
+.editor pre.highlighted .err {
+  background: var(--syntax-error-bg);
+  border-radius: 6px;
 }
 .editor .num,
 .editor .bool {
@@ -316,13 +325,34 @@ main.view-output {
 }
 .editor .lines .num {
   position: absolute;
-  color: hsl(212deg 8% 47%);
+  color: var(--line-num-color);
   left: 0;
 }
 .editor .lines .txt {
-  padding-left: 1ch;
   color: transparent;
   pointer-events: none;
+}
+.editor .lines .err.num {
+  background: var(--syntax-error-bg);
+  color: var(--color);
+}
+.editor .lines .err.txt {
+  left: calc(2ch + 1.2rem);
+  right: 0;
+  padding-left: 0.3rem;
+  background: var(--syntax-error-line-bg);
+  border-radius: 6px;
+  position: absolute;
+}
+.editor .lines .err.num::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H2 L10 12 L2 24 H0V0 Z' fill='%230057A8'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  content: "";
+  width: 0.8rem;
+  position: absolute;
+  right: -0.8rem;
+  top: 0;
+  bottom: 0;
 }
 
 /* --- Output -------------------------------------------------------- */

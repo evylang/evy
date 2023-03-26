@@ -130,16 +130,16 @@ func TestFunccallError(t *testing.T) {
 		ReturnType: NONE_TYPE,
 	}
 	tests := map[string]string{
-		`len 2 2`:    "line 1 column 8: 'len' takes 1 argument, found 2",
+		`len 2 2`:    "line 1 column 7: 'len' takes 1 argument, found 2",
 		`len`:        "line 1 column 4: 'len' takes 1 argument, found 0",
 		`a := print`: "line 1 column 11: invalid declaration, function 'print' has no return value",
 		`a := f0`:    "line 1 column 8: invalid declaration, function 'f0' has no return value",
-		`f0 "arg"`:   "line 1 column 9: 'f0' takes 0 arguments, found 1",
+		`f0 "arg"`:   "line 1 column 4: 'f0' takes 0 arguments, found 1",
 		`f2`:         "line 1 column 3: 'f2' takes 1 argument, found 0",
 		`f2 f1`:      "line 1 column 4: function call must be parenthesized: (f1 ...)",
-		`f1 "arg"`:   "line 1 column 9: 'f1' takes variadic arguments of type 'num', found 'string'",
-		`f3 1 2`:     "line 1 column 7: 'f3' takes 2nd argument of type 'string', found 'num'",
-		`f3 "1" "2"`: "line 1 column 11: 'f3' takes 1st argument of type 'num', found 'string'",
+		`f1 "arg"`:   "line 1 column 4: 'f1' takes variadic arguments of type 'num', found 'string'",
+		`f3 1 2`:     "line 1 column 6: 'f3' takes 2nd argument of type 'string', found 'num'",
+		`f3 "1" "2"`: "line 1 column 4: 'f3' takes 1st argument of type 'num', found 'string'",
 		`foo 0`:      "line 1 column 1: unknown function 'foo'",
 	}
 	for input, err1 := range tests {

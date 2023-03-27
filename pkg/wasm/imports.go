@@ -114,6 +114,14 @@ func jsRead() float64
 //export jsPrint
 func jsPrint(string)
 
+// jsError is imported from JS. jsError is used for setting compile time
+// errors of format:
+//
+//	line NUM column NUM: ERROR_DETAILS
+//
+//export jsError
+func jsError(string)
+
 // afterStop is imported from JS
 //
 //export afterStop

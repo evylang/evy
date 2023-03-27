@@ -8,11 +8,13 @@ import (
 )
 
 type Node interface {
+	Token() *lexer.Token
 	String() string
 	Type() *Type
 }
 
 type Program struct {
+	token              *lexer.Token
 	Statements         []Node
 	EventHandlers      map[string]*EventHandlerStmt
 	CalledBuiltinFuncs []string
@@ -22,30 +24,30 @@ type Program struct {
 }
 
 type EmptyStmt struct {
-	Token *lexer.Token // The NL token
+	token *lexer.Token // The NL token
 }
 
 type FuncCallStmt struct {
-	Token    *lexer.Token // The IDENT of the function
+	token    *lexer.Token // The IDENT of the function
 	FuncCall *FuncCall
 }
 
 type FuncCall struct {
-	Token     *lexer.Token // The IDENT of the function
+	token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
 	FuncDecl  *FuncDeclStmt
 }
 
 type UnaryExpression struct {
-	Token *lexer.Token // The unary operation token, e.g. !
+	token *lexer.Token // The unary operation token, e.g. !
 	Op    Operator
 	Right Node
 }
 
 type BinaryExpression struct {
 	T     *Type
-	Token *lexer.Token // The binary operation token, e.g. +
+	token *lexer.Token // The binary operation token, e.g. +
 	Op    Operator
 	Left  Node
 	Right Node
@@ -53,14 +55,14 @@ type BinaryExpression struct {
 
 type IndexExpression struct {
 	T     *Type
-	Token *lexer.Token // The [ token
+	token *lexer.Token // The [ token
 	Left  Node
 	Index Node
 }
 
 type SliceExpression struct {
 	T     *Type
-	Token *lexer.Token // The [ token
+	token *lexer.Token // The [ token
 	Left  Node
 	Start Node
 	End   Node
@@ -68,50 +70,54 @@ type SliceExpression struct {
 
 type DotExpression struct {
 	T     *Type
-	Token *lexer.Token // The . token
+	token *lexer.Token // The . token
 	Left  Node
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
 type GroupExpression struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Expr  Node
 }
 
 type Decl struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Var   *Var
 	Value Node // literal, expression, assignable, ...
 }
 
 type TypedDeclStmt struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Decl  *Decl
 }
 
 type InferredDeclStmt struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Decl  *Decl
 }
 
 type AssignmentStmt struct {
-	Token  *lexer.Token
+	token  *lexer.Token
 	Target Node // Variable, index or field expression
 	Value  Node // literal, expression, assignable, ...
 }
 
 type ReturnStmt struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Value Node // literal, expression, assignable, ...
 	T     *Type
 }
 
 type BreakStmt struct {
-	Token *lexer.Token
+	token *lexer.Token
+}
+
+func (f *FuncDeclStmt) Token() *lexer.Token {
+	return f.token
 }
 
 type FuncDeclStmt struct {
-	Token         *lexer.Token // The 'func' token
+	token         *lexer.Token // The 'func' token
 	Name          string
 	Params        []*Var
 	VariadicParam *Var
@@ -121,19 +127,31 @@ type FuncDeclStmt struct {
 	isCalled bool
 }
 
+func (i *IfStmt) Token() *lexer.Token {
+	return i.token
+}
+
 type IfStmt struct {
-	Token        *lexer.Token
+	token        *lexer.Token
 	IfBlock      *ConditionalBlock
 	ElseIfBlocks []*ConditionalBlock
 	Else         *BlockStatement
+}
+
+func (w *WhileStmt) Token() *lexer.Token {
+	return w.token
 }
 
 type WhileStmt struct {
 	ConditionalBlock
 }
 
+func (f *ForStmt) Token() *lexer.Token {
+	return f.token
+}
+
 type ForStmt struct {
-	Token *lexer.Token
+	token *lexer.Token
 
 	LoopVar *Var
 	Range   Node // StepRange or array/map/string expression
@@ -141,66 +159,110 @@ type ForStmt struct {
 	Block *BlockStatement
 }
 
+func (s *StepRange) Token() *lexer.Token {
+	return s.token
+}
+
 type StepRange struct {
-	Token *lexer.Token
+	token *lexer.Token
 
 	Start Node // num expression or nil
 	Stop  Node // num expression
 	Step  Node // num expression or nil
 }
 
+func (c *ConditionalBlock) Token() *lexer.Token {
+	return c.token
+}
+
 type ConditionalBlock struct {
-	Token     *lexer.Token
+	token     *lexer.Token
 	Condition Node // must be of type bool
 	Block     *BlockStatement
 }
 
+func (e *EventHandlerStmt) Token() *lexer.Token {
+	return e.token
+}
+
 type EventHandlerStmt struct {
-	Token  *lexer.Token // The 'on' token
+	token  *lexer.Token // The 'on' token
 	Name   string
 	Params []*Var
 	Body   *BlockStatement
 }
 
+func (v *Var) Token() *lexer.Token {
+	return v.token
+}
+
 type Var struct {
-	Token  *lexer.Token
+	token  *lexer.Token
 	Name   string
 	T      *Type
 	isUsed bool
 }
 
+func (b *BlockStatement) Token() *lexer.Token {
+	return b.token
+}
+
 type BlockStatement struct {
-	Token            *lexer.Token // the NL before the first statement
+	token            *lexer.Token // the NL before the first statement
 	Statements       []Node
 	alwaysTerminates bool
 }
 
+func (b *Bool) Token() *lexer.Token {
+	return b.token
+}
+
 type Bool struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Value bool
 }
 
+func (n *NumLiteral) Token() *lexer.Token {
+	return n.token
+}
+
 type NumLiteral struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Value float64
 }
 
+func (s *StringLiteral) Token() *lexer.Token {
+	return s.token
+}
+
 type StringLiteral struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Value string
 }
 
+func (a *ArrayLiteral) Token() *lexer.Token {
+	return a.token
+}
+
 type ArrayLiteral struct {
-	Token    *lexer.Token
+	token    *lexer.Token
 	Elements []Node
 	T        *Type
 }
 
+func (m *MapLiteral) Token() *lexer.Token {
+	return m.token
+}
+
 type MapLiteral struct {
-	Token *lexer.Token
+	token *lexer.Token
 	Pairs map[string]Node
 	Order []string // Track insertion order of keys for deterministic output.
 	T     *Type
+}
+
+func (p *Program) Token() *lexer.Token {
+	return p.token
 }
 
 func (p *Program) String() string {
@@ -222,11 +284,19 @@ func (p *Program) AlwaysTerminates() bool {
 	return p.alwaysTerminates
 }
 
+func (e *EmptyStmt) Token() *lexer.Token {
+	return e.token
+}
+
 func (e *EmptyStmt) String() string {
 	return ""
 }
 
 func (*EmptyStmt) Type() *Type { return NONE_TYPE }
+
+func (f *FuncCall) Token() *lexer.Token {
+	return f.token
+}
 
 func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))
@@ -241,6 +311,10 @@ func (f *FuncCall) Type() *Type {
 	return f.FuncDecl.ReturnType
 }
 
+func (f *FuncCallStmt) Token() *lexer.Token {
+	return f.token
+}
+
 func (f *FuncCallStmt) String() string {
 	return f.FuncCall.String()
 }
@@ -249,12 +323,20 @@ func (f *FuncCallStmt) Type() *Type {
 	return f.FuncCall.FuncDecl.ReturnType
 }
 
+func (u *UnaryExpression) Token() *lexer.Token {
+	return u.token
+}
+
 func (u *UnaryExpression) String() string {
 	return "(" + u.Op.String() + u.Right.String() + ")"
 }
 
 func (u *UnaryExpression) Type() *Type {
 	return u.Right.Type()
+}
+
+func (b *BinaryExpression) Token() *lexer.Token {
+	return b.token
 }
 
 func (b *BinaryExpression) String() string {
@@ -268,12 +350,20 @@ func (b *BinaryExpression) Type() *Type {
 	return b.T
 }
 
+func (i *IndexExpression) Token() *lexer.Token {
+	return i.token
+}
+
 func (i *IndexExpression) String() string {
 	return "(" + i.Left.String() + "[" + i.Index.String() + "])"
 }
 
 func (i *IndexExpression) Type() *Type {
 	return i.T
+}
+
+func (s *SliceExpression) Token() *lexer.Token {
+	return s.token
 }
 
 func (s *SliceExpression) String() string {
@@ -292,6 +382,10 @@ func (s *SliceExpression) Type() *Type {
 	return s.T
 }
 
+func (d *DotExpression) Token() *lexer.Token {
+	return d.token
+}
+
 func (d *DotExpression) String() string {
 	return "(" + d.Left.String() + "." + d.Key + ")"
 }
@@ -300,12 +394,20 @@ func (d *DotExpression) Type() *Type {
 	return d.T
 }
 
+func (d *GroupExpression) Token() *lexer.Token {
+	return d.token
+}
+
 func (d *GroupExpression) String() string {
 	return d.Expr.String()
 }
 
 func (d *GroupExpression) Type() *Type {
 	return d.Expr.Type()
+}
+
+func (d *Decl) Token() *lexer.Token {
+	return d.token
 }
 
 func (d *Decl) String() string {
@@ -319,6 +421,10 @@ func (d *Decl) Type() *Type {
 	return d.Var.T
 }
 
+func (d *TypedDeclStmt) Token() *lexer.Token {
+	return d.token
+}
+
 func (d *TypedDeclStmt) String() string {
 	return d.Decl.String()
 }
@@ -327,12 +433,20 @@ func (d *TypedDeclStmt) Type() *Type {
 	return d.Decl.Var.T
 }
 
+func (d *InferredDeclStmt) Token() *lexer.Token {
+	return d.token
+}
+
 func (d *InferredDeclStmt) String() string {
 	return d.Decl.String()
 }
 
 func (d *InferredDeclStmt) Type() *Type {
 	return d.Decl.Var.T
+}
+
+func (r *ReturnStmt) Token() *lexer.Token {
+	return r.token
 }
 
 func (r *ReturnStmt) String() string {
@@ -350,6 +464,10 @@ func (*ReturnStmt) AlwaysTerminates() bool {
 	return true
 }
 
+func (b *BreakStmt) Token() *lexer.Token {
+	return b.token
+}
+
 func (*BreakStmt) String() string {
 	return "break"
 }
@@ -360,6 +478,10 @@ func (*BreakStmt) Type() *Type {
 
 func (b *BreakStmt) AlwaysTerminates() bool {
 	return true
+}
+
+func (a *AssignmentStmt) Token() *lexer.Token {
+	return a.token
 }
 
 func (a *AssignmentStmt) String() string {

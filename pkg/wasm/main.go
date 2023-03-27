@@ -23,7 +23,7 @@ func main() {
 	input := getEvySource()
 	ast, err := parse(input, rt)
 	if err != nil {
-		rt.Print(err.Error())
+		jsError(err.Error())
 		return
 	}
 	if actions["fmt"] {

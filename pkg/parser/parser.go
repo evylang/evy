@@ -127,15 +127,15 @@ func newParser(input string, builtins Builtins) *parser {
 		if p.builtins.Globals[fd.Name] != nil {
 			// We still go on to add `fd` to the funcs map so that the
 			// function can be parsed correctly even though it has an invalid name.
-			p.appendErrorForToken("cannot override builtin variable '"+fd.Name+"'", fd.Token)
+			p.appendErrorForToken("cannot override builtin variable '"+fd.Name+"'", fd.token)
 		}
 		switch {
 		case p.funcs[fd.Name] == nil:
 			p.funcs[fd.Name] = fd
 		case builtins.Funcs[fd.Name] == nil:
-			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.Token)
+			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.token)
 		case builtins.Funcs[fd.Name] != nil:
-			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.Token)
+			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.token)
 		}
 	}
 	return p
@@ -214,16 +214,16 @@ func (p *parser) parseFunc(scope *scope) Node {
 
 func (p *parser) addParamsToScope(scope *scope, fd *FuncDeclStmt) {
 	for _, param := range fd.Params {
-		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
+		p.validateVarDecl(scope, param, param.token, true /* allowUnderscore */)
 		scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
 		vParam := fd.VariadicParam
-		p.validateVarDecl(scope, vParam, vParam.Token, true /* allowUnderscore */)
+		p.validateVarDecl(scope, vParam, vParam.token, true /* allowUnderscore */)
 
 		vParamAsArray := &Var{
+			token: vParam.token,
 			Name:  vParam.Name,
-			Token: vParam.Token,
 			T:     &Type{Name: ARRAY, Sub: vParam.Type()},
 		}
 		scope.set(vParam.Name, vParamAsArray)
@@ -231,7 +231,7 @@ func (p *parser) addParamsToScope(scope *scope, fd *FuncDeclStmt) {
 }
 
 func (p *parser) parseEventHandler(scope *scope) Node {
-	e := &EventHandlerStmt{Token: p.cur}
+	e := &EventHandlerStmt{token: p.cur}
 	p.advance() // advance past ON token
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -275,7 +275,7 @@ func (p *parser) addEventParamsToScope(scope *scope, e *EventHandlerStmt) {
 		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
 	}
 	for i, param := range e.Params {
-		p.validateVarDecl(scope, param, param.Token, true /* allowUnderscore */)
+		p.validateVarDecl(scope, param, param.token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
 		if !param.Type().Matches(exptectedType) {
 			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
@@ -326,7 +326,7 @@ func (p *parser) parseStatement(scope *scope) Node {
 }
 
 func (p *parser) parseEmptyStmt() Node {
-	empty := &EmptyStmt{Token: p.cur}
+	empty := &EmptyStmt{token: p.cur}
 	switch p.cur.Type {
 	case lexer.NL:
 		p.advance()
@@ -365,7 +365,7 @@ func (p *parser) parseAssignmentStatement(scope *scope) Node {
 		p.appendErrorForToken(msg, tok)
 	}
 	p.assertEOL()
-	stmt := &AssignmentStmt{Token: tok, Target: target, Value: value}
+	stmt := &AssignmentStmt{token: tok, Target: target, Value: value}
 	p.recordComment(stmt)
 	p.advancePastNL()
 	return stmt
@@ -404,7 +404,7 @@ func (p *parser) parseAssignmentTarget(scope *scope) Node {
 }
 
 func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
-	fd := &FuncDeclStmt{Token: p.cur, ReturnType: NONE_TYPE}
+	fd := &FuncDeclStmt{token: p.cur, ReturnType: NONE_TYPE}
 	p.advance() // advance past FUNC
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -416,7 +416,7 @@ func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
 		p.advance() // advance past `:` of return type declaration, e.g. in `func rand:num`
 		fd.ReturnType = p.parseType()
 		if fd.ReturnType.Name == ILLEGAL {
-			p.appendErrorForToken("invalid return type: "+p.cur.FormatDetails(), fd.Token)
+			p.appendErrorForToken("invalid return type: "+p.cur.FormatDetails(), fd.token)
 		}
 	}
 	for !p.isAtEOL() && p.cur.TokenType() != lexer.DOT3 {
@@ -441,11 +441,11 @@ func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
 
 func (p *parser) parseTypedDeclStatement(scope *scope) Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.Token, false /* allowUnderscore */) {
+	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.token, false /* allowUnderscore */) {
 		scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
-	typeDecl := &TypedDeclStmt{Token: decl.Token, Decl: decl}
+	typeDecl := &TypedDeclStmt{token: decl.token, Decl: decl}
 	p.recordComment(typeDecl)
 	p.advancePastNL()
 	return typeDecl
@@ -457,8 +457,8 @@ func (p *parser) parseTypedDecl() *Decl {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
 	decl := &Decl{
-		Token: p.cur,
-		Var:   &Var{Token: p.cur, Name: varName},
+		token: p.cur,
+		Var:   &Var{token: p.cur, Name: varName},
 	}
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:`
@@ -466,7 +466,7 @@ func (p *parser) parseTypedDecl() *Decl {
 	decl.Var.T = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
-		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.Token)
+		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.token)
 	}
 	return decl
 }
@@ -495,8 +495,8 @@ func (p *parser) parseInferredDeclStatement(scope *scope) Node {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
 	decl := &Decl{
-		Token: p.cur,
-		Var:   &Var{Token: p.cur, Name: varName},
+		token: p.cur,
+		Var:   &Var{token: p.cur, Name: varName},
 	}
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:=`
@@ -512,14 +512,14 @@ func (p *parser) parseInferredDeclStatement(scope *scope) Node {
 		return nil
 	}
 	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
-	if !p.validateVarDecl(scope, decl.Var, decl.Token, false /* allowUnderscore */) {
+	if !p.validateVarDecl(scope, decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
 	decl.Value = val
 	scope.set(varName, decl.Var)
 	p.assertEOL()
 
-	inferredDecl := &InferredDeclStmt{Token: decl.Token, Decl: decl}
+	inferredDecl := &InferredDeclStmt{token: decl.token, Decl: decl}
 	p.recordComment(inferredDecl)
 	return inferredDecl
 }
@@ -533,7 +533,7 @@ func (p *parser) isFuncCall(tok *lexer.Token) bool {
 func (p *parser) parseFunCallStatement(scope *scope) Node {
 	fc := p.parseFuncCall(scope).(*FuncCall)
 	p.assertEOL()
-	fcs := &FuncCallStmt{Token: fc.Token, FuncCall: fc}
+	fcs := &FuncCallStmt{token: fc.token, FuncCall: fc}
 	p.recordComment(fcs)
 
 	p.advancePastNL()
@@ -547,20 +547,25 @@ func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 		for _, arg := range args {
 			argType := arg.Type()
 			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-				p.appendError("'" + funcName + "' takes variadic arguments of type '" + paramType.String() + "', found '" + argType.String() + "'")
+				p.appendErrorForToken("'"+funcName+"' takes variadic arguments of type '"+paramType.String()+"', found '"+argType.String()+"'", arg.Token())
 			}
 		}
 		return
 	}
 	if len(decl.Params) != len(args) {
-		p.appendError("'" + funcName + "' takes " + quantify(len(decl.Params), "argument") + ", found " + strconv.Itoa(len(args)))
+		tok := p.cur
+		if len(args) > len(decl.Params) {
+			tok = args[len(decl.Params)].Token()
+		}
+		p.appendErrorForToken("'"+funcName+"' takes "+quantify(len(decl.Params), "argument")+", found "+strconv.Itoa(len(args)), tok)
 		return
 	}
-	for i := range args {
+	for i, arg := range args {
 		paramType := decl.Params[i].Type()
-		argType := args[i].Type()
+		argType := arg.Type()
 		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-			p.appendError("'" + funcName + "' takes " + ordinalize(i+1) + " argument of type '" + paramType.String() + "', found '" + argType.String() + "'")
+			msg := fmt.Sprintf("'%s' takes %s argument of type '%s', found '%s'", funcName, ordinalize(i+1), paramType.String(), argType.String())
+			p.appendErrorForToken(msg, arg.Token())
 		}
 	}
 }
@@ -614,7 +619,7 @@ func (p *parser) appendErrorForToken(message string, token *lexer.Token) {
 func (p *parser) validateScope(scope *scope) {
 	for _, v := range scope.vars {
 		if !v.isUsed {
-			p.appendErrorForToken("'"+v.Name+"' declared but not used", v.Token)
+			p.appendErrorForToken("'"+v.Name+"' declared but not used", v.token)
 		}
 	}
 }
@@ -630,7 +635,7 @@ func (p *parser) parseIfBlock(scope *scope) *BlockStatement {
 }
 
 func (p *parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.TokenType]bool) *BlockStatement {
-	block := &BlockStatement{Token: p.cur}
+	block := &BlockStatement{token: p.cur}
 	for !endTokens[p.cur.TokenType()] {
 		tok := p.cur
 		stmt := p.parseStatement(scope)
@@ -647,7 +652,7 @@ func (p *parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 		block.Statements = append(block.Statements, stmt)
 	}
 	if len(block.Statements) == 0 {
-		p.appendErrorForToken("at least one statement is required here", block.Token)
+		p.appendErrorForToken("at least one statement is required here", block.token)
 	}
 	p.validateScope(scope)
 	return block
@@ -728,7 +733,7 @@ func (p *parser) lookAt(pos int) *lexer.Token {
 }
 
 func (p *parser) parseReturnStatement(scope *scope) Node {
-	ret := &ReturnStmt{Token: p.cur}
+	ret := &ReturnStmt{token: p.cur}
 	p.advance() // advance past RETURN token
 	retValueToken := p.cur
 	if p.isAtEOL() { // no return value
@@ -755,7 +760,7 @@ func (p *parser) parseReturnStatement(scope *scope) Node {
 }
 
 func (p *parser) parseBreakStatement(scope *scope) Node {
-	breakStmt := &BreakStmt{Token: p.cur}
+	breakStmt := &BreakStmt{token: p.cur}
 	if !inLoop(scope) {
 		p.appendError("break is not in a loop")
 	}
@@ -767,12 +772,12 @@ func (p *parser) parseBreakStatement(scope *scope) Node {
 }
 
 func (p *parser) parseForStatement(scope *scope) Node {
-	forNode := &ForStmt{Token: p.cur}
+	forNode := &ForStmt{token: p.cur}
 	scope = newScope(scope, forNode)
 	p.advance() // advance past FOR token
 
 	if p.cur.TokenType() == lexer.IDENT {
-		forNode.LoopVar = &Var{Token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
+		forNode.LoopVar = &Var{token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
 		if !p.validateVarDecl(scope, forNode.LoopVar, p.cur, false /* allowUnderscore */) {
 			p.advancePastNL()
 			return nil
@@ -845,11 +850,11 @@ func (p *parser) parseStepRange(nodes []Node, tok *lexer.Token) *StepRange {
 	}
 	switch len(nodes) {
 	case 1:
-		return &StepRange{Token: tok, Start: nil, Stop: nodes[0], Step: nil}
+		return &StepRange{token: tok, Start: nil, Stop: nodes[0], Step: nil}
 	case 2:
-		return &StepRange{Token: tok, Start: nodes[0], Stop: nodes[1], Step: nil}
+		return &StepRange{token: tok, Start: nodes[0], Stop: nodes[1], Step: nil}
 	case 3:
-		return &StepRange{Token: tok, Start: nodes[0], Stop: nodes[1], Step: nodes[2]}
+		return &StepRange{token: tok, Start: nodes[0], Stop: nodes[1], Step: nodes[2]}
 	default:
 		p.appendErrorForToken("range can take up to 3 num arguments, found "+strconv.Itoa(len(nodes)), tok)
 		return nil
@@ -858,7 +863,7 @@ func (p *parser) parseStepRange(nodes []Node, tok *lexer.Token) *StepRange {
 
 func (p *parser) parseWhileStatement(scope *scope) Node {
 	while := &WhileStmt{}
-	while.Token = p.cur
+	while.token = p.cur
 	p.advance() // advance past WHILE token
 	scope = newScope(scope, while)
 	while.Condition = p.parseCondition(scope)
@@ -884,7 +889,7 @@ func inLoop(s *scope) bool {
 }
 
 func (p *parser) parseIfStatement(scope *scope) Node {
-	ifStmt := &IfStmt{Token: p.cur}
+	ifStmt := &IfStmt{token: p.cur}
 	ifStmt.IfBlock = p.parseIfConditionalBlock(newScope(scope, ifStmt))
 	// else if blocks
 	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
@@ -910,7 +915,7 @@ func (p *parser) parseIfStatement(scope *scope) Node {
 }
 
 func (p *parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
-	ifBlock := &ConditionalBlock{Token: p.cur}
+	ifBlock := &ConditionalBlock{token: p.cur}
 	p.advance() // advance past IF token
 	ifBlock.Condition = p.parseCondition(scope)
 	p.recordComment(ifBlock)

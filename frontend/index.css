@@ -2,33 +2,29 @@
   /* theme */
   --ff: "Inter", sans-serif;
   --ff-code: "Fira Code", monospace;
-
   --bg: hsl(210deg 5% 15%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
-
   --header-bg: hsl(213deg 10% 23%);
-
   --output-bg: hsl(0deg 0% 100%);
   --output-color: hsl(0deg 0% 0% / 80%);
   --output-border-dark: hsl(0deg 0% 80%);
   --output-border-mid: hsl(0deg 0% 85%);
   --output-border-light: hsl(0deg 0% 92%);
-
+  --line-num-color: hsl(212deg 8% 47%);
   --syntax-num: hsl(204deg 100% 75%);
   --syntax-string: hsl(203deg 100% 86%);
   --syntax-func: hsl(266deg 100% 86%);
   --syntax-builtin: hsl(27deg 100% 74%);
   --syntax-keyword: hsl(359deg 100% 75%);
-  --syntax-comment: hsl(210deg, 13%, 72%);
+  --syntax-comment: hsl(210deg 13% 72%);
+  --syntax-error-line-bg: hsl(210deg 7% 20%);
   --syntax-error-bg: hsl(209deg 100% 33%);
-
   --btn-color: hsl(0deg 0% 33%);
   --btn-color-active: hsl(0deg 0% 100%);
   --btn-color-disabled: hsl(0deg 0% 33% / 50%);
   --btn-bg: hsl(0deg 0% 92%);
   --btn-bg-hover: hsl(0deg 0% 80%);
-
   --modal-bg: hsl(210deg 5% 15% / 95%);
   --modal-color: hsl(0deg 0% 100% / 80%);
   --modal-color-hover: hsl(0deg 0% 100% / 100%);
@@ -102,7 +98,7 @@
   }
 }
 
-/* --- Resets --------------------------------------------------------*/
+/* --- Resets -------------------------------------------------------- */
 *,
 ::after,
 ::before {
@@ -110,7 +106,6 @@
   margin: 0;
   box-sizing: border-box;
 }
-
 html,
 body {
   height: 100%;
@@ -118,7 +113,7 @@ body {
   text-size-adjust: 100%;
 }
 
-/* --- Global --------------------------------------------------------*/
+/* --- Global -------------------------------------------------------- */
 body {
   font-family: var(--ff);
   letter-spacing: 0.15px;
@@ -131,29 +126,14 @@ a {
   transition: all 0.3s ease-in-out;
 }
 
-/* --- Header --------------------------------------------------------*/
+/* --- Header -------------------------------------------------------- */
 header {
   background: #34393f;
   padding: var(--header-padding);
   font-family: var(--ff);
   height: var(--header-height);
-
   display: flex;
   flex-direction: row;
-}
-header button {
-  color: var(--color);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  text-decoration-thickness: 1px;
-  border: none;
-  outline: none;
-  background: none;
-  font-size: 1rem;
-  cursor: pointer;
-}
-header button:hover {
-  color: var(--color-hover);
 }
 header .breadcrumbs {
   list-style: none;
@@ -187,19 +167,33 @@ header .share svg {
   position: relative;
   top: 0.2em;
 }
-header .breadcrumbs li {
+.breadcrumbs li {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-header .breadcrumbs li:not(:last-child) {
+.breadcrumbs li:not(:last-child) {
   display: var(--display-desktop-only);
 }
-header .breadcrumbs li:not(:last-child):after {
+.breadcrumbs li:not(:last-child)::after {
   content: "›";
   padding: 0 10px;
 }
+.breadcrumbs button {
+  color: var(--color);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.breadcrumbs button:hover {
+  color: var(--color-hover);
+}
 
-/* --- Main ----------------------------------------------------------*/
+/* --- Main ---------------------------------------------------------- */
 main {
   background: var(--bg);
   width: var(--main-width);
@@ -219,7 +213,6 @@ main.view-output {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -229,11 +222,9 @@ main.view-output {
   font-size: 1rem;
 }
 
-/* --- Editor --------------------------------------------------------*/
+/* --- Editor -------------------------------------------------------- */
 .editor-wrap {
   margin-top: var(--editor-padding);
-  padding-left: var(--editor-padding);
-  padding-right: var(--editor-padding);
   padding-bottom: var(--editor-padding-bottom);
   font-size: 1rem;
   flex: 1;
@@ -249,6 +240,7 @@ main.view-output {
   position: relative;
   overflow: hidden;
   width: max-content;
+  min-width: 100%;
 }
 .editor textarea {
   line-height: inherit;
@@ -267,44 +259,40 @@ main.view-output {
   font-variant-ligatures: inherit;
   letter-spacing: inherit;
   border: none;
-  top: 0px;
-  left: 0px;
-  color: transparent;
+  top: 0;
+  left: 0;
   overflow: hidden;
+  color: transparent;
 }
 .editor pre {
   line-height: inherit;
-  position: relative;
   white-space: pre-wrap;
   word-break: keep-all;
   padding: 0;
   width: max-content;
   margin: 0;
   font-size: inherit;
-  font-family: inherit;
   font-variant-ligatures: inherit;
   letter-spacing: inherit;
   pointer-events: none;
   font-family: inherit;
+}
+.editor pre.highlighted {
+  position: relative;
   overflow: hidden;
 }
 .editor pre.lines {
   position: absolute;
   height: 100%;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   pointer-events: none;
   overflow: auto;
+  min-width: 100%;
 }
-.editor pre.lines .num {
-  position: aboslute;
-  color: hsl(212deg 8% 47%);
-  left: 0;
-}
-.editor pre.lines .txt {
-  padding-left: 1ch;
-  color: transparent;
-  pointer-events: none;
+.editor pre.highlighted .err {
+  background: var(--syntax-error-bg);
+  border-radius: 6px;
 }
 .editor .num,
 .editor .bool {
@@ -335,15 +323,45 @@ main.view-output {
   font-style: italic;
   font-weight: 300;
 }
+.editor .lines .num {
+  position: absolute;
+  color: var(--line-num-color);
+  left: 0;
+}
+.editor .lines .txt {
+  color: transparent;
+  pointer-events: none;
+}
+.editor .lines .err.num {
+  background: var(--syntax-error-bg);
+  color: var(--color);
+}
+.editor .lines .err.txt {
+  left: calc(2ch + 1.2rem);
+  right: 0;
+  padding-left: 0.3rem;
+  background: var(--syntax-error-line-bg);
+  border-radius: 6px;
+  position: absolute;
+}
+.editor .lines .err.num::after {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H2 L10 12 L2 24 H0V0 Z' fill='%230057A8'/%3E%3C/svg%3E%0A");
+  background-repeat: no-repeat;
+  content: "";
+  width: 0.8rem;
+  position: absolute;
+  right: -0.8rem;
+  top: 0;
+  bottom: 0;
+}
 
-/* --- Output --------------------------------------------------------*/
+/* --- Output -------------------------------------------------------- */
 .output {
   width: var(--output-width);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: var(--output-border-light);
-
   border-radius: var(--output-border-radius);
   margin: var(--output-margin);
   border: var(--output-border);
@@ -363,6 +381,9 @@ main.view-output {
   width: 100%;
   height: 100%;
 }
+.read {
+  display: flex;
+}
 .output .console,
 .output .read,
 .output .input {
@@ -374,9 +395,6 @@ main.view-output {
   border-top: 1px solid var(--output-border-dark);
   border-bottom: 1px solid var(--output-border-light);
   width: var(--console-size);
-}
-.read {
-  display: flex;
 }
 .output .read textarea {
   font-size: 1rem;
@@ -399,7 +417,7 @@ main.view-output {
   padding-bottom: var(--editor-padding-bottom);
 }
 
-/* --- Run -----------------------------------------------------------*/
+/* --- Run ----------------------------------------------------------- */
 .run {
   padding: 8px;
   padding-bottom: 12px;
@@ -415,7 +433,8 @@ main.view-output {
   border-top: 1px solid var(--output-border-dark);
   background: var(--output-bg);
 }
-.run button {
+.run button#run,
+.run button#run-mobile {
   color: var(--btn-color);
   background: var(--btn-bg);
   box-shadow: 0 4px 0 hsl(0deg 0% 42%), 0 16px 12px -8px hsl(0deg 0% 0% / 42%),
@@ -434,19 +453,15 @@ main.view-output {
   transition: background 0.3s ease-in-out;
   text-decoration: none;
 }
-
+.run button:disabled {
+  color: var(--btn-color-disabled);
+  box-shadow: 0 4px 0 hsl(0deg 0% 60%), 0 16px 12px -8px hsl(0deg 0% 0% / 30%),
+    inset 0 -2px 1px 1px hsl(0deg 0% 60%);
+  cursor: not-allowed;
+}
 .run button:hover:enabled {
   background: var(--btn-bg-hover);
 }
-
-.run button:disabled {
-  color: var(--btn-color-disabled);
-  box-shadow: 0 4px 0 hsl(0 0% 60%), 0 16px 12px -8px hsl(0deg 0% 0% / 30%),
-    inset 0 -2px 1px 1px hsl(0 0% 60%);
-
-  cursor: not-allowed;
-}
-
 .run button.running,
 .run button.running:hover {
   color: var(--btn-color-active);
@@ -471,32 +486,33 @@ main.view-output {
   }
 }
 
-/* --- Sample selection modal ----------------------------------------*/
-.modal {
+/* --- Sample selection modal ---------------------------------------- */
+#modal {
   position: fixed;
   z-index: 10;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
   overflow: clip;
 }
-
-.modal header {
+#modal header {
   border-bottom: 1px solid hsl(0deg 0% 100% / 30%);
   color: hsl(0deg 0% 70%);
   background: var(--modal-bg);
   justify-content: right;
 }
-
 #modal-close {
   position: relative;
   top: 0.2em;
   right: 0.2em;
   cursor: pointer;
+  background: none;
+  color: var(--color);
+  border: none;
+  font-size: 1rem;
 }
-
-.modal-main {
+#modal-close:hover {
+  color: var(--hover-color);
+}
+#modal .modal-main {
   padding: 36px 32px;
   overflow-y: auto;
   display: flex;
@@ -504,37 +520,36 @@ main.view-output {
   flex-wrap: wrap;
   height: 100%;
 }
-.modal-main .item {
+#modal .modal-main .item {
   width: var(--modal-item-width);
   padding-bottom: 16px;
 }
-.modal-main h2 {
+#modal .modal-main h2 {
   font-family: var(--ff);
   font-weight: 700;
   font-size: 1rem;
   padding-bottom: 8px;
 }
-.modal-main ul {
+#modal .modal-main ul {
   padding-left: 6px;
   margin-bottom: 0;
   list-style: none;
 }
-.modal-main ul li {
+#modal .modal-main li {
   padding-bottom: 6px;
   line-height: 1.6;
 }
-.modal ul li a {
+#modal li a {
   font-family: var(--ff);
   color: var(--modal-color);
   padding-left: 1.5rem;
   text-decoration: none;
   position: relative;
 }
-.modal ul li a:hover {
+#modal ul li a:hover {
   color: var(--modal-color-hover);
 }
-
-.modal ul li a::before {
+#modal ul li a::before {
   content: "";
   position: absolute;
   height: 1rem;
@@ -547,7 +562,7 @@ main.view-output {
   display: inline-block;
   z-index: 1;
 }
-.modal ul li:not(:last-child) a::after {
+#modal ul li:not(:last-child) a::after {
   content: "";
   position: absolute;
   height: 100%;
@@ -557,7 +572,7 @@ main.view-output {
   background: var(--modal-circle-color);
 }
 
-/* --- Easter egg ----------------------------------------------------*/
+/* --- Easter egg ---------------------------------------------------- */
 .confetti {
   height: 7vw;
   width: 7vw;
@@ -574,7 +589,7 @@ main.view-output {
   transition: opacity 1.5s ease-in-out;
 }
 
-/* --- Utilities -----------------------------------------------------*/
+/* --- Utilities ----------------------------------------------------- */
 .desktop {
   display: var(--display-desktop-only);
 }

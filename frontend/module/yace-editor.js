@@ -36,14 +36,18 @@ export default class Yace {
     this.textarea.autocapitalize = false
     this.textarea.wrap = "off"
 
-    this.pre = document.createElement("pre")
+    this.highlighted = document.createElement("pre")
+    this.highlighted.classList.add("highlighted")
+    this.lines = document.createElement("pre")
+    this.lines.classList.add("lines")
+    this.errorLines = {}
 
     this.root.appendChild(this.textarea)
-    this.root.appendChild(this.pre)
+    this.root.appendChild(this.lines)
+    this.root.appendChild(this.highlighted)
 
     this.addTextareaEvents()
     this.update({ value: this.options.value })
-    this.updateLines()
   }
 
   addTextareaEvents() {
@@ -62,7 +66,7 @@ export default class Yace {
   }
 
   update(textareaProps) {
-    const { value, selectionStart, selectionEnd } = textareaProps
+    const { value, selectionStart, selectionEnd, errorLines } = textareaProps
     // should be before updating selection otherwise selection will be lost
     if (value != null) {
       this.textarea.value = value
@@ -71,48 +75,50 @@ export default class Yace {
     this.textarea.selectionStart = selectionStart
     this.textarea.selectionEnd = selectionEnd
 
-    if (value === this.value || value == null) {
+    if (
+      (value === this.value || value == null) &&
+      (!errorLines || Object.keys(errorLines).length === 0)
+    ) {
       return
     }
+    this.value = value || this.value
+    this.errorLines = errorLines || this.errorLines
+    const lines = this.value.split("\n")
+    this.updateErrorLines(lines)
+    const highlighted = this.options.highlighter(this.value, this.errorLines)
+    this.highlighted.innerHTML = highlighted + "<br/>"
 
-    this.value = value
-
-    const highlighted = this.options.highlighter(value)
-    this.pre.innerHTML = highlighted + "<br/>"
-
-    this.updateLines()
+    this.updateLines(lines)
 
     if (this.updateCallback) {
       this.updateCallback(value)
     }
   }
 
-  updateLines() {
-    if (!this.options.lineNumbers) {
-      return
-    }
-
-    if (!this.lines) {
-      this.lines = document.createElement("pre")
-      this.root.appendChild(this.lines)
-      this.lines.classList.add("lines")
-    }
-
-    const lines = this.value.split("\n")
+  updateLines(lines) {
     const length = lines.length.toString().length
 
-    this.root.style.paddingLeft = `${length + 2}ch`
+    const paddingLeft = `calc(${length}ch + 1.5rem)`
+    this.root.style.paddingLeft = paddingLeft
+    this.lines.style.paddingLeft = paddingLeft
 
     this.lines.innerHTML = lines
       .map((line, number) => {
-        // prettier-ignore
-        const num = `${number+1}`.padStart(length)
-        const lineNumber = `<span class="num"> ${num}</span>`
-        // prettier-ignore
-        const lineText = `<span class="txt">${escape(line)}</span>`;
+        const num = `${number + 1}`.padStart(length)
+        const errClass = this.errorLines[number + 1] ? "err " : ""
+        const lineNumber = `<span class="${errClass}num"> ${num}</span>`
+        const lineText = `<span class="${errClass}txt">${escape(line)}</span>`
         return `${lineNumber}${lineText}`
       })
       .join("\n")
+  }
+
+  updateErrorLines(lines) {
+    for (const [idx, { text }] of Object.entries(this.errorLines)) {
+      if (lines[idx - 1] !== text) {
+        delete this.errorLines[idx]
+      }
+    }
   }
 
   destroy() {
@@ -427,11 +433,9 @@ const tab =
     }
   }
 // evy highlighter
-function highlightEvy(val) {
-  const { tokens, funcs } = tokenize(val)
-  const type = (t) => (t.type === "ident" && funcs.has(t.val) ? "func" : t.type)
-
-  const span = (t) => `<span class="${type(t)}">${escape(t.val)}</span>`
+function highlightEvy(val, errorLines) {
+  const tokens = tokenize(val, errorLines)
+  const span = (t) => `<span class="${t.err}${t.type}">${escape(t.val)}</span>`
   const result = tokens.map((t) => span(t)).join("")
   return result
 }
@@ -490,56 +494,82 @@ const keywords = new Set([
   "end",
 ])
 
-function tokenize(str) {
+function tokenize(str, errorLines) {
   let tokens = []
   let i = 0
   let prev = ""
   let funcs = new Set()
-  while (i < str.length) {
+  let lineIdx = 1
+  let lineOffset = 0
+  const chars = Array.from(str)
+
+  while (i < chars.length) {
     const start = i
-    const c = str[i]
+    const c = chars[i]
     let type
     i++
     if (isWS(c)) {
       type = "ws"
-      i = readWS(str, i)
+      i = readWS(chars, i)
     } else if (isOP(c)) {
       type = "op"
-      str[i] === "=" && i++
-    } else if (c === ":" && str[i] === "=") {
+      chars[i] === "=" && i++
+    } else if (c === ":" && chars[i] === "=") {
       i++
       type = "op"
-    } else if (isPunc(c) || (c === ":" && str[i] !== "=")) {
+    } else if (isPunc(c) || (c === ":" && chars[i] !== "=")) {
       type = "punc"
-    } else if (c === "/" && str[i] == "/") {
+    } else if (c === "/" && chars[i] == "/") {
       type = "comment"
-      i = readComment(str, i)
-    } else if (c === "/" && str[i] != "/") {
+      i = readComment(chars, i)
+    } else if (c === "/" && chars[i] != "/") {
       type = "op"
     } else if (c === '"') {
       type = "str"
-      i = readString(str, i)
+      i = readString(chars, i)
     } else if (isDigit(c)) {
       type = "num"
-      i = readNum(str, i)
+      i = readNum(chars, i)
     } else if (isLetter(c)) {
       type = "ident"
-      i = readIdent(str, i)
+      i = readIdent(chars, i)
     } else if (c === "\n") {
       type = "nl"
     } else {
       type = "error"
     }
-    const val = str.substring(start, i)
+    let val = chars.slice(start, i).join("")
     if (type == "ident") {
       type = identType(val, prev, funcs)
     }
-    tokens.push({ type, val })
+    const errLine = errorLines[lineIdx]
+    let err = ""
+    if (errLine) {
+      const errCol = errLine.col - 1
+      const startCol = start - lineOffset
+      const endCol = i - lineOffset
+      if (errCol >= startCol && errCol < endCol) {
+        err = "err "
+      }
+    }
     if (type !== "ws") {
       prev = val
     }
+    if (type === "nl") {
+      lineIdx++
+      lineOffset = i
+      if (err) {
+        val = " \n"
+      }
+    }
+    tokens.push({ type, val, err })
   }
-  return { tokens, funcs }
+  tokens.forEach((t) => {
+    if (t.type === "ident" && funcs.has(t.val)) {
+      t.type = "func"
+    }
+  })
+  return tokens
 }
 
 function isWS(s) {

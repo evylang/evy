@@ -27,7 +27,7 @@ function initWasm() {
     .then((obj) => (wasmModule = obj))
     .catch((err) => console.error(err))
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
   runButton.disabled = false
   runButtonMob.onclick = handleMobRun
@@ -185,7 +185,7 @@ async function handleMobRun() {
   }
   // on output screen
   if (stopped) {
-    const runButtonMob = document.querySelector("#run-mob")
+    const runButtonMob = document.querySelector("#run-mobile")
     runButtonMob.innerText = "Run"
     slide()
     return
@@ -201,7 +201,7 @@ async function start() {
   clearOutput()
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.innerText = "Stop"
   runButton.classList.add("running")
   runButtonMob.innerText = "Stop"
@@ -234,7 +234,7 @@ function afterStop() {
   wasmInst = undefined
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.classList.remove("running")
   runButton.innerText = "Run"
   runButtonMob.classList.remove("running")
@@ -498,7 +498,7 @@ function registerEventHandler(ptr, len) {
 
 function unfocusRunBotton() {
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   document.activeElement === runButton && runButton.blur()
   document.activeElement === runButtonMob && runButtonMob.blur()
 }

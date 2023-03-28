@@ -146,6 +146,7 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	parserBuiltins := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
 	prog, err := parser.Parse(in, parserBuiltins)
 	if err != nil {
+		fmt.Println("parser error")
 		return fmt.Errorf("%w: %w", errParse, parser.TruncateError(err, 8))
 	}
 	out := prog.Format()

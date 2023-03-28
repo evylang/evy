@@ -544,7 +544,10 @@ func (i *IfStmt) AlwaysTerminates() bool {
 }
 
 func (e *EventHandlerStmt) String() string {
-	body := e.Body.String()
+	body := ""
+	if e.Body != nil {
+		body = e.Body.String()
+	}
 	return "on " + e.Name + " {\n" + body + "}\n"
 }
 

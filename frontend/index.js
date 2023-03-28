@@ -58,6 +58,7 @@ function newEvyGo() {
     // advanced canvas
     poly,
     ellipse,
+    curve,
     stroke,
     fill,
     dash,
@@ -99,6 +100,7 @@ function needsCanvas(f) {
     f.clear ||
     f.poly ||
     f.ellipse ||
+    f.curve ||
     f.stroke ||
     f.fill ||
     f.dash ||
@@ -558,6 +560,71 @@ function ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle) {
     startAngle * rad,
     endAngle * rad
   )
+  fill && ctx.fill()
+  stroke && ctx.stroke()
+}
+
+// curve is exported to evy go/wasm.
+// curve draws connected curve segments encoded as string
+// representing 2 dimensional array, e.g.:
+//  "1 2 3 4,5 6" => [[1,2,3,4], [5,6]]
+// the curve segments here are 1 2 3 4 and 5 6
+//
+// curve segments are interpreted differently depending on their
+// **length**:
+// 2: endX, endY - Line from current position end position x, y
+// 4: controlX, controlY, endX, endY: quadratic bezier curve, see
+//    https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo
+// 5: control1X, control1Y, control2X, control2Y, radius: arcTo, see
+//    https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arcTo
+// 6: control1X, control1Y, control2X, control2Y, endX, endY: bezierCurveTo, see
+//    https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo
+//
+// This notation is very dense and is intended as escape hatch for advanced graphics.
+function curve(ptr, len) {
+  const s = memToString(ptr, len)
+  // parse "1 2 3 4,5 6" into [[1,2,3,4], [5,6]]:
+  const curves = s.split(",").map((s) => s.split(" ").map(Number))
+
+  const { x, y, ctx, fill, stroke } = canvas
+
+  ctx.beginPath()
+  ctx.moveTo(x, y)
+
+  for (const curve of courves) {
+    switch (curve.length) {
+      case 2:
+        ctx.lineTo(transformX(curve[0]), transformY(curve[1]))
+        break
+      case 4:
+        ctx.quadraticCurveTo(
+          transformX(curve[0]), // controlPoint.x
+          transformY(curve[1]), // controlPoint.y
+          transformX(curve[2]), // endPoint.x
+          transformY(curve[3]) // endPoint.y
+        )
+        break
+      case 5:
+        ctx.arcTo(
+          transformX(curve[0]), // controlPoint1.x
+          transformY(curve[1]), // controlPoint1.y
+          transformX(curve[2]), // controlPoint2.x
+          transformY(curve[3]), // controlPoint1.y
+          transformX(curve[4]) // radius
+        )
+        break
+      case 6:
+        ctx.bezierCurveTo(
+          transformX(curve[0]), // controlPoint1.x
+          transformY(curve[1]), // controlPoint1.y
+          transformX(curve[2]), // controlPoint2.x
+          transformY(curve[3]), // controlPoint1.y
+          transformX(curve[4]), // endPoint.x
+          transformY(curve[5]) // endPoint.y
+        )
+        break
+    }
+  }
   fill && ctx.fill()
   stroke && ctx.stroke()
 }

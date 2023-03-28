@@ -476,6 +476,7 @@ const builtins = new Set([
   "clear",
   "poly",
   "ellipse",
+  "curve",
   "stroke",
   "fill",
   "dash",

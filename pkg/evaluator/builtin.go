@@ -86,6 +86,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"line":   xyBuiltin("line", rt.Line),
 		"rect":   xyBuiltin("rect", rt.Rect),
 		"circle": numBuiltin("circle", rt.Circle),
+
 		"width":  numBuiltin("width", rt.Width),
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
@@ -93,6 +94,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 
 		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
 		"ellipse": {Func: ellipseFunc(rt.Ellipse), Decl: ellipseDecl},
+		"curve":   {Func: curveFunc(rt.Curve), Decl: curveDecl},
 
 		"stroke":  stringBuiltin("stroke", rt.Stroke),
 		"fill":    stringBuiltin("fill", rt.Fill),
@@ -154,6 +156,7 @@ type GraphicsRuntime interface {
 	// advanced graphics functions
 	Poly(vertices [][]float64)
 	Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)
+	Curve(sements [][]float64)
 	Stroke(s string)
 	Fill(s string)
 	Dash(segments []float64)
@@ -191,6 +194,7 @@ func (rt *UnimplementedRuntime) Width(w float64)           { rt.Unimplemented("w
 func (rt *UnimplementedRuntime) Color(s string)            { rt.Unimplemented("color") }
 func (rt *UnimplementedRuntime) Clear(color string)        { rt.Unimplemented("clear") }
 func (rt *UnimplementedRuntime) Poly(vertices [][]float64) { rt.Unimplemented("poly") }
+func (rt *UnimplementedRuntime) Curve(sements [][]float64) { rt.Unimplemented("curve") }
 func (rt *UnimplementedRuntime) Stroke(s string)           { rt.Unimplemented("stroke") }
 func (rt *UnimplementedRuntime) Fill(s string)             { rt.Unimplemented("fill") }
 func (rt *UnimplementedRuntime) Dash(segments []float64)   { rt.Unimplemented("dash") }
@@ -642,6 +646,31 @@ func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, en
 			endAngle = args[6].(*Num).Val
 		}
 		ellipseFn(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+		return nil, nil
+	}
+}
+
+var curveDecl = &parser.FuncDeclStmt{
+	Name:          "curve",
+	VariadicParam: &parser.Var{Name: "n", T: numArrayType},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func curveFunc(curveFn func([][]float64)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		segments := make([][]float64, len(args))
+		for i, arg := range args {
+			vertex := arg.(*Array)
+			elements := *vertex.Elements
+			if len(elements) < 2 || len(elements) == 3 || len(elements) > 6 {
+				return nil, fmt.Errorf("%w: 'curve' argument %d has %d elements, expected 2, 4, 5 or 6", ErrBadArguments, i+1, len(elements))
+			}
+			segments[i] = make([]float64, len(elements))
+			for j, val := range elements {
+				segments[i][j] = val.(*Num).Val
+			}
+		}
+		curveFn(segments)
 		return nil, nil
 	}
 }

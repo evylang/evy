@@ -185,7 +185,6 @@ func (p *parser) parseFunc(scope *scope) Node {
 	p.advance()  // advance past FUNC
 	tok := p.cur // function name
 	funcName := p.cur.Literal
-
 	p.advancePastNL() // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
 	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
@@ -202,6 +201,7 @@ func (p *parser) parseFunc(scope *scope) Node {
 	if fd.ReturnType != NONE_TYPE && !block.AlwaysTerminates() {
 		p.appendError("missing return")
 	}
+
 	p.assertEnd()
 	p.advance()
 	p.recordComment(block)

@@ -57,6 +57,14 @@ func (rt *jsRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float6
 	ellipse(x, y, rX, rY, rotation, startAngle, endAngle)
 }
 
+func (rt *jsRuntime) Curve(segments [][]float64) {
+	sStrings := make([]string, len(segments))
+	for i, segment := range segments {
+		sStrings[i] = floatsToString(segment)
+	}
+	curve(strings.Join(sStrings, ","))
+}
+
 func floatsToString(floats []float64) string {
 	if len(floats) == 0 {
 		return ""
@@ -180,16 +188,6 @@ func rect(dx, dy float64)
 //export circle
 func circle(r float64)
 
-// width is imported from JS, setting the lineWidth
-//
-//export width
-func width(w float64)
-
-// color is imported from JS
-//
-//export color
-func color(s string)
-
 // clear is imported from JS
 //
 //export clear
@@ -204,6 +202,21 @@ func poly(s string)
 //
 //export ellipse
 func ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64)
+
+// curve is imported from JS
+//
+//export curve
+func curve(s string)
+
+// width is imported from JS, setting the lineWidth
+//
+//export width
+func width(w float64)
+
+// color is imported from JS
+//
+//export color
+func color(s string)
 
 // stroke is imported from JS
 //

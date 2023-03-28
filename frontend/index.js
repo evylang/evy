@@ -13,6 +13,7 @@ let animationStart
 let courses
 let actions = "fmt,ui,eval"
 let editor
+let errors = false
 // --- Initialise ------------------------------------------------------
 
 initWasm()
@@ -27,7 +28,7 @@ function initWasm() {
     .then((obj) => (wasmModule = obj))
     .catch((err) => console.error(err))
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
   runButton.disabled = false
   runButtonMob.onclick = handleMobRun
@@ -110,6 +111,7 @@ function jsRead() {
 }
 
 function jsError(ptr, len) {
+  errors = true
   const code = editor.value
   const lines = code.split("\n")
   const errs = memToString(ptr, len).split("\n")
@@ -185,7 +187,7 @@ async function handleMobRun() {
   }
   // on output screen
   if (stopped) {
-    const runButtonMob = document.querySelector("#run-mob")
+    const runButtonMob = document.querySelector("#run-mobile")
     runButtonMob.innerText = "Run"
     slide()
     return
@@ -197,11 +199,12 @@ async function handleMobRun() {
 // code and initialises the output ui.
 async function start() {
   stopped = false
+  errors = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   clearOutput()
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.innerText = "Stop"
   runButton.classList.add("running")
   runButtonMob.innerText = "Stop"
@@ -212,6 +215,8 @@ async function start() {
 
 // format calls evy wasm/go main() but doesn't evaluate.
 async function format() {
+  stopped = false
+  errors = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
   actions = "fmt,ui"
   go.run(wasmInst)
@@ -234,7 +239,7 @@ function afterStop() {
   wasmInst = undefined
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   runButton.classList.remove("running")
   runButton.innerText = "Run"
   runButtonMob.classList.remove("running")
@@ -276,6 +281,7 @@ async function initUI() {
   await fetchCourses()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
+  document.querySelector("#share").onclick = share
   initModal()
   handleHashChange()
   initEditor()
@@ -305,8 +311,15 @@ async function handleHashChange() {
   hideModal()
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
-  if (!opts.source && !opts.unit) {
+  if (!opts.source && !opts.unit && !opts.content) {
     opts = { unit: "welcome" }
+  }
+  if (opts.content) {
+    console.log("start content update")
+    const decoded = await decode(opts.content)
+    editor.update({ value: decoded, errorLines: {} })
+    console.log("finished content update")
+    return
   }
   let crumbs = ["Evy"]
   if (opts.unit) {
@@ -498,7 +511,7 @@ function registerEventHandler(ptr, len) {
 
 function unfocusRunBotton() {
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mob")
+  const runButtonMob = document.querySelector("#run-mobile")
   document.activeElement === runButton && runButton.blur()
   document.activeElement === runButtonMob && runButtonMob.blur()
 }
@@ -575,9 +588,22 @@ function hideModal() {
   el.classList.add("hidden")
 }
 
-function showModal() {
-  const el = document.querySelector("#modal")
-  el.classList.remove("hidden")
+function showCourses() {
+  const courses = document.querySelector("#modal-courses")
+  courses.classList.remove("hidden")
+  const share = document.querySelector("#modal-share")
+  share.classList.add("hidden")
+  const modal = document.querySelector("#modal")
+  modal.classList.remove("hidden")
+}
+
+function showSharing() {
+  const share = document.querySelector("#modal-share")
+  share.classList.remove("hidden")
+  const courses = document.querySelector("#modal-courses")
+  courses.classList.add("hidden")
+  const modal = document.querySelector("#modal")
+  modal.classList.remove("hidden")
 }
 
 function updateBreadcrumbs(crumbs) {
@@ -589,7 +615,7 @@ function updateBreadcrumbs(crumbs) {
 function breadcrumb(s) {
   const btn = document.createElement("button")
   btn.textContent = s
-  btn.onclick = () => showModal()
+  btn.onclick = () => showCourses()
   const li = document.createElement("li")
   li.appendChild(btn)
   return li
@@ -648,6 +674,91 @@ function showConfetti() {
   setTimeout(() => {
     confettiDivs.forEach((div) => div.classList.add("fadeout"))
   }, 8500)
+}
+
+// --- Share / load snippets -------------------------------------------
+
+async function share() {
+  console.log("share")
+  await format()
+  const el = document.querySelector("#modal-share")
+
+  if (errors) {
+    const msg = document.createElement("label")
+    msg.textContent = "Fix errors first please."
+    const button = document.createElement("button")
+    button.innerText = "OK"
+    button.onclick = hideModal
+    el.replaceChildren(msg, button)
+    showSharing()
+    console.log("Fix errors first please.")
+    return
+  }
+  const encoded = await encode(editor.value)
+  const msg = document.createElement("label")
+  msg.textContent = "Share"
+  const input = document.createElement("input")
+  input.type = "text"
+  input.onclick = input.select
+  const baseurl = window.location.origin + window.location.pathname
+  input.value = `${baseurl}#content=${encoded}`
+  const button = document.createElement("button")
+  button.className = "copy"
+  button.innerHTML = `<svg><use href="#icon-copy" /></svg>`
+  button.onclick = () => {
+    navigator.clipboard.writeText(input.value)
+    hideModal()
+  }
+  el.replaceChildren(msg, input, button)
+  showSharing()
+  console.log(encoded)
+}
+
+async function encode(input) {
+  await polyfillCompression()
+  const buffer = new TextEncoder().encode(input)
+  const stream = readableStream(buffer).pipeThrough(new CompressionStream("gzip"))
+  const compressedBuffer = await bufferFromStream(stream)
+  const encoded = btoa(String.fromCharCode(...compressedBuffer))
+  return encoded
+}
+
+async function decode(encoded) {
+  await polyfillCompression()
+  const bytes = atob(encoded).split("")
+  const buffer = new Uint8Array(bytes.map((b) => b.charCodeAt(0)))
+  const stream = readableStream(buffer).pipeThrough(new DecompressionStream("gzip"))
+  const decompressedBuffer = await bufferFromStream(stream)
+  const decoded = new TextDecoder().decode(decompressedBuffer)
+  return decoded
+}
+
+async function polyfillCompression() {
+  if (!window.CompressionStream) {
+    await import("https://unpkg.com/compression-streams-polyfill")
+  }
+}
+
+function readableStream(buffer) {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(buffer)
+      controller.close()
+    },
+  })
+}
+
+async function bufferFromStream(stream) {
+  const reader = stream.getReader()
+  let buffer = new Uint8Array()
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
+    }
+    buffer = new Uint8Array([...buffer, ...value])
+  }
+  return buffer
 }
 
 // --- Utilities -------------------------------------------------------

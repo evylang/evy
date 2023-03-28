@@ -154,16 +154,20 @@ header .logo img {
   height: 1.2em;
   top: var(--header-img-top);
 }
-header .share {
+#share {
   order: 3;
   flex: 1;
   text-align: right;
   color: var(--color);
+  cursor: pointer;
 }
-header .share > * {
+#share:hover {
+  color: var(--color-hover);
+}
+#share > * {
   display: var(--display-desktop-only);
 }
-header .share svg {
+#share svg {
   position: relative;
   top: 0.2em;
 }
@@ -512,7 +516,8 @@ main.view-output {
 #modal-close:hover {
   color: var(--hover-color);
 }
-#modal .modal-main {
+.modal-main {
+  font-family: var(--ff);
   padding: 36px 32px;
   overflow-y: auto;
   display: flex;
@@ -570,6 +575,52 @@ main.view-output {
   top: 1rem;
   width: 2px;
   background: var(--modal-circle-color);
+}
+
+#modal-share {
+  justify-content: center;
+  padding-top: 48px;
+}
+#modal-share label {
+  line-height: 2rem;
+}
+#modal-share input,
+#modal-share button {
+  height: 2rem;
+}
+#modal-share button {
+  padding: 4px 16px;
+  margin-left: 16px;
+  color: var(--btn-color);
+  background: var(--btn-bg);
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+}
+#modal-share button {
+  cursor: pointer;
+  background: var(--btn-bg-hover);
+}
+#modal-share button.copy {
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid hsl(0deg 0% 70%);
+}
+#modal-share button.copy svg {
+  width: 1rem;
+  height: 1rem;
+}
+#modal-share input {
+  margin-left: 16px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: none;
+  outline: none;
 }
 
 /* --- Easter egg ---------------------------------------------------- */

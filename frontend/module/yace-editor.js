@@ -81,7 +81,9 @@ export default class Yace {
     ) {
       return
     }
-    this.value = value || this.value
+    if (value != null && value != undefined) {
+      this.value = value
+    }
     this.errorLines = errorLines || this.errorLines
     const lines = this.value.split("\n")
     this.updateErrorLines(lines)

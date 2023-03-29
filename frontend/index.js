@@ -120,7 +120,9 @@ function jsError(ptr, len) {
   const errorLines = {}
   for (const err of errs) {
     const g = err.match(re).groups
-    errorLines[g.line] = { col: g.col, text: lines[g.line - 1] }
+    if (!errorLines[g.line]) {
+      errorLines[g.line] = { col: g.col, text: lines[g.line - 1] }
+    }
     msgs += `line ${g.line}: ${g.msg}\n`
   }
   const output = document.querySelector("#console")

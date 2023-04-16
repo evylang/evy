@@ -353,3 +353,37 @@ func TestString(t *testing.T) {
 		})
 	}
 }
+
+func TestStringLit(t *testing.T) {
+	in := `fn "" 0`
+	wantTokens := []*Token{
+		{Type: IDENT, Literal: "fn", Offset: 0, Line: 1, Col: 1},
+		{Type: WS, Literal: "", Offset: 2, Line: 1, Col: 3},
+		{Type: STRING_LIT, Literal: "", Offset: 3, Line: 1, Col: 4},
+		{Type: WS, Literal: "", Offset: 5, Line: 1, Col: 6},
+		{Type: NUM_LIT, Literal: "0", Offset: 6, Line: 1, Col: 7},
+	}
+	l := New(in)
+	for _, want := range wantTokens {
+		got := l.Next()
+		assert.Equal(t, want, got)
+	}
+}
+
+func TestStringLitErr(t *testing.T) {
+	in := `fn "unterminated
+"hello"`
+	wantTokens := []*Token{
+		{Type: IDENT, Literal: "fn", Offset: 0, Line: 1, Col: 1},
+		{Type: WS, Literal: "", Offset: 2, Line: 1, Col: 3},
+		{Type: ILLEGAL, Literal: "invalid string", Offset: 3, Line: 1, Col: 4},
+		{Type: NL, Literal: "", Offset: 16, Line: 1, Col: 17},
+		{Type: STRING_LIT, Literal: "hello", Offset: 17, Line: 2, Col: 1},
+		{Type: EOF, Offset: 24, Line: 2, Col: 8},
+	}
+	l := New(in)
+	for _, want := range wantTokens {
+		got := l.Next()
+		assert.Equal(t, want, got)
+	}
+}

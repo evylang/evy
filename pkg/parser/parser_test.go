@@ -1190,6 +1190,18 @@ func TestCalledBuiltinFuncs(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+func TestEmptyStringLitArg(t *testing.T) {
+	input := `
+fn "" 0
+
+func fn s:string n:num
+    print s n
+end`
+	parser := newParser(input, testBuiltins())
+	parser.Parse()
+	assertNoParseError(t, parser, input)
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

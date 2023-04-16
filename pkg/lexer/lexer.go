@@ -193,7 +193,6 @@ func (l *Lexer) readString() (string, error) {
 	pos := l.pos
 	backslashCnt := 0
 	for {
-		l.advance()
 		if l.cur == '\\' {
 			backslashCnt++
 		} else {
@@ -207,6 +206,7 @@ func (l *Lexer) readString() (string, error) {
 		if pr == 0 || pr == '\n' {
 			break // error case
 		}
+		l.advance()
 	}
 	s := string(l.input[pos : l.pos+1])
 	r, err := strconv.Unquote(s)

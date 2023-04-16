@@ -1190,6 +1190,25 @@ func TestCalledBuiltinFuncs(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+func TestBuiltinOverride(t *testing.T) {
+	input := `
+func len x:num
+  print x
+end
+print (len 5)`
+	parser := newParser(input, testBuiltins())
+	_ = parser.Parse()
+	assertParseError(t, parser, input)
+	gotErrs := parser.errors
+	wantErrs := []string{
+		"line 2 column 1: cannot override builtin function 'len'",
+		"line 5 column 7: 'print' takes variadic arguments of type 'any', found 'none'",
+	}
+	for i, err := range gotErrs {
+		assert.Equal(t, err.Error(), wantErrs[i])
+	}
+}
+
 func TestEmptyStringLitArg(t *testing.T) {
 	input := `
 fn "" 0

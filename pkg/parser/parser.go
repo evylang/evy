@@ -129,14 +129,12 @@ func newParser(input string, builtins Builtins) *parser {
 			// function can be parsed correctly even though it has an invalid name.
 			p.appendErrorForToken("cannot override builtin variable '"+fd.Name+"'", fd.token)
 		}
-		switch {
-		case p.funcs[fd.Name] == nil:
-			p.funcs[fd.Name] = fd
-		case builtins.Funcs[fd.Name] == nil:
-			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.token)
-		case builtins.Funcs[fd.Name] != nil:
+		if builtins.Funcs[fd.Name] != nil {
 			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.token)
+		} else if p.funcs[fd.Name] != nil {
+			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.token)
 		}
+		p.funcs[fd.Name] = fd // override anyway so the signature is correct for parsing the function
 	}
 	return p
 }
@@ -608,10 +606,14 @@ func (p *parser) assertEnd() {
 }
 
 func (p *parser) appendError(message string) {
-	p.errors = append(p.errors, &Error{message: message, token: p.cur})
+	p.appendErrorForToken(message, p.cur)
 }
 
 func (p *parser) appendErrorForToken(message string, token *lexer.Token) {
+	if token == nil {
+		err := fmt.Errorf("Token is nil for error %q\n previous errors: %w", message, p.errors)
+		panic(err)
+	}
 	p.errors = append(p.errors, &Error{message: message, token: token})
 }
 

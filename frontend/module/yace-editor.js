@@ -77,6 +77,7 @@ export default class Yace {
 
     if (
       (value === this.value || value == null) &&
+      Object.keys(this.errorLines).length === 0 &&
       (!errorLines || Object.keys(errorLines).length === 0)
     ) {
       return

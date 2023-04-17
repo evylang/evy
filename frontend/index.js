@@ -203,6 +203,7 @@ async function start() {
   stopped = false
   errors = false
   wasmInst = await WebAssembly.instantiate(wasmModule, go.importObject)
+  editor.update({ errorLines: {} })
   clearOutput()
 
   const runButton = document.querySelector("#run")

@@ -48,12 +48,6 @@ func delta:num d:num n:num
     return -d
 end
 
-func clear
-    color "white"
-    move 0 0
-    rect 100 100
-end
-
 func draw dot:{}num col:string
     color col
     move dot.x dot.y

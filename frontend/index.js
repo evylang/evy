@@ -54,6 +54,7 @@ function newEvyGo() {
     circle,
     rect,
     color,
+    clear,
   }
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
@@ -459,6 +460,20 @@ function circle(r) {
   ctx.beginPath()
   ctx.arc(x, y, scaleX(r), 0, Math.PI * 2, true)
   ctx.fill()
+}
+
+// clear is exported to evy go/wasm.
+function clear(ptr, len) {
+  const ctx = canvas.ctx
+  if (len === 0) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    return
+  }
+  const color = memToString(ptr, len)
+  const prevColor = ctx.fillStyle
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  ctx.fillStyle = prevColor
 }
 
 function logicalX(e) {

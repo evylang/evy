@@ -50,12 +50,6 @@ func dot x:num y:num radius:num hue:num
     circle radius
 end
 
-func clear
-    color "white"
-    move 0 0
-    rect 100 100
-end
-
 func hsl hue:num sat:num light:num
     s := sprintf "hsl(%.0fdeg %.0f%% %.0f%%)" hue%360 sat light
     color s

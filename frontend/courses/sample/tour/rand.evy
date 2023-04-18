@@ -7,11 +7,7 @@ while true
     guess := readn
 
     while guess != n
-        if guess > 10
-            print guess "Guess lower (1-10)."
-        else if guess < 1
-            print guess " Guess higher (1-10)."
-        else if guess < n
+        if guess < n
             print guess "Guess higher."
         else
             print guess "Guess lower."
@@ -23,7 +19,8 @@ while true
 end
 
 // readn reads a number.
-// If you enter a string that is not number
+// If the input is not a number readn
+// prints an error and repeats prompt.
 func readn:num
     while true
         str := read

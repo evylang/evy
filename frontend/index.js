@@ -45,14 +45,15 @@ function newEvyGo() {
     jsError,
     evySource,
     setEvySource,
+    afterStop,
+    registerEventHandler,
+    // canvas
     move,
     line,
     width,
     circle,
     rect,
     color,
-    afterStop,
-    registerEventHandler,
   }
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
@@ -318,10 +319,8 @@ async function handleHashChange() {
     opts = { unit: "welcome" }
   }
   if (opts.content) {
-    console.log("start content update")
     const decoded = await decode(opts.content)
     editor.update({ value: decoded, errorLines: {} })
-    console.log("finished content update")
     return
   }
   let crumbs = ["Evy"]
@@ -411,7 +410,7 @@ function transformY(y) {
   return scaleY(y + canvas.offset.y)
 }
 
-// move is exported to evy go/wasm
+// move is exported to evy go/wasm.
 function move(x, y) {
   movePhysical(transformX(x), transformY(y))
 }
@@ -421,7 +420,7 @@ function movePhysical(px, py) {
   canvas.y = py
 }
 
-// line is exported to evy go/wasm
+// line is exported to evy go/wasm.
 function line(x2, y2) {
   const { ctx, x, y } = canvas
   const px2 = transformX(x2)
@@ -433,19 +432,19 @@ function line(x2, y2) {
   movePhysical(px2, py2)
 }
 
-// color is exported to evy go/wasm
+// color is exported to evy go/wasm.
 function color(ptr, len) {
   const s = memToString(ptr, len)
   canvas.ctx.fillStyle = s
   canvas.ctx.strokeStyle = s
 }
 
-// width is exported to evy go/wasm
+// width is exported to evy go/wasm.
 function width(n) {
   canvas.ctx.lineWidth = scaleX(n)
 }
 
-// rect is exported to evy go/wasm
+// rect is exported to evy go/wasm.
 function rect(dx, dy) {
   const { ctx, x, y } = canvas
   const sDX = scaleX(dx)
@@ -454,7 +453,7 @@ function rect(dx, dy) {
   movePhysical(x + sDX, y + sDY)
 }
 
-// circle is exported to evy go/wasm
+// circle is exported to evy go/wasm.
 function circle(r) {
   const { x, y, ctx } = canvas
   ctx.beginPath()
@@ -682,7 +681,6 @@ function showConfetti() {
 // --- Share / load snippets -------------------------------------------
 
 async function share() {
-  console.log("share")
   await format()
   const el = document.querySelector("#modal-share")
 
@@ -694,7 +692,6 @@ async function share() {
     button.onclick = hideModal
     el.replaceChildren(msg, button)
     showSharing()
-    console.log("Fix errors first please.")
     return
   }
   const encoded = await encode(editor.value)
@@ -714,7 +711,6 @@ async function share() {
   }
   el.replaceChildren(msg, input, button)
   showSharing()
-  console.log(encoded)
 }
 
 async function encode(input) {

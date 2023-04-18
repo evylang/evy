@@ -627,20 +627,16 @@ function readIdent(s, i) {
 }
 
 function readString(s, i) {
-  let backslashCnt = 0
+  let escaped = false
   while (i < s.length) {
     const c = s[i]
-    if (c === "\\") {
-      backslashCnt++
-    } else {
-      backslashCnt = 0
-    }
-    if (c === '"' && backslashCnt % 2 == 0) {
-      return i + 1
-    }
     if (c === "\n") {
       return i
     }
+    if (c === '"' && !escaped) {
+      return i + 1
+    }
+    escaped = c === "\\" && !escaped
     i++
   }
   return i

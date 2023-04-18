@@ -5,12 +5,6 @@ for i := range 0 100 0.1
     sleep 0.01
 end
 
-func clear
-    color "white"
-    move 0 0
-    rect 100 100
-end
-
 func dot x:num y:num
     color "red"
     move x y

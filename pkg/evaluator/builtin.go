@@ -89,6 +89,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"width":  numBuiltin("width", rt.Width),
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
+		"clear":  {Func: clearFunc(rt.Clear), Decl: clearDecl},
 	}
 	xyParams := []*parser.Var{
 		{Name: "x", T: parser.NUM_TYPE},
@@ -135,6 +136,7 @@ type GraphicsRuntime interface {
 	Circle(radius float64)
 	Width(w float64)
 	Color(s string)
+	Clear(color string)
 }
 
 type UnimplementedRuntime struct {
@@ -162,6 +164,7 @@ func (rt *UnimplementedRuntime) Rect(x, y float64)     { rt.Unimplemented("rect"
 func (rt *UnimplementedRuntime) Circle(r float64)      { rt.Unimplemented("circle") }
 func (rt *UnimplementedRuntime) Width(w float64)       { rt.Unimplemented("width") }
 func (rt *UnimplementedRuntime) Color(s string)        { rt.Unimplemented("color") }
+func (rt *UnimplementedRuntime) Clear(color string)    { rt.Unimplemented("clear") }
 
 var readDecl = &parser.FuncDeclStmt{
 	Name:       "read",
@@ -521,6 +524,26 @@ var rand1Decl = &parser.FuncDeclStmt{
 
 func rand1Func(_ *scope, args []Value) (Value, error) {
 	return &Num{Val: rand.Float64()}, nil //nolint: gosec
+}
+
+var clearDecl = &parser.FuncDeclStmt{
+	Name:          "clear",
+	VariadicParam: &parser.Var{Name: "s", T: parser.STRING_TYPE},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func clearFunc(clearFn func(string)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		if len(args) > 1 {
+			return nil, fmt.Errorf("%w: 'clear' takes 0 or 1 string arguments", ErrBadArguments)
+		}
+		color := ""
+		if len(args) == 1 {
+			color = args[0].(*String).Val
+		}
+		clearFn(color)
+		return nil, nil
+	}
 }
 
 func xyDecl(name string) *parser.FuncDeclStmt {

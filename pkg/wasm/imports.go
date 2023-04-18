@@ -33,6 +33,7 @@ func (rt *jsRuntime) Rect(x, y float64)          { rect(x, y) }
 func (rt *jsRuntime) Circle(r float64)           { circle(r) }
 func (rt *jsRuntime) Width(w float64)            { width(w) }
 func (rt *jsRuntime) Color(s string)             { color(s) }
+func (rt *jsRuntime) Clear(color string)         { clear(color) }
 func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
 
 // sleepingYielder yields the CPU so that JavaScript/browser events
@@ -156,6 +157,11 @@ func width(w float64)
 //
 //export color
 func color(s string)
+
+// clear is imported from JS
+//
+//export clear
+func clear(s string)
 
 // setEvySource is imported from JS
 //

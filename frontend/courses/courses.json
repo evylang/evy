@@ -22,7 +22,9 @@
         { "id": "dot", "title": "Red Dot" },
         { "id": "lines", "title": "Lines" },
         { "id": "squares", "title": "Squares" },
-        { "id": "rainbow", "title": "Rainbow" }
+        { "id": "rainbow", "title": "Rainbow" },
+        { "id": "fill", "title": "Stroke and Fill" },
+        { "id": "linestyle", "title": "Line Styles" }
       ]
     },
     {

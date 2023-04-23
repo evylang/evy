@@ -1,0 +1,44 @@
+width 2
+
+move 10 65
+color "red"
+circle 7
+move 3 40
+rect 14 14
+move 3 35
+line 17 35
+
+move 30 65
+stroke "blue"
+circle 7
+move 23 40
+rect 14 14
+move 23 35
+line 37 35
+
+move 50 65
+color "green"
+fill "orange"
+circle 7
+move 43 40
+rect 14 14
+move 43 35
+line 57 35
+
+move 70 65
+stroke "deeppink"
+fill "cyan"
+circle 7
+move 63 40
+rect 14 14
+move 63 35
+line 77 35
+
+move 90 65
+stroke "violet"
+fill "none"
+circle 7
+move 83 40
+rect 14 14
+move 83 35
+line 97 35

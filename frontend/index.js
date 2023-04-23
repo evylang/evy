@@ -55,6 +55,11 @@ function newEvyGo() {
     rect,
     color,
     clear,
+    // advanced canvas
+    stroke,
+    fill,
+    dash,
+    linecap,
   }
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
@@ -77,7 +82,20 @@ function jsPrepareUI(ptr, len) {
 }
 
 function needsCanvas(f) {
-  return f.move || f.line || f.width || f.circle || f.rect || f.color || f.colour
+  return (
+    f.move ||
+    f.line ||
+    f.width ||
+    f.circle ||
+    f.rect ||
+    f.color ||
+    f.colour ||
+    f.clear ||
+    f.stroke ||
+    f.fill ||
+    f.dash ||
+    f.linecap
+  )
 }
 
 // jsPrint converts wasmInst memory bytes from ptr to ptr+len to string and
@@ -373,6 +391,8 @@ function newCanvas() {
     scale: { x: 1, y: -1 },
     width: 100,
     height: 100,
+    fill: true,
+    stroke: true,
 
     offset: { x: 0, y: -100 }, // height
   }
@@ -392,6 +412,10 @@ function resetCanvas() {
   ctx.fillStyle = "black"
   ctx.strokeStyle = "black"
   ctx.lineWidth = 1
+  canvas.fill = true
+  canvas.stroke = true
+  ctx.lineCap = "butt"
+  ctx.setLineDash([])
   move(0, 0)
 }
 
@@ -436,6 +460,8 @@ function line(x2, y2) {
 // color is exported to evy go/wasm.
 function color(ptr, len) {
   const s = memToString(ptr, len)
+  canvas.stroke = s !== "none"
+  canvas.fill = s !== "none"
   canvas.ctx.fillStyle = s
   canvas.ctx.strokeStyle = s
 }
@@ -447,19 +473,21 @@ function width(n) {
 
 // rect is exported to evy go/wasm.
 function rect(dx, dy) {
-  const { ctx, x, y } = canvas
+  const { ctx, x, y, fill, stroke } = canvas
   const sDX = scaleX(dx)
   const sDY = scaleY(dy)
-  canvas.ctx.fillRect(x, y, sDX, sDY)
+  fill && ctx.fillRect(x, y, sDX, sDY)
+  stroke && ctx.strokeRect(x, y, sDX, sDY)
   movePhysical(x + sDX, y + sDY)
 }
 
 // circle is exported to evy go/wasm.
 function circle(r) {
-  const { x, y, ctx } = canvas
+  const { x, y, ctx, fill, stroke } = canvas
   ctx.beginPath()
   ctx.arc(x, y, scaleX(r), 0, Math.PI * 2, true)
-  ctx.fill()
+  fill && ctx.fill()
+  stroke && ctx.stroke()
 }
 
 // clear is exported to evy go/wasm.
@@ -474,6 +502,33 @@ function clear(ptr, len) {
   ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = prevColor
+}
+
+// stroke is exported to evy go/wasm.
+function stroke(ptr, len) {
+  const s = memToString(ptr, len)
+  canvas.stroke = s !== "none"
+  canvas.ctx.strokeStyle = s
+}
+
+// fill is exported to evy go/wasm.
+function fill(ptr, len) {
+  const s = memToString(ptr, len)
+  canvas.fill = s !== "none"
+  canvas.ctx.fillStyle = s
+}
+
+// dash is exported to evy go/wasm.
+function dash(ptr, len) {
+  const s = memToString(ptr, len)
+  const nums = s.split(" ").map(Number).map(transformX)
+  canvas.ctx.setLineDash(nums)
+}
+
+// linecap is exported to evy go/wasm.
+function linecap(ptr, len) {
+  const s = memToString(ptr, len)
+  canvas.ctx.lineCap = s
 }
 
 function logicalX(e) {

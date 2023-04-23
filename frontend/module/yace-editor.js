@@ -474,6 +474,11 @@ const builtins = new Set([
   "width",
   "color",
   "colour",
+  "clear",
+  "stroke",
+  "fill",
+  "dash",
+  "linecap",
 ])
 
 const keywords = new Set([

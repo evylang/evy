@@ -8,6 +8,8 @@ package main
 // implement evaluator.Runtime.
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"foxygo.at/evy/pkg/evaluator"
@@ -24,6 +26,7 @@ func newJSRuntime() *jsRuntime {
 	return &jsRuntime{yielder: newSleepingYielder()}
 }
 
+func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
 func (*jsRuntime) Print(s string)                { jsPrint(s) }
 func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
 func (rt *jsRuntime) Sleep(dur time.Duration)    { rt.yielder.Sleep(dur) }
@@ -34,7 +37,21 @@ func (rt *jsRuntime) Circle(r float64)           { circle(r) }
 func (rt *jsRuntime) Width(w float64)            { width(w) }
 func (rt *jsRuntime) Color(s string)             { color(s) }
 func (rt *jsRuntime) Clear(color string)         { clear(color) }
-func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
+func (rt *jsRuntime) Stroke(s string)            { stroke(s) }
+func (rt *jsRuntime) Fill(s string)              { fill(s) }
+func (rt *jsRuntime) Dash(segments []float64)    { dash(floatsToString(segments)) }
+func (rt *jsRuntime) Linecap(s string)           { linecap(s) }
+
+func floatsToString(floats []float64) string {
+	if len(floats) == 0 {
+		return ""
+	}
+	var sb strings.Builder
+	for _, f := range floats {
+		sb.WriteString(fmt.Sprintf(" %f", f))
+	}
+	return sb.String()[1:]
+}
 
 // sleepingYielder yields the CPU so that JavaScript/browser events
 // get a chance to be processed. Currently(Feb 2023) it seems that you
@@ -162,6 +179,24 @@ func color(s string)
 //
 //export clear
 func clear(s string)
+
+//export stroke
+func stroke(s string)
+
+// fill is imported from JS
+//
+//export fill
+func fill(s string)
+
+// dash is imported from JS
+//
+//export dash
+func dash(s string)
+
+// linecap is imported from JS
+//
+//export linecap
+func linecap(s string)
 
 // setEvySource is imported from JS
 //

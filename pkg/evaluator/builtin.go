@@ -90,6 +90,11 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
 		"clear":  {Func: clearFunc(rt.Clear), Decl: clearDecl},
+
+		"stroke":  stringBuiltin("stroke", rt.Stroke),
+		"fill":    stringBuiltin("fill", rt.Fill),
+		"dash":    {Func: dashFunc(rt.Dash), Decl: dashDecl},
+		"linecap": stringBuiltin("linecap", rt.Linecap),
 	}
 	xyParams := []*parser.Var{
 		{Name: "x", T: parser.NUM_TYPE},
@@ -137,6 +142,12 @@ type GraphicsRuntime interface {
 	Width(w float64)
 	Color(s string)
 	Clear(color string)
+
+	// advanced graphics functions
+	Stroke(s string)
+	Fill(s string)
+	Dash(segments []float64)
+	Linecap(s string)
 }
 
 type UnimplementedRuntime struct {
@@ -155,16 +166,20 @@ func (rt *UnimplementedRuntime) Unimplemented(s string) {
 	rt.Print(fmt.Sprintf("%q not implemented\n", s))
 }
 
-func (rt *UnimplementedRuntime) Read() string          { rt.Unimplemented("read"); return "" }
-func (rt *UnimplementedRuntime) Sleep(_ time.Duration) { rt.Unimplemented("sleep") }
-func (rt *UnimplementedRuntime) Yielder() Yielder      { rt.Unimplemented("yielder"); return nil }
-func (rt *UnimplementedRuntime) Move(x, y float64)     { rt.Unimplemented("move") }
-func (rt *UnimplementedRuntime) Line(x, y float64)     { rt.Unimplemented("line") }
-func (rt *UnimplementedRuntime) Rect(x, y float64)     { rt.Unimplemented("rect") }
-func (rt *UnimplementedRuntime) Circle(r float64)      { rt.Unimplemented("circle") }
-func (rt *UnimplementedRuntime) Width(w float64)       { rt.Unimplemented("width") }
-func (rt *UnimplementedRuntime) Color(s string)        { rt.Unimplemented("color") }
-func (rt *UnimplementedRuntime) Clear(color string)    { rt.Unimplemented("clear") }
+func (rt *UnimplementedRuntime) Read() string            { rt.Unimplemented("read"); return "" }
+func (rt *UnimplementedRuntime) Sleep(_ time.Duration)   { rt.Unimplemented("sleep") }
+func (rt *UnimplementedRuntime) Yielder() Yielder        { rt.Unimplemented("yielder"); return nil }
+func (rt *UnimplementedRuntime) Move(x, y float64)       { rt.Unimplemented("move") }
+func (rt *UnimplementedRuntime) Line(x, y float64)       { rt.Unimplemented("line") }
+func (rt *UnimplementedRuntime) Rect(x, y float64)       { rt.Unimplemented("rect") }
+func (rt *UnimplementedRuntime) Circle(r float64)        { rt.Unimplemented("circle") }
+func (rt *UnimplementedRuntime) Width(w float64)         { rt.Unimplemented("width") }
+func (rt *UnimplementedRuntime) Color(s string)          { rt.Unimplemented("color") }
+func (rt *UnimplementedRuntime) Clear(color string)      { rt.Unimplemented("clear") }
+func (rt *UnimplementedRuntime) Stroke(s string)         { rt.Unimplemented("stroke") }
+func (rt *UnimplementedRuntime) Fill(s string)           { rt.Unimplemented("fill") }
+func (rt *UnimplementedRuntime) Dash(segments []float64) { rt.Unimplemented("dash") }
+func (rt *UnimplementedRuntime) Linecap(s string)        { rt.Unimplemented("linecap") }
 
 var readDecl = &parser.FuncDeclStmt{
 	Name:       "read",
@@ -542,6 +557,23 @@ func clearFunc(clearFn func(string)) BuiltinFunc {
 			color = args[0].(*String).Val
 		}
 		clearFn(color)
+		return nil, nil
+	}
+}
+
+var dashDecl = &parser.FuncDeclStmt{
+	Name:          "dash",
+	VariadicParam: &parser.Var{Name: "segments", T: parser.NUM_TYPE},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func dashFunc(dashFn func([]float64)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		segments := make([]float64, len(args))
+		for i, arg := range args {
+			segments[i] = arg.(*Num).Val
+		}
+		dashFn(segments)
 		return nil, nil
 	}
 }

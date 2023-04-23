@@ -95,6 +95,11 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"fill":    stringBuiltin("fill", rt.Fill),
 		"dash":    {Func: dashFunc(rt.Dash), Decl: dashDecl},
 		"linecap": stringBuiltin("linecap", rt.Linecap),
+
+		"text":       stringBuiltin("text", rt.Text),
+		"textsize":   numBuiltin("textsize", rt.Textsize),
+		"font":       stringBuiltin("font", rt.Font),
+		"fontfamily": stringBuiltin("fontfamily", rt.Fontfamily),
 	}
 	xyParams := []*parser.Var{
 		{Name: "x", T: parser.NUM_TYPE},
@@ -148,6 +153,10 @@ type GraphicsRuntime interface {
 	Fill(s string)
 	Dash(segments []float64)
 	Linecap(s string)
+	Text(s string)
+	Textsize(size float64)
+	Font(s string)
+	Fontfamily(s string)
 }
 
 type UnimplementedRuntime struct {
@@ -180,6 +189,10 @@ func (rt *UnimplementedRuntime) Stroke(s string)         { rt.Unimplemented("str
 func (rt *UnimplementedRuntime) Fill(s string)           { rt.Unimplemented("fill") }
 func (rt *UnimplementedRuntime) Dash(segments []float64) { rt.Unimplemented("dash") }
 func (rt *UnimplementedRuntime) Linecap(s string)        { rt.Unimplemented("linecap") }
+func (rt *UnimplementedRuntime) Text(s string)           { rt.Unimplemented("text") }
+func (rt *UnimplementedRuntime) Textsize(size float64)   { rt.Unimplemented("textsize") }
+func (rt *UnimplementedRuntime) Font(s string)           { rt.Unimplemented("font") }
+func (rt *UnimplementedRuntime) Fontfamily(s string)     { rt.Unimplemented("fontfamily") }
 
 var readDecl = &parser.FuncDeclStmt{
 	Name:       "read",

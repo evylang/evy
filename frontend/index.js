@@ -60,6 +60,10 @@ function newEvyGo() {
     fill,
     dash,
     linecap,
+    text,
+    textsize,
+    fontfamily,
+    font,
   }
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
@@ -94,7 +98,11 @@ function needsCanvas(f) {
     f.stroke ||
     f.fill ||
     f.dash ||
-    f.linecap
+    f.linecap ||
+    f.text ||
+    f.textsize ||
+    f.fontfamily ||
+    f.font
   )
 }
 
@@ -416,6 +424,8 @@ function resetCanvas() {
   canvas.stroke = true
   ctx.lineCap = "butt"
   ctx.setLineDash([])
+  ctx.font = "16px regular"
+  textsize(6)
   move(0, 0)
 }
 
@@ -529,6 +539,43 @@ function dash(ptr, len) {
 function linecap(ptr, len) {
   const s = memToString(ptr, len)
   canvas.ctx.lineCap = s
+}
+
+// text is exported to evy go/wasm.
+function text(ptr, len) {
+  const { x, y, ctx } = canvas
+  const text = memToString(ptr, len)
+  ctx.fillText(text, x, y)
+}
+
+// textsize is exported to evy go/wasm.
+function textsize(size) {
+  const { width, ctx } = canvas
+  const style = parsedStyle(`font: ${ctx.font}`)
+  style.fontSize = (ctx.canvas.width / 100) * size + "px"
+  ctx.font = style.font
+}
+
+var parsedStyle = function (cssString) {
+  var el = document.createElement("span")
+  el.setAttribute("style", cssString)
+  return el.style // CSSStyleDeclaration object
+}
+
+// font is exported to evy go/wasm.
+// see https://developer.mozilla.org/en-US/docs/Web/CSS/font
+function font(ptr, len) {
+  const font = memToString(ptr, len)
+  canvas.ctx.font = font
+}
+
+// fontfamily is exported to evy go/wasm.
+function fontfamily(ptr, len) {
+  const ctx = canvas.ctx
+  const s = memToString(ptr, len)
+  const style = parsedStyle(`font: ${ctx.font}`)
+  style.fontFamily = s
+  ctx.font = style.font
 }
 
 function logicalX(e) {

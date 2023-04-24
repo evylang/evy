@@ -1,0 +1,17 @@
+move 10 80
+text "Hello"
+
+move 10 60
+textsize 10
+text "all 🖖"
+
+move 10 40
+fontfamily "Luminari, fantasy"
+text "Cheriolas!"
+
+move 10 35
+fill "grey"
+// font maps directly to the CSS font property; see:
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font
+font "italic max(2rem, 2vh) \"Comic Sans MS\", cursive"
+text "(Cheering Charm)"

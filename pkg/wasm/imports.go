@@ -41,6 +41,10 @@ func (rt *jsRuntime) Stroke(s string)            { stroke(s) }
 func (rt *jsRuntime) Fill(s string)              { fill(s) }
 func (rt *jsRuntime) Dash(segments []float64)    { dash(floatsToString(segments)) }
 func (rt *jsRuntime) Linecap(s string)           { linecap(s) }
+func (rt *jsRuntime) Text(s string)              { text(s) }
+func (rt *jsRuntime) Textsize(size float64)      { textsize(size) }
+func (rt *jsRuntime) Font(s string)              { font(s) }
+func (rt *jsRuntime) Fontfamily(s string)        { fontfamily(s) }
 
 func floatsToString(floats []float64) string {
 	if len(floats) == 0 {
@@ -197,6 +201,26 @@ func dash(s string)
 //
 //export linecap
 func linecap(s string)
+
+// text is imported from JS
+//
+//export text
+func text(s string)
+
+// textsize is imported from JS
+//
+//export textsize
+func textsize(s float64)
+
+// font is imported from JS
+//
+//export font
+func font(s string)
+
+// fontfamily is imported from JS
+//
+//export fontfamily
+func fontfamily(s string)
 
 // setEvySource is imported from JS
 //

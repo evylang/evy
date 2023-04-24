@@ -479,6 +479,10 @@ const builtins = new Set([
   "fill",
   "dash",
   "linecap",
+  "text",
+  "textsize",
+  "fontfamily",
+  "font",
 ])
 
 const keywords = new Set([

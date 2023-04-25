@@ -384,6 +384,7 @@ main.view-output {
 .output .canvas canvas {
   width: 100%;
   height: 100%;
+  touch-action: pinch-zoom;
 }
 .read {
   display: flex;

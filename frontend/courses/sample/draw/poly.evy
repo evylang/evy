@@ -1,0 +1,8 @@
+width 1
+color "red"
+
+fill "none"
+poly [10 80] [30 60] [50 80] [70 60] [90 80]
+
+fill "gold"
+poly [10 20] [50 50] [20 10] [10 20]

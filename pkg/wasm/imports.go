@@ -45,6 +45,13 @@ func (rt *jsRuntime) Text(s string)              { text(s) }
 func (rt *jsRuntime) Textsize(size float64)      { textsize(size) }
 func (rt *jsRuntime) Font(s string)              { font(s) }
 func (rt *jsRuntime) Fontfamily(s string)        { fontfamily(s) }
+func (rt *jsRuntime) Poly(vertices [][]float64) {
+	vStrings := make([]string, len(vertices))
+	for i, vertex := range vertices {
+		vStrings[i] = fmt.Sprintf("%f %f", vertex[0], vertex[1])
+	}
+	poly(strings.Join(vStrings, " "))
+}
 
 func floatsToString(floats []float64) string {
 	if len(floats) == 0 {
@@ -184,6 +191,13 @@ func color(s string)
 //export clear
 func clear(s string)
 
+// poly is imported from JS
+//
+//export poly
+func poly(s string)
+
+// stroke is imported from JS
+//
 //export stroke
 func stroke(s string)
 

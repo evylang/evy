@@ -56,6 +56,7 @@ function newEvyGo() {
     color,
     clear,
     // advanced canvas
+    poly,
     stroke,
     fill,
     dash,
@@ -95,6 +96,7 @@ function needsCanvas(f) {
     f.color ||
     f.colour ||
     f.clear ||
+    f.poly ||
     f.stroke ||
     f.fill ||
     f.dash ||
@@ -512,6 +514,31 @@ function clear(ptr, len) {
   ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = prevColor
+}
+
+// poly is exported to evy go/wasm.
+function poly(ptr, len) {
+  const { x, y, ctx, fill, stroke } = canvas
+  const s = memToString(ptr, len)
+  const points = parsePoints(s)
+  ctx.beginPath()
+  ctx.moveTo(transformX(points[0][0]), transformY(points[0][1]))
+  for (const point of points.slice(1)) {
+    const x = transformX(point[0])
+    const y = transformY(point[1])
+    ctx.lineTo(x, y)
+  }
+  fill && ctx.fill()
+  stroke && ctx.stroke()
+}
+
+function parsePoints(s) {
+  const arr = s.split(" ")
+  const points = []
+  for (let i = 0; i < arr.length; i += 2) {
+    points.push([Number(arr[i]), Number(arr[i + 1])])
+  }
+  return points
 }
 
 // stroke is exported to evy go/wasm.

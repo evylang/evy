@@ -467,7 +467,6 @@ const builtins = new Set([
   "rand",
   "rand1",
   "move",
-  "read",
   "line",
   "rect",
   "circle",

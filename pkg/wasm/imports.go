@@ -27,7 +27,7 @@ func newJSRuntime() *jsRuntime {
 }
 
 func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
-func (*jsRuntime) Print(s string)                { jsPrint(s) }
+func (rt *jsRuntime) Print(s string)             { jsPrint(s) }
 func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
 func (rt *jsRuntime) Sleep(dur time.Duration)    { rt.yielder.Sleep(dur) }
 func (rt *jsRuntime) Move(x, y float64)          { move(x, y) }
@@ -51,6 +51,10 @@ func (rt *jsRuntime) Poly(vertices [][]float64) {
 		vStrings[i] = fmt.Sprintf("%f %f", vertex[0], vertex[1])
 	}
 	poly(strings.Join(vStrings, " "))
+}
+
+func (rt *jsRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
+	ellipse(x, y, rX, rY, rotation, startAngle, endAngle)
 }
 
 func floatsToString(floats []float64) string {
@@ -195,6 +199,11 @@ func clear(s string)
 //
 //export poly
 func poly(s string)
+
+// ellipse is imported from JS
+//
+//export ellipse
+func ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64)
 
 // stroke is imported from JS
 //

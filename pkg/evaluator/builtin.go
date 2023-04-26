@@ -91,7 +91,8 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"colour": stringBuiltin("colour", rt.Color),
 		"clear":  {Func: clearFunc(rt.Clear), Decl: clearDecl},
 
-		"poly": {Func: polyFunc(rt.Poly), Decl: polyDecl},
+		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
+		"ellipse": {Func: ellipseFunc(rt.Ellipse), Decl: ellipseDecl},
 
 		"stroke":  stringBuiltin("stroke", rt.Stroke),
 		"fill":    stringBuiltin("fill", rt.Fill),
@@ -152,6 +153,7 @@ type GraphicsRuntime interface {
 
 	// advanced graphics functions
 	Poly(vertices [][]float64)
+	Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)
 	Stroke(s string)
 	Fill(s string)
 	Dash(segments []float64)
@@ -197,6 +199,9 @@ func (rt *UnimplementedRuntime) Text(s string)             { rt.Unimplemented("t
 func (rt *UnimplementedRuntime) Textsize(size float64)     { rt.Unimplemented("textsize") }
 func (rt *UnimplementedRuntime) Font(s string)             { rt.Unimplemented("font") }
 func (rt *UnimplementedRuntime) Fontfamily(s string)       { rt.Unimplemented("fontfamily") }
+func (rt *UnimplementedRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
+	rt.Unimplemented("ellipse")
+}
 
 var readDecl = &parser.FuncDeclStmt{
 	Name:       "read",
@@ -603,6 +608,40 @@ func polyFunc(polyFn func([][]float64)) BuiltinFunc {
 			vertices[i] = []float64{x, y}
 		}
 		polyFn(vertices)
+		return nil, nil
+	}
+}
+
+var ellipseDecl = &parser.FuncDeclStmt{
+	Name:          "ellipse",
+	VariadicParam: &parser.Var{Name: "n", T: parser.NUM_TYPE},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		argLen := len(args)
+		if argLen < 3 || argLen == 6 || argLen > 7 {
+			return nil, fmt.Errorf("%w: 'ellipse' requires 3, 4, 5 or 7 arguments, found %d", ErrBadArguments, argLen)
+		}
+		x := args[0].(*Num).Val
+		y := args[1].(*Num).Val
+		radiusX := args[2].(*Num).Val
+		radiusY := radiusX
+		rotation := 0.0
+		startAngle := 0.0
+		endAngle := 360.0
+		if argLen > 3 {
+			radiusY = args[3].(*Num).Val
+		}
+		if argLen > 4 {
+			rotation = args[4].(*Num).Val
+		}
+		if argLen > 6 {
+			startAngle = args[5].(*Num).Val
+			endAngle = args[6].(*Num).Val
+		}
+		ellipseFn(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
 		return nil, nil
 	}
 }

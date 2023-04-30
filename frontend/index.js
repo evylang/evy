@@ -57,6 +57,7 @@ function newEvyGo() {
     clear,
     // advanced canvas
     poly,
+    ellipse,
     stroke,
     fill,
     dash,
@@ -97,6 +98,7 @@ function needsCanvas(f) {
     f.colour ||
     f.clear ||
     f.poly ||
+    f.ellipse ||
     f.stroke ||
     f.fill ||
     f.dash ||
@@ -539,6 +541,25 @@ function parsePoints(s) {
     points.push([Number(arr[i]), Number(arr[i + 1])])
   }
   return points
+}
+
+// ellipse is exported to evy go/wasm.
+// see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/ellipse
+function ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle) {
+  const rad = Math.PI / 180
+  const { ctx, fill, stroke } = canvas
+  ctx.beginPath()
+  ctx.ellipse(
+    transformX(x),
+    transformY(y),
+    transformX(radiusX),
+    transformX(radiusY),
+    rotation * rad,
+    startAngle * rad,
+    endAngle * rad
+  )
+  fill && ctx.fill()
+  stroke && ctx.stroke()
 }
 
 // stroke is exported to evy go/wasm.

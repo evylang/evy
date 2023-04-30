@@ -24,6 +24,7 @@
         { "id": "squares", "title": "Squares" },
         { "id": "rainbow", "title": "Rainbow" },
         { "id": "poly", "title": "Polygon and Polyline" },
+        { "id": "ellipse", "title": "Ellipse" },
         { "id": "fill", "title": "Stroke and Fill" },
         { "id": "linestyle", "title": "Line Styles" },
         { "id": "text", "title": "Text" }

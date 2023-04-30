@@ -56,6 +56,35 @@ func TestParseDecl(t *testing.T) {
 	}
 }
 
+func TestFuncScope(t *testing.T) {
+	prog := `
+f := "🦊"
+
+func outer
+    f := "🐤"
+    print f
+    if true
+        f := "🎈"
+        print f
+        inner
+        print f
+    end
+    print f
+end
+
+func inner
+    print f
+end
+
+print f
+outer
+print f
+`
+	want := "🦊\n🐤\n🎈\n🦊\n🎈\n🐤\n🦊\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestReturn(t *testing.T) {
 	prog := `
 func fox:string

@@ -42,6 +42,7 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 	return &Evaluator{
 		builtins: builtins,
 		scope:    scope,
+		global:   scope,
 		yielder:  builtins.Runtime.Yielder(),
 	}
 }
@@ -52,7 +53,8 @@ type Evaluator struct {
 	builtins      Builtins
 	eventHandlers map[string]*parser.EventHandlerStmt
 
-	scope *scope // Current top of scope stack
+	scope  *scope // Current top of scope stack
+	global *scope // Global scope
 }
 
 type Event struct {
@@ -147,8 +149,8 @@ func (e *Evaluator) HandleEvent(ev Event) error {
 	if eh == nil {
 		panic("no event handler for " + ev.Name)
 	}
-	e.pushScope()
-	defer e.popScope()
+	restoreScope := e.pushFuncScope()
+	defer restoreScope()
 	args := ev.Params
 	if len(args) < len(eh.Params) {
 		panic("not enough arguments for " + ev.Name)
@@ -250,8 +252,8 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	if ok {
 		return builtin.Func(e.scope, args)
 	}
-	e.pushScope()
-	defer e.popScope()
+	restoreScope := e.pushFuncScope()
+	defer restoreScope()
 
 	// Add func args to scope
 	fd := funcCall.FuncDecl
@@ -664,6 +666,12 @@ func (e *Evaluator) evalIfNotNil(n parser.Node) (Value, error) {
 
 func (e *Evaluator) pushScope() {
 	e.scope = newInnerScope(e.scope)
+}
+
+func (e *Evaluator) pushFuncScope() func() {
+	s := e.scope
+	e.scope = newInnerScope(e.global)
+	return func() { e.scope = s }
 }
 
 func (e *Evaluator) popScope() {

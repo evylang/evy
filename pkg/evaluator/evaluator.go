@@ -496,9 +496,16 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (Value, error)
 	if err != nil {
 		return nil, err
 	}
-	right, err := e.Eval(expr.Right)
-	if err != nil {
-		return nil, err
+	// We need to short-circuit the evaluation of expr.Right for and/or
+	// operators. We start of treating "right" as "left" and only if
+	// we cannot short-circuit do we evaluate expr.Right. If we do
+	// short-circuit, it does not matter what "right" is.
+	right := left
+	if !canShortCircuit(expr.Op, left) {
+		right, err = e.Eval(expr.Right)
+		if err != nil {
+			return nil, err
+		}
 	}
 	op := expr.Op
 	if op == parser.OP_EQ {
@@ -518,6 +525,20 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (Value, error)
 		return evalBinaryArrayExpr(op, l, right.(*Array))
 	}
 	return nil, fmt.Errorf("%w (binary): %v", ErrOperation, expr)
+}
+
+func canShortCircuit(op parser.Operator, left Value) bool {
+	l, ok := left.(*Bool)
+	if !ok {
+		return false
+	}
+	switch op {
+	case parser.OP_AND:
+		return !l.Val // short-circuit AND when left is false
+	case parser.OP_OR:
+		return l.Val // short-circuit OR when left is true
+	}
+	return false
 }
 
 func evalBinaryNumExpr(op parser.Operator, left, right *Num) (Value, error) {

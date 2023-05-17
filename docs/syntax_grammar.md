@@ -473,10 +473,12 @@ division and the [modulo operator]. `+` may also be used as
 concatenation operator for `string` and `array` types. 
 
 Boolean operators `and`, `or` stand for [logical conjunction (AND)] and
-[logical disjunction (OR)]. Comparison operators `<`  `<=`  `>`  `>=`
-stand for less, less or equal, greater, greater or equal. Their
-operands may be `num` or `string` values. For `string` types
-[lexicographical comparison] is used.
+[logical disjunction (OR)]. They perform [short-circuit evaluation]
+where the right-hand side of the operator is not evaluated if the result
+of the operation can be determined from the left-hand side alone.
+Comparison operators `<`  `<=`  `>`  `>=` stand for less, less or equal,
+greater, greater or equal. Their operands may be `num` or `string`
+values. For `string` types [lexicographical comparison] is used.
 
 The unary operator `-` stands for the negative sign and can only be used
 with `num`. The unary operator `!` stands for [logical negation] and
@@ -495,6 +497,7 @@ See section [whitespace](#whitespace) for further details.
 [modulo operator]: https://en.wikipedia.org/wiki/Modulo_operation
 [logical conjunction (AND)]: https://en.wikipedia.org/wiki/Truth_table#Logical_conjunction_(AND)
 [logical disjunction (OR)]: https://en.wikipedia.org/wiki/Truth_table#Logical_disjunction_(OR)
+[short-circuit evaluation]: https://en.wikipedia.org/wiki/Short-circuit_evaluation
 [logical negation]: https://en.wikipedia.org/wiki/Truth_table#Logical_negation
 [lexicographical comparison]: https://en.wikipedia.org/wiki/Lexicographic_order
 

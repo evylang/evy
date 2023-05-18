@@ -325,6 +325,7 @@ func TestExpressionFormat(t *testing.T) {
 		"x := arr[1:n+3]":     "x := arr[1:n + 3]",
 		"x := arr[ :n+3]":     "x := arr[:n + 3]",
 		"x := arr[ n+3: ]":    "x := arr[n + 3:]",
+		"x := a.( num )":      "x := a.(num)",
 	}
 	for input, want := range tests {
 		before := `
@@ -332,8 +333,9 @@ n := 1
 arr := [1 2 3]
 m := {a:1 b:2}
 s := "a"
+a:any
 `[1:]
-		after := "\nprint n arr m s x\n"
+		after := "\nprint n arr m s a x\n"
 		input := before + input + after
 		want := before + want + after
 		t.Run(input, func(t *testing.T) {

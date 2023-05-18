@@ -125,6 +125,11 @@ func (f *formatting) format(n Node) {
 	case *DotExpression:
 		f.format(n.Left)
 		f.writes(".", n.Key)
+	case *TypeAssertion:
+		f.format(n.Left)
+		f.write(".(")
+		f.formatType(n.T)
+		f.write(")")
 	case *GroupExpression:
 		f.write("(")
 		f.format(n.Expr)

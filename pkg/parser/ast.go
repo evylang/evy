@@ -76,6 +76,12 @@ type DotExpression struct {
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
+type TypeAssertion struct {
+	T     *Type
+	token *lexer.Token
+	Left  Node
+}
+
 type GroupExpression struct {
 	token *lexer.Token
 	Expr  Node
@@ -393,6 +399,18 @@ func (d *DotExpression) String() string {
 
 func (d *DotExpression) Type() *Type {
 	return d.T
+}
+
+func (t *TypeAssertion) Token() *lexer.Token {
+	return t.token
+}
+
+func (t *TypeAssertion) String() string {
+	return "(" + t.Left.String() + "." + "(" + t.T.String() + ")" + ")"
+}
+
+func (t *TypeAssertion) Type() *Type {
+	return t.T
 }
 
 func (d *GroupExpression) Token() *lexer.Token {

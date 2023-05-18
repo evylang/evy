@@ -110,14 +110,14 @@ not allowed.
                      statements
                  "end" NL .
 
-    return_stmt = "return" [ toplevel_expr ] NL.
+    return_stmt = "return" [ toplevel_expr ] NL .
     break_stmt  = "break" NL .
 
     /* --- Statement ---- */
     assign_stmt        = assignable "=" toplevel_expr NL .
     typed_decl_stmt    = typed_decl NL .
     inferred_decl_stmt = ident ":=" toplevel_expr NL .
-    func_call_stmt     = func_call NL.
+    func_call_stmt     = func_call NL .
 
     /* --- Assignment --- */
     assignable     = <- ident | index_expr | dot_expr -> . /* no WS around `[…]` and `.` */
@@ -129,8 +129,8 @@ not allowed.
     typed_decl     = <- ident ":" type -> . /* no WS allowed. */
     type           = BASIC_TYPE | DYNAMIC_TYPE | COMPOSITE_TYPE .
     BASIC_TYPE     = "num" | "string" | "bool" .
-    DYNAMIC_TYPE   = "any" 
-    COMPOSITE_TYPE = array_type | map_type
+    DYNAMIC_TYPE   = "any" .
+    COMPOSITE_TYPE = array_type | map_type .
     array_type     = "[]" type .
     map_type       = "{}" type .
 
@@ -140,34 +140,34 @@ not allowed.
     func_call = ident args .
     args      = { tight_expr } .  /* no WS within single arg, WS is arg separator */
 
-    tight_expr = <- expr ->       /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
+    tight_expr = <- expr -> .     /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
     expr       = operand | unary_expr | binary_expr .
 
     operand    = literal | assignable | slice | type_assertion | group_expr .
-    group_expr = "(" <+ toplevel_expr +> ")" /* WS can be used freely within `(…)` */
+    group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
     type_assertion = <- assignable "." "(" type ")" -> .
     
-    unary_expr = <- UNARY_OP -> expr  /* WS not allowed after UNARY_OP */
+    unary_expr = <- UNARY_OP -> expr .  /* WS not allowed after UNARY_OP */
     UNARY_OP   = "-" | "!" .
 
-    binary_expr   = expr BINARY_OP expr
+    binary_expr   = expr BINARY_OP expr .
     BINARY_OP     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
-    LOGICAL_OP    = "or" | "and"
+    LOGICAL_OP    = "or" | "and" .
     COMPARISON_OP = "==" | "!=" | "<" | "<=" | ">" | ">=" .
     ADD_OP        = "+" | "-" .
     MUL_OP        = "*" | "/" | "%" .
 
     /* --- Slice and Literals --- */
-    slice       = assignable "[" [expr] : [expr] "]" .
+    slice       = assignable "[" [expr] ":" [expr] "]" .
     literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
     num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
                   DECIMAL_DIGIT { DECIMAL_DIGIT } "." { DECIMAL_DIGIT } .
     string_lit  = """ { UNICODE_CHAR } """ .
     BOOL_CONST  = "true" | "false" .
     array_lit   = "[" <+ array_elems +> "]" . /* WS can be used freely within `[…], but not inside the elements` */
-    array_elems = { tight_expr [NL]  }
+    array_elems = { tight_expr [NL] } .
     map_lit     = "{" <+ map_elems +> "}" .   /* WS can be used freely within `{…}, but not inside the values` */
-    map_elems   = { ident ":" tight_expr [NL]  } .
+    map_elems   = { ident ":" tight_expr [NL] } .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .
@@ -176,7 +176,7 @@ not allowed.
     UNICODE_CHAR   = /* an arbitrary Unicode code point except newline */ .
     DECIMAL_DIGIT  = "0" … "9" .
     NL             = "\n" {"\n"} .
-    WS             = " "|"\t" {" "|"\t"}
+    WS             = " " | "\t" {" " | "\t"} .
 
 
 ## Comments

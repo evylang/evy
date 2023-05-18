@@ -42,6 +42,12 @@
       ]
     },
     {
+      "id": "sample/games",
+      "title": "Games",
+      "emoji": "🎱",
+      "units": [{ "id": "hanoi", "title": "Towers of Hanoi" }]
+    },
+    {
       "id": "course-01",
       "title": "Learn Coding",
       "emoji": "🌱",

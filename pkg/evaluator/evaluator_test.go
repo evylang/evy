@@ -352,6 +352,33 @@ func TestExpr(t *testing.T) {
 	}
 }
 
+func TestShortCircuit(t *testing.T) {
+	tests := map[string]string{
+		"a := false and (side_effect false)":           "false",
+		"a := false and (side_effect false) and false": "false",
+		"a := false and false and (side_effect false)": "false",
+		"a := true or (side_effect true) and true":     "true",
+		"a := true or false or (side_effect true)":     "true",
+		"a := true or (side_effect true)":              "true",
+		"a := true and (side_effect true)":             "side-effect\ntrue",
+		"a := false or (side_effect false)":            "side-effect\nfalse",
+		"a := true and (side_effect false)":            "side-effect\nfalse",
+		"a := false or (side_effect true)":             "side-effect\ntrue",
+	}
+	const preamble = `
+func side_effect:bool v:bool
+	print "side-effect"
+	return v
+end`
+	for in, want := range tests {
+		in, want := preamble+"\n"+in+"\n print a", want
+		t.Run(in, func(t *testing.T) {
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
+		})
+	}
+}
+
 func TestArrayLit(t *testing.T) {
 	tests := map[string]string{
 		"a := [1]":     "[1]",

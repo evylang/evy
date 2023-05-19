@@ -7,8 +7,7 @@
       "units": [
         { "id": "welcome", "title": "Welcome" },
         { "id": "helloworld", "title": "Hello, world!" },
-        { "id": "echo", "title": "Echo" },
-        { "id": "rand", "title": "Guess my Number" },
+        { "id": "echo", "title": "Read input" },
         { "id": "strings", "title": "String Functions" },
         { "id": "math", "title": "Math Functions" },
         { "id": "events", "title": "Events" }
@@ -24,7 +23,6 @@
         { "id": "squares", "title": "Squares" },
         { "id": "rainbow", "title": "Rainbow" },
         { "id": "poly", "title": "Polygon and Polyline" },
-        { "id": "ellipse", "title": "Ellipse" },
         { "id": "fill", "title": "Stroke and Fill" },
         { "id": "linestyle", "title": "Line Styles" },
         { "id": "text", "title": "Text" }
@@ -36,16 +34,21 @@
       "emoji": "🤹‍♀️",
       "units": [
         { "id": "movingdot", "title": "Moving Red Dot" },
+        { "id": "bounce", "title": "Bounce" },
+        { "id": "draw", "title": "Draw" },
         { "id": "juggle", "title": "Juggle" },
         { "id": "splashtrig", "title": "Splash of Trig" },
-        { "id": "draw", "title": "Draw" }
+        { "id": "ellipse", "title": "Interactive Ellipse" }
       ]
     },
     {
       "id": "sample/games",
       "title": "Games",
       "emoji": "🎱",
-      "units": [{ "id": "hanoi", "title": "Towers of Hanoi" }]
+      "units": [
+        { "id": "rand", "title": "Guess my Number" },
+        { "id": "hanoi", "title": "Towers of Hanoi" }
+      ]
     },
     {
       "id": "course-01",

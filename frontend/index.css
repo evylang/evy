@@ -58,7 +58,7 @@
   --output-border-top-width: 23px;
   --output-border-radius: 6px;
   --output-border-width: 1px;
-  --modal-item-width: 18rem;
+  --modal-section-width: 18rem;
   --slide: 0;
 }
 
@@ -87,7 +87,7 @@
     --editor-padding: 16px;
     --canvas-size: min(100vw, 60vh);
     --console-width: 100vw;
-    --modal-item-width: 100vw;
+    --modal-section-width: 100vw;
     --slide: -100vw;
   }
 }
@@ -529,8 +529,8 @@ main.view-output {
   display: flex;
   flex-wrap: wrap;
 }
-#modal .modal-main .item {
-  width: var(--modal-item-width);
+#modal .modal-main .section {
+  width: var(--modal-section-width);
   padding-bottom: 16px;
 }
 #modal .modal-main h2 {

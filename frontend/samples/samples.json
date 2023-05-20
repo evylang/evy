@@ -1,10 +1,10 @@
 {
-  "courseList": [
+  "sections": [
     {
-      "id": "sample/tour",
+      "id": "tour",
       "title": "Tour",
       "emoji": "🚌",
-      "units": [
+      "samples": [
         { "id": "welcome", "title": "Welcome" },
         { "id": "helloworld", "title": "Hello, world!" },
         { "id": "echo", "title": "Read input" },
@@ -14,10 +14,10 @@
       ]
     },
     {
-      "id": "sample/draw",
+      "id": "draw",
       "title": "Drawing",
       "emoji": "🎨",
-      "units": [
+      "samples": [
         { "id": "dot", "title": "Red Dot" },
         { "id": "lines", "title": "Lines" },
         { "id": "squares", "title": "Squares" },
@@ -29,10 +29,10 @@
       ]
     },
     {
-      "id": "sample/animate",
+      "id": "animate",
       "title": "Animation",
       "emoji": "🤹‍♀️",
-      "units": [
+      "samples": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "bounce", "title": "Bounce" },
         { "id": "draw", "title": "Draw" },
@@ -42,28 +42,12 @@
       ]
     },
     {
-      "id": "sample/games",
+      "id": "games",
       "title": "Games",
       "emoji": "🎲",
-      "units": [
+      "samples": [
         { "id": "rand", "title": "Guess my Number" },
         { "id": "hanoi", "title": "Towers of Hanoi" }
-      ]
-    },
-    {
-      "id": "course-01",
-      "title": "Learn Coding",
-      "emoji": "🌱",
-      "units": [
-        { "id": "targetboard", "title": "Target board" },
-        { "id": "types-string", "title": "String type" },
-        { "id": "print", "title": "Print" },
-        { "id": "variable-decl", "title": "Variable declaration" },
-        { "id": "variable-inference", "title": "Type inference" },
-        { "id": "print-multi", "title": "Print many" },
-        { "id": "read", "title": "Read" },
-        { "id": "concat", "title": "String concatenation" },
-        { "id": "concat2", "title": "More concatenation" }
       ]
     }
   ]

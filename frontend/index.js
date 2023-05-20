@@ -10,7 +10,7 @@ const canvas = newCanvas()
 let jsReadInitialised = false
 let stopped = true
 let animationStart
-let courses
+let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
@@ -313,7 +313,7 @@ function clearOutput() {
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
-  await fetchCourses()
+  await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
@@ -322,13 +322,13 @@ async function initUI() {
   initEditor()
 }
 
-async function fetchCourses() {
-  const resp = await fetch("courses/courses.json")
-  courses = await resp.json()
-  courses.units = {}
-  for (const course of courses.courseList) {
-    for (const unit of course.units) {
-      courses.units[unit.id] = { ...unit, courseTitle: course.title, courseID: course.id }
+async function fetchSamples() {
+  const resp = await fetch("samples/samples.json")
+  sampleData = await resp.json()
+  sampleData.byID = {}
+  for (const section of sampleData.sections) {
+    for (const sample of section.samples) {
+      sampleData.byID[sample.id] = { ...sample, sectionTitle: section.title, sectionID: section.id }
     }
   }
 }
@@ -346,8 +346,8 @@ async function handleHashChange() {
   hideModal()
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
-  if (!opts.source && !opts.unit && !opts.content) {
-    opts = { unit: "welcome" }
+  if (!opts.source && !opts.sample && !opts.content) {
+    opts = { sample: "welcome" }
   }
   if (opts.content) {
     const decoded = await decode(opts.content)
@@ -355,10 +355,10 @@ async function handleHashChange() {
     return
   }
   let crumbs = ["Evy"]
-  if (opts.unit) {
-    const unit = courses.units[opts.unit]
-    opts.source = `courses/${unit.courseID}/${opts.unit}.evy`
-    crumbs = [unit.courseTitle, unit.title]
+  if (opts.sample) {
+    const sample = sampleData.byID[opts.sample]
+    opts.source = `samples/${sample.sectionID}/${opts.sample}.evy`
+    crumbs = [sample.sectionTitle, sample.title]
   }
   try {
     const response = await fetch(opts.source)
@@ -383,10 +383,10 @@ function parseHash() {
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
   if (entries.length === 1 && entries[0].length === 1) {
-    // shortcut for evy.dev#draw loading evy.dev/courses/sample/draw/draw.evy
-    const unit = entries[0][0]
-    if (courses && courses.units[unit]) {
-      return { unit }
+    // shortcut for evy.dev#lines loading evy.dev/samples/draw/lines.evy
+    const sample = entries[0][0]
+    if (sampleData && sampleData.byID[sample]) {
+      return { sample }
     }
   }
   return Object.fromEntries(entries)
@@ -730,23 +730,23 @@ function animationLoop(ts) {
 function initModal() {
   const modalMain = document.querySelector("#modal .modal-main")
   modalMain.textContent = ""
-  for (const course of courses.courseList) {
-    const item = document.createElement("div")
-    item.classList.add("item")
+  for (const section of sampleData.sections) {
+    const sectionEl = document.createElement("div")
+    sectionEl.classList.add("section")
     const h2 = document.createElement("h2")
-    h2.textContent = `${course.emoji} ${course.title}`
+    h2.textContent = `${section.emoji} ${section.title}`
     const ul = document.createElement("ul")
-    item.replaceChildren(h2, ul)
-    for (const unit of course.units) {
+    sectionEl.replaceChildren(h2, ul)
+    for (const sample of section.samples) {
       const li = document.createElement("li")
       const a = document.createElement("a")
-      a.textContent = unit.title
-      a.href = `#${unit.id}`
+      a.textContent = sample.title
+      a.href = `#${sample.id}`
       a.onclick = hideModal
       li.appendChild(a)
       ul.appendChild(li)
     }
-    modalMain.appendChild(item)
+    modalMain.appendChild(sectionEl)
   }
 }
 
@@ -755,9 +755,9 @@ function hideModal() {
   el.classList.add("hidden")
 }
 
-function showCourses() {
-  const courses = document.querySelector("#modal-courses")
-  courses.classList.remove("hidden")
+function showSamples() {
+  const samples = document.querySelector("#modal-samples")
+  samples.classList.remove("hidden")
   const share = document.querySelector("#modal-share")
   share.classList.add("hidden")
   const modal = document.querySelector("#modal")
@@ -767,8 +767,8 @@ function showCourses() {
 function showSharing() {
   const share = document.querySelector("#modal-share")
   share.classList.remove("hidden")
-  const courses = document.querySelector("#modal-courses")
-  courses.classList.add("hidden")
+  const samples = document.querySelector("#modal-samples")
+  samples.classList.add("hidden")
   const modal = document.querySelector("#modal")
   modal.classList.remove("hidden")
 }
@@ -782,7 +782,7 @@ function updateBreadcrumbs(crumbs) {
 function breadcrumb(s) {
   const btn = document.createElement("button")
   btn.textContent = s
-  btn.onclick = () => showCourses()
+  btn.onclick = () => showSamples()
   const li = document.createElement("li")
   li.appendChild(btn)
   return li
@@ -934,7 +934,7 @@ function getElements(q) {
   try {
     return Array.from(document.querySelectorAll(q))
   } catch (error) {
-    consol.error("getElements", error)
+    console.error("getElements", error)
     return []
   }
 }

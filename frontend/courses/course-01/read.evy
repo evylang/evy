@@ -1,9 +1,0 @@
-print "Write something, hit return ⏎"
-
-input := read
-print "You wrote:" input
-
-// Print "What's your name?"
-
-// Read input into the variable `name`.
-// Print "Hello," followed by the name.

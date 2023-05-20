@@ -18,10 +18,8 @@
       "title": "Drawing",
       "emoji": "🎨",
       "samples": [
-        { "id": "dot", "title": "Red Dot" },
+        { "id": "circle-rect", "title": "Circle and Rectangle" },
         { "id": "lines", "title": "Lines" },
-        { "id": "squares", "title": "Squares" },
-        { "id": "rainbow", "title": "Rainbow" },
         { "id": "poly", "title": "Polygon and Polyline" },
         { "id": "fill", "title": "Stroke and Fill" },
         { "id": "linestyle", "title": "Line Styles" },

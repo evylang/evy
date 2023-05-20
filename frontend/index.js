@@ -346,15 +346,15 @@ async function handleHashChange() {
   hideModal()
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
-  if (!opts.source && !opts.sample && !opts.content) {
-    opts = { sample: "welcome" }
-  }
   if (opts.content) {
     const decoded = await decode(opts.content)
     editor.update({ value: decoded, errorLines: {} })
     return
   }
-  let crumbs = ["Evy"]
+  if (!opts.source && !opts.sample && !opts.content) {
+    opts = { sample: "welcome" }
+  }
+  let crumbs
   if (opts.sample) {
     const sample = sampleData.byID[opts.sample]
     opts.source = `samples/${sample.sectionID}/${opts.sample}.evy`
@@ -368,7 +368,7 @@ async function handleHashChange() {
     const source = await response.text()
     editor.update({ value: source, errorLines: {} })
     document.querySelector(".editor-wrap").scrollTo(0, 0)
-    updateBreadcrumbs(crumbs)
+    crumbs && updateBreadcrumbs(crumbs)
     clearOutput()
     format()
   } catch (err) {
@@ -748,6 +748,7 @@ function initModal() {
     }
     modalMain.appendChild(sectionEl)
   }
+  updateBreadcrumbs([sampleData.sections[0].title, sampleData.sections[0].samples[0].title])
 }
 
 function hideModal() {

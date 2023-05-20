@@ -44,7 +44,7 @@
     {
       "id": "sample/games",
       "title": "Games",
-      "emoji": "🎱",
+      "emoji": "🎲",
       "units": [
         { "id": "rand", "title": "Guess my Number" },
         { "id": "hanoi", "title": "Towers of Hanoi" }

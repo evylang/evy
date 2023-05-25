@@ -58,7 +58,7 @@
   --output-border-top-width: 23px;
   --output-border-radius: 6px;
   --output-border-width: 1px;
-  --modal-item-width: 18rem;
+  --modal-section-width: 18rem;
   --slide: 0;
 }
 
@@ -87,7 +87,7 @@
     --editor-padding: 16px;
     --canvas-size: min(100vw, 60vh);
     --console-width: 100vw;
-    --modal-item-width: 100vw;
+    --modal-section-width: 100vw;
     --slide: -100vw;
   }
 }
@@ -498,10 +498,15 @@ main.view-output {
   inset: 0;
   overflow: clip;
 }
+#modal .max-width-wrapper {
+  height: 100%;
+  background: var(--modal-bg);
+}
+
 #modal header {
   border-bottom: 1px solid hsl(0deg 0% 100% / 30%);
   color: hsl(0deg 0% 70%);
-  background: var(--modal-bg);
+  background: none;
   justify-content: right;
 }
 #modal-close {
@@ -522,12 +527,10 @@ main.view-output {
   padding: 36px 32px;
   overflow-y: auto;
   display: flex;
-  background: var(--modal-bg);
   flex-wrap: wrap;
-  height: 100%;
 }
-#modal .modal-main .item {
-  width: var(--modal-item-width);
+#modal .modal-main .section {
+  width: var(--modal-section-width);
   padding-bottom: 16px;
 }
 #modal .modal-main h2 {

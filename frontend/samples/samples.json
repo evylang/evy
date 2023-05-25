@@ -1,0 +1,52 @@
+{
+  "sections": [
+    {
+      "id": "tour",
+      "title": "Tour",
+      "emoji": "🚌",
+      "samples": [
+        { "id": "welcome", "title": "Welcome" },
+        { "id": "helloworld", "title": "Hello, world!" },
+        { "id": "echo", "title": "Read input" },
+        { "id": "strings", "title": "String Functions" },
+        { "id": "math", "title": "Math Functions" },
+        { "id": "events", "title": "Events" }
+      ]
+    },
+    {
+      "id": "draw",
+      "title": "Drawing",
+      "emoji": "🎨",
+      "samples": [
+        { "id": "circle-rect", "title": "Circle and Rectangle" },
+        { "id": "lines", "title": "Lines" },
+        { "id": "poly", "title": "Polygon and Polyline" },
+        { "id": "fill", "title": "Stroke and Fill" },
+        { "id": "linestyle", "title": "Line Styles" },
+        { "id": "text", "title": "Text" }
+      ]
+    },
+    {
+      "id": "animate",
+      "title": "Animation",
+      "emoji": "🤹‍♀️",
+      "samples": [
+        { "id": "movingdot", "title": "Moving Red Dot" },
+        { "id": "bounce", "title": "Bounce" },
+        { "id": "draw", "title": "Draw" },
+        { "id": "juggle", "title": "Juggle" },
+        { "id": "splashtrig", "title": "Splash of Trig" },
+        { "id": "ellipse", "title": "Interactive Ellipse" }
+      ]
+    },
+    {
+      "id": "games",
+      "title": "Games",
+      "emoji": "🎲",
+      "samples": [
+        { "id": "rand", "title": "Guess my Number" },
+        { "id": "hanoi", "title": "Towers of Hanoi" }
+      ]
+    }
+  ]
+}

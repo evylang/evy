@@ -636,6 +636,24 @@ function logicalY(e) {
   return e.offsetY * scaleY - canvas.offset.y
 }
 
+function leaveXY(e) {
+  const x = clamp(logicalX(e), 0, 100)
+  const y = clamp(logicalY(e), 0, 100)
+  const dx100 = 100 - x
+  const dx0 = x
+  const dy100 = 100 - y
+  const dy0 = y
+  const min = Math.min(dx100, dx0, dy100, dy0)
+  if (min === dx100) return [100, y]
+  if (min === dx0) return [0, y]
+  if (min === dy100) return [x, 100]
+  return [x, 0]
+}
+
+function clamp(val, min, max) {
+  return Math.min(Math.max(this, min), max)
+}
+
 function initEditor() {
   const value = `move 10 20
 line 50 50
@@ -664,6 +682,7 @@ function registerEventHandler(ptr, len) {
     c.onpointerup = (e) => exp.onUp(logicalX(e), logicalY(e))
   } else if (s === "move") {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
+    c.onpointerleave = (e) => exp.onMove(...leaveXY(e))
   } else if (s === "key") {
     unfocusRunBotton()
     document.addEventListener("keydown", keydownListener)

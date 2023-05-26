@@ -90,8 +90,14 @@ on up _:num _:num
     deltay = 0
 end
 
-on move _:num y:num
+on move x:num y:num
     if dragy == -1
+        return
+    end
+    if x == 0 or x == 100 or y == 0 or y == 100
+        // stop animation when we leave the canvas
+        dragy = -1
+        deltay = 0
         return
     end
     deltay = y - dragy

@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"time"
 
+	"foxygo.at/evy/pkg/lexer"
 	"foxygo.at/evy/pkg/parser"
 )
 
@@ -32,6 +33,20 @@ var (
 	ErrOperation        = fmt.Errorf("%w: unknown operation", ErrInternal)
 	ErrAssignmentTarget = fmt.Errorf("%w: bad assignment target", ErrInternal)
 )
+
+// Error is an Evy evaluator error.
+type Error struct {
+	err   error
+	token *lexer.Token
+}
+
+func (e *Error) Error() string {
+	return e.token.Location() + ": " + e.err.Error()
+}
+
+func newErr(node parser.Node, err error) *Error {
+	return &Error{token: node.Token(), err: err}
+}
 
 func NewEvaluator(builtins Builtins) *Evaluator {
 	rand.Seed(time.Now().UnixNano())
@@ -159,7 +174,7 @@ func (e *Evaluator) HandleEvent(ev Event) error {
 	for i, param := range eh.Params {
 		arg, err := valueFromAny(param.Type(), args[i])
 		if err != nil {
-			return err
+			return newErr(param, err)
 		}
 		e.scope.set(param.Name, arg)
 	}
@@ -251,7 +266,11 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	}
 	builtin, ok := e.builtins.Funcs[funcCall.Name]
 	if ok {
-		return builtin.Func(e.scope, args)
+		val, err := builtin.Func(e.scope, args)
+		if err != nil {
+			return nil, newErr(funcCall, err)
+		}
+		return val, nil
 	}
 	restoreScope := e.pushFuncScope()
 	defer restoreScope()
@@ -378,7 +397,7 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 		}
 		return mapRange, nil
 	}
-	return nil, fmt.Errorf("%w: %s", ErrRangeType, f.Range)
+	return nil, newErr(f.Range, ErrRangeType)
 }
 
 func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (ranger, error) {
@@ -395,7 +414,7 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 		return nil, err
 	}
 	if step == 0 {
-		return nil, fmt.Errorf("%w: step cannot by 0, infinite loop", ErrRangeValue)
+		return nil, newErr(r, fmt.Errorf("%w: step cannot be 0, infinite loop", ErrRangeValue))
 	}
 
 	sRange := &stepRange{
@@ -418,7 +437,7 @@ func (e *Evaluator) numVal(n parser.Node) (float64, error) {
 	}
 	numVal, ok := v.(*Num)
 	if !ok {
-		return 0, fmt.Errorf("%w: expected number, found %v", ErrType, v)
+		return 0, newErr(n, fmt.Errorf("%w: expected number, found %v", ErrType, v))
 	}
 	return numVal.Val, nil
 }
@@ -439,7 +458,8 @@ func (e *Evaluator) evalConditionalBlock(condBlock *parser.ConditionalBlock) (Va
 	}
 	boolCond, ok := cond.(*Bool)
 	if !ok {
-		return nil, false, fmt.Errorf("%w: conditional not a bool", ErrType)
+		err := fmt.Errorf("%w: conditional not a bool", ErrType)
+		return nil, false, newErr(condBlock.Condition, err)
 	}
 	if boolCond.Val {
 		val, err := e.Eval(condBlock.Block)
@@ -456,7 +476,7 @@ func (e *Evaluator) evalVar(v *parser.Var) (Value, error) {
 	if val, ok := e.scope.get(v.Name); ok {
 		return val, nil
 	}
-	return nil, fmt.Errorf("%w: %s", ErrNoVarible, v.Name)
+	return nil, newErr(v, fmt.Errorf("%w: %s", ErrNoVarible, v.Name))
 }
 
 func (e *Evaluator) evalExprList(terms []parser.Node) ([]Value, error) {
@@ -489,7 +509,7 @@ func (e *Evaluator) evalUnaryExpr(expr *parser.UnaryExpression) (Value, error) {
 			return &Bool{Val: !right.Val}, nil
 		}
 	}
-	return nil, fmt.Errorf("%w (unary): %v", ErrOperation, expr)
+	return nil, newErr(expr, fmt.Errorf("%w (unary): %v", ErrOperation, expr))
 }
 
 func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (Value, error) {
@@ -515,17 +535,23 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (Value, error)
 	if op == parser.OP_NOT_EQ {
 		return &Bool{Val: !left.Equals(right)}, nil
 	}
+	var val Value
 	switch l := left.(type) {
 	case *Num:
-		return evalBinaryNumExpr(op, l, right.(*Num))
+		val, err = evalBinaryNumExpr(op, l, right.(*Num))
 	case *String:
-		return evalBinaryStringExpr(op, l, right.(*String))
+		val, err = evalBinaryStringExpr(op, l, right.(*String))
 	case *Bool:
-		return evalBinaryBoolExpr(op, l, right.(*Bool))
+		val, err = evalBinaryBoolExpr(op, l, right.(*Bool))
 	case *Array:
-		return evalBinaryArrayExpr(op, l, right.(*Array))
+		val, err = evalBinaryArrayExpr(op, l, right.(*Array))
+	default:
+		err = fmt.Errorf("%w (binary): %v", ErrOperation, expr)
 	}
-	return nil, fmt.Errorf("%w (binary): %v", ErrOperation, expr)
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	return val, nil
 }
 
 func canShortCircuit(op parser.Operator, left Value) bool {
@@ -611,7 +637,7 @@ func (e *Evaluator) evalTarget(node parser.Node) (Value, error) {
 	case *parser.DotExpression:
 		return e.evalDotExpr(n, true /* forAssign */)
 	}
-	return nil, fmt.Errorf("%w: %v", ErrAssignmentTarget, node)
+	return nil, newErr(node, fmt.Errorf("%w: %v", ErrAssignmentTarget, node))
 }
 
 func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) (Value, error) {
@@ -624,22 +650,28 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 		return nil, err
 	}
 
+	var val Value
 	switch l := left.(type) {
 	case *Array:
-		return l.Index(index)
+		val, err = l.Index(index)
 	case *String:
-		return l.Index(index)
+		val, err = l.Index(index)
 	case *Map:
 		strIndex, ok := index.(*String)
 		if !ok {
-			return nil, fmt.Errorf("%w: expected string for map index, found %v", ErrType, index)
+			return nil, newErr(expr.Left, fmt.Errorf("%w: expected string for map index, found %v", ErrType, index))
 		}
 		if forAssign {
 			l.InsertKey(strIndex.Val, expr.Type())
 		}
-		return l.Get(strIndex.Val)
+		val, err = l.Get(strIndex.Val)
+	default:
+		err = fmt.Errorf("%w: expected array, string or map with index, found %v", ErrType, left.Type())
 	}
-	return nil, fmt.Errorf("%w: expected array, string or map with index, found %v", ErrType, left.Type())
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	return val, nil
 }
 
 func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (Value, error) {
@@ -649,12 +681,16 @@ func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (Val
 	}
 	m, ok := left.(*Map)
 	if !ok {
-		return nil, fmt.Errorf("%w: expected map before '.', found  %v", ErrType, left)
+		return nil, newErr(expr, fmt.Errorf("%w: expected map before '.', found %v", ErrType, left))
 	}
 	if forAssign {
 		m.InsertKey(expr.Key, expr.Type())
 	}
-	return m.Get(expr.Key)
+	val, err := m.Get(expr.Key)
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	return val, nil
 }
 
 func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
@@ -670,13 +706,20 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var val Value
 	switch left := left.(type) {
 	case *Array:
-		return left.Slice(start, end)
+		val, err = left.Slice(start, end)
 	case *String:
-		return left.Slice(start, end)
+		val, err = left.Slice(start, end)
+	default:
+		err = fmt.Errorf("%w: expected string or array before '[', found %v", ErrType, left)
 	}
-	return nil, fmt.Errorf("%w: expected map before '.', found  %v", ErrType, left)
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	return val, nil
 }
 
 func (e *Evaluator) evalIfNotNil(n parser.Node) (Value, error) {

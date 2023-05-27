@@ -179,7 +179,7 @@ func (p *parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool)
 	p.advance() // advance past [
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != MAP && leftType != STRING {
-		p.appendErrorForToken("only array, string and map type can be indexed found "+left.Type().String(), tok)
+		p.appendErrorForToken("only array, string and map type can be indexed, found "+left.Type().String(), tok)
 		return nil
 	}
 	if p.cur.TokenType() == lexer.COLON && allowSlice { // e.g. a[:2]
@@ -224,7 +224,7 @@ func (p *parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *T
 func (p *parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) Node {
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != STRING {
-		p.appendErrorForToken("only array and string be indexed sliced"+left.Type().String(), tok)
+		p.appendErrorForToken("only array and string can be sliced, found "+left.Type().String(), tok)
 		return nil
 	}
 

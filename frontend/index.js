@@ -14,6 +14,7 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
+
 // --- Initialise ------------------------------------------------------
 
 initWasm()
@@ -147,11 +148,16 @@ function jsError(ptr, len) {
   const code = editor.value
   const lines = code.split("\n")
   const errs = memToString(ptr, len).split("\n")
-  const re = /line (?<line>\d+) column (?<col>\d+): (?<msg>.*)/
+  const re = /line (?<line>\d+) column (?<col>\d+):( runtime error:)? (?<msg>.*)/
   let msgs = ""
   const errorLines = {}
   for (const err of errs) {
-    const g = err.match(re).groups
+    const m = err.match(re)
+    if (!m) {
+      msgs += err + "\n"
+      continue
+    }
+    const g = m.groups
     if (!errorLines[g.line]) {
       errorLines[g.line] = { col: g.col, text: lines[g.line - 1] }
     }

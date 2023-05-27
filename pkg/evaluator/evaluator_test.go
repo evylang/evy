@@ -453,10 +453,10 @@ func TestDoubleIndex(t *testing.T) {
 func TestIndexErr(t *testing.T) {
 	tests := map[string]string{
 		// x := ["a","b","c"]; x = "abc"
-		"print x[3]":  "runtime error: invalid slice: 3 out of bounds (-3 to 2)",
-		"print x[-4]": "runtime error: invalid slice: -4 out of bounds (-3 to 2)",
+		"print x[3]":  "line 2 column 8: runtime error: index out of bounds: 3",
+		"print x[-4]": "line 2 column 8: runtime error: index out of bounds: -4",
 		`m := {}
-		print m[x[1]]`: `runtime error: no value for map key: "b"`,
+		print m[x[1]]`: `line 3 column 10: runtime error: no value for map key: "b"`,
 	}
 	for in, want := range tests {
 		in, want := in, want
@@ -518,7 +518,7 @@ func TestDotErr(t *testing.T) {
 m := {a:1}
 print m.missing_index
 `
-	want := `runtime error: no value for map key: "missing_index"`
+	want := `line 3 column 8: runtime error: no value for map key: "missing_index"`
 	got := run(in)
 	assert.Equal(t, want, got)
 }

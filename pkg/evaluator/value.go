@@ -85,10 +85,6 @@ type ReturnValue struct {
 
 type Break struct{}
 
-type Error struct {
-	Message string
-}
-
 func (n *Num) Type() ValueType { return NUM }
 func (n *Num) String() string  { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
 func (n *Num) Equals(v Value) bool {
@@ -393,7 +389,7 @@ func normalizeIndex(idx Value, length int) (int, error) {
 	}
 	i := int(index.Val)
 	if i < -length || i >= length {
-		return 0, fmt.Errorf("%w: %d out of bounds (%d to %d)", ErrSlice, i, -length, length-1)
+		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}
 	if i < 0 {
 		return length + i, nil // -1 references len-1 i.e. last element

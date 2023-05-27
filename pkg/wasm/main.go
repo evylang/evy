@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"strings"
 
 	"foxygo.at/evy/pkg/evaluator"
@@ -39,7 +40,10 @@ func main() {
 		// The ast does not correspond to the formatted source code. For
 		// now this is acceptable because evaluator errors don't output
 		// source code locations.
-		evaluate(ast, rt)
+		err := evaluate(ast, rt)
+		if err != nil && !errors.Is(err, evaluator.ErrStopped) {
+			jsError(err.Error())
+		}
 	}
 }
 
@@ -77,32 +81,38 @@ func prepareUI(prog *parser.Program) {
 	jsPrepareUI(strings.Join(names, ","))
 }
 
-func evaluate(prog *parser.Program, rt *jsRuntime) {
+func evaluate(prog *parser.Program, rt *jsRuntime) error {
 	builtins := evaluator.DefaultBuiltins(rt)
 	eval = evaluator.NewEvaluator(builtins)
-	eval.Eval(prog)
-	handleEvents(rt.yielder)
+	_, err := eval.Eval(prog)
+	if err != nil {
+		return err
+	}
+	return handleEvents(rt.yielder)
 }
 
-func handleEvents(yielder *sleepingYielder) {
+func handleEvents(yielder *sleepingYielder) error {
 	if eval == nil || len(eval.EventHandlerNames()) == 0 {
-		return
+		return nil
 	}
 	for _, name := range eval.EventHandlerNames() {
 		registerEventHandler(name)
 	}
 	for {
 		if eval.Stopped {
-			return
+			return nil
 		}
 		// unsynchronized access to events - ok in WASM as single threaded.
 		if len(events) > 0 {
 			event := events[0]
 			events = events[1:]
 			yielder.Reset()
-			eval.HandleEvent(event)
+			if err := eval.HandleEvent(event); err != nil {
+				return err
+			}
 		} else {
 			yielder.ForceYield()
 		}
 	}
+	return nil
 }

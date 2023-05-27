@@ -85,10 +85,6 @@ type ReturnValue struct {
 
 type Break struct{}
 
-type Error struct {
-	Message string
-}
-
 func (n *Num) Type() ValueType { return NUM }
 func (n *Num) String() string  { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
 func (n *Num) Equals(v Value) bool {

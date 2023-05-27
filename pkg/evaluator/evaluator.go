@@ -698,15 +698,17 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
-	start, err := e.evalIfNotNil(expr.Start)
-	if err != nil {
-		return nil, err
+	var start, end Value
+	if expr.Start != nil {
+		if start, err = e.Eval(expr.Start); err != nil {
+			return nil, err
+		}
 	}
-	end, err := e.evalIfNotNil(expr.End)
-	if err != nil {
-		return nil, err
+	if expr.End != nil {
+		if end, err = e.Eval(expr.End); err != nil {
+			return nil, err
+		}
 	}
-
 	var val Value
 	switch left := left.(type) {
 	case *Array:
@@ -720,13 +722,6 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
 		return nil, newErr(expr, err)
 	}
 	return val, nil
-}
-
-func (e *Evaluator) evalIfNotNil(n parser.Node) (Value, error) {
-	if n == nil {
-		return nil, nil
-	}
-	return e.Eval(n)
 }
 
 func (e *Evaluator) pushScope() {

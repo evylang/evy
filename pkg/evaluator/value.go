@@ -389,7 +389,7 @@ func normalizeIndex(idx Value, length int) (int, error) {
 	}
 	i := int(index.Val)
 	if i < -length || i >= length {
-		return 0, fmt.Errorf("%w: %d out of bounds (%d to %d)", ErrSlice, i, -length, length-1)
+		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}
 	if i < 0 {
 		return length + i, nil // -1 references len-1 i.e. last element

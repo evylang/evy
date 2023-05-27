@@ -17,19 +17,20 @@ var (
 	ErrStopped = errors.New("stopped")
 
 	ErrRuntime       = errors.New("runtime error")
-	ErrAnyConversion = fmt.Errorf("%w:  error converting any to type", ErrRuntime)
+	ErrBounds        = fmt.Errorf("%w: index out of bounds", ErrRuntime)
 	ErrRangeValue    = fmt.Errorf("%w: bad range value", ErrRuntime)
 	ErrMapKey        = fmt.Errorf("%w: no value for map key", ErrRuntime)
-	ErrSlice         = fmt.Errorf("%w: invalid slice", ErrRuntime)
+	ErrSlice         = fmt.Errorf("%w: bad slice", ErrRuntime)
 	ErrBadArguments  = fmt.Errorf("%w: bad arguments", ErrRuntime)
+	ErrAnyConversion = fmt.Errorf("%w: error converting any to type", ErrRuntime)
 
 	ErrInternal         = errors.New("internal error")
 	ErrUnknownNode      = fmt.Errorf("%w: unknown AST node", ErrInternal)
 	ErrType             = fmt.Errorf("%w: type error", ErrInternal)
-	ErrRangeType        = fmt.Errorf("%w: invalid range type", ErrInternal)
+	ErrRangeType        = fmt.Errorf("%w: bad range type", ErrInternal)
 	ErrNoVarible        = fmt.Errorf("%w: no variable", ErrInternal)
 	ErrOperation        = fmt.Errorf("%w: unknown operation", ErrInternal)
-	ErrAssignmentTarget = fmt.Errorf("%w: invalid assignment target", ErrInternal)
+	ErrAssignmentTarget = fmt.Errorf("%w: bad assignment target", ErrInternal)
 )
 
 func NewEvaluator(builtins Builtins) *Evaluator {

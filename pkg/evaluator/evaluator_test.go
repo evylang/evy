@@ -453,8 +453,8 @@ func TestDoubleIndex(t *testing.T) {
 func TestIndexErr(t *testing.T) {
 	tests := map[string]string{
 		// x := ["a","b","c"]; x = "abc"
-		"print x[3]":  "runtime error: invalid slice: 3 out of bounds (-3 to 2)",
-		"print x[-4]": "runtime error: invalid slice: -4 out of bounds (-3 to 2)",
+		"print x[3]":  "runtime error: index out of bounds: 3",
+		"print x[-4]": "runtime error: index out of bounds: -4",
 		`m := {}
 		print m[x[1]]`: `runtime error: no value for map key: "b"`,
 	}

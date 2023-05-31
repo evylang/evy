@@ -42,7 +42,7 @@ func (rt *cliRuntime) Read() string {
 	if err != nil {
 		panic(err)
 	}
-	return s
+	return s[:len(s)-1] // strip trailing newline
 }
 
 func (*cliRuntime) Sleep(dur time.Duration) {

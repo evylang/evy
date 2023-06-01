@@ -549,8 +549,11 @@ var randDecl = &parser.FuncDeclStmt{
 }
 
 func randFunc(_ *scope, args []Value) (Value, error) {
-	upper := int32(args[0].(*Num).Val)
-	return &Num{Val: float64(rand.Int31n(upper))}, nil //nolint: gosec
+	upper := args[0].(*Num).Val
+	if upper <= 0 || upper > 2147483647 { // [1, 2^31-1]
+		return nil, fmt.Errorf(`%w: "rand %0.f" not in range 1 to 2147483647`, ErrBadArguments, upper)
+	}
+	return &Num{Val: float64(rand.Int31n(int32(upper)))}, nil //nolint: gosec
 }
 
 var rand1Decl = &parser.FuncDeclStmt{

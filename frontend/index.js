@@ -769,6 +769,9 @@ function initModal() {
     const ul = document.createElement("ul")
     sectionEl.replaceChildren(h2, ul)
     for (const sample of section.samples) {
+      if (sample.unlisted) {
+        continue
+      }
       const li = document.createElement("li")
       const a = document.createElement("a")
       a.textContent = sample.title

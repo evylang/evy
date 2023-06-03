@@ -341,6 +341,9 @@ func (e *Evaluator) evalWhile(w *parser.WhileStmt) (Value, error) {
 	for ok && err == nil && !isReturn(val) && !isBreak(val) {
 		val, ok, err = e.evalConditionalBlock(whileBlock)
 	}
+	if isBreak(val) {
+		val = nil
+	}
 	return val, err
 }
 
@@ -356,7 +359,10 @@ func (e *Evaluator) evalFor(f *parser.ForStmt) (Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		if isBreak(val) || isReturn(val) {
+		if isBreak(val) {
+			return nil, nil
+		}
+		if isReturn(val) {
 			return val, nil
 		}
 	}

@@ -168,6 +168,22 @@ while true
     end
     continue = false
 end
+`, `
+while true
+    while true
+        break
+    end
+    print "🎈"
+    break
+end
+`, `
+for range 3
+    for range 3
+        break
+    end
+    print "🎈"
+    break
+end
 `,
 	}
 	for _, input := range tests {

@@ -224,7 +224,7 @@ var printDecl = &parser.FuncDeclStmt{
 func printFunc(printFn func(string)) BuiltinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		printFn(join(args, " ") + "\n")
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -239,7 +239,7 @@ func printfFunc(printFn func(string)) BuiltinFunc {
 		}
 		s := sprintf(format.Val, args[1:])
 		printFn(s)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -524,7 +524,7 @@ func delFunc(_ *scope, args []Value) (Value, error) {
 	m := args[0].(*Map)
 	keyStr := args[1].(*String)
 	m.Delete(keyStr.Val)
-	return nil, nil
+	return &None{}, nil
 }
 
 var sleepDecl = &parser.FuncDeclStmt{
@@ -538,7 +538,7 @@ func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
 		secs := args[0].(*Num)
 		dur := time.Duration(secs.Val * float64(time.Second))
 		sleepFn(dur)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -582,7 +582,7 @@ func clearFunc(clearFn func(string)) BuiltinFunc {
 			color = args[0].(*String).Val
 		}
 		clearFn(color)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -611,7 +611,7 @@ func polyFunc(polyFn func([][]float64)) BuiltinFunc {
 			vertices[i] = []float64{x, y}
 		}
 		polyFn(vertices)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -645,7 +645,7 @@ func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, en
 			endAngle = args[6].(*Num).Val
 		}
 		ellipseFn(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -662,7 +662,7 @@ func dashFunc(dashFn func([]float64)) BuiltinFunc {
 			segments[i] = arg.(*Num).Val
 		}
 		dashFn(segments)
-		return nil, nil
+		return &None{}, nil
 	}
 }
 
@@ -683,7 +683,7 @@ func xyBuiltin(name string, fn func(x, y float64)) Builtin {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
 		fn(x.Val, y.Val)
-		return nil, nil
+		return &None{}, nil
 	}
 	return result
 }
@@ -725,7 +725,7 @@ func numBuiltin(name string, fn func(n float64)) Builtin {
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		n := args[0].(*Num)
 		fn(n.Val)
-		return nil, nil
+		return &None{}, nil
 	}
 	return result
 }
@@ -765,7 +765,7 @@ func stringBuiltin(name string, fn func(str string)) Builtin {
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		str := args[0].(*String)
 		fn(str.Val)
-		return nil, nil
+		return &None{}, nil
 	}
 	return result
 }

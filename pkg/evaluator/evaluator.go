@@ -151,7 +151,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 	case *parser.GroupExpression:
 		return e.Eval(node.Expr)
 	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
-		return nil, nil
+		return &None{}, nil
 	}
 	return nil, fmt.Errorf("%w: %v", ErrUnknownNode, node)
 }
@@ -292,7 +292,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	if returnValue, ok := funcResult.(*ReturnValue); ok {
 		return returnValue.Val, nil
 	}
-	return nil, nil
+	return &None{}, nil
 }
 
 func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) (Value, error) {
@@ -332,7 +332,7 @@ func (e *Evaluator) evalIf(i *parser.IfStmt) (Value, error) {
 		defer e.popScope()
 		return e.Eval(i.Else)
 	}
-	return nil, nil
+	return &None{}, nil
 }
 
 func (e *Evaluator) evalWhile(w *parser.WhileStmt) (Value, error) {
@@ -366,7 +366,7 @@ func (e *Evaluator) evalFor(f *parser.ForStmt) (Value, error) {
 			return val, nil
 		}
 	}
-	return nil, nil
+	return &None{}, nil
 }
 
 func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {

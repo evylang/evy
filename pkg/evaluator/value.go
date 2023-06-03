@@ -15,6 +15,7 @@ const (
 	BOOL
 	STRING
 	ANY
+	NONE
 	ARRAY
 	MAP
 	RETURN_VALUE
@@ -28,6 +29,7 @@ var valueTypeStrings = map[ValueType]string{
 	BOOL:         "bool",
 	STRING:       "string",
 	ANY:          "any",
+	NONE:         "none",
 	ARRAY:        "array",
 	MAP:          "map",
 	RETURN_VALUE: "return_value",
@@ -84,6 +86,8 @@ type ReturnValue struct {
 }
 
 type Break struct{}
+
+type None struct{}
 
 func (n *Num) Type() ValueType { return NUM }
 func (n *Num) String() string  { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
@@ -188,6 +192,11 @@ func (a *Any) Set(v Value) {
 		a.Val = copyOrRef(v)
 	}
 }
+
+func (n *None) Type() ValueType     { return NONE }
+func (n *None) String() string      { return "" }
+func (n *None) Equals(_ Value) bool { return false }
+func (n *None) Set(_ Value)         { panic("internal error: None.Set called") }
 
 func (r *ReturnValue) Type() ValueType     { return RETURN_VALUE }
 func (r *ReturnValue) String() string      { return r.Val.String() }

@@ -18,23 +18,16 @@ const (
 	NONE
 	ARRAY
 	MAP
-	RETURN_VALUE
-	BREAK
-	FUNCTION
-	BUILTIN
 )
 
 var valueTypeStrings = map[ValueType]string{
-	NUM:          "num",
-	BOOL:         "bool",
-	STRING:       "string",
-	ANY:          "any",
-	NONE:         "none",
-	ARRAY:        "array",
-	MAP:          "map",
-	RETURN_VALUE: "return_value",
-	FUNCTION:     "function",
-	BUILTIN:      "builtin",
+	NUM:    "num",
+	BOOL:   "bool",
+	STRING: "string",
+	ANY:    "any",
+	NONE:   "none",
+	ARRAY:  "array",
+	MAP:    "map",
 }
 
 func (t ValueType) String() string {
@@ -198,12 +191,12 @@ func (n *None) String() string      { return "" }
 func (n *None) Equals(_ Value) bool { return false }
 func (n *None) Set(_ Value)         { panic("internal error: None.Set called") }
 
-func (r *ReturnValue) Type() ValueType     { return RETURN_VALUE }
+func (r *ReturnValue) Type() ValueType     { return r.Val.Type() }
 func (r *ReturnValue) String() string      { return r.Val.String() }
 func (r *ReturnValue) Equals(v Value) bool { return r.Val.Equals(v) }
 func (r *ReturnValue) Set(v Value)         { r.Val.Set(v) }
 
-func (r *Break) Type() ValueType     { return BREAK }
+func (r *Break) Type() ValueType     { return NONE }
 func (r *Break) String() string      { return "" }
 func (r *Break) Equals(_ Value) bool { return false }
 func (r *Break) Set(_ Value)         {}
@@ -359,11 +352,13 @@ func (m *Map) Delete(key string) {
 }
 
 func isReturn(val Value) bool {
-	return val != nil && val.Type() == RETURN_VALUE
+	_, ok := val.(*ReturnValue)
+	return ok
 }
 
 func isBreak(val Value) bool {
-	return val != nil && val.Type() == BREAK
+	_, ok := val.(*Break)
+	return ok
 }
 
 func normalizeSliceIndices(start, end Value, length int) (int, int, error) {

@@ -37,9 +37,6 @@ func (b Builtins) ParserBuiltins() parser.Builtins {
 
 type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 
-func (b BuiltinFunc) Type() ValueType { return BUILTIN }
-func (b BuiltinFunc) String() string  { return "builtin function" }
-
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},

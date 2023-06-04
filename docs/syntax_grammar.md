@@ -104,7 +104,7 @@ not allowed.
     for_stmt   = "for" range NL
                     statements
                  "end" NL .
-    range      = ident ( ":=" | "=" ) "range" range_args .
+    range      = [ ident ":=" ] "range" range_args .
     range_args = <- expr -> [ <- expr -> [ <- expr -> ] ] .
     while_stmt = "while" toplevel_expr NL
                      statements

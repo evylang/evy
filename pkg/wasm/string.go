@@ -14,6 +14,9 @@ import (
 // * https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
 // * https://www.alcarney.me/blog/2020/passing-strings-between-tinygo-wasm
 func getString(ptr *uint32, length int) string {
+	if length == 0 {
+		return ""
+	}
 	var builder strings.Builder
 	uptr := uintptr(unsafe.Pointer(ptr))
 	for i := 0; i < length; i++ {

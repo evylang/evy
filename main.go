@@ -49,6 +49,8 @@ func (*cliRuntime) Sleep(dur time.Duration) {
 	time.Sleep(dur)
 }
 
+func (*cliRuntime) Yielder() evaluator.Yielder { return nil }
+
 const description = `
 evy is a tool for managing evy source code.
 `

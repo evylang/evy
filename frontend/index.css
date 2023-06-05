@@ -467,8 +467,10 @@ main.view-output {
 .run button:hover:enabled {
   background: var(--btn-bg-hover);
 }
-.run button.running,
-.run button.running:hover {
+.run button.running#run,
+.run button.running#run-mobile,
+.run button.running#run:hover,
+.run button.running#run-mobile:hover {
   color: var(--btn-color-active);
   letter-spacing: 0.2em;
   transition: 0s;

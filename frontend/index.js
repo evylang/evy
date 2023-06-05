@@ -188,7 +188,18 @@ function memToString(ptr, len) {
   return s
 }
 
+function stringToMemAddr(s) {
+  const ptrLen = stringToMem(s)
+  return ptrLenToBigInt(ptrLen)
+}
+
 function stringToMem(s) {
+  if (s === "") {
+    // We cannot use `{ ptr: 0, len: 0 }`, encoded into ptrLen 0,
+    // because we use 0 as sentinel for "nothing read" in wasm read polling
+    // so use any non-0 pointer with length 0 for empty string.
+    return { ptr: 1, len: 0 }
+  }
   const bytes = new TextEncoder("utf8").encode(s)
   const e = wasmInst.exports
   const len = bytes.length
@@ -196,11 +207,6 @@ function stringToMem(s) {
   const mem = new Uint8Array(e.memory.buffer, ptr, len)
   mem.set(new Uint8Array(bytes))
   return { ptr, len }
-}
-
-function stringToMemAddr(s) {
-  const ptrLen = stringToMem(s)
-  return ptrLenToBigInt(ptrLen)
 }
 
 function ptrLenToBigInt({ ptr, len }) {

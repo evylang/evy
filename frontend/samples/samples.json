@@ -45,7 +45,9 @@
       "emoji": "🎲",
       "samples": [
         { "id": "rand", "title": "Guess my Number" },
-        { "id": "hanoi", "title": "Towers of Hanoi" }
+        { "id": "hanoi", "title": "Towers of Hanoi" },
+        { "id": "tictactoe", "title": "Tic Tac Toe" },
+        { "id": "tictactoetext", "title": "Text Tic Tac Toe", "unlisted": true }
       ]
     }
   ]

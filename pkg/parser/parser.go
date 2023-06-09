@@ -30,22 +30,6 @@ func Parse(input string, builtins Builtins) (*Program, error) {
 	return prog, nil
 }
 
-type parser struct {
-	errors Errors
-
-	pos  int          // current position in token slice (points to current token)
-	cur  *lexer.Token // current token under examination
-	peek *lexer.Token // next token after current token
-
-	tokens        []*lexer.Token
-	builtins      Builtins
-	funcs         map[string]*FuncDeclStmt     // all function declarations by name
-	eventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
-
-	wssStack   []bool
-	formatting *formatting
-}
-
 // Errors is a list of parse errors as we typically report more than a
 // single parser error at a time to the end user. Errors itself also
 // implements the error interfaced and can be treated like a single Error.
@@ -84,6 +68,22 @@ func (e *Error) Error() string {
 	return e.token.Location() + ": " + e.message
 }
 
+type parser struct {
+	errors Errors
+
+	pos  int          // current position in token slice (points to current token)
+	cur  *lexer.Token // current token under examination
+	peek *lexer.Token // next token after current token
+
+	tokens        []*lexer.Token
+	builtins      Builtins
+	funcs         map[string]*FuncDeclStmt     // all function declarations by name
+	eventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
+
+	wssStack   []bool
+	formatting *formatting
+}
+
 func newParser(input string, builtins Builtins) *parser {
 	l := lexer.New(input)
 	p := &parser{
@@ -97,9 +97,14 @@ func newParser(input string, builtins Builtins) *parser {
 		fd := *funcDecl
 		p.funcs[name] = &fd
 	}
+	funcs := p.consumeTokens(l)
+	p.parseFuncSignatures(funcs)
+	return p
+}
 
-	// Read all tokens, collect function declaration tokens by index
-	// funcs temporarily holds FUNC token indices for further processing
+// consumeTokens reads all tokens and returns all function declaration
+// tokens by index for further pre-processing.
+func (p *parser) consumeTokens(l *lexer.Lexer) []int {
 	var funcs []int
 	var token *lexer.Token
 	for token = l.Next(); token.Type != lexer.EOF; token = l.Next() {
@@ -118,10 +123,13 @@ func newParser(input string, builtins Builtins) *parser {
 		}
 	}
 	p.tokens = append(p.tokens, token) // append EOF with pos
+	return funcs
+}
 
-	// Parse all function signatures, prior to proper parsing, to build
-	// a function name and type lookup table because functions can be
-	// called before declaration.
+// parseFuncSignatures parses all function signatures, prior to proper
+// parsing. It builds a function name and type lookup table because
+// functions can be called before declaration.
+func (p *parser) parseFuncSignatures(funcs []int) {
 	for _, i := range funcs {
 		p.advanceTo(i)
 		fd := p.parseFuncDeclSignature()
@@ -131,7 +139,7 @@ func newParser(input string, builtins Builtins) *parser {
 			msg := fmt.Sprintf("cannot override builtin variable %q", fd.Name)
 			p.appendErrorForToken(msg, fd.token)
 		}
-		if builtins.Funcs[fd.Name] != nil {
+		if p.builtins.Funcs[fd.Name] != nil {
 			msg := fmt.Sprintf("cannot override builtin function %q", fd.Name)
 			p.appendErrorForToken(msg, fd.token)
 		} else if p.funcs[fd.Name] != nil {
@@ -140,7 +148,6 @@ func newParser(input string, builtins Builtins) *parser {
 		}
 		p.funcs[fd.Name] = fd // override anyway so the signature is correct for parsing the function
 	}
-	return p
 }
 
 func (p *parser) parse() *Program {

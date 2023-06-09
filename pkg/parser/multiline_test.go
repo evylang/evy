@@ -107,7 +107,7 @@ func TestNLIndices(t *testing.T) {
 	}
 	for input, want := range tests {
 		parser := newParser(input, testBuiltins())
-		prog := parser.Parse()
+		prog := parser.parse()
 		assertNoParseError(t, parser, input)
 		got := nlAfter(prog.Statements, prog.formatting.comments)
 		// cannot equality test maps in tinygo

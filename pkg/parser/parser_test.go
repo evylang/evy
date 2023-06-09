@@ -37,7 +37,7 @@ func TestParseDecl(t *testing.T) {
 		wantSlice = append(wantSlice, "print(a)")
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := newParser(input, testBuiltins())
-		got := parser.Parse()
+		got := parser.parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
@@ -57,7 +57,7 @@ func TestEmptyProgram(t *testing.T) {
 	}
 	for input, want := range tests {
 		parser := newParser(input, testBuiltins())
-		got := parser.Parse()
+		got := parser.parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String(), input)
 	}
@@ -89,7 +89,7 @@ print m[s]`: `line 3 column 6: unknown variable name "name"`,
 	}
 	for input, err1 := range tests {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		got := parser.errors.Truncate(1)
 		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
@@ -113,7 +113,7 @@ func TestFunccall(t *testing.T) {
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := newParser(input, testBuiltins())
-		got := parser.Parse()
+		got := parser.parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
@@ -144,7 +144,7 @@ func TestFunccallError(t *testing.T) {
 	}
 	for input, err1 := range tests {
 		parser := newParser(input, builtins)
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		got := parser.errors.Truncate(1)
 		assert.Equal(t, err1, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
@@ -176,7 +176,7 @@ print("TRUE")
 	}
 	for input, want := range tests {
 		parser := newParser(input, testBuiltins())
-		got := parser.Parse()
+		got := parser.parse()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
@@ -188,7 +188,7 @@ x := len "123"
 print x
 `
 	parser := newParser(input, testBuiltins())
-	got := parser.Parse()
+	got := parser.parse()
 	assertNoParseError(t, parser, input)
 	want := `
 x=len("123")
@@ -238,7 +238,7 @@ func nums5 _:num
 end
 `
 	parser := newParser(input, testBuiltins())
-	_ = parser.Parse()
+	_ = parser.parse()
 	assertNoParseError(t, parser, input)
 	builtinCnt := len(testBuiltins().Funcs)
 	assert.Equal(t, builtinCnt+5, len(parser.funcs))
@@ -271,7 +271,7 @@ fox 1 2 3`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -345,7 +345,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
@@ -385,7 +385,7 @@ print a
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -422,7 +422,7 @@ fn = 3
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
@@ -473,7 +473,7 @@ print a
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -569,7 +569,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), input)
@@ -642,7 +642,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
@@ -689,7 +689,7 @@ func TestIf(t *testing.T) {
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -737,7 +737,7 @@ end`: `line 7 column 4: expected "end", got end of input`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -773,7 +773,7 @@ end
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -794,7 +794,7 @@ end`: "line 2 column 6: unexpected end of line",
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -827,7 +827,7 @@ end`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -904,7 +904,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -945,7 +945,7 @@ end`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -999,7 +999,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -1035,7 +1035,7 @@ nums []`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
 		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
@@ -1054,7 +1054,7 @@ end`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
 		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
@@ -1085,7 +1085,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -1116,7 +1116,7 @@ end`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 	}
 }
@@ -1149,7 +1149,7 @@ end`: `line 3 column 4: wrong number of parameters expected 2, got 1`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error(), "input: %s", input)
@@ -1172,7 +1172,7 @@ end
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		_ = parser.Parse()
+		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
@@ -1182,7 +1182,7 @@ end
 func TestCalledBuiltinFuncs(t *testing.T) {
 	input := `print (len "ABC")`
 	parser := newParser(input, testBuiltins())
-	prog := parser.Parse()
+	prog := parser.parse()
 	assertNoParseError(t, parser, input)
 	got := prog.CalledBuiltinFuncs
 	sort.Strings(got)
@@ -1197,7 +1197,7 @@ func len x:num
 end
 print (len 5)`
 	parser := newParser(input, testBuiltins())
-	_ = parser.Parse()
+	_ = parser.parse()
 	assertParseError(t, parser, input)
 	gotErrs := parser.errors
 	wantErrs := []string{
@@ -1217,7 +1217,7 @@ func fn s:string n:num
     print s n
 end`
 	parser := newParser(input, testBuiltins())
-	parser.Parse()
+	parser.parse()
 	assertNoParseError(t, parser, input)
 }
 
@@ -1232,7 +1232,7 @@ if x > 10
     print "🍦 big x"
 end`
 	parser := newParser(input, testBuiltins())
-	got := parser.Parse()
+	got := parser.parse()
 	assertParseError(t, parser, input)
 	gotErr := parser.errors.Truncate(1)
 	assert.Equal(t, `line 2 column 1: unknown function "move"`, gotErr.Error())

@@ -23,7 +23,7 @@ type Builtins struct {
 
 func Parse(input string, builtins Builtins) (*Program, error) {
 	parser := newParser(input, builtins)
-	prog := parser.Parse()
+	prog := parser.parse()
 	if parser.errors != nil {
 		return nil, parser.errors
 	}
@@ -143,7 +143,7 @@ func newParser(input string, builtins Builtins) *parser {
 	return p
 }
 
-func (p *parser) Parse() *Program {
+func (p *parser) parse() *Program {
 	return p.parseProgram()
 }
 
@@ -151,7 +151,7 @@ func (p *parser) Parse() *Program {
 // in grammar doc/syntax_grammar.md.
 func (p *parser) parseProgram() *Program {
 	program := &Program{formatting: p.formatting}
-	scope := newScope(nil, program) // TODO: model scope as stack like evaluator.
+	scope := newScope(nil, program)
 	for _, global := range p.builtins.Globals {
 		global.isUsed = true
 		scope.set(global.Name, global)

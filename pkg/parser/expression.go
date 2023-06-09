@@ -9,6 +9,7 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 
 	"foxygo.at/evy/pkg/lexer"
@@ -124,7 +125,8 @@ func (p *parser) parseUnaryExpr(scope *scope) Node {
 	unaryExp := &UnaryExpression{token: tok, Op: op(tok)}
 	p.advance() // advance past operator
 	if p.lookAt(p.pos-1).Type == lexer.WS {
-		p.appendErrorForToken("unexpected whitespace after '"+unaryExp.Op.String()+"'", tok)
+		msg := fmt.Sprintf("unexpected whitespace after %q", unaryExp.Op.String())
+		p.appendErrorForToken(msg, tok)
 	}
 	unaryExp.Right = p.parseExpr(scope, UNARY)
 	if unaryExp.Right == nil {
@@ -173,7 +175,7 @@ func (p *parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool)
 	defer p.popWSS()
 	tok := p.cur
 	if p.lookAt(p.pos-1).Type == lexer.WS {
-		p.appendError("unexpected whitespace before '['")
+		p.appendError(`unexpected whitespace before "["`)
 		return nil
 	}
 	p.advance() // advance past [
@@ -247,21 +249,21 @@ func (p *parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) No
 func (p *parser) parseDotExpr(left Node) Node {
 	tok := p.cur
 	if p.lookAt(p.pos-1).Type == lexer.WS {
-		p.appendError("unexpected whitespace before '.'")
+		p.appendError(`unexpected whitespace before "."`)
 		return nil
 	}
 	if p.lookAt(p.pos+1).Type == lexer.WS {
-		p.appendError("unexpected whitespace after '.'")
+		p.appendError(`unexpected whitespace after "."`)
 		return nil
 	}
 	p.advance() // advance past .
 	leftType := left.Type().Name
 	if leftType != MAP {
-		p.appendErrorForToken("field access with '.' expects map type, found "+left.Type().String(), tok)
+		p.appendErrorForToken(`field access with "." expects map type, found `+left.Type().String(), tok)
 		return nil
 	}
 	if p.cur.TokenType() != lexer.IDENT {
-		p.appendErrorForToken("expected map key, found "+p.cur.TokenType().String(), tok)
+		p.appendErrorForToken(`expected map key, found `+p.cur.TokenType().String(), tok)
 		return nil
 	}
 	expr := &DotExpression{token: tok, Left: left, T: left.Type().Sub, Key: p.cur.Literal}
@@ -283,11 +285,11 @@ func (p *parser) validateUnaryType(unaryExp *UnaryExpression) {
 	switch unaryExp.Op {
 	case OP_MINUS:
 		if unaryExp.Right.Type() != NUM_TYPE {
-			p.appendErrorForToken("'-' unary expects num type, found "+rightType.String(), tok)
+			p.appendErrorForToken(`"-" unary expects num type, found `+rightType.String(), tok)
 		}
 	case OP_BANG:
 		if unaryExp.Right.Type() != BOOL_TYPE {
-			p.appendErrorForToken("'!' unary expects bool type, found "+rightType.String(), tok)
+			p.appendErrorForToken(`"!" unary expects bool type, found `+rightType.String(), tok)
 		}
 	default:
 		p.appendErrorForToken("invalid unary operator", tok)
@@ -305,26 +307,30 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
 	if !leftType.Matches(rightType) {
-		p.appendErrorForToken("mismatched type for "+op.String()+": "+leftType.String()+", "+rightType.String(), tok)
+		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op.String(), leftType.String(), rightType.String())
+		p.appendErrorForToken(msg, tok)
 		return
 	}
 
 	switch op {
 	case OP_PLUS:
 		if leftType != NUM_TYPE && leftType != STRING_TYPE && leftType.Name != ARRAY {
-			p.appendErrorForToken("'+' takes num, string or array type, found "+leftType.String(), tok)
+			p.appendErrorForToken(`"+" takes num, string or array type, found `+leftType.String(), tok)
 		}
 	case OP_MINUS, OP_SLASH, OP_ASTERISK, OP_PERCENT:
 		if leftType != NUM_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes num type, found "+leftType.String(), tok)
+			msg := fmt.Sprintf("%q takes num type, found %s", op.String(), leftType.String())
+			p.appendErrorForToken(msg, tok)
 		}
 	case OP_LT, OP_GT, OP_LTEQ, OP_GTEQ:
 		if leftType != NUM_TYPE && leftType != STRING_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes num or string type, found "+leftType.String(), tok)
+			msg := fmt.Sprintf("%q takes num or string type, found %s", op.String(), leftType.String())
+			p.appendErrorForToken(msg, tok)
 		}
 	case OP_AND, OP_OR:
 		if leftType != BOOL_TYPE {
-			p.appendErrorForToken("'"+op.String()+"' takes bool type, found "+leftType.String(), tok)
+			msg := fmt.Sprintf("%q takes bool type, found %s", op.String(), leftType.String())
+			p.appendErrorForToken(msg, tok)
 		}
 	}
 }
@@ -461,7 +467,7 @@ func (p *parser) parseMapPairs(scope *scope, mapLit *MapLiteral) bool {
 		key := p.cur.Literal
 		p.advance() // advance past key IDENT
 		if _, ok := mapLit.Pairs[key]; ok {
-			p.appendError("duplicated map key'" + key + "'")
+			p.appendError(fmt.Sprintf("duplicated map key %q", key))
 			return false
 		}
 		p.assertToken(lexer.COLON)
@@ -490,7 +496,7 @@ func (p *parser) lookupVar(scope *scope) Node {
 	name := p.cur.Literal
 	p.advance()
 	if name == "_" {
-		p.appendErrorForToken("anonymous variable '_' cannot be read", tok)
+		p.appendErrorForToken(`anonymous variable "_" cannot be read`, tok)
 		return nil
 	}
 	if v, ok := scope.get(name); ok {
@@ -498,9 +504,11 @@ func (p *parser) lookupVar(scope *scope) Node {
 		return v
 	}
 	if _, ok := p.funcs[name]; ok {
-		p.appendErrorForToken("function call must be parenthesized: ("+name+" ...)", tok)
+		msg := fmt.Sprintf("function call must be parenthesized: (%s ...)", name)
+		p.appendErrorForToken(msg, tok)
 		return nil
 	}
-	p.appendErrorForToken("unknown variable name '"+name+"'", tok)
+	msg := fmt.Sprintf("unknown variable name %q", name)
+	p.appendErrorForToken(msg, tok)
 	return nil
 }

@@ -107,7 +107,8 @@ func newParser(input string, builtins Builtins) *parser {
 			if token.Literal == `"` {
 				p.appendErrorForToken(`unterminated string, missing "`, token)
 			} else {
-				p.appendErrorForToken("illegal character '"+token.Literal+"'", token)
+				msg := fmt.Sprintf("illegal character %q", token.Literal)
+				p.appendErrorForToken(msg, token)
 			}
 			continue
 		}
@@ -127,12 +128,15 @@ func newParser(input string, builtins Builtins) *parser {
 		if p.builtins.Globals[fd.Name] != nil {
 			// We still go on to add `fd` to the funcs map so that the
 			// function can be parsed correctly even though it has an invalid name.
-			p.appendErrorForToken("cannot override builtin variable '"+fd.Name+"'", fd.token)
+			msg := fmt.Sprintf("cannot override builtin variable %q", fd.Name)
+			p.appendErrorForToken(msg, fd.token)
 		}
 		if builtins.Funcs[fd.Name] != nil {
-			p.appendErrorForToken("cannot override builtin function '"+fd.Name+"'", fd.token)
+			msg := fmt.Sprintf("cannot override builtin function %q", fd.Name)
+			p.appendErrorForToken(msg, fd.token)
 		} else if p.funcs[fd.Name] != nil {
-			p.appendErrorForToken("redeclaration of function '"+fd.Name+"'", fd.token)
+			msg := fmt.Sprintf("redeclaration of function %q", fd.Name)
+			p.appendErrorForToken(msg, fd.token)
 		}
 		p.funcs[fd.Name] = fd // override anyway so the signature is correct for parsing the function
 	}
@@ -196,7 +200,7 @@ func (p *parser) parseFunc(scope *scope) Node {
 		return nil
 	}
 	if fd.Body != nil {
-		p.appendError("redeclaration of function '" + funcName + "'")
+		p.appendError(fmt.Sprintf("redeclaration of function %q", funcName))
 		return nil
 	}
 	if fd.ReturnType != NONE_TYPE && !block.AlwaysTerminates() {
@@ -304,7 +308,7 @@ func (p *parser) parseStatement(scope *scope) Node {
 		if p.peek.Type == lexer.LBRACKET {
 			return p.parseAssignmentStatement(scope)
 		}
-		p.appendError("unknown function '" + p.cur.Literal + "'")
+		p.appendError(fmt.Sprintf("unknown function %q", p.cur.Literal))
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
@@ -341,7 +345,7 @@ func (p *parser) parseEmptyStmt() Node {
 
 func (p *parser) parseAssignmentStatement(scope *scope) Node {
 	if p.isFuncCall(p.cur) {
-		p.appendError("cannot assign to '" + p.cur.Literal + "' as it is a function not a variable")
+		p.appendError(fmt.Sprintf("cannot assign to %q as it is a function not a variable", p.cur.Literal))
 		p.advancePastNL()
 		return nil
 	}
@@ -359,7 +363,7 @@ func (p *parser) parseAssignmentStatement(scope *scope) Node {
 		return nil
 	}
 	if !target.Type().Accepts(value.Type()) {
-		msg := "'" + target.String() + "' accepts values of type " + target.Type().String() + ", found " + value.Type().String()
+		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	}
 	p.assertEOL()
@@ -374,12 +378,13 @@ func (p *parser) parseAssignmentTarget(scope *scope) Node {
 	name := p.cur.Literal
 	p.advance()
 	if name == "_" {
-		p.appendErrorForToken("assignment to '_' not allowed", tok)
+		p.appendErrorForToken(`assignment to "_" not allowed`, tok)
 		return nil
 	}
 	v, ok := scope.get(name)
 	if !ok {
-		p.appendErrorForToken("unknown variable name '"+name+"'", tok)
+		msg := fmt.Sprintf("unknown variable name %q", name)
+		p.appendErrorForToken(msg, tok)
 		return nil
 	}
 	v.isUsed = true
@@ -388,7 +393,7 @@ func (p *parser) parseAssignmentTarget(scope *scope) Node {
 	for tt == lexer.LBRACKET || tt == lexer.DOT {
 		if p.cur.TokenType() == lexer.LBRACKET {
 			if n.Type() == STRING_TYPE {
-				p.appendErrorForToken("cannot index string on left side of '=', only on right", tok)
+				p.appendErrorForToken(`cannot index string on left side of "=", only on right`, tok)
 				return nil
 			}
 			n = p.parseIndexOrSliceExpr(scope, n, false)
@@ -464,26 +469,30 @@ func (p *parser) parseTypedDecl() *Decl {
 	decl.Var.T = v
 	decl.Value = zeroValue(v.Name)
 	if v == ILLEGAL_TYPE {
-		p.appendErrorForToken("invalid type declaration for '"+varName+"'", decl.token)
+		msg := fmt.Sprintf("invalid type declaration for %q", varName)
+		p.appendErrorForToken(msg, decl.token)
 	}
 	return decl
 }
 
 func (p *parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUnderscore bool) bool {
 	if _, ok := p.builtins.Globals[v.Name]; ok {
-		p.appendErrorForToken("redeclaration of builtin variable '"+v.Name+"'", tok)
+		msg := fmt.Sprintf("redeclaration of builtin variable %q", v.Name)
+		p.appendErrorForToken(msg, tok)
 		return false
 	}
 	if scope.inLocalScope(v.Name) { // already declared in current scope
-		p.appendErrorForToken("redeclaration of '"+v.Name+"'", tok)
+		msg := fmt.Sprintf("redeclaration of %q", v.Name)
+		p.appendErrorForToken(msg, tok)
 		return false
 	}
 	if _, ok := p.funcs[v.Name]; ok {
-		p.appendErrorForToken("invalid declaration of '"+v.Name+"', already used as function name", tok)
+		msg := fmt.Sprintf("invalid declaration of %q, already used as function name", v.Name)
+		p.appendErrorForToken(msg, tok)
 		return false
 	}
 	if !allowUnderscore && v.Name == "_" {
-		p.appendErrorForToken("declaration of anonymous variable '_' not allowed here", tok)
+		p.appendErrorForToken(`declaration of anonymous variable "_" not allowed here`, tok)
 		return false
 	}
 	return true
@@ -502,11 +511,11 @@ func (p *parser) parseInferredDeclStatement(scope *scope) Node {
 	val := p.parseTopLevelExpr(scope)
 	defer p.advancePastNL()
 	if val == nil || val.Type() == nil {
-		p.appendError("invalid inferred declaration for '" + varName + "'")
+		p.appendError(fmt.Sprintf("invalid inferred declaration for %q", varName))
 		return nil
 	}
 	if val.Type() == NONE_TYPE {
-		p.appendError("invalid declaration, function '" + valToken.Literal + "' has no return value")
+		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
 	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
@@ -545,7 +554,8 @@ func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 		for _, arg := range args {
 			argType := arg.Type()
 			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-				p.appendErrorForToken("'"+funcName+"' takes variadic arguments of type '"+paramType.String()+"', found '"+argType.String()+"'", arg.Token())
+				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
+				p.appendErrorForToken(msg, arg.Token())
 			}
 		}
 		return
@@ -555,14 +565,15 @@ func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 		if len(args) > len(decl.Params) {
 			tok = args[len(decl.Params)].Token()
 		}
-		p.appendErrorForToken("'"+funcName+"' takes "+quantify(len(decl.Params), "argument")+", found "+strconv.Itoa(len(args)), tok)
+		msg := fmt.Sprintf("%q takes %s, found %d", funcName, quantify(len(decl.Params), "argument"), len(args))
+		p.appendErrorForToken(msg, tok)
 		return
 	}
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
 		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
-			msg := fmt.Sprintf("'%s' takes %s argument of type '%s', found '%s'", funcName, ordinalize(i+1), paramType.String(), argType.String())
+			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}
 	}
@@ -621,7 +632,7 @@ func (p *parser) appendErrorForToken(message string, token *lexer.Token) {
 func (p *parser) validateScope(scope *scope) {
 	for _, v := range scope.vars {
 		if !v.isUsed {
-			p.appendErrorForToken("'"+v.Name+"' declared but not used", v.token)
+			p.appendErrorForToken(fmt.Sprintf("%q declared but not used", v.Name), v.token)
 		}
 	}
 }

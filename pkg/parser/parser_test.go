@@ -16,7 +16,7 @@ func TestParseDecl(t *testing.T) {
 		`a := "abc"
 		b:bool
 		c := true
-		print a b c`: {"a='abc'", "b=false", "c=true", "print(a, b, c)"},
+		print a b c`: {`a="abc"`, "b=false", "c=true", "print(a, b, c)"},
 		"a:[]num":                            {"a=[]"},
 		"a:{}[]num":                          {"a={}"},
 		"a:{}[]any":                          {"a={}"},
@@ -65,27 +65,27 @@ func TestEmptyProgram(t *testing.T) {
 
 func TestParseDeclError(t *testing.T) {
 	tests := map[string]string{
-		"a :invalid":    "line 1 column 1: invalid type declaration for 'a'",
-		"a :":           "line 1 column 1: invalid type declaration for 'a'",
-		"a :\n":         "line 1 column 1: invalid type declaration for 'a'",
-		"a ://blabla\n": "line 1 column 1: invalid type declaration for 'a'",
-		"a :true":       "line 1 column 1: invalid type declaration for 'a'",
-		"a :[]":         "line 1 column 1: invalid type declaration for 'a'",
-		"a :num[]":      "line 1 column 7: expected end of line, found '['",
-		"a :()":         "line 1 column 1: invalid type declaration for 'a'",
-		"a ::":          "line 1 column 1: invalid type declaration for 'a'",
-		"a := {}{":      "line 1 column 8: expected end of line, found '{'",
-		"a :=:":         "line 1 column 5: unexpected ':'",
-		"a := {":        "line 1 column 7: expected '}', got end of input",
-		"a := {}[":      "line 1 column 9: unexpected end of input",
-		"a :num num":    "line 1 column 8: expected end of line, found 'num'",
-		"a :num{}num":   "line 1 column 7: expected end of line, found '{'",
-		"_ :num":        "line 1 column 1: declaration of anonymous variable '_' not allowed here",
-		"_ := 0":        "line 1 column 1: declaration of anonymous variable '_' not allowed here",
+		"a :invalid":    `line 1 column 1: invalid type declaration for "a"`,
+		"a :":           `line 1 column 1: invalid type declaration for "a"`,
+		"a :\n":         `line 1 column 1: invalid type declaration for "a"`,
+		"a ://blabla\n": `line 1 column 1: invalid type declaration for "a"`,
+		"a :true":       `line 1 column 1: invalid type declaration for "a"`,
+		"a :[]":         `line 1 column 1: invalid type declaration for "a"`,
+		"a :num[]":      `line 1 column 7: expected end of line, found "["`,
+		"a :()":         `line 1 column 1: invalid type declaration for "a"`,
+		"a ::":          `line 1 column 1: invalid type declaration for "a"`,
+		"a := {}{":      `line 1 column 8: expected end of line, found "{"`,
+		"a :=:":         `line 1 column 5: unexpected ":"`,
+		"a := {":        `line 1 column 7: expected "}", got end of input`,
+		"a := {}[":      `line 1 column 9: unexpected end of input`,
+		"a :num num":    `line 1 column 8: expected end of line, found "num"`,
+		"a :num{}num":   `line 1 column 7: expected end of line, found "{"`,
+		"_ :num":        `line 1 column 1: declaration of anonymous variable "_" not allowed here`,
+		"_ := 0":        `line 1 column 1: declaration of anonymous variable "_" not allowed here`,
 		`
 m := {name: "Greta"}
 s := name
-print m[s]`: "line 3 column 6: unknown variable name 'name'",
+print m[s]`: `line 3 column 6: unknown variable name "name"`,
 	}
 	for input, err1 := range tests {
 		parser := newParser(input, testBuiltins())
@@ -100,15 +100,15 @@ func TestFunccall(t *testing.T) {
 	tests := map[string][]string{
 		"print":                          {"print()"},
 		"print 123":                      {"print(123)"},
-		`print 123 "abc"`:                {"print(123, 'abc')"},
+		`print 123 "abc"`:                {`print(123, "abc")`},
 		"a:=1 \n print a":                {"a=1", "print(a)"},
-		`a := len "abc"` + " \n print a": {"a=len('abc')", "print(a)"},
-		`len "abc"`:                      {"len('abc')"},
+		`a := len "abc"` + " \n print a": {`a=len("abc")`, "print(a)"},
+		`len "abc"`:                      {`len("abc")`},
 		`len []`:                         {"len([])"},
-		"a:string \n print a":            {"a=''", "print(a)"},
+		"a:string \n print a":            {`a=""`, "print(a)"},
 		`a:=true
 		b:string
-		print a b`: {"a=true", "b=''", "print(a, b)"},
+		print a b`: {`a=true`, `b=""`, `print(a, b)`},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -130,17 +130,17 @@ func TestFunccallError(t *testing.T) {
 		ReturnType: NONE_TYPE,
 	}
 	tests := map[string]string{
-		`len 2 2`:    "line 1 column 7: 'len' takes 1 argument, found 2",
-		`len`:        "line 1 column 4: 'len' takes 1 argument, found 0",
-		`a := print`: "line 1 column 11: invalid declaration, function 'print' has no return value",
-		`a := f0`:    "line 1 column 8: invalid declaration, function 'f0' has no return value",
-		`f0 "arg"`:   "line 1 column 4: 'f0' takes 0 arguments, found 1",
-		`f2`:         "line 1 column 3: 'f2' takes 1 argument, found 0",
-		`f2 f1`:      "line 1 column 4: function call must be parenthesized: (f1 ...)",
-		`f1 "arg"`:   "line 1 column 4: 'f1' takes variadic arguments of type 'num', found 'string'",
-		`f3 1 2`:     "line 1 column 6: 'f3' takes 2nd argument of type 'string', found 'num'",
-		`f3 "1" "2"`: "line 1 column 4: 'f3' takes 1st argument of type 'num', found 'string'",
-		`foo 0`:      "line 1 column 1: unknown function 'foo'",
+		`len 2 2`:    `line 1 column 7: "len" takes 1 argument, found 2`,
+		`len`:        `line 1 column 4: "len" takes 1 argument, found 0`,
+		`a := print`: `line 1 column 11: invalid declaration, function "print" has no return value`,
+		`a := f0`:    `line 1 column 8: invalid declaration, function "f0" has no return value`,
+		`f0 "arg"`:   `line 1 column 4: "f0" takes 0 arguments, found 1`,
+		`f2`:         `line 1 column 3: "f2" takes 1 argument, found 0`,
+		`f2 f1`:      `line 1 column 4: function call must be parenthesized: (f1 ...)`,
+		`f1 "arg"`:   `line 1 column 4: "f1" takes variadic arguments of type num, found string`,
+		`f3 1 2`:     `line 1 column 6: "f3" takes 2nd argument of type string, found num`,
+		`f3 "1" "2"`: `line 1 column 4: "f3" takes 1st argument of type num, found string`,
+		`foo 0`:      `line 1 column 1: unknown function "foo"`,
 	}
 	for input, err1 := range tests {
 		parser := newParser(input, builtins)
@@ -158,7 +158,7 @@ if true
 	print "TRUE"
 end`: `
 if (true) {
-print('TRUE')
+print("TRUE")
 }
 `,
 		`
@@ -169,7 +169,7 @@ if true
 end`: `
 if (true) {
 if (true) {
-print('TRUE')
+print("TRUE")
 }
 }
 `,
@@ -191,7 +191,7 @@ print x
 	got := parser.Parse()
 	assertNoParseError(t, parser, input)
 	want := `
-x=len('123')
+x=len("123")
 print(x)
 `
 	assert.Equal(t, want, got.String())
@@ -395,30 +395,30 @@ func TestFuncAssignmentErr(t *testing.T) {
 		`
 b:num
 b = true
-`: "line 3 column 1: 'b' accepts values of type num, found bool",
+`: `line 3 column 1: "b" accepts values of type num, found bool`,
 		`
 a:= 1
 a = b
-`: "line 3 column 5: unknown variable name 'b'",
+`: `line 3 column 5: unknown variable name "b"`,
 		`
 a:= 1
 b = a
-`: "line 3 column 1: unknown variable name 'b'",
+`: `line 3 column 1: unknown variable name "b"`,
 		`
 a:= 1
 a = []
-`: "line 3 column 1: 'a' accepts values of type num, found []",
+`: `line 3 column 1: "a" accepts values of type num, found []`,
 		`
 a:num
 b:any
 a = b
-`: "line 4 column 1: 'a' accepts values of type num, found any",
+`: `line 4 column 1: "a" accepts values of type num, found any`,
 		`
 func fn:bool
 	return true
 end
 fn = 3
-`: "line 5 column 1: cannot assign to 'fn' as it is a function not a variable",
+`: `line 5 column 1: cannot assign to "fn" as it is a function not a variable`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -482,21 +482,21 @@ func TestUnusedErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 x := 1
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 		`
 x := 1
 if true
 	x := 1
 end
 print x
-`: "line 4 column 2: 'x' declared but not used",
+`: `line 4 column 2: "x" declared but not used`,
 		`
 x := 1
 if true
 	x := 1
 	print x
 end
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 		`
 x := 1
 if true
@@ -505,7 +505,7 @@ else
 	x := 1
 	print x
 end
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 		`
 x := 1
 if true
@@ -514,7 +514,7 @@ else
 	x := 1
 end
 print x
-`: "line 6 column 2: 'x' declared but not used",
+`: `line 6 column 2: "x" declared but not used`,
 		`
 x := 1
 if true
@@ -523,49 +523,49 @@ else if true
 	x := 1
 end
 print x
-`: "line 6 column 2: 'x' declared but not used",
+`: `line 6 column 2: "x" declared but not used`,
 		`
 x := 1
 for i := range 10
 	x := 2
 	print i x
 end
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 		`
 x := 1
 for i := range 10
 	x := 2 * i
 end
 print x
-`: "line 4 column 2: 'x' declared but not used",
+`: `line 4 column 2: "x" declared but not used`,
 		`
 x := 1
 while true
 	x := 2
 	print x
 end
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 		`
 x := 1
 while true
 	x := 2
 end
 print x
-`: "line 4 column 2: 'x' declared but not used",
+`: `line 4 column 2: "x" declared but not used`,
 		`
 x := 1
 func foo
 	x := 2
 end
 print x
-`: "line 4 column 2: 'x' declared but not used",
+`: `line 4 column 2: "x" declared but not used`,
 		`
 x := 1
 func foo
 	x := 2
 	print x
 end
-`: "line 2 column 1: 'x' declared but not used",
+`: `line 2 column 1: "x" declared but not used`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -581,64 +581,64 @@ func TestScopeErr(t *testing.T) {
 		`
 x := 1
 x := 2
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x := 1
 x := "abc"
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x :num
 x := "abc"
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x := "abc"
 x :num
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x :num
 x :num
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x :num
 x :string
-`: "line 3 column 1: redeclaration of 'x'",
+`: `line 3 column 1: redeclaration of "x"`,
 		`
 x :num
 func x
    print "abc"
 end
-`: "line 2 column 1: invalid declaration of 'x', already used as function name",
+`: `line 2 column 1: invalid declaration of "x", already used as function name`,
 		`
 func x in:num
    in:string
 end
-`: "line 3 column 4: redeclaration of 'in'",
+`: `line 3 column 4: redeclaration of "in"`,
 		`
 func foo
    x := 0
    x := 0
 end
-`: "line 4 column 4: redeclaration of 'x'",
+`: `line 4 column 4: redeclaration of "x"`,
 		`
 func x
    x := 0
 end
-`: "line 3 column 4: invalid declaration of 'x', already used as function name",
+`: `line 3 column 4: invalid declaration of "x", already used as function name`,
 		`
 func x in:string in:string
    print in
 end
-`: "line 2 column 18: redeclaration of 'in'",
+`: `line 2 column 18: redeclaration of "in"`,
 		`
 func x x:string
    print x
 end
-`: "line 2 column 8: invalid declaration of 'x', already used as function name",
+`: `line 2 column 8: invalid declaration of "x", already used as function name`,
 		`
 func x x:string...
    print x
 end
-`: "line 2 column 8: invalid declaration of 'x', already used as function name",
+`: `line 2 column 8: invalid declaration of "x", already used as function name`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -699,26 +699,26 @@ func TestIfErr(t *testing.T) {
 		`
 if true
 	print "baba yaga"
-`: "line 4 column 1: expected 'end', got end of input",
+`: `line 4 column 1: expected "end", got end of input`,
 		`
 if true
-end`: "line 3 column 1: at least one statement is required here",
+end`: `line 3 column 1: at least one statement is required here`,
 		`
 if
 	print "baba yaga"
-end`: "line 2 column 3: unexpected end of line",
+end`: `line 2 column 3: unexpected end of line`,
 		`
 if true
 	print "true"
 else true
 	print "true"
-end`: "line 4 column 6: expected end of line, found 'true'",
+end`: `line 4 column 6: expected end of line, found "true"`,
 		`
 if true
 	print "true"
 else if
 	print "true"
-end`: "line 4 column 8: unexpected end of line",
+end`: `line 4 column 8: unexpected end of line`,
 		`
 if true
 	print "true"
@@ -726,14 +726,14 @@ else
    print "false"
 else if false
 	print "true"
-end`: "line 6 column 1: unexpected input 'else'",
+end`: `line 6 column 1: unexpected input "else"`,
 		`
 if true
 	if true
 		print "true true"
 else
 	print "false"
-end`: "line 7 column 4: expected 'end', got end of input",
+end`: `line 7 column 4: expected "end", got end of input`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -783,7 +783,7 @@ func TestWhileErr(t *testing.T) {
 		`
 while true
 	print "forever"
-`: "line 4 column 1: expected 'end', got end of input",
+`: `line 4 column 1: expected "end", got end of input`,
 		`
 while true
 end`: "line 3 column 1: at least one statement is required here",
@@ -956,33 +956,33 @@ func TestForErr(t *testing.T) {
 for
 	print "X"
 end
-`: "line 2 column 4: expected 'range', got end of line",
+`: `line 2 column 4: expected "range", got end of line`,
 		`
 for true
 	print "X"
 end
-`: "line 2 column 5: expected 'range', got 'true'",
+`: `line 2 column 5: expected "range", got "true"`,
 		`
 x := 0
 for x = range 5
 	print "X"
 end
-`: "line 3 column 7: expected ':=', got '='",
+`: `line 3 column 7: expected ":=", got "="`,
 		`
 for x := range 1 2 3 4
 	print "X"
 end
-`: "line 2 column 10: range can take up to 3 num arguments, found 4",
+`: `line 2 column 10: range can take up to 3 num arguments, found 4`,
 		`
 for x := range true
 	print "X"
 end
-`: "line 2 column 20: expected num, string, array or map after range, found bool",
+`: `line 2 column 20: expected num, string, array or map after range, found bool`,
 		`
 for x := range 1 true
 	print "X"
 end
-`: "line 2 column 10: range expects num type for 2nd argument, found bool",
+`: `line 2 column 10: range expects num type for 2nd argument, found bool`,
 		`
 func x
 	print "func x"
@@ -990,12 +990,12 @@ end
 for x := range 10
 	print "x" x
 end
-`: "line 5 column 5: invalid declaration of 'x', already used as function name",
+`: `line 5 column 5: invalid declaration of "x", already used as function name`,
 		`
 for _ := range 10
 	print "hi"
 end
-`: "line 2 column 5: declaration of anonymous variable '_' not allowed here",
+`: `line 2 column 5: declaration of anonymous variable "_" not allowed here`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -1067,7 +1067,7 @@ func TestFuncDeclErr(t *testing.T) {
 func len s:string
    print "len:" s
 end
-`: "line 2 column 1: cannot override builtin function 'len'",
+`: `line 2 column 1: cannot override builtin function "len"`,
 		`
 func fox
    print "fox"
@@ -1076,12 +1076,12 @@ end
 func fox
    print "fox overridden"
 end
-`: "line 6 column 1: redeclaration of function 'fox'",
+`: `line 6 column 1: redeclaration of function "fox"`,
 		`
 func fox _:string
    print "fox" _
 end
-`: "line 3 column 16: anonymous variable '_' cannot be read",
+`: `line 3 column 16: anonymous variable "_" cannot be read`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -1126,26 +1126,26 @@ func TestEventHandlerErr(t *testing.T) {
 		`
 on down x:num y:num
    print "pointer down:" x y
-`: "line 4 column 1: expected 'end', got end of input",
+`: `line 4 column 1: expected "end", got end of input`,
 		`
 on down:num
    print "down:" down
 end
-`: "line 2 column 8: expected identifier, got ':'",
+`: `line 2 column 8: expected identifier, got ":"`,
 		`
 on down x:num y:num
 return "abc"
 end
-`: "line 3 column 8: expected no return value, found string",
+`: `line 3 column 8: expected no return value, found string`,
 		`
 on down2 x:num y:num
    print "down:" down
 end
-`: "line 2 column 4: unknown event name down2",
+`: `line 2 column 4: unknown event name down2`,
 		`
 on down x:num
    print "pointer down:" x
-end`: "line 3 column 4: wrong number of parameters expected 2, got 1",
+end`: `line 3 column 4: wrong number of parameters expected 2, got 1`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -1160,15 +1160,15 @@ func TestGlobalErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 err := true
-`: "line 2 column 1: redeclaration of builtin variable 'err'",
+`: `line 2 column 1: redeclaration of builtin variable "err"`,
 		`
 errmsg := 5
-`: "line 2 column 1: redeclaration of builtin variable 'errmsg'",
+`: `line 2 column 1: redeclaration of builtin variable "errmsg"`,
 		`
 func errmsg
    print "💣"
 end
-`: "line 2 column 1: cannot override builtin variable 'errmsg'",
+`: `line 2 column 1: cannot override builtin variable "errmsg"`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
@@ -1201,8 +1201,8 @@ print (len 5)`
 	assertParseError(t, parser, input)
 	gotErrs := parser.errors
 	wantErrs := []string{
-		"line 2 column 1: cannot override builtin function 'len'",
-		"line 5 column 7: 'print' takes variadic arguments of type 'any', found 'none'",
+		`line 2 column 1: cannot override builtin function "len"`,
+		`line 5 column 7: "print" takes variadic arguments of type any, found none`,
 	}
 	for i, err := range gotErrs {
 		assert.Equal(t, err.Error(), wantErrs[i])
@@ -1235,14 +1235,14 @@ end`
 	got := parser.Parse()
 	assertParseError(t, parser, input)
 	gotErr := parser.errors.Truncate(1)
-	assert.Equal(t, "line 2 column 1: unknown function 'move'", gotErr.Error())
-	assert.Equal(t, "line 3 column 1: unknown function 'line'", parser.errors[1].Error())
+	assert.Equal(t, `line 2 column 1: unknown function "move"`, gotErr.Error())
+	assert.Equal(t, `line 3 column 1: unknown function "line"`, parser.errors[1].Error())
 	want := `
 
 x=12
-print('x:', x)
+print("x:", x)
 if ((x>10)) {
-print('🍦 big x')
+print("🍦 big x")
 }
 `
 	assert.Equal(t, want, got.String())

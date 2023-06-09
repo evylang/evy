@@ -14,7 +14,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"n2":  "n2",
 		"s":   "s",
 		"b":   "b",
-		`"b"`: "'b'",
+		`"b"`: `"b"`,
 
 		// binary expressions, arithmetic
 		"1+1":   "(1+1)",
@@ -27,8 +27,8 @@ func TestParseTopLevelExpression(t *testing.T) {
 		// binary expressions, logical
 		"n1<n2":                "(n1<n2)",
 		"1<2":                  "(1<2)",
-		`"a"<"b"`:              `('a'<'b')`,
-		`s<"b"`:                `(s<'b')`,
+		`"a"<"b"`:              `("a"<"b")`,
+		`s<"b"`:                `(s<"b")`,
 		"n1== n2":              "(n1==n2)",
 		"false and true":       "(false and true)",
 		"false or b":           "(false or b)",
@@ -56,7 +56,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"print":        "print()",
 		"print 1":      "print(1)",
 		"print 1 true": "print(1, true)",
-		`print 1 "a"`:  "print(1, 'a')",
+		`print 1 "a"`:  `print(1, "a")`,
 
 		// Function calls
 		`print (1+2)`:                 "print((1+2))",
@@ -64,12 +64,12 @@ func TestParseTopLevelExpression(t *testing.T) {
 		`print 1+2 3+4`:               "print((1+2), (3+4))",
 		`print 1-2`:                   "print((1-2))",
 		`print 1 -2`:                  "print(1, (-2))",
-		`len "abc"`:                   "len('abc')",
-		`print (len "abc")`:           "print(len('abc'))",
-		`print 1 (len "abc")`:         "print(1, len('abc'))",
-		`print 1 (len "abc") 2`:       "print(1, len('abc'), 2)",
-		`print (len "abc") 2`:         "print(len('abc'), 2)",
-		`print (len "abc") (len "x")`: "print(len('abc'), len('x'))",
+		`len "abc"`:                   `len("abc")`,
+		`print (len "abc")`:           `print(len("abc"))`,
+		`print 1 (len "abc")`:         `print(1, len("abc"))`,
+		`print 1 (len "abc") 2`:       `print(1, len("abc"), 2)`,
+		`print (len "abc") 2`:         `print(len("abc"), 2)`,
+		`print (len "abc") (len "x")`: `print(len("abc"), len("x"))`,
 		`print s[1]`:                  "print((s[1]))",
 		"print map2[s]":               "print((map2[s]))",
 
@@ -80,8 +80,8 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"arr2[1][n2+2]": "((arr2[1])[(n2+2)])",
 		"arr[1] and b":  "((arr[1]) and b)",
 		"map[s]":        "(map[s])",
-		`map["key"]`:    "(map['key'])",
-		`"abc"[1]`:      "('abc'[1])",
+		`map["key"]`:    `(map["key"])`,
+		`"abc"[1]`:      `("abc"[1])`,
 		`s[1]`:          "(s[1])",
 
 		// Map access - dot expressions
@@ -132,7 +132,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"{a: [1] b:2 c: 1+2}":    "{a:[1], b:2, c:(1+2)}",
 		"{a: [1] b:2+n2 c: 1+2}": "{a:[1], b:(2+n2), c:(1+2)}",
 		"{a: 1}.a":               "({a:1}.a)",
-		`{a: 1}["a"]`:            "({a:1}['a'])",
+		`{a: 1}["a"]`:            `({a:1}["a"])`,
 
 		// Array concatenation
 		"[1] + [2]":            "([1]+[2])",
@@ -203,56 +203,56 @@ func TestParseTopLevelExpression(t *testing.T) {
 
 func TestParseTopLevelExpressionErr(t *testing.T) {
 	tests := map[string]string{
-		"x":        "line 1 column 1: unknown variable name 'x'",
-		"+1":       "line 1 column 1: unexpected '+'",
-		"* n1":     "line 1 column 1: unexpected '*'",
-		"and true": "line 1 column 1: unexpected 'and'",
+		"x":        `line 1 column 1: unknown variable name "x"`,
+		"+1":       `line 1 column 1: unexpected "+"`,
+		"* n1":     `line 1 column 1: unexpected "*"`,
+		"and true": `line 1 column 1: unexpected "and"`,
 
 		"1 +":    "line 1 column 4: unexpected end of input",
 		"1 +\n2": "line 1 column 4: unexpected end of line",
 		"1 ==":   "line 1 column 5: unexpected end of input",
 
-		"true + false": "line 1 column 6: '+' takes num, string or array type, found bool",
-		"true - false": "line 1 column 6: '-' takes num type, found bool",
-		"true < false": "line 1 column 6: '<' takes num or string type, found bool",
-		"1 and 2":      "line 1 column 3: 'and' takes bool type, found num",
-		"1 + false":    "line 1 column 3: mismatched type for +: num, bool",
-		"false + 1":    "line 1 column 7: mismatched type for +: bool, num",
-		"(1+2":         "line 1 column 5: expected ')', got end of input",
-		"(1+2\n)":      "line 1 column 5: expected ')', got end of line",
-		"(1+)2":        "line 1 column 4: unexpected ')'",
-		"(1+]2":        "line 1 column 4: unexpected ']'",
-		"(1+2]":        "line 1 column 5: expected ')', got ']'",
+		"true + false": `line 1 column 6: "+" takes num, string or array type, found bool`,
+		"true - false": `line 1 column 6: "-" takes num type, found bool`,
+		"true < false": `line 1 column 6: "<" takes num or string type, found bool`,
+		"1 and 2":      `line 1 column 3: "and" takes bool type, found num`,
+		"1 + false":    `line 1 column 3: mismatched type for +: num, bool`,
+		"false + 1":    `line 1 column 7: mismatched type for +: bool, num`,
+		"(1+2":         `line 1 column 5: expected ")", got end of input`,
+		"(1+2\n)":      `line 1 column 5: expected ")", got end of line`,
+		"(1+)2":        `line 1 column 4: unexpected ")"`,
+		"(1+]2":        `line 1 column 4: unexpected "]"`,
+		"(1+2]":        `line 1 column 5: expected ")", got "]"`,
 
 		`"abc"["a"]`:   "line 1 column 6: string index expects num, found string",
 		`[1 2 3]["a"]`: "line 1 column 8: array index expects num, found string",
 		"{a:2}[2]":     "line 1 column 6: map index expects string, found num",
 
-		"{a:}": "line 1 column 4: unexpected '}'",
-		"{:a}": "line 1 column 2: expected map key, found ':'",
+		"{a:}": `line 1 column 4: unexpected "}"`,
+		"{:a}": `line 1 column 2: expected map key, found ":"`,
 
 		"[1] + [false]": "line 1 column 5: mismatched type for +: []num, []bool",
 
-		"a. b":        "line 1 column 2: unexpected whitespace after '.'",
-		"a .b":        "line 1 column 3: unexpected whitespace before '.'",
-		"- 5":         "line 1 column 1: unexpected whitespace after '-'",
-		"- n1":        "line 1 column 1: unexpected whitespace after '-'",
-		"[3 +5]":      "line 1 column 4: unexpected whitespace before '+'",
-		"[3+ 5]":      "line 1 column 3: unexpected whitespace after '+'",
-		"[ 3+ 5]":     "line 1 column 4: unexpected whitespace after '+'",
-		"print 1 - 2": "line 1 column 9: unexpected whitespace after '-'",
+		"a. b":        `line 1 column 2: unexpected whitespace after "."`,
+		"a .b":        `line 1 column 3: unexpected whitespace before "."`,
+		"- 5":         `line 1 column 1: unexpected whitespace after "-"`,
+		"- n1":        `line 1 column 1: unexpected whitespace after "-"`,
+		"[3 +5]":      `line 1 column 4: unexpected whitespace before "+"`,
+		"[3+ 5]":      `line 1 column 3: unexpected whitespace after "+"`,
+		"[ 3+ 5]":     `line 1 column 4: unexpected whitespace after "+"`,
+		"print 1 - 2": `line 1 column 9: unexpected whitespace after "-"`,
 
-		"- 2":    "line 1 column 1: unexpected whitespace after '-'",
-		"! true": "line 1 column 1: unexpected whitespace after '!'",
+		"- 2":    `line 1 column 1: unexpected whitespace after "-"`,
+		"! true": `line 1 column 1: unexpected whitespace after "!"`,
 
-		"{a: _}":   "line 1 column 5: anonymous variable '_' cannot be read",
-		"[_]":      "line 1 column 2: anonymous variable '_' cannot be read",
-		"{a:1}[_]": "line 1 column 7: anonymous variable '_' cannot be read",
+		"{a: _}":   `line 1 column 5: anonymous variable "_" cannot be read`,
+		"[_]":      `line 1 column 2: anonymous variable "_" cannot be read`,
+		"{a:1}[_]": `line 1 column 7: anonymous variable "_" cannot be read`,
 
-		"[1":    "line 1 column 3: expected ']', got end of input",
-		"[1)":   "line 1 column 3: unexpected ')'",
-		"[1(]":  "line 1 column 4: unexpected ']'",
-		"[1()]": "line 1 column 4: unexpected ')'",
+		"[1":    `line 1 column 3: expected "]", got end of input`,
+		"[1)":   `line 1 column 3: unexpected ")"`,
+		"[1(]":  `line 1 column 4: unexpected "]"`,
+		"[1()]": `line 1 column 4: unexpected ")"`,
 	}
 	for input, wantErr := range tests {
 		parser := newParser(input, testBuiltins())

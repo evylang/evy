@@ -80,6 +80,7 @@ type parser struct {
 	funcs         map[string]*FuncDeclStmt     // all function declarations by name
 	eventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
 
+	scope      *scope // Current top of scope stack
 	wssStack   []bool
 	formatting *formatting
 }
@@ -158,22 +159,22 @@ func (p *parser) parse() *Program {
 // in grammar doc/syntax_grammar.md.
 func (p *parser) parseProgram() *Program {
 	program := &Program{formatting: p.formatting}
-	scope := newScope(nil, program)
+	p.scope = newScope(nil, program)
 	for _, global := range p.builtins.Globals {
 		global.isUsed = true
-		scope.set(global.Name, global)
+		p.scope.set(global.Name, global)
 	}
 	p.advanceTo(0)
 	for p.cur.TokenType() != lexer.EOF {
 		var stmt Node
 		switch p.cur.TokenType() {
 		case lexer.FUNC:
-			stmt = p.parseFunc(scope)
+			stmt = p.parseFunc()
 		case lexer.ON:
-			stmt = p.parseEventHandler(scope)
+			stmt = p.parseEventHandler()
 		default:
 			tok := p.cur
-			stmt = p.parseStatement(scope)
+			stmt = p.parseStatement()
 			if stmt != nil && program.AlwaysTerminates() {
 				p.appendErrorForToken("unreachable code", tok)
 				stmt = nil
@@ -186,22 +187,35 @@ func (p *parser) parseProgram() *Program {
 			program.Statements = append(program.Statements, stmt)
 		}
 	}
-	p.validateScope(scope)
+	p.validateScope()
 	program.EventHandlers = p.eventHandlers
 	program.CalledBuiltinFuncs = p.calledBuiltinFuncs()
 	return program
 }
 
-func (p *parser) parseFunc(scope *scope) Node {
+func (p *parser) popScope() {
+	p.scope = p.scope.outer
+}
+
+func (p *parser) pushScope(s *scope) {
+	p.scope = s
+}
+
+func (p *parser) pushScopeWithNode(n Node) {
+	p.scope = newScope(p.scope, n)
+}
+
+func (p *parser) parseFunc() Node {
 	p.advance()  // advance past FUNC
 	tok := p.cur // function name
 	funcName := p.cur.Literal
 
 	p.advancePastNL() // advance past signature, already parsed into p.funcs earlier
 	fd := p.funcs[funcName]
-	scope = newScopeWithReturnType(scope, fd, fd.ReturnType)
-	p.addParamsToScope(scope, fd)
-	block := p.parseBlock(scope) // parse to "end"
+	p.scope = newScopeWithReturnType(p.scope, fd, fd.ReturnType)
+	defer p.popScope()
+	p.addParamsToScope(fd)
+	block := p.parseBlock() // parse to "end"
 
 	if tok.TokenType() != lexer.IDENT {
 		return nil
@@ -221,25 +235,25 @@ func (p *parser) parseFunc(scope *scope) Node {
 	return fd
 }
 
-func (p *parser) addParamsToScope(scope *scope, fd *FuncDeclStmt) {
+func (p *parser) addParamsToScope(fd *FuncDeclStmt) {
 	for _, param := range fd.Params {
-		p.validateVarDecl(scope, param, param.token, true /* allowUnderscore */)
-		scope.set(param.Name, param)
+		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
+		p.scope.set(param.Name, param)
 	}
 	if fd.VariadicParam != nil {
 		vParam := fd.VariadicParam
-		p.validateVarDecl(scope, vParam, vParam.token, true /* allowUnderscore */)
+		p.validateVarDecl(vParam, vParam.token, true /* allowUnderscore */)
 
 		vParamAsArray := &Var{
 			token: vParam.token,
 			Name:  vParam.Name,
 			T:     &Type{Name: ARRAY, Sub: vParam.Type()},
 		}
-		scope.set(vParam.Name, vParamAsArray)
+		p.scope.set(vParam.Name, vParamAsArray)
 	}
 }
 
-func (p *parser) parseEventHandler(scope *scope) Node {
+func (p *parser) parseEventHandler() Node {
 	e := &EventHandlerStmt{token: p.cur}
 	p.advance() // advance past ON token
 	if !p.assertToken(lexer.IDENT) {
@@ -265,9 +279,11 @@ func (p *parser) parseEventHandler(scope *scope) Node {
 	p.recordComment(e)
 	p.advancePastNL()
 
-	scope = newScopeWithReturnType(scope, e, NONE_TYPE) // only bare returns
-	p.addEventParamsToScope(scope, e)
-	e.Body = p.parseBlock(scope)
+	s := newScopeWithReturnType(p.scope, e, NONE_TYPE) // only bare returns
+	p.pushScope(s)
+	defer p.popScope()
+	p.addEventParamsToScope(e)
+	e.Body = p.parseBlock()
 	p.assertEnd()
 	p.advance()
 	p.recordComment(e.Body)
@@ -275,7 +291,7 @@ func (p *parser) parseEventHandler(scope *scope) Node {
 	return e
 }
 
-func (p *parser) addEventParamsToScope(scope *scope, e *EventHandlerStmt) {
+func (p *parser) addEventParamsToScope(e *EventHandlerStmt) {
 	if len(e.Params) == 0 || p.builtins.EventHandlers[e.Name] == nil {
 		return
 	}
@@ -284,16 +300,16 @@ func (p *parser) addEventParamsToScope(scope *scope, e *EventHandlerStmt) {
 		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
 	}
 	for i, param := range e.Params {
-		p.validateVarDecl(scope, param, param.token, true /* allowUnderscore */)
+		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
 		if !param.Type().Matches(exptectedType) {
 			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
 		}
-		scope.set(param.Name, param)
+		p.scope.set(param.Name, param)
 	}
 }
 
-func (p *parser) parseStatement(scope *scope) Node {
+func (p *parser) parseStatement() Node {
 	switch p.cur.TokenType() {
 	case lexer.WS:
 		p.advance()
@@ -303,31 +319,31 @@ func (p *parser) parseStatement(scope *scope) Node {
 	case lexer.IDENT:
 		switch p.peek.Type {
 		case lexer.ASSIGN, lexer.DOT:
-			return p.parseAssignmentStatement(scope)
+			return p.parseAssignmentStatement()
 		case lexer.COLON:
-			return p.parseTypedDeclStatement(scope)
+			return p.parseTypedDeclStatement()
 		case lexer.DECLARE:
-			return p.parseInferredDeclStatement(scope)
+			return p.parseInferredDeclStatement()
 		}
 		if p.isFuncCall(p.cur) {
-			return p.parseFunCallStatement(scope)
+			return p.parseFunCallStatement()
 		}
 		if p.peek.Type == lexer.LBRACKET {
-			return p.parseAssignmentStatement(scope)
+			return p.parseAssignmentStatement()
 		}
 		p.appendError(fmt.Sprintf("unknown function %q", p.cur.Literal))
 		p.advancePastNL()
 		return nil
 	case lexer.RETURN:
-		return p.parseReturnStatement(scope)
+		return p.parseReturnStatement()
 	case lexer.BREAK:
-		return p.parseBreakStatement(scope)
+		return p.parseBreakStatement()
 	case lexer.FOR:
-		return p.parseForStatement(scope)
+		return p.parseForStatement()
 	case lexer.WHILE:
-		return p.parseWhileStatement(scope)
+		return p.parseWhileStatement()
 	case lexer.IF:
-		return p.parseIfStatement(scope)
+		return p.parseIfStatement()
 	}
 	p.appendError("unexpected input " + p.cur.FormatDetails())
 	p.advancePastNL()
@@ -350,21 +366,21 @@ func (p *parser) parseEmptyStmt() Node {
 	}
 }
 
-func (p *parser) parseAssignmentStatement(scope *scope) Node {
+func (p *parser) parseAssignmentStatement() Node {
 	if p.isFuncCall(p.cur) {
 		p.appendError(fmt.Sprintf("cannot assign to %q as it is a function not a variable", p.cur.Literal))
 		p.advancePastNL()
 		return nil
 	}
 	tok := p.cur
-	target := p.parseAssignmentTarget(scope)
+	target := p.parseAssignmentTarget()
 	if target == nil {
 		p.advancePastNL()
 		return nil
 	}
 	p.assertToken(lexer.ASSIGN)
 	p.advance()
-	value := p.parseTopLevelExpr(scope)
+	value := p.parseTopLevelExpr()
 	if value == nil {
 		p.advancePastNL()
 		return nil
@@ -380,7 +396,7 @@ func (p *parser) parseAssignmentStatement(scope *scope) Node {
 	return stmt
 }
 
-func (p *parser) parseAssignmentTarget(scope *scope) Node {
+func (p *parser) parseAssignmentTarget() Node {
 	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
@@ -388,7 +404,7 @@ func (p *parser) parseAssignmentTarget(scope *scope) Node {
 		p.appendErrorForToken(`assignment to "_" not allowed`, tok)
 		return nil
 	}
-	v, ok := scope.get(name)
+	v, ok := p.scope.get(name)
 	if !ok {
 		msg := fmt.Sprintf("unknown variable name %q", name)
 		p.appendErrorForToken(msg, tok)
@@ -403,7 +419,7 @@ func (p *parser) parseAssignmentTarget(scope *scope) Node {
 				p.appendErrorForToken(`cannot index string on left side of "=", only on right`, tok)
 				return nil
 			}
-			n = p.parseIndexOrSliceExpr(scope, n, false)
+			n = p.parseIndexOrSliceExpr(n, false)
 		}
 		if p.cur.TokenType() == lexer.DOT {
 			n = p.parseDotExpr(n)
@@ -449,10 +465,10 @@ func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
 	return fd
 }
 
-func (p *parser) parseTypedDeclStatement(scope *scope) Node {
+func (p *parser) parseTypedDeclStatement() Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVarDecl(scope, decl.Var, decl.token, false /* allowUnderscore */) {
-		scope.set(decl.Var.Name, decl.Var)
+	if decl.Type().Name != ILLEGAL && p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
+		p.scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
 	typeDecl := &TypedDeclStmt{token: decl.token, Decl: decl}
@@ -482,13 +498,13 @@ func (p *parser) parseTypedDecl() *Decl {
 	return decl
 }
 
-func (p *parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUnderscore bool) bool {
+func (p *parser) validateVarDecl(v *Var, tok *lexer.Token, allowUnderscore bool) bool {
 	if _, ok := p.builtins.Globals[v.Name]; ok {
 		msg := fmt.Sprintf("redeclaration of builtin variable %q", v.Name)
 		p.appendErrorForToken(msg, tok)
 		return false
 	}
-	if scope.inLocalScope(v.Name) { // already declared in current scope
+	if p.scope.inLocalScope(v.Name) { // already declared in current scope
 		msg := fmt.Sprintf("redeclaration of %q", v.Name)
 		p.appendErrorForToken(msg, tok)
 		return false
@@ -505,7 +521,7 @@ func (p *parser) validateVarDecl(scope *scope, v *Var, tok *lexer.Token, allowUn
 	return true
 }
 
-func (p *parser) parseInferredDeclStatement(scope *scope) Node {
+func (p *parser) parseInferredDeclStatement() Node {
 	p.assertToken(lexer.IDENT)
 	varName := p.cur.Literal
 	decl := &Decl{
@@ -515,7 +531,7 @@ func (p *parser) parseInferredDeclStatement(scope *scope) Node {
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:=`
 	valToken := p.cur
-	val := p.parseTopLevelExpr(scope)
+	val := p.parseTopLevelExpr()
 	defer p.advancePastNL()
 	if val == nil || val.Type() == nil {
 		p.appendError(fmt.Sprintf("invalid inferred declaration for %q", varName))
@@ -526,11 +542,11 @@ func (p *parser) parseInferredDeclStatement(scope *scope) Node {
 		return nil
 	}
 	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
-	if !p.validateVarDecl(scope, decl.Var, decl.token, false /* allowUnderscore */) {
+	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
 	decl.Value = val
-	scope.set(varName, decl.Var)
+	p.scope.set(varName, decl.Var)
 	p.assertEOL()
 
 	inferredDecl := &InferredDeclStmt{token: decl.token, Decl: decl}
@@ -544,8 +560,8 @@ func (p *parser) isFuncCall(tok *lexer.Token) bool {
 	return ok
 }
 
-func (p *parser) parseFunCallStatement(scope *scope) Node {
-	fc := p.parseFuncCall(scope).(*FuncCall)
+func (p *parser) parseFunCallStatement() Node {
+	fc := p.parseFuncCall().(*FuncCall)
 	p.assertEOL()
 	fcs := &FuncCallStmt{token: fc.token, FuncCall: fc}
 	p.recordComment(fcs)
@@ -636,29 +652,29 @@ func (p *parser) appendErrorForToken(message string, token *lexer.Token) {
 }
 
 // validateScope ensures all variables in scope have been used.
-func (p *parser) validateScope(scope *scope) {
-	for _, v := range scope.vars {
+func (p *parser) validateScope() {
+	for _, v := range p.scope.vars {
 		if !v.isUsed {
 			p.appendErrorForToken(fmt.Sprintf("%q declared but not used", v.Name), v.token)
 		}
 	}
 }
 
-func (p *parser) parseBlock(scope *scope) *BlockStatement {
+func (p *parser) parseBlock() *BlockStatement {
 	endTokens := map[lexer.TokenType]bool{lexer.END: true, lexer.EOF: true}
-	return p.parseBlockWithEndTokens(scope, endTokens)
+	return p.parseBlockWithEndTokens(endTokens)
 }
 
-func (p *parser) parseIfBlock(scope *scope) *BlockStatement {
+func (p *parser) parseIfBlock() *BlockStatement {
 	endTokens := map[lexer.TokenType]bool{lexer.END: true, lexer.EOF: true, lexer.ELSE: true}
-	return p.parseBlockWithEndTokens(scope, endTokens)
+	return p.parseBlockWithEndTokens(endTokens)
 }
 
-func (p *parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.TokenType]bool) *BlockStatement {
+func (p *parser) parseBlockWithEndTokens(endTokens map[lexer.TokenType]bool) *BlockStatement {
 	block := &BlockStatement{token: p.cur}
 	for !endTokens[p.cur.TokenType()] {
 		tok := p.cur
-		stmt := p.parseStatement(scope)
+		stmt := p.parseStatement()
 		if stmt == nil {
 			continue
 		}
@@ -674,7 +690,7 @@ func (p *parser) parseBlockWithEndTokens(scope *scope, endTokens map[lexer.Token
 	if len(block.Statements) == 0 {
 		p.appendErrorForToken("at least one statement is required here", block.token)
 	}
-	p.validateScope(scope)
+	p.validateScope()
 	return block
 }
 
@@ -752,14 +768,14 @@ func (p *parser) lookAt(pos int) *lexer.Token {
 	return p.tokens[pos]
 }
 
-func (p *parser) parseReturnStatement(scope *scope) Node {
+func (p *parser) parseReturnStatement() Node {
 	ret := &ReturnStmt{token: p.cur}
 	p.advance() // advance past RETURN token
 	retValueToken := p.cur
 	if p.isAtEOL() { // no return value
 		ret.T = NONE_TYPE
 	} else {
-		ret.Value = p.parseTopLevelExpr(scope)
+		ret.Value = p.parseTopLevelExpr()
 		if ret.Value == nil {
 			ret.T = ILLEGAL_TYPE
 		} else {
@@ -767,9 +783,9 @@ func (p *parser) parseReturnStatement(scope *scope) Node {
 			p.assertEOL()
 		}
 	}
-	if !scope.returnType.Accepts(ret.T) {
-		msg := "expected return value of type " + scope.returnType.String() + ", found " + ret.T.String()
-		if scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
+	if !p.scope.returnType.Accepts(ret.T) {
+		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
+		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()
 		}
 		p.appendErrorForToken(msg, retValueToken)
@@ -779,9 +795,9 @@ func (p *parser) parseReturnStatement(scope *scope) Node {
 	return ret
 }
 
-func (p *parser) parseBreakStatement(scope *scope) Node {
+func (p *parser) parseBreakStatement() Node {
 	breakStmt := &BreakStmt{token: p.cur}
-	if !inLoop(scope) {
+	if !inLoop(p.scope) {
 		p.appendError("break is not in a loop")
 	}
 	p.advance() // advance past BREAK token
@@ -791,18 +807,19 @@ func (p *parser) parseBreakStatement(scope *scope) Node {
 	return breakStmt
 }
 
-func (p *parser) parseForStatement(scope *scope) Node {
+func (p *parser) parseForStatement() Node {
 	forNode := &ForStmt{token: p.cur}
-	scope = newScope(scope, forNode)
+	p.pushScopeWithNode(forNode)
+	defer p.popScope()
 	p.advance() // advance past FOR token
 
 	if p.cur.TokenType() == lexer.IDENT {
 		forNode.LoopVar = &Var{token: p.cur, Name: p.cur.Literal, T: NONE_TYPE}
-		if !p.validateVarDecl(scope, forNode.LoopVar, p.cur, false /* allowUnderscore */) {
+		if !p.validateVarDecl(forNode.LoopVar, p.cur, false /* allowUnderscore */) {
 			p.advancePastNL()
 			return nil
 		}
-		scope.set(forNode.LoopVar.Name, forNode.LoopVar)
+		p.scope.set(forNode.LoopVar.Name, forNode.LoopVar)
 		p.advance() // advance past loopVarName
 		p.assertToken(lexer.DECLARE)
 		p.advance() // advance past :=
@@ -813,7 +830,7 @@ func (p *parser) parseForStatement(scope *scope) Node {
 	}
 	tok := p.cur
 	p.advance() // advance past range
-	nodes := p.parseExprList(scope)
+	nodes := p.parseExprList()
 	if len(nodes) == 0 {
 		p.appendError("range cannot be empty")
 		return nil // previous error
@@ -846,7 +863,7 @@ func (p *parser) parseForStatement(scope *scope) Node {
 	}
 	p.recordComment(forNode)
 	p.advancePastNL()
-	forNode.Block = p.parseBlock(scope)
+	forNode.Block = p.parseBlock()
 	p.assertEnd()
 	p.advance()
 	p.recordComment(forNode.Block)
@@ -881,15 +898,16 @@ func (p *parser) parseStepRange(nodes []Node, tok *lexer.Token) *StepRange {
 	}
 }
 
-func (p *parser) parseWhileStatement(scope *scope) Node {
+func (p *parser) parseWhileStatement() Node {
 	while := &WhileStmt{}
 	while.token = p.cur
 	p.advance() // advance past WHILE token
-	scope = newScope(scope, while)
-	while.Condition = p.parseCondition(scope)
+	p.pushScopeWithNode(while)
+	defer p.popScope()
+	while.Condition = p.parseCondition()
 	comment := p.curComment()
 	p.advancePastNL()
-	while.Block = p.parseBlock(scope)
+	while.Block = p.parseBlock()
 	p.recordCommentString(&while.ConditionalBlock, comment)
 	p.assertEnd()
 	p.advance()
@@ -908,13 +926,17 @@ func inLoop(s *scope) bool {
 	return false
 }
 
-func (p *parser) parseIfStatement(scope *scope) Node {
+func (p *parser) parseIfStatement() Node {
 	ifStmt := &IfStmt{token: p.cur}
-	ifStmt.IfBlock = p.parseIfConditionalBlock(newScope(scope, ifStmt))
+	p.pushScopeWithNode(ifStmt)
+	ifStmt.IfBlock = p.parseIfConditionalBlock()
+	p.popScope()
 	// else if blocks
 	for p.cur.TokenType() == lexer.ELSE && p.peek.TokenType() == lexer.IF {
 		p.advance() // advance past ELSE token
-		elseIfBlock := p.parseIfConditionalBlock(newScope(scope, ifStmt))
+		p.pushScopeWithNode(ifStmt)
+		elseIfBlock := p.parseIfConditionalBlock()
+		p.popScope()
 		ifStmt.ElseIfBlocks = append(ifStmt.ElseIfBlocks, elseIfBlock)
 	}
 	// else block
@@ -923,7 +945,9 @@ func (p *parser) parseIfStatement(scope *scope) Node {
 		p.assertEOL()
 		comment := p.curComment()
 		p.advancePastNL()
-		elseBlock := p.parseBlock(newScope(scope, ifStmt))
+		p.pushScopeWithNode(ifStmt)
+		elseBlock := p.parseBlock()
+		p.popScope()
 		p.recordCommentString(elseBlock, comment)
 		ifStmt.Else = elseBlock
 	}
@@ -934,19 +958,19 @@ func (p *parser) parseIfStatement(scope *scope) Node {
 	return ifStmt
 }
 
-func (p *parser) parseIfConditionalBlock(scope *scope) *ConditionalBlock {
+func (p *parser) parseIfConditionalBlock() *ConditionalBlock {
 	ifBlock := &ConditionalBlock{token: p.cur}
 	p.advance() // advance past IF token
-	ifBlock.Condition = p.parseCondition(scope)
+	ifBlock.Condition = p.parseCondition()
 	p.recordComment(ifBlock)
 	p.advancePastNL()
-	ifBlock.Block = p.parseIfBlock(scope)
+	ifBlock.Block = p.parseIfBlock()
 	return ifBlock
 }
 
-func (p *parser) parseCondition(scope *scope) Node {
+func (p *parser) parseCondition() Node {
 	tok := p.cur
-	condition := p.parseTopLevelExpr(scope)
+	condition := p.parseTopLevelExpr()
 	if condition != nil {
 		p.assertEOL()
 		if condition.Type() != BOOL_TYPE {

@@ -47,36 +47,36 @@ var precedences = map[lexer.TokenType]precedence{
 	lexer.DOT:      INDEX,
 }
 
-func (p *parser) parseTopLevelExpr(scope *scope) Node {
+func (p *parser) parseTopLevelExpr() Node {
 	tok := p.cur
 	if tok.Type == lexer.IDENT && p.funcs[tok.Literal] != nil {
-		return p.parseFuncCall(scope)
+		return p.parseFuncCall()
 	}
-	return p.parseExpr(scope, LOWEST)
+	return p.parseExpr(LOWEST)
 }
 
-func (p *parser) parseFuncCall(scope *scope) Node {
+func (p *parser) parseFuncCall() Node {
 	fc := &FuncCall{token: p.cur, Name: p.cur.Literal}
 	p.advance() // advance past function name IDENT
 	funcDecl := p.funcs[fc.Name]
 	funcDecl.isCalled = true
 	fc.FuncDecl = funcDecl
-	fc.Arguments = p.parseExprList(scope)
+	fc.Arguments = p.parseExprList()
 	p.assertArgTypes(fc.FuncDecl, fc.Arguments)
 	return fc
 }
 
-func (p *parser) parseExpr(scope *scope, prec precedence) Node {
+func (p *parser) parseExpr(prec precedence) Node {
 	var left Node
 	switch p.cur.Type {
 	case lexer.IDENT:
-		left = p.lookupVar(scope)
+		left = p.lookupVar()
 	case lexer.STRING_LIT, lexer.NUM_LIT, lexer.TRUE, lexer.FALSE, lexer.LBRACKET, lexer.LCURLY:
-		left = p.parseLiteral(scope)
+		left = p.parseLiteral()
 	case lexer.BANG, lexer.MINUS:
-		left = p.parseUnaryExpr(scope)
+		left = p.parseUnaryExpr()
 	case lexer.LPAREN:
-		left = p.parseGroupedExpr(scope)
+		left = p.parseGroupedExpr()
 	default:
 		p.unexpectedLeftTokenError()
 	}
@@ -84,9 +84,9 @@ func (p *parser) parseExpr(scope *scope, prec precedence) Node {
 		tt := p.cur.Type
 		switch {
 		case isBinaryOp(tt):
-			left = p.parseBinaryExpr(scope, left)
+			left = p.parseBinaryExpr(left)
 		case tt == lexer.LBRACKET:
-			left = p.parseIndexOrSliceExpr(scope, left, true)
+			left = p.parseIndexOrSliceExpr(left, true)
 		case tt == lexer.DOT:
 			left = p.parseDotExpr(left)
 		default:
@@ -120,7 +120,7 @@ func (p *parser) isAtExprEnd() bool {
 	return p.isAtEOL()
 }
 
-func (p *parser) parseUnaryExpr(scope *scope) Node {
+func (p *parser) parseUnaryExpr() Node {
 	tok := p.cur
 	unaryExp := &UnaryExpression{token: tok, Op: op(tok)}
 	p.advance() // advance past operator
@@ -128,7 +128,7 @@ func (p *parser) parseUnaryExpr(scope *scope) Node {
 		msg := fmt.Sprintf("unexpected whitespace after %q", unaryExp.Op.String())
 		p.appendErrorForToken(msg, tok)
 	}
-	unaryExp.Right = p.parseExpr(scope, UNARY)
+	unaryExp.Right = p.parseExpr(UNARY)
 	if unaryExp.Right == nil {
 		return nil // previous error
 	}
@@ -136,7 +136,7 @@ func (p *parser) parseUnaryExpr(scope *scope) Node {
 	return unaryExp
 }
 
-func (p *parser) parseBinaryExpr(scope *scope, left Node) Node {
+func (p *parser) parseBinaryExpr(left Node) Node {
 	tok := p.cur
 	expType := left.Type()
 	if isComparisonOp(tok.Type) {
@@ -145,7 +145,7 @@ func (p *parser) parseBinaryExpr(scope *scope, left Node) Node {
 	binaryExp := &BinaryExpression{token: tok, T: expType, Op: op(tok), Left: left}
 	prec := precedences[tok.Type]
 	p.advance() // advance past operator
-	binaryExp.Right = p.parseExpr(scope, prec)
+	binaryExp.Right = p.parseExpr(prec)
 	if binaryExp.Right == nil {
 		return nil // previous error
 	}
@@ -157,12 +157,12 @@ func (p *parser) parseBinaryExpr(scope *scope, left Node) Node {
 	return binaryExp
 }
 
-func (p *parser) parseGroupedExpr(scope *scope) Node {
+func (p *parser) parseGroupedExpr() Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
 	p.advance() // advance past (
-	exp := p.parseTopLevelExpr(scope)
+	exp := p.parseTopLevelExpr()
 	if !p.assertToken(lexer.RPAREN) || exp == nil {
 		return nil
 	}
@@ -170,7 +170,7 @@ func (p *parser) parseGroupedExpr(scope *scope) Node {
 	return &GroupExpression{token: tok, Expr: exp}
 }
 
-func (p *parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool) Node {
+func (p *parser) parseIndexOrSliceExpr(left Node, allowSlice bool) Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
@@ -186,16 +186,16 @@ func (p *parser) parseIndexOrSliceExpr(scope *scope, left Node, allowSlice bool)
 	}
 	if p.cur.TokenType() == lexer.COLON && allowSlice { // e.g. a[:2]
 		p.advance() //  advance past :
-		return p.parseSlice(scope, tok, left, nil)
+		return p.parseSlice(tok, left, nil)
 	}
-	index := p.parseTopLevelExpr(scope)
+	index := p.parseTopLevelExpr()
 	if index == nil {
 		return nil
 	}
 	tt := p.cur.TokenType()
 	if tt == lexer.COLON && allowSlice { // e.g. a[1:3] or a[1:]
 		p.advance() // advance past :
-		return p.parseSlice(scope, tok, left, index)
+		return p.parseSlice(tok, left, index)
 	}
 	if !p.validateIndex(tok, leftType, index.Type()) {
 		return nil
@@ -223,7 +223,7 @@ func (p *parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *T
 	return true
 }
 
-func (p *parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) Node {
+func (p *parser) parseSlice(tok *lexer.Token, left, start Node) Node {
 	leftType := left.Type().Name
 	if leftType != ARRAY && leftType != STRING {
 		p.appendErrorForToken("only array and string can be sliced, found "+left.Type().String(), tok)
@@ -235,7 +235,7 @@ func (p *parser) parseSlice(scope *scope, tok *lexer.Token, left, start Node) No
 		p.advance()
 		return &SliceExpression{token: tok, Left: left, Start: start, End: nil, T: t}
 	}
-	end := p.parseTopLevelExpr(scope)
+	end := p.parseTopLevelExpr()
 	if end == nil {
 		return nil
 	}
@@ -335,7 +335,7 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 	}
 }
 
-func (p *parser) parseLiteral(scope *scope) Node {
+func (p *parser) parseLiteral() Node {
 	tok := p.cur
 	tt := tok.TokenType()
 	switch tt {
@@ -354,21 +354,21 @@ func (p *parser) parseLiteral(scope *scope) Node {
 		p.advance()
 		return &Bool{token: tok, Value: tt == lexer.TRUE}
 	case lexer.LBRACKET:
-		return p.parseArrayLiteral(scope)
+		return p.parseArrayLiteral()
 	case lexer.LCURLY:
-		return p.parseMapLiteral(scope)
+		return p.parseMapLiteral()
 	}
 	return nil
 }
 
-func (p *parser) parseArrayLiteral(scope *scope) Node {
+func (p *parser) parseArrayLiteral() Node {
 	tok := p.cur
 	p.advance()                   // advance past [
 	multi := p.parseMulitlineWS() // allow whitespace after `[`, eg [ 1 2 3 ]
 	elements := []Node{}
 	tt := p.cur.TokenType()
 	for tt != lexer.RBRACKET && tt != lexer.EOF {
-		n := p.parseExprWSS(scope)
+		n := p.parseExprWSS()
 		if n == nil {
 			return nil // previous error
 		}
@@ -395,11 +395,11 @@ func (p *parser) parseArrayLiteral(scope *scope) Node {
 	return arrayLit
 }
 
-func (p *parser) parseExprList(scope *scope) []Node {
+func (p *parser) parseExprList() []Node {
 	list := []Node{}
 	tt := p.cur.TokenType()
 	for tt != lexer.RPAREN && tt != lexer.RBRACKET && tt != lexer.EOF && !p.isAtEOL() {
-		n := p.parseExprWSS(scope)
+		n := p.parseExprWSS()
 		if n == nil {
 			return nil // previous error
 		}
@@ -410,10 +410,10 @@ func (p *parser) parseExprList(scope *scope) []Node {
 	return list
 }
 
-func (p *parser) parseExprWSS(scope *scope) Node {
+func (p *parser) parseExprWSS() Node {
 	p.pushWSS(true)
 	defer p.popWSS()
-	return p.parseExpr(scope, LOWEST)
+	return p.parseExpr(LOWEST)
 }
 
 func (p *parser) combineTypes(types []*Type) *Type {
@@ -431,14 +431,14 @@ func (p *parser) combineTypes(types []*Type) *Type {
 	return combinedT
 }
 
-func (p *parser) parseMapLiteral(scope *scope) Node {
+func (p *parser) parseMapLiteral() Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
 	mapLit := &MapLiteral{token: tok, Pairs: map[string]Node{}, T: GENERIC_MAP}
 	p.advance() // advance past {
 
-	if ok := p.parseMapPairs(scope, mapLit); !ok {
+	if ok := p.parseMapPairs(mapLit); !ok {
 		return nil // previous error
 	}
 	if !p.assertToken(lexer.RCURLY) {
@@ -456,7 +456,7 @@ func (p *parser) parseMapLiteral(scope *scope) Node {
 	return mapLit
 }
 
-func (p *parser) parseMapPairs(scope *scope, mapLit *MapLiteral) bool {
+func (p *parser) parseMapPairs(mapLit *MapLiteral) bool {
 	multi := p.parseMulitlineWS()
 	tt := p.cur.TokenType()
 
@@ -473,7 +473,7 @@ func (p *parser) parseMapPairs(scope *scope, mapLit *MapLiteral) bool {
 		p.assertToken(lexer.COLON)
 		p.advance() // advance past COLON
 
-		n := p.parseExprWSS(scope)
+		n := p.parseExprWSS()
 		if n == nil {
 			return false // previous error
 		}
@@ -491,7 +491,7 @@ func (p *parser) parseMapPairs(scope *scope, mapLit *MapLiteral) bool {
 // it assumes use, meaning reading of the variable, by marking the
 // variable as used and hinting at using () around function calls.
 // Do not use for writes, e.g. in left side of assignment.
-func (p *parser) lookupVar(scope *scope) Node {
+func (p *parser) lookupVar() Node {
 	tok := p.cur
 	name := p.cur.Literal
 	p.advance()
@@ -499,7 +499,7 @@ func (p *parser) lookupVar(scope *scope) Node {
 		p.appendErrorForToken(`anonymous variable "_" cannot be read`, tok)
 		return nil
 	}
-	if v, ok := scope.get(name); ok {
+	if v, ok := p.scope.get(name); ok {
 		v.isUsed = true
 		return v
 	}

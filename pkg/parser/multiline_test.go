@@ -24,9 +24,9 @@ func TestArrayLiteralMultiline(t *testing.T) {
 		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
-		scope := newScope(nil, &Program{})
+		parser.scope = newScope(nil, &Program{})
 
-		arrayLit := parser.parseArrayLiteral(scope).(*ArrayLiteral)
+		arrayLit := parser.parseArrayLiteral().(*ArrayLiteral)
 		assertNoParseError(t, parser, input)
 		got := parser.formatting.multiline[ptr(arrayLit)]
 		assert.Equal(t, want, got)
@@ -52,9 +52,9 @@ func TestMapLiteralMultiline(t *testing.T) {
 		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
-		scope := newScope(nil, &Program{})
+		parser.scope = newScope(nil, &Program{})
 
-		mapLit := parser.parseMapLiteral(scope).(*MapLiteral)
+		mapLit := parser.parseMapLiteral().(*MapLiteral)
 		assertNoParseError(t, parser, input)
 		got := parser.formatting.multiline[ptr(mapLit)]
 		assert.Equal(t, want, got)

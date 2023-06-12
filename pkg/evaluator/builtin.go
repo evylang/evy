@@ -96,10 +96,8 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"dash":    {Func: dashFunc(rt.Dash), Decl: dashDecl},
 		"linecap": stringBuiltin("linecap", rt.Linecap),
 
-		"text":       stringBuiltin("text", rt.Text),
-		"textsize":   numBuiltin("textsize", rt.Textsize),
-		"font":       stringBuiltin("font", rt.Font),
-		"fontfamily": stringBuiltin("fontfamily", rt.Fontfamily),
+		"text": stringBuiltin("text", rt.Text),
+		"font": {Func: fontFunc(rt.Font), Decl: fontDecl},
 	}
 	xyParams := []*parser.Var{
 		{Name: "x", T: parser.NUM_TYPE},
@@ -591,6 +589,70 @@ func dashFunc(dashFn func([]float64)) BuiltinFunc {
 		}
 		dashFn(segments)
 		return &None{}, nil
+	}
+}
+
+var fontDecl = &parser.FuncDeclStmt{
+	Name:       "font",
+	Params:     []*parser.Var{{Name: "properties", T: parser.GENERIC_MAP}},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func parseFontProps(arg *Map) (map[string]any, error) {
+	props := map[string]any{}
+	propTypes := map[string]string{
+		"family":        "string",
+		"size":          "num",
+		"weight":        "num",
+		"style":         "string",
+		"baseline":      "string",
+		"align":         "string",
+		"letterspacing": "num",
+	}
+	for key, val := range arg.Pairs {
+		propType, ok := propTypes[key]
+		if !ok {
+			return nil, fmt.Errorf("%w: unknown property %q", ErrBadArguments, key)
+		}
+		if a, ok := val.(*Any); ok {
+			val = a.Val
+		}
+		switch v := val.(type) {
+		case *String:
+			if propType != "string" {
+				return nil, fmt.Errorf("%w: expected property %q of type %s, found string", ErrBadArguments, key, propType)
+			}
+			s := v.Val
+			if (key == "align" && s != "left" && s != "center" && s != "right") ||
+				(key == "baseline" && s != "top" && s != "middle" && s != "bottom" && s != "alphabetic") {
+				return nil, fmt.Errorf(`%w: expected property %q to be "top", "middle" or "bottom", found %q`, ErrBadArguments, key, s)
+			}
+			props[key] = v.Val
+		case *Num:
+			if propType != "num" {
+				return nil, fmt.Errorf("%w: expected property %q of type %s, found num", ErrBadArguments, key, propType)
+			}
+			n := v.Val
+			if (key == "size" || key == "weight") && n <= 0 {
+				return nil, fmt.Errorf(`%w: expected property %q to be greater than 0`, ErrBadArguments, key)
+			}
+			props[key] = v.Val
+		default:
+			return nil, fmt.Errorf("%w: expected property %q of type %s, found %s", ErrBadArguments, key, propType, v.Type().String())
+		}
+	}
+	return props, nil
+}
+
+func fontFunc(fontFn func(map[string]any)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		arg := args[0].(*Map)
+		properties, err := parseFontProps(arg)
+		if err != nil {
+			return nil, err
+		}
+		fontFn(properties)
+		return nil, nil
 	}
 }
 

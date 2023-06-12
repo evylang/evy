@@ -30,9 +30,20 @@ type GraphicsRuntime interface {
 	Dash(segments []float64)
 	Linecap(s string)
 	Text(s string)
-	Textsize(size float64)
-	Font(s string)
-	Fontfamily(s string)
+	// font optionally sets font properties such as family, size or weight.
+	// font properties match their CSS properties. Here's an exhaustive list
+	// of mapped properties:
+	//
+	//		font {
+	//			family: "Georgia, serif"
+	//			size: 3 // relative to canvas, numbers only no "12px" etc.
+	//			weight: 100 | 200| 300 | 400 == "normal" | 500 | 600 | 700 == "bold" | 800 | 900
+	//			style: "italic" | "oblique 35deg" | "normal"
+	//			baseline: "top" | "middle" | "bottom"
+	//			align: "left" | "center" | "right"
+	//			letterspacing: 1 // number, see size. extra inter-character space. negative allowed.
+	//		}
+	Font(props map[string]any)
 }
 
 type UnimplementedRuntime struct {
@@ -67,9 +78,7 @@ func (rt *UnimplementedRuntime) Fill(s string)             { rt.Unimplemented("f
 func (rt *UnimplementedRuntime) Dash(segments []float64)   { rt.Unimplemented("dash") }
 func (rt *UnimplementedRuntime) Linecap(s string)          { rt.Unimplemented("linecap") }
 func (rt *UnimplementedRuntime) Text(s string)             { rt.Unimplemented("text") }
-func (rt *UnimplementedRuntime) Textsize(size float64)     { rt.Unimplemented("textsize") }
-func (rt *UnimplementedRuntime) Font(s string)             { rt.Unimplemented("font") }
-func (rt *UnimplementedRuntime) Fontfamily(s string)       { rt.Unimplemented("fontfamily") }
+func (rt *UnimplementedRuntime) Font(props map[string]any) { rt.Unimplemented("font") }
 func (rt *UnimplementedRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
 	rt.Unimplemented("ellipse")
 }

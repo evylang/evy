@@ -9,7 +9,7 @@ bot_strength := 2
 bot_start := false
 turn:string
 
-font "2rem \"Fira Code\", monospace"
+font {family:"Fira Code, monospace"}
 linecap "round"
 
 new_game
@@ -68,7 +68,7 @@ func draw_board
     hline 12.5 87.5 75 1 "black"
 
     // x and o
-    textsize 20
+    font {size:20}
     for i := range 9
         if board[i] != "."
             x := (get_x i) - 6
@@ -80,7 +80,7 @@ func draw_board
 end
 
 func draw_score
-    textsize 4
+    font {size:4}
     move 13 16
     text (sprintf "score     🤖:%.0f    you:%.0f" bot_score human_score)
     move 13 10
@@ -129,7 +129,7 @@ end
 func draw_winning_msg msg:string
     move 13 10
     color "black"
-    textsize 7
+    font {size:7}
     text msg
     sleep 1.5
 end

@@ -5,7 +5,7 @@
 board:[]string
 human_score:num
 bot_score:num
-bot_strength := 3
+bot_strength := 2
 bot_start := false
 turn:string
 
@@ -48,7 +48,7 @@ func draw_gameover
     draw_board
     draw_winning_line
     draw_winning_msg msg
-    sleep 1.5
+    sleep 0.5
     new_game
 end
 

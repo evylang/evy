@@ -35,8 +35,16 @@
         { "id": "bounce", "title": "Bounce" },
         { "id": "draw", "title": "Draw" },
         { "id": "juggle", "title": "Juggle" },
-        { "id": "splashtrig", "title": "Splash of Trig" },
-        { "id": "ellipse", "title": "Interactive Ellipse" }
+        { "id": "splashtrig", "title": "Splash of Trig" }
+      ]
+    },
+    {
+      "id": "interact",
+      "title": "Interaction",
+      "emoji": "🤼",
+      "samples": [
+        { "id": "ellipse", "title": "Watermelon Ellipse" },
+        { "id": "coords", "title": "Coordinates" }
       ]
     },
     {

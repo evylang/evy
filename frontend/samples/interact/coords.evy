@@ -1,0 +1,6 @@
+grid
+print "Move mouse or touch to print coordinates"
+
+on move x:num y:num
+    print "x:" (round x) "y:" (round y)
+end

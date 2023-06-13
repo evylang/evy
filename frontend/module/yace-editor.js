@@ -458,6 +458,8 @@ const builtins = new Set([
   "fill",
   "floor",
   "font",
+  "grid",
+  "gridn",
   "has",
   "index",
   "join",

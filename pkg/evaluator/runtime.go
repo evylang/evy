@@ -44,6 +44,7 @@ type GraphicsRuntime interface {
 	//			letterspacing: 1 // number, see size. extra inter-character space. negative allowed.
 	//		}
 	Font(props map[string]any)
+	Gridn(unit float64, color string)
 }
 
 type UnimplementedRuntime struct {
@@ -72,6 +73,7 @@ func (rt *UnimplementedRuntime) Circle(r float64)          { rt.Unimplemented("c
 func (rt *UnimplementedRuntime) Width(w float64)           { rt.Unimplemented("width") }
 func (rt *UnimplementedRuntime) Color(s string)            { rt.Unimplemented("color") }
 func (rt *UnimplementedRuntime) Clear(color string)        { rt.Unimplemented("clear") }
+func (rt *UnimplementedRuntime) Gridn(float64, string)     { rt.Unimplemented("gridn") }
 func (rt *UnimplementedRuntime) Poly(vertices [][]float64) { rt.Unimplemented("poly") }
 func (rt *UnimplementedRuntime) Stroke(s string)           { rt.Unimplemented("stroke") }
 func (rt *UnimplementedRuntime) Fill(s string)             { rt.Unimplemented("fill") }

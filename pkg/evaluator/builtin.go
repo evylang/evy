@@ -83,10 +83,14 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"line":   xyBuiltin("line", rt.Line),
 		"rect":   xyBuiltin("rect", rt.Rect),
 		"circle": numBuiltin("circle", rt.Circle),
+
 		"width":  numBuiltin("width", rt.Width),
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
-		"clear":  {Func: clearFunc(rt.Clear), Decl: clearDecl},
+
+		"clear": {Func: clearFunc(rt.Clear), Decl: clearDecl},
+		"grid":  {Func: gridFunc(rt.Gridn), Decl: gridDecl},
+		"gridn": {Func: gridnFunc(rt.Gridn), Decl: gridnDecl},
 
 		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
 		"ellipse": {Func: ellipseFunc(rt.Ellipse), Decl: ellipseDecl},
@@ -509,6 +513,36 @@ func clearFunc(clearFn func(string)) BuiltinFunc {
 		}
 		clearFn(color)
 		return &None{}, nil
+	}
+}
+
+var gridnDecl = &parser.FuncDeclStmt{
+	Name: "gridn",
+	Params: []*parser.Var{
+		{Name: "unit", T: parser.NUM_TYPE},
+		{Name: "color", T: parser.STRING_TYPE},
+	},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func gridnFunc(gridnFn func(float64, string)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		unit := args[0].(*Num)
+		color := args[1].(*String)
+		gridnFn(unit.Val, color.Val)
+		return nil, nil
+	}
+}
+
+var gridDecl = &parser.FuncDeclStmt{
+	Name:       "gridn",
+	ReturnType: parser.NONE_TYPE,
+}
+
+func gridFunc(gridnFn func(float64, string)) BuiltinFunc {
+	return func(_ *scope, args []Value) (Value, error) {
+		gridnFn(10, "hsl(0deg 100% 0% / 50%)")
+		return nil, nil
 	}
 }
 

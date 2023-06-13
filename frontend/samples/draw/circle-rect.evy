@@ -5,3 +5,5 @@ rect 20 5
 move 50 50
 color "red"
 circle 10
+
+grid

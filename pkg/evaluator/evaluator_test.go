@@ -1035,6 +1035,29 @@ print n a m`
 	assert.Equal(t, want, got)
 }
 
+func TestTypeAssertion(t *testing.T) {
+	prog := `
+a := {v:[1 2 3]}
+b:any
+b = a
+c := b.({}[]num)
+print c`
+	want := "{v:[1 2 3]}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestTypeAssertionErr(t *testing.T) {
+	// Note the zero value for any is a false bool
+	prog := `
+a:any
+b := a.(num)
+print b`
+	want := "line 3 column 7: runtime error: error converting any to type: expected num, found bool"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestStr2BoolNum(t *testing.T) {
 	prog := `
 print 1 (str2bool "1") err

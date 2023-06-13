@@ -217,7 +217,7 @@ func (e *Evaluator) evalDecl(decl *parser.Decl) error {
 	if err != nil {
 		return err
 	}
-	if decl.Type() == parser.ANY_TYPE && val.Type() != ANY {
+	if decl.Type() == parser.ANY_TYPE && val.Type() != parser.ANY_TYPE {
 		val = &Any{Val: val}
 	}
 	e.scope.set(decl.Var.Name, copyOrRef(val))
@@ -242,7 +242,7 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Array{Elements: &elements}, nil
+	return &Array{Elements: &elements, T: arr.T}, nil
 }
 
 func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (Value, error) {
@@ -256,7 +256,7 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (Value, error) {
 	}
 	order := make([]string, len(m.Order))
 	copy(order, m.Order)
-	return &Map{Pairs: pairs, Order: &order}, nil
+	return &Map{Pairs: pairs, Order: &order, T: m.T}, nil
 }
 
 func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
@@ -281,7 +281,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 		e.scope.set(param.Name, args[i])
 	}
 	if fd.VariadicParam != nil {
-		varArg := &Array{Elements: &args}
+		varArg := &Array{Elements: &args, T: fd.VariadicParam.T}
 		e.scope.set(fd.VariadicParam.Name, varArg)
 	}
 

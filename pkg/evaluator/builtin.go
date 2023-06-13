@@ -315,7 +315,7 @@ func splitFunc(_ *scope, args []Value) (Value, error) {
 	for i, s := range slice {
 		elements[i] = &String{Val: s}
 	}
-	return &Array{Elements: &elements}, nil
+	return &Array{Elements: &elements, T: stringArrayType}, nil
 }
 
 var upperDecl = &parser.FuncDeclStmt{

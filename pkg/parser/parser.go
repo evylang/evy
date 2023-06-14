@@ -490,7 +490,7 @@ func (p *parser) parseTypedDecl() *Decl {
 	p.advance() // advance past `:`
 	v := p.parseType()
 	decl.Var.T = v
-	decl.Value = zeroValue(v.Name)
+	decl.Value = zeroValue(v, p.cur)
 	if v == ILLEGAL_TYPE {
 		msg := fmt.Sprintf("invalid type declaration for %q", varName)
 		p.appendErrorForToken(msg, decl.token)

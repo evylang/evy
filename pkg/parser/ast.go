@@ -712,20 +712,20 @@ func newlineList(nodes []Node) string {
 	return strings.Join(lines, "\n") + "\n"
 }
 
-func zeroValue(t TypeName) Node {
-	switch t {
+func zeroValue(t *Type, tt *lexer.Token) Node {
+	switch t.Name {
 	case NUM:
-		return &NumLiteral{Value: 0}
+		return &NumLiteral{Value: 0, token: tt}
 	case STRING:
-		return &StringLiteral{Value: ""}
+		return &StringLiteral{Value: "", token: tt}
 	case BOOL:
-		return &Bool{Value: false}
+		return &Bool{Value: false, token: tt}
 	case ANY:
-		return &Bool{Value: false}
+		return &Bool{Value: false, token: tt}
 	case ARRAY:
-		return &ArrayLiteral{}
+		return &ArrayLiteral{T: t, token: tt}
 	case MAP:
-		return &MapLiteral{}
+		return &MapLiteral{T: t, token: tt}
 	}
 	return nil
 }

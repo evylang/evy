@@ -457,6 +457,10 @@ func (p *parser) combineTypes(types []*Type) *Type {
 			combinedT = t
 			continue
 		}
+		if t.sameComposite(combinedT) {
+			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
+			continue
+		}
 		return ANY_TYPE
 	}
 	return combinedT

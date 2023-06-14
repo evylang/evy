@@ -298,9 +298,9 @@ func TestRun(t *testing.T) {
 		{in: ":=", want: "DECLARE\n"},
 		{in: "", want: ""},
 		{in: "\n", want: "NL\n"},
-		{in: ` "abc"`, want: "WS\nSTRING_LIT 'abc'\n"},
-		{in: ",", want: "ILLEGAL 💥 ',' at line 1 column 1\n"},
-		{in: `"asdf `, want: "ILLEGAL 💥 'invalid string' at line 1 column 1\n"},
+		{in: ` "abc"`, want: "WS\n" + `STRING_LIT "abc"` + "\n"},
+		{in: ",", want: `ILLEGAL 💥 "," at line 1 column 1` + "\n"},
+		{in: `"asdf `, want: `ILLEGAL 💥 "invalid string" at line 1 column 1` + "\n"},
 	}
 
 	for _, tt := range tests {
@@ -338,10 +338,10 @@ func TestString(t *testing.T) {
 		in   string
 		want string
 	}{
-		{in: `"abc" `, want: "STRING_LIT 'abc'"},
-		{in: `"abc\"" `, want: `STRING_LIT 'abc"'`},
-		{in: `"abc\\" `, want: `STRING_LIT 'abc\'`},
-		{in: `"abc\\\"" `, want: `STRING_LIT 'abc\"'`},
+		{in: `"abc" `, want: `STRING_LIT "abc"`},
+		{in: `"abc\"" `, want: `STRING_LIT "abc\""`},
+		{in: `"abc\\" `, want: `STRING_LIT "abc\\"`},
+		{in: `"abc\\\"" `, want: `STRING_LIT "abc\\\""`},
 	}
 
 	for _, tt := range tests {

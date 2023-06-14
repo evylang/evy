@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -194,7 +195,7 @@ func (t TokenType) FormatDetails() string {
 	if t == IDENT {
 		return "identifier"
 	}
-	return "'" + t.Format() + "'"
+	return fmt.Sprintf("%q", t.Format())
 }
 
 func (t *Token) SetType(tokenType TokenType) *Token {
@@ -214,9 +215,9 @@ func (t *Token) SetLiteral(literal string) *Token {
 func (t *Token) String() string {
 	switch t.Type {
 	case COMMENT, IDENT, NUM_LIT, STRING_LIT:
-		return t.Type.String() + " '" + t.Literal + "'"
+		return fmt.Sprintf("%s %q", t.Type.String(), t.Literal)
 	case ILLEGAL:
-		return "ILLEGAL 💥 '" + t.Literal + "' at " + t.Location()
+		return fmt.Sprintf("ILLEGAL 💥 %q at %s", t.Literal, t.Location())
 	}
 	return t.Type.String()
 }

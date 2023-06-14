@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -117,7 +118,7 @@ func (f *FuncDeclStmt) Token() *lexer.Token {
 }
 
 type FuncDeclStmt struct {
-	token         *lexer.Token // The 'func' token
+	token         *lexer.Token // The "func" token
 	Name          string
 	Params        []*Var
 	VariadicParam *Var
@@ -186,7 +187,7 @@ func (e *EventHandlerStmt) Token() *lexer.Token {
 }
 
 type EventHandlerStmt struct {
-	token  *lexer.Token // The 'on' token
+	token  *lexer.Token // The "on" token
 	Name   string
 	Params []*Var
 	Body   *BlockStatement
@@ -653,7 +654,7 @@ func (n *NumLiteral) Type() *Type {
 }
 
 func (s *StringLiteral) String() string {
-	return "'" + s.Value + "'"
+	return fmt.Sprintf("%q", s.Value)
 }
 
 func (s *StringLiteral) Type() *Type {

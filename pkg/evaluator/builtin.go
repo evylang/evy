@@ -231,11 +231,11 @@ func printFunc(printFn func(string)) BuiltinFunc {
 func printfFunc(printFn func(string)) BuiltinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		if len(args) < 1 {
-			return nil, fmt.Errorf("%w: 'printf' takes at least 1 argument", ErrBadArguments)
+			return nil, fmt.Errorf(`%w: "printf" takes at least 1 argument`, ErrBadArguments)
 		}
 		format, ok := args[0].(*String)
 		if !ok {
-			return nil, fmt.Errorf("%w: first argument of 'printf' must be a string", ErrBadArguments)
+			return nil, fmt.Errorf(`%w: first argument of "printf" must be a string`, ErrBadArguments)
 		}
 		s := sprintf(format.Val, args[1:])
 		printFn(s)
@@ -255,11 +255,11 @@ func sprintFunc(_ *scope, args []Value) (Value, error) {
 
 func sprintfFunc(_ *scope, args []Value) (Value, error) {
 	if len(args) < 1 {
-		return nil, fmt.Errorf("%w: 'sprintf' takes at least 1 argument", ErrBadArguments)
+		return nil, fmt.Errorf(`%w: "sprintf" takes at least 1 argument`, ErrBadArguments)
 	}
 	format, ok := args[0].(*String)
 	if !ok {
-		return nil, fmt.Errorf("%w: first argument of 'sprintf' must be a string", ErrBadArguments)
+		return nil, fmt.Errorf(`%w: first argument of "sprintf" must be a string`, ErrBadArguments)
 	}
 	return &String{Val: sprintf(format.Val, args[1:])}, nil
 }
@@ -492,7 +492,7 @@ func lenFunc(_ *scope, args []Value) (Value, error) {
 	case *String:
 		return &Num{Val: float64(len(arg.Val))}, nil
 	}
-	return nil, fmt.Errorf("%w: 'len' takes 1 argument of type 'string', array '[]' or map '{}' not %s", ErrBadArguments, args[0].Type())
+	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].Type())
 }
 
 var hasDecl = &parser.FuncDeclStmt{
@@ -575,7 +575,7 @@ var clearDecl = &parser.FuncDeclStmt{
 func clearFunc(clearFn func(string)) BuiltinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		if len(args) > 1 {
-			return nil, fmt.Errorf("%w: 'clear' takes 0 or 1 string arguments", ErrBadArguments)
+			return nil, fmt.Errorf(`%w: "clear" takes 0 or 1 string arguments`, ErrBadArguments)
 		}
 		color := ""
 		if len(args) == 1 {
@@ -604,7 +604,7 @@ func polyFunc(polyFn func([][]float64)) BuiltinFunc {
 			vertex := arg.(*Array)
 			elements := *vertex.Elements
 			if len(elements) != 2 {
-				return nil, fmt.Errorf("%w: 'poly' argument %d has %d elements, expected 2 (x, y)", ErrBadArguments, i+1, len(elements))
+				return nil, fmt.Errorf(`%w: "poly" argument %d has %d elements, expected 2 (x, y)`, ErrBadArguments, i+1, len(elements))
 			}
 			x := elements[0].(*Num).Val
 			y := elements[1].(*Num).Val
@@ -625,7 +625,7 @@ func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, en
 	return func(_ *scope, args []Value) (Value, error) {
 		argLen := len(args)
 		if argLen < 3 || argLen == 6 || argLen > 7 {
-			return nil, fmt.Errorf("%w: 'ellipse' requires 3, 4, 5 or 7 arguments, found %d", ErrBadArguments, argLen)
+			return nil, fmt.Errorf(`%w: "ellipse" requires 3, 4, 5 or 7 arguments, found %d`, ErrBadArguments, argLen)
 		}
 		x := args[0].(*Num).Val
 		y := args[1].(*Num).Val

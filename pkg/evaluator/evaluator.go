@@ -687,7 +687,7 @@ func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (Val
 	}
 	m, ok := left.(*Map)
 	if !ok {
-		return nil, newErr(expr, fmt.Errorf("%w: expected map before '.', found %v", ErrType, left))
+		return nil, newErr(expr, fmt.Errorf(`%w: expected map before ".", found %v`, ErrType, left))
 	}
 	if forAssign {
 		m.InsertKey(expr.Key, expr.Type())
@@ -722,7 +722,7 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
 	case *String:
 		val, err = left.Slice(start, end)
 	default:
-		err = fmt.Errorf("%w: expected string or array before '[', found %v", ErrType, left)
+		err = fmt.Errorf(`%w: expected string or array before "[", found %v`, ErrType, left)
 	}
 	if err != nil {
 		return nil, newErr(expr, err)

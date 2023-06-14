@@ -834,7 +834,7 @@ m.a = 1
 m.b.c = 2
 `
 	got := run(in)
-	want := "line 4 column 4: field access with '.' expects map type, found any"
+	want := `line 4 column 4: field access with "." expects map type, found any`
 	assert.Equal(t, want, got)
 }
 
@@ -859,9 +859,9 @@ print (has m "MISSING")
 
 func TestHasErr(t *testing.T) {
 	prog := `
-has ["a"] "a" // cannot run 'has' on array
+has ["a"] "a" // cannot run "has" on array
 `
-	want := "line 2 column 5: 'has' takes 1st argument of type '{}', found '[]string'"
+	want := `line 2 column 5: "has" takes 1st argument of type {}, found []string`
 	got := run(prog)
 	assert.Equal(t, want, got)
 }
@@ -897,7 +897,7 @@ func TestDelErr(t *testing.T) {
 	prog := `
 del ["a"] "a" // cannot delete from array
 `
-	want := "line 2 column 5: 'del' takes 1st argument of type '{}', found '[]string'"
+	want := `line 2 column 5: "del" takes 1st argument of type {}, found []string`
 	got := run(prog)
 	assert.Equal(t, want, got)
 }

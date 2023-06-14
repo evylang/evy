@@ -26,22 +26,23 @@ func newJSRuntime() *jsRuntime {
 	return &jsRuntime{yielder: newSleepingYielder()}
 }
 
-func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
-func (rt *jsRuntime) Print(s string)             { jsPrint(s) }
-func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
-func (rt *jsRuntime) Sleep(dur time.Duration)    { rt.yielder.Sleep(dur) }
-func (rt *jsRuntime) Move(x, y float64)          { move(x, y) }
-func (rt *jsRuntime) Line(x, y float64)          { line(x, y) }
-func (rt *jsRuntime) Rect(x, y float64)          { rect(x, y) }
-func (rt *jsRuntime) Circle(r float64)           { circle(r) }
-func (rt *jsRuntime) Width(w float64)            { width(w) }
-func (rt *jsRuntime) Color(s string)             { color(s) }
-func (rt *jsRuntime) Clear(color string)         { clear(color) }
-func (rt *jsRuntime) Stroke(s string)            { stroke(s) }
-func (rt *jsRuntime) Fill(s string)              { fill(s) }
-func (rt *jsRuntime) Dash(segments []float64)    { dash(floatsToString(segments)) }
-func (rt *jsRuntime) Linecap(s string)           { linecap(s) }
-func (rt *jsRuntime) Text(s string)              { text(s) }
+func (rt *jsRuntime) Yielder() evaluator.Yielder       { return rt.yielder }
+func (rt *jsRuntime) Print(s string)                   { jsPrint(s) }
+func (rt *jsRuntime) Read() string                     { return rt.yielder.Read() }
+func (rt *jsRuntime) Sleep(dur time.Duration)          { rt.yielder.Sleep(dur) }
+func (rt *jsRuntime) Move(x, y float64)                { move(x, y) }
+func (rt *jsRuntime) Line(x, y float64)                { line(x, y) }
+func (rt *jsRuntime) Rect(x, y float64)                { rect(x, y) }
+func (rt *jsRuntime) Circle(r float64)                 { circle(r) }
+func (rt *jsRuntime) Width(w float64)                  { width(w) }
+func (rt *jsRuntime) Color(s string)                   { color(s) }
+func (rt *jsRuntime) Clear(color string)               { clear(color) }
+func (rt *jsRuntime) Gridn(unit float64, color string) { gridn(unit, color) }
+func (rt *jsRuntime) Stroke(s string)                  { stroke(s) }
+func (rt *jsRuntime) Fill(s string)                    { fill(s) }
+func (rt *jsRuntime) Dash(segments []float64)          { dash(floatsToString(segments)) }
+func (rt *jsRuntime) Linecap(s string)                 { linecap(s) }
+func (rt *jsRuntime) Text(s string)                    { text(s) }
 func (rt *jsRuntime) Font(props map[string]any) {
 	// encode/json not implemented in tinygo 0.27.0, so do it manually
 	pairs := make([]string, 0, len(props))
@@ -206,6 +207,11 @@ func color(s string)
 //
 //export clear
 func clear(s string)
+
+// gridn is imported from JS
+//
+//export gridn
+func gridn(unit float64, s string)
 
 // poly is imported from JS
 //

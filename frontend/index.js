@@ -65,6 +65,7 @@ function newEvyGo() {
     linecap,
     text,
     font,
+    gridn,
   }
   const go = new Go() // see wasm_exec.js
   go.importObject.env = Object.assign(go.importObject.env, evyEnv)
@@ -96,6 +97,8 @@ function needsCanvas(f) {
     f.color ||
     f.colour ||
     f.clear ||
+    f.grid ||
+    f.gridn ||
     f.poly ||
     f.ellipse ||
     f.stroke ||
@@ -604,6 +607,27 @@ function text(ptr, len) {
   const { x, y, ctx } = canvas
   const text = memToString(ptr, len)
   ctx.fillText(text, x, y)
+}
+
+// gridn is exported to evy go/wasm.
+function gridn(unit, ptr, len) {
+  const { ctx, x, y } = canvas
+  const restoreLineWidth = ctx.lineWidth
+  const restoreStrokeStyle = ctx.strokeStyle
+  ctx.strokeStyle = memToString(ptr, len)
+  let lineCnt = 0
+  for (let i = unit; i < 100; i += unit) {
+    lineCnt += 1
+    ctx.lineWidth = lineCnt % 5 === 0 ? 2 : 1
+    move(i, 0)
+    line(i, 100)
+    move(0, i)
+    line(100, i)
+  }
+  ctx.lineWidth = restoreLineWidth
+  ctx.strokeStyle = restoreStrokeStyle
+  canvas.x = x
+  canvas.y = y
 }
 
 var parsedStyle = function (cssString) {

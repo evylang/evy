@@ -654,16 +654,20 @@ by an expression whose value is returned by the function call.
 ## Typeof
 
 `typeof` returns the concrete type of a value held by a variable as a
-string. It returns one of `"num"`, `"string"`, `"bool"`, `"array"`, or
-`"map"`.
+string. It returns a string the same as the type in an evy program,
+e.g. `num`, `bool`, `string`, `[]num`, `{}[]any`, etc. For an empty
+composite literal , `typeof` returns `[]` or `{}` as it can be matched
+to any subtype. e.g. `[]` can be passed to a function that takes an
+argument of `[]num`, or `[]string`, etc.
 
     typeof "abc"        // string
     typeof true         // bool
     arr := [ "abc" 1 ]
-    typeof arr          // array
+    typeof arr          // []any
     typeof arr[0]       // string
     typeof arr[1]       // num
-    typeof {}           // map
+    typeof {}           // {}
+    typeof []           // []
 
 ## Type assertion
 

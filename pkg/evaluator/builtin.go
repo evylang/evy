@@ -58,6 +58,8 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"str2num":  {Func: BuiltinFunc(str2numFunc), Decl: str2numDecl},
 		"str2bool": {Func: BuiltinFunc(str2boolFunc), Decl: str2boolDecl},
 
+		"typeof": {Func: BuiltinFunc(typeofFunc), Decl: typeofDecl},
+
 		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
 		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
@@ -405,6 +407,20 @@ func globalErr(scope *scope, isErr bool, msg string) {
 		panic("cannot find global errmsg")
 	}
 	val.Set(&String{Val: msg})
+}
+
+var typeofDecl = &parser.FuncDeclStmt{
+	Name:       "typeof",
+	Params:     []*parser.Var{{Name: "a", T: parser.ANY_TYPE}},
+	ReturnType: parser.STRING_TYPE,
+}
+
+func typeofFunc(_ *scope, args []Value) (Value, error) {
+	t := args[0].Type()
+	if a, ok := args[0].(*Any); ok {
+		t = a.Val.Type()
+	}
+	return &String{Val: t.String()}, nil
 }
 
 var lenDecl = &parser.FuncDeclStmt{

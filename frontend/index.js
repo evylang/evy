@@ -64,8 +64,6 @@ function newEvyGo() {
     dash,
     linecap,
     text,
-    textsize,
-    fontfamily,
     font,
   }
   const go = new Go() // see wasm_exec.js
@@ -105,8 +103,6 @@ function needsCanvas(f) {
     f.dash ||
     f.linecap ||
     f.text ||
-    f.textsize ||
-    f.fontfamily ||
     f.font
   )
 }
@@ -440,8 +436,10 @@ function resetCanvas() {
   canvas.stroke = true
   ctx.lineCap = "butt"
   ctx.setLineDash([])
-  ctx.font = "16px regular"
-  textsize(6)
+  ctx.font = `${(ctx.canvas.width / 100) * 6}px regular`
+  ctx.textAlign = "left"
+  ctx.textBaseline = "alphabetic"
+  ctx.letterSpacing = "0px"
   move(0, 0)
 }
 
@@ -608,7 +606,12 @@ function text(ptr, len) {
   ctx.fillText(text, x, y)
 }
 
-// textsize is exported to evy go/wasm.
+var parsedStyle = function (cssString) {
+  let el = document.createElement("span")
+  el.setAttribute("style", cssString)
+  return el.style // CSSStyleDeclaration object
+}
+
 function textsize(size) {
   const { width, ctx } = canvas
   const style = parsedStyle(`font: ${ctx.font}`)
@@ -616,25 +619,46 @@ function textsize(size) {
   ctx.font = style.font
 }
 
-var parsedStyle = function (cssString) {
-  var el = document.createElement("span")
-  el.setAttribute("style", cssString)
-  return el.style // CSSStyleDeclaration object
-}
-
 // font is exported to evy go/wasm.
 // see https://developer.mozilla.org/en-US/docs/Web/CSS/font
+//
+// Exhaustive example of accepted properties encoded as JSON:
+//
+//    {
+//      "family": "Georgia, serif",
+//      "size": 3, // relative to canvas, numbers only no "12px" etc.
+//      "weight": 100, //| 200| 300 | 400 == "normal" | 500 | 600 | 700 == "bold" | 800 | 900
+//      "style": "italic", | "oblique 35deg" | "normal"
+//      "baseline": "top", // | "middle" | "bottom"
+//      "align": "left", // | "center" | "right"
+//      "letterspacing": 1 // number, see size. extra inter-character space. negative allowed.
+//    }
 function font(ptr, len) {
-  const font = memToString(ptr, len)
-  canvas.ctx.font = font
-}
-
-// fontfamily is exported to evy go/wasm.
-function fontfamily(ptr, len) {
+  const propsJSON = memToString(ptr, len)
+  const props = JSON.parse(propsJSON)
   const ctx = canvas.ctx
-  const s = memToString(ptr, len)
   const style = parsedStyle(`font: ${ctx.font}`)
-  style.fontFamily = s
+  if (props.family !== undefined) {
+    style.fontFamily = props.family
+  }
+  if (props.size !== undefined) {
+    style.fontSize = (ctx.canvas.width / 100) * props.size + "px"
+  }
+  if (props.weight !== undefined) {
+    style.fontWeight = props.weight
+  }
+  if (props.style !== undefined) {
+    style.fontStyle = props.style
+  }
+  if (props.baseline !== undefined) {
+    ctx.textBaseline = props.baseline
+  }
+  if (props.align !== undefined) {
+    ctx.textAlign = props.align
+  }
+  if (props.letterspacing !== undefined) {
+    ctx.letterSpacing = (ctx.canvas.width / 100) * props.letterspacing + "px"
+  }
   ctx.font = style.font
 }
 

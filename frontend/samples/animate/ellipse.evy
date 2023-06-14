@@ -26,8 +26,7 @@ func draw_ellipse
 end
 
 func draw_text
-    font "italic 300 2rem \"Fira Code\", monospace"
-    textsize 2.7
+    font {size:2.7 style:"italic" family:"Fira Code, monospace"}
     width 0.2
     fill "hsl(210deg 13% 72%)" // light grey
     move 2 15
@@ -36,8 +35,7 @@ func draw_text
         move i*w+20 15
         text (sprintf "%5s" labels[i])
     end
-    font "2rem \"Fira Code\", monospace"
-    textsize 2.7
+    font {size:2.7 style:"normal"}
     fill "hsl(27deg 100% 74%)" // orange
     move 2 10
     text "ellipse"

@@ -42,9 +42,21 @@ func (rt *jsRuntime) Fill(s string)              { fill(s) }
 func (rt *jsRuntime) Dash(segments []float64)    { dash(floatsToString(segments)) }
 func (rt *jsRuntime) Linecap(s string)           { linecap(s) }
 func (rt *jsRuntime) Text(s string)              { text(s) }
-func (rt *jsRuntime) Textsize(size float64)      { textsize(size) }
-func (rt *jsRuntime) Font(s string)              { font(s) }
-func (rt *jsRuntime) Fontfamily(s string)        { fontfamily(s) }
+func (rt *jsRuntime) Font(props map[string]any) {
+	// encode/json not implemented in tinygo 0.27.0, so do it manually
+	pairs := make([]string, 0, len(props))
+	for key, value := range props {
+		switch value.(type) {
+		case string:
+			pairs = append(pairs, fmt.Sprintf("%q:%q", key, value))
+		default:
+			pairs = append(pairs, fmt.Sprintf("%q:%v", key, value))
+		}
+	}
+	jsonProps := "{" + strings.Join(pairs, ",") + "}"
+	font(jsonProps)
+}
+
 func (rt *jsRuntime) Poly(vertices [][]float64) {
 	vStrings := make([]string, len(vertices))
 	for i, vertex := range vertices {
@@ -230,20 +242,10 @@ func linecap(s string)
 //export text
 func text(s string)
 
-// textsize is imported from JS
-//
-//export textsize
-func textsize(s float64)
-
 // font is imported from JS
 //
 //export font
 func font(s string)
-
-// fontfamily is imported from JS
-//
-//export fontfamily
-func fontfamily(s string)
 
 // setEvySource is imported from JS
 //

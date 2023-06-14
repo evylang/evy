@@ -1,17 +1,65 @@
-move 10 80
+move 10 90
 text "Hello"
 
-move 10 60
-textsize 10
-text "all 🖖"
-
-move 10 40
-fontfamily "Luminari, fantasy"
+move 10 70
+font {family:"Luminari, fantasy" size:15}
 text "Cheriolas!"
 
-move 10 35
-fill "grey"
-// font maps directly to the CSS font property; see:
-// https://developer.mozilla.org/en-US/docs/Web/CSS/font
-font "italic max(2rem, 2vh) \"Comic Sans MS\", cursive"
+// all font properties
+font {
+    size:4
+    style:"italic" // "normal"
+    family:"Comic Sans MS, cursive" // see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+    letterspacing:2 // extra inter-character space. negative allowed. default:0
+    align:"center" // "left", "right"
+    baseline:"middle" // "top", "bottom", "alphabetic" (default)
+}
+move 50 65
+color "deeppink"
 text "(Cheering Charm)"
+
+color "black"
+font {size:6 style:"normal" letterspacing:0 align:"left" family:"Fira Code, monospace"}
+fill "none"
+
+move 10 50
+line 45 50
+move 10 50
+font {baseline:"bottom"}
+text "bottom-pq"
+
+move 10 35
+line 45 35
+move 10 35
+font {baseline:"top"}
+text "top"
+
+move 10 20
+line 45 20
+move 10 20
+font {baseline:"middle"}
+text "middle"
+
+move 10 5
+line 45 5
+move 10 5
+font {baseline:"alphabetic"}
+text "alphabetic"
+
+move 70 48
+line 70 56
+move 70 50
+font {align:"left"}
+text "left"
+
+move 70 33
+line 70 41
+move 70 35
+font {align:"right"}
+text "right"
+
+move 70 18
+line 70 26
+move 70 20
+font {align:"center"}
+text "center"

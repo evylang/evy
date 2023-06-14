@@ -8,46 +8,8 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-type ValueType int
-
-const (
-	NUM ValueType = iota
-	BOOL
-	STRING
-	ANY
-	ARRAY
-	MAP
-	RETURN_VALUE
-	BREAK
-	FUNCTION
-	BUILTIN
-)
-
-var valueTypeStrings = map[ValueType]string{
-	NUM:          "num",
-	BOOL:         "bool",
-	STRING:       "string",
-	ANY:          "any",
-	ARRAY:        "array",
-	MAP:          "map",
-	RETURN_VALUE: "return_value",
-	FUNCTION:     "function",
-	BUILTIN:      "builtin",
-}
-
-func (t ValueType) String() string {
-	if s, ok := valueTypeStrings[t]; ok {
-		return s
-	}
-	return "<UNKNOWN>"
-}
-
-func (t ValueType) GoString() string {
-	return t.String()
-}
-
 type Value interface {
-	Type() ValueType
+	Type() *parser.Type
 	Equals(Value) bool
 	String() string
 	Set(Value)
@@ -72,11 +34,13 @@ type Any struct {
 
 type Array struct {
 	Elements *[]Value
+	T        *parser.Type
 }
 
 type Map struct {
 	Pairs map[string]Value
 	Order *[]string
+	T     *parser.Type
 }
 
 type ReturnValue struct {
@@ -85,8 +49,10 @@ type ReturnValue struct {
 
 type Break struct{}
 
-func (n *Num) Type() ValueType { return NUM }
-func (n *Num) String() string  { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
+type None struct{}
+
+func (n *Num) Type() *parser.Type { return parser.NUM_TYPE }
+func (n *Num) String() string     { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
 func (n *Num) Equals(v Value) bool {
 	n2, ok := v.(*Num)
 	if !ok {
@@ -103,8 +69,8 @@ func (n *Num) Set(v Value) {
 	*n = *n2
 }
 
-func (s *String) Type() ValueType { return STRING }
-func (s *String) String() string  { return s.Val }
+func (s *String) Type() *parser.Type { return parser.STRING_TYPE }
+func (s *String) String() string     { return s.Val }
 func (s *String) Equals(v Value) bool {
 	s2, ok := v.(*String)
 	if !ok {
@@ -147,7 +113,7 @@ func (s *String) Slice(start, end Value) (Value, error) {
 	return &String{Val: string(runes[startIdx:endIdx])}, nil
 }
 
-func (*Bool) Type() ValueType { return BOOL }
+func (*Bool) Type() *parser.Type { return parser.BOOL_TYPE }
 func (b *Bool) String() string {
 	return strconv.FormatBool(b.Val)
 }
@@ -168,7 +134,7 @@ func (b *Bool) Set(v Value) {
 	*b = *b2
 }
 
-func (*Any) Type() ValueType { return ANY }
+func (*Any) Type() *parser.Type { return parser.ANY_TYPE }
 func (a *Any) String() string {
 	return a.Val.String()
 }
@@ -189,17 +155,22 @@ func (a *Any) Set(v Value) {
 	}
 }
 
-func (r *ReturnValue) Type() ValueType     { return RETURN_VALUE }
+func (n *None) Type() *parser.Type  { return parser.NONE_TYPE }
+func (n *None) String() string      { return "" }
+func (n *None) Equals(_ Value) bool { return false }
+func (n *None) Set(_ Value)         { panic("internal error: None.Set called") }
+
+func (r *ReturnValue) Type() *parser.Type  { return r.Val.Type() }
 func (r *ReturnValue) String() string      { return r.Val.String() }
 func (r *ReturnValue) Equals(v Value) bool { return r.Val.Equals(v) }
 func (r *ReturnValue) Set(v Value)         { r.Val.Set(v) }
 
-func (r *Break) Type() ValueType     { return BREAK }
+func (r *Break) Type() *parser.Type  { return parser.NONE_TYPE }
 func (r *Break) String() string      { return "" }
 func (r *Break) Equals(_ Value) bool { return false }
 func (r *Break) Set(_ Value)         {}
 
-func (a *Array) Type() ValueType { return ARRAY }
+func (a *Array) Type() *parser.Type { return a.T }
 func (a *Array) String() string {
 	elements := make([]string, len(*a.Elements))
 	for i, e := range *a.Elements {
@@ -248,7 +219,7 @@ func (a *Array) Copy() *Array {
 	for i, v := range *a.Elements {
 		elements[i] = copyOrRef(v)
 	}
-	return &Array{Elements: &elements}
+	return &Array{Elements: &elements, T: a.T}
 }
 
 func (a *Array) Slice(start, end Value) (Value, error) {
@@ -263,7 +234,7 @@ func (a *Array) Slice(start, end Value) (Value, error) {
 		v := (*a.Elements)[i]
 		elements[i-startIdx] = copyOrRef(v)
 	}
-	return &Array{Elements: &elements}, nil
+	return &Array{Elements: &elements, T: a.T}, nil
 }
 
 // copyOrRef is a copy of the input value for basic types and a
@@ -286,7 +257,7 @@ func copyOrRef(val Value) Value {
 	panic("internal error: copyOrRef called with with invalid Value")
 }
 
-func (m *Map) Type() ValueType { return MAP }
+func (m *Map) Type() *parser.Type { return m.T }
 func (m *Map) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
 	for _, key := range *m.Order {
@@ -350,11 +321,13 @@ func (m *Map) Delete(key string) {
 }
 
 func isReturn(val Value) bool {
-	return val != nil && val.Type() == RETURN_VALUE
+	_, ok := val.(*ReturnValue)
+	return ok
 }
 
 func isBreak(val Value) bool {
-	return val != nil && val.Type() == BREAK
+	_, ok := val.(*Break)
+	return ok
 }
 
 func normalizeSliceIndices(start, end Value, length int) (int, int, error) {
@@ -409,10 +382,10 @@ func zero(t *parser.Type) Value {
 		return &Any{Val: &Bool{}}
 	case t.Name == parser.ARRAY:
 		elements := []Value{}
-		return &Array{Elements: &elements}
+		return &Array{Elements: &elements, T: t}
 	case t.Name == parser.MAP:
 		order := []string{}
-		return &Map{Pairs: map[string]Value{}, Order: &order}
+		return &Map{Pairs: map[string]Value{}, Order: &order, T: t}
 	}
 	panic("cannot create zero value for type " + t.String())
 }

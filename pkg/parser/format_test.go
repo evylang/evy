@@ -588,7 +588,7 @@ x := [
 print x
 `[1:]
 	parser := newParser(input, testBuiltins())
-	prog := parser.Parse()
+	prog := parser.parse()
 	assertNoParseError(t, parser, input)
 	got := prog.Format()
 	assert.Equal(t, want, got)
@@ -601,7 +601,7 @@ print x
 `[1:]
 	want := input
 	parser := newParser(input, testBuiltins())
-	prog := parser.Parse()
+	prog := parser.parse()
 	assertNoParseError(t, parser, input)
 	got := prog.Format()
 	assert.Equal(t, want, got)
@@ -619,7 +619,7 @@ end
 `[1:]
 	want := input
 	parser := newParser(input, testBuiltins())
-	prog := parser.Parse()
+	prog := parser.parse()
 	assertNoParseError(t, parser, input)
 	got := prog.Format()
 	assert.Equal(t, want, got)
@@ -730,7 +730,7 @@ end
 func testFormat(t *testing.T, input string) string {
 	t.Helper()
 	parser := newParser(input, testBuiltins())
-	prog := parser.Parse()
+	prog := parser.parse()
 	assertNoParseError(t, parser, input)
 	return prog.Format()
 }

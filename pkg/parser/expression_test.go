@@ -177,25 +177,25 @@ func TestParseTopLevelExpression(t *testing.T) {
 		parser := newParser(input, testBuiltins())
 		parser.formatting = newFormatting()
 		parser.advanceTo(0)
-		scope := newScope(nil, &Program{})
-		scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
-		scope.set("n2", &Var{Name: "n2", T: NUM_TYPE})
-		scope.set("s", &Var{Name: "s", T: STRING_TYPE})
-		scope.set("b", &Var{Name: "b", T: BOOL_TYPE})
+		parser.scope = newScope(nil, &Program{})
+		parser.scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
+		parser.scope.set("n2", &Var{Name: "n2", T: NUM_TYPE})
+		parser.scope.set("s", &Var{Name: "s", T: STRING_TYPE})
+		parser.scope.set("b", &Var{Name: "b", T: BOOL_TYPE})
 		arrType := &Type{Name: ARRAY, Sub: BOOL_TYPE}
-		scope.set("arr", &Var{Name: "arr", T: arrType})
+		parser.scope.set("arr", &Var{Name: "arr", T: arrType})
 		arrType2 := &Type{Name: ARRAY, Sub: arrType}
-		scope.set("arr2", &Var{Name: "arr2", T: arrType2})
+		parser.scope.set("arr2", &Var{Name: "arr2", T: arrType2})
 		mapType := &Type{Name: MAP, Sub: NUM_TYPE}
-		scope.set("map", &Var{Name: "map", T: mapType})
+		parser.scope.set("map", &Var{Name: "map", T: mapType})
 		mapType2 := &Type{Name: MAP, Sub: mapType}
-		scope.set("map2", &Var{Name: "map2", T: mapType2})
+		parser.scope.set("map2", &Var{Name: "map2", T: mapType2})
 		arrayMapType := &Type{Name: ARRAY, Sub: mapType}
-		scope.set("list", &Var{Name: "list", T: arrayMapType})
+		parser.scope.set("list", &Var{Name: "list", T: arrayMapType})
 		mapArrayType := &Type{Name: MAP, Sub: arrType}
-		scope.set("map3", &Var{Name: "map3", T: mapArrayType})
+		parser.scope.set("map3", &Var{Name: "map3", T: mapArrayType})
 
-		got := parser.parseTopLevelExpr(scope)
+		got := parser.parseTopLevelExpr()
 		assertNoParseError(t, parser, input)
 		assert.Equal(t, want, got.String())
 	}
@@ -258,12 +258,12 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		parser := newParser(input, testBuiltins())
 		parser.advanceTo(0)
 		parser.formatting = newFormatting()
-		scope := newScope(nil, &Program{})
-		scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
+		parser.scope = newScope(nil, &Program{})
+		parser.scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
 		mapType := &Type{Name: MAP, Sub: NUM_TYPE}
-		scope.set("a", &Var{Name: "a", T: mapType})
+		parser.scope.set("a", &Var{Name: "a", T: mapType})
 
-		_ = parser.parseTopLevelExpr(scope)
+		_ = parser.parseTopLevelExpr()
 		assertParseError(t, parser, input)
 		got := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)

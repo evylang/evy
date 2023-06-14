@@ -95,6 +95,13 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"list[n1][s]":      "((list[n1])[s])",
 		"map2[s]":          "(map2[s])",
 
+		// Type assertions
+		"a.(num)":     "(a.(num))",
+		"a.(string)":  "(a.(string))",
+		"a.(bool)":    "(a.(bool))",
+		"a.([]num)":   "(a.([]num))",
+		"a.({}[]num)": "(a.({}[]num))",
+
 		// Array literals
 		"[]":          "[]",
 		"[1]":         "[1]",
@@ -182,6 +189,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		parser.scope.set("n2", &Var{Name: "n2", T: NUM_TYPE})
 		parser.scope.set("s", &Var{Name: "s", T: STRING_TYPE})
 		parser.scope.set("b", &Var{Name: "b", T: BOOL_TYPE})
+		parser.scope.set("a", &Var{Name: "a", T: ANY_TYPE})
 		arrType := &Type{Name: ARRAY, Sub: BOOL_TYPE}
 		parser.scope.set("arr", &Var{Name: "arr", T: arrType})
 		arrType2 := &Type{Name: ARRAY, Sub: arrType}
@@ -233,8 +241,15 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 
 		"[1] + [false]": "line 1 column 5: mismatched type for +: []num, []bool",
 
-		"a. b":        `line 1 column 2: unexpected whitespace after "."`,
-		"a .b":        `line 1 column 3: unexpected whitespace before "."`,
+		"n1.(num)": "line 1 column 3: value of type assertion must be of type any, not num",
+		"a.(any)":  "line 1 column 2: cannot type assert to type any",
+		"a.(x)":    `line 1 column 2: invalid type in type assertion of "a"`,
+		"a.([]x)":  `line 1 column 2: invalid type in type assertion of "a"`,
+
+		"a. (num)":    `line 1 column 2: unexpected whitespace after "."`,
+		"a .(num)":    `line 1 column 3: unexpected whitespace before "."`,
+		"map. b":      `line 1 column 4: unexpected whitespace after "."`,
+		"map .b":      `line 1 column 5: unexpected whitespace before "."`,
 		"- 5":         `line 1 column 1: unexpected whitespace after "-"`,
 		"- n1":        `line 1 column 1: unexpected whitespace after "-"`,
 		"[3 +5]":      `line 1 column 4: unexpected whitespace before "+"`,
@@ -261,7 +276,8 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		parser.scope = newScope(nil, &Program{})
 		parser.scope.set("n1", &Var{Name: "n1", T: NUM_TYPE})
 		mapType := &Type{Name: MAP, Sub: NUM_TYPE}
-		parser.scope.set("a", &Var{Name: "a", T: mapType})
+		parser.scope.set("map", &Var{Name: "map", T: mapType})
+		parser.scope.set("a", &Var{Name: "a", T: ANY_TYPE})
 
 		_ = parser.parseTopLevelExpr()
 		assertParseError(t, parser, input)

@@ -76,6 +76,12 @@ type DotExpression struct {
 	Key   string // m := { age: 42}; m.age => key: "age"
 }
 
+type TypeAssertion struct {
+	T     *Type
+	token *lexer.Token
+	Left  Node
+}
+
 type GroupExpression struct {
 	token *lexer.Token
 	Expr  Node
@@ -395,6 +401,18 @@ func (d *DotExpression) Type() *Type {
 	return d.T
 }
 
+func (t *TypeAssertion) Token() *lexer.Token {
+	return t.token
+}
+
+func (t *TypeAssertion) String() string {
+	return "(" + t.Left.String() + "." + "(" + t.T.String() + ")" + ")"
+}
+
+func (t *TypeAssertion) Type() *Type {
+	return t.T
+}
+
 func (d *GroupExpression) Token() *lexer.Token {
 	return d.token
 }
@@ -694,20 +712,20 @@ func newlineList(nodes []Node) string {
 	return strings.Join(lines, "\n") + "\n"
 }
 
-func zeroValue(t TypeName) Node {
-	switch t {
+func zeroValue(t *Type, tt *lexer.Token) Node {
+	switch t.Name {
 	case NUM:
-		return &NumLiteral{Value: 0}
+		return &NumLiteral{Value: 0, token: tt}
 	case STRING:
-		return &StringLiteral{Value: ""}
+		return &StringLiteral{Value: "", token: tt}
 	case BOOL:
-		return &Bool{Value: false}
+		return &Bool{Value: false, token: tt}
 	case ANY:
-		return &Bool{Value: false}
+		return &Bool{Value: false, token: tt}
 	case ARRAY:
-		return &ArrayLiteral{}
+		return &ArrayLiteral{T: t, token: tt}
 	case MAP:
-		return &MapLiteral{}
+		return &MapLiteral{T: t, token: tt}
 	}
 	return nil
 }

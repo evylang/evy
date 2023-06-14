@@ -150,6 +150,8 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 		return e.evalDotExpr(node, false /* forAssign */)
 	case *parser.GroupExpression:
 		return e.Eval(node.Expr)
+	case *parser.TypeAssertion:
+		return e.evalTypeAssertion(node)
 	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
 		return &None{}, nil
 	}
@@ -728,6 +730,24 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (Value, error) {
 		return nil, newErr(expr, err)
 	}
 	return val, nil
+}
+
+func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (Value, error) {
+	left, err := e.Eval(ta.Left)
+	if err != nil {
+		return nil, err
+	}
+	// The parser should have already validated that the type of Left
+	// is `any`, but we check anyway just in case. This may be removed
+	// later.
+	a, ok := left.(*Any)
+	if !ok {
+		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
+	}
+	if !a.Val.Type().Matches(ta.T) {
+		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.Val.Type()))
+	}
+	return a.Val, nil
 }
 
 func (e *Evaluator) pushScope() {

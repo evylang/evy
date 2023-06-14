@@ -87,6 +87,8 @@ func (p *parser) parseExpr(prec precedence) Node {
 			left = p.parseBinaryExpr(left)
 		case tt == lexer.LBRACKET:
 			left = p.parseIndexOrSliceExpr(left, true)
+		case tt == lexer.DOT && p.peek.Type == lexer.LPAREN:
+			left = p.parseTypeAssertion(left)
 		case tt == lexer.DOT:
 			left = p.parseDotExpr(left)
 		default:
@@ -271,6 +273,35 @@ func (p *parser) parseDotExpr(left Node) Node {
 	return expr
 }
 
+func (p *parser) parseTypeAssertion(left Node) Node {
+	tok := p.cur
+	if p.lookAt(p.pos-1).Type == lexer.WS {
+		p.appendError(`unexpected whitespace before "."`)
+		return nil
+	}
+	if p.lookAt(p.pos+1).Type == lexer.WS {
+		p.appendError(`unexpected whitespace after "."`)
+		return nil
+	}
+	p.advance() // advance past .
+	p.advance() // advance past (
+	t := p.parseType()
+	switch t {
+	case ILLEGAL_TYPE:
+		msg := fmt.Sprintf("invalid type in type assertion of %q", left.String())
+		p.appendErrorForToken(msg, tok)
+	case ANY_TYPE:
+		p.appendErrorForToken("cannot type assert to type any", tok)
+	}
+	if p.assertToken(lexer.RPAREN) {
+		p.advance() // advance past )
+	}
+	if left.Type() != ANY_TYPE {
+		p.appendErrorForToken("value of type assertion must be of type any, not "+left.Type().String(), tok)
+	}
+	return &TypeAssertion{T: t, token: tok, Left: left}
+}
+
 func isBinaryOp(tt lexer.TokenType) bool {
 	return isComparisonOp(tt) || tt == lexer.PLUS || tt == lexer.MINUS || tt == lexer.SLASH || tt == lexer.ASTERISK || tt == lexer.PERCENT || tt == lexer.OR || tt == lexer.AND
 }
@@ -424,6 +455,10 @@ func (p *parser) combineTypes(types []*Type) *Type {
 		}
 		if t.Accepts(combinedT) {
 			combinedT = t
+			continue
+		}
+		if t.sameComposite(combinedT) {
+			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
 			continue
 		}
 		return ANY_TYPE

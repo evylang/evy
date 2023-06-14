@@ -145,3 +145,13 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 	}
 	return t.Sub.acceptsStrict(t2.Sub)
 }
+
+func (t *Type) sameComposite(t2 *Type) bool {
+	if t.Name == ARRAY && t2.Name == ARRAY {
+		return true
+	}
+	if t.Name == MAP && t2.Name == MAP {
+		return true
+	}
+	return false
+}

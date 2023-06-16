@@ -40,6 +40,7 @@ function newEvyGo() {
   // evyEnv contains JS functions from this file exported to wasm/go
   const evyEnv = {
     jsPrint,
+    jsCls,
     jsRead,
     jsActions,
     jsPrepareUI,
@@ -120,6 +121,11 @@ function jsPrint(ptr, len) {
   if (s.toLowerCase().includes("confetti")) {
     showConfetti()
   }
+}
+
+// jsCls clears output textarea.
+function jsCls() {
+  document.querySelector("#console").textContent = ""
 }
 
 // jsRead reads the content of the "read" textarea. If the textarea

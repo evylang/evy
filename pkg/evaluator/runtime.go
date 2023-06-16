@@ -9,6 +9,7 @@ type Runtime interface {
 	GraphicsRuntime
 	Print(string)
 	Read() string
+	Cls()
 	Sleep(dur time.Duration)
 	Yielder() Yielder
 }
@@ -63,6 +64,7 @@ func (rt *UnimplementedRuntime) Unimplemented(s string) {
 	rt.Print(fmt.Sprintf("%q not implemented\n", s))
 }
 
+func (rt *UnimplementedRuntime) Cls()                      { rt.Unimplemented("cls") }
 func (rt *UnimplementedRuntime) Read() string              { rt.Unimplemented("read"); return "" }
 func (rt *UnimplementedRuntime) Sleep(_ time.Duration)     { rt.Unimplemented("sleep") }
 func (rt *UnimplementedRuntime) Yielder() Yielder          { rt.Unimplemented("yielder"); return nil }

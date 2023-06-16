@@ -448,6 +448,7 @@ const builtins = new Set([
   "ceil",
   "circle",
   "clear",
+  "cls",
   "color",
   "colour",
   "cos",

@@ -40,6 +40,7 @@ type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
+		"cls":    {Func: clsFunc(rt.Cls), Decl: clsDecl},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
 		"printf": {Func: printfFunc(rt.Print), Decl: printDecl},
 
@@ -144,6 +145,18 @@ func readFunc(readFn func() string) BuiltinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		s := readFn()
 		return &String{Val: s}, nil
+	}
+}
+
+var clsDecl = &parser.FuncDeclStmt{
+	Name:       "cls",
+	ReturnType: parser.NONE_TYPE,
+}
+
+func clsFunc(clsFn func()) BuiltinFunc {
+	return func(_ *scope, _ []Value) (Value, error) {
+		clsFn()
+		return &None{}, nil
 	}
 }
 

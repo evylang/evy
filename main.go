@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
+	"runtime"
 	"time"
 
 	"foxygo.at/evy/pkg/evaluator"
@@ -35,6 +37,17 @@ func newCLIRuntime() *cliRuntime {
 
 func (*cliRuntime) Print(s string) {
 	fmt.Print(s)
+}
+
+func (*cliRuntime) Cls() {
+	cmd := exec.Command("clear")
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", "cls")
+	}
+	cmd.Stdout = os.Stdout
+	if err := cmd.Run(); err != nil {
+		fmt.Println("cannot clear screen", err)
+	}
 }
 
 func (rt *cliRuntime) Read() string {

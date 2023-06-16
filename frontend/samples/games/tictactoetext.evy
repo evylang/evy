@@ -9,7 +9,6 @@ func select_strength:num
         str := read
         n := str2num str
         if !err and n >= 1 and n <= 3
-            printf "Strength %0.f\n\n" n
             return n
         end
         printf "💣 %q is not a valid strength (1-3). Try again.\n" str
@@ -18,19 +17,15 @@ func select_strength:num
 end
 
 func play_game turn:string strength:num
-    print "Enter index of \"o\" move:"
-    print "0 1 2"
-    print "3 4 5"
-    print "6 7 8\n"
-
     board := new_board
+    print_all strength board
     while !(is_gameover board)
         if turn == "x"
             bot_turn board strength
         else
             human_turn board
         end
-        print_board board
+        print_all strength board
         turn = next turn
     end
     result := winner board
@@ -81,6 +76,20 @@ func winner:string b:[]string
         return b[8]
     end
     return "." // no winner
+end
+
+func print_all strength:num b:[]string
+    cls
+    print_notes strength
+    print_board b
+end
+
+func print_notes strength:num
+    printf "Strength %0.f.\n\n" strength
+    print "Enter index for \"o\" move:"
+    print "0 1 2"
+    print "3 4 5"
+    print "6 7 8\n"
 end
 
 func print_board b:[]string

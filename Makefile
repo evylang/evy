@@ -148,10 +148,13 @@ nexttag:
 .PHONY: nexttag release
 
 define NEXTTAG_CMD
-{ git tag --list --merged HEAD --sort=-v:refname; echo v0.0.0; }
-| grep -E "^v?[0-9]+.[0-9]+.[0-9]+$$"
-| head -n1
-| awk -F . '{ print $$1 "." $$2 "." $$3 + 1 }'
+{
+  { git tag --list --merged HEAD --sort=-v:refname; echo v0.0.0; }
+  | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+$$"
+  | head -n 1
+  | awk -F . '{ print $$1 "." $$2 "." $$3 + 1 }';
+  git diff --name-only @^ | sed -E -n 's|^docs/release-notes/(v[0-9]+\.[0-9]+\.[0-9]+)\.md$$|\1|p';
+} | sort --reverse --version-sort | head -n 1
 endef
 
 # --- Utilities ----------------------------------------------------------------

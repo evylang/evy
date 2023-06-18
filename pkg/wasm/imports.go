@@ -28,6 +28,7 @@ func newJSRuntime() *jsRuntime {
 
 func (rt *jsRuntime) Yielder() evaluator.Yielder       { return rt.yielder }
 func (rt *jsRuntime) Print(s string)                   { jsPrint(s) }
+func (rt *jsRuntime) Cls()                             { jsCls() }
 func (rt *jsRuntime) Read() string                     { return rt.yielder.Read() }
 func (rt *jsRuntime) Sleep(dur time.Duration)          { rt.yielder.Sleep(dur) }
 func (rt *jsRuntime) Move(x, y float64)                { move(x, y) }
@@ -159,6 +160,11 @@ func jsRead() float64
 //
 //export jsPrint
 func jsPrint(string)
+
+// jsCls is imported from JS. It clears all printed output.
+//
+//export jsCls
+func jsCls()
 
 // jsError is imported from JS. jsError is used for setting compile time
 // errors of format:

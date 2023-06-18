@@ -33,7 +33,6 @@
       "samples": [
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "bounce", "title": "Bounce" },
-        { "id": "draw", "title": "Draw" },
         { "id": "juggle", "title": "Juggle" },
         { "id": "splashtrig", "title": "Splash of Trig" }
       ]
@@ -44,6 +43,7 @@
       "emoji": "🤼",
       "samples": [
         { "id": "ellipse", "title": "Watermelon Ellipse" },
+        { "id": "draw", "title": "Draw" },
         { "id": "coords", "title": "Coordinates" }
       ]
     },

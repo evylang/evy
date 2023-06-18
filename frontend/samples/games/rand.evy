@@ -15,7 +15,8 @@ while true
         guess = readn
     end
     print guess "You got it 🥳."
-    print
+    sleep 2
+    cls
 end
 
 // readn reads a number.

@@ -6,11 +6,11 @@ import (
 	"foxygo.at/evy/pkg/assert"
 )
 
-func TestReturnStmtFormat(t *testing.T) {
+func TestFuncCallStmtFormat(t *testing.T) {
 	tests := map[string]string{
-		"return 1":                 "return 1\n",
-		"return    1  ":            "return 1\n",
-		"return  1   // a comment": "return 1 // a comment\n",
+		"print 1":                 "print 1\n",
+		"print    1  ":            "print 1\n",
+		"print  1   // a comment": "print 1 // a comment\n",
 	}
 	for input, want := range tests {
 		input, want := input, want
@@ -53,87 +53,87 @@ end // end comment
 func TestIfStmtFormat(t *testing.T) {
 	tests := map[string]string{
 		`if true
-return 1
+print 1
 else if false
-return 2
+print 2
 else
-return 3
+print 3
 end
 `: `
 if true
-    return 1
+    print 1
 else if false
-    return 2
+    print 2
 else
-    return 3
+    print 3
 end
 `[1:],
 		`if true
   if true
-    return 1
+    print 1
   else
-    return 1.5
+    print 1.5
   end
 else if false
   if true
-    return 2
+    print 2
   end
 else
   if true
-    return 3
+    print 3
   else if true
-    return 4
+    print 4
   end
 end
 `: `
 if true
     if true
-        return 1
+        print 1
     else
-        return 1.5
+        print 1.5
     end
 else if false
     if true
-        return 2
+        print 2
     end
 else
     if true
-        return 3
+        print 3
     else if true
-        return 4
+        print 4
     end
 end
 `[1:],
 		`if true  // if comment
-		return 1 // 1 comment
+		print 1 // 1 comment
 		else if false // else if comment
-		return 2 // 2 comment
+		print 2 // 2 comment
 		else // else comment
-		return 3 // 3 comment
+		print 3 // 3 comment
 		end // end comment
 		`: `
 if true // if comment
-    return 1 // 1 comment
+    print 1 // 1 comment
 else if false // else if comment
-    return 2 // 2 comment
+    print 2 // 2 comment
 else // else comment
-    return 3 // 3 comment
+    print 3 // 3 comment
 end // end comment
 `[1:],
 		`if true
-return 1
+print 1
 end
 `: `
 if true
-    return 1
+    print 1
 end
 `[1:],
 		`if true  // if comment
-		return 1 // 1 comment
+		print 1 // 1 comment
 		end // end comment
 		`: `
 if true // if comment
-    return 1 // 1 comment
+    print 1 // 1 comment
 end // end comment
 `[1:],
 	}

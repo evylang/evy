@@ -224,7 +224,7 @@ func nums3
 		return
 	end
 end
-return "success"
+print "success"
 func nums4:num
 	a := 5
 	while true
@@ -309,15 +309,17 @@ func nums:num
 end
 `: "line 12 column 2: unreachable code",
 		`
-while true
-	if true
-		return 1
-	else
-		return 2
+func foo
+	while true
+		if true
+			return
+		else
+			return
+		end
+		print "deadcode"
 	end
-	print "deadcode"
 end
-`: "line 8 column 2: unreachable code",
+`: "line 9 column 3: unreachable code",
 		`
 foo
 return false
@@ -325,7 +327,7 @@ func foo
   print "hello"
 end
 print "do i run?"
-`: "line 7 column 1: unreachable code",
+`: "line 3 column 8: return statement not allowed here",
 		`
 func nums:num
 	while true

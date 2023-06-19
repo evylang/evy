@@ -4,12 +4,12 @@ type scope struct {
 	vars       map[string]*Var
 	outer      *scope
 	block      Node
-	returnType *Type // TODO: maybe get rid of returnType and look up the scope chain for Func nodes and their return type
+	returnType *Type
 }
 
 func newScope(outer *scope, node Node) *scope {
 	if outer == nil {
-		return newScopeWithReturnType(nil, node, ANY_TYPE)
+		return newScopeWithReturnType(nil, node, nil)
 	}
 	return newScopeWithReturnType(outer, node, outer.returnType)
 }

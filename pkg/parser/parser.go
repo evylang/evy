@@ -783,7 +783,9 @@ func (p *parser) parseReturnStatement() Node {
 			p.assertEOL()
 		}
 	}
-	if !p.scope.returnType.Accepts(ret.T) {
+	if p.scope.returnType == nil {
+		p.appendErrorForToken("return statement not allowed here", retValueToken)
+	} else if !p.scope.returnType.Accepts(ret.T) {
 		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
 		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()

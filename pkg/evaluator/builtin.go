@@ -40,7 +40,7 @@ type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
-		"cls":    {Func: clsFunc(rt.Cls), Decl: clsDecl},
+		"cls":    {Func: clsFunc(rt.Cls), Decl: emptyDecl("cls")},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
 		"printf": {Func: printfFunc(rt.Print), Decl: printDecl},
 
@@ -92,7 +92,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"colour": stringBuiltin("colour", rt.Color),
 
 		"clear": {Func: clearFunc(rt.Clear), Decl: clearDecl},
-		"grid":  {Func: gridFunc(rt.Gridn), Decl: gridDecl},
+		"grid":  {Func: gridFunc(rt.Gridn), Decl: emptyDecl("grid")},
 		"gridn": {Func: gridnFunc(rt.Gridn), Decl: gridnDecl},
 
 		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
@@ -146,11 +146,6 @@ func readFunc(readFn func() string) BuiltinFunc {
 		s := readFn()
 		return &String{Val: s}, nil
 	}
-}
-
-var clsDecl = &parser.FuncDeclStmt{
-	Name:       "cls",
-	ReturnType: parser.NONE_TYPE,
 }
 
 func clsFunc(clsFn func()) BuiltinFunc {
@@ -563,11 +558,6 @@ func gridnFunc(gridnFn func(float64, string)) BuiltinFunc {
 	}
 }
 
-var gridDecl = &parser.FuncDeclStmt{
-	Name:       "gridn",
-	ReturnType: parser.NONE_TYPE,
-}
-
 func gridFunc(gridnFn func(float64, string)) BuiltinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		gridnFn(10, "hsl(0deg 100% 0% / 50%)")
@@ -716,6 +706,13 @@ func fontFunc(fontFn func(map[string]any)) BuiltinFunc {
 		}
 		fontFn(properties)
 		return nil, nil
+	}
+}
+
+func emptyDecl(name string) *parser.FuncDeclStmt {
+	return &parser.FuncDeclStmt{
+		Name:       name,
+		ReturnType: parser.NONE_TYPE,
 	}
 }
 

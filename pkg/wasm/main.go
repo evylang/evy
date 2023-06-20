@@ -43,9 +43,14 @@ func main() {
 	}
 	if actions["eval"] {
 		err := evaluate(ast, rt)
-		if err != nil && !errors.Is(err, evaluator.ErrStopped) {
-			jsError(err.Error())
+		if err == nil || errors.Is(err, evaluator.ErrStopped) {
+			return
 		}
+		var exitErr evaluator.ExitError
+		if errors.As(err, &exitErr) && exitErr == 0 {
+			return
+		}
+		jsError(err.Error())
 	}
 }
 

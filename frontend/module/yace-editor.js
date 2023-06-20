@@ -456,6 +456,7 @@ const builtins = new Set([
   "del",
   "ellipse",
   "endswith",
+  "exit",
   "fill",
   "floor",
   "font",

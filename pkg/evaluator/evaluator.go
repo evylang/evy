@@ -32,6 +32,12 @@ var (
 	ErrAssignmentTarget = fmt.Errorf("%w: bad assignment target", ErrInternal)
 )
 
+type ExitError int
+
+func (e ExitError) Error() string {
+	return fmt.Sprintf("exit %d", int(e))
+}
+
 // Error is an Evy evaluator error.
 type Error struct {
 	err   error
@@ -40,6 +46,10 @@ type Error struct {
 
 func (e *Error) Error() string {
 	return e.token.Location() + ": " + e.err.Error()
+}
+
+func (e *Error) Unwrap() error {
+	return e.err
 }
 
 func newErr(node parser.Node, err error) *Error {

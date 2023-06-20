@@ -66,6 +66,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
 
 		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":  {Func: BuiltinFunc(exitFunc), Decl: numDecl("exit")},
 
 		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
@@ -494,6 +495,10 @@ func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
 		sleepFn(dur)
 		return &None{}, nil
 	}
+}
+
+func exitFunc(_ *scope, args []Value) (Value, error) {
+	return nil, ExitError(args[0].(*Num).Val)
 }
 
 var randDecl = &parser.FuncDeclStmt{

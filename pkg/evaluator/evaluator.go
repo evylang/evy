@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
-	"time"
 
 	"foxygo.at/evy/pkg/lexer"
 	"foxygo.at/evy/pkg/parser"
@@ -49,7 +47,6 @@ func newErr(node parser.Node, err error) *Error {
 }
 
 func NewEvaluator(builtins Builtins) *Evaluator {
-	rand.Seed(time.Now().UnixNano())
 	scope := newScope()
 	for _, global := range builtins.Globals {
 		z := zero(global.Type())

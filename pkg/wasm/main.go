@@ -31,19 +31,26 @@ func main() {
 		formattedInput := ast.Format()
 		if formattedInput != input {
 			setEvySource(formattedInput)
+			ast, err = parse(formattedInput, rt)
+			if err != nil {
+				jsError(err.Error())
+				return
+			}
 		}
 	}
 	if actions["ui"] {
 		prepareUI(ast)
 	}
 	if actions["eval"] {
-		// The ast does not correspond to the formatted source code. For
-		// now this is acceptable because evaluator errors don't output
-		// source code locations.
 		err := evaluate(ast, rt)
-		if err != nil && !errors.Is(err, evaluator.ErrStopped) {
-			jsError(err.Error())
+		if err == nil || errors.Is(err, evaluator.ErrStopped) {
+			return
 		}
+		var exitErr evaluator.ExitError
+		if errors.As(err, &exitErr) && exitErr == 0 {
+			return
+		}
+		jsError(err.Error())
 	}
 }
 

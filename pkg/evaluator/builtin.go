@@ -40,7 +40,7 @@ type BuiltinFunc func(scope *scope, args []Value) (Value, error)
 func DefaultBuiltins(rt Runtime) Builtins {
 	funcs := map[string]Builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
-		"cls":    {Func: clsFunc(rt.Cls), Decl: clsDecl},
+		"cls":    {Func: clsFunc(rt.Cls), Decl: emptyDecl("cls")},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
 		"printf": {Func: printfFunc(rt.Print), Decl: printDecl},
 
@@ -66,6 +66,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
 
 		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":  {Func: BuiltinFunc(exitFunc), Decl: numDecl("exit")},
 
 		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
@@ -92,7 +93,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"colour": stringBuiltin("colour", rt.Color),
 
 		"clear": {Func: clearFunc(rt.Clear), Decl: clearDecl},
-		"grid":  {Func: gridFunc(rt.Gridn), Decl: gridDecl},
+		"grid":  {Func: gridFunc(rt.Gridn), Decl: emptyDecl("grid")},
 		"gridn": {Func: gridnFunc(rt.Gridn), Decl: gridnDecl},
 
 		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
@@ -146,11 +147,6 @@ func readFunc(readFn func() string) BuiltinFunc {
 		s := readFn()
 		return &String{Val: s}, nil
 	}
-}
-
-var clsDecl = &parser.FuncDeclStmt{
-	Name:       "cls",
-	ReturnType: parser.NONE_TYPE,
 }
 
 func clsFunc(clsFn func()) BuiltinFunc {
@@ -501,6 +497,10 @@ func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
 	}
 }
 
+func exitFunc(_ *scope, args []Value) (Value, error) {
+	return nil, ExitError(args[0].(*Num).Val)
+}
+
 var randDecl = &parser.FuncDeclStmt{
 	Name:       "rand",
 	Params:     []*parser.Var{{Name: "upper", T: parser.NUM_TYPE}},
@@ -561,11 +561,6 @@ func gridnFunc(gridnFn func(float64, string)) BuiltinFunc {
 		gridnFn(unit.Val, color.Val)
 		return nil, nil
 	}
-}
-
-var gridDecl = &parser.FuncDeclStmt{
-	Name:       "gridn",
-	ReturnType: parser.NONE_TYPE,
 }
 
 func gridFunc(gridnFn func(float64, string)) BuiltinFunc {
@@ -716,6 +711,13 @@ func fontFunc(fontFn func(map[string]any)) BuiltinFunc {
 		}
 		fontFn(properties)
 		return nil, nil
+	}
+}
+
+func emptyDecl(name string) *parser.FuncDeclStmt {
+	return &parser.FuncDeclStmt{
+		Name:       name,
+		ReturnType: parser.NONE_TYPE,
 	}
 }
 

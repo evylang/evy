@@ -111,7 +111,12 @@ func (c *runCmd) Run() error {
 	}
 	builtins := evaluator.DefaultBuiltins(newCLIRuntime())
 	eval := evaluator.NewEvaluator(builtins)
-	return eval.Run(string(b))
+	err = eval.Run(string(b))
+	var exitErr evaluator.ExitError
+	if errors.As(err, &exitErr) {
+		os.Exit(int(exitErr))
+	}
+	return err
 }
 
 func (c *fmtCmd) Run() error {

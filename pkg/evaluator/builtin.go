@@ -507,12 +507,15 @@ var randDecl = &parser.FuncDeclStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
+// We need to manually seed for tinygo 0.28.1.
+var randsource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+
 func randFunc(_ *scope, args []Value) (Value, error) {
 	upper := args[0].(*Num).Val
 	if upper <= 0 || upper > 2147483647 { // [1, 2^31-1]
 		return nil, fmt.Errorf(`%w: "rand %0.f" not in range 1 to 2147483647`, ErrBadArguments, upper)
 	}
-	return &Num{Val: float64(rand.Int31n(int32(upper)))}, nil //nolint: gosec
+	return &Num{Val: float64(randsource.Int31n(int32(upper)))}, nil
 }
 
 var rand1Decl = &parser.FuncDeclStmt{
@@ -522,7 +525,7 @@ var rand1Decl = &parser.FuncDeclStmt{
 }
 
 func rand1Func(_ *scope, args []Value) (Value, error) {
-	return &Num{Val: rand.Float64()}, nil //nolint: gosec
+	return &Num{Val: randsource.Float64()}, nil
 }
 
 var clearDecl = &parser.FuncDeclStmt{

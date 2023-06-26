@@ -109,10 +109,10 @@ $(NODELIB):
 # --- firebase -----------------------------------------------------------------
 
 firebase-deploy-prod: firebase-public ## Deploy to live channel on firebase, use with care!
-	./firebase/deploy live
+	./scripts/firebase-deploy live
 
 firebase-deploy: firebase-public ## Deploy to dev (or other) channel on firebase
-	./firebase/deploy
+	./scripts/firebase-deploy
 
 firebase-emulate: firebase-public ## Run firebase emulator for auth, hosting and datastore
 	firebase --config firebase/firebase.json emulators:start
@@ -124,7 +124,7 @@ firebase-public: frontend
 .PHONY: firebase-deploy firebase-deploy-prod firebase-emulate firebase-public
 
 # --- scripts ------------------------------------------------------------------
-SCRIPTS = firebase/deploy .github/scripts/app_token
+SCRIPTS = scripts/firebase-deploy .github/scripts/app_token
 
 sh-lint: ## Lint script files with shellcheck and shfmt
 	shellcheck $(SCRIPTS)

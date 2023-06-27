@@ -28,7 +28,8 @@ var (
 // cliRuntime implements evaluator.Runtime.
 type cliRuntime struct {
 	evaluator.UnimplementedRuntime
-	reader *bufio.Reader
+	reader    *bufio.Reader
+	skipSleep bool
 }
 
 func newCLIRuntime() *cliRuntime {
@@ -58,8 +59,10 @@ func (rt *cliRuntime) Read() string {
 	return s[:len(s)-1] // strip trailing newline
 }
 
-func (*cliRuntime) Sleep(dur time.Duration) {
-	time.Sleep(dur)
+func (rt *cliRuntime) Sleep(dur time.Duration) {
+	if !rt.skipSleep {
+		time.Sleep(dur)
+	}
 }
 
 func (*cliRuntime) Yielder() evaluator.Yielder { return nil }
@@ -87,7 +90,8 @@ func main() {
 }
 
 type runCmd struct {
-	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+	Source    string `arg:"" help:"Source file. Default stdin" default:"-"`
+	SkipSleep bool   `help:"skip evy sleep command" env:"EVY_SKIP_SLEEP"`
 }
 
 type fmtCmd struct {
@@ -109,7 +113,9 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	builtins := evaluator.DefaultBuiltins(newCLIRuntime())
+	rt := newCLIRuntime()
+	rt.skipSleep = c.SkipSleep
+	builtins := evaluator.DefaultBuiltins(rt)
 	eval := evaluator.NewEvaluator(builtins)
 	err = eval.Run(string(b))
 	var exitErr evaluator.ExitError

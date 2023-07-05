@@ -144,7 +144,7 @@ function runPlugins(plugins, event) {
         ...plugin(acc, event),
       }
     },
-    { value, selectionStart, selectionEnd }
+    { value, selectionStart, selectionEnd },
   )
 }
 
@@ -234,7 +234,7 @@ function isKey(string, event) {
         shiftKey: false,
       },
       keyCode: null,
-    }
+    },
   )
 
   const hasModifiers = Object.keys(keys.modifiers).every((key) => {

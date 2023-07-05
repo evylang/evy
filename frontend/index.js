@@ -575,7 +575,7 @@ function ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle) {
     transformX(radiusY),
     rotation * rad,
     startAngle * rad,
-    endAngle * rad
+    endAngle * rad,
   )
   fill && ctx.fill()
   stroke && ctx.stroke()

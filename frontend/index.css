@@ -442,7 +442,9 @@ main.view-output {
 .run button#run-mobile {
   color: var(--btn-color);
   background: var(--btn-bg);
-  box-shadow: 0 4px 0 hsl(0deg 0% 42%), 0 16px 12px -8px hsl(0deg 0% 0% / 42%),
+  box-shadow:
+    0 4px 0 hsl(0deg 0% 42%),
+    0 16px 12px -8px hsl(0deg 0% 0% / 42%),
     inset 0 -2px 1px 1px hsl(0deg 0% 42%);
   border-radius: 10px;
   font-weight: 700;
@@ -460,7 +462,9 @@ main.view-output {
 }
 .run button:disabled {
   color: var(--btn-color-disabled);
-  box-shadow: 0 4px 0 hsl(0deg 0% 60%), 0 16px 12px -8px hsl(0deg 0% 0% / 30%),
+  box-shadow:
+    0 4px 0 hsl(0deg 0% 60%),
+    0 16px 12px -8px hsl(0deg 0% 0% / 30%),
     inset 0 -2px 1px 1px hsl(0deg 0% 60%);
   cursor: not-allowed;
 }

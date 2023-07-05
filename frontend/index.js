@@ -436,8 +436,8 @@ function initCanvas() {
 }
 
 function resetCanvas() {
+  clear(0, 0)
   const ctx = canvas.ctx
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.fillStyle = "black"
   ctx.strokeStyle = "black"
   ctx.lineWidth = 1
@@ -526,11 +526,10 @@ function circle(r) {
 // clear is exported to evy go/wasm.
 function clear(ptr, len) {
   const ctx = canvas.ctx
-  if (len === 0) {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    return
+  let color = "white"
+  if (len !== 0) {
+    color = memToString(ptr, len)
   }
-  const color = memToString(ptr, len)
   const prevColor = ctx.fillStyle
   ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -575,7 +574,7 @@ function ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle) {
     transformX(radiusY),
     rotation * rad,
     startAngle * rad,
-    endAngle * rad
+    endAngle * rad,
   )
   fill && ctx.fill()
   stroke && ctx.stroke()
@@ -622,9 +621,9 @@ function gridn(unit, ptr, len) {
   const restoreStrokeStyle = ctx.strokeStyle
   ctx.strokeStyle = memToString(ptr, len)
   let lineCnt = 0
-  for (let i = unit; i < 100; i += unit) {
-    lineCnt += 1
+  for (let i = 0; i <= 100; i += unit) {
     ctx.lineWidth = lineCnt % 5 === 0 ? 2 : 1
+    lineCnt += 1
     move(i, 0)
     line(i, 100)
     move(0, i)

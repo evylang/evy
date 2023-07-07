@@ -1142,10 +1142,10 @@ print 5 errmsg
 	out := run(prog)
 	want := []string{
 		"1 false true",
-		"2 str2bool: cannot parse BAD",
+		`2 str2bool: cannot parse "BAD"`,
 		"3 false",
 		"4 0 true",
-		"5 str2num: cannot parse BAD",
+		`5 str2num: cannot parse "BAD"`,
 		"",
 	}
 	got := strings.Split(out, "\n")

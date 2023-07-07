@@ -376,7 +376,8 @@ func str2numFunc(scope *scope, args []Value) (Value, error) {
 	s := args[0].(*String)
 	n, err := strconv.ParseFloat(s.Val, 64)
 	if err != nil {
-		setGlobalErr(scope, "str2num: cannot parse "+s.Val)
+		msg := fmt.Sprintf("str2num: cannot parse %q", s.Val)
+		setGlobalErr(scope, msg)
 	}
 	return &Num{Val: n}, nil
 }
@@ -392,7 +393,8 @@ func str2boolFunc(scope *scope, args []Value) (Value, error) {
 	s := args[0].(*String)
 	b, err := strconv.ParseBool(s.Val)
 	if err != nil {
-		setGlobalErr(scope, "str2bool: cannot parse "+s.Val)
+		msg := fmt.Sprintf("str2bool: cannot parse %q", s.Val)
+		setGlobalErr(scope, msg)
 	}
 	return &Bool{Val: b}, nil
 }

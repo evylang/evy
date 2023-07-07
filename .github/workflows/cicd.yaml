@@ -13,6 +13,8 @@ jobs:
       with:
         fetch-depth: 0
     - run: ./bin/make ci
+      env:
+        TERM: vt100
     - run: ./bin/make firebase-deploy
       if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/master in release job
       env:

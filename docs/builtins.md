@@ -235,3 +235,206 @@ right:  |   1.00|
 left:   |ab     |
 zeropad:|0001.23|
 ```
+
+## Types
+
+### `len`
+
+`len` returns the number of characters in a string, the number of
+elements in an array or the number of key-value pairs in a map.
+
+#### Example
+
+```evy
+l := len "abcd"
+print "len \"abcd\":" l
+
+l = len [1 2]
+print "len [1 2]:" l
+
+l = len {a:3 b:4 c:5}
+print "len {a:3 b:4 c:5}:" l
+```
+
+Output
+```evy:output
+len "abcd": 4
+len [1 2]: 2
+len {a:3 b:4 c:5}: 3
+```
+
+#### Reference 
+
+    len:num a:any
+
+The `len` function takes a single argument, which can be a string, an
+array, or a map. If the argument is a string, `len` returns the number
+of characters in the string. If the argument is an array, `len` returns
+the number of elements in the array. If the argument is a map, `len`
+returns the number of key-value pairs in the map. If the argument is of
+any other type, a fatal runtime error will occur.
+
+### `typeof`
+
+`typeof` returns the type of the argument as string value.
+
+#### Example
+
+```evy
+a:any
+a = "abcd"
+t := typeof a
+print "typeof \"abcd\":" t
+
+t = typeof {kind:true strong:true}
+print "typeof {kind:true strong:true}:" t
+
+t = typeof [[1 2] [3 4]]
+print "typeof [[1 2] [3 4]]:" t
+
+t = typeof [1 2 true]
+print "typeof [1 2 true]:" t
+
+print "typeof []:" (typeof [])
+```
+
+Output
+```evy:output
+typeof "abcd": string
+typeof {kind:true strong:true}: {}bool
+typeof [[1 2] [3 4]]: [][]num
+typeof [1 2 true]: []any
+typeof []: []
+```
+
+#### Reference 
+
+    typeof:string a:any
+
+The `typeof` function takes a single argument, which can be of any type.
+The function returns a string that represents the type of the argument.
+The string returned by `typeof` is the same as the type in an Evy
+program, for example `num`, `bool`, `string`, `[]num`, `{}[]any`. For
+an empty composite literal, `typeof` returns `[]` or `{}` as it can be
+matched to any subtype, e.g. `[]` can be passed to a function that
+takes an argument of `[]num`, or `[]string`.
+
+## Map
+
+### `has`
+
+`has` returns whether a map has a given key or not.
+
+#### Example
+
+```evy
+map := {a:1}
+printf "has %v %q: %t\n" map "a" (has map "a")
+printf "has %v %q: %t\n" map "X" (has map "X")
+```
+
+Output
+```evy:output
+has {a:1} "a": true
+has {a:1} "X": false
+```
+
+#### Reference 
+
+    has:bool map:{} key:string
+
+The `has` function takes two arguments: a map and a key. It returns true
+if the map has the key, and false if the map does not have the key. The
+map can be of any value type, such as `{}num` or `{}[]any` and the key
+can be any string.
+
+### `del`
+
+`del` deletes a key-value entry from a map.
+
+#### Example
+
+```evy
+map := {a:1 b:2}
+del map "b"
+print map
+```
+
+Output
+```evy:output
+{a:1}
+```
+
+#### Reference 
+
+    del map:{} key:string
+
+The `del` function takes two arguments: a map and a key. It deletes the
+key-value entry from the map if the key exists. If the key does not
+exist, the function does nothing. The map can have any value type, and
+the key can be any string.
+
+## Program control
+
+### `sleep`
+
+`sleep` pauses the program for the given number of seconds.
+
+`sleep` can be used to create delays in Evy programs. For example, you
+could use sleep to create a countdown timer.
+
+#### Example
+
+```evy
+print "2"
+sleep 1
+print "1"
+```
+
+Output
+```evy:output
+2
+1
+```
+
+#### Reference 
+
+    sleep seconds:num
+
+The `sleep` function pauses the execution of the current Evy program for
+at least the given number of seconds. Sleep may also pause for a
+fraction of a second, e.g. `sleep 0.1`.
+
+### `exit`
+
+`exit` terminates the program with the given status code.
+
+#### Example
+
+```evy
+input := "not a number"
+n := str2num input
+
+if err
+    print errmsg
+    exit 1
+end
+
+print n
+```
+
+Output
+```evy:output
+str2num: cannot parse "not a number"
+```
+
+#### Reference 
+
+    exit status:num
+
+The `exit` function takes a single argument, which is the status code
+that the program will terminate with. The status code can be any
+number, but it is typically used to indicate whether the program
+terminated successfully or with an error. A status code of 0 means that
+the program terminated successfully, while any other status code is
+considered an error.

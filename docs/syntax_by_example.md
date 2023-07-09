@@ -75,7 +75,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
         print x           // 1 3 5 7 9
     end
 
-    for x := range -10 
+    for x := range -10
         print x        // nothing. step is 1 by default.
     end
 
@@ -129,7 +129,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
 ### Function calls
 
     n := add 1 2        // 3
-    foxprint "🐾"       // 🦊 🐾  
+    foxprint "🐾"       // 🦊 🐾
     list 2 true "blue"  // 2, true, blue
 
 ## Array
@@ -155,7 +155,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
 ### Concatenation
 
     a := [1 2 3 4]
-    a = a + [ 100 ]          // [1 2 3 4 100]; optional extra whitespace 
+    a = a + [ 100 ]          // [1 2 3 4 100]; optional extra whitespace
     a = [0] + a + [101 102]  // [0 1 2 3 4 100 101 102]
 
 ### Slicing
@@ -171,7 +171,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
     m1.name = "fox"
     m1.age = 42
     m1["key with space"] = "🔑🪐"
-    
+
     m2 := {letters:"abc" name:"Jill"} // type: {}string
     m3 := {}                          // type: {}any
     m4 := {
@@ -185,7 +185,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
 
 ### Map value access
 
-    m := {letters:"abc" name:"Jill"}   
+    m := {letters:"abc" name:"Jill"}
     s := "letters"
     print m.letters    // abc
     print m[s]         // abc
@@ -198,7 +198,7 @@ Builtin functions, such as `print` and `circle`, are documented in the
     m2 := { letter:"a" number:1 }
     arr1:[]any
     arr2 := [ "b" 2 ]
-   
+
 ## Type assertion
 
     x:any
@@ -216,11 +216,11 @@ Builtin functions, such as `print` and `circle`, are documented in the
     v = "🐐"
     if (typeof v) == "string"
         print "v is a string:" v
-        s := v.(string) // type assertion        
-        print s+s       // 🐐🐐 
+        s := v.(string) // type assertion
+        print s+s       // 🐐🐐
     end
 
-## Event handling 
+## Event handling
 
     on key
         print "key pressed"
@@ -234,4 +234,3 @@ movements, or periodic screen redraws.
     on key k:string
         printf "%q pressed\n" k
     end
-

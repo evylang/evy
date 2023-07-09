@@ -14,7 +14,7 @@ all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-
 ci: clean check-uptodate all ## Full clean build and up-to-date checks as run on CI
 
 check-uptodate: tidy fmt doctest
-	test -z "$$(git status --porcelain -- go.mod go.sum $(GOFILES) $(DOCTESTS))" || { git status; false; }
+	test -z "$$(git status --porcelain)" || { git status; false; }
 
 clean:: ## Remove generated files
 	-rm -rf $(O)
@@ -101,11 +101,11 @@ frontend: tiny | $(O) ## Build frontend, typically iterate with npm and inside f
 frontend-serve: frontend ## Build frontend and serve on free port
 	servedir $(O)/public
 
-prettier: | $(NODELIB) ## Format frontend code with prettier
-	npx -y prettier --write frontend
+prettier: | $(NODELIB) ## Format code with prettier
+	npx -y prettier --write .
 
-check-prettier: | $(NODELIB)  ## Ensure frontend code is formatted with prettier
-	npx -y prettier --check frontend
+check-prettier: | $(NODELIB)  ## Ensure code is formatted with prettier
+	npx -y prettier --check .
 
 $(NODELIB):
 	@mkdir -p $@

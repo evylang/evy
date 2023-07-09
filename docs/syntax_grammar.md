@@ -63,7 +63,7 @@ horizontal whitespace, `<-` … `->` and `<+` … `+>`. `<-` … `->` means
 no horizontal whitespace is allowed between the terminals of the
 enclosed expression, e.g. `3+5` inside `<-` … `->` is allowed, but
 `3 + 5` is not. The fencing tokens `<+` … `+>` are the default and mean
-horizontal whitespace is allowed (again) between terminals. 
+horizontal whitespace is allowed (again) between terminals.
 
 See section [whitespace](#whitespace) for further details.
 
@@ -75,8 +75,8 @@ not allowed.
     program    = { statement | func | event_handler | NL } .
     statements = statement { statement } .
     statement  = typed_decl_stmt | inferred_decl_stmt |
-                 assign_stmt | 
-                 func_call_stmt | 
+                 assign_stmt |
+                 func_call_stmt |
                  return_stmt | break_stmt |
                  if_stmt | for_stmt | while_stmt .
 
@@ -146,7 +146,7 @@ not allowed.
     operand    = literal | assignable | slice | type_assertion | group_expr .
     group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
     type_assertion = <- assignable "." "(" type ")" -> .
-    
+
     unary_expr = <- UNARY_OP -> expr .  /* WS not allowed after UNARY_OP */
     UNARY_OP   = "-" | "!" .
 
@@ -178,7 +178,6 @@ not allowed.
     NL             = "\n" {"\n"} .
     WS             = " " | "\t" {" " | "\t"} .
 
-
 ## Comments
 
 There is only one type of comment, the line comment which starts with
@@ -192,7 +191,7 @@ composite types: [arrays](#arrays) `[]` and [maps](#maps) `{}`.
 The _dynamic_ type `any` can hold any of the previously listed
 types.
 
-Composite types can nest further composite types, for example 
+Composite types can nest further composite types, for example
 `[]{}string` is an array of maps with string values.
 
 A `bool` value is either `true` or `false`.
@@ -213,7 +212,7 @@ declaration_. With the inferred declaration the type is not given but
 inferred from the value. With typed declaration the type is explicitly
 specified and the variable is initialised to its type's zero value.
 
-    a1 := 1 // inferred declaration of variable 'a1' 
+    a1 := 1 // inferred declaration of variable 'a1'
             // with type 'num' and value 1.
     a2:num  // typed declaration of variable 'a2'
             // with type 'num' and zero value 0.
@@ -245,8 +244,8 @@ value of their type:
 ## Assignments
 
 Assignments are defined by an equal sign `=`. The left hand side of the
-`=` must contain an _assignable_, a variable, an indexed array 
-(`arr[1] = "abc"`) or a map field (`person.age = 42`), see [Arrays](#Arrays) 
+`=` must contain an _assignable_, a variable, an indexed array
+(`arr[1] = "abc"`) or a map field (`person.age = 42`), see [Arrays](#Arrays)
 and [Maps](#Maps) for further details. Before the assignment
 the variable must be declared via inferred (`:=`)or typed declaration
 (`:TYPE`). Only values of the correct type can be assigned to a
@@ -299,7 +298,7 @@ calling `b` and `func b` calling func `a`.
 Variables by contrast must be declared and given an unchangeable type
 before they can be used. Variables can be declared at the top level of
 the program, at _global scope_, or within a block-statement, at _block
-scope_. 
+scope_.
 
 A _block-statement_ is a block of statements that ends with the keyword
 `end`. A function body following the line starting with `func` is a
@@ -308,7 +307,7 @@ block-statement. The statements between `if` and `else` are a block
 a block. Blocks can be nested within other blocks.
 
 A variable declared inside a block only exists until the end of the
-block and may not be used outside the block. 
+block and may not be used outside the block.
 
 Variable names in an inner block can shadow or override the same
 variable name from an outer block, which makes the variable of the
@@ -325,7 +324,7 @@ unchanged:
     print "3" x
 
 This program will print
-    
+
     1 outer
     2 true
     3 outer
@@ -418,7 +417,7 @@ in the iteration.
 `len m` returns the number of values in the map.
 
 The empty map literal becomes `{}any` in inferred declarations,
-otherwise the empty map literal assumes the type required. 
+otherwise the empty map literal assumes the type required.
 `m:{}any` and `m := {}` are equivalent.
 
 The dot expression `.` and the index expression `[ "key" ]` must not be
@@ -470,13 +469,13 @@ have a `bool` result.
 
 `+` `-` `*` `/` `%` stand for addition, subtraction, multiplication,
 division and the [modulo operator]. `+` may also be used as
-concatenation operator for `string` and `array` types. 
+concatenation operator for `string` and `array` types.
 
 Boolean operators `and`, `or` stand for [logical conjunction (AND)] and
 [logical disjunction (OR)]. They perform [short-circuit evaluation]
 where the right-hand side of the operator is not evaluated if the result
 of the operation can be determined from the left-hand side alone.
-Comparison operators `<`  `<=`  `>`  `>=` stand for less, less or equal,
+Comparison operators `<` `<=` `>` `>=` stand for less, less or equal,
 greater, greater or equal. Their operands may be `num` or `string`
 values. For `string` types [lexicographical comparison] is used.
 
@@ -511,7 +510,7 @@ Finally, binary operators have the following order of precedence:
         6             *  /  %
         5             +  -
         4             <  <=  >  >=
-        3             ==  !=  
+        3             ==  !=
         2             and
         1             or
 
@@ -539,24 +538,23 @@ More formally, `WS` between tokens or terminals as defined in the
 grammar is ignored except for the following cases:
 
 1. `WS` is not allowed in assignables, around `DOT`, or before array or
-map index. Invalid: `person .name`, `person. name`, `array [1] = 2`.
-Valid: `person.name`, `array[1] = 2`.
+   map index. Invalid: `person .name`, `person. name`, `array [1] = 2`.
+   Valid: `person.name`, `array[1] = 2`.
 
 2. `WS` is not allowed following the unary operators `-` and `!`.
 
 3. `WS` is used as the separator in expression lists in function call
-arguments and array elements. `WS` is therefore _not_ allowed within
-the expressions of an expression list, including the values of map
-literal definitions.
+   arguments and array elements. `WS` is therefore _not_ allowed within
+   the expressions of an expression list, including the values of map
+   literal definitions.
 
 4. `WS` is allowed within the expression of an expression list if the
-expression is surrounded by `()`, `[]` or `{}`, `e.g. [ ( 2 + 3 ) ]`,
-not `WS` directly after `[` and within `( … )`
+   expression is surrounded by `()`, `[]` or `{}`, `e.g. [ ( 2 + 3 ) ]`,
+   not `WS` directly after `[` and within `( … )`
 
 5. `WS` can be freely used in single expressions for assignments,
-inferred declarations, return statements, `if` conditions and `while`
-conditions, as well as within parentheses `(…)`
-
+   inferred declarations, return statements, `if` conditions and `while`
+   conditions, as well as within parentheses `(…)`
 
 Examples:
 
@@ -571,7 +569,7 @@ Examples:
     print arr[1]        // b
     print arr [1]       // [a b] [1]
     arr [0] = "A"       // invalid
-    arr2 :=[ 1   ]      // valid 
+    arr2 :=[ 1   ]      // valid
     arr3 := [[1][2]]    // valid
     arr3 := [[1] [ 2] ] // valid
     arr3 := [1 + 1 ]    // invalid
@@ -618,7 +616,6 @@ Bare returns in functions without result types are allowed
         end
         // further validation
     end
-
 
 ## Variadic functions
 
@@ -676,7 +673,7 @@ A type assertion `ident.(type)` asserts that the value of the variable
 [run-time panic](#run-time-panics-and-recoverable-errors) occurs.
 
     x:any
-    x = [ 1 2 3 4 ]  
+    x = [ 1 2 3 4 ]
     num_array := x.([]num)
     x = "abc"
     str := x.(string)
@@ -692,7 +689,7 @@ or other concrete type:
     x[0].(num)    // valid
     x[0].(string) // run time panic
 
-However, the elements of `x` can be type assert, e.g. `x[0].(num)`, 
+However, the elements of `x` can be type assert, e.g. `x[0].(num)`,
 `x[1].([]num)`.
 
 ## Event Handler

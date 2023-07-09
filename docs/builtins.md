@@ -15,7 +15,7 @@ key.
 `print` prints the arguments given to it to the output area. It separates them by
 a single space and outputs a newline character at the end.
 
-#### Example 
+#### Example
 
 ```evy
 print "Hello"
@@ -23,7 +23,9 @@ print 2 true "blue"
 print "array:" [1 2 3]
 print "map:" {name:"Scholl" age:21}
 ```
+
 Output
+
 ```evy:output
 Hello
 2 true blue
@@ -37,20 +39,21 @@ map: {name:Scholl age:21}
 
 The `print` function prints its arguments to the output area, each
 separated by a single space and terminated by a newline character. If
-no arguments are provided it only prints the newline character. 
+no arguments are provided it only prints the newline character.
 
 The backslash character `\` can be used to represent special characters
 in strings. For example, the `\t` escape sequence represents a tab
 character, and the `\n` escape sequence represents a newline character.
 Quotes in string literals must also be escaped with backslashes,
 otherwise they will be interpreted as the end of the string literal.
-For example: 
+For example:
 
 ```evy
 print "Here's a tab: 👉\t👈\nShe said: \"Thank you!\""
 ```
 
 Output
+
 ```evy:output
 Here's a tab: 👉	👈
 She said: "Thank you!"
@@ -61,22 +64,25 @@ running Evy from the command line interface, `print` prints to standard
 out.
 
 ### `read`
- 
+
 `read` reads a line of input from the user and returns it as a
 string. The newline character is not included in the returned string.
 
 #### Example
+
 ```evy
 name := read
 print "Hello, "+name+"!"
 ```
 
 Input
+
 ```evy:input
 Mary Jackson
 ```
 
 Output
+
 ```evy:output
 Hello, Mary Jackson!
 ```
@@ -99,6 +105,7 @@ in.
 `cls` clears the output area of all printed text.
 
 #### Example
+
 ```evy
 print "Hello"
 sleep 1
@@ -107,6 +114,7 @@ print "Bye"
 ```
 
 Output
+
 ```evy:output
 Bye
 ```
@@ -129,15 +137,15 @@ string. The format string is the first argument, and it
 contains _specifiers_. Specifiers start with a percent sign `%`. They
 tell the `printf` function how and where to print the remaining
 arguments inside the format string. The rest of the format string is
-printed to the output area without changes. 
+printed to the output area without changes.
 
 Here are some valid specifiers in Evy:
 
-| Specifier | Description |
-| --------- | ------------- |
-| `%v`      | the argument in its default format  |
-| `%q`      | a double-quoted string |
-| `%%`      | a percent sign `%`  |
+| Specifier | Description                        |
+| --------- | ---------------------------------- |
+| `%v`      | the argument in its default format |
+| `%q`      | a double-quoted string             |
+| `%%`      | a percent sign `%`                 |
 
 #### Example
 
@@ -158,6 +166,7 @@ printf "Map: %v\n" {a:1 b:2}
 ```
 
 Output
+
 ```evy:output
 The tank is 100% full.
 
@@ -183,15 +192,15 @@ A, second: B`.
 
 Full list of valid specifiers in Evy:
 
-| Specifier | Description |
-| --------- | ------------- |
-| `%v`      | the argument in a default format  |
-| `%t`      | the word `true` or `false` |
+| Specifier | Description                                            |
+| --------- | ------------------------------------------------------ |
+| `%v`      | the argument in a default format                       |
+| `%t`      | the word `true` or `false`                             |
 | `%f`      | decimal point (floating-point) number, e.g. 123.456000 |
-| `%e`      | scientific notation, e.g. -1.234456e+78 |
-| `%s`      | string value |
-| `%q`      | a double-quoted string |
-| `%%`      | a literal percent sign `%`; consumes no value  |
+| `%e`      | scientific notation, e.g. -1.234456e+78                |
+| `%s`      | string value                                           |
+| `%q`      | a double-quoted string                                 |
+| `%%`      | a literal percent sign `%`; consumes no value          |
 
 If the arguments for the `%s`, `%q`, `%f`, `%e`, and `%t` specifiers do
 not match the required type, a fatal runtime error will occur.
@@ -204,18 +213,18 @@ with the `%f` and `%v` format specifiers.
   the size of the number. It can be useful for padding and aligned
   output.
 - Precision is the number of decimal places that will be displayed. If
-  the precision is not specified, it will be set to 6 for `%f`. 
+  the precision is not specified, it will be set to 6 for `%f`.
 
 Here is a table that shows the different ways to specify the width and
 precision of a floating-point number:
 
-| Verb    | Description |
-| ------- | ------------- |
+| Verb    | Description                      |
+| ------- | -------------------------------- |
 | `%f`    | default width, default precision |
-| `%7f`   | width 7, default precision |
-| `%.2f`  | default width, precision 2 |
-| `%7.2f` | width 7, precision 2 |
-| `%7.f`  | width 7, precision 0 |
+| `%7f`   | width 7, default precision       |
+| `%.2f`  | default width, precision 2       |
+| `%7.2f` | width 7, precision 2             |
+| `%7.f`  | width 7, precision 0             |
 
 If the width/precision is preceded by a `-`, the value is padded with
 spaces on the right rather than the left. If it is preceded by a 0, the
@@ -229,7 +238,9 @@ printf "right:  |%7.2f|\n" 1
 printf "left:   |%-7.2v|\n" "abcd"
 printf "zeropad:|%07.2f|\n" 1.2345
 ```
+
 Output
+
 ```evy:output
 right:  |   1.00|
 left:   |ab     |
@@ -257,6 +268,7 @@ print "len {a:3 b:4 c:5}:" l
 ```
 
 Output
+
 ```evy:output
 len "abcd": 4
 len [1 2]: 2
@@ -299,6 +311,7 @@ print "typeof []:" (typeof [])
 ```
 
 Output
+
 ```evy:output
 typeof "abcd": string
 typeof {kind:true strong:true}: {}bool
@@ -334,6 +347,7 @@ printf "has %v %q: %t\n" map "X" (has map "X")
 ```
 
 Output
+
 ```evy:output
 has {a:1} "a": true
 has {a:1} "X": false
@@ -361,6 +375,7 @@ print map
 ```
 
 Output
+
 ```evy:output
 {a:1}
 ```
@@ -392,6 +407,7 @@ print "1"
 ```
 
 Output
+
 ```evy:output
 2
 1
@@ -424,6 +440,7 @@ print n
 ```
 
 Output
+
 ```evy:output
 str2num: cannot parse "not a number"
 ```
@@ -457,6 +474,7 @@ print "n:" n "err:" err
 ```
 
 Output
+
 ```evy:output
 n: 1 err: false
 n: 0 err: true
@@ -489,6 +507,7 @@ print "b:" b "err:" err
 ```
 
 Output
+
 ```evy:output
 b: true err: false
 b: false err: true
@@ -500,7 +519,7 @@ b: false err: true
 
 The `str2bool` function converts a string to a bool. It takes a single
 argument, which is the string to convert. The function returns `true`
-if the string is equal to `"true"`, `"True"`, `"TRUE"`,  or `"1"`, and
+if the string is equal to `"true"`, `"True"`, `"TRUE"`, or `"1"`, and
 `false` if the string is equal to `"false"`, `"False"`, `"FALSE"`, or
 `"0"`. The function returns `false` and sets the global `err` variable
 to `true` if the string is not a valid boolean. For more information
@@ -520,7 +539,7 @@ message. They typically occur when the program encounters a situation
 that it cannot handle, such as trying to access an element of an array
 that is out of bounds. Fatal errors cannot be intercepted by the
 program, so it is important to take steps to prevent them from
-occurring in the first place. 
+occurring in the first place.
 
 One way to do this is to use _guarding code_, which is code that checks
 for potential errors and takes steps to prevent them from occurring.
@@ -539,7 +558,7 @@ print "This line will not be executed"
 ```
 
 This code will cause a fatal error because the index 5 is out of bounds
-for the array `arr`. The program will exit with the error message 
+for the array `arr`. The program will exit with the error message
 
 ```
 line 3: index out of bounds: 5
@@ -559,7 +578,7 @@ no error, `err` is set to `false`.
 
 The global `errmsg` variable stores a detailed message about the error
 which is set alongside `err`. `errmsg` is set to the empty string `""`
-if no error has occurred.  If an error does occur, `errmsg` is set to a
+if no error has occurred. If an error does occur, `errmsg` is set to a
 message that describes the error.
 
 When a function that could potentially cause an error finishes executing
@@ -579,6 +598,7 @@ print "errmsg:" errmsg
 ```
 
 Output
+
 ```evy:output
 num: 0
 err: true

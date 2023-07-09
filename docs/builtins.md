@@ -31,7 +31,7 @@ array: [1 2 3]
 map: {name:Scholl age:21}
 ```
 
-#### Reference 
+#### Reference
 
     print a:any...
 
@@ -81,7 +81,7 @@ Output
 Hello, Mary Jackson!
 ```
 
-#### Reference 
+#### Reference
 
     read:string
 
@@ -111,7 +111,7 @@ Output
 Bye
 ```
 
-#### Reference 
+#### Reference
 
     cls
 
@@ -170,7 +170,7 @@ Array: [1 2 3]
 Map: {a:1 b:2}
 ```
 
-#### Reference 
+#### Reference
 
     printf format:string a:any...
 
@@ -263,7 +263,7 @@ len [1 2]: 2
 len {a:3 b:4 c:5}: 3
 ```
 
-#### Reference 
+#### Reference
 
     len:num a:any
 
@@ -307,7 +307,7 @@ typeof [1 2 true]: []any
 typeof []: []
 ```
 
-#### Reference 
+#### Reference
 
     typeof:string a:any
 
@@ -339,7 +339,7 @@ has {a:1} "a": true
 has {a:1} "X": false
 ```
 
-#### Reference 
+#### Reference
 
     has:bool map:{} key:string
 
@@ -365,7 +365,7 @@ Output
 {a:1}
 ```
 
-#### Reference 
+#### Reference
 
     del map:{} key:string
 
@@ -397,7 +397,7 @@ Output
 1
 ```
 
-#### Reference 
+#### Reference
 
     sleep seconds:num
 
@@ -428,7 +428,7 @@ Output
 str2num: cannot parse "not a number"
 ```
 
-#### Reference 
+#### Reference
 
     exit status:num
 

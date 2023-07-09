@@ -2,48 +2,48 @@ name: ci/cd
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
 
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - run: ./bin/make ci
-      env:
-        TERM: vt100
-    - run: ./bin/make firebase-deploy
-      if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/master in release job
-      env:
-        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: ./bin/make ci
+        env:
+          TERM: vt100
+      - run: ./bin/make firebase-deploy
+        if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/master in release job
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     runs-on: ubuntu-latest
-    needs: [ ci ]
+    needs: [ci]
     if: ${{ github.event_name == 'push' }} # only run on push to master
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - run: ./bin/make release
-      env:
-        GITHUB_APP_ID: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
-        GITHUB_APP_PEM: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: ./bin/make firebase-deploy-prod
-      env:
-        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: ./bin/make release
+        env:
+          GITHUB_APP_ID: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
+          GITHUB_APP_PEM: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: ./bin/make firebase-deploy-prod
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
 
   howl-on-fail:
     runs-on: ubuntu-latest
-    needs: [ ci, release ]
+    needs: [ci, release]
     if: ${{ always() && github.event_name == 'push' && ( needs.ci.result == 'failure' ||  needs.release.result == 'failure' ) }}
     steps:
-    - uses: foxygoat/howl@v1
-      env:
-        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-        SLACK_TEXT: <!here|here>
+      - uses: foxygoat/howl@v1
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_TEXT: <!here|here>

@@ -443,7 +443,7 @@ function resetCanvas() {
   ctx.lineWidth = 1
   canvas.fill = true
   canvas.stroke = true
-  ctx.lineCap = "butt"
+  ctx.lineCap = "round"
   ctx.setLineDash([])
   ctx.font = `${(ctx.canvas.width / 100) * 6}px regular`
   ctx.textAlign = "left"
@@ -619,7 +619,9 @@ function gridn(unit, ptr, len) {
   const { ctx, x, y } = canvas
   const restoreLineWidth = ctx.lineWidth
   const restoreStrokeStyle = ctx.strokeStyle
+  const restoreLineDash = ctx.getLineDash()
   ctx.strokeStyle = memToString(ptr, len)
+  ctx.setLineDash([])
   let lineCnt = 0
   for (let i = 0; i <= 100; i += unit) {
     ctx.lineWidth = lineCnt % 5 === 0 ? 2 : 1
@@ -631,6 +633,7 @@ function gridn(unit, ptr, len) {
   }
   ctx.lineWidth = restoreLineWidth
   ctx.strokeStyle = restoreStrokeStyle
+  ctx.setLineDash(restoreLineDash)
   canvas.x = x
   canvas.y = y
 }

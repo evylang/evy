@@ -1,22 +1,21 @@
-move 10 90
-text "Hello"
-
-move 10 70
-font {family:"Luminari, fantasy" size:15}
-text "Cheriolas!"
+move 10 85
+text "“Time is an illusion."
+move 10 78
+text "Lunchtime doubly so.”"
 
 // all font properties
 font {
     size:4
     style:"italic" // "normal"
-    family:"Comic Sans MS, cursive" // see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
-    letterspacing:2 // extra inter-character space. negative allowed. default:0
-    align:"center" // "left", "right"
+    family:"Tahomana, sans-serif" // see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+    weight:700
+    letterspacing:-0.1 // extra inter-character space
+    align:"center" // "right", "left" (default)
     baseline:"middle" // "top", "bottom", "alphabetic" (default)
 }
-move 50 65
-color "deeppink"
-text "(Cheering Charm)"
+move 60 72
+color "dodgerblue"
+text "― Douglas Adams"
 
 color "black"
 font {size:6 style:"normal" letterspacing:0 align:"left" family:"Fira Code, monospace"}
@@ -26,7 +25,7 @@ move 10 50
 line 45 50
 move 10 50
 font {baseline:"bottom"}
-text "bottom-pq"
+text "bottom"
 
 move 10 35
 line 45 35

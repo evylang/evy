@@ -28,7 +28,7 @@ func TestArrayLiteralMultiline(t *testing.T) {
 
 		arrayLit := parser.parseArrayLiteral().(*ArrayLiteral)
 		assertNoParseError(t, parser, input)
-		got := parser.formatting.multiline[ptr(arrayLit)]
+		got := parser.formatting.multiline[arrayLit]
 		assert.Equal(t, want, got)
 	}
 }
@@ -56,7 +56,7 @@ func TestMapLiteralMultiline(t *testing.T) {
 
 		mapLit := parser.parseMapLiteral().(*MapLiteral)
 		assertNoParseError(t, parser, input)
-		got := parser.formatting.multiline[ptr(mapLit)]
+		got := parser.formatting.multiline[mapLit]
 		assert.Equal(t, want, got)
 	}
 }

@@ -3,7 +3,6 @@ package parser
 import (
 	"fmt"
 	"io"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -11,30 +10,23 @@ import (
 func newFormatting() *formatting {
 	return &formatting{
 		wss:       map[*BinaryExpression]bool{},
-		comments:  map[uintptr]string{},
-		multiline: map[uintptr][]multilineItem{},
+		comments:  map[Node]string{},
+		multiline: map[Node][]multilineItem{},
 	}
 }
 
 type formatting struct {
 	w io.StringWriter
 
-	wss map[*BinaryExpression]bool
-	// TODO: When tinygo 0.28.0 is released replace uintptr keys with Node interface
-	//
-	//     comments  map[Node]string
-	//     multiline map[Node][]multilineItem
-	//
-	// the current implementation is a hack to work around a tinygo but, details:
-	// https://gophers.slack.com/archives/CDJD3SUP6/p1677288675055869
-	comments  map[uintptr]string
-	multiline map[uintptr][]multilineItem
+	wss       map[*BinaryExpression]bool
+	comments  map[Node]string
+	multiline map[Node][]multilineItem
 
 	indentLevel int
 }
 
 func (f *formatting) recordComment(n Node, comment string) {
-	f.comments[ptr(n)] = comment
+	f.comments[n] = comment
 }
 
 func (f *formatting) recordWSS(n *BinaryExpression) {
@@ -42,7 +34,7 @@ func (f *formatting) recordWSS(n *BinaryExpression) {
 }
 
 func (f *formatting) recordMultiline(n Node, multiline []multilineItem) {
-	f.multiline[ptr(n)] = multiline
+	f.multiline[n] = multiline
 }
 
 func (f *formatting) format(n Node) {
@@ -269,7 +261,7 @@ func (f *formatting) formatFuncCall(n *FuncCall) {
 }
 
 func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
-	multi := formatMultiline(f.multiline[ptr(n)])
+	multi := formatMultiline(f.multiline[n])
 	if len(multi) == 0 {
 		f.write("[]")
 		return
@@ -304,7 +296,7 @@ func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
 }
 
 func (f *formatting) formatMapLiteral(n *MapLiteral) {
-	multi := formatMultiline(f.multiline[ptr(n)])
+	multi := formatMultiline(f.multiline[n])
 	if len(multi) == 0 {
 		f.write("{}")
 		return
@@ -367,7 +359,7 @@ func (f *formatting) writeLn() {
 }
 
 func (f *formatting) writeComment(n Node) {
-	c := f.comments[ptr(n)]
+	c := f.comments[n]
 	if c == "" {
 		return
 	}
@@ -408,7 +400,7 @@ func (f *formatting) writeStmts(stmts []Node) {
 
 func (f *formatting) writeBlankLine(n Node, lastEmpty bool) bool {
 	_, ok := n.(*EmptyStmt)
-	if !ok || f.comments[ptr(n)] != "" {
+	if !ok || f.comments[n] != "" {
 		return false
 	}
 	if !lastEmpty {
@@ -421,8 +413,4 @@ func (f *formatting) writeWSS(n *BinaryExpression) {
 	if !f.wss[n] {
 		f.write(" ")
 	}
-}
-
-func ptr(n Node) uintptr {
-	return reflect.ValueOf(n).Pointer()
 }

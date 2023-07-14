@@ -98,7 +98,7 @@ type accumulation struct {
 
 // nlAfter returns a map (set) of statements that need to be
 // followed by a newline.
-func nlAfter(stmts []Node, comments map[uintptr]string) map[int]bool {
+func nlAfter(stmts []Node, comments map[Node]string) map[int]bool {
 	accums := newAccumulations(stmts, comments)
 	indices := map[int]bool{}
 	length := len(accums)
@@ -123,7 +123,7 @@ func nlAfter(stmts []Node, comments map[uintptr]string) map[int]bool {
 	return indices
 }
 
-func newAccumulations(stmts []Node, comments map[uintptr]string) []accumulation {
+func newAccumulations(stmts []Node, comments map[Node]string) []accumulation {
 	lastStmtType := ""
 	var accums []accumulation
 	for i, stmt := range stmts {
@@ -131,7 +131,7 @@ func newAccumulations(stmts []Node, comments map[uintptr]string) []accumulation 
 		switch s := stmt.(type) {
 		case *EmptyStmt:
 			stmtType = "empty"
-			if comments[ptr(s)] != "" {
+			if comments[s] != "" {
 				stmtType = "comment"
 			}
 		case *FuncDeclStmt, *EventHandlerStmt:

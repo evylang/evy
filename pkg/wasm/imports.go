@@ -45,7 +45,7 @@ func (rt *jsRuntime) Dash(segments []float64)          { dash(floatsToString(seg
 func (rt *jsRuntime) Linecap(s string)                 { linecap(s) }
 func (rt *jsRuntime) Text(s string)                    { text(s) }
 func (rt *jsRuntime) Font(props map[string]any) {
-	// encode/json not implemented in tinygo 0.27.0, so do it manually
+	// We don't use encoding/json here as it adds more than 100K to evy.wasm.
 	pairs := make([]string, 0, len(props))
 	for key, value := range props {
 		switch value.(type) {

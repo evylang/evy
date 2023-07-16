@@ -413,15 +413,14 @@ func (p *parser) parseAssignmentTarget() Node {
 	v.isUsed = true
 	tt := p.cur.TokenType()
 	var n Node = v
-	for tt == lexer.LBRACKET || tt == lexer.DOT {
+	for n != nil && (tt == lexer.LBRACKET || tt == lexer.DOT) {
 		if p.cur.TokenType() == lexer.LBRACKET {
 			if n.Type() == STRING_TYPE {
 				p.appendErrorForToken(`cannot index string on left side of "=", only on right`, tok)
 				return nil
 			}
 			n = p.parseIndexOrSliceExpr(n, false)
-		}
-		if p.cur.TokenType() == lexer.DOT {
+		} else if p.cur.TokenType() == lexer.DOT {
 			n = p.parseDotExpr(n)
 		}
 		tt = p.cur.TokenType()

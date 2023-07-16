@@ -354,7 +354,7 @@ end
 	}
 }
 
-func TestFuncAssignment(t *testing.T) {
+func TestAssignment(t *testing.T) {
 	inputs := []string{
 		`
 a := 1
@@ -392,7 +392,7 @@ print a
 	}
 }
 
-func TestFuncAssignmentErr(t *testing.T) {
+func TestAssignmentErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 b:num
@@ -415,6 +415,10 @@ a:num
 b:any
 a = b
 `: `line 4 column 1: "a" accepts values of type num, found any`,
+		`
+m := [{a:1} {b:2}]
+m[0]. a = 3
+print m`: `line 3 column 5: unexpected whitespace after "."`,
 		`
 func fn:bool
 	return true
@@ -1221,6 +1225,31 @@ end`
 	parser := newParser(input, testBuiltins())
 	parser.parse()
 	assertNoParseError(t, parser, input)
+}
+
+func TestTypeAssertion(t *testing.T) {
+	inputs := []string{
+		`
+a:any
+n := a.(num)
+print n`,
+		`
+a:any
+a = 1
+print a.(num)`,
+		`
+a:any
+n := a.( num ) // whitespaces added
+print n`,
+		`
+a:any
+print a.( num ) // whitespaces added`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
+	}
 }
 
 func TestDemo(t *testing.T) {

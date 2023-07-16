@@ -283,6 +283,8 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 		p.appendError(`unexpected whitespace after "."`)
 		return nil
 	}
+	p.pushWSS(false)
+	defer p.popWSS()
 	p.advance() // advance past .
 	p.advance() // advance past (
 	t := p.parseType()

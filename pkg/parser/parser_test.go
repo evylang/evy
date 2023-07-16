@@ -1227,6 +1227,31 @@ end`
 	assertNoParseError(t, parser, input)
 }
 
+func TestTypeAssertion(t *testing.T) {
+	inputs := []string{
+		`
+a:any
+n := a.(num)
+print n`,
+		`
+a:any
+a = 1
+print a.(num)`,
+		`
+a:any
+n := a.( num ) // whitespaces added
+print n`,
+		`
+a:any
+print a.( num ) // whitespaces added`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

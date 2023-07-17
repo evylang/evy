@@ -1274,7 +1274,7 @@ from the left edge of the canvas and 60 units from the bottom edge.
 
 <img width="300" alt="Cartesian coordinates with x and y axes and point (30, 60)" src="img/coords.png">
 
-[Evy source](https://evy.dev/#content=H4sIAAAAAAAAE0WRwW6EIBCG7/MUE86NAV1w8dqkL7HxYJFtSVE2rmnXNn33DgL2NDMfA///h7fFjWCCDwuyVz+YDwZfblzfkVcnAO9mixwF5zCFz9jyxIhQC7fgN7zsQ48XfUZRydTEOfG8tL8SYSVRn/sIcokc4BrmFX/u7tt2J7wOk/Nbx17cMuBzGO0TTmEO99tgLPtNXrREAat9rMgeLCFBMKPtQGWJM0ioOVJQp3gJqY48hKUma7VG2VJtRK47z0t0qGKeus3LLSrRF56laomqzvq72OFBYK2L1e6fC5JQJVXXRJ4/Z7EjO/yTV+MW4+kC/AGSFdVbwgEAAA==).
+[Evy source: coordinates].
 
 The canvas ranges from coordinates `0 0` to `100 100`. The center of the
 canvas has the coordinates `50 50`.
@@ -1287,6 +1287,8 @@ Some graphics functions, like `line`, `rect`, `circle`, and `text`,
 create shapes on the canvas. Other graphics functions such as
 `color`, `width`, and `font` set the style of the pen for subsequent
 drawing commands.
+
+[Evy source: coordinates]: https://evy.dev/#content=H4sIAAAAAAAAE0WRwW6EIBCG7/MUE86NAV1w8dqkL7HxYJFtSVE2rmnXNn33DgL2NDMfA///h7fFjWCCDwuyVz+YDwZfblzfkVcnAO9mixwF5zCFz9jyxIhQC7fgN7zsQ48XfUZRydTEOfG8tL8SYSVRn/sIcokc4BrmFX/u7tt2J7wOk/Nbx17cMuBzGO0TTmEO99tgLPtNXrREAat9rMgeLCFBMKPtQGWJM0ioOVJQp3gJqY48hKUma7VG2VJtRK47z0t0qGKeus3LLSrRF56laomqzvq72OFBYK2L1e6fC5JQJVXXRJ4/Z7EjO/yTV+MW4+kC/AGSFdVbwgEAAA==
 
 ### `move`
 
@@ -1394,10 +1396,12 @@ after drawing a circle.
 ### `color`
 
 `color` changes the color of the pen. All
-[CSS (Cascading Style Sheets) color values](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) are
-supported. You can start by using the simpler
-[named CSS colors](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color),
-such as `"red"`, `"darkmagenta"`, and `"springgreen"`.
+[CSS (Cascading Style Sheets) color values] are supported. You can start
+by using the simpler [named CSS colors] , such as `"red"`,
+`"darkmagenta"`, and `"springgreen"`.
+
+[CSS (Cascading Style Sheets) color values]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+[named CSS colors]: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
 
 #### Example
 
@@ -1415,19 +1419,21 @@ Output
     color c:string
 
 The `color` function changes the color of the _stroke_ and the _fill_ to
-the given CSS color string `c`. Evy supports all
-[CSS color values](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value),
-including semi-transparent ones. For example, the following code changes
-the color to a shade of red that is 60% opaque:
-`color "hsl(0deg 100% 50% / 60%)"`.
+the given CSS color string `c`. Evy supports all [CSS color values],
+including semi-transparent ones. For example, the following code
+changes the color to a shade of red that is 60% opaque:
+`color "hsl (0deg 100% 50% / 60%)"`.
 
 _Named CSS colors_, such as `"red"`, `"darkmagenta"`, and
-`"springgreen"`, are a simpler way of specifying
-common colors. For a complete list of named CSS colors, see the
-[Mozilla Developer documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color).
+`"springgreen"`, are a simpler way of specifying common colors. For a
+complete list of named CSS colors, see the [Mozilla Developer
+documentation].
 
 If the color string `c` is not recognized as a valid CSS color, the color
 does not change. The initial color is `"black"`.
+
+[CSS color values]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+[Mozilla Developer documentation]: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
 
 ### `colour`
 

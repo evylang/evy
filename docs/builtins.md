@@ -1826,9 +1826,9 @@ Output
 
     linecap style:string
 
-The `linecap` sets the shape of the ends of lines to the `style` string
-argument. Valid styles are `"round"`, `"butt"` or `"square"`. An
-invalid style takes no effect.
+The `linecap` function sets the shape of the ends of lines to the
+`style` string argument. Valid styles are `"round"`, `"butt"` or
+`"square"`. An invalid style takes no effect.
 
 | Style      | Description                                                                                                           |
 | ---------- | --------------------------------------------------------------------------------------------------------------------- |

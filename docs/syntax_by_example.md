@@ -226,8 +226,8 @@ and `circle`, are documented in the[Builtins section](builtins.md).
         print "key pressed"
     end
 
-Evy can only handle a limited set of events, such as key presses, mouse
-movements, or periodic screen redraws.
+Evy can only handle a limited set of events, such as key presses,
+pointer movements, or periodic screen redraws.
 
 ### Event handlers with parameters
 

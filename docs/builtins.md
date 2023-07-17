@@ -1742,3 +1742,283 @@ Output
 The `fill` function sets the color of the _fill_ to the given string
 argument `c`. The fill is the interior of a shape. The initial fill
 color is `"black"`.
+
+### `dash`
+
+`dash` sets the line dash pattern.
+
+#### Example
+
+```evy
+width 2
+
+dash 5 // same as: dash 5 5, dash 5 5 5
+hline 85 "red"
+
+dash 10 4 1 4
+hline 75 "blue"
+
+dash 10 5 10 // same as: dash 10 5 10 10 5 10
+hline 65 "gold"
+
+dash // reset dash
+hline 50 "black"
+
+gridn 5 "gray"
+
+func hline y:num c:string
+    color c
+    move 0 y
+    line 100 y
+end
+```
+
+Output
+
+<img width="300" alt="dash patterns" src="img/dashes.png">
+
+#### Reference
+
+    dash segments:num...
+
+The `dash` function sets the line dash pattern used when stroking lines.
+The dash pattern is specified as a variadic number of arguments, where
+each argument represents the length of a dash or gap. For example, the
+arguments `5 10` would create a line with 5-unit long dashes and 10-unit
+long gaps.
+
+If the number of arguments is odd, they are copied and concatenated. For
+example, the arguments `10 5 10` would become `10 5 10 10 5 10`. If no
+arguments are given, the line returns to being solid.
+
+The initial dash pattern is a solid line.
+
+### `linecap`
+
+`linecap` sets the shape of the ends of lines.
+
+#### Example
+
+```evy
+width 5
+grid
+
+linecap "round"
+hline 70
+
+linecap "butt"
+hline 50
+
+linecap "square"
+hline 30
+
+func hline y:num
+    move 10 y
+    line 90 y
+end
+```
+
+Output
+
+<img width="300" alt="round and square line caps" src="img/linecaps.png">
+
+#### Reference
+
+    linecap style:string
+
+The `linecap` sets the shape of the ends of lines to the `style` string
+argument. Valid styles are `"round"`, `"butt"` or `"square"`. An
+invalid style takes no effect.
+
+| Style      | Description                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| `"round"`  | The ends of the line are rounded.                                                                                     |
+| `"butt"`   | The ends of the line are squared off at the endpoints.                                                                |
+| `"square"` | The ends of the line are squared off by adding a box with an equal width and half the height of the line's thickness. |
+
+The initial linecap style is `"round"`.
+
+### `text`
+
+`text` prints text to the canvas at the current cursor position.
+
+#### Example
+
+```evy
+move 20 70
+text "“Time is an illusion."
+move 20 63
+text "Lunchtime doubly so.”"
+move 35 48
+text "― Douglas Adams"
+```
+
+Output
+
+<img width="300" alt="text sample" src="img/text.png">
+
+#### Reference
+
+    text s:string
+
+The `text` function prints the string argument `s` to the canvas at the
+current cursor position. The cursor position is not updated after
+writing text. Only `fill` and `color` have an effect on the text;
+`stroke` has no effect. For more text styling, such as setting
+_font size_ or _font family_, see [`font`](#font).
+
+### `font`
+
+`font` sets the font properties for text. The font properties are
+`family`,`size`, `weight`, `style`, `letterspacing`, `baseline`, and
+`align`.
+
+#### Example
+
+```evy
+font {family:"Bradley Hand, cursive" size:4}
+
+move 10 65
+text "“The wonderful thing about programming"
+move 10 60
+text "is that anyone can learn it and do it. You"
+move 10 55
+text "don't have to be a genius or have a specific"
+move 10 50
+text "background. You just need curiosity and"
+move 10 45
+text "the willingness to try.”"
+
+// all font properties
+font {
+    size:9
+    style:"normal" // "normal"
+    family:"Tahomana, sans-serif" // see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+    weight:900
+    letterspacing:-0.5 // extra inter-character space. negative allowed. default:0
+    align:"right" // "left", "right"
+    baseline:"middle" // "top", "bottom", "alphabetic" (default)
+}
+
+move 90 32
+color "red"
+text "Grace Hopper"
+color "black"
+font {size:4 letterspacing:0 weight:100 style:"normal"}
+move 90 25
+text "computer scientist, compiler builder"
+```
+
+Output
+
+<img width="300" alt="styled text sample" src="img/font.png">
+
+The following example shows the effect of the `align` and `baseline`
+properties:
+
+```evy
+font {size:6 family:"Fira Code, monospace"}
+
+move 25 78
+line 25 86
+move 25 80
+font {align:"left"}
+text "left"
+
+move 25 63
+line 25 71
+move 25 65
+font {align:"right"}
+text "right"
+
+move 25 48
+line 25 56
+move 25 50
+font {align:"center"}
+text "center"
+
+move 55 80
+line 90 80
+move 55 80
+font {baseline:"bottom" align:"left"}
+text "bottom"
+
+move 55 65
+line 90 65
+move 55 65
+font {baseline:"top"}
+text "top"
+
+move 55 50
+line 90 50
+move 55 50
+font {baseline:"middle"}
+text "middle"
+
+move 55 35
+line 90 35
+move 55 35
+font {baseline:"alphabetic"}
+text "alphabetic"
+```
+
+Output
+
+<img width="300" alt="styled text sample" src="img/align.png">
+
+#### Reference
+
+    font props:{}any
+
+The `font` function sets the font properties for text. The font
+properties are `family`, `size`, `weight`, `style`, `letterspacing`,
+`align`, and `baseline`.
+
+The `family` property specifies a prioritized list of one or more font
+family names. Values are separated by commas to indicate that they are
+alternatives. The browser will select the first available font. For
+example, the value `"Fira Code, monospace"` would specify that the
+browser should try to use the Fira Code font, but if that font is not
+available, it should use a monospace font. The default font family is
+the browser default.
+
+The `size` property specifies the height of a letter in canvas units.
+The default size is 6.
+
+The `weight` property specifies the boldness of the font. The values
+100, 200, ..., 900 can be used to specify the weight of the font. The
+value 400 is normal, 700 is bold. The default weight is 400.
+
+The `style` property specifies the sloping of the font. The values
+`"normal"` and `"italic"` can be used to specify the style of the font.
+The default style is "normal".
+
+The `letterspacing` property specifies the additional horizontal space
+between text characters in canvas units. The default value is 0.
+
+The `align` property specifies the horizontal alignment of the text. The
+values `"left"`, `"right"`, and `"center"` can be used to specify the
+alignment. The default value is `"left"`.
+
+The `baseline` property specifies the vertical cursor position relative to
+the vertical text position. The values `"top"`, `"bottom"`, `"middle"`,
+and `"alphabetic"` can be used to specify the baseline. The default value
+is `"alphabetic"`.
+
+Here is an example of how to use the font function:
+
+```evy
+font {
+    family:"Fira Code, monospace"
+    size:9
+    weight:700
+    style:"italic"
+    letterspacing:0.5
+    baseline:"top"
+    align:"center"
+}
+```
+
+This code sets the font properties to use the Fira Code font, a size of
+9, a weight of 700, an italic style, a letterspacing of 0.5, a top
+baseline, and a center alignment.

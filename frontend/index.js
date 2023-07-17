@@ -107,7 +107,9 @@ function needsCanvas(f) {
     f.dash ||
     f.linecap ||
     f.text ||
-    f.font
+    f.font ||
+    f.down ||
+    f.up
   )
 }
 

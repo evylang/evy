@@ -8,6 +8,35 @@ task. Events are notifications that are sent to a program when
 something happens, such as when a user moves the mouse or presses a
 key.
 
+#### Table of Contents
+
+<!-- gen:toc -->
+
+1. [**Input and Output**](#input-and-output)  
+   [print](#print), [read](#read), [cls](#cls), [printf](#printf)
+2. [**Types**](#types)  
+   [len](#len), [typeof](#typeof)
+3. [**Map**](#map)  
+   [has](#has), [del](#del)
+4. [**Program control**](#program-control)  
+   [sleep](#sleep), [exit](#exit)
+5. [**Conversion**](#conversion)  
+   [str2num](#str2num), [str2bool](#str2bool)
+6. [**Error**](#error)  
+   [Fatal Errors](#fatal-errors), [Non-fatal Errors](#non-fatal-errors)
+7. [**String**](#string)  
+   [sprint](#sprint), [sprintf](#sprintf), [join](#join), [split](#split), [upper](#upper), [lower](#lower), [index](#index), [startswith](#startswith), [endswith](#endswith), [trim](#trim), [replace](#replace)
+8. [**Random**](#random)  
+   [rand](#rand), [rand1](#rand1)
+9. [**Math**](#math)  
+   [min](#min), [max](#max), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [sin](#sin), [cos](#cos), [atan2](#atan2)
+10. [**Graphics**](#graphics)  
+    [move](#move), [line](#line), [rect](#rect), [circle](#circle), [color](#color), [colour](#colour), [width](#width), [clear](#clear), [grid](#grid), [gridn](#gridn), [poly](#poly), [ellipse](#ellipse), [stroke](#stroke), [fill](#fill), [dash](#dash), [linecap](#linecap), [text](#text), [font](#font)
+11. [**Event Handlers**](#event-handlers)  
+    [key](#key), [down](#down), [up](#up), [move](#move-1), [animate](#animate), [input](#input)
+
+<!-- genend:toc -->
+
 ## Input and Output
 
 ### `print`

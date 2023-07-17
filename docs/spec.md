@@ -245,10 +245,13 @@ inside string literals.
 
 ## Types
 
-There are three basic types: `string`, `bool` and `num` as well as two
-composite types: [arrays](#arrays) `[]` and [maps](#maps) `{}`.
-The _dynamic_ type `any` can hold any of the previously listed
-types.
+Evy has a static _type system_ where the types of variables, parameters
+and expressions are known at compile time. This means that the compiler
+can check for type errors before the program is run.
+
+There are three basic types: `num`, `string` and `bool` as well as two
+composite types: arrays `[]` and maps `{}`. The _dynamic_ type `any`
+can hold any of the previously listed types.
 
 Composite types can nest further composite types, for example
 `[]{}string` is an array of maps with string values.
@@ -263,71 +266,127 @@ according to the IEEE-754 64-bit floating point standard.
 
 ## Variables and Declarations
 
-Variables hold values of the type specified in the variable declaration.
+Variables hold values of a specific type. They must be _declared_ before
+they can be used. There are two types of variable declarations:
+inferred declarations and typed declarations.
 
-Variables must be _declared_ before they can be used. A variable
-declaration can either be an _inferred declaration_ or a _typed
-declaration_. With the inferred declaration the type is not given but
-inferred from the value. With typed declaration the type is explicitly
-specified and the variable is initialised to its type's zero value.
+_Inferred declarations_ do not specify the type of the variable
+explicitly. The type of the variable is inferred from the value that
+it is initialized to. For example, the following code declares a
+variable `n` and initializes it to the value `1`. The type of `n` is
+inferred to be `num`.
 
-    a1 := 1 // inferred declaration of variable 'a1'
-            // with type 'num' and value 1.
-    a2:num  // typed declaration of variable 'a2'
-            // with type 'num' and zero value 0.
+    n := 1
+
+_Typed declarations_ explicitly specify the type of the variable. The
+variable is initialized to the type's zero value. For example, the
+following code declares a variable `s` of type `string` and
+initializes it to the empty string `""`.
+
+    s:string
 
 `arr := []` infers an array of type any, `[]any`. `map := {}` infers a
 map of type any, `{}any`. The strictest possible type is inferred for
 composite types:
 
-    arr := [ 1 2 3 ]     // type: []num
-    arr := [ 1 "a" ]     // type: []any
-    arr := [ [1] ["a"] ] // type: [][]any
-    arr := []            // type: []any
-    arr := [ 1 ] + []    // type: []num
-    m := {}              // type: {}any
-    m := {age: 10}       // type: {}num
+```evy
+arr1 := [1 2 3] // type: []num
+arr2 := [1 "a"] // type: []any
+arr3 := [[1] ["a"]] // type: [][]any
+arr4 := [] // type: []any
+arr5 := [1] + [] // type: []num
+
+map1 := {} // type: {}any
+map2 := {age:10} // type: {}num
+print arr1 arr2 arr3 arr4 arr5 map1 map2
+```
 
 ## Zero Values
 
-Variables declared via typed declaration are initialised to the zero
+Variables declared via typed declaration are initialized to the zero
 value of their type:
 
-    Type        Zero
-    num         0
-    string      ""
-    bool        false
-    []ANY       [] // empty array of given type, if no type given: array of any
-    {}ANY       {} // empty map of given type, if no type given: map of any
+- Number: `0`
+- String: `""`
+- Boolean: `false`
+- Any: `false`
+- Array: `[]`
+- Map: `{}`
+
+The empty array becomes `[]any` in inferred declarations. Otherwise the
+empty array literal assumes the array type `[]TYPE` required by the
+assigned variable or parameter. For example, the following code
+
+```evy
+arr:[]num
+print 1 arr (typeof arr)
+arr = []
+print 2 arr (typeof arr)
+print 3 (typeof [])
+```
+
+generates the output
+
+```evy:output
+1 [] []num
+2 [] []num
+3 []
+```
+
+Similarly, the empty map literal becomes `{}any` in inferred
+declarations. Otherwise the empty map literal assumes the map type
+`{}TYPE` required.
 
 ## Assignments
 
-Assignments are defined by an equal sign `=`. The left hand side of the
-`=` must contain an _assignable_, a variable, an indexed array
-(`arr[1] = "abc"`) or a map field (`person.age = 42`), see [Arrays](#Arrays)
-and [Maps](#Maps) for further details. Before the assignment
-the variable must be declared via inferred (`:=`)or typed declaration
-(`:TYPE`). Only values of the correct type can be assigned to a
-variable.
+Assignments are defined by an equal sign `=`. The left-hand side of the
+`=` must contain an _assignable_, a variable, an indexed array, or a
+map field. Before the assignment the variable must be declared via
+inferred or typed declaration. Only values of the correct type can be
+assigned to a variable.
 
-    a := 1
-    print a // prints 1
-    a = 2
-    print a // prints 2
-    a = "abc" // compile time error, wrong type
+For example, the following code declares a string variable named `s` and
+initializes it to the value `"a"` through inference. Then, it assigns
+the value `"b"` to `s`. Finally, it tries to assign the value `100` to
+`s`, which will cause a compile-time error because `s` is a string
+variable and `100` is a number.
+
+```evy
+s := "a"
+print 1 s
+s = "b"
+print 2 s
+// s = 100 // compile time error, wrong type
+```
+
+Output
+
+```evy:output
+1 a
+2 b
+```
 
 ## Copy and reference
 
 When a variable of a basic type `num`, `string`, or `bool` is the value
 of an assignment, a copy of its value is made. A copy is also made when
-a variable of basic type is used as the value in an inferred
+a variable of a basic type is used as the value in an inferred
 declaration or passed as an argument to a function.
 
-    a := 1
-    b := a
-    print a b // 1 1
-    a = 2
-    print a b // 2 1 - `b` keeps its initial value
+```evy
+a := 1
+b := a
+print a b
+a = 2 // `b` keeps its initial value
+print a b
+```
+
+generates the output
+
+```evy:output
+1 1
+2 1
+```
 
 By contrast, composite types - maps and arrays - are passed by
 reference and no copy is made. Modifying the contents of an array
@@ -335,180 +394,313 @@ referenced by one variable also modifies the contents of the array
 referenced by another variable. This is also true for argument passing
 and inferred declarations:
 
-    a := [1]
-    b := a
-    print a b // [1] [1]
-    a[0] = 2
-    print a b // [2] [2] - b also has updated contents
+```evy
+a := [1]
+b := a
+print a b
+a[0] = 2 // the value of `b` is also updated
+print a b
+```
 
-For the dynamic type `any`, a copy is made if the value is of basic type
-and the variable is passed by reference if the value is a composite type.
+generates the output
 
-See [Functions](#Functions), [Maps](#Maps) and [Arrays](#Arrays) for
-further details.
+```evy:output
+[1] [1]
+[2] [2]
+```
+
+For the dynamic type `any`, a copy is made if the value is a basic type.
+The variable is passed by reference if the value is a composite type.
 
 ## Scope
 
+_Scope_ refers to the visibility of a variable or function.
+
 Functions can only be defined at the top level of the program, known
 as _global scope_. A function does not have to be defined before it can
-be used. This allows for [mutual recursion] of functions - `func a`
-calling `b` and `func b` calling func `a`.
+be called; it can also be defined afterwards. This allows for
+[mutual recursion], where function a calls function b and function b
+calls function a.
 
-Variables by contrast must be declared and given an unchangeable type
+Variables, by contrast, must be declared and given an unchangeable type
 before they can be used. Variables can be declared at the top level of
 the program, at _global scope_, or within a block-statement, at _block
 scope_.
 
 A _block-statement_ is a block of statements that ends with the keyword
-`end`. A function body following the line starting with `func` is a
-block-statement. The statements between `if` and `else` are a block
-(statement). The statements between `while`/`for`/`else` and `end` are
-a block. Blocks can be nested within other blocks.
+`end`. A function's parameter declaration and the function body
+following the line starting with `func` is a block-statement. The
+statements between `if` and `else` are a block. The statements between
+`while`/`for`/`else` and `end` are a block. Blocks can be nested within
+other blocks.
 
 A variable declared inside a block only exists until the end of the
-block and may not be used outside the block.
+block. It cannot be used outside the block.
 
-Variable names in an inner block can shadow or override the same
+Variable names in an inner block can _shadow_ or override the same
 variable name from an outer block, which makes the variable of the
 outer block inaccessible to the inner block. However, when the inner
-block is finished the variable from the outer block is restored and
+block is finished, the variable from the outer block is restored and
 unchanged:
 
-    x := "outer"
-    print "1" x
-    for i := range 1
-        x := true
-        print "2" x
-    end
-    print "3" x
+```evy
+x := "outer"
+print "1" x
+for range 1
+    x := true
+    print "2" x
+end
+print "3" x
+```
 
 This program will print
 
-    1 outer
-    2 true
-    3 outer
+```evy:output
+1 outer
+2 true
+3 outer
+```
 
 [mutual recursion]: https://en.wikipedia.org/wiki/Mutual_recursion
 
 ## Strings
 
 A `string` is a sequence of [Unicode code points]. A string literal is
-enclosed by double quotes `"`, for example str := "Hallöchen Welt 🌏".
+enclosed by double quotes `"`, for example
+`str := "Hallöchen Welt 👋🌍"`.
 
-`len str` returns the number of Unicode code points, _characters_, in
-the string. `for ch := range str` iterates over all characters of the
-string. Individual characters of a string can be addressed and updated
-by index. Strings can be concatenated with the `+` operator.
+The `len str` function returns the number of Unicode code points,
+_characters_, in the string. The loop `for ch := range str` iterates
+over all characters of the string. Individual characters of a string can
+be read by index, starting at `0`. Strings can be concatenated with the
+`+` operator.
 
-    str := "hello!"
-    str[0] = "H"             // Hello
-    str1 := str + ", " + str // Hello, Hello
+The backslash character `\` can be used to represent special characters
+in strings. For example, the `\t` escape sequence represents a tab
+character, and the `\n` escape sequence represents a newline character.
+Quotes in string literals must also be escaped with backslashes.
+
+For example the following code
+
+```evy
+str := "hello"
+str = str + ", " + str // hello, hello
+str = "H" + str[1:] // Hello, hello
+str = "She said, \"" + str + "!\""
+print str
+```
+
+outputs
+
+```evy:output
+She said, "Hello, hello!"
+```
 
 [Unicode code points]: https://en.wikipedia.org/wiki/Unicode
 
 ## Arrays
 
-Arrays are declared with brackets `[]`. Their elements have a type, for
-example `arr := [1 2 3]` and `arr:[]num` are arrays of type `num`.
-Arrays can be nested `arr:[]{}string`.
+Arrays are collections of elements that have the same type. They are
+declared with brackets `[]`, and the elements are separated by a space.
+For example, the following code declares two arrays of numbers
 
-An array composed of different types becomes an array of `any`:
+```evy
+arr1 := [1 2 3]
+arr2:[]num
+print arr1 arr2
+```
 
-    arr := ["abc" 123] // type: []any
+The output is
 
-`len arr` returns the length of the array. `for el := range arr`
-iterates over all elements of the array in order. `append arr 1` and
-`prepend arr 0` add a new element to end or beginning of the array.
-Arrays can be concatenated with the `+` operator `arr2 := arr + arr`.
+```evy:output
+[1 2 3] []
+```
 
-The elements of an array can be accessed via index starting at 0. In the
-example above the first element in the array `arr[0]` is `"abc"`.
+Arrays can also be nested, meaning that they can contain other arrays or
+maps. For example, the following code declares an array of maps of
+strings `arr:[]{}string`.
 
-The empty arrays becomes `[]any` in inferred declarations, otherwise the
-empty array literal assumes the type required. `arr:[]any` and `arr :=
-[]` are equivalent.
+An array composed of different types becomes an array of type any,
+`[]any`, for example
+
+```evy
+arr := ["abc" 123] // []any
+print "Type of arr:" (typeof arr)
+```
+
+outputs
+
+```evy:output
+Type of arr: []any
+```
+
+The function `len arr` returns the length of the array, which is the
+number of elements in the array. The loop `for el := range arr`
+iterates over all elements of the array in order. Arrays can be
+concatenated with the `+` operator, for example `arr2 := arr + arr`.
+
+The elements of an array can be accessed via index starting at `0`. In
+the example `arr := ["abc" 123]` the first element in the array
+`arr[0]` is `"abc"`.
+
+The empty array becomes `[]any` in inferred declarations, otherwise the
+empty array literal assumes the array type required by the assigned
+variable or parameter. `arr:[]any` and `arr := []` are equivalent.
 
 In order to distinguish between array literals and array indices, there
-cannot be any whitespace between array variable and index.
+cannot be any whitespace between array variable and index. For example,
+the following code
 
-    arr := ["a" "b"]
-    print arr[1]  // index: b
-    print arr [1] // literal: [a b] [1]
-    arr[0] = "A"
-    arr [1] = "B" // invalid
+```evy
+arr := ["a" "b"]
+print 1 arr[1] // index
+print 2 arr [1] // literal
+arr[0] = "A"
+print 3 arr
+// arr [1] = "B" // whitespace before `[` is invalid
+```
 
-See section [whitespace](#whitespace) for further details.
+outputs
+
+```evy:output
+1 b
+2 [a b] [1]
+3 [A b]
+```
 
 ## Maps
 
 Maps are key-value stores, where the values can be looked up by their
-key
+key, for example `m := { key1:"value1" key2:"value2" }`.
 
-    m := { key1:"value1" key2:"value2" }
+Map values can be accessed with the dot expression, for example
+`map.key`. If maps are accessed via the dot expression the key must
+match the grammars `ident` production. Map values can also be accessed
+with an index expression which allows for evaluation, non-ident keys
+and variable usage. For example the following code
 
-Map keys must be strings that match the grammars `ident` production. Map
-values can be accessed with the dot expression, for example `map.key`.
-Map values can also be accessed with an index which allows for
-evaluation and variable usage:
+```evy
+m := {letters:"abc"}
+print 1 m.letters
+print 2 m["letters"]
 
-    m := { letters: "abc" }
-    print m.letters    // abc
-    print m["letters"] // abc
+key := "German letters"
+m[key] = "äöü"
+print 3 m[key]
+print 4 m["German letters"]
+```
 
-    s := "letters"
-    print m[s]         // abc
+outputs
 
-The `has` function tests for the existence of a key in a map:
+```evy:output
+1 abc
+2 abc
+3 äöü
+4 äöü
+```
 
-    has m "letters"     // true
-    has m "digits"      // false
+The `has` function tests for the existence of a key in a map. The
+following code
 
-The `del` function deletes a key from a map if it exists:
+```evy
+m := {letters:"abc"}
+print 1 (has m "letters")
+print 2 (has m "digits")
+```
 
-    del m "letters"    // m == {}
+outputs
 
-`for key := range map` iterates over all map keys. It is safe to delete
-values from the map with the builtin function `del` while iterating.
-The keys are iterated in the order in which they are inserted. Any
-values inserted into the map during the iteration will not be included
-in the iteration.
+```evy:output
+1 true
+2 false
+```
 
-`len m` returns the number of values in the map.
+The `del` function deletes a key from a map if it exists and does
+nothing if the key does not exist. The following code
+
+```evy
+m := {letters:"abc"}
+del m "letters"
+print m
+```
+
+outputs
+
+```evy:output
+{}
+```
+
+The loop `for key := range map` iterates over all map keys. It is safe
+to delete values from the map with the builtin function `del` while
+iterating. The keys are iterated in the order in which they are
+inserted. Any values inserted into the map during the iteration will
+not be included in the iteration.
+
+The function `len m` returns the number of key-value pairs in the map.
 
 The empty map literal becomes `{}any` in inferred declarations,
-otherwise the empty map literal assumes the type required.
-`m:{}any` and `m := {}` are equivalent.
+otherwise the empty map literal assumes the type required by the map
+type of the assigned variable or parameter. `m:{}any` and `m := {}` are
+equivalent.
 
-The dot expression `.` and the index expression `[ "key" ]` must not be
-surrounded by any whitespace. See section [whitespace](#whitespace) for
-further details.
+No whitespace is allowed around the dot expression `.`, and before the
+index expression `[`.
 
 ## Index and Slice
 
-The first index of an array or string is `0`. A negative index `-i` is a
-short hand for `(len a) - i`. Therefore `arr[-1]` references the last
-element of `arr`. When trying to index an array or string out of bounds
-a [run-time panic](#run-time-panics-and-recoverable-errors) occurs.
+An array or string _index_ in Evy is a number that is used to access a
+specific element of an array or character of a string. Array indices
+start at `0`, so the first element of an array is `arr[0]`. A negative
+index `-i` is a shorthand for `(len arr) - i`, so arr[-1] refers to the
+last element of arr.
 
-Portions of an array or string can be copied with the slice selector,
-for example `a[1:3]`. `a[start : end]` copies a substring or subarray,
-a _slice_, starting with the value at `a[start]`. The length of the
-slice is `end - start`. The end index `a[end]` is not included in the
-slice. If `start` is left out it defaults to 0. If `end` is left out it
-defaults to `len a`.
+For example, the following code
 
-    s := "abcd"
-    print s[1:3] // bc
-    print s[:2]  // ab
-    print s[2:]  // cd
-    print s[:]   // abcd
-    print s[:-1] // abc
+```evy
+arr := ["a" "b" "c"]
+print 1 arr[0]
+print 2 arr[-1]
+```
 
-Slices may not be sliced further, `a[:2][1:]` is illegal.
+will print the first and last elements of the array
 
-Slice expressions must nut be preceded by whitespace, like array or
-string indexing. See section [whitespace](#whitespace) for further
-details.
+```evy:output
+1 a
+2 c
+```
+
+A _slice_ is a way to access portions of an array or a string. It is a
+substring or subarray that is copied from the original array or string.
+The slice expression `arr[start:end]` copies a substring or subarray
+starting with the value at index `arr[start]`. The length of the slice
+is `end-start`. The end index `arr[end]` is not included in the slice.
+If `start` is left out, it defaults to `0`. If `end` is left out, it
+defaults to `len arr`. For example, the following code
+
+```evy
+s := "abcd"
+print 1 s[1:3]
+print 2 s[:2]
+print 3 s[2:]
+print 4 s[:]
+print 5 s[:-1]
+```
+
+outputs
+
+```evy:output
+1 bc
+2 ab
+3 cd
+4 abcd
+5 abc
+```
+
+If you try to access an element of an array or string that is out of
+bounds, a [fatal runtime error](#fatal-errors) will occur. Slice
+expressions must not be preceded by whitespace before the `[` character,
+just like indexing an array or string. For more details, see the section
+on[whitespace](#whitespace).
 
 ## Operators
 

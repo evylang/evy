@@ -63,6 +63,8 @@ In a browser environment `print` outputs to the output area. When
 running Evy from the command line interface, `print` prints to standard
 out.
 
+---
+
 ### `read`
 
 `read` reads a line of input from the user and returns it as a
@@ -100,6 +102,8 @@ In a browser environment `read` reads from the text input area. When
 running Evy from the command line interface, `read` reads from standard
 in.
 
+---
+
 ### `cls`
 
 `cls` clears the output area of all printed text.
@@ -127,6 +131,8 @@ The `cls` function clears all text output. In a browser environment
 `cls` clears the output area. When running Evy from the command line
 interface, `cls` clears the terminal, similar to the Unix `clear` or
 Windows `cls` commands.
+
+---
 
 ### `printf`
 
@@ -286,6 +292,8 @@ the number of elements in the array. If the argument is a map, `len`
 returns the number of key-value pairs in the map. If the argument is of
 any other type, a fatal runtime error will occur.
 
+---
+
 ### `typeof`
 
 `typeof` returns the type of the argument as string value.
@@ -362,6 +370,8 @@ if the map has the key, and false if the map does not have the key. The
 map can be of any value type, such as `{}num` or `{}[]any` and the key
 can be any string.
 
+---
+
 ### `del`
 
 `del` deletes a key-value entry from a map.
@@ -420,6 +430,8 @@ Output
 The `sleep` function pauses the execution of the current Evy program for
 at least the given number of seconds. Sleep may also pause for a
 fraction of a second, e.g. `sleep 0.1`.
+
+---
 
 ### `exit`
 
@@ -489,6 +501,8 @@ argument, which is the string to convert. If the string is a valid
 number, the function returns the number. Otherwise, the function
 returns 0 and sets the global `err` variable to `true`. For more
 information on `err`, see the [Non-fatal Error section](#non-fatal-errors).
+
+---
 
 ### `str2bool`
 
@@ -639,6 +653,8 @@ that represents them, separated by a single space. The arguments can be
 of any type, including strings, numbers, booleans, and maps. Unlike the
 `print` function, there is no newline added to the end of the string.
 
+---
+
 ### `sprintf`
 
 `sprintf` stands for print formatted to string.
@@ -670,6 +686,8 @@ arguments are formatted. The `sprintf` function works the same way as
 the `printf` function, and the formatting syntax is the same, see
 [`printf`](#printf).
 
+---
+
 ### `join`
 
 `join` concatenates the elements of an array of strings into a single
@@ -700,6 +718,8 @@ between elements in the resulting string.
 The `join` function returns a single string that is the concatenation of
 the elements in the list of strings, with the separator string placed
 between elements.
+
+---
 
 ### `split`
 
@@ -745,6 +765,8 @@ string after each character (UTF-8 sequence).
 If both the string and the separator are empty, the `split` function
 returns an empty list.
 
+---
+
 ### `upper`
 
 `upper` returns a string with all lowercase letters converted to
@@ -773,6 +795,8 @@ letters converted to uppercase. All other characters are left unchanged.
 
 The `upper` function uses the Unicode character database to determine
 which characters are lowercase and their equivalent uppercase form.
+
+---
 
 ### `lower`
 
@@ -804,6 +828,8 @@ unchanged.
 The `lower` function uses the Unicode character database to determine
 which characters are uppercase and their equivalent lowercase form.
 
+---
+
 ### `index`
 
 `index` returns the position of a substring in a string, or -1 if the
@@ -830,6 +856,8 @@ The `index` function finds the index of a substring `sub` in a string
 `s`. It returns the index of the first occurrence of a `sub` within
 `s`, or -1 if the substring is not present.
 
+---
+
 ### `startswith`
 
 `startswith` tests whether a string begins with a given prefix.
@@ -855,6 +883,8 @@ The `startswith` function tests whether the string `s` begins with
 `prefix` and returns `true` if `s` starts with `prefix`, `false`
 otherwise.
 
+---
+
 ### `endswith`
 
 `endswith` tests whether a string ends with a given suffix.
@@ -878,6 +908,8 @@ false
 
 The `endswith` function tests whether the string `s` ends with `suffix`
 and returns `true` if `s` ends with `suffix`, `false` otherwise.
+
+---
 
 ### `trim`
 
@@ -903,6 +935,8 @@ abc.de
 The `trim` function removes any characters in `cutset` from the
 beginning and end of string `s`. It returns a copy of the resulting
 string.
+
+---
 
 ### `replace`
 
@@ -957,6 +991,8 @@ The `rand` functions returns, a non-negative pseudo-random integer
 number in the half-open interval `[0,n)`. A fatal runtime error occurs
 for `n <= 0`.
 
+---
+
 ### `rand1`
 
 `rand1` returns a random, non-negative floating point number less than 1.
@@ -1007,6 +1043,8 @@ Output
 The `min` function returns the smaller of the two given number
 arguments.
 
+---
+
 ### `max`
 
 `max` returns the greater of the two given numbers.
@@ -1029,6 +1067,8 @@ Output
 
 The `max` function returns the greater of the two given number
 arguments.
+
+---
 
 ### `floor`
 
@@ -1056,6 +1096,8 @@ Output
 The `floor` function returns the greatest integer value less than or
 equal to its number argument `n`.
 
+---
+
 ### `ceil`
 
 `ceil` returns the smallest integer greater than or equal to the given
@@ -1081,6 +1123,8 @@ Sample output
 
 The `ceil` function returns the smallest integer greater than or equal
 to its number argument `n`.
+
+---
 
 ### `round`
 
@@ -1108,6 +1152,8 @@ Sample output
 The `round` function returns the nearest integer to the given number
 argument `n`, rounding half away from 0.
 
+---
+
 ### `pow`
 
 `pow` returns the value of the first number raised to the power of the
@@ -1132,6 +1178,8 @@ Output
 The `pow` function returns `b` to the power of `exp`. The first number
 argument `b` is the base. The second number argument `exp` is the
 exponent.
+
+---
 
 ### `log`
 
@@ -1158,6 +1206,8 @@ Output
 The `log` function returns the _natural logarithm_, the logarithm of the
 given number argument `n`, to the base of `e`.
 
+---
+
 ### `sqrt`
 
 `sqrt` returns the square root of the given number.
@@ -1180,6 +1230,8 @@ Output
 
 The `sqrt` function returns the positive square root of the number
 argument `n`.
+
+---
 
 ### `sin`
 
@@ -1204,6 +1256,8 @@ Output
 
 The `sin` function returns the sine of the given angle `n` in radians.
 
+---
+
 ### `cos`
 
 `cos` returns the cosine of the given angle in radians.
@@ -1226,6 +1280,8 @@ Output
     cos:num n:num
 
 The `cos` function returns the cosine of the given angle `n` in radians.
+
+---
 
 ### `atan2`
 
@@ -1259,7 +1315,7 @@ value.
 
 ## Graphics
 
-`evy` on the web outputs drawing commands to a drawing area
+Evy on the web outputs drawing commands to a drawing area
 called the _canvas_.
 
 Positions on the canvas are defined by a coordinate system, similar to
@@ -1290,6 +1346,8 @@ drawing commands.
 
 [Evy source: coordinates]: https://evy.dev/#content=H4sIAAAAAAAAE0WRwW6EIBCG7/MUE86NAV1w8dqkL7HxYJFtSVE2rmnXNn33DgL2NDMfA///h7fFjWCCDwuyVz+YDwZfblzfkVcnAO9mixwF5zCFz9jyxIhQC7fgN7zsQ48XfUZRydTEOfG8tL8SYSVRn/sIcokc4BrmFX/u7tt2J7wOk/Nbx17cMuBzGO0TTmEO99tgLPtNXrREAat9rMgeLCFBMKPtQGWJM0ioOVJQp3gJqY48hKUma7VG2VJtRK47z0t0qGKeus3LLSrRF56laomqzvq72OFBYK2L1e6fC5JQJVXXRJ4/Z7EjO/yTV+MW4+kC/AGSFdVbwgEAAA==
 
+---
+
 ### `move`
 
 `move` sets the position of the pen to the given coordinates.
@@ -1312,6 +1370,8 @@ Output
 
 The `move` function sets the position of the cursor to the given `x` and
 `y` coordinates. The initial cursor position is `0 0`.
+
+---
 
 ### `line`
 
@@ -1341,6 +1401,8 @@ The `line` function draws a line from the current cursor position to the
 given `x` and `y` coordinates. The cursor position is then updated to
 the given coordinates, which allows for easy polygon drawing.
 
+---
+
 ### `rect`
 
 `rect` draws a rectangle with the given width and height at the pen's
@@ -1369,6 +1431,8 @@ updated to the position that is the width and height away from the
 current position. In other words, the opposite corner of the
 rectangle is at the new cursor position.
 
+---
+
 ### `circle`
 
 `circle` draws a circle with given radius at the pen's current position.
@@ -1392,6 +1456,8 @@ Output
 The `circle` function draws a circle with the given `radius` centered
 at the current cursor position. The cursor position does not change
 after drawing a circle.
+
+---
 
 ### `color`
 
@@ -1435,9 +1501,13 @@ does not change. The initial color is `"black"`.
 [CSS color values]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
 [Mozilla Developer documentation]: https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
 
+---
+
 ### `colour`
 
 `colour` is an alternate spelling of `color`. See [`color`](#color).
+
+---
 
 ### `width`
 
@@ -1467,6 +1537,8 @@ The `width` function sets the thickness of the _stroke_ to the given `n`
 units. The stroke is the visible line that is drawn when using the
 `line` function or any other shape function after setting
 `fill "none"`. The initial stroke width it 0.1 units.
+
+---
 
 ### `clear`
 
@@ -1502,6 +1574,8 @@ as a string argument, in which case the canvas will be cleared to that
 color. If no color is specified, the canvas will be cleared to
 `"white"`. Initially the canvas is cleared to `"white"`, not
 `"transparent"`.
+
+---
 
 ### `grid`
 
@@ -1550,6 +1624,8 @@ for i := range 0 101 10
     line 100 i
 end
 ```
+
+---
 
 ### `gridn`
 
@@ -1600,6 +1676,8 @@ for i := range 0 101 n
 end
 ```
 
+---
+
 ### `poly`
 
 `poly` draws polylines and polygons for the given coordinates.
@@ -1643,6 +1721,8 @@ the `poly` function can be called as follows:
 Use `fill "none"` to draw a line without filling. To draw a closed
 polygon, make sure that the first and last coordinates are the same.
 The `poly` function does not use or change the cursor position.
+
+---
 
 ### `ellipse`
 
@@ -1690,6 +1770,8 @@ a default value of 0. The sixth and seventh arguments are the start and
 end angles of the ellipse in degrees, with default values of 0 and 360,
 respectively.
 
+---
+
 ### `stroke`
 
 `stroke` sets the color of the outline of shapes.
@@ -1720,6 +1802,8 @@ argument `c`. The stroke is the visible line that is drawn when you use
 the line function or any other shape function after calling
 fill "none". The initial stroke color is `"black"`.
 
+---
+
 ### `fill`
 
 `fill` sets the color of the interior of shapes.
@@ -1748,6 +1832,8 @@ Output
 The `fill` function sets the color of the _fill_ to the given string
 argument `c`. The fill is the interior of a shape. The initial fill
 color is `"black"`.
+
+---
 
 ### `dash`
 
@@ -1799,6 +1885,8 @@ arguments are given, the line returns to being solid.
 
 The initial dash pattern is a solid line.
 
+---
+
 ### `linecap`
 
 `linecap` sets the shape of the ends of lines.
@@ -1844,6 +1932,8 @@ The `linecap` function sets the shape of the ends of lines to the
 
 The initial linecap style is `"round"`.
 
+---
+
 ### `text`
 
 `text` prints text to the canvas at the current cursor position.
@@ -1872,6 +1962,8 @@ current cursor position. The cursor position is not updated after
 writing text. Only `fill` and `color` have an effect on the text;
 `stroke` has no effect. For more text styling, such as setting
 _font size_ or _font family_, see [`font`](#font).
+
+---
 
 ### `font`
 
@@ -2064,6 +2156,8 @@ Pointer events, such as `down`, `up`, and `move`, occur when a pointing
 input device, such as a mouse, a pen or stylus, or a finger, is used to
 interact with the canvas.
 
+---
+
 ### `key`
 
 `key` is called when a key on the keyboard is pressed.
@@ -2104,6 +2198,8 @@ argument is the uppercase or special character representation of the
 key that was pressed. For example, if the user presses `shift`+`a`, the
 argument is the string `"A"`.
 
+---
+
 ### `down`
 
 `down` is called when the pointer is pressed down.
@@ -2132,6 +2228,8 @@ the canvas. The handler is passed two number arguments, `x` and `y`,
 which are the coordinates of the pointer location when the pointer was
 pressed down. The pointer is typically a mouse, stylus or finger.
 
+---
+
 ### `up`
 
 `up` is called when the pointer is lifted up.
@@ -2158,6 +2256,8 @@ The `up` event handler is called when a _pointerup_ event occurs on the
 canvas. The handler is passed two number arguments, `x` and `y`, which
 are the coordinates of the pointer location when the pointer was lifted
 up. The pointer is typically a mouse, stylus or finger.
+
+---
 
 ### `move`
 
@@ -2200,6 +2300,8 @@ the canvas. The handler is passed two number arguments, `x` and `y`,
 which are the coordinates of the position that the pointer has moved
 to. The pointer is typically a mouse, stylus or finger.
 
+---
+
 ### `animate`
 
 `animate` gets called periodically around 60 times per second.
@@ -2238,6 +2340,8 @@ The animate event handler is passed a single numeric argument which is
 the number of elapsed milliseconds since the start of the animation.
 This allows you to track the progress of the animation and to update
 the animation accordingly.
+
+---
 
 ### `input`
 

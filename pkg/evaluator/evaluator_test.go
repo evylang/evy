@@ -1078,8 +1078,10 @@ func TestTypeof(t *testing.T) {
 		"a := [{a:1} {b:2} false]": "[]any",
 		"a := {a:1 b:[2]}":         "{}any",
 		"a := {a:[1 2 3] b:[]}":    "{}[]num",
-		"a := []":                  "[]",
-		"a := {}":                  "{}",
+		"a := []":                  "[]any",
+		"a := {}":                  "{}any",
+		"a:[]num \n a = []":        "[]num",
+		"a:{}num \n a = {}":        "{}num",
 	}
 	for in, want := range tests {
 		in, want := in, want
@@ -1098,6 +1100,79 @@ func TestTypeof(t *testing.T) {
 		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print (typeof a[0])"
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
+		})
+	}
+
+	tests = map[string]string{
+		`print (typeof [])`: "[]",
+		`print (typeof {})`: "{}",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
+		})
+	}
+}
+
+func TestTypeofParam(t *testing.T) {
+	tests := map[string]string{
+		`
+func fn x:[]num
+    print (typeof x)
+end
+fn []
+`: "[]num",
+		`
+func fn x:{}num
+    print (typeof x)
+end
+fn {}
+`: "{}num",
+		`
+func fn x:[][]num
+    print (typeof x)
+end
+fn []
+`: "[][]num",
+		`
+func fn x:{}{}num
+    print (typeof x)
+end
+fn {}
+`: "{}{}num",
+		`
+func fn x:[]{}num
+    print (typeof x)
+end
+fn []
+`: "[]{}num",
+		`
+func fn x:{}[]num
+    print (typeof x)
+end
+fn {}
+`: "{}[]num",
+		`
+func fn x:num...
+    print (typeof x)
+end
+fn
+`: "[]num",
+		`
+func fn x:[]num...
+    print (typeof x)
+end
+fn
+fn []
+`: "[][]num\n[][]num",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want+"\n", got)
 		})

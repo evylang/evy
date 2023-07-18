@@ -243,11 +243,10 @@ func (p *parser) addParamsToScope(fd *FuncDeclStmt) {
 	if fd.VariadicParam != nil {
 		vParam := fd.VariadicParam
 		p.validateVarDecl(vParam, vParam.token, true /* allowUnderscore */)
-
 		vParamAsArray := &Var{
 			token: vParam.token,
 			Name:  vParam.Name,
-			T:     &Type{Name: ARRAY, Sub: vParam.Type()},
+			T:     fd.VariadicParamType,
 		}
 		p.scope.set(vParam.Name, vParamAsArray)
 	}
@@ -454,6 +453,7 @@ func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
 		if len(fd.Params) == 1 {
 			fd.VariadicParam = fd.Params[0]
 			fd.Params = nil
+			fd.VariadicParamType = &Type{Name: ARRAY, Sub: fd.VariadicParam.Type()}
 		} else {
 			p.appendError("invalid variadic parameter, must be used with single type")
 		}

@@ -59,8 +59,9 @@ func newErr(node parser.Node, err error) *Error {
 func NewEvaluator(builtins Builtins) *Evaluator {
 	scope := newScope()
 	for _, global := range builtins.Globals {
-		z := zero(global.Type())
-		scope.set(global.Name, z)
+		t := global.Type()
+		z := zero(t)
+		scope.set(global.Name, z, t)
 	}
 	return &Evaluator{
 		builtins: builtins,
@@ -185,7 +186,7 @@ func (e *Evaluator) HandleEvent(ev Event) error {
 		if err != nil {
 			return newErr(param, err)
 		}
-		e.scope.set(param.Name, arg)
+		e.scope.set(param.Name, arg, param.Type())
 	}
 	_, err := e.Eval(eh.Body)
 	return err
@@ -229,7 +230,7 @@ func (e *Evaluator) evalDecl(decl *parser.Decl) error {
 	if decl.Type() == parser.ANY_TYPE && val.Type() != parser.ANY_TYPE {
 		val = &Any{Val: val}
 	}
-	e.scope.set(decl.Var.Name, copyOrRef(val))
+	e.scope.set(decl.Var.Name, copyOrRef(val), decl.Type())
 	return nil
 }
 
@@ -287,11 +288,11 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	// Add func args to scope
 	fd := funcCall.FuncDecl
 	for i, param := range fd.Params {
-		e.scope.set(param.Name, args[i])
+		e.scope.set(param.Name, args[i], param.Type())
 	}
 	if fd.VariadicParam != nil {
-		varArg := &Array{Elements: &args, T: fd.VariadicParam.T}
-		e.scope.set(fd.VariadicParam.Name, varArg)
+		varArg := &Array{Elements: &args, T: fd.VariadicParamType}
+		e.scope.set(fd.VariadicParam.Name, varArg, fd.VariadicParamType)
 	}
 
 	funcResult, err := e.Eval(fd.Body)
@@ -392,14 +393,14 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 		aRange := &arrayRange{array: v, cur: 0}
 		if f.LoopVar != nil {
 			aRange.loopVar = zero(f.LoopVar.Type())
-			e.scope.set(f.LoopVar.Name, aRange.loopVar)
+			e.scope.set(f.LoopVar.Name, aRange.loopVar, f.LoopVar.Type())
 		}
 		return aRange, nil
 	case *String:
 		sRange := &stringRange{str: v, cur: 0}
 		if f.LoopVar != nil {
 			sRange.loopVar = &String{}
-			e.scope.set(f.LoopVar.Name, sRange.loopVar)
+			e.scope.set(f.LoopVar.Name, sRange.loopVar, f.LoopVar.Type())
 		}
 		return sRange, nil
 	case *Map:
@@ -408,7 +409,7 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 		mapRange := &mapRange{mapVal: v, cur: 0, order: order}
 		if f.LoopVar != nil {
 			mapRange.loopVar = &String{}
-			e.scope.set(f.LoopVar.Name, mapRange.loopVar)
+			e.scope.set(f.LoopVar.Name, mapRange.loopVar, f.LoopVar.Type())
 		}
 		return mapRange, nil
 	}
@@ -439,7 +440,7 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 	}
 	if loopVar != nil {
 		loopVarVal := &Num{}
-		e.scope.set(loopVar.Name, loopVarVal)
+		e.scope.set(loopVar.Name, loopVarVal, loopVar.Type())
 		sRange.loopVar = loopVarVal
 	}
 	return sRange, nil

@@ -124,12 +124,13 @@ func (f *FuncDeclStmt) Token() *lexer.Token {
 }
 
 type FuncDeclStmt struct {
-	token         *lexer.Token // The "func" token
-	Name          string
-	Params        []*Var
-	VariadicParam *Var
-	ReturnType    *Type
-	Body          *BlockStatement
+	token             *lexer.Token // The "func" token
+	Name              string
+	Params            []*Var
+	VariadicParam     *Var
+	ReturnType        *Type
+	VariadicParamType *Type
+	Body              *BlockStatement
 
 	isCalled bool
 }

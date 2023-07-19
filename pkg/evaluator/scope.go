@@ -1,5 +1,7 @@
 package evaluator
 
+import "foxygo.at/evy/pkg/parser"
+
 type scope struct {
 	values map[string]Value
 	outer  *scope
@@ -23,8 +25,15 @@ func (s *scope) get(name string) (Value, bool) {
 	return s.outer.get(name)
 }
 
-func (s *scope) set(name string, val Value) {
-	if name != "_" {
-		s.values[name] = val
+func (s *scope) set(name string, val Value, t *parser.Type) {
+	if name == "_" {
+		return
 	}
+	switch val.Type() {
+	case parser.GENERIC_ARRAY:
+		val.(*Array).T = t
+	case parser.GENERIC_MAP:
+		val.(*Map).T = t
+	}
+	s.values[name] = val
 }

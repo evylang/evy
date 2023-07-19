@@ -276,6 +276,23 @@ fox 1 2 3`,
 	}
 }
 
+func TestReturn(t *testing.T) {
+	inputs := []string{
+		`
+func fn
+    print 1
+    return
+    // unreachable code!?
+end
+`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
 func TestReturnErr(t *testing.T) {
 	inputs := map[string]string{
 		`

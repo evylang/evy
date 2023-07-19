@@ -719,6 +719,54 @@ on down
     print 2
 end
 `,
+		`
+a := 1
+b := 2
+func fn
+    print "fn" a b
+end
+func fn2
+    print "fn2" a b
+end
+fn
+`: `
+a := 1
+b := 2
+
+func fn
+    print "fn" a b
+end
+
+func fn2
+    print "fn2" a b
+end
+
+fn
+`, `
+a := 1
+func fn
+    print "fn" a
+end
+`: `
+a := 1
+
+func fn
+    print "fn" a
+end
+`, `
+a := 1
+b := 2
+func fn
+    print "fn" a b
+end
+`: `
+a := 1
+b := 2
+
+func fn
+    print "fn" a b
+end
+`,
 	}
 	for input, want := range tests {
 		input, want := input, want

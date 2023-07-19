@@ -113,8 +113,9 @@ func nlAfter(stmts []Node, comments map[Node]string) map[int]bool {
 			// add NL after func decl directly followed by stmt
 			indices[accum.idx] = true
 		case accums[i+1].stmtType == "func":
-			// add NL before func decl (after stmt or other func decl)
-			indices[accum.idx] = true
+			// add NL before func decl (before stmt or other func decl)
+			beforeFuncIdx := accums[i+1].idx - 1
+			indices[beforeFuncIdx] = true
 		case i+2 < length && accums[i+1].stmtType == "comment" && accums[i+2].stmtType == "func":
 			// add NL before comments of func decl (after stmt or other func decl)
 			indices[accum.idx] = true

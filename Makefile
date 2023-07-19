@@ -13,7 +13,7 @@ all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-
 
 ci: clean check-uptodate all ## Full clean build and up-to-date checks as run on CI
 
-check-uptodate: tidy fmt doctest
+check-uptodate: tidy fmt doc
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 clean:: ## Remove generated files
@@ -84,12 +84,19 @@ evy-fmt: ## Format evy sample code
 check-evy-fmt:
 	go run . fmt --check $(EVY_FILES)
 
+doc: doctest toc
+
 DOCTEST_CMD = ./scripts/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 DOCTESTS = docs/builtins.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
-.PHONY: check-evy-fmt doctest evy-fmt lint
+TOC_CMD = ./scripts/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+TOCFILES = docs/builtins.md
+toc:
+	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
+
+.PHONY: check-evy-fmt doc doctest evy-fmt lint toc
 
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib

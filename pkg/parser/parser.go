@@ -678,8 +678,10 @@ func (p *parser) parseBlockWithEndTokens(endTokens map[lexer.TokenType]bool) *Bl
 			continue
 		}
 		if block.AlwaysTerminates() {
-			p.appendErrorForToken("unreachable code", tok)
-			continue
+			if _, ok := stmt.(*EmptyStmt); !ok {
+				p.appendErrorForToken("unreachable code", tok)
+				continue
+			}
 		}
 		if alwaysTerminates(stmt) {
 			block.alwaysTerminates = true

@@ -1,40 +1,78 @@
-# Evy syntax specification
+# Evy language specification
 
-`evy` is a [statically typed], [garbage collected],
+Evy is a [statically typed], [garbage collected],
 [procedural] programming language. Its main design goal is to help
-learn programming. `evy` aims for simplicity and directness in its
+learn programming. Evy aims for simplicity and directness in its
 tooling and syntax. Several features typical of modern programming
 languages are purposefully left out.
 
-`evy`'s syntax is specified using a [WSN] grammar, a variant of
-[EBNF] grammars, borrowing concepts from the [Go Programming Language
-Specification].
-
-For an intuitive understanding of `evy` see its [syntax by example].
+To get an intuitive understanding of Evy, you can either look at its
+[syntax by example](syntax_by_example.md) or read through the
+[builtins documentation](builtins.md).
 
 [statically typed]: https://developer.mozilla.org/en-US/docs/Glossary/Static_typing
 [garbage collected]: https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)
 [procedural]: https://en.wikipedia.org/wiki/Procedural_programming
-[WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
-[EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
-[Go Programming Language Specification]: https://go.dev/ref/spec
-[syntax by example]: syntax_by_example.md
 
-## WSN syntax grammar
+#### Table of Contents
 
-The top level element of a WSN grammar is called _production_. For
-example, `OPERATOR = "+" | "-" | "*" | "/" .` is a production
-specifying an operator. A production consists of an _expression_
-assigned to an _identifier_ or production name. Each production is
-terminated by a period `.`. An expression consists of terms and the
-following operators in increasing precedence:
+<!-- gen:toc -->
 
-    |   alternation: `a | b` stands for `a` or `b`.
-    ()  grouping: `(a|b)c` stands for `ac | bc`.
-    []  optionality:  `[a]b` stands for `ab | b`.
-    {}  repetition (0 to n times):  `{a}` stands for `ε | a | aa | aaa | ....`.
+1. [**Syntax grammar**](#syntax-grammar)  
+   [WSN syntax grammar](#wsn-syntax-grammar), [Evy syntax grammar](#evy-syntax-grammar)
+2. [**Comments**](#comments)
+3. [**Types**](#types)
+4. [**Variables and Declarations**](#variables-and-declarations)
+5. [**Zero Values**](#zero-values)
+6. [**Assignments**](#assignments)
+7. [**Copy and reference**](#copy-and-reference)
+8. [**Scope**](#scope)
+9. [**Strings**](#strings)
+10. [**Arrays**](#arrays)
+11. [**Maps**](#maps)
+12. [**Index and Slice**](#index-and-slice)
+13. [**Operators**](#operators)
+14. [**Precedence**](#precedence)
+15. [**Whitespace**](#whitespace)
+16. [**Functions**](#functions)
+17. [**Variadic functions**](#variadic-functions)
+18. [**Break and Return**](#break-and-return)
+19. [**Typeof**](#typeof)
+20. [**Type assertion**](#type-assertion)
+21. [**Event Handler**](#event-handler)
+22. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
 
-`a … b` are single characters from `a` through `b` as alternatives.
+<!-- genend:toc -->
+
+## Syntax grammar
+
+The Evy syntax grammar is _WSN_ grammar, which is a formal set of rules
+that define how Evy programs are written. The Evy compiler uses the
+syntax grammar to parse Evy source code, which means that it checks
+that the code follows the rules of the grammar.
+
+### WSN syntax grammar
+
+Evy's syntax is specified using a [WSN] grammar, a variant of
+[EBNF] grammars, borrowing concepts from the [Go Programming Language
+Specification].
+
+_Productions_ are the top-level elements of a WSN grammar. For example,
+the production `OPERATOR = "+" | "-" | "*" | "/" .` specifies that an
+operator can be one of the characters `+`, `-`, `*`, or `/`.
+
+A production consists of an _expression_ assigned to an _identifier_ or
+production name. Each production is terminated by a period `.`. An
+expression consists of _terms_ and the following operators in
+increasing precedence:
+
+- _Alternation:_ `|` stands for "or". For example, `a | b` stands for `a` or `b`.
+- _Grouping:_ `()` stands for grouping. For example, `(a|b)c` stands for `ac` or `bc`.
+- _Optionality:_ `[]` stands for optionality. For example, `[a]b` stands for `ab` or `b`.
+- _Repetition:_ `{}` stands for repetition. For example, `{a}` stands for the empty string, `a`, `aa`, `aaa`, ...".
+
+`a … b` stands for a range of single characters from `a` to `b`,
+inclusive.
 
 Here is a WSN defining itself:
 
@@ -48,29 +86,44 @@ Here is a WSN defining itself:
                  "(" expression ")" |
                  "{" expression "}" .
     identifier = LETTER { LETTER } .
-    literal    = """ CHARACTER { CHARACTER } """ .
+    literal    = """ CHARACTER { CHARACTER } """ . /* """" is a literal `"` */
     LETTER     = "a" … "z" | "A" … "Z" | "_" .
     CHARACTER  = /* an arbitrary Unicode code point */ .
 
-By convention, upper case production names identify _terminal tokens_.
-Terminal tokens are the leaves in the grammar that cannot be expanded
-further. Lower case production names identify _non-terminals_, which
-are production names that may be expanded further. Lexical tokens are
-enclosed in double quotes `""`. Comments are fenced by `/* … */`.
+_Terminals_ are the leaves in the grammar that cannot be expanded
+further. By convention, terminals are identified by production names
+in uppercase.
 
-There are two special fencing tokens in evy's grammar related to
+_Non-terminals_, on the other hand, can be expanded into other
+productions. This means that they can be replaced by a more complex
+expression. By convention, non-terminals are identified by production
+names in lowercase.
+
+_Literals_ or lexical tokens are enclosed in double quotes `""`.
+Comments are fenced by `/*` … `*/`.
+
+There are two special fencing tokens in Evy's grammar related to
 horizontal whitespace, `<-` … `->` and `<+` … `+>`. `<-` … `->` means
 no horizontal whitespace is allowed between the terminals of the
 enclosed expression, e.g. `3+5` inside `<-` … `->` is allowed, but
 `3 + 5` is not. The fencing tokens `<+` … `+>` are the default and mean
 horizontal whitespace is allowed (again) between terminals.
 
-See section [whitespace](#whitespace) for further details.
+See the section on [whitespace](#whitespace) for further details.
 
-## Evy syntax grammar
+[WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
+[EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
+[Go Programming Language Specification]: https://go.dev/ref/spec
 
-The `evy` source code is UTF-8 encoded. The NUL character `U+0000` is
-not allowed.
+### Evy syntax grammar
+
+Evy source code is UTF-8 encoded, which means that it can contain any
+Unicode character. The NUL character `U+0000` is not allowed, as it is
+a special character that is used during compilation.
+
+The `WS` abbreviation in the grammar comments below refers to horizontal
+whitespace, which is any combination of spaces and tabs. The following
+listing contains the complete syntax grammar for Evy.
 
     program    = { statement | func | event_handler | NL } .
     statements = statement { statement } .

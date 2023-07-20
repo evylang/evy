@@ -46,14 +46,16 @@ To get an intuitive understanding of Evy, you can either look at its
 
 ## Syntax grammar
 
-The Evy syntax grammar is _WSN_ grammar, which is a formal set of rules
-that define how Evy programs are written. The Evy compiler uses the
-syntax grammar to parse Evy source code, which means that it checks
+The Evy syntax grammar is a [WSN] grammar, which is a formal set of
+rules that define how Evy programs are written. The Evy compiler uses
+the syntax grammar to parse Evy source code, which means that it checks
 that the code follows the rules of the grammar.
+
+[WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
 
 ### WSN syntax grammar
 
-Evy's syntax is specified using a [WSN] grammar, a variant of
+Evy's syntax is specified using a WSN grammar, a variant of
 [EBNF] grammars, borrowing concepts from the [Go Programming Language
 Specification].
 
@@ -111,7 +113,6 @@ horizontal whitespace is allowed (again) between terminals.
 
 See the section on [whitespace](#whitespace) for further details.
 
-[WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
 [EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 [Go Programming Language Specification]: https://go.dev/ref/spec
 
@@ -125,102 +126,107 @@ The `WS` abbreviation in the grammar comments below refers to horizontal
 whitespace, which is any combination of spaces and tabs. The following
 listing contains the complete syntax grammar for Evy.
 
-    program    = { statement | func | event_handler | NL } .
-    statements = statement { statement } .
+    program    = { statement | func | event_handler | nl } eof .
+    statements = { nl } statement { statement | nl } .
     statement  = typed_decl_stmt | inferred_decl_stmt |
                  assign_stmt |
                  func_call_stmt |
                  return_stmt | break_stmt |
-                 if_stmt | for_stmt | while_stmt .
+                 if_stmt | while_stmt | for_stmt .
 
     /* --- Functions and Event handlers ---- */
-    func            = "func" ident func_signature NL
+    func            = "func" ident func_signature nl
                           statements
-                      "end" NL .
+                      "end" nl .
     func_signature  = [ ":" type ] params .
     params          = { typed_decl } | variadic_param .
     variadic_param  = typed_decl "..." .
 
-    event_handler   = "on" ident NL
+    event_handler   = "on" ident params nl
                           statements
-                      "end" NL .
+                      "end" nl .
 
     /* --- Control flow --- */
-    if_stmt = "if" toplevel_expr NL
-                    statements
-              { "else" "if" toplevel_expr NL
-                    statements }
-              [ "else" NL
-                    statements ]
-              "end" NL .
+    if_stmt         = "if" toplevel_expr nl
+                            statements
+                      { "else" "if" toplevel_expr nl
+                            statements }
+                      [ "else" nl
+                            statements ]
+                      "end" nl .
 
-    for_stmt   = "for" range NL
-                    statements
-                 "end" NL .
+    while_stmt      = "while" toplevel_expr nl
+                          statements
+                      "end" nl .
+
+    for_stmt   = "for" range nl
+                      statements
+                 "end" nl .
     range      = [ ident ":=" ] "range" range_args .
     range_args = <- expr -> [ <- expr -> [ <- expr -> ] ] .
-    while_stmt = "while" toplevel_expr NL
-                     statements
-                 "end" NL .
 
-    return_stmt = "return" [ toplevel_expr ] NL .
-    break_stmt  = "break" NL .
+    return_stmt = "return" [ toplevel_expr ]  nl .
+    break_stmt  = "break" nl .
 
     /* --- Statement ---- */
-    assign_stmt        = assignable "=" toplevel_expr NL .
-    typed_decl_stmt    = typed_decl NL .
-    inferred_decl_stmt = ident ":=" toplevel_expr NL .
-    func_call_stmt     = func_call NL .
+    assign_stmt        = assignable "=" toplevel_expr nl .
+    typed_decl_stmt    = typed_decl nl .
+    inferred_decl_stmt = ident ":=" toplevel_expr nl .
+    func_call_stmt     = func_call nl .
 
     /* --- Assignment --- */
-    assignable     = <- ident | index_expr | dot_expr -> . /* no WS around `[…]` and `.` */
+    assignable     = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
     ident          = LETTER { LETTER | UNICODE_DIGIT } .
-    index_expr     = assignable "[" expr "]" .
+    index_expr     = assignable "[" <+ toplevel_expr +> "]" .
     dot_expr       = assignable "." ident .
 
     /* --- Type --- */
-    typed_decl     = <- ident ":" type -> . /* no WS allowed. */
+    typed_decl     = ident ":" type .
     type           = BASIC_TYPE | DYNAMIC_TYPE | COMPOSITE_TYPE .
     BASIC_TYPE     = "num" | "string" | "bool" .
     DYNAMIC_TYPE   = "any" .
     COMPOSITE_TYPE = array_type | map_type .
-    array_type     = "[]" type .
-    map_type       = "{}" type .
+    array_type     = "[" "]" type .
+    map_type       = "{" "}" type .
 
     /* --- Expressions --- */
     toplevel_expr = func_call | expr .
 
     func_call = ident args .
-    args      = { tight_expr } .  /* no WS within single arg, WS is arg separator */
+    args      = { tight_expr } . /* no WS within single arg, WS is arg separator */
 
-    tight_expr = <- expr -> .     /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
+    tight_expr = <- expr -> . /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
     expr       = operand | unary_expr | binary_expr .
 
     operand    = literal | assignable | slice | type_assertion | group_expr .
     group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
-    type_assertion = <- assignable "." "(" type ")" -> .
+    type_assertion = <- assignable ".(" -> type ")" . /* no WS around `.` */
 
-    unary_expr = <- UNARY_OP -> expr .  /* WS not allowed after UNARY_OP */
+    unary_expr = <- UNARY_OP -> expr .  /* no WS after UNARY_OP */
     UNARY_OP   = "-" | "!" .
 
-    binary_expr   = expr BINARY_OP expr .
-    BINARY_OP     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
+    binary_expr   = expr binary_op expr .
+    binary_op     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
     LOGICAL_OP    = "or" | "and" .
     COMPARISON_OP = "==" | "!=" | "<" | "<=" | ">" | ">=" .
     ADD_OP        = "+" | "-" .
     MUL_OP        = "*" | "/" | "%" .
 
     /* --- Slice and Literals --- */
-    slice       = assignable "[" [expr] ":" [expr] "]" .
+    slice       = <- assignable "[" slice_expr "]" -> .
+    slice_expr  = <+ [expr] ":" [expr] +> .
     literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
     num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
                   DECIMAL_DIGIT { DECIMAL_DIGIT } "." { DECIMAL_DIGIT } .
     string_lit  = """ { UNICODE_CHAR } """ .
     BOOL_CONST  = "true" | "false" .
-    array_lit   = "[" <+ array_elems +> "]" . /* WS can be used freely within `[…], but not inside the elements` */
-    array_elems = { tight_expr [NL] } .
-    map_lit     = "{" <+ map_elems +> "}" .   /* WS can be used freely within `{…}, but not inside the values` */
-    map_elems   = { ident ":" tight_expr [NL] } .
+    array_lit   = "[" <+ array_elems +> "]" . /* WS can be used freely within `[…]`, but not inside the elements */
+    array_elems = { tight_expr [nl] } .
+    map_lit     = "{" <+ map_elems +> "}" . /* WS can be used freely within `{…}`, but not inside the values */
+    map_elems   = { ident ":" tight_expr [nl] } .
+    nl          = [ COMMENT ] NL .
+    eof         = [ COMMENT ] EOF .
+    COMMENT     = "//" { UNICODE_CHAR } .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .
@@ -228,8 +234,8 @@ listing contains the complete syntax grammar for Evy.
     UNICODE_DIGIT  = /* a Unicode code point categorized as "Number, decimal digit" */ .
     UNICODE_CHAR   = /* an arbitrary Unicode code point except newline */ .
     DECIMAL_DIGIT  = "0" … "9" .
-    NL             = "\n" {"\n"} .
-    WS             = " " | "\t" {" " | "\t"} .
+    NL             = "\n"  . /* end of file */
+    EOF            = "" . /* end of file */
 
 ## Comments
 

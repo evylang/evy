@@ -151,6 +151,9 @@ func (p *parser) parseBinaryExpr(left Node) Node {
 	if binaryExp.Right == nil {
 		return nil // previous error
 	}
+	if expType == GENERIC_ARRAY {
+		binaryExp.T = binaryExp.Right.Type() // array concatenation e.g. [] + [1 2]
+	}
 	p.validateBinaryType(binaryExp)
 	if p.isWSS() {
 		p.formatting.recordWSS(binaryExp)

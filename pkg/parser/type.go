@@ -104,6 +104,7 @@ func (t *Type) Matches(t2 *Type) bool {
 	if t.Sub == nil || t2.Sub == nil {
 		return false
 	}
+
 	if t == GENERIC_ARRAY || t == GENERIC_MAP || t2 == GENERIC_ARRAY || t2 == GENERIC_MAP {
 		return true
 	}

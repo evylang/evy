@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"testing"
@@ -1266,6 +1267,31 @@ print a.( num ) // whitespaces added`,
 		parser := newParser(input, testBuiltins())
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
+	}
+}
+
+func TestArrayConcatTyping(t *testing.T) {
+	inputs := map[string]string{
+		`
+b:[]num
+b = [true]
+`: `line 3 column 1: "b" accepts values of type []num, found []bool`,
+		`
+b:[]num
+b = [true] + []
+`: `line 3 column 1: "b" accepts values of type []num, found []bool`,
+		`
+b:[]num
+b = [] + [true]
+`: `line 3 column 1: "b" accepts values of type []num, found []bool`,
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		fmt.Println(input)
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
 	}
 }
 

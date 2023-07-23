@@ -639,6 +639,9 @@ func evalBinaryArrayExpr(op parser.Operator, left, right *Array) (Value, error) 
 		return nil, fmt.Errorf("%w (array): %v", ErrOperation, op.String())
 	}
 	result := left.Copy()
+	if result.T == parser.GENERIC_ARRAY {
+		result.T = right.T
+	}
 	rightElemnts := *right.Copy().Elements
 	*result.Elements = append(*result.Elements, rightElemnts...)
 	return result, nil

@@ -78,7 +78,10 @@ func (t *Type) String() string {
 	return t.Name.String() + t.Sub.String()
 }
 
-func (t *Type) Accepts(t2 *Type) bool {
+func (t *Type) Accepts(t2 *Type, isLiteral bool) bool {
+	if isLiteral {
+		return t.acceptsLiteral(t2)
+	}
 	if t.acceptsStrict(t2) {
 		return true
 	}
@@ -89,6 +92,29 @@ func (t *Type) Accepts(t2 *Type) bool {
 	// empty Array none array accepted by all arrays.
 	// empty Map of none_type accepted by all maps
 	return false
+}
+
+func (t *Type) acceptsLiteral(t2 *Type) bool {
+	n, n2 := t.Name, t2.Name
+	if n == ILLEGAL || n2 == ILLEGAL || n2 == NONE {
+		return false
+	}
+	if n == ANY {
+		return true
+	}
+	if n != n2 {
+		return false
+	}
+	if t.Sub == nil || t2.Sub == nil {
+		return t.Sub == nil && t2.Sub == nil
+	}
+	if n == ARRAY && t2 == GENERIC_ARRAY {
+		return true
+	}
+	if n == MAP && t2 == GENERIC_MAP {
+		return true
+	}
+	return t.Sub.acceptsLiteral(t2.Sub)
 }
 
 func (t *Type) Matches(t2 *Type) bool {

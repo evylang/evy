@@ -455,10 +455,10 @@ func (p *parser) parseExprWSS() Node {
 func (p *parser) combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
-		if combinedT.Accepts(t) {
+		if combinedT.Accepts(t, false) {
 			continue
 		}
-		if t.Accepts(combinedT) {
+		if t.Accepts(combinedT, false) {
 			combinedT = t
 			continue
 		}

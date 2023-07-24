@@ -730,3 +730,9 @@ func zeroValue(t *Type, tt *lexer.Token) Node {
 	}
 	return nil
 }
+
+func isCompositeLit(n Node) bool {
+	_, aok := n.(*ArrayLiteral)
+	_, mok := n.(*MapLiteral)
+	return aok || mok
+}

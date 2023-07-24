@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"testing"
@@ -1270,7 +1269,7 @@ print a.( num ) // whitespaces added`,
 	}
 }
 
-func TestArrayConcatTyping(t *testing.T) {
+func TestArrayConcatTypingErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 b:[]num
@@ -1287,7 +1286,6 @@ b = [] + [true]
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		fmt.Println(input)
 		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)

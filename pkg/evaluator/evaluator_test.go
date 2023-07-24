@@ -1082,6 +1082,7 @@ func TestTypeof(t *testing.T) {
 		"a := {}":                  "{}any",
 		"a:[]num \n a = []":        "[]num",
 		"a:{}num \n a = {}":        "{}num",
+		"a := [] + [true]":         "[]bool",
 	}
 	for in, want := range tests {
 		in, want := in, want
@@ -1106,8 +1107,11 @@ func TestTypeof(t *testing.T) {
 	}
 
 	tests = map[string]string{
-		`print (typeof [])`: "[]",
-		`print (typeof {})`: "{}",
+		`print (typeof [])`:        "[]",
+		`print (typeof {})`:        "{}",
+		`print (typeof []+[true])`: "[]bool",
+		`print (typeof [true]+[])`: "[]bool",
+		`print (typeof []+[])`:     "[]",
 	}
 	for in, want := range tests {
 		in, want := in, want

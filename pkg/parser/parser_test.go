@@ -1293,6 +1293,43 @@ b = [] + [true]
 	}
 }
 
+func TestArgsWithIndex(t *testing.T) {
+	inputs := []string{
+		"print [1 2] [1]",
+		"print [1 2][1]",
+		"print {} []",
+		"print [] []",
+		"print [] {}",
+		"print {} {}",
+		`print {a:1}["a"]`,
+		`print {a:1} ["a"]`,
+		`
+func fn:{}num
+	return {a:1}
+end
+print (fn)["a"]
+print (fn) ["a"]
+`,
+		`
+func fn:string
+	return "abc"
+end
+print (fn)[1]
+print (fn) [1]
+`,
+		`a:any
+a = [1 2]
+print a.([]num) [1]
+print a.([]num)[1]
+`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10

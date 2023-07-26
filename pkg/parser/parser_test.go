@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"testing"
@@ -1270,7 +1269,7 @@ print a.( num ) // whitespaces added`,
 	}
 }
 
-func TestArrayConcatTyping(t *testing.T) {
+func TestArrayConcatTypingErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 b:[]num
@@ -1287,11 +1286,47 @@ b = [] + [true]
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())
-		fmt.Println(input)
 		_ = parser.parse()
 		assertParseError(t, parser, input)
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
+func TestArgsWithIndex(t *testing.T) {
+	inputs := []string{
+		"print [1 2] [1]",
+		"print [1 2][1]",
+		"print {} []",
+		"print [] []",
+		"print [] {}",
+		"print {} {}",
+		`print {a:1}["a"]`,
+		`print {a:1} ["a"]`,
+		`
+func fn:{}num
+	return {a:1}
+end
+print (fn)["a"]
+print (fn) ["a"]
+`,
+		`
+func fn:string
+	return "abc"
+end
+print (fn)[1]
+print (fn) [1]
+`,
+		`a:any
+a = [1 2]
+print a.([]num) [1]
+print a.([]num)[1]
+`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
 	}
 }
 

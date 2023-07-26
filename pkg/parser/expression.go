@@ -171,7 +171,7 @@ func (p *parser) parseGroupedExpr() Node {
 	if !p.assertToken(lexer.RPAREN) || exp == nil {
 		return nil
 	}
-	p.advance() // advance past )
+	p.advanceWSS() // advance past )
 	return &GroupExpression{token: tok, Expr: exp}
 }
 
@@ -205,7 +205,7 @@ func (p *parser) parseIndexOrSliceExpr(left Node, allowSlice bool) Node {
 	if !p.validateIndex(tok, leftType, index.Type()) {
 		return nil
 	}
-	p.advance() // advance past ]
+	p.advanceWSS() // advance past ]
 	t := left.Type().Sub
 	if leftType == STRING {
 		t = STRING_TYPE
@@ -299,7 +299,7 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 		p.appendErrorForToken("cannot type assert to type any", tok)
 	}
 	if p.assertToken(lexer.RPAREN) {
-		p.advance() // advance past )
+		p.advanceWSS() // advance past )
 	}
 	if left.Type() != ANY_TYPE {
 		p.appendErrorForToken("value of type assertion must be of type any, not "+left.Type().String(), tok)
@@ -484,7 +484,7 @@ func (p *parser) parseMapLiteral() Node {
 	if !p.assertToken(lexer.RCURLY) {
 		return nil
 	}
-	p.advance() // advance past }
+	p.advanceWSS() // advance past }
 	if len(mapLit.Pairs) == 0 {
 		return mapLit
 	}

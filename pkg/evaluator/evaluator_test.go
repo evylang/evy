@@ -1276,6 +1276,46 @@ fox3 [1 2] true
 	}
 }
 
+func TestIndexing(t *testing.T) {
+	tests := map[string]string{
+		"print [1 2] [1]":          "[1 2] [1]",
+		"print [1 2][1]":           "2",
+		"print {} []":              "{} []",
+		"print [] []":              "[] []",
+		"print [] {}":              "[] {}",
+		"print {} {}":              "{} {}",
+		`print {a:1}["a"]`:         "1",
+		`print {a:1} ["a"]`:        "{a:1} [a]",
+		`print ( sin ( sin 0 ) ) `: "0",
+		`
+func fn:{}num
+	return {a:1}
+end
+print (fn)["a"]
+print (fn) ["a"]
+`: "1\n{a:1} [a]",
+		`
+func fn:string
+	return "abc"
+end
+print (fn)[1]
+print (fn) [1]
+`: "b\nabc [1]",
+		`a:any
+a = [1 2]
+print a.([]num)[1]
+print a.([]num) [1]
+`: "2\n[1 2] [1]",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
+		})
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

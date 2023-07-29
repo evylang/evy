@@ -43,9 +43,10 @@ To get an intuitive understanding of Evy, you can either look at its
     [Bare returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic functions](#variadic-functions)
 20. [**Break and Return**](#break-and-return)
 21. [**Typeof**](#typeof)
-22. [**Type assertion**](#type-assertion)
-23. [**Event Handler**](#event-handler)
-24. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+22. [**Type Assertion**](#type-assertion)
+23. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+24. [**Execution Model and Event Handlers**](#execution-model-and-event-handlers)
+25. [**Runtimes**](#runtimes)
 
 <!-- genend:toc -->
 
@@ -1135,85 +1136,253 @@ in Evy. The call arguments must be listed individually.
 
 ## Break and Return
 
-`break` and `return` are terminating statements. They interrupt the
-regular flow of control. `break` is used to exit from the inner-most
-loop body. `return` is used to exit from a function and may be followed
-by an expression whose value is returned by the function call.
+`break` and `return` are _terminating statements_ in Evy. They interrupt
+the regular flow of control.
+
+- `break` is used to exit from the innermost loop body. This means that
+  it will skip the rest of the loop body and continue with the next
+  statement after the loop.
+- `return` is used to exit from a function. It can be followed by an
+  expression whose value is returned by the function call.
+
+For example, the following code shows how the `break` statement can be
+used to exit from a loop:
+
+```evy
+for x := range 2
+    y := 0
+    while y < 10
+        if y == 2
+            print "break" y
+            break
+        end
+        print "no break" y
+        y = y + 1
+    end
+    print "x" x "y" y
+    print
+end
+```
+
+This code will print the following output:
+
+```evy:output
+no break 0
+no break 1
+break 2
+x 0 y 2
+
+no break 0
+no break 1
+break 2
+x 1 y 2
+
+```
+
+As you can see, the `break` statement causes the loop to exit when the
+value of `y` is equal to 2. The next statement after the loop is then
+executed. Note how `break` only exits the innermost loop.
+
+The following code shows how the return statement can be used to exit
+from a function:
+
+```evy
+func foo:string
+    if (rand1) < 0.7
+        return "bar"
+    else
+        return "baz"
+    end
+end
+```
+
+This code will return the value of `"bar"` 70% of the time and `"baz"`
+otherwise. The names [foo, bar, and baz] are common placeholder names
+used in code.
+
+[foo, bar, and baz]: https://en.wikipedia.org/wiki/Foobar
 
 ## Typeof
 
-`typeof` returns the concrete type of a value held by a variable as a
-string. It returns a string the same as the type in an evy program,
-e.g. `num`, `bool`, `string`, `[]num`, `{}[]any`, etc. For an empty
-composite literal , `typeof` returns `[]` or `{}` as it can be matched
-to any subtype. e.g. `[]` can be passed to a function that takes an
-argument of `[]num`, or `[]string`, etc.
+The `typeof` function returns the concrete type of a value held by a
+variable as a string. It returns a string that is the same as the type
+in an Evy program, such as `"num"`, `"bool"`, `"string"`, `"[]num"`,
+`"{}[]any"`, etc. It is particularly useful to determine the concrete
+type of an `any` variable together with type assertions.
 
-    typeof "abc"        // string
-    typeof true         // bool
-    arr := [ "abc" 1 ]
-    typeof arr          // []any
-    typeof arr[0]       // string
-    typeof arr[1]       // num
-    typeof {}           // {}
-    typeof []           // []
+Here is an example of how the `typeof` function works
 
-## Type assertion
+```evy
+print (typeof "abc")
+print (typeof true)
+print
+
+arr := ["abc" 1]
+print (typeof arr)
+print (typeof arr[0])
+print (typeof arr[1])
+```
+
+The output of this code is
+
+```evy:output
+string
+bool
+
+[]any
+string
+num
+```
+
+Empty composite literals, `[]` and `{}`, can be assigned to variables or
+parameters of any subtype, such as `[]string` or `{}num`. This is
+because empty composite literals are generic, meaning that they can be
+matched to any subtype.
+
+```evy
+func fn nums:[]num
+    print nums
+end
+
+fn []
+```
+
+The `typeof` functions will return `"[]"` or `"{}"` for an empty
+composite literal.
+
+An array literal, such as `[1 2 3]`, has a type of `[]num`. However, it
+is possible to assign an array literal of any type to a variable of
+type `[]any`. It is important to note that this only applies to array
+literals. A variable of type `[]num` cannot be assigned to a variable
+of type `[]any`.
+
+```evy
+x := [1 2 3]
+print "x" (typeof x)
+y:[]any
+// y = [1 2 3] // TODO PR https://github.com/foxygoat/evy/pull/179
+print "y" (typeof y)
+// y = x // compile time error
+// x = y // compile time error
+```
+
+will output
+
+```evy:output
+x []num
+y []any
+```
+
+## Type Assertion
 
 A type assertion `ident.(type)` asserts that the value of the variable
 `ident` is of the given `type`. If the assertion does not hold a
 [run-time panic](#run-time-panics-and-recoverable-errors) occurs.
 
-    x:any
-    x = [ 1 2 3 4 ]
-    num_array := x.([]num)
-    x = "abc"
-    str := x.(string)
+```evy
+x:any
+x = [1 2 3 4]
+num_array := x.([]num)
+print "typeof x:" (typeof x)
+print "typeof num_array" (typeof num_array)
+print
+
+x = "abc"
+str := x.(string)
+print "typeof x:" (typeof x)
+print "typeof str:" (typeof str)
+```
+
+Will generate the output
+
+```ev:output
+typeof x: any
+typeof num_array: []num
+
+typeof x: any
+typeof str: string
+```
 
 Only values of type `any` can be type asserted. That means an array of
-type any, `[]any`, _cannot_ be type assert to be an array of type `num`
-or other concrete type:
+type any, `[]any`, _cannot_ be type asserted to be an array of type
+`[]num` or any other concrete type. However, the elements of an array of
+type `[]any` can be type assert, for example `arr[0].(num)`,
 
-    x:[]
-    x = [1 2]
-    // x.([]num) // compile time error
-    x[1] = [3 4 5]
-    x[0].(num)    // valid
-    x[0].(string) // run time panic
+```evy
+x:[]any
+x = [1 2 3 true]
+x = x[:-1] // TODO remove, use x := [1 2 3] , PR 175, 179
+print "x:" x "typeof x:" (typeof x)
+// print x.([]num) // compile time error
+// print x[0].(string) // run-time panic
+```
 
-However, the elements of `x` can be type assert, e.g. `x[0].(num)`,
-`x[1].([]num)`.
+outputs
 
-## Event Handler
-
-An event handler starts with `on`, followed by an event name and a block
-of statements. The statements get executed when the given event is
-triggered. Events can be triggered by user interaction, for example
-clicking the mouse or tapping the keyboard or by the system, for
-example `frame` when a new frame is painted.
-
-There is a limited, predefined set of events. It is not possible to
-create custom events.
-
-    on mouse_down
-        print mouse_x mouse_y
-    end
-
-    on frame
-        draw
-    end
-
-The `frame` event is triggered every 2 Milliseconds, 50 times per
-second.
+```evy:output
+x: [1 2 3] typeof x: []any
+```
 
 ## Run-time Panics and Recoverable Errors
 
-Execution errors such as trying to index an array out of bounds or
-access a map value for a key that does not exist or a failed type
-assertion trigger a run-time panic. The execution of the `evy` program
-stops and error details are printed.
+_Run-time panics_ are unrecoverable errors that can occur during the
+execution of an Evy program. They can be caused by a variety of things,
+such as trying to index an array out of bounds, accessing a map value
+for a key that does not exist, or a failed type assertion. When a
+run-time panic occurs, the Evy program will stop and error details will
+be printed. You can trigger a panic in your own code by calling the
+builtin function `panic "msg"`.
 
-A panic can be triggered with `panic "message"`.
+_Recoverable errors_ are errors that can be handled by the Evy program.
+They are typically caused by user input or external factors that the
+Evy program cannot control. Functions that can cause recoverable errors
+set the global `err` variable to `true` and the string variable `errmsg`
+to a description of the error. The Evy program can then check the value
+of `err` and handle the error accordingly. You can trigger a recoverable
+error in your own code by setting `err` and `errmsg`.
 
-Functions that can cause recoverable errors set the global string
-variable `error` and the error classification number `errno`.
+For more information on run-time panics and recoverable errors, see the
+builtin documentation on the [panic function](builtins.md#panic) and
+the [errors section](builtins.md#errors).
+
+## Execution Model and Event Handlers
+
+Evy first executes all top-level code in the order it appears in the
+source code. If there is at least one event handler, Evy then enters an
+event loop. In the event loop, Evy waits for external events, such as a
+key press or a pointer down event. When an event occurs, Evy calls the
+corresponding event handler function if it has been implemented. The
+event handler function can optionally receive arguments, such as the
+key character or the pointer coordinates. Once the event handler
+function has finished, Evy returns to the event loop and waits for the
+next event.
+
+Event handlers are declared using the `on` keyword. Only predefined
+events can be handled: `key`, `down`, `up`, `move`, `animate`, and
+`input`. The parameters to the event handlers must match the expected
+signature. The parameters can be fully omitted or fully specified. If
+only some parameters are needed, use the anonymous `_` parameter.
+
+For more information on individual event handlers, see the [builtin
+documentation](builtins.md#event-handlers).
+
+## Runtimes
+
+Evy has two runtimes: the _terminal runtime_ and the _browser runtime_.
+
+The browser runtime can be tried at [evy.dev](https://evy.dev). It fully
+supports all builtin functions and event handlers as described in the
+[builtin documentation](builtin.md).
+
+To use the terminal runtime, first install Evy and then run
+
+    evy run FILE.evy
+
+in the terminal. This will execute the source code in the
+given file. You can also use the evy command to format your source code
+with
+
+    evy fmt FILE.evy
+
+For more details, run `evy run --help` or `evy fmt --help`. The terminal
+runtime does not support event handlers or graphics functions.

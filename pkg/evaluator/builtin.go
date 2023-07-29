@@ -67,6 +67,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 
 		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
 		"exit":  {Func: BuiltinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic": {Func: BuiltinFunc(panicFunc), Decl: stringDecl("panic")},
 
 		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
@@ -501,6 +502,11 @@ func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
 
 func exitFunc(_ *scope, args []Value) (Value, error) {
 	return nil, ExitError(args[0].(*Num).Val)
+}
+
+func panicFunc(_ *scope, args []Value) (Value, error) {
+	s := args[0].(*String).Val
+	return nil, PanicError("panic: " + s)
 }
 
 var randDecl = &parser.FuncDeclStmt{

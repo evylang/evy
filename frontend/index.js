@@ -964,6 +964,7 @@ async function share() {
   button.className = "copy"
   button.innerHTML = `<svg><use href="#icon-copy" /></svg>`
   button.onclick = () => {
+    input.select()
     navigator.clipboard.writeText(input.value)
     hideModal()
   }

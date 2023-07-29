@@ -262,6 +262,13 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (Value, error) {
 	if err != nil {
 		return nil, err
 	}
+	if arr.T.Sub.Name == parser.ANY {
+		for i, e := range elements {
+			if _, ok := e.(*Any); !ok {
+				elements[i] = &Any{Val: e}
+			}
+		}
+	}
 	return &Array{Elements: &elements, T: arr.T}, nil
 }
 
@@ -271,6 +278,11 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (Value, error) {
 		val, err := e.Eval(node)
 		if err != nil {
 			return nil, err
+		}
+		if m.T.Sub.Name == parser.ANY {
+			if _, ok := val.(*Any); !ok {
+				val = &Any{Val: val}
+			}
 		}
 		pairs[key] = copyOrRef(val)
 	}

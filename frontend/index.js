@@ -171,8 +171,8 @@ function jsError(ptr, len) {
     msgs += `line ${g.line}: ${g.msg}\n`
   }
   const output = document.querySelector("#console")
-  output.textContent = msgs
-  output.scrollTo({ behavior: "smooth", left: 0, top: 0 })
+  output.textContent += msgs
+  output.scrollTo({ behavior: "smooth", left: 0, top: output.scrollHeight })
   editor.update({ errorLines })
 }
 

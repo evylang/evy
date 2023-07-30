@@ -38,6 +38,12 @@ func (e ExitError) Error() string {
 	return fmt.Sprintf("exit %d", int(e))
 }
 
+type PanicError string
+
+func (e PanicError) Error() string {
+	return string(e)
+}
+
 // Error is an Evy evaluator error.
 type Error struct {
 	err   error

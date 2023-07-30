@@ -118,11 +118,20 @@ func (c *runCmd) Run() error {
 	builtins := evaluator.DefaultBuiltins(rt)
 	eval := evaluator.NewEvaluator(builtins)
 	err = eval.Run(string(b))
+	handlEvyErr(err)
+	return nil
+}
+
+func handlEvyErr(err error) {
+	if err == nil {
+		return
+	}
 	var exitErr evaluator.ExitError
 	if errors.As(err, &exitErr) {
 		os.Exit(int(exitErr))
 	}
-	return err
+	fmt.Fprintln(os.Stderr, err.Error())
+	os.Exit(1)
 }
 
 func (c *fmtCmd) Run() error {

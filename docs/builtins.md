@@ -426,7 +426,8 @@ Output
 The `del` function takes two arguments: a map and a key. It deletes the
 key-value entry from the map if the key exists. If the key does not
 exist, the function does nothing. The map can have any value type, and
-the key can be any string.
+the key can be any string. It is safe to delete values from the map
+with `del` while iterating with a `for … range` loop.
 
 ## Program control
 

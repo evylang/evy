@@ -87,7 +87,7 @@ check-evy-fmt:
 doc: doctest toc
 
 DOCTEST_CMD = ./scripts/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
-DOCTESTS = docs/builtins.md
+DOCTESTS = docs/builtins.md docs/spec.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 

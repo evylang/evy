@@ -1,40 +1,80 @@
-# Evy syntax specification
+# Evy language specification
 
-`evy` is a [statically typed], [garbage collected],
+Evy is a [statically typed], [garbage collected],
 [procedural] programming language. Its main design goal is to help
-learn programming. `evy` aims for simplicity and directness in its
+learn programming. Evy aims for simplicity and directness in its
 tooling and syntax. Several features typical of modern programming
 languages are purposefully left out.
 
-`evy`'s syntax is specified using a [WSN] grammar, a variant of
-[EBNF] grammars, borrowing concepts from the [Go Programming Language
-Specification].
-
-For an intuitive understanding of `evy` see its [syntax by example].
+To get an intuitive understanding of Evy, you can either look at its
+[syntax by example](syntax_by_example.md) or read through the
+[builtins documentation](builtins.md).
 
 [statically typed]: https://developer.mozilla.org/en-US/docs/Glossary/Static_typing
 [garbage collected]: https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)
 [procedural]: https://en.wikipedia.org/wiki/Procedural_programming
+
+#### Table of Contents
+
+<!-- gen:toc -->
+
+1. [**Syntax grammar**](#syntax-grammar)  
+   [WSN syntax grammar](#wsn-syntax-grammar), [Evy syntax grammar](#evy-syntax-grammar)
+2. [**Comments**](#comments)
+3. [**Types**](#types)
+4. [**Variables and Declarations**](#variables-and-declarations)
+5. [**Zero Values**](#zero-values)
+6. [**Assignments**](#assignments)
+7. [**Copy and reference**](#copy-and-reference)
+8. [**Scope**](#scope)
+9. [**Strings**](#strings)
+10. [**Arrays**](#arrays)
+11. [**Maps**](#maps)
+12. [**Index and Slice**](#index-and-slice)
+13. [**Operators**](#operators)
+14. [**Precedence**](#precedence)
+15. [**Whitespace**](#whitespace)
+16. [**Functions**](#functions)
+17. [**Variadic functions**](#variadic-functions)
+18. [**Break and Return**](#break-and-return)
+19. [**Typeof**](#typeof)
+20. [**Type assertion**](#type-assertion)
+21. [**Event Handler**](#event-handler)
+22. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+
+<!-- genend:toc -->
+
+## Syntax grammar
+
+The Evy syntax grammar is a [WSN] grammar, which is a formal set of
+rules that define how Evy programs are written. The Evy compiler uses
+the syntax grammar to parse Evy source code, which means that it checks
+that the code follows the rules of the grammar.
+
 [WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
-[EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
-[Go Programming Language Specification]: https://go.dev/ref/spec
-[syntax by example]: syntax_by_example.md
 
-## WSN syntax grammar
+### WSN syntax grammar
 
-The top level element of a WSN grammar is called _production_. For
-example, `OPERATOR = "+" | "-" | "*" | "/" .` is a production
-specifying an operator. A production consists of an _expression_
-assigned to an _identifier_ or production name. Each production is
-terminated by a period `.`. An expression consists of terms and the
-following operators in increasing precedence:
+Evy's syntax is specified using a WSN grammar, a variant of
+[EBNF] grammars, borrowing concepts from the [Go Programming Language
+Specification].
 
-    |   alternation: `a | b` stands for `a` or `b`.
-    ()  grouping: `(a|b)c` stands for `ac | bc`.
-    []  optionality:  `[a]b` stands for `ab | b`.
-    {}  repetition (0 to n times):  `{a}` stands for `ε | a | aa | aaa | ....`.
+_Productions_ are the top-level elements of a WSN grammar. For example,
+the production `OPERATOR = "+" | "-" | "*" | "/" .` specifies that an
+operator can be one of the characters `+`, `-`, `*`, or `/`.
 
-`a … b` are single characters from `a` through `b` as alternatives.
+A production consists of an _expression_ assigned to an _identifier_ or
+production name. Each production is terminated by a period `.`. An
+expression consists of _terms_ and the following operators in
+increasing precedence:
+
+- _Alternation:_ `|` stands for "or". For example, `a | b` stands for `a` or `b`.
+- _Grouping:_ `()` stands for grouping. For example, `(a|b)c` stands for `ac` or `bc`.
+- _Optionality:_ `[]` stands for optionality. For example, `[a]b` stands for `ab` or `b`.
+- _Repetition:_ `{}` stands for repetition. For example, `{a}` stands for the empty string, `a`, `aa`, `aaa`, ...".
+
+`a … b` stands for a range of single characters from `a` to `b`,
+inclusive.
 
 Here is a WSN defining itself:
 
@@ -48,126 +88,145 @@ Here is a WSN defining itself:
                  "(" expression ")" |
                  "{" expression "}" .
     identifier = LETTER { LETTER } .
-    literal    = """ CHARACTER { CHARACTER } """ .
+    literal    = """ CHARACTER { CHARACTER } """ . /* """" is a literal `"` */
     LETTER     = "a" … "z" | "A" … "Z" | "_" .
     CHARACTER  = /* an arbitrary Unicode code point */ .
 
-By convention, upper case production names identify _terminal tokens_.
-Terminal tokens are the leaves in the grammar that cannot be expanded
-further. Lower case production names identify _non-terminals_, which
-are production names that may be expanded further. Lexical tokens are
-enclosed in double quotes `""`. Comments are fenced by `/* … */`.
+_Terminals_ are the leaves in the grammar that cannot be expanded
+further. By convention, terminals are identified by production names
+in uppercase.
 
-There are two special fencing tokens in evy's grammar related to
+_Non-terminals_, on the other hand, can be expanded into other
+productions. This means that they can be replaced by a more complex
+expression. By convention, non-terminals are identified by production
+names in lowercase.
+
+_Literals_ or lexical tokens are enclosed in double quotes `""`.
+Comments are fenced by `/*` … `*/`.
+
+There are two special fencing tokens in Evy's grammar related to
 horizontal whitespace, `<-` … `->` and `<+` … `+>`. `<-` … `->` means
 no horizontal whitespace is allowed between the terminals of the
 enclosed expression, e.g. `3+5` inside `<-` … `->` is allowed, but
 `3 + 5` is not. The fencing tokens `<+` … `+>` are the default and mean
 horizontal whitespace is allowed (again) between terminals.
 
-See section [whitespace](#whitespace) for further details.
+See the section on [whitespace](#whitespace) for further details.
 
-## Evy syntax grammar
+[EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
+[Go Programming Language Specification]: https://go.dev/ref/spec
 
-The `evy` source code is UTF-8 encoded. The NUL character `U+0000` is
-not allowed.
+### Evy syntax grammar
 
-    program    = { statement | func | event_handler | NL } .
-    statements = statement { statement } .
+Evy source code is UTF-8 encoded, which means that it can contain any
+Unicode character. The NUL character `U+0000` is not allowed, as it is
+a special character that is used during compilation.
+
+The `WS` abbreviation in the grammar comments below refers to horizontal
+whitespace, which is any combination of spaces and tabs. The following
+listing contains the complete syntax grammar for Evy.
+
+    program    = { statement | func | event_handler | nl } eof .
+    statements = { nl } statement { statement | nl } .
     statement  = typed_decl_stmt | inferred_decl_stmt |
                  assign_stmt |
                  func_call_stmt |
                  return_stmt | break_stmt |
-                 if_stmt | for_stmt | while_stmt .
+                 if_stmt | while_stmt | for_stmt .
 
     /* --- Functions and Event handlers ---- */
-    func            = "func" ident func_signature NL
+    func            = "func" ident func_signature nl
                           statements
-                      "end" NL .
+                      "end" nl .
     func_signature  = [ ":" type ] params .
     params          = { typed_decl } | variadic_param .
     variadic_param  = typed_decl "..." .
 
-    event_handler   = "on" ident NL
+    event_handler   = "on" ident params nl
                           statements
-                      "end" NL .
+                      "end" nl .
 
     /* --- Control flow --- */
-    if_stmt = "if" toplevel_expr NL
-                    statements
-              { "else" "if" toplevel_expr NL
-                    statements }
-              [ "else" NL
-                    statements ]
-              "end" NL .
+    if_stmt         = "if" toplevel_expr nl
+                            statements
+                      { "else" "if" toplevel_expr nl
+                            statements }
+                      [ "else" nl
+                            statements ]
+                      "end" nl .
 
-    for_stmt   = "for" range NL
-                    statements
-                 "end" NL .
+    while_stmt      = "while" toplevel_expr nl
+                          statements
+                      "end" nl .
+
+    for_stmt   = "for" range nl
+                      statements
+                 "end" nl .
     range      = [ ident ":=" ] "range" range_args .
     range_args = <- expr -> [ <- expr -> [ <- expr -> ] ] .
-    while_stmt = "while" toplevel_expr NL
-                     statements
-                 "end" NL .
 
-    return_stmt = "return" [ toplevel_expr ] NL .
-    break_stmt  = "break" NL .
+    return_stmt = "return" [ toplevel_expr ]  nl .
+    break_stmt  = "break" nl .
 
     /* --- Statement ---- */
-    assign_stmt        = assignable "=" toplevel_expr NL .
-    typed_decl_stmt    = typed_decl NL .
-    inferred_decl_stmt = ident ":=" toplevel_expr NL .
-    func_call_stmt     = func_call NL .
+    assign_stmt        = assignable "=" toplevel_expr nl .
+    typed_decl_stmt    = typed_decl nl .
+    inferred_decl_stmt = ident ":=" toplevel_expr nl .
+    func_call_stmt     = func_call nl .
 
     /* --- Assignment --- */
-    assignable     = <- ident | index_expr | dot_expr -> . /* no WS around `[…]` and `.` */
+    assignable     = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
     ident          = LETTER { LETTER | UNICODE_DIGIT } .
-    index_expr     = assignable "[" expr "]" .
+    index_expr     = assignable "[" <+ toplevel_expr +> "]" .
     dot_expr       = assignable "." ident .
 
     /* --- Type --- */
-    typed_decl     = <- ident ":" type -> . /* no WS allowed. */
+    typed_decl     = ident ":" type .
     type           = BASIC_TYPE | DYNAMIC_TYPE | COMPOSITE_TYPE .
     BASIC_TYPE     = "num" | "string" | "bool" .
     DYNAMIC_TYPE   = "any" .
     COMPOSITE_TYPE = array_type | map_type .
-    array_type     = "[]" type .
-    map_type       = "{}" type .
+    array_type     = "[" "]" type .
+    map_type       = "{" "}" type .
 
     /* --- Expressions --- */
     toplevel_expr = func_call | expr .
 
     func_call = ident args .
-    args      = { tight_expr } .  /* no WS within single arg, WS is arg separator */
+    args      = { tight_expr } . /* no WS within single arg, WS is arg separator */
 
-    tight_expr = <- expr -> .     /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
+    tight_expr = <- expr -> . /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
     expr       = operand | unary_expr | binary_expr .
 
     operand    = literal | assignable | slice | type_assertion | group_expr .
     group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
-    type_assertion = <- assignable "." "(" type ")" -> .
+    type_assertion = <- assignable ".(" -> type ")" . /* no WS around `.` */
 
-    unary_expr = <- UNARY_OP -> expr .  /* WS not allowed after UNARY_OP */
+    unary_expr = <- UNARY_OP -> expr .  /* no WS after UNARY_OP */
     UNARY_OP   = "-" | "!" .
 
-    binary_expr   = expr BINARY_OP expr .
-    BINARY_OP     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
+    binary_expr   = expr binary_op expr .
+    binary_op     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
     LOGICAL_OP    = "or" | "and" .
     COMPARISON_OP = "==" | "!=" | "<" | "<=" | ">" | ">=" .
     ADD_OP        = "+" | "-" .
     MUL_OP        = "*" | "/" | "%" .
 
     /* --- Slice and Literals --- */
-    slice       = assignable "[" [expr] ":" [expr] "]" .
+    slice       = <- assignable "[" slice_expr "]" -> .
+    slice_expr  = <+ [expr] ":" [expr] +> .
     literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
     num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
                   DECIMAL_DIGIT { DECIMAL_DIGIT } "." { DECIMAL_DIGIT } .
     string_lit  = """ { UNICODE_CHAR } """ .
     BOOL_CONST  = "true" | "false" .
-    array_lit   = "[" <+ array_elems +> "]" . /* WS can be used freely within `[…], but not inside the elements` */
-    array_elems = { tight_expr [NL] } .
-    map_lit     = "{" <+ map_elems +> "}" .   /* WS can be used freely within `{…}, but not inside the values` */
-    map_elems   = { ident ":" tight_expr [NL] } .
+    array_lit   = "[" <+ array_elems +> "]" . /* WS can be used freely within `[…]`, but not inside the elements */
+    array_elems = { tight_expr [nl] } .
+    map_lit     = "{" <+ map_elems +> "}" . /* WS can be used freely within `{…}`, but not inside the values */
+    map_elems   = { ident ":" tight_expr [nl] } .
+    nl          = [ COMMENT ] NL .
+    eof         = [ COMMENT ] EOF .
+    COMMENT     = "//" { UNICODE_CHAR } .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .
@@ -175,8 +234,8 @@ not allowed.
     UNICODE_DIGIT  = /* a Unicode code point categorized as "Number, decimal digit" */ .
     UNICODE_CHAR   = /* an arbitrary Unicode code point except newline */ .
     DECIMAL_DIGIT  = "0" … "9" .
-    NL             = "\n" {"\n"} .
-    WS             = " " | "\t" {" " | "\t"} .
+    NL             = "\n"  . /* end of file */
+    EOF            = "" . /* end of file */
 
 ## Comments
 

@@ -156,7 +156,7 @@ func (p *parser) parse() *Program {
 }
 
 // function names matching `parsePRODUCTION` align with production names
-// in grammar doc/syntax_grammar.md.
+// in grammar doc/spec.md.
 func (p *parser) parseProgram() *Program {
 	program := &Program{formatting: p.formatting}
 	p.scope = newScope(nil, program)

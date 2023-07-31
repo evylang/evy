@@ -92,7 +92,7 @@ doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
 TOC_CMD = ./scripts/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
-TOCFILES = docs/builtins.md
+TOCFILES = docs/builtins.md docs/spec.md
 toc:
 	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
 

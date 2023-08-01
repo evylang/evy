@@ -40,7 +40,7 @@ To get an intuitive understanding of Evy, you can either look at its
     [Vertical whitespace](#vertical-whitespace)
 18. [**Horizontal whitespace**](#horizontal-whitespace)
 19. [**Functions**](#functions)  
-    [Variadic functions](#variadic-functions)
+    [Bare returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic functions](#variadic-functions)
 20. [**Break and Return**](#break-and-return)
 21. [**Typeof**](#typeof)
 22. [**Type assertion**](#type-assertion)
@@ -1046,6 +1046,8 @@ func isValid:bool s:string maxLen:num
 end
 ```
 
+### Bare returns
+
 _Bare returns_ are return statements without values. They can be used in
 functions without result type. For example, the following code defines a
 function called _validate_ that takes a map as an argument and does not
@@ -1077,6 +1079,27 @@ length of abc: 3
 Function names must be unique within an Evy program. This means that no
 two functions can have the same name. Function names also cannot be the
 same as a variable name.
+
+### Function Names
+
+Function names in Evy must start with a letter or underscore, and can
+contain any combination of letters, numbers, and underscores. They
+cannot be the same as keywords, such as `if`, `func`, or any built-in
+or other defined function names.
+
+### Anonymous Parameters
+
+The anonymous parameter `_` is a special parameter in Evy that can be
+used as a placeholder for a named parameter. It can be used for
+multiple parameters in a single function, but it cannot be read. For
+example, the following code defines an event handler for the pointer down
+event that only uses the `y` parameter:
+
+```evy
+on down _:num y:num
+    print "y:" (round y)
+end
+```
 
 ### Variadic functions
 

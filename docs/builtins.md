@@ -1,12 +1,17 @@
 # Builtins
 
-Evy provides built-in functions and events that allow for user
-interaction, graphics, animation, mathematical operations, and more.
+_Builtins_ in Evy are pre-defined functions and events that allow for
+user interaction, graphics, animation, mathematical operations, and
+more.
 
-Functions are self-contained blocks of code that perform a specific
-task. Events are notifications that are sent to a program when
+_Functions_ are self-contained blocks of code that perform a specific
+task. _Events_ are notifications that are sent to a program when
 something happens, such as when a user moves the mouse or presses a
 key.
+
+For a more formal definition of the Evy syntax, see the
+[Language Specification](spec.md), and for an intuitive understanding
+see [syntax by example](syntax_by_example.md).
 
 #### Table of Contents
 

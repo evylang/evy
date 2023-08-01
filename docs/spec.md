@@ -31,16 +31,20 @@ To get an intuitive understanding of Evy, you can either look at its
 10. [**Arrays**](#arrays)
 11. [**Maps**](#maps)
 12. [**Index and Slice**](#index-and-slice)
-13. [**Operators**](#operators)
+13. [**Operators and Expressions**](#operators-and-expressions)  
+    [Arithmetic and Concatenation Operators](#arithmetic-and-concatenation-operators), [Logical Operators](#logical-operators), [Comparison Operators](#comparison-operators), [Unary Operators](#unary-operators)
 14. [**Precedence**](#precedence)
-15. [**Whitespace**](#whitespace)
-16. [**Functions**](#functions)
-17. [**Variadic functions**](#variadic-functions)
-18. [**Break and Return**](#break-and-return)
-19. [**Typeof**](#typeof)
-20. [**Type assertion**](#type-assertion)
-21. [**Event Handler**](#event-handler)
-22. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+15. [**Statements**](#statements)
+16. [**Whitespace**](#whitespace)  
+    [Vertical whitespace](#vertical-whitespace)
+17. [**Horizontal whitespace**](#horizontal-whitespace)
+18. [**Functions**](#functions)  
+    [Variadic functions](#variadic-functions)
+19. [**Break and Return**](#break-and-return)
+20. [**Typeof**](#typeof)
+21. [**Type assertion**](#type-assertion)
+22. [**Event Handler**](#event-handler)
+23. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
 
 <!-- genend:toc -->
 
@@ -702,195 +706,401 @@ expressions must not be preceded by whitespace before the `[` character,
 just like indexing an array or string. For more details, see the section
 on[whitespace](#whitespace).
 
-## Operators
+## Operators and Expressions
 
-Binary operations can only be executed with operands of the same type.
-There is no automated type conversion of operands.
+_Operators_ are special symbols or identifiers that combine the values of
+their operands into a single value. _Operands_ are the variables or
+literal values that the operator acts on. The combination of operands
+and operators is called expression. An _expression_ is a combination
+of literal values, operators, variables, and further nested expressions
+that evaluates to a single value.
 
-    operands   operators      result
-    num        + - * / %      num
-    string     +              string
-    array      +              array
-    bool       and or         bool
-    num        <  <=  >  >=   bool
-    string     <  <=  >  >=   bool
+In Evy, there are two types of operators: unary operators and binary
+operators:
 
-`==` and `!=` compare two operands of the same type for equality and
-have a `bool` result.
+- _Unary operators_ act on a single operand. For example, the unary operator `-` negates the value of its operand.
+- _Binary operators_ act on two operands. For example, the binary operator `+` adds the two operands together.
 
-`+` `-` `*` `/` `%` stand for addition, subtraction, multiplication,
-division and the [modulo operator]. `+` may also be used as
-concatenation operator for `string` and `array` types.
+Operators can be combined to form larger expressions, for example, the
+expression `-delta + 3` would first negate the value of the variable `delta` and
+then add literal number `3` to the result.
 
-Boolean operators `and`, `or` stand for [logical conjunction (AND)] and
-[logical disjunction (OR)]. They perform [short-circuit evaluation]
-where the right-hand side of the operator is not evaluated if the result
-of the operation can be determined from the left-hand side alone.
-Comparison operators `<` `<=` `>` `>=` stand for less, less or equal,
+Binary expressions can only be evaluated if the operands are of the
+same type. For example, you cannot add a string to a number. There is
+no automated type conversion of operands.
+
+There are a variety of binary operators: arithmetic, concatenation,
+logical, and comparison operators.
+
+| Operator            | Operands  | Result   | Description   |
+| ------------------- | --------- | -------- | ------------- |
+| `+` `-` `*` `/` `%` | `num`     | `num`    | arithmetic    |
+| `+`                 | `string`  | `string` | concatenation |
+| `+`                 | array     | array    | concatenation |
+| `and` `or`          | `bool`    | `bool`   | logical       |
+| `<` `<=` `>` `>=`   | `num`     | `bool`   | comparison    |
+| `<` `<=` `>` `>=`   | `string`  | `bool`   | comparison    |
+| `==` `!=`           | all types | `bool`   | comparison    |
+
+### Arithmetic and Concatenation Operators
+
+The _arithmetic operators_ `+`, `-`, `*`, `/`, and `%` stand for addition,
+subtraction, multiplication, division, and the [modulo operator]. The
+symbol `+` can also be used to concatenate strings and arrays.
+
+The _modulo operator_ `%`, also known as the remainder operator, returns the
+remainder of a division operation. For example, `10 % 3` results in
+`1`, because `10` divided by `3` has a remainder of `1`.
+
+The _concatenation operator_ `+`, combines two strings or two arrays
+together. For example, `"fire"` + `"engine"` combines into the string
+`"fireengine"`.
+
+[modulo operator]: https://en.wikipedia.org/wiki/Modulo_operation
+
+### Logical Operators
+
+The _logical operators_ `and` and `or` are used to perform
+[logical conjunction] and [logical disjunction]. They are used to
+perform logical operations on boolean values with type `bool`.
+
+The `and` operator evaluates to `true` if both operands are `true`. The
+`or` operator evaluates to `true` if either operand is `true`.
+
+These operators perform [short-circuit evaluation], which means that the
+right-hand side of the operator is not evaluated if the result of the
+operation can be determined from the left-hand side alone.
+
+For example, the expression `false and true` evaluates to `false`
+because the first operand is `false`. The second operand does not need
+to be evaluated because the result of the expression is already known
+to be `false`.
+
+[logical conjunction]: https://en.wikipedia.org/wiki/Truth_table#Logical_conjunction_(AND)
+[logical disjunction]: https://en.wikipedia.org/wiki/Truth_table#Logical_disjunction_(OR)
+[short-circuit evaluation]: https://en.wikipedia.org/wiki/Short-circuit_evaluation
+
+### Comparison Operators
+
+The _comparison operators_ `<` `<=` `>` `>=` stand for less, less or equal,
 greater, greater or equal. Their operands may be `num` or `string`
 values. For `string` types [lexicographical comparison] is used.
 
-The unary operator `-` stands for the negative sign and can only be used
-with `num`. The unary operator `!` stands for [logical negation] and
-can only be used with `bool`. Unary operators `-` and `!` must not be
-followed by horizontal whitespace.
+The _comparison operators_ `==` and `!=` compare two operands of the
+same type for equality and inequality. The operands of these operators
+can be basic types, such as numbers and strings, or composite types,
+such as arrays and maps. The result of a comparison operation is the
+boolean value `true` or `false`.
 
-    a := 1
-    b := 2
-    print a-b     // -1
-    print (a - b) // -1
-    print a -b    // 1 -2
-    print a - b   // compile time error
-
-See section [whitespace](#whitespace) for further details.
-
-[modulo operator]: https://en.wikipedia.org/wiki/Modulo_operation
-[logical conjunction (AND)]: https://en.wikipedia.org/wiki/Truth_table#Logical_conjunction_(AND)
-[logical disjunction (OR)]: https://en.wikipedia.org/wiki/Truth_table#Logical_disjunction_(OR)
-[short-circuit evaluation]: https://en.wikipedia.org/wiki/Short-circuit_evaluation
-[logical negation]: https://en.wikipedia.org/wiki/Truth_table#Logical_negation
 [lexicographical comparison]: https://en.wikipedia.org/wiki/Lexicographic_order
+
+### Unary Operators
+
+_Unary operators_ are operators that operate on a single operand. In
+Evy, there are two unary operators: `-` and `!`.
+
+- The unary operator `-` negates the value of a numeric operand. For example, `-delta` negates the value of `delta`.
+- The unary operator `!` performs [logical negation] on a boolean operand. For example, `!true` evaluates to `false`.
+
+Unary operators must not be immediately followed by whitespace. For example, the
+`-delta` is valid, but `- delta` is not.
+
+The following sample illustrates the care needed with operators and
+whitespace
+
+```evy
+a := 10
+b := 3
+print 1 a-b
+print 2 (a - b)
+print 3 a -b
+// print a - b // compile time error
+```
+
+Output:
+
+```evy:output
+1 7
+2 7
+3 10 -3
+```
+
+For more information about whitespace, see the
+[whitespace](#whitespace) section.
+
+[logical negation]: https://en.wikipedia.org/wiki/Truth_table#Logical_negation
 
 ## Precedence
 
-The index `a[i]`, dot `a.b` and group `(` … `)`expressions have the
-highest precedence, followed by the unary operators `-` and `!`.
-Finally, binary operators have the following order of precedence:
+Operators in Evy are evaluated in a specific order, called _precedence_.
+The order of precedence is as follows:
 
-    precedence    Operator
-        6             *  /  %
-        5             +  -
-        4             <  <=  >  >=
-        3             ==  !=
-        2             and
-        1             or
+1. Indexing, dot notation and grouped expressions: `a[i]` `a.b` `(` … `)`
+2. Unary operators: `-delta` `!true`
+3. Binary operators
+   1. Multiplication, division, and modulo: `*` `/` `%`
+   2. Addition and subtraction: `+` `-`
+   3. Comparison operators: `<` `<=` `>` `>=`
+   4. Equality operators: `==` `!=`
+   5. Logical conjunction: `and`
+   6. Logical disjunction: `or`
+
+Operators of the same precedence are evaluated from left to right. For
+example, the expression `a[i] - 5 * 2` will be evaluated as follows:
+
+- The index `a[i]` will be evaluated first.
+- The multiplication `5 * 2` will be evaluated next.
+- The subtraction `- 5 * 2` will be evaluated last.
+
+If you want to change the order of precedence, you can use parentheses
+to group expressions. For example, the expression `(a[i] - 5) * 2` will
+be evaluated as follows:
+
+- The expression `a[i] - 5` will be evaluated first.
+- The multiplication `* 2` will be evaluated next.
+
+## Statements
+
+A _statement_ is a unit of code that performs an action. Statements are
+the building blocks of programs, and they can be used to control the
+flow of execution.
+
+Statements can be divided into two categories: block statements and basic statements.
+
+- _Basic statements_ are statements that cannot be broken down into further statements.
+- _Block statements_ are statements that contain further statements.
+
+There are 5 types of block statements in Evy:
+
+- Function definition
+- Event Handler definitions
+- If statements
+- For statements
+- While statements
+
+There are 5 types of basic statements in Evy:
+
+- Variable declaration statement
+- Assignment statement
+- Function call statement
+- Return statement
+- Break statement
+
+Not all statements are allowed in all contexts. For example, a return
+statement may only be used within a function definition.
 
 ## Whitespace
 
-Vertical whitespace is newlines, `NL` in the grammar. It delimits
-statements. Array and map literals are the exception as they can be
-very large and allow for whitespace `NL` within:
+Whitespace in Evy is used to separate different parts of a program.
+There are two types of whitespace in Evy: vertical whitespace and
+horizontal whitespace.
 
-    person := {
-        name: "Jane Goddall"
-        born: 1934
-    }               // valid map declaration
-    x := 1 +
-         2          // compile time error
+### Vertical whitespace
 
-Horizontal whitespace is tabs or spaces, `WS` in the grammar. `WS` is
-used as a separator between elements in lists and cannot be
-used _within_ an element. These lists include argument list to a
-function call and the element lists of array literals or map literals.
-To further avoid confusion, whitespace within index expression, dot
-expressions or unary expressions is not allowed.
+Vertical whitespace is a sequence of one or more newline characters that
+can optionally contain comments. It is used to terminate or end basic
+statements in Evy. A basic statement is a statement that cannot be
+broken up into smaller statements, such as a variable declaration,
+an assignment or a function call.
 
-More formally, `WS` between tokens or terminals as defined in the
-grammar is ignored except for the following cases:
+Evy does not allow multiple statements on a single line. For example,
+the following code is invalid because it contains two statements, a
+declaration and a function call, on one line:
 
-1. `WS` is not allowed in assignables, around `DOT`, or before array or
-   map index. Invalid: `person .name`, `person. name`, `array [1] = 2`.
-   Valid: `person.name`, `array[1] = 2`.
+`x := 1      print x`
 
-2. `WS` is not allowed following the unary operators `-` and `!`.
+It is also not possible to break up a single basic statement over more
+than one line. For example, the following code is invalid because the
+arithmetic expression `1 + 2` is split over two lines:
 
-3. `WS` is used as the separator in expression lists in function call
-   arguments and array elements. `WS` is therefore _not_ allowed within
-   the expressions of an expression list, including the values of map
-   literal definitions.
+```
+x := 1 +
+     2
+```
 
-4. `WS` is allowed within the expression of an expression list if the
-   expression is surrounded by `()`, `[]` or `{}`, `e.g. [ ( 2 + 3 ) ]`,
-   not `WS` directly after `[` and within `( … )`
+The rule that basic statements cannot be split across multiple lines has
+one exception: Array literals and map literals can be broken up over
+multiple lines, as long as each line is a complete expression. For
+example, the following code is valid because it is a declaration with a
+multiline map literal:
 
-5. `WS` can be freely used in single expressions for assignments,
-   inferred declarations, return statements, `if` conditions and `while`
-   conditions, as well as within parentheses `(…)`
+```evy
+person := {
+    name:"Jane Goddall"
+    born:1934
+}
+print person
+```
 
-Examples:
+## Horizontal whitespace
 
-    print -5      // -5
-    print - 5     // invalid
-    print 2-1     // 1
-    print 2 -1    // 2 -1
-    print 2 - 1   // invalid
-    a := 2 - 1    // valid!
+_Horizontal whitespace_ is a sequence of tabs or spaces that is used to
+separate elements in lists. Lists include the argument list to a
+function call, the element list of an array literal, and the value in
+the key-value pairs of a map literal. However, horizontal whitespace
+is not allowed _within_ this list elements.
 
-    arr := ["a" "b"]
-    print arr[1]        // b
-    print arr [1]       // [a b] [1]
-    arr [0] = "A"       // invalid
-    arr2 :=[ 1   ]      // valid
-    arr3 := [[1][2]]    // valid
-    arr3 := [[1] [ 2] ] // valid
-    arr3 := [1 + 1 ]    // invalid
+Horizontal whitespace is not allowed around the dot expression `.` or
+before the opening brace `[` in an index expression or slice
+expression. However, it is allowed _within_ the grouping expression,
+index expression, and slice expression, even if the expression is an
+element of a list such as an argument to a function call.
 
-    m1 := { age:3+6 name:"mary"+"anne" }     // valid
-    m2 := {age:  12 name:"mary"}             // valid
-    m1.address = "10 Downing" + "Street"     // valid
-    m3 := {address: "10 Downing" + "Street"} // invalid
+Assignments, inferred variable declarations, return statements and the
+the expression inside an index expression `[ … ]` _can_ have whitespace
+around their binary operators. The whitespace around the operators is
+optional, but it is often used to improve the readability of the code,
+for example:
 
-    func add:num n1:num n2:num
-        return n1 + n2 // valid
-    end
-    print (add 1 2)  // 3
-    print add 1 2    // invalid
+```evy
+x := 5 + 3
+x = 7 - 2
+
+arr := [1 2 3]
+arr[3 - 2] = 10
+
+func fn:num
+    return 7 + 1
+end
+
+print x arr (fn)
+```
+
+More formally, horizontal whitespace `WS` between tokens or terminals as
+defined in the grammar is ignored and can be used freely with the
+addition of the following rules:
+
+1. `WS` is not allowed around dot `.` in dot expressions.
+2. `WS` is not allowed around before the `[` in index or slice expressions.
+3. `WS` is not allowed following the unary operators `-` and `!`.
+4. `WS` is not allowed within arguments to a function call
+5. `WS` is not allowed within elements of an array literal
+6. `WS` is not allowed within the values of a map literal's key-value pairs.
+7. `WS` is allowed within any grouping expression `(` … `)`.
+8. `WS` is allowed within an index expression `[` … `]`.
+9. `WS` is allowed within a slice expression `[` … `:` … `]`.
+
+Here are some examples of incorrect uses of horizontal whitespace, along
+with their correct uses.
+
+Invalid:
+
+```
+print - 5
+len "a" + "b"
+
+arr := [1 + 1]
+arr [0] = 3 + 2
+print 2 + arr [0]
+
+map := {address: "10 Downing" + "Street"}
+map.  address = "221B Baker Street"
+
+print len map
+```
+
+Valid:
+
+```evy
+print -5
+len "a"+"b"
+
+arr := [1+1]
+arr[0] = 3 + 2
+print 2+arr[0]
+
+map := {address:"10 Downing"+"Street"}
+map.address = "221B Baker Street"
+
+print (len map)
+```
 
 ## Functions
 
-A function declaration binds an identifier, the function name, to a
-function. As part of the function declaration, the function signature
-defines the number, order and types of input parameters as well as the
-result or return type of the function. If the return type is left out
+_Functions_ are blocks of code that are used to perform a specific task.
+They are often used to encapsulate code that is used repeatedly, so
+that it can be called from different parts of a program.
+
+A _function definition_ binds an identifier, the function name, to a
+function. As part of the function definition, the _function signature_
+declares the number, order and types of input parameters as well as the
+result or return type of the function. If the return type is left out,
 the function does not return a value.
 
-    func is_valid:bool text:string cap:num
-        return (len text) <= cap
+For example, the following code defines a function called `isValid`
+that takes two parameters, `s` and `cap`, and returns a boolean
+result. The `s` parameter is of type `string` and the `cap`
+parameter is of type `num`. The return type of the function is `bool`.
+
+```evy
+func isValid:bool s:string maxLen:num
+    return (len s) <= maxLen
+end
+```
+
+_Bare returns_ are return statements without values. They can be used in
+functions without result type. For example, the following code defines a
+function called _validate_ that takes a map as an argument and does not
+return a value. The _return_ statement in the _if_ statement simply
+exits the function early.
+
+```evy
+func validate m:{}any
+    if m == {}
+        return
     end
+    // further validation
+end
+```
 
-The example above has a function name of `is_valid`, input parameters
-`text` of type `string` and `cap` of type `num`. The return type is
-`bool`.
-
-A variable may not use the same name as a function.
-
-Function calls used as arguments to another function call must be
+Function calls used as arguments to other function calls must be
 parenthesized to avoid ambiguity, for example:
 
-    print "valid:" (is_valid "abc" 5)
+```evy
+print "length of abc:" (len "abc")
+```
 
-Bare returns in functions without result types are allowed
+Output
 
-    func validate m:{}any
-        if m == {}
-            return
-        end
-        // further validation
+```evy:out
+length of abc: 3
+```
+
+Function names must be unique within an Evy program. This means that no
+two functions can have the same name. Function names also cannot be the
+same as a variable name.
+
+### Variadic functions
+
+_Variadic functions_ in Evy are functions that can take zero or more
+arguments of a specific type. The type of the variadic parameter is an
+array with the element type of the parameter. The length of the array
+is the number of arguments passed to the function.
+
+For example, the following code defines a variadic function called
+`quote` that can take any number of arguments of any type
+
+```evy
+func quote args:any...
+    words:[]string
+    for arg := range args
+        word := sprintf "«%v»" arg
+        words = words + [word]
     end
+    print (join words " ")
+end
 
-## Variadic functions
+quote "Life, universe and everything?" 42
+```
 
-A function with a single parameter may have a type suffixed with `...`.
-A function with such a parameter is called variadic and may be invoked
-with zero or more arguments for that parameter.
+Output
 
-If `f` is variadic with a parameter `p` of type `T...`, then within `f`
-the type of `p` is equivalent to type `[]T`. The length of the array is
-the number of arguments bound to `p` and may differ for each call.
-
-For example, `my_print` is a variadic function
-
-    func my_print args:any...
-        for arg := range args
-            write arg
-            write " "
-        end
-    end
-
-It can be called as `my_print "hello" "world" true 42`
+```evy:output
+«Life, universe and everything?» «42»
+```
 
 Unlike other languages, arrays cannot be turned into variadic arguments
-at the call site. The call arguments must be listed individually.
+in Evy. The call arguments must be listed individually.
 
 ## Break and Return
 

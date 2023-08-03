@@ -15,13 +15,13 @@ import (
 var (
 	ErrStopped = errors.New("stopped")
 
-	ErrRuntime       = errors.New("runtime error")
-	ErrBounds        = fmt.Errorf("%w: index out of bounds", ErrRuntime)
-	ErrRangeValue    = fmt.Errorf("%w: bad range value", ErrRuntime)
-	ErrMapKey        = fmt.Errorf("%w: no value for map key", ErrRuntime)
-	ErrSlice         = fmt.Errorf("%w: bad slice", ErrRuntime)
-	ErrBadArguments  = fmt.Errorf("%w: bad arguments", ErrRuntime)
-	ErrAnyConversion = fmt.Errorf("%w: error converting any to type", ErrRuntime)
+	ErrPanic         = errors.New("panic")
+	ErrBounds        = fmt.Errorf("%w: index out of bounds", ErrPanic)
+	ErrRangeValue    = fmt.Errorf("%w: bad range value", ErrPanic)
+	ErrMapKey        = fmt.Errorf("%w: no value for map key", ErrPanic)
+	ErrSlice         = fmt.Errorf("%w: bad slice", ErrPanic)
+	ErrBadArguments  = fmt.Errorf("%w: bad arguments", ErrPanic)
+	ErrAnyConversion = fmt.Errorf("%w: error converting any to type", ErrPanic)
 
 	ErrInternal         = errors.New("internal error")
 	ErrUnknownNode      = fmt.Errorf("%w: unknown AST node", ErrInternal)
@@ -42,6 +42,10 @@ type PanicError string
 
 func (e PanicError) Error() string {
 	return string(e)
+}
+
+func (e *PanicError) Unwrap() error {
+	return ErrPanic
 }
 
 // Error is an Evy evaluator error.

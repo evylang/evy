@@ -110,8 +110,8 @@ func (p *parser) consumeTokens(l *lexer.Lexer) []int {
 	var token *lexer.Token
 	for token = l.Next(); token.Type != lexer.EOF; token = l.Next() {
 		if token.Type == lexer.ILLEGAL {
-			if token.Literal == `"` {
-				p.appendErrorForToken(`unterminated string, missing "`, token)
+			if token.Literal == "invalid string" {
+				p.appendErrorForToken("invalid string", token)
 			} else {
 				msg := fmt.Sprintf("illegal character %q", token.Literal)
 				p.appendErrorForToken(msg, token)

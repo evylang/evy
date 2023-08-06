@@ -52,14 +52,8 @@ function accumulate_line(line, buffer) {
 # instead.
 function execute(cmd, input) {
 	tempfile = "/tmp/doctest.tmp"
-	print input | (cmd ">" tempfile)
-
-	rv = close(cmd ">" tempfile)
-	if (rv != 0) {
-		print "Error running:", cmd, "for:", builtin > "/dev/stderr"
-		print o > "/dev/stderr"
-		return -1
-	}
+	print input | (cmd ">" tempfile " 2>&1")
+	rv = close(cmd ">" tempfile " 2>&1")
 
 	o = ""
 	while (getline line < tempfile) {
@@ -67,6 +61,14 @@ function execute(cmd, input) {
 	}
 	close(tempfile)
 	system("rm " tempfile)
+
+	if (rv != 0) {
+		split(cmd, args)
+		print "Error running 'evy " args[2] "' for:", builtin > "/dev/stderr"
+		print o > "/dev/stderr"
+		close("/dev/stderr")
+		return -1
+	}
 	return o
 }
 

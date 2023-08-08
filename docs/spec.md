@@ -26,25 +26,26 @@ To get an intuitive understanding of Evy, you can either look at its
 5. [**Zero Values**](#zero-values)
 6. [**Assignments**](#assignments)
 7. [**Copy and reference**](#copy-and-reference)
-8. [**Scope**](#scope)
-9. [**Strings**](#strings)
-10. [**Arrays**](#arrays)
-11. [**Maps**](#maps)
-12. [**Index and Slice**](#index-and-slice)
-13. [**Operators and Expressions**](#operators-and-expressions)  
+8. [**Variable Names**](#variable-names)
+9. [**Scope**](#scope)
+10. [**Strings**](#strings)
+11. [**Arrays**](#arrays)
+12. [**Maps**](#maps)
+13. [**Index and Slice**](#index-and-slice)
+14. [**Operators and Expressions**](#operators-and-expressions)  
     [Arithmetic and Concatenation Operators](#arithmetic-and-concatenation-operators), [Logical Operators](#logical-operators), [Comparison Operators](#comparison-operators), [Unary Operators](#unary-operators)
-14. [**Precedence**](#precedence)
-15. [**Statements**](#statements)
-16. [**Whitespace**](#whitespace)  
+15. [**Precedence**](#precedence)
+16. [**Statements**](#statements)
+17. [**Whitespace**](#whitespace)  
     [Vertical whitespace](#vertical-whitespace)
-17. [**Horizontal whitespace**](#horizontal-whitespace)
-18. [**Functions**](#functions)  
-    [Variadic functions](#variadic-functions)
-19. [**Break and Return**](#break-and-return)
-20. [**Typeof**](#typeof)
-21. [**Type assertion**](#type-assertion)
-22. [**Event Handler**](#event-handler)
-23. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+18. [**Horizontal whitespace**](#horizontal-whitespace)
+19. [**Functions**](#functions)  
+    [Bare returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic functions](#variadic-functions)
+20. [**Break and Return**](#break-and-return)
+21. [**Typeof**](#typeof)
+22. [**Type assertion**](#type-assertion)
+23. [**Event Handler**](#event-handler)
+24. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
 
 <!-- genend:toc -->
 
@@ -415,6 +416,13 @@ generates the output
 
 For the dynamic type `any`, a copy is made if the value is a basic type.
 The variable is passed by reference if the value is a composite type.
+
+## Variable Names
+
+Variable names in Evy must start with a letter or underscore, and can
+contain any combination of letters, numbers, and underscores. They
+cannot be the same as keywords, such as `if`, `func`, or any built-in
+or defined function names.
 
 ## Scope
 
@@ -1038,6 +1046,8 @@ func isValid:bool s:string maxLen:num
 end
 ```
 
+### Bare returns
+
 _Bare returns_ are return statements without values. They can be used in
 functions without result type. For example, the following code defines a
 function called _validate_ that takes a map as an argument and does not
@@ -1069,6 +1079,27 @@ length of abc: 3
 Function names must be unique within an Evy program. This means that no
 two functions can have the same name. Function names also cannot be the
 same as a variable name.
+
+### Function Names
+
+Function names in Evy must start with a letter or underscore, and can
+contain any combination of letters, numbers, and underscores. They
+cannot be the same as keywords, such as `if`, `func`, or any built-in
+or other defined function names.
+
+### Anonymous Parameters
+
+The anonymous parameter `_` is a special parameter in Evy that can be
+used as a placeholder for a named parameter. It can be used for
+multiple parameters in a single function, but it cannot be read. For
+example, the following code defines an event handler for the pointer down
+event that only uses the `y` parameter:
+
+```evy
+on down _:num y:num
+    print "y:" (round y)
+end
+```
 
 ### Variadic functions
 

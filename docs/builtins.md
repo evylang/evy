@@ -474,7 +474,7 @@ fraction of a second, e.g. `sleep 0.1`.
 
 #### Example
 
-```evy
+```evy expect_err
 input := "not a number"
 n := str2num input
 

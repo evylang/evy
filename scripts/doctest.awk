@@ -36,6 +36,7 @@ BEGIN {
 function reset() {
 	code = input = output = ""
 	in_code = in_input = in_output = 0
+	delete(flags)
 }
 
 # accumulate lines in a buffer, leaving off the final newline
@@ -52,14 +53,8 @@ function accumulate_line(line, buffer) {
 # instead.
 function execute(cmd, input) {
 	tempfile = "/tmp/doctest.tmp"
-	print input | (cmd ">" tempfile)
-
-	rv = close(cmd ">" tempfile)
-	if (rv != 0) {
-		print "Error running:", cmd, "for:", builtin > "/dev/stderr"
-		print o > "/dev/stderr"
-		return -1
-	}
+	print input | (cmd ">" tempfile " 2>&1")
+	rv = close(cmd ">" tempfile " 2>&1")
 
 	o = ""
 	while (getline line < tempfile) {
@@ -67,6 +62,14 @@ function execute(cmd, input) {
 	}
 	close(tempfile)
 	system("rm " tempfile)
+
+	if (rv != 0 && !flags["expect_err"]) {
+		split(cmd, args)
+		print "Error running 'evy " args[2] "' for:", builtin > "/dev/stderr"
+		print o > "/dev/stderr"
+		close("/dev/stderr")
+		return -1
+	}
 	return o
 }
 
@@ -82,9 +85,12 @@ function execute(cmd, input) {
 # we get to the end of the code block. If `evy fmt` returns an error,
 # just print out the original code and send the error to stderr. Otherwise
 # output the formatted code in the place of the code.
-/^```evy$/ {
+/^```evy( .*)?$/ {
 	reset()
 	in_code = 1
+	for (i = 2; i <= NF; i++) {
+		flags[$i]=1
+	}
 	print; next
 }
 /^```$/ && in_code {

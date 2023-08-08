@@ -36,7 +36,8 @@ BEGIN {
 function reset() {
 	code = input = output = ""
 	in_code = in_input = in_output = 0
-	delete(flags)
+	for (i in flags)
+		delete flags[i]
 }
 
 # accumulate lines in a buffer, leaving off the final newline

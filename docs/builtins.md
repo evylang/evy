@@ -24,11 +24,11 @@ see [syntax by example](syntax_by_example.md).
 3. [**Map**](#map)  
    [has](#has), [del](#del)
 4. [**Program control**](#program-control)  
-   [sleep](#sleep), [exit](#exit)
+   [sleep](#sleep), [exit](#exit), [panic](#panic)
 5. [**Conversion**](#conversion)  
    [str2num](#str2num), [str2bool](#str2bool)
-6. [**Error**](#error)  
-   [Fatal Errors](#fatal-errors), [Non-fatal Errors](#non-fatal-errors)
+6. [**Errors**](#errors)  
+   [Panic](#panic-1), [Recoverable Errors](#recoverable-errors)
 7. [**String**](#string)  
    [sprint](#sprint), [sprintf](#sprintf), [join](#join), [split](#split), [upper](#upper), [lower](#lower), [index](#index), [startswith](#startswith), [endswith](#endswith), [trim](#trim), [replace](#replace)
 8. [**Random**](#random)  
@@ -243,7 +243,7 @@ Full list of valid specifiers in Evy:
 | `%%`      | a literal percent sign `%`; consumes no value          |
 
 If the arguments for the `%s`, `%q`, `%f`, `%e`, and `%t` specifiers do
-not match the required type, a fatal runtime error will occur.
+not match the required type, a panic will occur.
 
 The _width_ and _precision_ of a floating-point number can be specified
 with the `%f` and `%v` format specifiers.
@@ -324,7 +324,7 @@ array, or a map. If the argument is a string, `len` returns the number
 of characters in the string. If the argument is an array, `len` returns
 the number of elements in the array. If the argument is a map, `len`
 returns the number of key-value pairs in the map. If the argument is of
-any other type, a fatal runtime error will occur.
+any other type, a panic will occur.
 
 ---
 
@@ -492,16 +492,35 @@ Output
 str2num: cannot parse "not a number"
 ```
 
+---
+
+### `panic`
+
+`panic` prints the given error message and terminates the program
+immediately. It is used to report unrecoverable errors.
+
+#### Example
+
+```evy exepect_err
+scale := -5
+
+if (scale) <= 0
+    panic "scale must be positive"
+end
+```
+
+Output
+
+```evy:output
+line 4 column 5: scale must be positive
+```
+
 #### Reference
 
-    exit status:num
+    panic msg:string
 
-The `exit` function takes a single argument, which is the status code
-that the program will terminate with. The status code can be any
-number, but it is typically used to indicate whether the program
-terminated successfully or with an error. A status code of 0 means that
-the program terminated successfully, while any other status code is
-considered an error.
+The `panic` function takes a single argument, which is the error message
+that the program will print before it terminates with exit status 1.
 
 ## Conversion
 
@@ -535,7 +554,7 @@ The `str2num` function converts a string to a number. It takes a single
 argument, which is the string to convert. If the string is a valid
 number, the function returns the number. Otherwise, the function
 returns 0 and sets the global `err` variable to `true`. For more
-information on `err`, see the [Non-fatal Error section](#non-fatal-errors).
+information on `err`, see the [Recoverable Errors section](#recoverable-errors).
 
 ---
 
@@ -572,23 +591,50 @@ if the string is equal to `"true"`, `"True"`, `"TRUE"`, or `"1"`, and
 `false` if the string is equal to `"false"`, `"False"`, `"FALSE"`, or
 `"0"`. The function returns `false` and sets the global `err` variable
 to `true` if the string is not a valid boolean. For more information
-on `err`, see the [Non-fatal Error section](#non-fatal-errors).
+on `err`, see the [Recoverable Errors section](#recoverable-errors).
 
-## Error
+## Errors
 
-Evy programs in execution can report two types of errors:
+Evy has two types of errors: compiler errors and run-time errors.
 
-- Fatal errors
-- Non-fatal errors
+- _Compiler errors_ are reported before the program is executed. They
+  report errors with the syntax, such as a missing closing quote for
+  `print "abc`, an illegal character, such as `#`, or type errors, such
+  as `min "a" "b"`.
+- _Run-time errors_ only occur if there are no compiler errors and the
+  code path causing the error is executed.
 
-### Fatal Errors
+For example, the following code will _sometimes_ cause a run-time error:
 
-Fatal errors cause the program to exit immediately with an error
-message. They typically occur when the program encounters a situation
+```evy
+n:num
+if (rand1) < 0.5
+    n = str2num "not-a-number"
+else
+    n = str2num "5"
+end
+print "n:" n "error:" err
+```
+
+Half the time, the program above will cause a run-time error and print
+`n: 0 error: true`. The other half of the time, no error will occur and
+the program will print `n:5 error:false`.
+
+Evy has two types of run-time errors: panic and error.
+
+- A _panic_ is non-recoverable. It causes the program to exit
+  immediately.
+- An _error_ is recoverable. The program can continue running after the
+  error is handled.
+
+### Panic
+
+A panic causes the program to exit immediately and print an error
+message. Panics typically occur when the program encounters a situation
 that it cannot handle, such as trying to access an element of an array
-that is out of bounds. Fatal errors cannot be intercepted by the
-program, so it is important to take steps to prevent them from
-occurring in the first place.
+that is out of bounds. Panics cannot be intercepted by the program, so
+it is important to take steps to prevent them from occurring in the
+first place.
 
 One way to do this is to use _guarding code_, which is code that checks
 for potential errors and takes steps to prevent them from occurring.
@@ -597,7 +643,7 @@ array before trying to access an element to avoid an out of bounds
 error. If the access index is out of bounds, the guarding code could
 report the error.
 
-Here is an example of a fatal error:
+Here is an example of a panic:
 
 ```evy
 arr := [0 1 2]
@@ -606,22 +652,30 @@ print arr[i] // out of bounds
 print "This line will not be executed"
 ```
 
-This code will cause a fatal error because the index 5 is out of bounds
+This code will cause a panic because the index 5 is out of bounds
 for the array `arr`. The program will exit with the error message
 
 ```
-line 3: index out of bounds: 5
+line 3: panic: index out of bounds: 5
 ```
 
-### Non-fatal Errors
+If you want your own code to panic, you can use the built-in `panic`
+function. This is typically used to highlight mistakes or bugs in your
+program, such as invalid function arguments or conditions that should
+never occur. The `panic` function exits your program immediately, so it
+should only be used when it is clear that the program cannot continue.
+For more information, see the [Panic](#panic) section under Program
+Control above.
 
-The global `err` variable is used to indicate whether a non-fatal
+### Recoverable Errors
+
+The global `err` variable is used to indicate whether a recoverable
 error has occurred. The global `errmsg` variable stores a detailed
 message about the error that occurred.
 
-Non-fatal errors are caused by code that could not be prevented from
+Recoverable errors are caused by code that could not be prevented from
 running, such as converting a user input string to a number if the
-string is not a number. Non-fatal errors will set the global `err`
+string is not a number. This recoverable error will set the global `err`
 variable to `true` and the program will continue executing. If there is
 no error, `err` is set to `false`.
 
@@ -637,7 +691,7 @@ without an error, the `err` variable is reset to `false` and the
 was not empty. Therefore, it is up to the program to check the `err`
 variable after any possible error occurrence.
 
-Here is an example of a non-fatal error:
+Here is an example of a recoverable error:
 
 ```evy
 n := str2num "NOT A NUM"
@@ -653,6 +707,11 @@ num: 0
 err: true
 errmsg: str2num: cannot parse "NOT A NUM"
 ```
+
+If you want your own code or function to cause a recoverable error,
+follow the convention of setting the `err` variable to `true` and the
+`errmsg` variable to a message describing the error in the error case.
+In the non-error case, make sure to set the `err` variable to `false`.
 
 ## String
 
@@ -1023,7 +1082,7 @@ Sample output
     rand:num n:num
 
 The `rand` functions returns, a non-negative pseudo-random integer
-number in the half-open interval `[0,n)`. A fatal runtime error occurs
+number in the half-open interval `[0,n)`. A panic occurs
 for `n <= 0`.
 
 ---
@@ -1748,7 +1807,7 @@ The `poly` function takes a variadic number of arguments of type
 `[]num`. Each argument has to be a number array with two elements
 `[x y]`. The first element representing the x coordinate and the second
 the y coordinate of a vertex in the polyline or polygon. If the array
-does not have two elements, a fatal runtime error occurs. For example,
+does not have two elements, a panic occurs. For example,
 the `poly` function can be called as follows:
 
     poly [x1 y1] [x2 y2] [x3 y3]

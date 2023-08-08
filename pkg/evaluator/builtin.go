@@ -506,7 +506,7 @@ func exitFunc(_ *scope, args []Value) (Value, error) {
 
 func panicFunc(_ *scope, args []Value) (Value, error) {
 	s := args[0].(*String).Val
-	return nil, PanicError("panic: " + s)
+	return nil, PanicError(s)
 }
 
 var randDecl = &parser.FuncDeclStmt{

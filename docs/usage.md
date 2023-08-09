@@ -1,7 +1,7 @@
 # `evy` Usage
 
 The `evy` toolchain is a set of tools that can be used to compile, run,
-and format Evy source code. You can install the Evy toolchain locally
+and format Evy source code. You can [install] the Evy toolchain locally
 and run it from your command line. The command-line interface for Evy
 supports all built-in functions except for graphics functions and event
 handlers. Only the web interface on [evy.dev] supports graphics and
@@ -15,6 +15,7 @@ The Evy toolchain has two subcommands:
 You can also get help for each subcommand by running it with the
 `--help` flag.
 
+[install]: ../README.md#-installation
 [evy.dev]: https://evy.dev
 
 #### evy --help

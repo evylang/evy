@@ -272,9 +272,11 @@ according to the IEEE-754 64-bit floating point standard.
 
 ## Variables and Declarations
 
-Variables hold values of a specific type. They must be _declared_ before
-they can be used. There are two types of variable declarations:
-inferred declarations and typed declarations.
+Variables hold values of a specific type. They must be _declared_
+before they can be used. A declared variable must be used at least once,
+meaning it must be used in the right hand side of an assignment or
+passed as an argument to a function call. There are two types of
+variable declarations: inferred declarations and typed declarations.
 
 _Inferred declarations_ do not specify the type of the variable
 explicitly. The type of the variable is inferred from the value that

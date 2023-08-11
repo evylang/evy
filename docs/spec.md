@@ -737,7 +737,7 @@ outputs
 ```
 
 If you try to access an element of an array or string that is out of
-bounds, a [fatal runtime error](#fatal-errors) will occur. Slice
+bounds, a [runtime panic](#run-time-panics-and-recoverable-errors) will occur. Slice
 expressions must not be preceded by whitespace before the `[` character,
 just like indexing an array or string. For more details, see the section
 on[whitespace](#whitespace).

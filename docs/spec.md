@@ -18,14 +18,14 @@ To get an intuitive understanding of Evy, you can either look at its
 
 <!-- gen:toc -->
 
-1. [**Syntax grammar**](#syntax-grammar)  
-   [WSN syntax grammar](#wsn-syntax-grammar), [Evy syntax grammar](#evy-syntax-grammar)
+1. [**Syntax Grammar**](#syntax-grammar)  
+   [WSN Syntax Grammar](#wsn-syntax-grammar), [Evy Syntax Grammar](#evy-syntax-grammar)
 2. [**Comments**](#comments)
 3. [**Types**](#types)
 4. [**Variables and Declarations**](#variables-and-declarations)
 5. [**Zero Values**](#zero-values)
 6. [**Assignments**](#assignments)
-7. [**Copy and reference**](#copy-and-reference)
+7. [**Copy and Reference**](#copy-and-reference)
 8. [**Variable Names**](#variable-names)
 9. [**Scope**](#scope)
 10. [**Strings**](#strings)
@@ -37,10 +37,10 @@ To get an intuitive understanding of Evy, you can either look at its
 15. [**Precedence**](#precedence)
 16. [**Statements**](#statements)
 17. [**Whitespace**](#whitespace)  
-    [Vertical whitespace](#vertical-whitespace)
-18. [**Horizontal whitespace**](#horizontal-whitespace)
+    [Vertical Whitespace](#vertical-whitespace)
+18. [**Horizontal Whitespace**](#horizontal-whitespace)
 19. [**Functions**](#functions)  
-    [Bare returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic functions](#variadic-functions)
+    [Bare Returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic Functions](#variadic-functions)
 20. [**Break and Return**](#break-and-return)
 21. [**Typeof**](#typeof)
 22. [**Type Assertion**](#type-assertion)
@@ -50,7 +50,7 @@ To get an intuitive understanding of Evy, you can either look at its
 
 <!-- genend:toc -->
 
-## Syntax grammar
+## Syntax Grammar
 
 The Evy syntax grammar is a [WSN] grammar, which is a formal set of
 rules that define how Evy programs are written. The Evy compiler uses
@@ -59,7 +59,7 @@ that the code follows the rules of the grammar.
 
 [WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
 
-### WSN syntax grammar
+### WSN Syntax Grammar
 
 Evy's syntax is specified using a WSN grammar, a variant of
 [EBNF] grammars, borrowing concepts from the [Go Programming Language
@@ -122,7 +122,7 @@ See the section on [whitespace](#whitespace) for further details.
 [EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 [Go Programming Language Specification]: https://go.dev/ref/spec
 
-### Evy syntax grammar
+### Evy Syntax Grammar
 
 Evy source code is UTF-8 encoded, which means that it can contain any
 Unicode character. The NUL character `U+0000` is not allowed, as it is
@@ -372,7 +372,7 @@ Output
 2 b
 ```
 
-## Copy and reference
+## Copy and Reference
 
 When a variable of a basic type `num`, `string`, or `bool` is the value
 of an assignment, a copy of its value is made. A copy is also made when
@@ -904,7 +904,7 @@ Whitespace in Evy is used to separate different parts of a program.
 There are two types of whitespace in Evy: vertical whitespace and
 horizontal whitespace.
 
-### Vertical whitespace
+### Vertical Whitespace
 
 Vertical whitespace is a sequence of one or more newline characters that
 can optionally contain comments. It is used to terminate or end basic
@@ -941,7 +941,7 @@ person := {
 print person
 ```
 
-## Horizontal whitespace
+## Horizontal Whitespace
 
 _Horizontal whitespace_ is a sequence of tabs or spaces that is used to
 separate elements in lists. Lists include the argument list to a
@@ -1047,7 +1047,7 @@ func isValid:bool s:string maxLen:num
 end
 ```
 
-### Bare returns
+### Bare Returns
 
 _Bare returns_ are return statements without values. They can be used in
 functions without result type. For example, the following code defines a
@@ -1102,7 +1102,7 @@ on down _:num y:num
 end
 ```
 
-### Variadic functions
+### Variadic Functions
 
 _Variadic functions_ in Evy are functions that can take zero or more
 arguments of a specific type. The type of the variadic parameter is an

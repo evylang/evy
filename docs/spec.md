@@ -740,7 +740,7 @@ If you try to access an element of an array or string that is out of
 bounds, a [runtime panic](#run-time-panics-and-recoverable-errors) will occur. Slice
 expressions must not be preceded by whitespace before the `[` character,
 just like indexing an array or string. For more details, see the section
-on[whitespace](#whitespace).
+on [whitespace](#whitespace).
 
 ## Operators and Expressions
 
@@ -1007,7 +1007,7 @@ defined in the grammar is ignored and can be used freely with the
 addition of the following rules:
 
 1. `WS` is not allowed around dot `.` in dot expressions.
-2. `WS` is not allowed around before the `[` in index or slice expressions.
+2. `WS` is not allowed before the `[` in index or slice expressions.
 3. `WS` is not allowed following the unary operators `-` and `!`.
 4. `WS` is not allowed within arguments to a function call
 5. `WS` is not allowed within elements of an array literal
@@ -1029,7 +1029,7 @@ arr := [1 + 1]
 arr [0] = 3 + 2
 print 2 + arr [0]
 
-map := {address: "10 Downing" + "Street"}
+map := {address: "10 Downing " + "Street"}
 map.  address = "221B Baker Street"
 
 print len map
@@ -1045,7 +1045,7 @@ arr := [1+1]
 arr[0] = 3 + 2
 print 2+arr[0]
 
-map := {address:"10 Downing"+"Street"}
+map := {address:"10 Downing "+"Street"}
 map.address = "221B Baker Street"
 
 print (len map)
@@ -1064,8 +1064,8 @@ result or return type of the function. If the return type is left out,
 the function does not return a value.
 
 For example, the following code defines a function called `isValid`
-that takes two parameters, `s` and `cap`, and returns a boolean
-result. The `s` parameter is of type `string` and the `cap`
+that takes two parameters, `s` and `maxLen`, and returns a boolean
+result. The `s` parameter is of type `string` and the `maxLen`
 parameter is of type `num`. The return type of the function is `bool`.
 
 ```evy
@@ -1302,8 +1302,9 @@ y []any
 
 ## Type Assertion
 
-A type assertion `ident.(type)` asserts that the value of the variable
-`ident` is of the given `type`. If the assertion does not hold a
+A type assertion `x.(TYPE)` asserts that the value of the variable `x`
+is of the given `TYPE`. `TYPE` can be any basic or composite type, such
+as `num` or `[]string`. If the assertion does not hold, a
 [run-time panic](#run-time-panics-and-recoverable-errors) occurs.
 
 ```evy

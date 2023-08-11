@@ -472,12 +472,12 @@ unchanged:
 
 ```evy
 x := "outer"
-print "1" x
+print 1 x
 for range 1
     x := true
-    print "2" x
+    print 2 x
 end
-print "3" x
+print 3 x
 ```
 
 This program will print

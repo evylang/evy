@@ -188,10 +188,10 @@ listing contains the complete syntax grammar for Evy.
 
     /* --- Type --- */
     typed_decl     = ident ":" type .
-    type           = BASIC_TYPE | DYNAMIC_TYPE | COMPOSITE_TYPE .
+    type           = BASIC_TYPE | DYNAMIC_TYPE | composite_type .
     BASIC_TYPE     = "num" | "string" | "bool" .
     DYNAMIC_TYPE   = "any" .
-    COMPOSITE_TYPE = array_type | map_type .
+    composite_type = array_type | map_type .
     array_type     = "[" "]" type .
     map_type       = "{" "}" type .
 
@@ -230,9 +230,9 @@ listing contains the complete syntax grammar for Evy.
     array_elems = { tight_expr [nl] } .
     map_lit     = "{" <+ map_elems +> "}" . /* WS can be used freely within `{…}`, but not inside the values */
     map_elems   = { ident ":" tight_expr [nl] } .
-    nl          = [ COMMENT ] NL .
-    eof         = [ COMMENT ] EOF .
-    COMMENT     = "//" { UNICODE_CHAR } .
+    nl          = [ comment ] NL .
+    eof         = [ comment ] EOF .
+    comment     = "//" { UNICODE_CHAR } .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .

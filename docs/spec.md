@@ -1063,14 +1063,14 @@ declares the number, order and types of input parameters as well as the
 result or return type of the function. If the return type is left out,
 the function does not return a value.
 
-For example, the following code defines a function called `isValid`
-that takes two parameters, `s` and `maxLen`, and returns a boolean
-result. The `s` parameter is of type `string` and the `maxLen`
+For example, the following code defines a function called `validate`
+that takes two parameters, `s` and `maxl`, and returns a boolean
+result. The `s` parameter is of type `string` and the `maxl`
 parameter is of type `num`. The return type of the function is `bool`.
 
 ```evy
-func isValid:bool s:string maxLen:num
-    return (len s) <= maxLen
+func validate:bool s:string maxl:num
+    return (len s) <= maxl
 end
 ```
 
@@ -1078,16 +1078,16 @@ end
 
 _Bare returns_ are return statements without values. They can be used in
 functions without result type. For example, the following code defines a
-function called _validate_ that takes a map as an argument and does not
-return a value. The _return_ statement in the _if_ statement simply
+function called `reverse` that takes a string array as an argument and
+does not return a value. The return statement in the if statement simply
 exits the function early.
 
 ```evy
-func validate m:{}any
-    if m == {}
+func reverse arr:[]string
+    if arr == []
         return
     end
-    // further validation
+    // ...
 end
 ```
 

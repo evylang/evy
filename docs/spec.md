@@ -492,12 +492,24 @@ This program will print
 
 ## Strings
 
-A `string` is a sequence of [Unicode code points]. A string literal is
-enclosed by double quotes `"`, for example
-`str := "Hallöchen Welt 👋🌍"`.
+A **string** is a sequence of [Unicode code points]. Unicode is a
+standard that defines a unique code point for every character in every
+language. This means that a string can contain characters from any
+language, including English, French, Spanish, Chinese, Japanese, and
+Korean.
 
-The `len str` function returns the number of Unicode code points,
-_characters_, in the string. The loop `for ch := range str` iterates
+A **string literal** is a sequence of characters enclosed by double
+quotes. The characters in a string literal are interpreted as Unicode
+code points. This means that a string literal can contain any character
+that has a Unicode code point, including letters, numbers, punctuation
+marks, and emojis.
+
+The example code `str := "Hallöchen Welt 👋🌍"` defines a string variable
+`str` and initializes it with a string literal that contains the German
+words "Hallöchen Welt" and the emojis "👋🌍".
+
+The `len str` function returns the number of Unicode code points, or
+**characters**, in the string. The loop `for ch := range str` iterates
 over all characters of the string. Individual characters of a string can
 be read by index, starting at `0`. Strings can be concatenated with the
 `+` operator.
@@ -505,7 +517,8 @@ be read by index, starting at `0`. Strings can be concatenated with the
 The backslash character `\` can be used to represent special characters
 in strings. For example, the `\t` escape sequence represents a tab
 character, and the `\n` escape sequence represents a newline character.
-Quotes in string literals must also be escaped with backslashes.
+Quotes in string literals must also be escaped with backslashes. To
+print a backslash character, use `\\`.
 
 For example the following code
 

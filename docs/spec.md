@@ -298,15 +298,27 @@ map of type any, `{}any`. The strictest possible type is inferred for
 composite types:
 
 ```evy
-arr1 := [1 2 3] // type: []num
-arr2 := [1 "a"] // type: []any
-arr3 := [[1] ["a"]] // type: [][]any
-arr4 := [] // type: []any
-arr5 := [1] + [] // type: []num
+arr1 := [1 2 3] // []num
+arr2 := [1] + [] // []num
+print 1 (typeof arr1) (typeof arr2)
 
-map1 := {} // type: {}any
-map2 := {age:10} // type: {}num
-print arr1 arr2 arr3 arr4 arr5 map1 map2
+arr3 := [1 "a"] // []any
+arr4 := [[1] ["a"]] // [][]any
+arr5 := [] // []any
+print 2 (typeof arr3) (typeof arr4) (typeof arr5)
+
+map1 := {} // {}any
+map2 := {age:10} // {}num
+print 3 (typeof map1) (typeof map2)
+```
+
+The [`typeof`](#typeof) function returns the type as string
+representation, so the code above outputs:
+
+```evy:output
+1 []num []num
+2 []any [][]any []any
+3 {}any {}num
 ```
 
 ## Zero Values

@@ -1,11 +1,11 @@
 # Builtins
 
-_Builtins_ in Evy are pre-defined functions and events that allow for
+**Builtins** in Evy are pre-defined functions and events that allow for
 user interaction, graphics, animation, mathematical operations, and
 more.
 
-_Functions_ are self-contained blocks of code that perform a specific
-task. _Events_ are notifications that are sent to a program when
+**Functions** are self-contained blocks of code that perform a specific
+task. **Events** are notifications that are sent to a program when
 something happens, such as when a user moves the mouse or presses a
 key.
 
@@ -174,7 +174,7 @@ Windows `cls` commands.
 
 `printf` prints its arguments to the output area according to a _format_
 string. The format string is the first argument, and it
-contains _specifiers_. Specifiers start with a percent sign `%`. They
+contains **specifiers**. Specifiers start with a percent sign `%`. They
 tell the `printf` function how and where to print the remaining
 arguments inside the format string. The rest of the format string is
 printed to the output area without changes.
@@ -224,7 +224,7 @@ Map: {a:1 b:2}
     printf format:string a:any...
 
 The `printf` function prints its arguments to the output area according
-to the _format_ string that is the first argument. The _specifiers_
+to the **format** string that is the first argument. The **specifiers**
 that start with `%` and are contained in the format string are replaced
 by the remaining arguments in the given order. For example, the
 following code `printf "first: %s, second: %s" "A" "B"` prints `first:
@@ -245,7 +245,7 @@ Full list of valid specifiers in Evy:
 If the arguments for the `%s`, `%q`, `%f`, `%e`, and `%t` specifiers do
 not match the required type, a panic will occur.
 
-The _width_ and _precision_ of a floating-point number can be specified
+The **width** and **precision** of a floating-point number can be specified
 with the `%f` and `%v` format specifiers.
 
 - Width is the number of characters that will be used to print the
@@ -597,14 +597,14 @@ on `err`, see the [Recoverable Errors section](#recoverable-errors).
 
 Evy has two types of errors: compiler errors and run-time errors.
 
-- _Compiler errors_ are reported before the program is executed. They
+- **Compiler errors** are reported before the program is executed. They
   report errors with the syntax, such as a missing closing quote for
   `print "abc`, an illegal character, such as `#`, or type errors, such
   as `min "a" "b"`.
-- _Run-time errors_ only occur if there are no compiler errors and the
+- **Run-time errors** only occur if there are no compiler errors and the
   code path causing the error is executed.
 
-For example, the following code will _sometimes_ cause a run-time error:
+For example, the following code will **sometimes** cause a run-time error:
 
 ```evy
 n:num
@@ -622,9 +622,9 @@ the program will print `n:5 error:false`.
 
 Evy has two types of run-time errors: panic and error.
 
-- A _panic_ is non-recoverable. It causes the program to exit
+- A **panic** is non-recoverable. It causes the program to exit
   immediately.
-- An _error_ is recoverable. The program can continue running after the
+- An **error** is recoverable. The program can continue running after the
   error is handled.
 
 ### Panic
@@ -636,7 +636,7 @@ that is out of bounds. Panics cannot be intercepted by the program, so
 it is important to take steps to prevent them from occurring in the
 first place.
 
-One way to do this is to use _guarding code_, which is code that checks
+One way to do this is to use **guarding code**, which is code that checks
 for potential errors and takes steps to prevent them from occurring.
 For example, guarding code could be used to check the length of an
 array before trying to access an element to avoid an out of bounds
@@ -754,7 +754,7 @@ of any type, including strings, numbers, booleans, and maps. Unlike the
 `sprintf` stands for print formatted to string.
 
 `sprintf` returns a string representation of its arguments according to
-a _format_ string. Formatting in `sprintf` and `printf` work the same
+a **format** string. Formatting in `sprintf` and `printf` work the same
 way, see [`printf`](#printf).
 
 #### Example
@@ -775,7 +775,7 @@ Output
     sprintf:string format:string a:any...
 
 The `sprintf` function returns a string representation of its arguments
-according to a _format_ string. The format string controls how the
+according to a **format** string. The format string controls how the
 arguments are formatted. The `sprintf` function works the same way as
 the `printf` function, and the formatting syntax is the same, see
 [`printf`](#printf).
@@ -1297,7 +1297,7 @@ Output
 
     log:num n:num
 
-The `log` function returns the _natural logarithm_, the logarithm of the
+The `log` function returns the **natural logarithm**, the logarithm of the
 given number argument `n`, to the base of `e`.
 
 ---
@@ -1410,14 +1410,14 @@ value.
 ## Graphics
 
 Evy on the web outputs drawing commands to a drawing area
-called the _canvas_.
+called the **canvas**.
 
 Positions on the canvas are defined by a coordinate system, similar to
 the Cartesian coordinate system used in mathematics. The horizontal
-dimension is called the _x-axis_, and the vertical dimension is
-called the _y-axis_.
+dimension is called the **x-axis**, and the vertical dimension is
+called the **y-axis**.
 
-A point on the canvas is defined by its _x_ and _y coordinates_,
+A point on the canvas is defined by its **x** and **y coordinates**,
 which are written as `x y`. For example, the point `30 60` has an
 x-coordinate of 30 and a y-coordinate of 60. It is located 30 units
 from the left edge of the canvas and 60 units from the bottom edge.
@@ -1429,9 +1429,9 @@ from the left edge of the canvas and 60 units from the bottom edge.
 The canvas ranges from coordinates `0 0` to `100 100`. The center of the
 canvas has the coordinates `50 50`.
 
-Shapes are drawn on the canvas using a _pen_. The pen has an `x y`
+Shapes are drawn on the canvas using a **pen**. The pen has an `x y`
 position and a style. The position of the pen is also known as the
-current _cursor position_.
+current **cursor position**.
 
 Some graphics functions, like `line`, `rect`, `circle`, and `text`,
 create shapes on the canvas. Other graphics functions such as
@@ -1578,13 +1578,13 @@ Output
 
     color c:string
 
-The `color` function changes the color of the _stroke_ and the _fill_ to
+The `color` function changes the color of the **stroke** and the **fill** to
 the given CSS color string `c`. Evy supports all [CSS color values],
 including semi-transparent ones. For example, the following code
 changes the color to a shade of red that is 60% opaque:
 `color "hsl (0deg 100% 50% / 60%)"`.
 
-_Named CSS colors_, such as `"red"`, `"darkmagenta"`, and
+**Named CSS colors**, such as `"red"`, `"darkmagenta"`, and
 `"springgreen"`, are a simpler way of specifying common colors. For a
 complete list of named CSS colors, see the [Mozilla Developer
 documentation].
@@ -1627,7 +1627,7 @@ Output
 
     width n:num
 
-The `width` function sets the thickness of the _stroke_ to the given `n`
+The `width` function sets the thickness of the **stroke** to the given `n`
 units. The stroke is the visible line that is drawn when using the
 `line` function or any other shape function after setting
 `fill "none"`. The initial stroke width it 0.1 units.
@@ -1891,7 +1891,7 @@ Output
 
     stroke c:string
 
-The `stroke` function sets the color of the _stroke_ to the given string
+The `stroke` function sets the color of the **stroke** to the given string
 argument `c`. The stroke is the visible line that is drawn when you use
 the line function or any other shape function after calling
 fill "none". The initial stroke color is `"black"`.
@@ -1923,7 +1923,7 @@ Output
 
     fill c:string
 
-The `fill` function sets the color of the _fill_ to the given string
+The `fill` function sets the color of the **fill** to the given string
 argument `c`. The fill is the interior of a shape. The initial fill
 color is `"black"`.
 
@@ -2055,7 +2055,7 @@ The `text` function prints the string argument `s` to the canvas at the
 current cursor position. The cursor position is not updated after
 writing text. Only `fill` and `color` have an effect on the text;
 `stroke` has no effect. For more text styling, such as setting
-_font size_ or _font family_, see [`font`](#font).
+**font size** or **font family**, see [`font`](#font).
 
 ---
 
@@ -2277,7 +2277,7 @@ o
 
     key k:string
 
-The `key` event handler is called when a _keydown_ event occurs. The
+The `key` event handler is called when a **keydown** event occurs. The
 handler is passed a string argument which is the character of the key
 that was pressed. For example, if the user presses the `a` key, the
 argument would be the string `"a"`.
@@ -2317,7 +2317,7 @@ x:  7 y:  6
 
     down x:num y:num
 
-The `down` event handler is called when a _pointerdown_ event occurs on
+The `down` event handler is called when a **pointerdown** event occurs on
 the canvas. The handler is passed two number arguments, `x` and `y`,
 which are the coordinates of the pointer location when the pointer was
 pressed down. The pointer is typically a mouse, stylus or finger.
@@ -2346,7 +2346,7 @@ Sample output
 
     up x:num y:num
 
-The `up` event handler is called when a _pointerup_ event occurs on the
+The `up` event handler is called when a **pointerup** event occurs on the
 canvas. The handler is passed two number arguments, `x` and `y`, which
 are the coordinates of the pointer location when the pointer was lifted
 up. The pointer is typically a mouse, stylus or finger.
@@ -2389,7 +2389,7 @@ Sample output
 
     move x:num y:num
 
-The `move` event handler is called when a _pointermove_ event occurs on
+The `move` event handler is called when a **pointermove** event occurs on
 the canvas. The handler is passed two number arguments, `x` and `y`,
 which are the coordinates of the position that the pointer has moved
 to. The pointer is typically a mouse, stylus or finger.

@@ -18,14 +18,14 @@ To get an intuitive understanding of Evy, you can either look at its
 
 <!-- gen:toc -->
 
-1. [**Syntax grammar**](#syntax-grammar)  
-   [WSN syntax grammar](#wsn-syntax-grammar), [Evy syntax grammar](#evy-syntax-grammar)
+1. [**Syntax Grammar**](#syntax-grammar)  
+   [WSN Syntax Grammar](#wsn-syntax-grammar), [Evy Syntax Grammar](#evy-syntax-grammar)
 2. [**Comments**](#comments)
 3. [**Types**](#types)
 4. [**Variables and Declarations**](#variables-and-declarations)
 5. [**Zero Values**](#zero-values)
 6. [**Assignments**](#assignments)
-7. [**Copy and reference**](#copy-and-reference)
+7. [**Copy and Reference**](#copy-and-reference)
 8. [**Variable Names**](#variable-names)
 9. [**Scope**](#scope)
 10. [**Strings**](#strings)
@@ -37,10 +37,10 @@ To get an intuitive understanding of Evy, you can either look at its
 15. [**Precedence**](#precedence)
 16. [**Statements**](#statements)
 17. [**Whitespace**](#whitespace)  
-    [Vertical whitespace](#vertical-whitespace)
-18. [**Horizontal whitespace**](#horizontal-whitespace)
+    [Vertical Whitespace](#vertical-whitespace)
+18. [**Horizontal Whitespace**](#horizontal-whitespace)
 19. [**Functions**](#functions)  
-    [Bare returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic functions](#variadic-functions)
+    [Bare Returns](#bare-returns), [Function Names](#function-names), [Anonymous Parameters](#anonymous-parameters), [Variadic Functions](#variadic-functions)
 20. [**Break and Return**](#break-and-return)
 21. [**Typeof**](#typeof)
 22. [**Type Assertion**](#type-assertion)
@@ -50,7 +50,7 @@ To get an intuitive understanding of Evy, you can either look at its
 
 <!-- genend:toc -->
 
-## Syntax grammar
+## Syntax Grammar
 
 The Evy syntax grammar is a [WSN] grammar, which is a formal set of
 rules that define how Evy programs are written. The Evy compiler uses
@@ -59,25 +59,25 @@ that the code follows the rules of the grammar.
 
 [WSN]: https://en.wikipedia.org/wiki/Wirth_syntax_notation
 
-### WSN syntax grammar
+### WSN Syntax Grammar
 
 Evy's syntax is specified using a WSN grammar, a variant of
 [EBNF] grammars, borrowing concepts from the [Go Programming Language
 Specification].
 
-_Productions_ are the top-level elements of a WSN grammar. For example,
+**Productions** are the top-level elements of a WSN grammar. For example,
 the production `OPERATOR = "+" | "-" | "*" | "/" .` specifies that an
 operator can be one of the characters `+`, `-`, `*`, or `/`.
 
-A production consists of an _expression_ assigned to an _identifier_ or
+A production consists of an **expression** assigned to an **identifier** or
 production name. Each production is terminated by a period `.`. An
-expression consists of _terms_ and the following operators in
+expression consists of **terms** and the following **operators** in
 increasing precedence:
 
-- _Alternation:_ `|` stands for "or". For example, `a | b` stands for `a` or `b`.
-- _Grouping:_ `()` stands for grouping. For example, `(a|b)c` stands for `ac` or `bc`.
-- _Optionality:_ `[]` stands for optionality. For example, `[a]b` stands for `ab` or `b`.
-- _Repetition:_ `{}` stands for repetition. For example, `{a}` stands for the empty string, `a`, `aa`, `aaa`, ...".
+- **Alternation:** `|` stands for "or". For example, `a | b` stands for `a` or `b`.
+- **Grouping:** `()` stands for grouping. For example, `(a|b)c` stands for `ac` or `bc`.
+- **Optionality:** `[]` stands for optionality. For example, `[a]b` stands for `ab` or `b`.
+- **Repetition:** `{}` stands for repetition. For example, `{a}` stands for the empty string, `a`, `aa`, `aaa`, ...".
 
 `a … b` stands for a range of single characters from `a` to `b`,
 inclusive.
@@ -98,20 +98,20 @@ Here is a WSN defining itself:
     LETTER     = "a" … "z" | "A" … "Z" | "_" .
     CHARACTER  = /* an arbitrary Unicode code point */ .
 
-_Terminals_ are the leaves in the grammar that cannot be expanded
+**Terminals** are the leaves in the grammar that cannot be expanded
 further. By convention, terminals are identified by production names
 in uppercase.
 
-_Non-terminals_, on the other hand, can be expanded into other
+**Non-terminals**, on the other hand, can be expanded into other
 productions. This means that they can be replaced by a more complex
 expression. By convention, non-terminals are identified by production
 names in lowercase.
 
-_Literals_ or lexical tokens are enclosed in double quotes `""`.
+**Literals** or lexical tokens are enclosed in double quotes `""`.
 Comments are fenced by `/*` … `*/`.
 
 There are two special fencing tokens in Evy's grammar related to
-horizontal whitespace, `<-` … `->` and `<+` … `+>`. `<-` … `->` means
+**horizontal whitespace**, `<-` … `->` and `<+` … `+>`. `<-` … `->` means
 no horizontal whitespace is allowed between the terminals of the
 enclosed expression, e.g. `3+5` inside `<-` … `->` is allowed, but
 `3 + 5` is not. The fencing tokens `<+` … `+>` are the default and mean
@@ -122,7 +122,7 @@ See the section on [whitespace](#whitespace) for further details.
 [EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 [Go Programming Language Specification]: https://go.dev/ref/spec
 
-### Evy syntax grammar
+### Evy Syntax Grammar
 
 Evy source code is UTF-8 encoded, which means that it can contain any
 Unicode character. The NUL character `U+0000` is not allowed, as it is
@@ -188,10 +188,10 @@ listing contains the complete syntax grammar for Evy.
 
     /* --- Type --- */
     typed_decl     = ident ":" type .
-    type           = BASIC_TYPE | DYNAMIC_TYPE | COMPOSITE_TYPE .
+    type           = BASIC_TYPE | DYNAMIC_TYPE | composite_type .
     BASIC_TYPE     = "num" | "string" | "bool" .
     DYNAMIC_TYPE   = "any" .
-    COMPOSITE_TYPE = array_type | map_type .
+    composite_type = array_type | map_type .
     array_type     = "[" "]" type .
     map_type       = "{" "}" type .
 
@@ -230,9 +230,9 @@ listing contains the complete syntax grammar for Evy.
     array_elems = { tight_expr [nl] } .
     map_lit     = "{" <+ map_elems +> "}" . /* WS can be used freely within `{…}`, but not inside the values */
     map_elems   = { ident ":" tight_expr [nl] } .
-    nl          = [ COMMENT ] NL .
-    eof         = [ COMMENT ] EOF .
-    COMMENT     = "//" { UNICODE_CHAR } .
+    nl          = [ comment ] NL .
+    eof         = [ comment ] EOF .
+    comment     = "//" { UNICODE_CHAR } .
 
     /* --- Terminals --- */
     LETTER         = UNICODE_LETTER | "_" .
@@ -251,12 +251,12 @@ inside string literals.
 
 ## Types
 
-Evy has a static _type system_ where the types of variables, parameters
+Evy has a static **type system** where the types of variables, parameters
 and expressions are known at compile time. This means that the compiler
 can check for type errors before the program is run.
 
-There are three basic types: `num`, `string` and `bool` as well as two
-composite types: arrays `[]` and maps `{}`. The _dynamic_ type `any`
+There are three **basic types**: `num`, `string` and `bool` as well as two
+**composite types**: arrays `[]` and maps `{}`. The **dynamic** type `any`
 can hold any of the previously listed types.
 
 Composite types can nest further composite types, for example
@@ -272,11 +272,13 @@ according to the IEEE-754 64-bit floating point standard.
 
 ## Variables and Declarations
 
-Variables hold values of a specific type. They must be _declared_ before
-they can be used. There are two types of variable declarations:
-inferred declarations and typed declarations.
+Variables hold values of a specific type. They must be **declared**
+before they can be used. A declared variable must be used at least once,
+meaning it must be used in the right hand side of an assignment or
+passed as an argument to a function call. There are two types of
+variable declarations: inferred declarations and typed declarations.
 
-_Inferred declarations_ do not specify the type of the variable
+**Inferred declarations** do not specify the type of the variable
 explicitly. The type of the variable is inferred from the value that
 it is initialized to. For example, the following code declares a
 variable `n` and initializes it to the value `1`. The type of `n` is
@@ -284,7 +286,7 @@ inferred to be `num`.
 
     n := 1
 
-_Typed declarations_ explicitly specify the type of the variable. The
+**Typed declarations** explicitly specify the type of the variable. The
 variable is initialized to the type's zero value. For example, the
 following code declares a variable `s` of type `string` and
 initializes it to the empty string `""`.
@@ -296,15 +298,27 @@ map of type any, `{}any`. The strictest possible type is inferred for
 composite types:
 
 ```evy
-arr1 := [1 2 3] // type: []num
-arr2 := [1 "a"] // type: []any
-arr3 := [[1] ["a"]] // type: [][]any
-arr4 := [] // type: []any
-arr5 := [1] + [] // type: []num
+arr1 := [1 2 3] // []num
+arr2 := [1] + [] // []num
+print 1 (typeof arr1) (typeof arr2)
 
-map1 := {} // type: {}any
-map2 := {age:10} // type: {}num
-print arr1 arr2 arr3 arr4 arr5 map1 map2
+arr3 := [1 "a"] // []any
+arr4 := [[1] ["a"]] // [][]any
+arr5 := [] // []any
+print 2 (typeof arr3) (typeof arr4) (typeof arr5)
+
+map1 := {} // {}any
+map2 := {age:10} // {}num
+print 3 (typeof map1) (typeof map2)
+```
+
+The [`typeof`](#typeof) function returns the type as string
+representation, so the code above outputs:
+
+```evy:output
+1 []num []num
+2 []any [][]any []any
+3 {}any {}num
 ```
 
 ## Zero Values
@@ -346,7 +360,7 @@ declarations. Otherwise the empty map literal assumes the map type
 ## Assignments
 
 Assignments are defined by an equal sign `=`. The left-hand side of the
-`=` must contain an _assignable_, a variable, an indexed array, or a
+`=` must contain an **assignable**, a variable, an indexed array, or a
 map field. Before the assignment the variable must be declared via
 inferred or typed declaration. Only values of the correct type can be
 assigned to a variable.
@@ -372,11 +386,11 @@ Output
 2 b
 ```
 
-## Copy and reference
+## Copy and Reference
 
 When a variable of a basic type `num`, `string`, or `bool` is the value
-of an assignment, a copy of its value is made. A copy is also made when
-a variable of a basic type is used as the value in an inferred
+of an assignment, a **copy** of its value is made. A copy is also made
+when a variable of a basic type is used as the value in an inferred
 declaration or passed as an argument to a function.
 
 ```evy
@@ -394,8 +408,8 @@ generates the output
 2 1
 ```
 
-By contrast, composite types - maps and arrays - are passed by
-reference and no copy is made. Modifying the contents of an array
+By contrast, composite types - maps and arrays - are **passed by
+reference** and no copy is made. Modifying the contents of an array
 referenced by one variable also modifies the contents of the array
 referenced by another variable. This is also true for argument passing
 and inferred declarations:
@@ -427,20 +441,20 @@ or defined function names.
 
 ## Scope
 
-_Scope_ refers to the visibility of a variable or function.
+**Scope** refers to the visibility of a variable or function.
 
 Functions can only be defined at the top level of the program, known
-as _global scope_. A function does not have to be defined before it can
-be called; it can also be defined afterwards. This allows for
-[mutual recursion], where function a calls function b and function b
-calls function a.
+as **global scope**. A function does not have to be defined before it
+can be called; it can also be defined afterwards. This allows for
+[mutual recursion], where function `a` calls function `b` and function
+`b` calls function `a`.
 
 Variables, by contrast, must be declared and given an unchangeable type
 before they can be used. Variables can be declared at the top level of
-the program, at _global scope_, or within a block-statement, at _block
+the program, at **global scope**, or within a block-statement, at _block
 scope_.
 
-A _block-statement_ is a block of statements that ends with the keyword
+A **block-statement** is a block of statements that ends with the keyword
 `end`. A function's parameter declaration and the function body
 following the line starting with `func` is a block-statement. The
 statements between `if` and `else` are a block. The statements between
@@ -450,7 +464,7 @@ other blocks.
 A variable declared inside a block only exists until the end of the
 block. It cannot be used outside the block.
 
-Variable names in an inner block can _shadow_ or override the same
+Variable names in an inner block can **shadow** or override the same
 variable name from an outer block, which makes the variable of the
 outer block inaccessible to the inner block. However, when the inner
 block is finished, the variable from the outer block is restored and
@@ -458,12 +472,12 @@ unchanged:
 
 ```evy
 x := "outer"
-print "1" x
+print 1 x
 for range 1
     x := true
-    print "2" x
+    print 2 x
 end
-print "3" x
+print 3 x
 ```
 
 This program will print
@@ -478,12 +492,24 @@ This program will print
 
 ## Strings
 
-A `string` is a sequence of [Unicode code points]. A string literal is
-enclosed by double quotes `"`, for example
-`str := "Hallöchen Welt 👋🌍"`.
+A **string** is a sequence of [Unicode code points]. Unicode is a
+standard that defines a unique code point for every character in every
+language. This means that a string can contain characters from any
+language, including English, French, Spanish, Chinese, Japanese, and
+Korean.
 
-The `len str` function returns the number of Unicode code points,
-_characters_, in the string. The loop `for ch := range str` iterates
+A **string literal** is a sequence of characters enclosed by double
+quotes. The characters in a string literal are interpreted as Unicode
+code points. This means that a string literal can contain any character
+that has a Unicode code point, including letters, numbers, punctuation
+marks, and emojis.
+
+The example code `str := "Hallöchen Welt 👋🌍"` defines a string variable
+`str` and initializes it with a string literal that contains the German
+words "Hallöchen Welt" and the emojis "👋🌍".
+
+The `len str` function returns the number of Unicode code points, or
+**characters**, in the string. The loop `for ch := range str` iterates
 over all characters of the string. Individual characters of a string can
 be read by index, starting at `0`. Strings can be concatenated with the
 `+` operator.
@@ -491,7 +517,8 @@ be read by index, starting at `0`. Strings can be concatenated with the
 The backslash character `\` can be used to represent special characters
 in strings. For example, the `\t` escape sequence represents a tab
 character, and the `\n` escape sequence represents a newline character.
-Quotes in string literals must also be escaped with backslashes.
+Quotes in string literals must also be escaped with backslashes. To
+print a backslash character, use `\\`.
 
 For example the following code
 
@@ -513,7 +540,7 @@ She said, "Hello, hello!"
 
 ## Arrays
 
-Arrays are collections of elements that have the same type. They are
+**Arrays** are collections of elements that have the same type. They are
 declared with brackets `[]`, and the elements are separated by a space.
 For example, the following code declares two arrays of numbers
 
@@ -583,11 +610,11 @@ outputs
 
 ## Maps
 
-Maps are key-value stores, where the values can be looked up by their
-key, for example `m := { key1:"value1" key2:"value2" }`.
+**Maps** are key-value stores, where the values can be looked up by their
+key, for example `map := { key1:"value1" key2:"value2" }`.
 
 Map values can be accessed with the dot expression, for example
-`map.key`. If maps are accessed via the dot expression the key must
+`map.key1`. If maps are accessed via the dot expression the key must
 match the grammars `ident` production. Map values can also be accessed
 with an index expression which allows for evaluation, non-ident keys
 and variable usage. For example the following code
@@ -661,10 +688,10 @@ index expression `[`.
 
 ## Index and Slice
 
-An array or string _index_ in Evy is a number that is used to access a
+An array or string **index** in Evy is a number that is used to access a
 specific element of an array or character of a string. Array indices
 start at `0`, so the first element of an array is `arr[0]`. A negative
-index `-i` is a shorthand for `(len arr) - i`, so arr[-1] refers to the
+index `-i` is a shorthand for `(len arr) - i`, so `arr[-1]` refers to the
 last element of arr.
 
 For example, the following code
@@ -682,7 +709,7 @@ will print the first and last elements of the array
 2 c
 ```
 
-A _slice_ is a way to access portions of an array or a string. It is a
+A **slice** is a way to access portions of an array or a string. It is a
 substring or subarray that is copied from the original array or string.
 The slice expression `arr[start:end]` copies a substring or subarray
 starting with the value at index `arr[start]`. The length of the slice
@@ -710,25 +737,25 @@ outputs
 ```
 
 If you try to access an element of an array or string that is out of
-bounds, a [fatal runtime error](#fatal-errors) will occur. Slice
+bounds, a [runtime panic](#run-time-panics-and-recoverable-errors) will occur. Slice
 expressions must not be preceded by whitespace before the `[` character,
 just like indexing an array or string. For more details, see the section
-on[whitespace](#whitespace).
+on [whitespace](#whitespace).
 
 ## Operators and Expressions
 
-_Operators_ are special symbols or identifiers that combine the values of
-their operands into a single value. _Operands_ are the variables or
+**Operators** are special symbols or identifiers that combine the values of
+their operands into a single value. **Operands** are the variables or
 literal values that the operator acts on. The combination of operands
-and operators is called expression. An _expression_ is a combination
+and operators is called expression. An **expression** is a combination
 of literal values, operators, variables, and further nested expressions
 that evaluates to a single value.
 
 In Evy, there are two types of operators: unary operators and binary
 operators:
 
-- _Unary operators_ act on a single operand. For example, the unary operator `-` negates the value of its operand.
-- _Binary operators_ act on two operands. For example, the binary operator `+` adds the two operands together.
+- **Unary operators** act on a single operand. For example, the unary operator `-` negates the value of its operand.
+- **Binary operators** act on two operands. For example, the binary operator `+` adds the two operands together.
 
 Operators can be combined to form larger expressions, for example, the
 expression `-delta + 3` would first negate the value of the variable `delta` and
@@ -753,15 +780,15 @@ logical, and comparison operators.
 
 ### Arithmetic and Concatenation Operators
 
-The _arithmetic operators_ `+`, `-`, `*`, `/`, and `%` stand for addition,
+The **arithmetic operators** `+`, `-`, `*`, `/`, and `%` stand for addition,
 subtraction, multiplication, division, and the [modulo operator]. The
 symbol `+` can also be used to concatenate strings and arrays.
 
-The _modulo operator_ `%`, also known as the remainder operator, returns the
+The **modulo operator** `%`, also known as the remainder operator, returns the
 remainder of a division operation. For example, `10 % 3` results in
 `1`, because `10` divided by `3` has a remainder of `1`.
 
-The _concatenation operator_ `+`, combines two strings or two arrays
+The **concatenation operator** `+`, combines two strings or two arrays
 together. For example, `"fire"` + `"engine"` combines into the string
 `"fireengine"`.
 
@@ -769,7 +796,7 @@ together. For example, `"fire"` + `"engine"` combines into the string
 
 ### Logical Operators
 
-The _logical operators_ `and` and `or` are used to perform
+The **logical operators** `and` and `or` are used to perform
 [logical conjunction] and [logical disjunction]. They are used to
 perform logical operations on boolean values with type `bool`.
 
@@ -791,11 +818,11 @@ to be `false`.
 
 ### Comparison Operators
 
-The _comparison operators_ `<` `<=` `>` `>=` stand for less, less or equal,
+The **comparison operators** `<` `<=` `>` `>=` stand for less, less or equal,
 greater, greater or equal. Their operands may be `num` or `string`
 values. For `string` types [lexicographical comparison] is used.
 
-The _comparison operators_ `==` and `!=` compare two operands of the
+The **comparison operators** `==` and `!=` compare two operands of the
 same type for equality and inequality. The operands of these operators
 can be basic types, such as numbers and strings, or composite types,
 such as arrays and maps. The result of a comparison operation is the
@@ -805,7 +832,7 @@ boolean value `true` or `false`.
 
 ### Unary Operators
 
-_Unary operators_ are operators that operate on a single operand. In
+**Unary operators** are operators that operate on a single operand. In
 Evy, there are two unary operators: `-` and `!`.
 
 - The unary operator `-` negates the value of a numeric operand. For example, `-delta` negates the value of `delta`.
@@ -841,7 +868,7 @@ For more information about whitespace, see the
 
 ## Precedence
 
-Operators in Evy are evaluated in a specific order, called _precedence_.
+Operators in Evy are evaluated in a specific order, called **precedence**.
 The order of precedence is as follows:
 
 1. Indexing, dot notation and grouped expressions: `a[i]` `a.b` `(` … `)`
@@ -870,14 +897,14 @@ be evaluated as follows:
 
 ## Statements
 
-A _statement_ is a unit of code that performs an action. Statements are
+A **statement** is a unit of code that performs an action. Statements are
 the building blocks of programs, and they can be used to control the
 flow of execution.
 
 Statements can be divided into two categories: block statements and basic statements.
 
-- _Basic statements_ are statements that cannot be broken down into further statements.
-- _Block statements_ are statements that contain further statements.
+- **Basic statements** are statements that cannot be broken down into further statements.
+- **Block statements** are statements that contain further statements.
 
 There are 5 types of block statements in Evy:
 
@@ -904,7 +931,7 @@ Whitespace in Evy is used to separate different parts of a program.
 There are two types of whitespace in Evy: vertical whitespace and
 horizontal whitespace.
 
-### Vertical whitespace
+### Vertical Whitespace
 
 Vertical whitespace is a sequence of one or more newline characters that
 can optionally contain comments. It is used to terminate or end basic
@@ -941,9 +968,9 @@ person := {
 print person
 ```
 
-## Horizontal whitespace
+## Horizontal Whitespace
 
-_Horizontal whitespace_ is a sequence of tabs or spaces that is used to
+**Horizontal whitespace** is a sequence of tabs or spaces that is used to
 separate elements in lists. Lists include the argument list to a
 function call, the element list of an array literal, and the value in
 the key-value pairs of a map literal. However, horizontal whitespace
@@ -980,7 +1007,7 @@ defined in the grammar is ignored and can be used freely with the
 addition of the following rules:
 
 1. `WS` is not allowed around dot `.` in dot expressions.
-2. `WS` is not allowed around before the `[` in index or slice expressions.
+2. `WS` is not allowed before the `[` in index or slice expressions.
 3. `WS` is not allowed following the unary operators `-` and `!`.
 4. `WS` is not allowed within arguments to a function call
 5. `WS` is not allowed within elements of an array literal
@@ -1002,7 +1029,7 @@ arr := [1 + 1]
 arr [0] = 3 + 2
 print 2 + arr [0]
 
-map := {address: "10 Downing" + "Street"}
+map := {address: "10 Downing " + "Street"}
 map.  address = "221B Baker Street"
 
 print len map
@@ -1018,7 +1045,7 @@ arr := [1+1]
 arr[0] = 3 + 2
 print 2+arr[0]
 
-map := {address:"10 Downing"+"Street"}
+map := {address:"10 Downing "+"Street"}
 map.address = "221B Baker Street"
 
 print (len map)
@@ -1026,41 +1053,41 @@ print (len map)
 
 ## Functions
 
-_Functions_ are blocks of code that are used to perform a specific task.
+**Functions** are blocks of code that are used to perform a specific task.
 They are often used to encapsulate code that is used repeatedly, so
 that it can be called from different parts of a program.
 
-A _function definition_ binds an identifier, the function name, to a
-function. As part of the function definition, the _function signature_
+A **function definition** binds an identifier, the function name, to a
+function. As part of the function definition, the **function signature**
 declares the number, order and types of input parameters as well as the
 result or return type of the function. If the return type is left out,
 the function does not return a value.
 
-For example, the following code defines a function called `isValid`
-that takes two parameters, `s` and `cap`, and returns a boolean
-result. The `s` parameter is of type `string` and the `cap`
+For example, the following code defines a function called `validate`
+that takes two parameters, `s` and `maxl`, and returns a boolean
+result. The `s` parameter is of type `string` and the `maxl`
 parameter is of type `num`. The return type of the function is `bool`.
 
 ```evy
-func isValid:bool s:string maxLen:num
-    return (len s) <= maxLen
+func validate:bool s:string maxl:num
+    return (len s) <= maxl
 end
 ```
 
-### Bare returns
+### Bare Returns
 
-_Bare returns_ are return statements without values. They can be used in
+**Bare returns** are return statements without values. They can be used in
 functions without result type. For example, the following code defines a
-function called _validate_ that takes a map as an argument and does not
-return a value. The _return_ statement in the _if_ statement simply
+function called `reverse` that takes a string array as an argument and
+does not return a value. The return statement in the if statement simply
 exits the function early.
 
 ```evy
-func validate m:{}any
-    if m == {}
+func reverse arr:[]string
+    if arr == []
         return
     end
-    // further validation
+    // ...
 end
 ```
 
@@ -1102,9 +1129,9 @@ on down _:num y:num
 end
 ```
 
-### Variadic functions
+### Variadic Functions
 
-_Variadic functions_ in Evy are functions that can take zero or more
+**Variadic functions** in Evy are functions that can take zero or more
 arguments of a specific type. The type of the variadic parameter is an
 array with the element type of the parameter. The length of the array
 is the number of arguments passed to the function.
@@ -1136,7 +1163,7 @@ in Evy. The call arguments must be listed individually.
 
 ## Break and Return
 
-`break` and `return` are _terminating statements_ in Evy. They interrupt
+`break` and `return` are **terminating statements** in Evy. They interrupt
 the regular flow of control.
 
 - `break` is used to exit from the innermost loop body. This means that
@@ -1275,8 +1302,9 @@ y []any
 
 ## Type Assertion
 
-A type assertion `ident.(type)` asserts that the value of the variable
-`ident` is of the given `type`. If the assertion does not hold a
+A type assertion `x.(TYPE)` asserts that the value of the variable `x`
+is of the given `TYPE`. `TYPE` can be any basic or composite type, such
+as `num` or `[]string`. If the assertion does not hold, a
 [run-time panic](#run-time-panics-and-recoverable-errors) occurs.
 
 ```evy
@@ -1325,7 +1353,7 @@ x: [1 2 3] typeof x: []any
 
 ## Run-time Panics and Recoverable Errors
 
-_Run-time panics_ are unrecoverable errors that can occur during the
+**Run-time panics** are unrecoverable errors that can occur during the
 execution of an Evy program. They can be caused by a variety of things,
 such as trying to index an array out of bounds, accessing a map value
 for a key that does not exist, or a failed type assertion. When a
@@ -1333,7 +1361,7 @@ run-time panic occurs, the Evy program will stop and error details will
 be printed. You can trigger a panic in your own code by calling the
 builtin function `panic "msg"`.
 
-_Recoverable errors_ are errors that can be handled by the Evy program.
+**Recoverable errors** are errors that can be handled by the Evy program.
 They are typically caused by user input or external factors that the
 Evy program cannot control. Functions that can cause recoverable errors
 set the global `err` variable to `true` and the string variable `errmsg`
@@ -1368,7 +1396,7 @@ documentation](builtins.md#event-handlers).
 
 ## Runtimes
 
-Evy has two runtimes: the _terminal runtime_ and the _browser runtime_.
+Evy has two runtimes: the **terminal runtime** and the **browser runtime**.
 
 The browser runtime can be tried at [evy.dev](https://evy.dev). It fully
 supports all builtin functions and event handlers as described in the

@@ -2,8 +2,8 @@
 
 The following examples will help you understand the syntax of Evy. For a
 more formal definition of the syntax, see the
-[Language Specification](spec.md). Builtin functions, such as `print`
-and `circle`, are documented in the[Builtins section](builtins.md).
+[Language Specification](spec.md). Built-in functions, such as `print`
+and `circle`, are documented in the[Built-ins section](builtins.md).
 
 ## Comment
 

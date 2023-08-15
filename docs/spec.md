@@ -8,7 +8,7 @@ languages are purposefully left out.
 
 To get an intuitive understanding of Evy, you can either look at its
 [syntax by example](syntax_by_example.md) or read through the
-[builtins documentation](builtins.md).
+[built-ins documentation](builtins.md).
 
 [statically typed]: https://developer.mozilla.org/en-US/docs/Glossary/Static_typing
 [garbage collected]: https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)
@@ -671,7 +671,7 @@ outputs
 ```
 
 The loop `for key := range map` iterates over all map keys. It is safe
-to delete values from the map with the builtin function `del` while
+to delete values from the map with the built-in function `del` while
 iterating. The keys are iterated in the order in which they are
 inserted. Any values inserted into the map during the iteration will
 not be included in the iteration.
@@ -1359,7 +1359,7 @@ such as trying to index an array out of bounds, accessing a map value
 for a key that does not exist, or a failed type assertion. When a
 run-time panic occurs, the Evy program will stop and error details will
 be printed. You can trigger a panic in your own code by calling the
-builtin function `panic "msg"`.
+built-in function `panic "msg"`.
 
 **Recoverable errors** are errors that can be handled by the Evy program.
 They are typically caused by user input or external factors that the
@@ -1370,7 +1370,7 @@ of `err` and handle the error accordingly. You can trigger a recoverable
 error in your own code by setting `err` and `errmsg`.
 
 For more information on run-time panics and recoverable errors, see the
-builtin documentation on the [panic function](builtins.md#panic) and
+built-in documentation on the [panic function](builtins.md#panic) and
 the [errors section](builtins.md#errors).
 
 ## Execution Model and Event Handlers
@@ -1391,16 +1391,16 @@ events can be handled: `key`, `down`, `up`, `move`, `animate`, and
 signature. The parameters can be fully omitted or fully specified. If
 only some parameters are needed, use the anonymous `_` parameter.
 
-For more information on individual event handlers, see the [builtin
-documentation](builtins.md#event-handlers).
+For more information on individual event handlers, see the
+[built-in documentation](builtins.md#event-handlers).
 
 ## Runtimes
 
 Evy has two runtimes: the **terminal runtime** and the **browser runtime**.
 
 The browser runtime can be tried at [evy.dev](https://evy.dev). It fully
-supports all builtin functions and event handlers as described in the
-[builtin documentation](builtin.md).
+supports all built-in functions and event handlers as described in the
+[built-in documentation](builtin.md).
 
 To use the terminal runtime, first install Evy and then run
 

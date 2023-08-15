@@ -5,9 +5,9 @@
 }
 /<!-- genend:toc -->/ {
 	in_toc = 0
-	printf "\n";
+	printf "\n"
 	system("awk -f scripts/tocgen.awk " FILENAME)
-	printf "\n";
+	printf "\n"
 }
 in_toc {
 	next

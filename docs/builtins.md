@@ -1,6 +1,6 @@
-# Builtins
+# Built-ins
 
-**Builtins** in Evy are pre-defined functions and events that allow for
+**Built-ins** in Evy are pre-defined functions and events that allow for
 user interaction, graphics, animation, mathematical operations, and
 more.
 
@@ -1702,7 +1702,7 @@ makes it easier to see the center of the canvas.
 The `grid` function is a shorthand of the `gridn` function with the
 arguments `10` and `"hsl(0deg 100% 0% / 50%)"`, see [`gridn`](#gridn).
 It is roughly equivalent to the following Evy code. However, the current
-color, cursor position, and line width are not affected by the builtin
+color, cursor position, and line width are not affected by the built-in
 `grid` function.
 
 ```evy
@@ -1749,7 +1749,7 @@ grid line is slightly thicker, with a line width of 0.2 units.
 
 The `gridn` function is roughly equivalent to the following Evy code,
 but the current color, cursor position, and line width are not affected
-by the builtin `gridn` function.
+by the built-in `gridn` function.
 
 ```evy
 c := "red"

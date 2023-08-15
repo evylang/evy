@@ -96,6 +96,11 @@ TOCFILES = docs/builtins.md docs/spec.md
 toc:
 	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
 
+USAGE_CMD = ./scripts/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+USAGEFILES = docs/usage.md
+usage: install
+	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
+
 .PHONY: check-evy-fmt doc doctest evy-fmt lint toc
 
 # --- frontend -----------------------------------------------------------------

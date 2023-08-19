@@ -17,7 +17,7 @@ and animations. Evy bridges the gap between block-based languages like
 
 ## 🌱 Getting Started
 
-You can try Evy online at [evy.dev] and browse the examples.
+You can try Evy online at [evy.dev/play] and browse the examples.
 Alternatively you can [install](#-installation) the `evy` toolchain
 locally.
 
@@ -34,8 +34,8 @@ Here is a "hello world" program in Evy
 
 </details>
 
-[evy.dev]: https://evy.dev
-[Animation source code]: https://evy.dev/#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
+[evy.dev/play]: https://evy.dev/play
+[Animation source code]: https://evy.dev/play#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
 
 ## 📖 Documentation
 
@@ -140,7 +140,7 @@ Evy would not be here today without the help of many people.
 [@ckaser]: https://github.com/ckaser
 [easylang]: https://easylang.online/
 [@fcostin]: https://github.com/fcostin
-[Splash of Trig]: https://evy.dev/#splashtrig
+[Splash of Trig]: https://evy.dev/play#splashtrig
 [@starkcoffee]: https://github.com/starkcoffee
 [@loislambeth]: https://github.com/loislambeth
 [@alecthomas]: https://github.com/alecthomas

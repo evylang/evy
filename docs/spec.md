@@ -1398,7 +1398,7 @@ For more information on individual event handlers, see the
 
 Evy has two runtimes: the **terminal runtime** and the **browser runtime**.
 
-The browser runtime can be tried at [evy.dev](https://evy.dev). It fully
+The browser runtime can be tried at [evy.dev/play]. It fully
 supports all built-in functions and event handlers as described in the
 [built-in documentation](builtin.md).
 
@@ -1414,3 +1414,5 @@ with
 
 For more details, run `evy run --help` or `evy fmt --help`. The terminal
 runtime does not support event handlers or graphics functions.
+
+[evy.dev/play](https://evy.dev/play)

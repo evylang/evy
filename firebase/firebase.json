@@ -16,6 +16,11 @@
         "source": "/discord-server",
         "destination": "https://discord.com/channels/1008553546058313738",
         "type": 301
+      },
+      {
+        "source": "/play",
+        "destination": "/",
+        "type": 301
       }
     ]
   },

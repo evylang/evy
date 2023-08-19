@@ -1,6 +1,6 @@
 # Evy
 
-[![Slack Chat](https://img.shields.io/badge/slack-gophers-660066?style=flat-square&logo=slack)](https://gophers.slack.com/messages/foxygoat)
+[![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://evy.dev/discord)
 [![GitHub Build](https://img.shields.io/github/actions/workflow/status/foxygoat/evy/cicd.yaml?style=flat-square&branch=master&logo=github)](https://github.com/foxygoat/evy/actions/workflows/cicd.yaml?query=branch%3Amaster)
 [![Go Reference](https://pkg.go.dev/badge/foxygo.at/evy.svg)](https://pkg.go.dev/foxygo.at/evy)
 
@@ -45,6 +45,10 @@ Here are some resources for learning more about Evy:
 - [Syntax by Example](docs/syntax_by_example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
+
+For questions and discussions, join the [Evy community] on Discord.
+
+[Evy community]: https://evy.dev/discord
 
 ## 📦 Installation
 

@@ -5,7 +5,19 @@
   },
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "redirects": [
+      {
+        "source": "/discord",
+        "destination": "https://discord.gg/XHHXf6y29n",
+        "type": 301
+      },
+      {
+        "source": "/discord-server",
+        "destination": "https://discord.com/channels/1008553546058313738",
+        "type": 301
+      }
+    ]
   },
   "emulators": {
     "auth": {

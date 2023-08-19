@@ -18,6 +18,11 @@
         "type": 301
       },
       {
+        "source": "/docs",
+        "destination": "https://github.com/foxygoat/evy/blob/master/docs/README.md",
+        "type": 301
+      },
+      {
         "source": "/play",
         "destination": "/",
         "type": 301

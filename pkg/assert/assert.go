@@ -1,6 +1,5 @@
-// Package assert is a testing utility package for online assertion that
-// also work with TinyGo which has only limited support for
-// reflection.
+// Package assert is a minimal testing utility package with inline
+// assertions.
 package assert
 
 import (
@@ -9,20 +8,26 @@ import (
 	"testing"
 )
 
+// NoError is a testing utility function that immediately fails the test
+// if err is not nil and prints the optional message with arguments in
+// fmt.Printf syntax.
 func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	t.Helper()
 	if err == nil {
 		return
 	}
-	fatalf(t, "err: %v%s", err, format(msgAndArgs...))
+	t.Fatalf("err: %v%s", err, format(msgAndArgs...))
 }
 
+// Equal is a testing utility function that immediately fails the test
+// if want is not equal to got and prints the optional message with
+// arguments in fmt.Printf syntax.
 func Equal(t *testing.T, want, got any, msgAndArgs ...interface{}) {
 	t.Helper()
 	if equal(want, got) {
 		return
 	}
-	fatalf(t, "want != got\n%#v\n%#v%s", want, got, format(msgAndArgs...))
+	t.Fatalf("want != got\n%#v\n%#v%s", want, got, format(msgAndArgs...))
 }
 
 func equal(a, b any) bool {

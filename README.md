@@ -1,23 +1,24 @@
 # Evy
 
-[![Slack Chat](https://img.shields.io/badge/slack-gophers-660066?style=flat-square&logo=slack)](https://gophers.slack.com/messages/foxygoat)
+[![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://evy.dev/discord)
 [![GitHub Build](https://img.shields.io/github/actions/workflow/status/foxygoat/evy/cicd.yaml?style=flat-square&branch=master&logo=github)](https://github.com/foxygoat/evy/actions/workflows/cicd.yaml?query=branch%3Amaster)
 [![Go Reference](https://pkg.go.dev/badge/foxygo.at/evy.svg)](https://pkg.go.dev/foxygo.at/evy)
 
 Evy is a simple programming language, made to learn coding.
 
-Evy has a minimalist syntax with fewer special characters and advanced
-concepts than most programming languages. It also has a small set of
+Evy bridges the gap between block-based languages like [Scratch] and
+conventional languages like Python or JavaScript. It has a minimalist
+syntax with fewer special characters and advanced concepts than most
+programming languages. Evy has a small set of
 [built-in functions](docs/builtins.md) that are easy to understand and
 remember, but it still is powerful enough for user interaction, games,
-and animations. Evy bridges the gap between block-based languages like
-[Scratch] and conventional languages like Python or JavaScript.
+and animations.
 
 [Scratch]: https://scratch.mit.edu/
 
 ## 🌱 Getting Started
 
-You can try Evy online at [evy.dev] and browse the examples.
+You can try Evy online at [evy.dev/play] and browse the examples.
 Alternatively you can [install](#-installation) the `evy` toolchain
 locally.
 
@@ -28,14 +29,14 @@ Here is a "hello world" program in Evy
 <details>
   <summary>Screencast: How to code a simple animation in Evy.</summary>
 
-[![Coding evy](docs/img/purple-dot.gif)](https://evy.dev)
+![Coding evy](docs/img/purple-dot.gif)
 
 [Animation source code]
 
 </details>
 
-[evy.dev]: https://evy.dev
-[Animation source code]: https://evy.dev/#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
+[evy.dev/play]: https://evy.dev/play
+[Animation source code]: https://evy.dev/play#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
 
 ## 📖 Documentation
 
@@ -45,6 +46,10 @@ Here are some resources for learning more about Evy:
 - [Syntax by Example](docs/syntax_by_example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
+
+For questions and discussions, join the [Evy community] on Discord.
+
+[Evy community]: https://evy.dev/discord
 
 ## 📦 Installation
 
@@ -136,7 +141,7 @@ Evy would not be here today without the help of many people.
 [@ckaser]: https://github.com/ckaser
 [easylang]: https://easylang.online/
 [@fcostin]: https://github.com/fcostin
-[Splash of Trig]: https://evy.dev/#splashtrig
+[Splash of Trig]: https://evy.dev/play#splashtrig
 [@starkcoffee]: https://github.com/starkcoffee
 [@loislambeth]: https://github.com/loislambeth
 [@alecthomas]: https://github.com/alecthomas

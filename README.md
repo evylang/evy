@@ -6,12 +6,13 @@
 
 Evy is a simple programming language, made to learn coding.
 
-Evy has a minimalist syntax with fewer special characters and advanced
-concepts than most programming languages. It also has a small set of
+Evy bridges the gap between block-based languages like [Scratch] and
+conventional languages like Python or JavaScript. It has a minimalist
+syntax with fewer special characters and advanced concepts than most
+programming languages. Evy has a small set of
 [built-in functions](docs/builtins.md) that are easy to understand and
 remember, but it still is powerful enough for user interaction, games,
-and animations. Evy bridges the gap between block-based languages like
-[Scratch] and conventional languages like Python or JavaScript.
+and animations.
 
 [Scratch]: https://scratch.mit.edu/
 

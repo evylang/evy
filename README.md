@@ -29,7 +29,7 @@ Here is a "hello world" program in Evy
 <details>
   <summary>Screencast: How to code a simple animation in Evy.</summary>
 
-[![Coding evy](docs/img/purple-dot.gif)](https://evy.dev)
+![Coding evy](docs/img/purple-dot.gif)
 
 [Animation source code]
 

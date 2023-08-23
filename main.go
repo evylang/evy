@@ -1,5 +1,32 @@
 //go:build !tinygo
 
+// Evy compiles, runs, and formats Evy source code.
+//
+// Evy on the command line supports all [built-in functions] except for
+// graphics functions and event handlers. Only the web interface on
+// [evy.dev/play] supports graphics and events.
+//
+// The Evy toolchain has two subcommands: run and fmt.
+//
+//	Usage: evy <command>
+//
+//	evy is a tool for managing evy source code.
+//
+//	Flags:
+//	  -h, --help       Show context-sensitive help.
+//	  -V, --version    Print version information
+//
+//	Commands:
+//	  run [<source>]
+//	    Run Evy program.
+//
+//	  fmt [<files> ...]
+//	    Format Evy files.
+//
+//	Run "evy <command> --help" for more information on a command.
+//
+// [built-in functions]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md
+// [evy.dev/play]: https://evy.dev/play
 package main
 
 import (

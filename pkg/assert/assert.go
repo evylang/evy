@@ -8,9 +8,8 @@ import (
 	"testing"
 )
 
-// NoError is a testing utility function that immediately fails the test
-// if err is not nil and prints the optional message with arguments in
-// fmt.Printf syntax.
+// NoError immediately fails a test function if err is not nil. It
+// prints an optional formatted message with arguments.
 func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	t.Helper()
 	if err == nil {
@@ -19,9 +18,8 @@ func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	t.Fatalf("err: %v%s", err, format(msgAndArgs...))
 }
 
-// Equal is a testing utility function that immediately fails the test
-// if want is not equal to got and prints the optional message with
-// arguments in fmt.Printf syntax.
+// Equal immediately fails a test function if want is not equal to
+// got. It prints an optional formatted message with arguments.
 func Equal(t *testing.T, want, got any, msgAndArgs ...interface{}) {
 	t.Helper()
 	if equal(want, got) {

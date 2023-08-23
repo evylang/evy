@@ -84,7 +84,10 @@ evy-fmt: ## Format evy sample code
 check-evy-fmt:
 	go run . fmt --check $(EVY_FILES)
 
-doc: doctest toc
+.PHONY: check-evy-fmt evy-fmt lint
+
+# --- Docs ---------------------------------------------------------------------
+doc: doctest godoc toc usage
 
 DOCTEST_CMD = ./scripts/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 DOCTESTS = docs/builtins.md docs/spec.md
@@ -101,7 +104,12 @@ USAGEFILES = docs/usage.md
 usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
-.PHONY: check-evy-fmt doc doctest evy-fmt lint toc
+GODOC_CMD = ./scripts/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
+GODOCFILES = main.go
+godoc: install
+	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
+
+.PHONY: doc doctest godoc toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib

@@ -61,7 +61,7 @@ func TestSingleToken(t *testing.T) {
 			want := &Token{Type: tt.want, Literal: "", Offset: 0, Line: 1, Col: 1}
 			assert.Equal(t, want, got)
 
-			wantFormat := tt.in
+			wantFormat := `"` + tt.in + `"`
 			gotFormat := got.Format()
 			assert.Equal(t, wantFormat, gotFormat)
 

@@ -167,13 +167,6 @@ var tokenStrings = map[TokenType]tokenString{
 	END:        {string: "END", format: "end"},
 }
 
-func (t TokenType) Format() string {
-	if ts, ok := tokenStrings[t]; ok {
-		return ts.format
-	}
-	return "<unknown>"
-}
-
 func (t TokenType) String() string {
 	if ts, ok := tokenStrings[t]; ok {
 		return ts.string
@@ -185,7 +178,7 @@ func (t TokenType) GoString() string {
 	return t.String()
 }
 
-func (t TokenType) FormatDetails() string {
+func (t TokenType) Format() string {
 	if t == EOF {
 		return "end of input"
 	}
@@ -195,7 +188,7 @@ func (t TokenType) FormatDetails() string {
 	if t == IDENT {
 		return "identifier"
 	}
-	return fmt.Sprintf("%q", t.Format())
+	return fmt.Sprintf("%q", tokenStrings[t].format)
 }
 
 func (t *Token) setType(tokenType TokenType) *Token {
@@ -230,16 +223,6 @@ func (t *Token) Format() string {
 		return `"` + t.Literal + `"`
 	}
 	return t.Type.Format()
-}
-
-func (t *Token) FormatDetails() string {
-	switch t.Type {
-	case COMMENT, IDENT, NUM_LIT:
-		return t.Literal
-	case STRING_LIT:
-		return `"` + t.Literal + `"`
-	}
-	return t.Type.FormatDetails()
 }
 
 func (t *Token) Location() string {

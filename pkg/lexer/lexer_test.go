@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"strings"
 	"testing"
 
 	"foxygo.at/evy/pkg/assert"
@@ -306,7 +307,7 @@ func TestRun(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
-			got := Run(tt.in)
+			got := run(tt.in)
 			want := tt.want + "EOF\n"
 			assert.Equal(t, want, got)
 		})
@@ -326,7 +327,7 @@ func TestRunWS(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
-			got := Run(tt.in)
+			got := run(tt.in)
 			want := tt.want + "WS\nEOF\n"
 			assert.Equal(t, want, got)
 		})
@@ -347,7 +348,7 @@ func TestString(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
-			got := Run(tt.in)
+			got := run(tt.in)
 			want := tt.want + "\nWS\nEOF\n"
 			assert.Equal(t, want, got)
 		})
@@ -386,4 +387,15 @@ func TestStringLitErr(t *testing.T) {
 		got := l.Next()
 		assert.Equal(t, want, got)
 	}
+}
+
+func run(input string) string {
+	l := New(input)
+	tok := l.Next()
+	var sb strings.Builder
+	for ; tok.Type != EOF; tok = l.Next() {
+		sb.WriteString(tok.String() + "\n")
+	}
+	sb.WriteString(tok.String() + "\n")
+	return sb.String()
 }

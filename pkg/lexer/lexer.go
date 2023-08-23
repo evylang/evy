@@ -6,20 +6,8 @@ package lexer
 
 import (
 	"strconv"
-	"strings"
 	"unicode"
 )
-
-func Run(input string) string {
-	l := New(input)
-	tok := l.Next()
-	var sb strings.Builder
-	for ; tok.Type != EOF; tok = l.Next() {
-		sb.WriteString(tok.String() + "\n")
-	}
-	sb.WriteString(tok.String() + "\n")
-	return sb.String()
-}
 
 type Lexer struct {
 	input []rune

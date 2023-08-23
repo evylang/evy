@@ -80,7 +80,7 @@ const (
 	END    // end
 )
 
-func LookupKeyword(s string) TokenType {
+func lookupKeyword(s string) TokenType {
 	if tok, ok := keywords[s]; ok {
 		return tok
 	}
@@ -198,7 +198,7 @@ func (t TokenType) FormatDetails() string {
 	return fmt.Sprintf("%q", t.Format())
 }
 
-func (t *Token) SetType(tokenType TokenType) *Token {
+func (t *Token) setType(tokenType TokenType) *Token {
 	t.Type = tokenType
 	return t
 }
@@ -207,7 +207,7 @@ func (t *Token) TokenType() TokenType {
 	return t.Type
 }
 
-func (t *Token) SetLiteral(literal string) *Token {
+func (t *Token) setLiteral(literal string) *Token {
 	t.Literal = literal
 	return t
 }

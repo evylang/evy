@@ -5,6 +5,11 @@ import (
 	"strconv"
 )
 
+// Token contains
+//   - type of the token, such as [IDENT], [PLUS] or [NUM_LIT]
+//   - start location of the token in the input string
+//   - literal value of the token, used only for number literals, string
+//     literals and comments.
 type Token struct {
 	Literal string
 
@@ -14,6 +19,8 @@ type Token struct {
 	Type   TokenType
 }
 
+// TokenType represents the type of token, such as identifier [IDENT],
+// operator [PLUS] or literal [NUM_LIT].
 type TokenType int
 
 const (
@@ -23,7 +30,7 @@ const (
 
 	// Identifiers and Literals.
 	IDENT      // some_identifier
-	NUM_LIT    // 123 456.78
+	NUM_LIT    // 123 or 456.78
 	STRING_LIT // "a string 🧵"
 
 	// Operators.
@@ -167,6 +174,7 @@ var tokenStrings = map[TokenType]tokenString{
 	END:        {string: "END", format: "end"},
 }
 
+// String implements the [fmt.Stringer] interface for [TokenType].
 func (t TokenType) String() string {
 	if ts, ok := tokenStrings[t]; ok {
 		return ts.string
@@ -174,10 +182,16 @@ func (t TokenType) String() string {
 	return "UNKNOWN"
 }
 
+// GoString implements the [fmt.GoStringer] interface for
+// [TokenType]. Its return value is more useful than the iota value
+// when debugging failed tests.
 func (t TokenType) GoString() string {
 	return t.String()
 }
 
+// Format returns a string representation of the token type that is
+// useful in error messages. The string representation is more
+// descriptive than the string returned by the String() method.
 func (t TokenType) Format() string {
 	if t == EOF {
 		return "end of input"
@@ -196,6 +210,8 @@ func (t *Token) setType(tokenType TokenType) *Token {
 	return t
 }
 
+// TokenType returns the type of the token as represented by the
+// [TokenType] type.
 func (t *Token) TokenType() TokenType {
 	return t.Type
 }
@@ -205,6 +221,7 @@ func (t *Token) setLiteral(literal string) *Token {
 	return t
 }
 
+// String implements the [fmt.Stringer] interface for [Token].
 func (t *Token) String() string {
 	switch t.Type {
 	case COMMENT, IDENT, NUM_LIT, STRING_LIT:
@@ -215,6 +232,10 @@ func (t *Token) String() string {
 	return t.Type.String()
 }
 
+// Format returns a string representation of the token that is useful in
+// error messages. If the token has a relevant literal value, the
+// literal is returned. Otherwise, the format of the token type is
+// returned.
 func (t *Token) Format() string {
 	switch t.Type {
 	case COMMENT, IDENT, NUM_LIT:
@@ -225,6 +246,8 @@ func (t *Token) Format() string {
 	return t.Type.Format()
 }
 
+// Location returns a string representation of a token's start location
+// in the form of: "line <line number> column <column number>".
 func (t *Token) Location() string {
 	return "line " + strconv.Itoa(t.Line) + " column " + strconv.Itoa(t.Col)
 }

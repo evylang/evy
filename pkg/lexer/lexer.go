@@ -1,7 +1,21 @@
-// Package lexer tokenizes input and lets follow up phases in compiler,
-// such as parser, iterate over tokens via Lexer.Next() function. The
-// lexer package also exposes a Run method for debugging the lexing
-// phase only.
+// Package lexer tokenizes the input.
+//
+// The first step in the Evy compilation process is tokenization. This
+// involves breaking the Evy input code into individual tokens, such as
+// keywords, operators, and identifiers.  The lexer package is
+// responsible for this task. It provides a [Lexer] type, which can be
+// initialized using the [New] function. The [Lexer.Next] method
+// returns the next Token in the input string. A [Token] is a data
+// structure that represents a single token in the input code. The
+// [EOF] token is a special token that indicates the end of the input
+// code.
+//
+// The [parser] then takes these tokens and creates an Abstract Syntax
+// Tree(AST), which is a representation of the Evy code's structure.
+// Finally, the [evaluator] walks the AST and executes the program.
+//
+// [parser]: https://pkg.go.dev/foxygo.at/evy/pkg/parser
+// [evaluator]: https://pkg.go.dev/foxygo.at/evy/pkg/evaluator
 package lexer
 
 import (
@@ -9,6 +23,7 @@ import (
 	"unicode"
 )
 
+// Lexer is a lexical analyzer for Evy source code.
 type Lexer struct {
 	input []rune
 	cur   rune // current rune under examination
@@ -17,10 +32,13 @@ type Lexer struct {
 	col   int
 }
 
+// New creates a new Lexer for the given input string.
 func New(input string) *Lexer {
 	return &Lexer{input: []rune(input), pos: -1, line: 1}
 }
 
+// Next returns the next [Token] in the input string. When the end of
+// the input string is reached Next returns a Token with type [EOF].
 func (l *Lexer) Next() *Token {
 	l.advance()
 

@@ -344,7 +344,7 @@ func (p *parser) parseStatement() Node {
 	case lexer.IF:
 		return p.parseIfStatement()
 	}
-	p.appendError("unexpected input " + p.cur.FormatDetails())
+	p.appendError("unexpected input " + p.cur.Format())
 	p.advancePastNL()
 	return nil
 }
@@ -440,7 +440,7 @@ func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
 		p.advance() // advance past `:` of return type declaration, e.g. in `func rand:num`
 		fd.ReturnType = p.parseType()
 		if fd.ReturnType.Name == ILLEGAL {
-			p.appendErrorForToken("invalid return type: "+p.cur.FormatDetails(), fd.token)
+			p.appendErrorForToken("invalid return type: "+p.cur.Format(), fd.token)
 		}
 	}
 	for !p.isAtEOL() && p.cur.TokenType() != lexer.DOT3 {
@@ -622,7 +622,7 @@ func isEOL(tt lexer.TokenType) bool {
 
 func (p *parser) assertToken(tt lexer.TokenType) bool {
 	if p.cur.TokenType() != tt {
-		p.appendError("expected " + tt.FormatDetails() + ", got " + p.cur.TokenType().FormatDetails())
+		p.appendError("expected " + tt.Format() + ", got " + p.cur.TokenType().Format())
 		return false
 	}
 	return true
@@ -630,7 +630,7 @@ func (p *parser) assertToken(tt lexer.TokenType) bool {
 
 func (p *parser) assertEOL() {
 	if !p.isAtEOL() {
-		p.appendError("expected end of line, found " + p.cur.FormatDetails())
+		p.appendError("expected end of line, found " + p.cur.Format())
 	}
 }
 

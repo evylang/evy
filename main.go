@@ -228,8 +228,13 @@ func (c *tokenizeCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	result := lexer.Run(string(b))
-	fmt.Println(result)
+	l := lexer.New(string(b))
+	tok := l.Next()
+	for ; tok.Type != lexer.EOF; tok = l.Next() {
+		fmt.Println(tok)
+	}
+	fmt.Println(tok)
+	fmt.Println()
 	return nil
 }
 

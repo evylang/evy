@@ -1,26 +1,29 @@
-// Package lexer tokenizes input and lets follow up phases in compiler,
-// such as parser, iterate over tokens via Lexer.Next() function. The
-// lexer package also exposes a Run method for debugging the lexing
-// phase only.
+// Package lexer tokenizes the input.
+//
+// The first step in the Evy compilation process is tokenization. This
+// involves breaking the Evy input code into individual tokens, such as
+// keywords, operators, and identifiers.  The lexer package is
+// responsible for this task. It provides a [Lexer] type, which can be
+// initialized using the [New] function. The [Lexer.Next] method
+// returns the next Token in the input string. A [Token] is a data
+// structure that represents a single token in the input code. The
+// [EOF] token is a special token that indicates the end of the input
+// code.
+//
+// The [parser] then takes these tokens and creates an Abstract Syntax
+// Tree(AST), which is a representation of the Evy code's structure.
+// Finally, the [evaluator] walks the AST and executes the program.
+//
+// [parser]: https://pkg.go.dev/foxygo.at/evy/pkg/parser
+// [evaluator]: https://pkg.go.dev/foxygo.at/evy/pkg/evaluator
 package lexer
 
 import (
 	"strconv"
-	"strings"
 	"unicode"
 )
 
-func Run(input string) string {
-	l := New(input)
-	tok := l.Next()
-	var sb strings.Builder
-	for ; tok.Type != EOF; tok = l.Next() {
-		sb.WriteString(tok.String() + "\n")
-	}
-	sb.WriteString(tok.String() + "\n")
-	return sb.String()
-}
-
+// Lexer is a lexical analyzer for Evy source code.
 type Lexer struct {
 	input []rune
 	cur   rune // current rune under examination
@@ -29,10 +32,13 @@ type Lexer struct {
 	col   int
 }
 
+// New creates a new Lexer for the given input string.
 func New(input string) *Lexer {
 	return &Lexer{input: []rune(input), pos: -1, line: 1}
 }
 
+// Next returns the next [Token] in the input string. When the end of
+// the input string is reached Next returns a Token with type [EOF].
 func (l *Lexer) Next() *Token {
 	l.advance()
 
@@ -44,94 +50,94 @@ func (l *Lexer) Next() *Token {
 	switch l.cur {
 	case ' ', '\t':
 		l.consumeHorizontalWhitespace()
-		return tok.SetType(WS)
+		return tok.setType(WS)
 	case '=':
 		if l.peekRune() == '=' {
 			l.advance()
-			return tok.SetType(EQ)
+			return tok.setType(EQ)
 		}
-		return tok.SetType(ASSIGN)
+		return tok.setType(ASSIGN)
 	case '+':
-		return tok.SetType(PLUS)
+		return tok.setType(PLUS)
 	case '-':
-		return tok.SetType(MINUS)
+		return tok.setType(MINUS)
 	case '!':
 		if l.peekRune() == '=' {
 			l.advance()
-			return tok.SetType(NOT_EQ)
+			return tok.setType(NOT_EQ)
 		}
-		return tok.SetType(BANG)
+		return tok.setType(BANG)
 	case '/':
 		if l.peekRune() == '/' {
-			return tok.SetType(COMMENT).SetLiteral(l.readComment())
+			return tok.setType(COMMENT).setLiteral(l.readComment())
 		}
-		return tok.SetType(SLASH)
+		return tok.setType(SLASH)
 	case '*':
-		return tok.SetType(ASTERISK)
+		return tok.setType(ASTERISK)
 	case '%':
-		return tok.SetType(PERCENT)
+		return tok.setType(PERCENT)
 	case '<':
 		if l.peekRune() == '=' {
 			l.advance()
-			return tok.SetType(LTEQ)
+			return tok.setType(LTEQ)
 		}
-		return tok.SetType(LT)
+		return tok.setType(LT)
 	case '>':
 		if l.peekRune() == '=' {
 			l.advance()
-			return tok.SetType(GTEQ)
+			return tok.setType(GTEQ)
 		}
-		return tok.SetType(GT)
+		return tok.setType(GT)
 	case ':':
 		if l.peekRune() == '=' {
 			l.advance()
-			return tok.SetType(DECLARE)
+			return tok.setType(DECLARE)
 		}
-		return tok.SetType(COLON)
+		return tok.setType(COLON)
 	case '{':
-		return tok.SetType(LCURLY)
+		return tok.setType(LCURLY)
 	case '}':
-		return tok.SetType(RCURLY)
+		return tok.setType(RCURLY)
 	case '(':
-		return tok.SetType(LPAREN)
+		return tok.setType(LPAREN)
 	case ')':
-		return tok.SetType(RPAREN)
+		return tok.setType(RPAREN)
 	case '[':
-		return tok.SetType(LBRACKET)
+		return tok.setType(LBRACKET)
 	case ']':
-		return tok.SetType(RBRACKET)
+		return tok.setType(RBRACKET)
 	case '\n':
-		return tok.SetType(NL)
+		return tok.setType(NL)
 	case '.':
 		if l.peekRune() == '.' && l.peekRune2() == '.' {
 			l.advance()
 			l.advance()
-			return tok.SetType(DOT3)
+			return tok.setType(DOT3)
 		}
-		return tok.SetType(DOT)
+		return tok.setType(DOT)
 	case '"':
 		literal, err := l.readString()
 		// strconv.Unquote error
 		if err != nil {
-			return tok.SetType(ILLEGAL).SetLiteral("invalid string")
+			return tok.setType(ILLEGAL).setLiteral("invalid string")
 		}
-		return tok.SetType(STRING_LIT).SetLiteral(literal)
+		return tok.setType(STRING_LIT).setLiteral(literal)
 	case 0:
-		return tok.SetType(EOF)
+		return tok.setType(EOF)
 	}
 	if isLetter(l.cur) {
 		literal := l.readIdent()
-		tokenType := LookupKeyword(literal)
+		tokenType := lookupKeyword(literal)
 		if tokenType == IDENT {
-			return tok.SetType(IDENT).SetLiteral(literal)
+			return tok.setType(IDENT).setLiteral(literal)
 		}
-		return tok.SetType(tokenType)
+		return tok.setType(tokenType)
 	}
 	if isDigit(l.cur) {
-		return tok.SetType(NUM_LIT).SetLiteral(l.readNum())
+		return tok.setType(NUM_LIT).setLiteral(l.readNum())
 	}
 
-	return tok.SetType(ILLEGAL).SetLiteral(string(l.cur))
+	return tok.setType(ILLEGAL).setLiteral(string(l.cur))
 }
 
 func (l *Lexer) advance() {

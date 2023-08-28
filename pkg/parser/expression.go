@@ -103,16 +103,16 @@ func (p *parser) unexpectedLeftTokenError() {
 		tt := p.cur.Type
 		prevTT := p.lookAt(p.pos - 1).Type
 		if isBinaryOp(tt) && prevTT == lexer.WS {
-			p.appendError("unexpected whitespace before " + p.cur.FormatDetails())
+			p.appendError("unexpected whitespace before " + p.cur.Format())
 			return
 		}
 		if tt == lexer.WS && isBinaryOp(prevTT) {
 			prevToken := p.lookAt(p.pos - 1)
-			p.appendErrorForToken("unexpected whitespace after "+prevToken.FormatDetails(), prevToken)
+			p.appendErrorForToken("unexpected whitespace after "+prevToken.Format(), prevToken)
 			return
 		}
 	}
-	p.appendError("unexpected " + p.cur.FormatDetails())
+	p.appendError("unexpected " + p.cur.Format())
 }
 
 func (p *parser) isAtExprEnd() bool {
@@ -502,7 +502,7 @@ func (p *parser) parseMapPairs(mapLit *MapLiteral) bool {
 
 	for tt != lexer.RCURLY && tt != lexer.EOF {
 		if tt != lexer.IDENT {
-			p.appendError("expected map key, found " + p.cur.FormatDetails())
+			p.appendError("expected map key, found " + p.cur.Format())
 		}
 		key := p.cur.Literal
 		p.advance() // advance past key IDENT

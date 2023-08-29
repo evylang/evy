@@ -63,10 +63,12 @@ func newCLIRuntime() *cliRuntime {
 	return &cliRuntime{reader: bufio.NewReader(os.Stdin)}
 }
 
+// Print prints s to stdout.
 func (*cliRuntime) Print(s string) {
 	fmt.Print(s)
 }
 
+// Cls clears the screen.
 func (*cliRuntime) Cls() {
 	cmd := exec.Command("clear")
 	if runtime.GOOS == "windows" {
@@ -78,6 +80,7 @@ func (*cliRuntime) Cls() {
 	}
 }
 
+// Read reads a line of input from stdin and strips trailing newline.
 func (rt *cliRuntime) Read() string {
 	s, err := rt.reader.ReadString('\n')
 	if err != nil {
@@ -86,12 +89,16 @@ func (rt *cliRuntime) Read() string {
 	return s[:len(s)-1] // strip trailing newline
 }
 
+// Sleep sleeps for dur. If the --skip-sleep flag is used, it does nothing.
 func (rt *cliRuntime) Sleep(dur time.Duration) {
 	if !rt.skipSleep {
 		time.Sleep(dur)
 	}
 }
 
+// Yielder returns a no-op yielder for CLI evy as it is not needed. By
+// contrast, browser Evy needs to explicitly hand over control to JS
+// host with Yielder.
 func (*cliRuntime) Yielder() evaluator.Yielder { return nil }
 
 const description = `
@@ -135,6 +142,7 @@ type parseCmd struct {
 	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
 }
 
+// Run implements the `evy run` CLI command, called by the Kong API.
 func (c *runCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
@@ -161,6 +169,7 @@ func handlEvyErr(err error) {
 	os.Exit(1)
 }
 
+// Run implements the `evy fmt` CLI command, called by the Kong API.
 func (c *fmtCmd) Run() error {
 	if len(c.Files) == 0 {
 		if c.Write {
@@ -223,6 +232,8 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	return nil
 }
 
+// Run implements the hidden `evy tokenize` CLI command, called by the
+// Kong API.
 func (c *tokenizeCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {
@@ -238,6 +249,8 @@ func (c *tokenizeCmd) Run() error {
 	return nil
 }
 
+// Run implements the hidden `evy parse` CLI command, called by the
+// Kong API.
 func (c *parseCmd) Run() error {
 	b, err := fileBytes(c.Source)
 	if err != nil {

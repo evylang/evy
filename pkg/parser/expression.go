@@ -18,33 +18,33 @@ import (
 type precedence int
 
 const (
-	LOWEST      precedence = iota
-	OR                     // or
-	AND                    // and
-	EQUALS                 // ==
-	LESSGREATER            // > or <
-	SUM                    // +
-	PRODUCT                // *
-	UNARY                  // -x  !x
-	INDEX                  // array[i]
+	lowestPrec      precedence = iota
+	orPrec                     // or
+	andPrec                    // and
+	equalsPrec                 // ==
+	lessgreaterPrec            // > or <
+	sumPrec                    // +
+	productPrec                // *
+	unaryPrec                  // -x  !x
+	indexPrec                  // array[i]
 )
 
 var precedences = map[lexer.TokenType]precedence{
-	lexer.EQ:       EQUALS,
-	lexer.NOT_EQ:   EQUALS,
-	lexer.LT:       LESSGREATER,
-	lexer.GT:       LESSGREATER,
-	lexer.LTEQ:     LESSGREATER,
-	lexer.GTEQ:     LESSGREATER,
-	lexer.PLUS:     SUM,
-	lexer.MINUS:    SUM,
-	lexer.OR:       OR,
-	lexer.SLASH:    PRODUCT,
-	lexer.ASTERISK: PRODUCT,
-	lexer.PERCENT:  PRODUCT,
-	lexer.AND:      AND,
-	lexer.LBRACKET: INDEX,
-	lexer.DOT:      INDEX,
+	lexer.EQ:       equalsPrec,
+	lexer.NOT_EQ:   equalsPrec,
+	lexer.LT:       lessgreaterPrec,
+	lexer.GT:       lessgreaterPrec,
+	lexer.LTEQ:     lessgreaterPrec,
+	lexer.GTEQ:     lessgreaterPrec,
+	lexer.PLUS:     sumPrec,
+	lexer.MINUS:    sumPrec,
+	lexer.OR:       orPrec,
+	lexer.SLASH:    productPrec,
+	lexer.ASTERISK: productPrec,
+	lexer.PERCENT:  productPrec,
+	lexer.AND:      andPrec,
+	lexer.LBRACKET: indexPrec,
+	lexer.DOT:      indexPrec,
 }
 
 func (p *parser) parseTopLevelExpr() Node {
@@ -52,7 +52,7 @@ func (p *parser) parseTopLevelExpr() Node {
 	if tok.Type == lexer.IDENT && p.funcs[tok.Literal] != nil {
 		return p.parseFuncCall()
 	}
-	return p.parseExpr(LOWEST)
+	return p.parseExpr(lowestPrec)
 }
 
 func (p *parser) parseFuncCall() Node {
@@ -130,7 +130,7 @@ func (p *parser) parseUnaryExpr() Node {
 		msg := fmt.Sprintf("unexpected whitespace after %q", unaryExp.Op.String())
 		p.appendErrorForToken(msg, tok)
 	}
-	unaryExp.Right = p.parseExpr(UNARY)
+	unaryExp.Right = p.parseExpr(unaryPrec)
 	if unaryExp.Right == nil {
 		return nil // previous error
 	}
@@ -449,7 +449,7 @@ func (p *parser) parseExprList() []Node {
 func (p *parser) parseExprWSS() Node {
 	p.pushWSS(true)
 	defer p.popWSS()
-	return p.parseExpr(LOWEST)
+	return p.parseExpr(lowestPrec)
 }
 
 func (p *parser) combineTypes(types []*Type) *Type {

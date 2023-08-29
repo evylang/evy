@@ -4,8 +4,15 @@ import (
 	"foxygo.at/evy/pkg/lexer"
 )
 
+// TypeName represents the enumerable basic types (such as num, string,
+// and bool), categories of composite types (such as array and map),
+// the dynamic type (any), and the none type, which is used where no
+// type is expected. TypeName is used in the [Type] struct which fully
+// specifies all types, including composite types.
 type TypeName int
 
+// The enumerated basic types, categories of composite types, any and
+// none are defined as constants.
 const (
 	ILLEGAL TypeName = iota
 	NUM
@@ -17,6 +24,11 @@ const (
 	NONE // for functions without return value, declaration statements, etc.
 )
 
+// Basic types, any, none, and generic arrays and generic maps are
+// [interned] into variables for reuse, such as [NUM_TYPE] or
+// [GENERIC_MAP].
+//
+// [interned]: https://en.wikipedia.org/wiki/Interning_(computer_science)
 var (
 	ILLEGAL_TYPE  = &Type{Name: ILLEGAL}
 	NUM_TYPE      = &Type{Name: NUM}
@@ -62,6 +74,11 @@ func (t TypeName) name() string {
 	return typeNameStrings[t].name
 }
 
+// Type holds a full representation of any Evy variable or value. It can
+// represent basic types, such as numbers and strings, as well as
+// composite types, such as arrays and maps. It is also used to
+// represent the dynamic [ANY_TYPE]. For AST nodes that have no type
+// [NONE_TYPE] is used.
 type Type struct {
 	Name TypeName // string, num, bool, composite types array, map
 	Sub  *Type    // e.g.: `[]int` : Type{Name: "array", Sub: &Type{Name: "int"} }
@@ -82,11 +99,18 @@ func (t *Type) accepts(t2 *Type) bool {
 	if n == ANY && n2 != ILLEGAL && n2 != NONE {
 		return true
 	}
-	// empty Array none array accepted by all arrays.
+	// empty Array of none_type accepted by all arrays.
 	// empty Map of none_type accepted by all maps
 	return false
 }
 
+// Matches returns true if the two types are equal, or if one is a
+// generic array and the other is a specific array, or if one is a
+// generic map and the other is a specific map. This is useful for type
+// validation in binary expressions, such as array concatenation:
+//
+//	[] + [1]
+//	[1] + []
 func (t *Type) Matches(t2 *Type) bool {
 	if t == t2 {
 		return true

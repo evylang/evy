@@ -233,7 +233,7 @@ print i
 	}
 }
 
-func TestFuncDeclFormat(t *testing.T) {
+func TestFuncDefFormat(t *testing.T) {
 	tests := map[string]string{
 		`func fox     // func
 		print   "🦊"  // print

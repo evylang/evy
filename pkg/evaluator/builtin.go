@@ -13,7 +13,7 @@ import (
 
 type Builtin struct {
 	Func BuiltinFunc
-	Decl *parser.FuncDeclStmt
+	Decl *parser.FuncDefStmt
 }
 
 type Builtins struct {
@@ -24,7 +24,7 @@ type Builtins struct {
 }
 
 func (b Builtins) ParserBuiltins() parser.Builtins {
-	funcs := make(map[string]*parser.FuncDeclStmt, len(b.Funcs))
+	funcs := make(map[string]*parser.FuncDefStmt, len(b.Funcs))
 	for name, builtin := range b.Funcs {
 		funcs[name] = builtin.Decl
 	}
@@ -138,7 +138,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 	}
 }
 
-var readDecl = &parser.FuncDeclStmt{
+var readDecl = &parser.FuncDefStmt{
 	Name:       "read",
 	ReturnType: parser.STRING_TYPE,
 }
@@ -157,7 +157,7 @@ func clsFunc(clsFn func()) BuiltinFunc {
 	}
 }
 
-var printDecl = &parser.FuncDeclStmt{
+var printDecl = &parser.FuncDefStmt{
 	Name:          "print",
 	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
 	ReturnType:    parser.NONE_TYPE,
@@ -185,7 +185,7 @@ func printfFunc(printFn func(string)) BuiltinFunc {
 	}
 }
 
-var sprintDecl = &parser.FuncDeclStmt{
+var sprintDecl = &parser.FuncDefStmt{
 	Name:          "sprint",
 	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
 	ReturnType:    parser.STRING_TYPE,
@@ -214,7 +214,7 @@ func sprintf(s string, vals []Value) string {
 	return fmt.Sprintf(s, args...)
 }
 
-var joinDecl = &parser.FuncDeclStmt{
+var joinDecl = &parser.FuncDefStmt{
 	Name: "join",
 	Params: []*parser.Var{
 		{Name: "arr", T: parser.GENERIC_ARRAY},
@@ -243,7 +243,7 @@ var stringArrayType *parser.Type = &parser.Type{
 	Sub:  parser.STRING_TYPE,
 }
 
-var splitDecl = &parser.FuncDeclStmt{
+var splitDecl = &parser.FuncDefStmt{
 	Name: "split",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -263,7 +263,7 @@ func splitFunc(_ *scope, args []Value) (Value, error) {
 	return &Array{Elements: &elements, T: stringArrayType}, nil
 }
 
-var upperDecl = &parser.FuncDeclStmt{
+var upperDecl = &parser.FuncDefStmt{
 	Name: "upper",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -276,7 +276,7 @@ func upperFunc(_ *scope, args []Value) (Value, error) {
 	return &String{Val: strings.ToUpper(s)}, nil
 }
 
-var lowerDecl = &parser.FuncDeclStmt{
+var lowerDecl = &parser.FuncDefStmt{
 	Name: "lower",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -289,7 +289,7 @@ func lowerFunc(_ *scope, args []Value) (Value, error) {
 	return &String{Val: strings.ToLower(s)}, nil
 }
 
-var indexDecl = &parser.FuncDeclStmt{
+var indexDecl = &parser.FuncDefStmt{
 	Name: "index",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -304,7 +304,7 @@ func indexFunc(_ *scope, args []Value) (Value, error) {
 	return &Num{Val: float64(strings.Index(s, substr))}, nil
 }
 
-var startswithDecl = &parser.FuncDeclStmt{
+var startswithDecl = &parser.FuncDefStmt{
 	Name: "startswith",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -319,7 +319,7 @@ func startswithFunc(_ *scope, args []Value) (Value, error) {
 	return &Bool{Val: strings.HasPrefix(s, prefix)}, nil
 }
 
-var endswithDecl = &parser.FuncDeclStmt{
+var endswithDecl = &parser.FuncDefStmt{
 	Name: "endswith",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -334,7 +334,7 @@ func endswithFunc(_ *scope, args []Value) (Value, error) {
 	return &Bool{Val: strings.HasSuffix(s, suffix)}, nil
 }
 
-var trimDecl = &parser.FuncDeclStmt{
+var trimDecl = &parser.FuncDefStmt{
 	Name: "trim",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -349,7 +349,7 @@ func trimFunc(_ *scope, args []Value) (Value, error) {
 	return &String{Val: strings.Trim(s, cutset)}, nil
 }
 
-var replaceDecl = &parser.FuncDeclStmt{
+var replaceDecl = &parser.FuncDefStmt{
 	Name: "replace",
 	Params: []*parser.Var{
 		{Name: "s", T: parser.STRING_TYPE},
@@ -366,7 +366,7 @@ func replaceFunc(_ *scope, args []Value) (Value, error) {
 	return &String{Val: strings.ReplaceAll(s, oldStr, newStr)}, nil
 }
 
-var str2numDecl = &parser.FuncDeclStmt{
+var str2numDecl = &parser.FuncDefStmt{
 	Name:       "str2num",
 	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
 	ReturnType: parser.NUM_TYPE,
@@ -383,7 +383,7 @@ func str2numFunc(scope *scope, args []Value) (Value, error) {
 	return &Num{Val: n}, nil
 }
 
-var str2boolDecl = &parser.FuncDeclStmt{
+var str2boolDecl = &parser.FuncDefStmt{
 	Name:       "str2bool",
 	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
 	ReturnType: parser.BOOL_TYPE,
@@ -421,7 +421,7 @@ func globalErr(scope *scope, isErr bool, msg string) {
 	val.Set(&String{Val: msg})
 }
 
-var typeofDecl = &parser.FuncDeclStmt{
+var typeofDecl = &parser.FuncDefStmt{
 	Name:       "typeof",
 	Params:     []*parser.Var{{Name: "a", T: parser.ANY_TYPE}},
 	ReturnType: parser.STRING_TYPE,
@@ -435,7 +435,7 @@ func typeofFunc(_ *scope, args []Value) (Value, error) {
 	return &String{Val: t.String()}, nil
 }
 
-var lenDecl = &parser.FuncDeclStmt{
+var lenDecl = &parser.FuncDefStmt{
 	Name:       "len",
 	Params:     []*parser.Var{{Name: "a", T: parser.ANY_TYPE}},
 	ReturnType: parser.NUM_TYPE,
@@ -453,7 +453,7 @@ func lenFunc(_ *scope, args []Value) (Value, error) {
 	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].Type())
 }
 
-var hasDecl = &parser.FuncDeclStmt{
+var hasDecl = &parser.FuncDefStmt{
 	Name: "has",
 	Params: []*parser.Var{
 		{Name: "m", T: parser.GENERIC_MAP},
@@ -469,7 +469,7 @@ func hasFunc(_ *scope, args []Value) (Value, error) {
 	return &Bool{Val: ok}, nil
 }
 
-var delDecl = &parser.FuncDeclStmt{
+var delDecl = &parser.FuncDefStmt{
 	Name: "del",
 	Params: []*parser.Var{
 		{Name: "m", T: parser.GENERIC_MAP},
@@ -485,7 +485,7 @@ func delFunc(_ *scope, args []Value) (Value, error) {
 	return &None{}, nil
 }
 
-var sleepDecl = &parser.FuncDeclStmt{
+var sleepDecl = &parser.FuncDefStmt{
 	Name:       "sleep",
 	Params:     []*parser.Var{{Name: "seconds", T: parser.NUM_TYPE}},
 	ReturnType: parser.NONE_TYPE,
@@ -509,7 +509,7 @@ func panicFunc(_ *scope, args []Value) (Value, error) {
 	return nil, PanicError(s)
 }
 
-var randDecl = &parser.FuncDeclStmt{
+var randDecl = &parser.FuncDefStmt{
 	Name:       "rand",
 	Params:     []*parser.Var{{Name: "upper", T: parser.NUM_TYPE}},
 	ReturnType: parser.NUM_TYPE,
@@ -526,7 +526,7 @@ func randFunc(_ *scope, args []Value) (Value, error) {
 	return &Num{Val: float64(randsource.Int31n(int32(upper)))}, nil
 }
 
-var rand1Decl = &parser.FuncDeclStmt{
+var rand1Decl = &parser.FuncDefStmt{
 	Name:       "rand",
 	Params:     []*parser.Var{},
 	ReturnType: parser.NUM_TYPE,
@@ -536,7 +536,7 @@ func rand1Func(_ *scope, args []Value) (Value, error) {
 	return &Num{Val: randsource.Float64()}, nil
 }
 
-var clearDecl = &parser.FuncDeclStmt{
+var clearDecl = &parser.FuncDefStmt{
 	Name:          "clear",
 	VariadicParam: &parser.Var{Name: "s", T: parser.STRING_TYPE},
 	ReturnType:    parser.NONE_TYPE,
@@ -556,7 +556,7 @@ func clearFunc(clearFn func(string)) BuiltinFunc {
 	}
 }
 
-var gridnDecl = &parser.FuncDeclStmt{
+var gridnDecl = &parser.FuncDefStmt{
 	Name: "gridn",
 	Params: []*parser.Var{
 		{Name: "unit", T: parser.NUM_TYPE},
@@ -586,7 +586,7 @@ var numArrayType *parser.Type = &parser.Type{
 	Sub:  parser.NUM_TYPE,
 }
 
-var polyDecl = &parser.FuncDeclStmt{
+var polyDecl = &parser.FuncDefStmt{
 	Name:          "poly",
 	VariadicParam: &parser.Var{Name: "vertices", T: numArrayType},
 	ReturnType:    parser.NONE_TYPE,
@@ -610,7 +610,7 @@ func polyFunc(polyFn func([][]float64)) BuiltinFunc {
 	}
 }
 
-var ellipseDecl = &parser.FuncDeclStmt{
+var ellipseDecl = &parser.FuncDefStmt{
 	Name:          "ellipse",
 	VariadicParam: &parser.Var{Name: "n", T: parser.NUM_TYPE},
 	ReturnType:    parser.NONE_TYPE,
@@ -644,7 +644,7 @@ func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, en
 	}
 }
 
-var dashDecl = &parser.FuncDeclStmt{
+var dashDecl = &parser.FuncDefStmt{
 	Name:          "dash",
 	VariadicParam: &parser.Var{Name: "segments", T: parser.NUM_TYPE},
 	ReturnType:    parser.NONE_TYPE,
@@ -661,7 +661,7 @@ func dashFunc(dashFn func([]float64)) BuiltinFunc {
 	}
 }
 
-var fontDecl = &parser.FuncDeclStmt{
+var fontDecl = &parser.FuncDefStmt{
 	Name:       "font",
 	Params:     []*parser.Var{{Name: "properties", T: parser.GENERIC_MAP}},
 	ReturnType: parser.NONE_TYPE,
@@ -725,15 +725,15 @@ func fontFunc(fontFn func(map[string]any)) BuiltinFunc {
 	}
 }
 
-func emptyDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func emptyDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name:       name,
 		ReturnType: parser.NONE_TYPE,
 	}
 }
 
-func xyDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func xyDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name: name,
 		Params: []*parser.Var{
 			{Name: "x", T: parser.NUM_TYPE},
@@ -754,8 +754,8 @@ func xyBuiltin(name string, fn func(x, y float64)) Builtin {
 	return result
 }
 
-func xyRetDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func xyRetDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name: name,
 		Params: []*parser.Var{
 			{Name: "x", T: parser.NUM_TYPE},
@@ -776,8 +776,8 @@ func xyRetBuiltin(name string, fn func(x, y float64) float64) Builtin {
 	return result
 }
 
-func numDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func numDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name: name,
 		Params: []*parser.Var{
 			{Name: "n", T: parser.NUM_TYPE},
@@ -796,8 +796,8 @@ func numBuiltin(name string, fn func(n float64)) Builtin {
 	return result
 }
 
-func numRetDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func numRetDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name: name,
 		Params: []*parser.Var{
 			{Name: "n", T: parser.NUM_TYPE},
@@ -816,8 +816,8 @@ func numRetBuiltin(name string, fn func(n float64) float64) Builtin {
 	return result
 }
 
-func stringDecl(name string) *parser.FuncDeclStmt {
-	return &parser.FuncDeclStmt{
+func stringDecl(name string) *parser.FuncDefStmt {
+	return &parser.FuncDefStmt{
 		Name: name,
 		Params: []*parser.Var{
 			{Name: "str", T: parser.STRING_TYPE},

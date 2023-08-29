@@ -16,7 +16,7 @@ import (
 )
 
 type Builtins struct {
-	Funcs         map[string]*FuncDeclStmt
+	Funcs         map[string]*FuncDefStmt
 	EventHandlers map[string]*EventHandlerStmt
 	Globals       map[string]*Var
 }
@@ -77,7 +77,7 @@ type parser struct {
 
 	tokens        []*lexer.Token
 	builtins      Builtins
-	funcs         map[string]*FuncDeclStmt     // all function declarations by name
+	funcs         map[string]*FuncDefStmt      // all function declarations by name
 	eventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
 
 	scope      *scope // Current top of scope stack
@@ -88,14 +88,14 @@ type parser struct {
 func newParser(input string, builtins Builtins) *parser {
 	l := lexer.New(input)
 	p := &parser{
-		funcs:         map[string]*FuncDeclStmt{},
+		funcs:         map[string]*FuncDefStmt{},
 		eventHandlers: map[string]*EventHandlerStmt{},
 		wssStack:      []bool{false},
 		builtins:      builtins,
 		formatting:    newFormatting(),
 	}
-	for name, funcDecl := range builtins.Funcs {
-		fd := *funcDecl
+	for name, funcDef := range builtins.Funcs {
+		fd := *funcDef
 		p.funcs[name] = &fd
 	}
 	funcs := p.consumeTokens(l)
@@ -133,7 +133,7 @@ func (p *parser) consumeTokens(l *lexer.Lexer) []int {
 func (p *parser) parseFuncSignatures(funcs []int) {
 	for _, i := range funcs {
 		p.advanceTo(i)
-		fd := p.parseFuncDeclSignature()
+		fd := p.parseFuncDefSignature()
 		if p.builtins.Globals[fd.Name] != nil {
 			// We still go on to add `fd` to the funcs map so that the
 			// function can be parsed correctly even though it has an invalid name.
@@ -235,7 +235,7 @@ func (p *parser) parseFunc() Node {
 	return fd
 }
 
-func (p *parser) addParamsToScope(fd *FuncDeclStmt) {
+func (p *parser) addParamsToScope(fd *FuncDefStmt) {
 	for _, param := range fd.Params {
 		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		p.scope.set(param.Name, param)
@@ -427,8 +427,8 @@ func (p *parser) parseAssignmentTarget() Node {
 	return n
 }
 
-func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
-	fd := &FuncDeclStmt{token: p.cur, ReturnType: NONE_TYPE}
+func (p *parser) parseFuncDefSignature() *FuncDefStmt {
+	fd := &FuncDefStmt{token: p.cur, ReturnType: NONE_TYPE}
 	p.advance() // advance past FUNC
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -569,7 +569,7 @@ func (p *parser) parseFunCallStatement() Node {
 	return fcs
 }
 
-func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
+func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	funcName := decl.Name
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
@@ -1030,8 +1030,8 @@ func (p *parser) curComment() string {
 
 func (p *parser) calledBuiltinFuncs() []string {
 	var funcs []string
-	for name, funcDecl := range p.funcs {
-		if _, ok := p.builtins.Funcs[name]; ok && funcDecl.isCalled {
+	for name, funcDef := range p.funcs {
+		if _, ok := p.builtins.Funcs[name]; ok && funcDef.isCalled {
 			funcs = append(funcs, name)
 		}
 	}

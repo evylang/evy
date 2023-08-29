@@ -170,7 +170,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 		return e.Eval(node.Expr)
 	case *parser.TypeAssertion:
 		return e.evalTypeAssertion(node)
-	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
+	case *parser.FuncDefStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
 		return &None{}, nil
 	}
 	return nil, fmt.Errorf("%w: %v", ErrUnknownNode, node)
@@ -296,7 +296,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	defer restoreScope()
 
 	// Add func args to scope
-	fd := funcCall.FuncDecl
+	fd := funcCall.FuncDef
 	for i, param := range fd.Params {
 		e.scope.set(param.Name, args[i], param.Type())
 	}

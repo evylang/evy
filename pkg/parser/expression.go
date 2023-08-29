@@ -58,11 +58,11 @@ func (p *parser) parseTopLevelExpr() Node {
 func (p *parser) parseFuncCall() Node {
 	fc := &FuncCall{token: p.cur, Name: p.cur.Literal}
 	p.advance() // advance past function name IDENT
-	funcDecl := p.funcs[fc.Name]
-	funcDecl.isCalled = true
-	fc.FuncDecl = funcDecl
+	funcDef := p.funcs[fc.Name]
+	funcDef.isCalled = true
+	fc.FuncDef = funcDef
 	fc.Arguments = p.parseExprList()
-	p.assertArgTypes(fc.FuncDecl, fc.Arguments)
+	p.assertArgTypes(fc.FuncDef, fc.Arguments)
 	return fc
 }
 

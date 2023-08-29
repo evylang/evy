@@ -121,10 +121,10 @@ func TestFunccall(t *testing.T) {
 
 func TestFunccallError(t *testing.T) {
 	builtins := testBuiltins()
-	builtins.Funcs["f0"] = &FuncDeclStmt{Name: "f0", ReturnType: NONE_TYPE}
-	builtins.Funcs["f1"] = &FuncDeclStmt{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
-	builtins.Funcs["f2"] = &FuncDeclStmt{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
-	builtins.Funcs["f3"] = &FuncDeclStmt{
+	builtins.Funcs["f0"] = &FuncDefStmt{Name: "f0", ReturnType: NONE_TYPE}
+	builtins.Funcs["f1"] = &FuncDefStmt{Name: "f1", VariadicParam: &Var{Name: "a", T: NUM_TYPE}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f2"] = &FuncDefStmt{Name: "f2", Params: []*Var{{Name: "a", T: NUM_TYPE}}, ReturnType: NONE_TYPE}
+	builtins.Funcs["f3"] = &FuncDefStmt{
 		Name:       "f3",
 		Params:     []*Var{{Name: "a", T: NUM_TYPE}, {Name: "b", T: STRING_TYPE}},
 		ReturnType: NONE_TYPE,
@@ -197,7 +197,7 @@ print(x)
 	assert.Equal(t, want, got.String())
 }
 
-func TestFuncDecl(t *testing.T) {
+func TestFuncDef(t *testing.T) {
 	input := `
 c := 1
 func nums1:num n1:num n2:num
@@ -256,7 +256,7 @@ end
 	assert.Equal(t, "return n2", returnStmt.String())
 }
 
-func TestVariadicFuncDecl(t *testing.T) {
+func TestVariadicFuncDef(t *testing.T) {
 	inputs := []string{
 		`
 func fox nums:num...
@@ -1084,7 +1084,7 @@ end`,
 	}
 }
 
-func TestFuncDeclErr(t *testing.T) {
+func TestFuncDefErr(t *testing.T) {
 	inputs := map[string]string{
 		`
 func len s:string
@@ -1368,7 +1368,7 @@ func assertNoParseError(t *testing.T, parser *parser, input string) {
 }
 
 func testBuiltins() Builtins {
-	funcs := map[string]*FuncDeclStmt{
+	funcs := map[string]*FuncDefStmt{
 		"print": {
 			Name:          "print",
 			VariadicParam: &Var{Name: "a", T: ANY_TYPE},

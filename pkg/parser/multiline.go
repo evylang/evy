@@ -135,7 +135,7 @@ func newAccumulations(stmts []Node, comments map[Node]string) []accumulation {
 			if comments[s] != "" {
 				stmtType = "comment"
 			}
-		case *FuncDeclStmt, *EventHandlerStmt:
+		case *FuncDefStmt, *EventHandlerStmt:
 			stmtType = "func"
 		}
 		if stmtType != lastStmtType || stmtType == "func" {

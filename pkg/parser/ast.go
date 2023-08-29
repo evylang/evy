@@ -37,7 +37,7 @@ type FuncCall struct {
 	token     *lexer.Token // The IDENT of the function
 	Name      string
 	Arguments []Node
-	FuncDecl  *FuncDeclStmt
+	FuncDef   *FuncDefStmt
 }
 
 type UnaryExpression struct {
@@ -119,11 +119,11 @@ type BreakStmt struct {
 	token *lexer.Token
 }
 
-func (f *FuncDeclStmt) Token() *lexer.Token {
+func (f *FuncDefStmt) Token() *lexer.Token {
 	return f.token
 }
 
-type FuncDeclStmt struct {
+type FuncDefStmt struct {
 	token             *lexer.Token // The "func" token
 	Name              string
 	Params            []*Var
@@ -316,7 +316,7 @@ func (f *FuncCall) String() string {
 }
 
 func (f *FuncCall) Type() *Type {
-	return f.FuncDecl.ReturnType
+	return f.FuncDef.ReturnType
 }
 
 func (f *FuncCallStmt) Token() *lexer.Token {
@@ -328,7 +328,7 @@ func (f *FuncCallStmt) String() string {
 }
 
 func (f *FuncCallStmt) Type() *Type {
-	return f.FuncCall.FuncDecl.ReturnType
+	return f.FuncCall.FuncDef.ReturnType
 }
 
 func (u *UnaryExpression) Token() *lexer.Token {
@@ -512,7 +512,7 @@ func (a *AssignmentStmt) Type() *Type {
 	return a.Target.Type()
 }
 
-func (f *FuncDeclStmt) String() string {
+func (f *FuncDefStmt) String() string {
 	s := make([]string, len(f.Params))
 	for i, param := range f.Params {
 		s[i] = param.String()
@@ -529,7 +529,7 @@ func (f *FuncDeclStmt) String() string {
 	return signature + "{\n" + body + "}\n"
 }
 
-func (f *FuncDeclStmt) Type() *Type {
+func (f *FuncDefStmt) Type() *Type {
 	return f.ReturnType
 }
 

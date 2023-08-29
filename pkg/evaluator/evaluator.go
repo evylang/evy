@@ -134,7 +134,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 		return &Num{Val: node.Value}, nil
 	case *parser.StringLiteral:
 		return &String{Val: node.Value}, nil
-	case *parser.Bool:
+	case *parser.BoolLiteral:
 		return e.evalBool(node), nil
 	case *parser.ArrayLiteral:
 		return e.evalArrayLiteral(node)
@@ -228,7 +228,7 @@ func (e *Evaluator) evalStatments(statements []parser.Node) (Value, error) {
 	return result, nil
 }
 
-func (e *Evaluator) evalBool(b *parser.Bool) Value {
+func (e *Evaluator) evalBool(b *parser.BoolLiteral) Value {
 	return &Bool{Val: b.Value}
 }
 

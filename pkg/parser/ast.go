@@ -221,11 +221,11 @@ type BlockStatement struct {
 	alwaysTerminates bool
 }
 
-func (b *Bool) Token() *lexer.Token {
+func (b *BoolLiteral) Token() *lexer.Token {
 	return b.token
 }
 
-type Bool struct {
+type BoolLiteral struct {
 	token *lexer.Token
 	Value bool
 }
@@ -656,11 +656,11 @@ func (c *ConditionalBlock) AlwaysTerminates() bool {
 	return c.Block.AlwaysTerminates()
 }
 
-func (b *Bool) String() string {
+func (b *BoolLiteral) String() string {
 	return strconv.FormatBool(b.Value)
 }
 
-func (b *Bool) Type() *Type {
+func (b *BoolLiteral) Type() *Type {
 	return BOOL_TYPE
 }
 
@@ -720,9 +720,9 @@ func zeroValue(t *Type, tt *lexer.Token) Node {
 	case STRING:
 		return &StringLiteral{Value: "", token: tt}
 	case BOOL:
-		return &Bool{Value: false, token: tt}
+		return &BoolLiteral{Value: false, token: tt}
 	case ANY:
-		return &Bool{Value: false, token: tt}
+		return &BoolLiteral{Value: false, token: tt}
 	case ARRAY:
 		return &ArrayLiteral{T: t, token: tt}
 	case MAP:

@@ -126,7 +126,7 @@ func (f *formatting) format(n Node) {
 		f.write("(")
 		f.format(n.Expr)
 		f.write(")")
-	case *Bool:
+	case *BoolLiteral:
 		f.write(n.String())
 	case *NumLiteral:
 		f.write(n.String())

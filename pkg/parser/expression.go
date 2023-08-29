@@ -388,7 +388,7 @@ func (p *parser) parseLiteral() Node {
 		return &NumLiteral{token: tok, Value: val}
 	case lexer.TRUE, lexer.FALSE:
 		p.advance()
-		return &Bool{token: tok, Value: tt == lexer.TRUE}
+		return &BoolLiteral{token: tok, Value: tt == lexer.TRUE}
 	case lexer.LBRACKET:
 		return p.parseArrayLiteral()
 	case lexer.LCURLY:

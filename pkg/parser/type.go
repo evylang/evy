@@ -58,7 +58,7 @@ func (t TypeName) String() string {
 	return typeNameStrings[t].format
 }
 
-func (t TypeName) Name() string {
+func (t TypeName) name() string {
 	return typeNameStrings[t].name
 }
 
@@ -74,7 +74,7 @@ func (t *Type) String() string {
 	return t.Name.String() + t.Sub.String()
 }
 
-func (t *Type) Accepts(t2 *Type) bool {
+func (t *Type) accepts(t2 *Type) bool {
 	if t.acceptsStrict(t2) {
 		return true
 	}
@@ -107,7 +107,7 @@ func (t *Type) Matches(t2 *Type) bool {
 	return t.Sub.Matches(t2.Sub)
 }
 
-func (t *Type) Infer() *Type {
+func (t *Type) infer() *Type {
 	if t.Name != ARRAY && t.Name != MAP {
 		return t
 	}
@@ -116,7 +116,7 @@ func (t *Type) Infer() *Type {
 		t2.Sub = ANY_TYPE
 		return &t2
 	}
-	t.Sub = t.Sub.Infer()
+	t.Sub = t.Sub.infer()
 	return t
 }
 

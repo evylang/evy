@@ -384,7 +384,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		p.advancePastNL()
 		return nil
 	}
-	if !target.Type().Accepts(value.Type()) {
+	if !target.Type().accepts(value.Type()) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	}
@@ -540,7 +540,7 @@ func (p *parser) parseInferredDeclStatement() Node {
 		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
-	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
+	decl.Var.T = val.Type().infer() // assign ANY to sub_type to empty arrays and maps.
 	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
@@ -575,7 +575,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
-			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
+			if !paramType.accepts(argType) && !paramType.Matches(argType) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			}
@@ -594,7 +594,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
+		if !paramType.accepts(argType) && !paramType.Matches(argType) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}
@@ -786,7 +786,7 @@ func (p *parser) parseReturnStatement() Node {
 	}
 	if p.scope.returnType == nil {
 		p.appendErrorForToken("return statement not allowed here", retValueToken)
-	} else if !p.scope.returnType.Accepts(ret.T) {
+	} else if !p.scope.returnType.accepts(ret.T) {
 		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
 		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()
@@ -853,7 +853,7 @@ func (p *parser) parseForStatement() Node {
 		forNode.Range = n
 	case ARRAY:
 		if forNode.LoopVar != nil {
-			forNode.LoopVar.T = t.Infer().Sub
+			forNode.LoopVar.T = t.infer().Sub
 		}
 		forNode.Range = n
 	case NUM:

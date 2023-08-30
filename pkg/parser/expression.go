@@ -218,7 +218,7 @@ func (p *parser) validateIndex(tok *lexer.Token, leftType TypeName, indexType *T
 		return false
 	}
 	if (leftType == ARRAY || leftType == STRING) && indexType != NUM_TYPE {
-		p.appendErrorForToken(leftType.Name()+" index expects num, found "+indexType.String(), tok)
+		p.appendErrorForToken(leftType.name()+" index expects num, found "+indexType.String(), tok)
 		return false
 	}
 	if leftType == MAP && indexType != STRING_TYPE {
@@ -455,10 +455,10 @@ func (p *parser) parseExprWSS() Node {
 func (p *parser) combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
-		if combinedT.Accepts(t) {
+		if combinedT.accepts(t) {
 			continue
 		}
-		if t.Accepts(combinedT) {
+		if t.accepts(combinedT) {
 			combinedT = t
 			continue
 		}

@@ -76,7 +76,11 @@ func parse(input string, rt evaluator.Runtime) (*parser.Program, error) {
 	builtins := evaluator.DefaultBuiltins(rt).ParserBuiltins()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
-		return nil, parser.TruncateError(err, 8)
+		var parseErrors parser.Errors
+		if errors.As(err, &parseErrors) {
+			err = parseErrors.Truncate(8)
+		}
+		return nil, err
 	}
 	return prog, nil
 }

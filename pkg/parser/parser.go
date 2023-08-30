@@ -7,7 +7,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -48,14 +47,6 @@ func (e Errors) Truncate(length int) Errors {
 		return e
 	}
 	return e[:length]
-}
-
-func TruncateError(err error, length int) error {
-	var parseErrors Errors
-	if errors.As(err, &parseErrors) {
-		return parseErrors.Truncate(8)
-	}
-	return err
 }
 
 // Error is an Evy parse error.

@@ -217,7 +217,7 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 	parserBuiltins := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
 	prog, err := parser.Parse(in, parserBuiltins)
 	if err != nil {
-		return fmt.Errorf("%w: %w", errParse, parser.TruncateError(err, 8))
+		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
 	out := prog.Format()
 	if checkOnly {
@@ -259,7 +259,7 @@ func (c *parseCmd) Run() error {
 	builtinDecls := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
 	ast, err := parser.Parse(string(b), builtinDecls)
 	if err != nil {
-		return fmt.Errorf("%w: %w", errParse, parser.TruncateError(err, 8))
+		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
 	fmt.Println(ast.String())
 	return nil
@@ -270,4 +270,12 @@ func fileBytes(filename string) ([]byte, error) {
 		return io.ReadAll(os.Stdin)
 	}
 	return os.ReadFile(filename)
+}
+
+func truncateError(err error) error {
+	var parseErrors parser.Errors
+	if errors.As(err, &parseErrors) {
+		return parseErrors.Truncate(8)
+	}
+	return err
 }

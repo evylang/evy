@@ -62,10 +62,6 @@ func (t TypeName) Name() string {
 	return typeNameStrings[t].name
 }
 
-func (t TypeName) GoString() string {
-	return t.String()
-}
-
 type Type struct {
 	Name TypeName // string, num, bool, composite types array, map
 	Sub  *Type    // e.g.: `[]int` : Type{Name: "array", Sub: &Type{Name: "int"} }

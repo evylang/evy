@@ -1028,11 +1028,3 @@ func (p *parser) calledBuiltinFuncs() []string {
 	}
 	return funcs
 }
-
-func EventHandlerNames(eventHandlers map[string]*EventHandlerStmt) []string {
-	names := make([]string, 0, len(eventHandlers))
-	for name := range eventHandlers {
-		names = append(names, name)
-	}
-	return names
-}

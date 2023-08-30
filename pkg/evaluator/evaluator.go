@@ -82,7 +82,9 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 }
 
 type Evaluator struct {
-	Stopped       bool
+	Stopped           bool
+	EventHandlerNames []string
+
 	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	builtins      Builtins
 	eventHandlers map[string]*parser.EventHandlerStmt
@@ -176,10 +178,6 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 	return nil, fmt.Errorf("%w: %v", ErrUnknownNode, node)
 }
 
-func (e *Evaluator) EventHandlerNames() []string {
-	return parser.EventHandlerNames(e.eventHandlers)
-}
-
 func (e *Evaluator) HandleEvent(ev Event) error {
 	eh := e.eventHandlers[ev.Name]
 	if eh == nil {
@@ -210,6 +208,10 @@ func (e *Evaluator) yield() {
 
 func (e *Evaluator) evalProgram(program *parser.Program) (Value, error) {
 	e.eventHandlers = program.EventHandlers
+	e.EventHandlerNames = make([]string, 0, len(e.eventHandlers))
+	for name := range e.eventHandlers {
+		e.EventHandlerNames = append(e.EventHandlerNames, name)
+	}
 	return e.evalStatments(program.Statements)
 }
 

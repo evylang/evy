@@ -20,8 +20,8 @@ type Program struct {
 	EventHandlers      map[string]*EventHandlerStmt
 	CalledBuiltinFuncs []string
 
-	alwaysTerminates bool
-	formatting       *formatting
+	alwaysTerms bool
+	formatting  *formatting
 }
 
 type EmptyStmt struct {
@@ -216,9 +216,9 @@ func (b *BlockStatement) Token() *lexer.Token {
 }
 
 type BlockStatement struct {
-	token            *lexer.Token // the NL before the first statement
-	Statements       []Node
-	alwaysTerminates bool
+	token       *lexer.Token // the NL before the first statement
+	Statements  []Node
+	alwaysTerms bool
 }
 
 func (b *BoolLiteral) Token() *lexer.Token {
@@ -288,8 +288,8 @@ func (*Program) Type() *Type {
 	return NONE_TYPE
 }
 
-func (p *Program) AlwaysTerminates() bool {
-	return p.alwaysTerminates
+func (p *Program) alwaysTerminates() bool {
+	return p.alwaysTerms
 }
 
 func (e *EmptyStmt) Token() *lexer.Token {
@@ -480,7 +480,7 @@ func (r *ReturnStmt) Type() *Type {
 	return r.T
 }
 
-func (*ReturnStmt) AlwaysTerminates() bool {
+func (*ReturnStmt) alwaysTerminates() bool {
 	return true
 }
 
@@ -496,7 +496,7 @@ func (*BreakStmt) Type() *Type {
 	return NONE_TYPE
 }
 
-func (b *BreakStmt) AlwaysTerminates() bool {
+func (b *BreakStmt) alwaysTerminates() bool {
 	return true
 }
 
@@ -548,15 +548,15 @@ func (i *IfStmt) Type() *Type {
 	return NONE_TYPE
 }
 
-func (i *IfStmt) AlwaysTerminates() bool {
-	if i.Else == nil || !i.Else.AlwaysTerminates() {
+func (i *IfStmt) alwaysTerminates() bool {
+	if i.Else == nil || !i.Else.alwaysTerminates() {
 		return false
 	}
-	if !i.IfBlock.AlwaysTerminates() {
+	if !i.IfBlock.alwaysTerminates() {
 		return false
 	}
 	for _, b := range i.ElseIfBlocks {
-		if !b.AlwaysTerminates() {
+		if !b.alwaysTerminates() {
 			return false
 		}
 	}
@@ -588,13 +588,13 @@ func (b *BlockStatement) Type() *Type {
 	return NONE_TYPE
 }
 
-func (b *BlockStatement) AlwaysTerminates() bool {
-	return b.alwaysTerminates
+func (b *BlockStatement) alwaysTerminates() bool {
+	return b.alwaysTerms
 }
 
-func alwaysTerminates(n Node) bool {
-	r, ok := n.(interface{ AlwaysTerminates() bool })
-	return ok && r.AlwaysTerminates()
+func alwaysTerms(n Node) bool {
+	r, ok := n.(interface{ alwaysTerminates() bool })
+	return ok && r.alwaysTerminates()
 }
 
 func (w *WhileStmt) String() string {
@@ -605,7 +605,7 @@ func (w *WhileStmt) Type() *Type {
 	return w.ConditionalBlock.Type()
 }
 
-func (*WhileStmt) AlwaysTerminates() bool {
+func (*WhileStmt) alwaysTerminates() bool {
 	return false
 }
 
@@ -639,7 +639,7 @@ func (s *StepRange) Type() *Type {
 	return NUM_TYPE
 }
 
-func (*ForStmt) AlwaysTerminates() bool {
+func (*ForStmt) alwaysTerminates() bool {
 	return false
 }
 
@@ -652,8 +652,8 @@ func (c *ConditionalBlock) Type() *Type {
 	return NONE_TYPE
 }
 
-func (c *ConditionalBlock) AlwaysTerminates() bool {
-	return c.Block.AlwaysTerminates()
+func (c *ConditionalBlock) alwaysTerminates() bool {
+	return c.Block.alwaysTerminates()
 }
 
 func (b *BoolLiteral) String() string {

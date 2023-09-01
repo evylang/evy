@@ -5,29 +5,29 @@ type ranger interface {
 }
 
 type stepRange struct {
-	loopVar *Num
+	loopVar *numVal
 	cur     float64
 	stop    float64
 	step    float64
 }
 
 type arrayRange struct {
-	loopVar Value
+	loopVar value
 	cur     int
-	array   *Array
+	array   *arrayVal
 }
 
 type mapRange struct {
-	loopVar Value
-	cur     int // index of Map.Order slice of keys
-	mapVal  *Map
-	order   []string // copy of order in case map entry gets deleted during iteration
+	loopVar  value
+	cur      int // index of Map.Order slice of keys
+	mapValal *mapVal
+	order    []string // copy of order in case map entry gets deleted during iteration
 }
 
 type stringRange struct {
-	loopVar *String
+	loopVar *stringVal
 	cur     int
-	str     *String
+	str     *stringVal
 	runes   []rune
 }
 
@@ -39,7 +39,7 @@ func (s *stepRange) next() bool {
 		return false
 	}
 	if s.loopVar != nil {
-		s.loopVar.Val = s.cur
+		s.loopVar.V = s.cur
 	}
 	s.cur += s.step
 	return true
@@ -62,9 +62,9 @@ func (m *mapRange) next() bool {
 	for m.cur < len(m.order) {
 		key := m.order[m.cur]
 		m.cur++
-		if _, ok := m.mapVal.Pairs[key]; ok { // ensure value hasn't been deleted
+		if _, ok := m.mapValal.Pairs[key]; ok { // ensure value hasn't been deleted
 			if m.loopVar != nil {
-				m.loopVar.(*String).Val = key
+				m.loopVar.(*stringVal).V = key
 			}
 			return true
 		}
@@ -80,7 +80,7 @@ func (s *stringRange) next() bool {
 		return false
 	}
 	if s.loopVar != nil {
-		s.loopVar.Val = string(s.runes[s.cur])
+		s.loopVar.V = string(s.runes[s.cur])
 	}
 	s.cur++
 	return true

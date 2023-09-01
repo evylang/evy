@@ -3,19 +3,19 @@ package evaluator
 import "foxygo.at/evy/pkg/parser"
 
 type scope struct {
-	values map[string]Value
+	values map[string]value
 	outer  *scope
 }
 
 func newScope() *scope {
-	return &scope{values: map[string]Value{}}
+	return &scope{values: map[string]value{}}
 }
 
 func newInnerScope(outer *scope) *scope {
-	return &scope{values: map[string]Value{}, outer: outer}
+	return &scope{values: map[string]value{}, outer: outer}
 }
 
-func (s *scope) get(name string) (Value, bool) {
+func (s *scope) get(name string) (value, bool) {
 	if s == nil || name == "_" {
 		return nil, false
 	}
@@ -25,15 +25,15 @@ func (s *scope) get(name string) (Value, bool) {
 	return s.outer.get(name)
 }
 
-func (s *scope) set(name string, val Value, t *parser.Type) {
+func (s *scope) set(name string, val value, t *parser.Type) {
 	if name == "_" {
 		return
 	}
 	switch val.Type() {
 	case parser.GENERIC_ARRAY:
-		val.(*Array).T = t
+		val.(*arrayVal).T = t
 	case parser.GENERIC_MAP:
-		val.(*Map).T = t
+		val.(*mapVal).T = t
 	}
 	s.values[name] = val
 }

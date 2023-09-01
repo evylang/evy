@@ -8,170 +8,170 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-type Value interface {
+type value interface {
 	Type() *parser.Type
-	Equals(Value) bool
+	Equals(value) bool
 	String() string
-	Set(Value)
+	Set(value)
 }
 
-type Num struct {
-	Val float64
+type numVal struct {
+	V float64
 }
 
-type Bool struct {
-	Val bool
+type boolVal struct {
+	V bool
 }
 
-type String struct {
-	Val       string
+type stringVal struct {
+	V         string
 	runeSlice []rune
 }
 
-type Any struct {
-	Val Value
+type anyVal struct {
+	V value
 }
 
-type Array struct {
-	Elements *[]Value
+type arrayVal struct {
+	Elements *[]value
 	T        *parser.Type
 }
 
-type Map struct {
-	Pairs map[string]Value
+type mapVal struct {
+	Pairs map[string]value
 	Order *[]string
 	T     *parser.Type
 }
 
-type ReturnValue struct {
-	Val Value
+type returnVal struct {
+	V value
 }
 
-type Break struct{}
+type breakVal struct{}
 
-type None struct{}
+type noneVal struct{}
 
-func (n *Num) Type() *parser.Type { return parser.NUM_TYPE }
-func (n *Num) String() string     { return strconv.FormatFloat(n.Val, 'f', -1, 64) }
-func (n *Num) Equals(v Value) bool {
-	n2, ok := v.(*Num)
+func (n *numVal) Type() *parser.Type { return parser.NUM_TYPE }
+func (n *numVal) String() string     { return strconv.FormatFloat(n.V, 'f', -1, 64) }
+func (n *numVal) Equals(v value) bool {
+	n2, ok := v.(*numVal)
 	if !ok {
-		panic("internal error: Num.Equals called with non-Num Value")
+		panic("internal error: Num.Equals called with non-Num value")
 	}
-	return n.Val == n2.Val
+	return n.V == n2.V
 }
 
-func (n *Num) Set(v Value) {
-	n2, ok := v.(*Num)
+func (n *numVal) Set(v value) {
+	n2, ok := v.(*numVal)
 	if !ok {
-		panic("internal error: Num.Set called with with non-Num Value")
+		panic("internal error: Num.Set called with with non-Num value")
 	}
 	*n = *n2
 }
 
-func (s *String) Type() *parser.Type { return parser.STRING_TYPE }
-func (s *String) String() string     { return s.Val }
-func (s *String) Equals(v Value) bool {
-	s2, ok := v.(*String)
+func (s *stringVal) Type() *parser.Type { return parser.STRING_TYPE }
+func (s *stringVal) String() string     { return s.V }
+func (s *stringVal) Equals(v value) bool {
+	s2, ok := v.(*stringVal)
 	if !ok {
-		panic("internal error: String.Equals called with non-String Value")
+		panic("internal error: String.Equals called with non-String value")
 	}
-	return s.Val == s2.Val
+	return s.V == s2.V
 }
 
-func (s *String) Set(v Value) {
-	s2, ok := v.(*String)
+func (s *stringVal) Set(v value) {
+	s2, ok := v.(*stringVal)
 	if !ok {
-		panic("internal error: String.Set called with with non-String Value")
+		panic("internal error: String.Set called with with non-String value")
 	}
 	*s = *s2
 }
 
-func (s *String) runes() []rune {
+func (s *stringVal) runes() []rune {
 	if s.runeSlice == nil {
-		s.runeSlice = []rune(s.Val)
+		s.runeSlice = []rune(s.V)
 	}
 	return s.runeSlice
 }
 
-func (s *String) Index(idx Value) (Value, error) {
+func (s *stringVal) Index(idx value) (value, error) {
 	runes := s.runes()
 	i, err := normalizeIndex(idx, len(runes))
 	if err != nil {
 		return nil, err
 	}
-	return &String{Val: string(runes[i])}, nil
+	return &stringVal{V: string(runes[i])}, nil
 }
 
-func (s *String) Slice(start, end Value) (Value, error) {
+func (s *stringVal) Slice(start, end value) (value, error) {
 	runes := s.runes()
 	length := len(runes)
 	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
 	if err != nil {
 		return nil, err
 	}
-	return &String{Val: string(runes[startIdx:endIdx])}, nil
+	return &stringVal{V: string(runes[startIdx:endIdx])}, nil
 }
 
-func (*Bool) Type() *parser.Type { return parser.BOOL_TYPE }
-func (b *Bool) String() string {
-	return strconv.FormatBool(b.Val)
+func (*boolVal) Type() *parser.Type { return parser.BOOL_TYPE }
+func (b *boolVal) String() string {
+	return strconv.FormatBool(b.V)
 }
 
-func (b *Bool) Equals(v Value) bool {
-	b2, ok := v.(*Bool)
+func (b *boolVal) Equals(v value) bool {
+	b2, ok := v.(*boolVal)
 	if !ok {
-		panic("internal error: Bool.Equals called with non-Bool Value")
+		panic("internal error: Bool.Equals called with non-Bool value")
 	}
-	return b.Val == b2.Val
+	return b.V == b2.V
 }
 
-func (b *Bool) Set(v Value) {
-	b2, ok := v.(*Bool)
+func (b *boolVal) Set(v value) {
+	b2, ok := v.(*boolVal)
 	if !ok {
-		panic("internal error: Bool.Set called with with non-Bool Value")
+		panic("internal error: Bool.Set called with with non-Bool value")
 	}
 	*b = *b2
 }
 
-func (*Any) Type() *parser.Type { return parser.ANY_TYPE }
-func (a *Any) String() string {
-	return a.Val.String()
+func (*anyVal) Type() *parser.Type { return parser.ANY_TYPE }
+func (a *anyVal) String() string {
+	return a.V.String()
 }
 
-func (a *Any) Equals(v Value) bool {
-	a2, ok := v.(*Any)
+func (a *anyVal) Equals(v value) bool {
+	a2, ok := v.(*anyVal)
 	if !ok {
-		panic("internal error: Any.Equals called with non-Any Value")
+		panic("internal error: Any.Equals called with non-Any value")
 	}
-	return a.Val.Equals(a2.Val)
+	return a.V.Equals(a2.V)
 }
 
-func (a *Any) Set(v Value) {
-	if a2, ok := v.(*Any); ok {
-		a.Val = copyOrRef(a2.Val)
+func (a *anyVal) Set(v value) {
+	if a2, ok := v.(*anyVal); ok {
+		a.V = copyOrRef(a2.V)
 	} else {
-		a.Val = copyOrRef(v)
+		a.V = copyOrRef(v)
 	}
 }
 
-func (n *None) Type() *parser.Type  { return parser.NONE_TYPE }
-func (n *None) String() string      { return "" }
-func (n *None) Equals(_ Value) bool { return false }
-func (n *None) Set(_ Value)         { panic("internal error: None.Set called") }
+func (n *noneVal) Type() *parser.Type  { return parser.NONE_TYPE }
+func (n *noneVal) String() string      { return "" }
+func (n *noneVal) Equals(_ value) bool { return false }
+func (n *noneVal) Set(_ value)         { panic("internal error: None.Set called") }
 
-func (r *ReturnValue) Type() *parser.Type  { return r.Val.Type() }
-func (r *ReturnValue) String() string      { return r.Val.String() }
-func (r *ReturnValue) Equals(v Value) bool { return r.Val.Equals(v) }
-func (r *ReturnValue) Set(v Value)         { r.Val.Set(v) }
+func (r *returnVal) Type() *parser.Type  { return r.V.Type() }
+func (r *returnVal) String() string      { return r.V.String() }
+func (r *returnVal) Equals(v value) bool { return r.V.Equals(v) }
+func (r *returnVal) Set(v value)         { r.V.Set(v) }
 
-func (r *Break) Type() *parser.Type  { return parser.NONE_TYPE }
-func (r *Break) String() string      { return "" }
-func (r *Break) Equals(_ Value) bool { return false }
-func (r *Break) Set(_ Value)         {}
+func (r *breakVal) Type() *parser.Type  { return parser.NONE_TYPE }
+func (r *breakVal) String() string      { return "" }
+func (r *breakVal) Equals(_ value) bool { return false }
+func (r *breakVal) Set(_ value)         {}
 
-func (a *Array) Type() *parser.Type { return a.T }
-func (a *Array) String() string {
+func (a *arrayVal) Type() *parser.Type { return a.T }
+func (a *arrayVal) String() string {
 	elements := make([]string, len(*a.Elements))
 	for i, e := range *a.Elements {
 		elements[i] = e.String()
@@ -179,10 +179,10 @@ func (a *Array) String() string {
 	return "[" + strings.Join(elements, " ") + "]"
 }
 
-func (a *Array) Equals(v Value) bool {
-	a2, ok := v.(*Array)
+func (a *arrayVal) Equals(v value) bool {
+	a2, ok := v.(*arrayVal)
 	if !ok {
-		panic("internal error: Array.Equals called with non-Array Value")
+		panic("internal error: Array.Equals called with non-Array value")
 	}
 	if len(*a.Elements) != len(*a2.Elements) {
 		return false
@@ -197,17 +197,17 @@ func (a *Array) Equals(v Value) bool {
 	return true
 }
 
-func (a *Array) Set(v Value) {
-	a2, ok := v.(*Array)
+func (a *arrayVal) Set(v value) {
+	a2, ok := v.(*arrayVal)
 	if !ok {
-		panic("internal error: Array.Set called with with non-Array Value")
+		panic("internal error: Array.Set called with with non-Array value")
 	}
 	// Copy elements but maintain type of assignable `a` as RHS `a2` may be a generic array, e.g. [].
 	// Maintain the type of the assignable as it is specific, e.g. []num.
 	a.Elements = a2.Elements
 }
 
-func (a *Array) Index(idx Value) (Value, error) {
+func (a *arrayVal) Index(idx value) (value, error) {
 	i, err := normalizeIndex(idx, len(*a.Elements))
 	if err != nil {
 		return nil, err
@@ -216,51 +216,51 @@ func (a *Array) Index(idx Value) (Value, error) {
 	return elements[i], nil
 }
 
-func (a *Array) Copy() *Array {
-	elements := make([]Value, len(*a.Elements))
+func (a *arrayVal) Copy() *arrayVal {
+	elements := make([]value, len(*a.Elements))
 	for i, v := range *a.Elements {
 		elements[i] = copyOrRef(v)
 	}
-	return &Array{Elements: &elements, T: a.T}
+	return &arrayVal{Elements: &elements, T: a.T}
 }
 
-func (a *Array) Slice(start, end Value) (Value, error) {
+func (a *arrayVal) Slice(start, end value) (value, error) {
 	length := len(*a.Elements)
 	startIdx, endIdx, err := normalizeSliceIndices(start, end, length)
 	if err != nil {
 		return nil, err
 	}
 
-	elements := make([]Value, endIdx-startIdx)
+	elements := make([]value, endIdx-startIdx)
 	for i := startIdx; i < endIdx; i++ {
 		v := (*a.Elements)[i]
 		elements[i-startIdx] = copyOrRef(v)
 	}
-	return &Array{Elements: &elements, T: a.T}, nil
+	return &arrayVal{Elements: &elements, T: a.T}, nil
 }
 
 // copyOrRef is a copy of the input value for basic types and a
 // reference to the value for composite types (arrays and maps).
-func copyOrRef(val Value) Value {
+func copyOrRef(val value) value {
 	switch v := val.(type) {
-	case *Num:
-		return &Num{Val: v.Val}
-	case *String:
-		return &String{Val: v.Val}
-	case *Bool:
-		return &Bool{Val: v.Val}
-	case *Any:
-		return &Any{Val: copyOrRef(v.Val)}
-	case *Array:
+	case *numVal:
+		return &numVal{V: v.V}
+	case *stringVal:
+		return &stringVal{V: v.V}
+	case *boolVal:
+		return &boolVal{V: v.V}
+	case *anyVal:
+		return &anyVal{V: copyOrRef(v.V)}
+	case *arrayVal:
 		return v
-	case *Map:
+	case *mapVal:
 		return v
 	}
-	panic("internal error: copyOrRef called with with invalid Value")
+	panic("internal error: copyOrRef called with with invalid value")
 }
 
-func (m *Map) Type() *parser.Type { return m.T }
-func (m *Map) String() string {
+func (m *mapVal) Type() *parser.Type { return m.T }
+func (m *mapVal) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
 	for _, key := range *m.Order {
 		pairs = append(pairs, key+":"+m.Pairs[key].String())
@@ -268,10 +268,10 @@ func (m *Map) String() string {
 	return "{" + strings.Join(pairs, " ") + "}"
 }
 
-func (m *Map) Equals(v Value) bool {
-	m2, ok := v.(*Map)
+func (m *mapVal) Equals(v value) bool {
+	m2, ok := v.(*mapVal)
 	if !ok {
-		panic("internal error: Map.Equals called with non-Map Value")
+		panic("internal error: Map.Equals called with non-Map value")
 	}
 	if len(m.Pairs) != len(m2.Pairs) {
 		return false
@@ -285,10 +285,10 @@ func (m *Map) Equals(v Value) bool {
 	return true
 }
 
-func (m *Map) Set(v Value) {
-	m2, ok := v.(*Map)
+func (m *mapVal) Set(v value) {
+	m2, ok := v.(*mapVal)
 	if !ok {
-		panic("internal error: Map.Set called with with non-Map Value")
+		panic("internal error: Map.Set called with with non-Map value")
 	}
 	// Copy pairs and order but maintain type of assignable `m` as RHS `m2` may be a generic array, e.g. {}.
 	// Maintain the type of the assignable as it is specific, e.g. {}num.
@@ -296,7 +296,7 @@ func (m *Map) Set(v Value) {
 	m.Order = m2.Order
 }
 
-func (m *Map) Get(key string) (Value, error) {
+func (m *mapVal) Get(key string) (value, error) {
 	val, ok := m.Pairs[key]
 	if !ok {
 		return nil, fmt.Errorf("%w: %q", ErrMapKey, key)
@@ -304,7 +304,7 @@ func (m *Map) Get(key string) (Value, error) {
 	return val, nil
 }
 
-func (m *Map) InsertKey(key string, t *parser.Type) {
+func (m *mapVal) InsertKey(key string, t *parser.Type) {
 	if _, ok := m.Pairs[key]; ok {
 		return
 	}
@@ -312,7 +312,7 @@ func (m *Map) InsertKey(key string, t *parser.Type) {
 	m.Pairs[key] = zero(t)
 }
 
-func (m *Map) Delete(key string) {
+func (m *mapVal) Delete(key string) {
 	if _, ok := m.Pairs[key]; !ok {
 		return
 	}
@@ -325,17 +325,17 @@ func (m *Map) Delete(key string) {
 	}
 }
 
-func isReturn(val Value) bool {
-	_, ok := val.(*ReturnValue)
+func isReturn(val value) bool {
+	_, ok := val.(*returnVal)
 	return ok
 }
 
-func isBreak(val Value) bool {
-	_, ok := val.(*Break)
+func isBreak(val value) bool {
+	_, ok := val.(*breakVal)
 	return ok
 }
 
-func normalizeSliceIndices(start, end Value, length int) (int, int, error) {
+func normalizeSliceIndices(start, end value, length int) (int, int, error) {
 	startIdx := 0
 	var err error
 	if start != nil {
@@ -347,7 +347,7 @@ func normalizeSliceIndices(start, end Value, length int) (int, int, error) {
 	endIdx := length
 	if end != nil {
 		// length is a valid end slice index, but not a valid ordinary index (out of bounds)
-		if endNum, ok := end.(*Num); ok && int(endNum.Val) != length {
+		if endNum, ok := end.(*numVal); ok && int(endNum.V) != length {
 			endIdx, err = normalizeIndex(end, length)
 			if err != nil {
 				return 0, 0, err
@@ -360,12 +360,12 @@ func normalizeSliceIndices(start, end Value, length int) (int, int, error) {
 	return startIdx, endIdx, nil
 }
 
-func normalizeIndex(idx Value, length int) (int, error) {
-	index, ok := idx.(*Num)
+func normalizeIndex(idx value, length int) (int, error) {
+	index, ok := idx.(*numVal)
 	if !ok {
 		return 0, fmt.Errorf("%w: expected num, found %v", ErrType, idx.Type())
 	}
-	i := int(index.Val)
+	i := int(index.V)
 	if i < -length || i >= length {
 		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}
@@ -375,60 +375,60 @@ func normalizeIndex(idx Value, length int) (int, error) {
 	return i, nil
 }
 
-func zero(t *parser.Type) Value {
+func zero(t *parser.Type) value {
 	switch {
 	case t == parser.NUM_TYPE:
-		return &Num{}
+		return &numVal{}
 	case t == parser.STRING_TYPE:
-		return &String{}
+		return &stringVal{}
 	case t == parser.BOOL_TYPE:
-		return &Bool{}
+		return &boolVal{}
 	case t == parser.ANY_TYPE:
-		return &Any{Val: &Bool{}}
+		return &anyVal{V: &boolVal{}}
 	case t.Name == parser.ARRAY:
-		elements := []Value{}
-		return &Array{Elements: &elements, T: t}
+		elements := []value{}
+		return &arrayVal{Elements: &elements, T: t}
 	case t.Name == parser.MAP:
 		order := []string{}
-		return &Map{Pairs: map[string]Value{}, Order: &order, T: t}
+		return &mapVal{Pairs: map[string]value{}, Order: &order, T: t}
 	}
 	panic("cannot create zero value for type " + t.String())
 }
 
-func valueFromAny(t *parser.Type, v any) (Value, error) {
+func valueFromAny(t *parser.Type, v any) (value, error) {
 	switch {
 	case t == parser.NUM_TYPE:
 		val, ok := v.(float64)
 		if !ok {
 			return nil, fmt.Errorf("%w: expected number, found %v", ErrAnyConversion, val)
 		}
-		return &Num{Val: val}, nil
+		return &numVal{V: val}, nil
 	case t == parser.STRING_TYPE:
 		val, ok := v.(string)
 		if !ok {
 			return nil, fmt.Errorf("%w: expected string, found %v", ErrAnyConversion, val)
 		}
-		return &String{Val: val}, nil
+		return &stringVal{V: val}, nil
 	case t == parser.BOOL_TYPE:
 		val, ok := v.(bool)
 		if !ok {
 			return nil, fmt.Errorf("%w: expected bool, found %v", ErrAnyConversion, val)
 		}
-		return &Bool{Val: val}, nil
+		return &boolVal{V: val}, nil
 	}
 	return nil, fmt.Errorf("%w: cannot create value for type %v", ErrAnyConversion, t)
 }
 
-func unwrapBasicValue(val Value) any {
+func unwrapBasicvalue(val value) any {
 	switch v := val.(type) {
-	case *Num:
-		return v.Val
-	case *String:
-		return v.Val
-	case *Bool:
-		return v.Val
-	case *Any:
-		return unwrapBasicValue(v.Val)
+	case *numVal:
+		return v.V
+	case *stringVal:
+		return v.V
+	case *boolVal:
+		return v.V
+	case *anyVal:
+		return unwrapBasicvalue(v.V)
 	default:
 		return v.String()
 	}

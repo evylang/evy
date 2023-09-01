@@ -149,7 +149,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 	case *parser.ReturnStmt:
 		return e.evalReturn(node)
 	case *parser.BreakStmt:
-		return e.evalBreak(node), nil
+		return &Break{}, nil
 	case *parser.IfStmt:
 		return e.evalIf(node)
 	case *parser.WhileStmt:
@@ -326,10 +326,6 @@ func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) (Value, error) {
 		return nil, err
 	}
 	return &ReturnValue{Val: val}, nil
-}
-
-func (e *Evaluator) evalBreak(ret *parser.BreakStmt) Value {
-	return &Break{}
 }
 
 func (e *Evaluator) evalIf(i *parser.IfStmt) (Value, error) {

@@ -245,7 +245,7 @@ end
 	got := parser.funcs["nums1"]
 	assert.Equal(t, "nums1", got.Name)
 	assert.Equal(t, NUM_TYPE, got.ReturnType)
-	var wantVariadicParam *Var = nil
+	var wantVariadicParam *Var
 	assert.Equal(t, wantVariadicParam, got.VariadicParam)
 	assert.Equal(t, 2, len(got.Params))
 	n1 := got.Params[0]

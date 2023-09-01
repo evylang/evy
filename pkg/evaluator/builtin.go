@@ -532,7 +532,7 @@ var rand1Decl = &parser.FuncDefStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-func rand1Func(_ *scope, args []Value) (Value, error) {
+func rand1Func(_ *scope, _ []Value) (Value, error) {
 	return &Num{Val: randsource.Float64()}, nil
 }
 

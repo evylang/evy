@@ -46,10 +46,10 @@ import (
 )
 
 var (
-	version         string = "v0.0.0"
-	errBadWriteFlag        = errors.New("cannot use -w without files")
-	errNotFormatted        = errors.New("not formatted")
-	errParse               = errors.New("parse error")
+	version         = "v0.0.0"
+	errBadWriteFlag = errors.New("cannot use -w without files")
+	errNotFormatted = errors.New("not formatted")
+	errParse        = errors.New("parse error")
 )
 
 // cliRuntime implements evaluator.Runtime.

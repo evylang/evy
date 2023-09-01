@@ -64,25 +64,25 @@ func (rt *UnimplementedRuntime) unimplemented(s string) {
 	rt.Print(fmt.Sprintf("%q not implemented\n", s))
 }
 
-func (rt *UnimplementedRuntime) Cls()                      { rt.unimplemented("cls") }
-func (rt *UnimplementedRuntime) Read() string              { rt.unimplemented("read"); return "" }
-func (rt *UnimplementedRuntime) Sleep(_ time.Duration)     { rt.unimplemented("sleep") }
-func (rt *UnimplementedRuntime) Yielder() Yielder          { rt.unimplemented("yielder"); return nil }
-func (rt *UnimplementedRuntime) Move(x, y float64)         { rt.unimplemented("move") }
-func (rt *UnimplementedRuntime) Line(x, y float64)         { rt.unimplemented("line") }
-func (rt *UnimplementedRuntime) Rect(x, y float64)         { rt.unimplemented("rect") }
-func (rt *UnimplementedRuntime) Circle(r float64)          { rt.unimplemented("circle") }
-func (rt *UnimplementedRuntime) Width(w float64)           { rt.unimplemented("width") }
-func (rt *UnimplementedRuntime) Color(s string)            { rt.unimplemented("color") }
-func (rt *UnimplementedRuntime) Clear(color string)        { rt.unimplemented("clear") }
-func (rt *UnimplementedRuntime) Gridn(float64, string)     { rt.unimplemented("gridn") }
-func (rt *UnimplementedRuntime) Poly(vertices [][]float64) { rt.unimplemented("poly") }
-func (rt *UnimplementedRuntime) Stroke(s string)           { rt.unimplemented("stroke") }
-func (rt *UnimplementedRuntime) Fill(s string)             { rt.unimplemented("fill") }
-func (rt *UnimplementedRuntime) Dash(segments []float64)   { rt.unimplemented("dash") }
-func (rt *UnimplementedRuntime) Linecap(s string)          { rt.unimplemented("linecap") }
-func (rt *UnimplementedRuntime) Text(s string)             { rt.unimplemented("text") }
-func (rt *UnimplementedRuntime) Font(props map[string]any) { rt.unimplemented("font") }
-func (rt *UnimplementedRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
+func (rt *UnimplementedRuntime) Cls()                  { rt.unimplemented("cls") }
+func (rt *UnimplementedRuntime) Read() string          { rt.unimplemented("read"); return "" }
+func (rt *UnimplementedRuntime) Sleep(time.Duration)   { rt.unimplemented("sleep") }
+func (rt *UnimplementedRuntime) Yielder() Yielder      { rt.unimplemented("yielder"); return nil }
+func (rt *UnimplementedRuntime) Move(float64, float64) { rt.unimplemented("move") }
+func (rt *UnimplementedRuntime) Line(float64, float64) { rt.unimplemented("line") }
+func (rt *UnimplementedRuntime) Rect(float64, float64) { rt.unimplemented("rect") }
+func (rt *UnimplementedRuntime) Circle(float64)        { rt.unimplemented("circle") }
+func (rt *UnimplementedRuntime) Width(float64)         { rt.unimplemented("width") }
+func (rt *UnimplementedRuntime) Color(string)          { rt.unimplemented("color") }
+func (rt *UnimplementedRuntime) Clear(string)          { rt.unimplemented("clear") }
+func (rt *UnimplementedRuntime) Gridn(float64, string) { rt.unimplemented("gridn") }
+func (rt *UnimplementedRuntime) Poly([][]float64)      { rt.unimplemented("poly") }
+func (rt *UnimplementedRuntime) Stroke(string)         { rt.unimplemented("stroke") }
+func (rt *UnimplementedRuntime) Fill(string)           { rt.unimplemented("fill") }
+func (rt *UnimplementedRuntime) Dash([]float64)        { rt.unimplemented("dash") }
+func (rt *UnimplementedRuntime) Linecap(string)        { rt.unimplemented("linecap") }
+func (rt *UnimplementedRuntime) Text(string)           { rt.unimplemented("text") }
+func (rt *UnimplementedRuntime) Font(map[string]any)   { rt.unimplemented("font") }
+func (rt *UnimplementedRuntime) Ellipse(float64, float64, float64, float64, float64, float64, float64) {
 	rt.unimplemented("ellipse")
 }

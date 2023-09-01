@@ -1,5 +1,5 @@
 // Package evaluator evaluates a given syntax tree as created by the
-// parser packages. It also exports a Run and RunWithBuiltings function
+// parser packages. It also exports a Run and RunWithbuiltings function
 // which creates and calls a Parser.
 package evaluator
 
@@ -66,7 +66,8 @@ func newErr(node parser.Node, err error) *Error {
 	return &Error{token: node.Token(), err: err}
 }
 
-func NewEvaluator(builtins Builtins) *Evaluator {
+func NewEvaluator(rt Runtime) *Evaluator {
+	builtins := newBuiltins(rt)
 	scope := newScope()
 	for _, global := range builtins.Globals {
 		t := global.Type()
@@ -86,7 +87,7 @@ type Evaluator struct {
 	EventHandlerNames []string
 
 	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
-	builtins      Builtins
+	builtins      builtins
 	eventHandlers map[string]*parser.EventHandlerStmt
 
 	scope  *scope // Current top of scope stack
@@ -99,7 +100,7 @@ type Event struct {
 }
 
 func (e *Evaluator) Run(input string) error {
-	builtins := e.builtins.ParserBuiltins()
+	builtins := builtinsDeclsFromBuiltins(e.builtins)
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		return err

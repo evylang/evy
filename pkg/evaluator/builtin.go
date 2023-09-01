@@ -11,19 +11,24 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
-type Builtin struct {
-	Func BuiltinFunc
+type builtin struct {
+	Func builtinFunc
 	Decl *parser.FuncDefStmt
 }
 
-type Builtins struct {
-	Funcs         map[string]Builtin
+type builtins struct {
+	Funcs         map[string]builtin
 	EventHandlers map[string]*parser.EventHandlerStmt
 	Globals       map[string]*parser.Var
 	Runtime       Runtime
 }
 
-func (b Builtins) ParserBuiltins() parser.Builtins {
+func BuiltinDecls() parser.Builtins {
+	b := newBuiltins(&UnimplementedRuntime{})
+	return builtinsDeclsFromBuiltins(b)
+}
+
+func builtinsDeclsFromBuiltins(b builtins) parser.Builtins {
 	funcs := make(map[string]*parser.FuncDefStmt, len(b.Funcs))
 	for name, builtin := range b.Funcs {
 		funcs[name] = builtin.Decl
@@ -35,10 +40,10 @@ func (b Builtins) ParserBuiltins() parser.Builtins {
 	}
 }
 
-type BuiltinFunc func(scope *scope, args []Value) (Value, error)
+type builtinFunc func(scope *scope, args []Value) (Value, error)
 
-func DefaultBuiltins(rt Runtime) Builtins {
-	funcs := map[string]Builtin{
+func newBuiltins(rt Runtime) builtins {
+	funcs := map[string]builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
 		"cls":    {Func: clsFunc(rt.Cls), Decl: emptyDecl("cls")},
 		"print":  {Func: printFunc(rt.Print), Decl: printDecl},
@@ -56,21 +61,21 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"trim":       {Func: trimFunc, Decl: trimDecl},
 		"replace":    {Func: replaceFunc, Decl: replaceDecl},
 
-		"str2num":  {Func: BuiltinFunc(str2numFunc), Decl: str2numDecl},
-		"str2bool": {Func: BuiltinFunc(str2boolFunc), Decl: str2boolDecl},
+		"str2num":  {Func: builtinFunc(str2numFunc), Decl: str2numDecl},
+		"str2bool": {Func: builtinFunc(str2boolFunc), Decl: str2boolDecl},
 
-		"typeof": {Func: BuiltinFunc(typeofFunc), Decl: typeofDecl},
+		"typeof": {Func: builtinFunc(typeofFunc), Decl: typeofDecl},
 
-		"len": {Func: BuiltinFunc(lenFunc), Decl: lenDecl},
-		"has": {Func: BuiltinFunc(hasFunc), Decl: hasDecl},
-		"del": {Func: BuiltinFunc(delFunc), Decl: delDecl},
+		"len": {Func: builtinFunc(lenFunc), Decl: lenDecl},
+		"has": {Func: builtinFunc(hasFunc), Decl: hasDecl},
+		"del": {Func: builtinFunc(delFunc), Decl: delDecl},
 
 		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
-		"exit":  {Func: BuiltinFunc(exitFunc), Decl: numDecl("exit")},
-		"panic": {Func: BuiltinFunc(panicFunc), Decl: stringDecl("panic")},
+		"exit":  {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic": {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
 
-		"rand":  {Func: BuiltinFunc(randFunc), Decl: randDecl},
-		"rand1": {Func: BuiltinFunc(rand1Func), Decl: rand1Decl},
+		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
+		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
 
 		"min":   xyRetBuiltin("min", math.Min),
 		"max":   xyRetBuiltin("max", math.Max),
@@ -84,9 +89,9 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"cos":   numRetBuiltin("cos", math.Cos),
 		"atan2": xyRetBuiltin("atan2", math.Atan2),
 
-		"move":   xyBuiltin("move", rt.Move),
-		"line":   xyBuiltin("line", rt.Line),
-		"rect":   xyBuiltin("rect", rt.Rect),
+		"move":   xybuiltin("move", rt.Move),
+		"line":   xybuiltin("line", rt.Line),
+		"rect":   xybuiltin("rect", rt.Rect),
 		"circle": numBuiltin("circle", rt.Circle),
 
 		"width":  numBuiltin("width", rt.Width),
@@ -130,7 +135,7 @@ func DefaultBuiltins(rt Runtime) Builtins {
 		"err":    {Name: "err", T: parser.BOOL_TYPE},
 		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
 	}
-	return Builtins{
+	return builtins{
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
 		Globals:       globals,
@@ -143,14 +148,14 @@ var readDecl = &parser.FuncDefStmt{
 	ReturnType: parser.STRING_TYPE,
 }
 
-func readFunc(readFn func() string) BuiltinFunc {
+func readFunc(readFn func() string) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		s := readFn()
 		return &String{Val: s}, nil
 	}
 }
 
-func clsFunc(clsFn func()) BuiltinFunc {
+func clsFunc(clsFn func()) builtinFunc {
 	return func(_ *scope, _ []Value) (Value, error) {
 		clsFn()
 		return &None{}, nil
@@ -163,14 +168,14 @@ var printDecl = &parser.FuncDefStmt{
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func printFunc(printFn func(string)) BuiltinFunc {
+func printFunc(printFn func(string)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		printFn(join(args, " ") + "\n")
 		return &None{}, nil
 	}
 }
 
-func printfFunc(printFn func(string)) BuiltinFunc {
+func printfFunc(printFn func(string)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		if len(args) < 1 {
 			return nil, fmt.Errorf(`%w: "printf" takes at least 1 argument`, ErrBadArguments)
@@ -491,7 +496,7 @@ var sleepDecl = &parser.FuncDefStmt{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func sleepFunc(sleepFn func(time.Duration)) BuiltinFunc {
+func sleepFunc(sleepFn func(time.Duration)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		secs := args[0].(*Num)
 		dur := time.Duration(secs.Val * float64(time.Second))
@@ -542,7 +547,7 @@ var clearDecl = &parser.FuncDefStmt{
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func clearFunc(clearFn func(string)) BuiltinFunc {
+func clearFunc(clearFn func(string)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		if len(args) > 1 {
 			return nil, fmt.Errorf(`%w: "clear" takes 0 or 1 string arguments`, ErrBadArguments)
@@ -565,7 +570,7 @@ var gridnDecl = &parser.FuncDefStmt{
 	ReturnType: parser.NONE_TYPE,
 }
 
-func gridnFunc(gridnFn func(float64, string)) BuiltinFunc {
+func gridnFunc(gridnFn func(float64, string)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		unit := args[0].(*Num)
 		color := args[1].(*String)
@@ -574,7 +579,7 @@ func gridnFunc(gridnFn func(float64, string)) BuiltinFunc {
 	}
 }
 
-func gridFunc(gridnFn func(float64, string)) BuiltinFunc {
+func gridFunc(gridnFn func(float64, string)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		gridnFn(10, "hsl(0deg 100% 0% / 50%)")
 		return nil, nil
@@ -592,7 +597,7 @@ var polyDecl = &parser.FuncDefStmt{
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func polyFunc(polyFn func([][]float64)) BuiltinFunc {
+func polyFunc(polyFn func([][]float64)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		vertices := make([][]float64, len(args))
 		for i, arg := range args {
@@ -616,7 +621,7 @@ var ellipseDecl = &parser.FuncDefStmt{
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)) BuiltinFunc {
+func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		argLen := len(args)
 		if argLen < 3 || argLen == 6 || argLen > 7 {
@@ -650,7 +655,7 @@ var dashDecl = &parser.FuncDefStmt{
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func dashFunc(dashFn func([]float64)) BuiltinFunc {
+func dashFunc(dashFn func([]float64)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		segments := make([]float64, len(args))
 		for i, arg := range args {
@@ -713,7 +718,7 @@ func parseFontProps(arg *Map) (map[string]any, error) {
 	return props, nil
 }
 
-func fontFunc(fontFn func(map[string]any)) BuiltinFunc {
+func fontFunc(fontFn func(map[string]any)) builtinFunc {
 	return func(_ *scope, args []Value) (Value, error) {
 		arg := args[0].(*Map)
 		properties, err := parseFontProps(arg)
@@ -743,8 +748,8 @@ func xyDecl(name string) *parser.FuncDefStmt {
 	}
 }
 
-func xyBuiltin(name string, fn func(x, y float64)) Builtin {
-	result := Builtin{Decl: xyDecl(name)}
+func xybuiltin(name string, fn func(x, y float64)) builtin {
+	result := builtin{Decl: xyDecl(name)}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
@@ -765,8 +770,8 @@ func xyRetDecl(name string) *parser.FuncDefStmt {
 	}
 }
 
-func xyRetBuiltin(name string, fn func(x, y float64) float64) Builtin {
-	result := Builtin{Decl: xyRetDecl(name)}
+func xyRetBuiltin(name string, fn func(x, y float64) float64) builtin {
+	result := builtin{Decl: xyRetDecl(name)}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		x := args[0].(*Num)
 		y := args[1].(*Num)
@@ -786,8 +791,8 @@ func numDecl(name string) *parser.FuncDefStmt {
 	}
 }
 
-func numBuiltin(name string, fn func(n float64)) Builtin {
-	result := Builtin{Decl: numDecl(name)}
+func numBuiltin(name string, fn func(n float64)) builtin {
+	result := builtin{Decl: numDecl(name)}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		n := args[0].(*Num)
 		fn(n.Val)
@@ -806,8 +811,8 @@ func numRetDecl(name string) *parser.FuncDefStmt {
 	}
 }
 
-func numRetBuiltin(name string, fn func(n float64) float64) Builtin {
-	result := Builtin{Decl: numRetDecl(name)}
+func numRetBuiltin(name string, fn func(n float64) float64) builtin {
+	result := builtin{Decl: numRetDecl(name)}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		n := args[0].(*Num)
 		result := fn(n.Val)
@@ -826,8 +831,8 @@ func stringDecl(name string) *parser.FuncDefStmt {
 	}
 }
 
-func stringBuiltin(name string, fn func(str string)) Builtin {
-	result := Builtin{Decl: stringDecl(name)}
+func stringBuiltin(name string, fn func(str string)) builtin {
+	result := builtin{Decl: stringDecl(name)}
 	result.Func = func(_ *scope, args []Value) (Value, error) {
 		str := args[0].(*String)
 		fn(str.Val)

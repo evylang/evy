@@ -25,7 +25,7 @@ func (*testRT) Yielder() Yielder {
 func run(input string) string {
 	rt := &testRT{}
 	rt.UnimplementedRuntime.print = rt.Print
-	eval := NewEvaluator(DefaultBuiltins(rt))
+	eval := NewEvaluator(rt)
 	err := eval.Run(input)
 	if err != nil {
 		return err.Error()
@@ -147,7 +147,7 @@ end
 
 	rt := &testRT{}
 	rt.UnimplementedRuntime.print = rt.Print
-	eval := NewEvaluator(DefaultBuiltins(&testRT{}))
+	eval := NewEvaluator(&testRT{})
 	err := eval.Run(prog)
 	assert.Equal(t, true, errors.Is(err, ErrVarNotSet))
 	evalErr := &Error{}

@@ -166,7 +166,7 @@ func jsPrint(string)
 //export jsCls
 func jsCls()
 
-// jsError is imported from JS. jsError is used for setting compile time
+// jsError is imported from JS. jsError is used for setting parse
 // errors of format:
 //
 //	line NUM column NUM: ERROR_DETAILS

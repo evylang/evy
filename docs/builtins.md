@@ -595,13 +595,13 @@ on `err`, see the [Recoverable Errors section](#recoverable-errors).
 
 ## Errors
 
-Evy has two types of errors: compiler errors and run-time errors.
+Evy has two types of errors: parse errors and run-time errors.
 
-- **Compiler errors** are reported before the program is executed. They
+- **parse errors** are reported before the program is executed. They
   report errors with the syntax, such as a missing closing quote for
   `print "abc`, an illegal character, such as `#`, or type errors, such
   as `min "a" "b"`.
-- **Run-time errors** only occur if there are no compiler errors and the
+- **Run-time errors** only occur if there are no parse errors and the
   code path causing the error is executed.
 
 For example, the following code will **sometimes** cause a run-time error:

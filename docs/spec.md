@@ -53,7 +53,7 @@ To get an intuitive understanding of Evy, you can either look at its
 ## Syntax Grammar
 
 The Evy syntax grammar is a [WSN] grammar, which is a formal set of
-rules that define how Evy programs are written. The Evy compiler uses
+rules that define how Evy programs are written. The Evy interpreter uses
 the syntax grammar to parse Evy source code, which means that it checks
 that the code follows the rules of the grammar.
 
@@ -252,7 +252,7 @@ inside string literals.
 ## Types
 
 Evy has a static **type system** where the types of variables, parameters
-and expressions are known at compile time. This means that the compiler
+and expressions are known at parse time. This means that the parser
 can check for type errors before the program is run.
 
 There are three **basic types**: `num`, `string` and `bool` as well as two
@@ -368,7 +368,7 @@ assigned to a variable.
 For example, the following code declares a string variable named `s` and
 initializes it to the value `"a"` through inference. Then, it assigns
 the value `"b"` to `s`. Finally, it tries to assign the value `100` to
-`s`, which will cause a compile-time error because `s` is a string
+`s`, which will cause a parse error because `s` is a string
 variable and `100` is a number.
 
 ```evy
@@ -376,7 +376,7 @@ s := "a"
 print 1 s
 s = "b"
 print 2 s
-// s = 100 // compile time error, wrong type
+// s = 100 // parse error, wrong type
 ```
 
 Output
@@ -850,7 +850,7 @@ b := 3
 print 1 a-b
 print 2 (a - b)
 print 3 a -b
-// print a - b // compile time error
+// print a - b // parse error
 ```
 
 Output:
@@ -1289,8 +1289,8 @@ print "x" (typeof x)
 y:[]any
 // y = [1 2 3] // TODO PR https://github.com/foxygoat/evy/pull/179
 print "y" (typeof y)
-// y = x // compile time error
-// x = y // compile time error
+// y = x // parse error
+// x = y // parse error
 ```
 
 will output
@@ -1341,7 +1341,7 @@ x:[]any
 x = [1 2 3 true]
 x = x[:-1] // TODO remove, use x := [1 2 3] , PR 175, 179
 print "x:" x "typeof x:" (typeof x)
-// print x.([]num) // compile time error
+// print x.([]num) // parse error
 // print x[0].(string) // run-time panic
 ```
 

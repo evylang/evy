@@ -1,6 +1,6 @@
 //go:build !tinygo
 
-// Evy compiles, runs, and formats Evy source code.
+// Evy parses, runs, and formats Evy source code.
 //
 // Evy on the command line supports all [built-in functions] except for
 // graphics functions and event handlers. Only the web interface on

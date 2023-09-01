@@ -73,9 +73,9 @@ Use [Homebrew] to install `evy`.
 
 ## 💻 Development
 
-The Evy compiler is written in [Go] and built using the Go and
+The Evy interpreter is written in [Go] and built using the Go and
 [TinyGo] compilers. TinyGo targets [WebAssembly], which allows Evy
-source code to be compiled and run in a web browser. The browser
+source code to be parsed and run in a web browser. The browser
 runtime is written in plain JavaScript without the use of frameworks.
 
 To build the Evy source code, [clone] this repository and

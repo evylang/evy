@@ -152,7 +152,7 @@ end
 	assert.Equal(t, true, errors.Is(err, ErrVarNotSet))
 	evalErr := &Error{}
 	assert.Equal(t, true, errors.As(err, &evalErr))
-	assert.Equal(t, "line 7 column 13", evalErr.token.Location())
+	assert.Equal(t, "line 7 column 13", evalErr.Token.Location())
 }
 
 func TestLenString(t *testing.T) {

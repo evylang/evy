@@ -51,11 +51,11 @@ func (e *PanicError) Unwrap() error {
 // Error is an Evy evaluator error.
 type Error struct {
 	err   error
-	token *lexer.Token
+	Token *lexer.Token
 }
 
 func (e *Error) Error() string {
-	return e.token.Location() + ": " + e.err.Error()
+	return e.Token.Location() + ": " + e.err.Error()
 }
 
 func (e *Error) Unwrap() error {
@@ -63,7 +63,7 @@ func (e *Error) Unwrap() error {
 }
 
 func newErr(node parser.Node, err error) *Error {
-	return &Error{token: node.Token(), err: err}
+	return &Error{Token: node.Token(), err: err}
 }
 
 func NewEvaluator(rt Runtime) *Evaluator {

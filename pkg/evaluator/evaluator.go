@@ -105,17 +105,19 @@ func (e *Evaluator) Run(input string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := e.Eval(prog); err != nil {
-		return err
-	}
-	return nil
+	return e.Eval(prog)
 }
 
 type Yielder interface {
 	Yield()
 }
 
-func (e *Evaluator) Eval(node parser.Node) (value, error) {
+func (e *Evaluator) Eval(prog *parser.Program) error {
+	_, err := e.eval(prog)
+	return err
+}
+
+func (e *Evaluator) eval(node parser.Node) (value, error) {
 	if e.Stopped {
 		return nil, ErrStopped
 	}
@@ -170,7 +172,7 @@ func (e *Evaluator) Eval(node parser.Node) (value, error) {
 	case *parser.DotExpression:
 		return e.evalDotExpr(node, false /* forAssign */)
 	case *parser.GroupExpression:
-		return e.Eval(node.Expr)
+		return e.eval(node.Expr)
 	case *parser.TypeAssertion:
 		return e.evalTypeAssertion(node)
 	case *parser.FuncDefStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
@@ -197,7 +199,7 @@ func (e *Evaluator) HandleEvent(ev Event) error {
 		}
 		e.scope.set(param.Name, arg, param.Type())
 	}
-	_, err := e.Eval(eh.Body)
+	_, err := e.eval(eh.Body)
 	return err
 }
 
@@ -219,7 +221,7 @@ func (e *Evaluator) evalProgram(program *parser.Program) (value, error) {
 func (e *Evaluator) evalStatments(statements []parser.Node) (value, error) {
 	var result value
 	for _, statement := range statements {
-		result, err := e.Eval(statement)
+		result, err := e.eval(statement)
 		if err != nil {
 			return nil, err
 		}
@@ -236,7 +238,7 @@ func (e *Evaluator) evalBool(b *parser.BoolLiteral) value {
 }
 
 func (e *Evaluator) evalDecl(decl *parser.Decl) error {
-	val, err := e.Eval(decl.Value)
+	val, err := e.eval(decl.Value)
 	if err != nil {
 		return err
 	}
@@ -248,7 +250,7 @@ func (e *Evaluator) evalDecl(decl *parser.Decl) error {
 }
 
 func (e *Evaluator) evalAssignment(assignment *parser.AssignmentStmt) error {
-	val, err := e.Eval(assignment.Value)
+	val, err := e.eval(assignment.Value)
 	if err != nil {
 		return err
 	}
@@ -271,7 +273,7 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
 func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
 	pairs := map[string]value{}
 	for key, node := range m.Pairs {
-		val, err := e.Eval(node)
+		val, err := e.eval(node)
 		if err != nil {
 			return nil, err
 		}
@@ -308,7 +310,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 		e.scope.set(fd.VariadicParam.Name, varArg, fd.VariadicParamType)
 	}
 
-	funcResult, err := e.Eval(fd.Body)
+	funcResult, err := e.eval(fd.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +324,7 @@ func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) (value, error) {
 	if ret.Value == nil {
 		return &returnVal{}, nil
 	}
-	val, err := e.Eval(ret.Value)
+	val, err := e.eval(ret.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +351,7 @@ func (e *Evaluator) evalIf(i *parser.IfStmt) (value, error) {
 	if i.Else != nil {
 		e.pushScope()
 		defer e.popScope()
-		return e.Eval(i.Else)
+		return e.eval(i.Else)
 	}
 	return &noneVal{}, nil
 }
@@ -374,7 +376,7 @@ func (e *Evaluator) evalFor(f *parser.ForStmt) (value, error) {
 		return nil, err
 	}
 	for r.next() {
-		val, err := e.Eval(f.Block)
+		val, err := e.eval(f.Block)
 		if err != nil {
 			return nil, err
 		}
@@ -392,7 +394,7 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 	if r, ok := f.Range.(*parser.StepRange); ok {
 		return e.newStepRange(r, f.LoopVar)
 	}
-	rangeVal, err := e.Eval(f.Range)
+	rangeVal, err := e.eval(f.Range)
 	if err != nil {
 		return nil, err
 	}
@@ -456,7 +458,7 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 }
 
 func (e *Evaluator) numValal(n parser.Node) (float64, error) {
-	v, err := e.Eval(n)
+	v, err := e.eval(n)
 	if err != nil {
 		return 0, err
 	}
@@ -477,7 +479,7 @@ func (e *Evaluator) numValalWithDefault(n parser.Node, defaultVal float64) (floa
 func (e *Evaluator) evalConditionalBlock(condBlock *parser.ConditionalBlock) (value, bool, error) {
 	e.pushScope()
 	defer e.popScope()
-	cond, err := e.Eval(condBlock.Condition)
+	cond, err := e.eval(condBlock.Condition)
 	if err != nil {
 		return nil, false, err
 	}
@@ -487,7 +489,7 @@ func (e *Evaluator) evalConditionalBlock(condBlock *parser.ConditionalBlock) (va
 		return nil, false, newErr(condBlock.Condition, err)
 	}
 	if boolCond.V {
-		val, err := e.Eval(condBlock.Block)
+		val, err := e.eval(condBlock.Block)
 		return val, true, err
 	}
 	return nil, false, nil
@@ -508,7 +510,7 @@ func (e *Evaluator) evalExprList(terms []parser.Node) ([]value, error) {
 	result := make([]value, len(terms))
 
 	for i, t := range terms {
-		evaluated, err := e.Eval(t)
+		evaluated, err := e.eval(t)
 		if err != nil {
 			return nil, err
 		}
@@ -519,7 +521,7 @@ func (e *Evaluator) evalExprList(terms []parser.Node) ([]value, error) {
 }
 
 func (e *Evaluator) evalUnaryExpr(expr *parser.UnaryExpression) (value, error) {
-	right, err := e.Eval(expr.Right)
+	right, err := e.eval(expr.Right)
 	if err != nil {
 		return nil, err
 	}
@@ -538,7 +540,7 @@ func (e *Evaluator) evalUnaryExpr(expr *parser.UnaryExpression) (value, error) {
 }
 
 func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (value, error) {
-	left, err := e.Eval(expr.Left)
+	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
 	}
@@ -548,7 +550,7 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (value, error)
 	// short-circuit, it does not matter what "right" is.
 	right := left
 	if !canShortCircuit(expr.Op, left) {
-		right, err = e.Eval(expr.Right)
+		right, err = e.eval(expr.Right)
 		if err != nil {
 			return nil, err
 		}
@@ -669,11 +671,11 @@ func (e *Evaluator) evalTarget(node parser.Node) (value, error) {
 }
 
 func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) (value, error) {
-	left, err := e.Eval(expr.Left)
+	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
 	}
-	index, err := e.Eval(expr.Index)
+	index, err := e.eval(expr.Index)
 	if err != nil {
 		return nil, err
 	}
@@ -703,7 +705,7 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 }
 
 func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (value, error) {
-	left, err := e.Eval(expr.Left)
+	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
 	}
@@ -722,18 +724,18 @@ func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (val
 }
 
 func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (value, error) {
-	left, err := e.Eval(expr.Left)
+	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
 	}
 	var start, end value
 	if expr.Start != nil {
-		if start, err = e.Eval(expr.Start); err != nil {
+		if start, err = e.eval(expr.Start); err != nil {
 			return nil, err
 		}
 	}
 	if expr.End != nil {
-		if end, err = e.Eval(expr.End); err != nil {
+		if end, err = e.eval(expr.End); err != nil {
 			return nil, err
 		}
 	}
@@ -753,7 +755,7 @@ func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (value, error) {
 }
 
 func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
-	left, err := e.Eval(ta.Left)
+	left, err := e.eval(ta.Left)
 	if err != nil {
 		return nil, err
 	}

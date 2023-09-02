@@ -96,8 +96,7 @@ func prepareUI(prog *parser.Program) {
 
 func evaluate(prog *parser.Program, rt *jsRuntime) error {
 	eval = evaluator.NewEvaluator(rt)
-	_, err := eval.Eval(prog)
-	if err != nil {
+	if err := eval.Eval(prog); err != nil {
 		return err
 	}
 	return handleEvents(rt.yielder)

@@ -3,6 +3,7 @@ issues:
   exclude:
     - "^don't use ALL_CAPS"
     - "^ST1003: should not use ALL_CAPS"
+    - "^var-naming: don't use ALL_CAPS"
     - "^G304: Potential file inclusion via variable"
 
 linters:
@@ -34,7 +35,6 @@ linters:
     - nilnil
     - nosnakecase
     - paralleltest
-    - revive
     - scopelint
     - structcheck
     - tagalign

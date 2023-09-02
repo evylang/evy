@@ -23,6 +23,9 @@ type builtins struct {
 	Runtime       Runtime
 }
 
+// BuiltinDecls returns the signatures of all built-in functions and
+// event handlers, as well as predefined global variables, for use by
+// the [parser.Parse] function.
 func BuiltinDecls() parser.Builtins {
 	b := newBuiltins(&UnimplementedRuntime{})
 	return builtinsDeclsFromBuiltins(b)

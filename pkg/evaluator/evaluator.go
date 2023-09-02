@@ -1,6 +1,3 @@
-// Package evaluator evaluates a given syntax tree as created by the
-// parser packages. It also exports a Run and RunWithbuiltings function
-// which creates and calls a Parser.
 package evaluator
 
 import (
@@ -12,6 +9,10 @@ import (
 	"foxygo.at/evy/pkg/parser"
 )
 
+// The Evaluator can return the following sentinel errors:
+//   - ErrStopped is returned when the program has been stopped externally.
+//   - ErrPanic and errors wrapping ErrPanic report runtime errors, such as an index out of bounds error.
+//   - ErrInternal and errors wrapping ErrInternal report internal errors of the evaluator or AST. These errors should not occur.
 var (
 	ErrStopped = errors.New("stopped")
 
@@ -32,32 +33,49 @@ var (
 	ErrAssignmentTarget = fmt.Errorf("%w: bad assignment target", ErrInternal)
 )
 
+// ExitError is returned by [Evaluator.Eval] if Evy's [builtin exit]
+// function is called.
+//
+// [builtin exit]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#exit
 type ExitError int
 
+// Error implements the error interface and returns message containing the exit status.
 func (e ExitError) Error() string {
 	return fmt.Sprintf("exit %d", int(e))
 }
 
+// PanicError is returned by [Evaluator.Eval] if Evy's [builtin panic]
+// function is called or a runtime error occurs.
+//
+// [builtin panic]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#panic
 type PanicError string
 
+// Error implements the error interface and returns the panic message.
 func (e PanicError) Error() string {
 	return string(e)
 }
 
+// Unwrap returns the ErrPanic sentinel error so that it can be used in
+//
+//	errors.Is(err, evaluator.ErrPanic)
 func (e *PanicError) Unwrap() error {
 	return ErrPanic
 }
 
-// Error is an Evy evaluator error.
+// Error is an Evy evaluator error associated with a [lexer.Token] that
+// points to a location in the Evy source code that caused the error.
 type Error struct {
 	err   error
 	Token *lexer.Token
 }
 
+// Error implements the error interface and returns the wrapped error
+// message prefixed with the source location.
 func (e *Error) Error() string {
 	return e.Token.Location() + ": " + e.err.Error()
 }
 
+// Unwrap returns the wrapped error.
 func (e *Error) Unwrap() error {
 	return e.err
 }
@@ -66,6 +84,9 @@ func newErr(node parser.Node, err error) *Error {
 	return &Error{Token: node.Token(), err: err}
 }
 
+// NewEvaluator creates a new Evaluator for a given [Runtime]. Runtimes
+// target different environments, such as the browser or the command
+// line.
 func NewEvaluator(rt Runtime) *Evaluator {
 	builtins := newBuiltins(rt)
 	scope := newScope()
@@ -82,7 +103,18 @@ func NewEvaluator(rt Runtime) *Evaluator {
 	}
 }
 
+// Evaluator is a tree-walking interpreter that directly interprets the
+// AST using the Run and Eval methods. The HandleEvent method can be
+// used to allow the evaluator to handle events. The Evaluator does not
+// preprocess or compile the AST to an intermediate representation,
+// which results in a straightforward implementation that trades off
+// execution performance for simplicity.
 type Evaluator struct {
+	// Stopped flags the evaluation to be stopped.
+	// The unsynchronized access to the Stopped field is safe in WASM because
+	// WASM is a single-threaded environment. TinyGo does not currently support
+	// synchronization in reactor mode, see
+	// https://github.com/tinygo-org/tinygo/issues/2735.
 	Stopped           bool
 	EventHandlerNames []string
 
@@ -94,11 +126,19 @@ type Evaluator struct {
 	global *scope // Global scope
 }
 
+// Event is a generic data structure that is passed to the
+// [Evaluator] through the [Evaluator.HandleEvent] function. The
+// evaluator tries to match the event's name and parameters to an event
+// handler implementation in the Evy source code. If a matching handler
+// is found, it is executed.
 type Event struct {
 	Name   string
 	Params []any
 }
 
+// Run is a convenience function that parses and evaluates a given Evy
+// source code input string. See the [Evaluator] type and
+// [Evaluator.Eval] method for details on evaluation and errors.
 func (e *Evaluator) Run(input string) error {
 	builtins := builtinsDeclsFromBuiltins(e.builtins)
 	prog, err := parser.Parse(input, builtins)
@@ -108,10 +148,24 @@ func (e *Evaluator) Run(input string) error {
 	return e.Eval(prog)
 }
 
+// Yielder is a runtime-implemented mechanism that causes the
+// evaluation process to periodically give up control to the runtime.
+// The Yield method of the Yielder interface is called at the
+// beginning of each evaluation step. This allows the runtime to
+// handle external tasks, such as processing events. For a sample
+// implementation, see the sleepingYielder of the browser environment
+// in the pkg/wasm directory.
 type Yielder interface {
 	Yield()
 }
 
+// Eval evaluates a [parser.Program], which is the root node of the AST.
+// The program's statements are evaluated in order. If a runtime panic
+// occurs, a wrapped [ErrPanic] is returned. If an internal error
+// occurs, a wrapped [ErrInternal] is returned. Evaluation is also
+// stopped if the built-in exit function is called, which results in an
+// [ExitError]. If the evaluator's Stopped flag is externally set to
+// true, evaluation is stopped and [ErrStopped] is returned.
 func (e *Evaluator) Eval(prog *parser.Program) error {
 	_, err := e.eval(prog)
 	return err
@@ -181,6 +235,19 @@ func (e *Evaluator) eval(node parser.Node) (value, error) {
 	return nil, fmt.Errorf("%w: %v", ErrUnknownNode, node)
 }
 
+// HandleEvent is called by an environment's event loop, passing the
+// event ev to be handled. If the event's name and parameters match
+// those of a predefined, built-in event handler signature, and if
+// there is an event handler implementation in the Evy source code with
+// the following signature:
+//
+//	on <event-name> [<event-params>]
+//
+// then the event handler implementation of the Evy source code is executed.
+//
+// For more details, see the [built-in documentation] on event handlers.
+//
+// [built-in documentation]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#event-handlers
 func (e *Evaluator) HandleEvent(ev Event) error {
 	eh := e.eventHandlers[ev.Name]
 	if eh == nil {

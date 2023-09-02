@@ -5,6 +5,17 @@ import (
 	"time"
 )
 
+// The Runtime interface must be implemented by an environment in order
+// to execute Evy source code and Evy builtins. To create a new runtime
+// implementation, you can embed [UnimplementedRuntime] and override
+// the methods that your runtime can provide. For example, there is a
+// jsRuntime implementation for the browser, which has full support for
+// all graphics built-in functions. There is also a command-line
+// environment implementation, which does not have graphics function
+// support. For more details on the built-in functions, see the
+// [built-ins documentation].
+//
+// [built-ins documentation]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md
 type Runtime interface {
 	GraphicsRuntime
 	Print(string)
@@ -14,6 +25,11 @@ type Runtime interface {
 	Yielder() Yielder
 }
 
+// The GraphicsRuntime interface contains all methods that are required
+// by the graphics built-ins. For more details see the
+// [graphics built-ins] documentation.
+//
+// [graphics built-ins]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#graphics
 type GraphicsRuntime interface {
 	Move(x, y float64)
 	Line(x, y float64)
@@ -48,10 +64,12 @@ type GraphicsRuntime interface {
 	Gridn(unit float64, color string)
 }
 
+// UnimplementedRuntime implements Runtime with no-ops and prints a "<func> not implemented" message.
 type UnimplementedRuntime struct {
 	print func(string)
 }
 
+// Print prints to os.Stdout.
 func (rt *UnimplementedRuntime) Print(s string) {
 	if rt.print != nil {
 		rt.print(s)
@@ -64,25 +82,64 @@ func (rt *UnimplementedRuntime) unimplemented(s string) {
 	rt.Print(fmt.Sprintf("%q not implemented\n", s))
 }
 
-func (rt *UnimplementedRuntime) Cls()                  { rt.unimplemented("cls") }
-func (rt *UnimplementedRuntime) Read() string          { rt.unimplemented("read"); return "" }
-func (rt *UnimplementedRuntime) Sleep(time.Duration)   { rt.unimplemented("sleep") }
-func (rt *UnimplementedRuntime) Yielder() Yielder      { rt.unimplemented("yielder"); return nil }
+// Cls is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Cls() { rt.unimplemented("cls") }
+
+// Read is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Read() string { rt.unimplemented("read"); return "" }
+
+// Sleep is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Sleep(time.Duration) { rt.unimplemented("sleep") }
+
+// Yielder is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Yielder() Yielder { rt.unimplemented("yielder"); return nil }
+
+// Move is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Move(float64, float64) { rt.unimplemented("move") }
+
+// Line is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Line(float64, float64) { rt.unimplemented("line") }
+
+// Rect is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Rect(float64, float64) { rt.unimplemented("rect") }
-func (rt *UnimplementedRuntime) Circle(float64)        { rt.unimplemented("circle") }
-func (rt *UnimplementedRuntime) Width(float64)         { rt.unimplemented("width") }
-func (rt *UnimplementedRuntime) Color(string)          { rt.unimplemented("color") }
-func (rt *UnimplementedRuntime) Clear(string)          { rt.unimplemented("clear") }
+
+// Circle is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Circle(float64) { rt.unimplemented("circle") }
+
+// Width is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Width(float64) { rt.unimplemented("width") }
+
+// Color is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Color(string) { rt.unimplemented("color") }
+
+// Clear is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Clear(string) { rt.unimplemented("clear") }
+
+// Gridn is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Gridn(float64, string) { rt.unimplemented("gridn") }
-func (rt *UnimplementedRuntime) Poly([][]float64)      { rt.unimplemented("poly") }
-func (rt *UnimplementedRuntime) Stroke(string)         { rt.unimplemented("stroke") }
-func (rt *UnimplementedRuntime) Fill(string)           { rt.unimplemented("fill") }
-func (rt *UnimplementedRuntime) Dash([]float64)        { rt.unimplemented("dash") }
-func (rt *UnimplementedRuntime) Linecap(string)        { rt.unimplemented("linecap") }
-func (rt *UnimplementedRuntime) Text(string)           { rt.unimplemented("text") }
-func (rt *UnimplementedRuntime) Font(map[string]any)   { rt.unimplemented("font") }
+
+// Poly is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Poly([][]float64) { rt.unimplemented("poly") }
+
+// Stroke is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Stroke(string) { rt.unimplemented("stroke") }
+
+// Fill is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Fill(string) { rt.unimplemented("fill") }
+
+// Dash is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Dash([]float64) { rt.unimplemented("dash") }
+
+// Linecap is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Linecap(string) { rt.unimplemented("linecap") }
+
+// Text is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Text(string) { rt.unimplemented("text") }
+
+// Font is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Font(map[string]any) { rt.unimplemented("font") }
+
+// Ellipse is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Ellipse(float64, float64, float64, float64, float64, float64, float64) {
 	rt.unimplemented("ellipse")
 }

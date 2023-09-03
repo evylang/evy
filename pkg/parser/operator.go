@@ -88,7 +88,3 @@ func op(tok *lexer.Token) Operator {
 func (o Operator) String() string {
 	return operatorStrings[o]
 }
-
-func (o Operator) GoString() string {
-	return o.String()
-}

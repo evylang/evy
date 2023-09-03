@@ -68,8 +68,8 @@ func (f *formatting) format(n Node) {
 		f.formatForStmt(n)
 	case *ReturnStmt:
 		f.formatReturnStmt(n)
-	case *FuncDeclStmt:
-		f.formatFuncDeclStmt(n)
+	case *FuncDefStmt:
+		f.formatFuncDefStmt(n)
 	case *FuncCallStmt:
 		f.format(n.FuncCall)
 		f.writeComment(n)
@@ -126,7 +126,7 @@ func (f *formatting) format(n Node) {
 		f.write("(")
 		f.format(n.Expr)
 		f.write(")")
-	case *Bool:
+	case *BoolLiteral:
 		f.write(n.String())
 	case *NumLiteral:
 		f.write(n.String())
@@ -209,7 +209,7 @@ func (f *formatting) formatReturnStmt(s *ReturnStmt) {
 	f.writeComment(s)
 }
 
-func (f *formatting) formatFuncDeclStmt(s *FuncDeclStmt) {
+func (f *formatting) formatFuncDefStmt(s *FuncDefStmt) {
 	f.writes("func ", s.Name)
 	if s.ReturnType != NONE_TYPE {
 		f.write(":")

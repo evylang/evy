@@ -76,15 +76,21 @@ func parse(input string, rt evaluator.Runtime) (*parser.Program, error) {
 	builtins := evaluator.DefaultBuiltins(rt).ParserBuiltins()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
-		return nil, parser.TruncateError(err, 8)
+		var parseErrors parser.Errors
+		if errors.As(err, &parseErrors) {
+			err = parseErrors.Truncate(8)
+		}
+		return nil, err
 	}
 	return prog, nil
 }
 
 func prepareUI(prog *parser.Program) {
-	funcNames := prog.CalledBuiltinFuncs
-	eventHandlerNames := parser.EventHandlerNames(prog.EventHandlers)
-	names := append(funcNames, eventHandlerNames...)
+	names := make([]string, 0, len(prog.CalledBuiltinFuncs)+len(prog.EventHandlers))
+	names = append(names, prog.CalledBuiltinFuncs...)
+	for name := range prog.EventHandlers {
+		names = append(names, name)
+	}
 	jsPrepareUI(strings.Join(names, ","))
 }
 
@@ -99,10 +105,10 @@ func evaluate(prog *parser.Program, rt *jsRuntime) error {
 }
 
 func handleEvents(yielder *sleepingYielder) error {
-	if eval == nil || len(eval.EventHandlerNames()) == 0 {
+	if eval == nil || len(eval.EventHandlerNames) == 0 {
 		return nil
 	}
-	for _, name := range eval.EventHandlerNames() {
+	for _, name := range eval.EventHandlerNames {
 		registerEventHandler(name)
 	}
 	for {

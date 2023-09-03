@@ -7,7 +7,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -16,7 +15,7 @@ import (
 )
 
 type Builtins struct {
-	Funcs         map[string]*FuncDeclStmt
+	Funcs         map[string]*FuncDefStmt
 	EventHandlers map[string]*EventHandlerStmt
 	Globals       map[string]*Var
 }
@@ -50,14 +49,6 @@ func (e Errors) Truncate(length int) Errors {
 	return e[:length]
 }
 
-func TruncateError(err error, length int) error {
-	var parseErrors Errors
-	if errors.As(err, &parseErrors) {
-		return parseErrors.Truncate(8)
-	}
-	return err
-}
-
 // Error is an Evy parse error.
 type Error struct {
 	message string
@@ -77,7 +68,7 @@ type parser struct {
 
 	tokens        []*lexer.Token
 	builtins      Builtins
-	funcs         map[string]*FuncDeclStmt     // all function declarations by name
+	funcs         map[string]*FuncDefStmt      // all function declarations by name
 	eventHandlers map[string]*EventHandlerStmt // all event handler declarations by name
 
 	scope      *scope // Current top of scope stack
@@ -88,14 +79,14 @@ type parser struct {
 func newParser(input string, builtins Builtins) *parser {
 	l := lexer.New(input)
 	p := &parser{
-		funcs:         map[string]*FuncDeclStmt{},
+		funcs:         map[string]*FuncDefStmt{},
 		eventHandlers: map[string]*EventHandlerStmt{},
 		wssStack:      []bool{false},
 		builtins:      builtins,
 		formatting:    newFormatting(),
 	}
-	for name, funcDecl := range builtins.Funcs {
-		fd := *funcDecl
+	for name, funcDef := range builtins.Funcs {
+		fd := *funcDef
 		p.funcs[name] = &fd
 	}
 	funcs := p.consumeTokens(l)
@@ -133,7 +124,7 @@ func (p *parser) consumeTokens(l *lexer.Lexer) []int {
 func (p *parser) parseFuncSignatures(funcs []int) {
 	for _, i := range funcs {
 		p.advanceTo(i)
-		fd := p.parseFuncDeclSignature()
+		fd := p.parseFuncDefSignature()
 		if p.builtins.Globals[fd.Name] != nil {
 			// We still go on to add `fd` to the funcs map so that the
 			// function can be parsed correctly even though it has an invalid name.
@@ -175,12 +166,12 @@ func (p *parser) parseProgram() *Program {
 		default:
 			tok := p.cur
 			stmt = p.parseStatement()
-			if stmt != nil && program.AlwaysTerminates() {
+			if stmt != nil && program.alwaysTerminates() {
 				p.appendErrorForToken("unreachable code", tok)
 				stmt = nil
 			}
-			if alwaysTerminates(stmt) {
-				program.alwaysTerminates = true
+			if alwaysTerms(stmt) {
+				program.alwaysTerms = true
 			}
 		}
 		if stmt != nil {
@@ -224,7 +215,7 @@ func (p *parser) parseFunc() Node {
 		p.appendError(fmt.Sprintf("redeclaration of function %q", funcName))
 		return nil
 	}
-	if fd.ReturnType != NONE_TYPE && !block.AlwaysTerminates() {
+	if fd.ReturnType != NONE_TYPE && !block.alwaysTerminates() {
 		p.appendError("missing return")
 	}
 	p.assertEnd()
@@ -235,7 +226,7 @@ func (p *parser) parseFunc() Node {
 	return fd
 }
 
-func (p *parser) addParamsToScope(fd *FuncDeclStmt) {
+func (p *parser) addParamsToScope(fd *FuncDefStmt) {
 	for _, param := range fd.Params {
 		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		p.scope.set(param.Name, param)
@@ -384,7 +375,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		p.advancePastNL()
 		return nil
 	}
-	if !target.Type().Accepts(value.Type()) {
+	if !target.Type().accepts(value.Type()) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	}
@@ -427,8 +418,8 @@ func (p *parser) parseAssignmentTarget() Node {
 	return n
 }
 
-func (p *parser) parseFuncDeclSignature() *FuncDeclStmt {
-	fd := &FuncDeclStmt{token: p.cur, ReturnType: NONE_TYPE}
+func (p *parser) parseFuncDefSignature() *FuncDefStmt {
+	fd := &FuncDefStmt{token: p.cur, ReturnType: NONE_TYPE}
 	p.advance() // advance past FUNC
 	if !p.assertToken(lexer.IDENT) {
 		p.advancePastNL()
@@ -540,7 +531,7 @@ func (p *parser) parseInferredDeclStatement() Node {
 		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
-	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
+	decl.Var.T = val.Type().infer() // assign ANY to sub_type to empty arrays and maps.
 	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
@@ -569,13 +560,13 @@ func (p *parser) parseFunCallStatement() Node {
 	return fcs
 }
 
-func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
+func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	funcName := decl.Name
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
-			if !paramType.Accepts(argType) && !paramType.Matches(argType) {
+			if !paramType.accepts(argType) && !paramType.Matches(argType) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			}
@@ -594,7 +585,7 @@ func (p *parser) assertArgTypes(decl *FuncDeclStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.Accepts(argType) && !paramType.Matches(argType) {
+		if !paramType.accepts(argType) && !paramType.Matches(argType) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}
@@ -677,14 +668,14 @@ func (p *parser) parseBlockWithEndTokens(endTokens map[lexer.TokenType]bool) *Bl
 		if stmt == nil {
 			continue
 		}
-		if block.AlwaysTerminates() {
+		if block.alwaysTerminates() {
 			if _, ok := stmt.(*EmptyStmt); !ok {
 				p.appendErrorForToken("unreachable code", tok)
 				continue
 			}
 		}
-		if alwaysTerminates(stmt) {
-			block.alwaysTerminates = true
+		if alwaysTerms(stmt) {
+			block.alwaysTerms = true
 		}
 		block.Statements = append(block.Statements, stmt)
 	}
@@ -786,7 +777,7 @@ func (p *parser) parseReturnStatement() Node {
 	}
 	if p.scope.returnType == nil {
 		p.appendErrorForToken("return statement not allowed here", retValueToken)
-	} else if !p.scope.returnType.Accepts(ret.T) {
+	} else if !p.scope.returnType.accepts(ret.T) {
 		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
 		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()
@@ -853,7 +844,7 @@ func (p *parser) parseForStatement() Node {
 		forNode.Range = n
 	case ARRAY:
 		if forNode.LoopVar != nil {
-			forNode.LoopVar.T = t.Infer().Sub
+			forNode.LoopVar.T = t.infer().Sub
 		}
 		forNode.Range = n
 	case NUM:
@@ -1030,18 +1021,10 @@ func (p *parser) curComment() string {
 
 func (p *parser) calledBuiltinFuncs() []string {
 	var funcs []string
-	for name, funcDecl := range p.funcs {
-		if _, ok := p.builtins.Funcs[name]; ok && funcDecl.isCalled {
+	for name, funcDef := range p.funcs {
+		if _, ok := p.builtins.Funcs[name]; ok && funcDef.isCalled {
 			funcs = append(funcs, name)
 		}
 	}
 	return funcs
-}
-
-func EventHandlerNames(eventHandlers map[string]*EventHandlerStmt) []string {
-	names := make([]string, 0, len(eventHandlers))
-	for name := range eventHandlers {
-		names = append(names, name)
-	}
-	return names
 }

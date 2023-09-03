@@ -23,6 +23,8 @@ type Token struct {
 // operator [PLUS] or literal [NUM_LIT].
 type TokenType int
 
+// Token types are represented as constants and are the core field of
+// the [Token] struct type.
 const (
 	ILLEGAL TokenType = iota
 	EOF

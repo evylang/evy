@@ -82,7 +82,9 @@ func NewEvaluator(builtins Builtins) *Evaluator {
 }
 
 type Evaluator struct {
-	Stopped       bool
+	Stopped           bool
+	EventHandlerNames []string
+
 	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	builtins      Builtins
 	eventHandlers map[string]*parser.EventHandlerStmt
@@ -134,7 +136,7 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 		return &Num{Val: node.Value}, nil
 	case *parser.StringLiteral:
 		return &String{Val: node.Value}, nil
-	case *parser.Bool:
+	case *parser.BoolLiteral:
 		return e.evalBool(node), nil
 	case *parser.ArrayLiteral:
 		return e.evalArrayLiteral(node)
@@ -170,14 +172,10 @@ func (e *Evaluator) Eval(node parser.Node) (Value, error) {
 		return e.Eval(node.Expr)
 	case *parser.TypeAssertion:
 		return e.evalTypeAssertion(node)
-	case *parser.FuncDeclStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
+	case *parser.FuncDefStmt, *parser.EventHandlerStmt, *parser.EmptyStmt:
 		return &None{}, nil
 	}
 	return nil, fmt.Errorf("%w: %v", ErrUnknownNode, node)
-}
-
-func (e *Evaluator) EventHandlerNames() []string {
-	return parser.EventHandlerNames(e.eventHandlers)
 }
 
 func (e *Evaluator) HandleEvent(ev Event) error {
@@ -210,6 +208,10 @@ func (e *Evaluator) yield() {
 
 func (e *Evaluator) evalProgram(program *parser.Program) (Value, error) {
 	e.eventHandlers = program.EventHandlers
+	e.EventHandlerNames = make([]string, 0, len(e.eventHandlers))
+	for name := range e.eventHandlers {
+		e.EventHandlerNames = append(e.EventHandlerNames, name)
+	}
 	return e.evalStatments(program.Statements)
 }
 
@@ -228,7 +230,7 @@ func (e *Evaluator) evalStatments(statements []parser.Node) (Value, error) {
 	return result, nil
 }
 
-func (e *Evaluator) evalBool(b *parser.Bool) Value {
+func (e *Evaluator) evalBool(b *parser.BoolLiteral) Value {
 	return &Bool{Val: b.Value}
 }
 
@@ -296,7 +298,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (Value, error) {
 	defer restoreScope()
 
 	// Add func args to scope
-	fd := funcCall.FuncDecl
+	fd := funcCall.FuncDef
 	for i, param := range fd.Params {
 		e.scope.set(param.Name, args[i], param.Type())
 	}

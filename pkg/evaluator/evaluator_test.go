@@ -291,6 +291,7 @@ func TestAnyArray(t *testing.T) {
 	prog := `
 x:[]any
 x = [1 2 true]
+// TODO: x = [true]
 print x
 x[1] = [3 4 5]
 print x
@@ -306,6 +307,7 @@ x:[][]any
 a:any
 a = 1
 x = [[a 2 true]]
+// TODO: x = [[true]]
 print x
 a = 5
 x[0][1] = [3 4 a]
@@ -319,6 +321,7 @@ print x
 func TestAnyMap(t *testing.T) {
 	prog := `
 x:{}any
+// TODO: x = {a:true} print (typeof x)
 x = {a:1 b:2 c:true}
 print x
 x.b = [3 4 5]
@@ -334,6 +337,7 @@ func TestNestedAnyMap(t *testing.T) {
 x:{}{}any
 a:any
 a = 1
+//TODO: x = {A:{A:true}} print (typeof x)
 x = {A:{A:a B:2 C:true}}
 print x
 a = 5
@@ -430,6 +434,17 @@ typeof: []{}any
 typeof: [][]num
 typeof: bool
 `[1:]
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestAnyCompositeVar(t *testing.T) {
+	prog := `m:{}any
+m = {a:true}
+print (typeof m) m
+m = {a:1 b:2 c:true}
+`
+	want := "{}any {a:true}\n"
 	got := run(prog)
 	assert.Equal(t, want, got)
 }

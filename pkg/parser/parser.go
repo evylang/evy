@@ -378,7 +378,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		p.advancePastNL()
 		return nil
 	}
-	if !target.Type().accepts(value.Type()) {
+	if !accepts(target.Type(), value) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	}
@@ -569,7 +569,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
-			if !paramType.accepts(argType) {
+			if !accepts(paramType, arg) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			}
@@ -588,11 +588,24 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.accepts(argType) {
+		if !accepts(paramType, arg) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}
 	}
+}
+
+func accepts(paramType *Type, arg Node) bool {
+	if paramType == NONE_TYPE && arg == nil {
+		return true // used with bare returns in parseReturnStatement.
+	}
+	argType := arg.Type()
+	_, aok := arg.(*ArrayLiteral)
+	_, mok := arg.(*MapLiteral)
+	if aok || mok {
+		return paramType.acceptsLit(argType)
+	}
+	return paramType.accepts(argType)
 }
 
 func (p *parser) advancePastNL() {
@@ -778,13 +791,17 @@ func (p *parser) parseReturnStatement() Node {
 			p.assertEOL()
 		}
 	}
-	if p.scope.returnType == nil {
+	expectedType := p.scope.returnType
+	switch {
+	case expectedType == nil:
 		p.appendErrorForToken("return statement not allowed here", retValueToken)
-	} else if !p.scope.returnType.accepts(ret.T) {
-		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
-		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
-			msg = "expected no return value, found " + ret.T.String()
-		}
+	case ret.T == ILLEGAL_TYPE:
+		break // error already reported
+	case expectedType == NONE_TYPE && ret.T != NONE_TYPE:
+		msg := "expected no return value, found " + ret.T.String()
+		p.appendErrorForToken(msg, retValueToken)
+	case !accepts(expectedType, ret.Value):
+		msg := "expected return value of type " + expectedType.String() + ", found " + ret.T.String()
 		p.appendErrorForToken(msg, retValueToken)
 	}
 	p.recordComment(ret)

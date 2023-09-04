@@ -109,6 +109,20 @@ func (t *Type) accepts(t2 *Type) bool {
 	return t.matches(t2) || t == ANY_TYPE
 }
 
+func (t *Type) acceptsLit(litType *Type) bool {
+	if t.accepts(litType) {
+		return true
+	}
+	if !t.sameComposite(litType) {
+		return false
+	}
+	return t.Sub.acceptsLit(litType.Sub)
+}
+
+func (t *Type) sameComposite(t2 *Type) bool {
+	return (t.Name == ARRAY && t2.Name == ARRAY) || (t.Name == MAP && t2.Name == MAP)
+}
+
 // Matches returns true if the two types are equal, or if one is a
 // untyped array and the other is a specific array, or if one is a
 // untyped map and the other is a specific map. This is useful for type

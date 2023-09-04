@@ -464,7 +464,7 @@ func (p *parser) combineTypes(types []*Type) *Type {
 		// same composite types can be combined, for instance
 		// []string and []num become []any in
 		// {a:["X" "Y"] b:[1 2]}
-		if t.Name == ARRAY && combinedT.Name == ARRAY || t.Name == MAP && combinedT.Name == MAP {
+		if t.sameComposite(combinedT) {
 			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
 			continue
 		}

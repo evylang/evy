@@ -534,7 +534,7 @@ func (p *parser) parseInferredDeclStatement() Node {
 		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
-	decl.Var.T = val.Type().infer() // assign ANY to sub_type to empty arrays and maps.
+	decl.Var.T = val.Type().Infer() // assign ANY to sub_type to empty arrays and maps.
 	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
@@ -847,7 +847,7 @@ func (p *parser) parseForStatement() Node {
 		forNode.Range = n
 	case ARRAY:
 		if forNode.LoopVar != nil {
-			forNode.LoopVar.T = t.infer().Sub
+			forNode.LoopVar.T = t.Infer().Sub
 		}
 		forNode.Range = n
 	case NUM:

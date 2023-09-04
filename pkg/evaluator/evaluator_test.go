@@ -345,6 +345,95 @@ print x
 	assert.Equal(t, want, got)
 }
 
+func TestAnyParamType(t *testing.T) {
+	prog := `
+func f a:any
+    if (typeof a) == "num"
+        n := a.(num)
+        print "num" n
+    else if (typeof a) == "[]num"
+        na := a.([]num)
+        print "[]num" na
+    else if (typeof a) == "[]any"
+        aa := a.([]any)
+        print "[]any" aa
+    else if (typeof a) == "[][]any"
+        aa := a.([][]any)
+        print "[][]any" aa
+    else
+        print "typeof:" (typeof a)
+    end
+end
+f 1
+f [1 2]
+f []
+f [[] {}]
+f [[]]
+f [{}]
+f [[1]]
+a:any
+f a
+`
+	want := `
+num 1
+[]num [1 2]
+[]any []
+[]any [[] {}]
+[][]any [[]]
+typeof: []{}any
+typeof: [][]num
+typeof: bool
+`[1:]
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestAnyVariadicParamType(t *testing.T) {
+	prog := `
+func f a:any...
+    if (len a) == 0
+        print "no args"
+        return
+    else if (typeof a[0]) == "num"
+        n := a[0].(num)
+        print "num" n
+    else if (typeof a[0]) == "[]num"
+        na := a[0].([]num)
+        print "[]num" na
+    else if (typeof a[0]) == "[]any"
+        aa := a[0].([]any)
+        print "[]any" aa
+    else if (typeof a[0]) == "[][]any"
+        aa := a[0].([][]any)
+        print "[][]any" aa
+    else
+        print "typeof:" (typeof a[0])
+    end
+end
+f 1
+f [1 2]
+f []
+f [[] {}]
+f [[]]
+f [{}]
+f [[1]]
+a:any
+f a
+`
+	want := `
+num 1
+[]num [1 2]
+[]any []
+[]any [[] {}]
+[][]any [[]]
+typeof: []{}any
+typeof: [][]num
+typeof: bool
+`[1:]
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestIf(t *testing.T) {
 	tests := []string{
 		`
@@ -1174,6 +1263,7 @@ func TestTypeof(t *testing.T) {
 		"a := [] + [true]":         "[]bool",
 		"a := [[] [1] []]":         "[][]num",
 		"a := [[[]] [[1]] [[]]]":   "[][][]num",
+		"a := [[]]":                "[][]any",
 	}
 	for in, want := range tests {
 		in, want := in, want

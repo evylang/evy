@@ -456,7 +456,7 @@ func (p *parser) combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
 		if combinedT.accepts(t) {
-			if combinedT.isUntyped() {
+			if combinedT.IsUntyped() {
 				combinedT = t
 			}
 			continue

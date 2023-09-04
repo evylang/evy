@@ -378,10 +378,15 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 	// Add func args to scope
 	fd := funcCall.FuncDef
 	for i, param := range fd.Params {
-		e.scope.set(param.Name, args[i], param.Type())
+		typedArg := typeArg(args[i], param.Type())
+		e.scope.set(param.Name, typedArg, param.Type())
 	}
 	if fd.VariadicParam != nil {
-		varArg := &arrayVal{Elements: &args, T: fd.VariadicParamType}
+		typedArgs := make([]value, len(args))
+		for i, arg := range args {
+			typedArgs[i] = typeArg(arg, fd.VariadicParamType.Sub)
+		}
+		varArg := &arrayVal{Elements: &typedArgs, T: fd.VariadicParamType}
 		e.scope.set(fd.VariadicParam.Name, varArg, fd.VariadicParamType)
 	}
 
@@ -393,6 +398,33 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 		return returnValalue.V, nil
 	}
 	return &noneVal{}, nil
+}
+
+func typeArg(arg value, paramType *parser.Type) value {
+	argType := arg.Type()
+	if argType.Equals(paramType) {
+		return arg
+	}
+	if argType.IsUntyped() && paramType.Name == parser.ARRAY {
+		arg.(*arrayVal).T = paramType
+		return arg
+	}
+	if argType.IsUntyped() && paramType.Name == parser.MAP {
+		arg.(*mapVal).T = paramType
+		return arg
+	}
+	if paramType == parser.ANY_TYPE {
+		if argType.IsUntyped() {
+			switch a := arg.(type) {
+			case *arrayVal:
+				a.T = a.T.Infer()
+			case *mapVal:
+				a.T = a.T.Infer()
+			}
+		}
+		return &anyVal{V: arg}
+	}
+	panic(fmt.Sprintf("typeArg: cannot convert argument of type %v to required parameter type %v", argType, paramType))
 }
 
 func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) (value, error) {

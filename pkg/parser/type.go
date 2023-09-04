@@ -142,7 +142,9 @@ func (t *Type) matches(t2 *Type) bool {
 	return t.Sub.matches(t2.Sub)
 }
 
-func (t *Type) infer() *Type {
+// Infer returns the default inferred type of an empty composite type.
+// For example, [] becomes []any, and {{}} becomes {}{}any.
+func (t *Type) Infer() *Type {
 	if t.Name != ARRAY && t.Name != MAP {
 		return t
 	}
@@ -152,16 +154,22 @@ func (t *Type) infer() *Type {
 		t2.Sub = ANY_TYPE
 		return &t2
 	}
-	t.Sub = t.Sub.infer()
+	t.Sub = t.Sub.Infer()
 	return t
 }
 
-func (t *Type) isUntyped() bool {
+// IsUntyped returns true if the type is an untyped array, an untyped map
+// or a combination. It returns true for the following literals:
+//
+// [], {}, [[]], [{}]
+//
+// However, it returns false for a variable of type []any or [[] {}].
+func (t *Type) IsUntyped() bool {
 	if t.Name != ARRAY && t.Name != MAP {
 		return false
 	}
 	if t.Sub == NONE_TYPE {
 		return true
 	}
-	return t.Sub.isUntyped()
+	return t.Sub.IsUntyped()
 }

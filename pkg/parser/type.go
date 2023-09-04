@@ -179,11 +179,16 @@ func (t *Type) Infer() *Type {
 //
 // However, it returns false for a variable of type []any or [[] {}].
 func (t *Type) IsUntyped() bool {
-	if t.Name != ARRAY && t.Name != MAP {
+	if !t.IsComposite() {
 		return false
 	}
 	if t.Sub == NONE_TYPE {
 		return true
 	}
 	return t.Sub.IsUntyped()
+}
+
+// IsComposite returns true if the type is an array or a map.
+func (t *Type) IsComposite() bool {
+	return t.Name == ARRAY || t.Name == MAP
 }

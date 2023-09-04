@@ -600,9 +600,7 @@ func accepts(paramType *Type, arg Node) bool {
 		return true // used with bare returns in parseReturnStatement.
 	}
 	argType := arg.Type()
-	_, aok := arg.(*ArrayLiteral)
-	_, mok := arg.(*MapLiteral)
-	if aok || mok {
+	if IsCompositeLiteral(arg) {
 		return paramType.acceptsLit(argType)
 	}
 	return paramType.accepts(argType)

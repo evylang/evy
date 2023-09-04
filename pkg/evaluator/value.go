@@ -240,6 +240,15 @@ func (a *arrayVal) Slice(start, end value) (value, error) {
 	return &arrayVal{Elements: &elements, T: a.T}, nil
 }
 
+func (a *arrayVal) anyWrap() {
+	a.T = &parser.Type{Name: parser.ARRAY, Sub: parser.ANY_TYPE}
+	for i, v := range *a.Elements {
+		if _, ok := v.(*anyVal); !ok {
+			(*a.Elements)[i] = &anyVal{V: v}
+		}
+	}
+}
+
 // copyOrRef is a copy of the input value for basic types and a
 // reference to the value for composite types (arrays and maps).
 func copyOrRef(val value) value {
@@ -323,6 +332,15 @@ func (m *mapVal) Delete(key string) {
 		if k == key {
 			*m.Order = append((*m.Order)[:i], (*m.Order)[i+1:]...)
 			break
+		}
+	}
+}
+
+func (m *mapVal) anyWrap() {
+	m.T = &parser.Type{Name: parser.MAP, Sub: parser.ANY_TYPE}
+	for key, v := range m.Pairs {
+		if _, ok := v.(*anyVal); !ok {
+			m.Pairs[key] = &anyVal{V: v}
 		}
 	}
 }

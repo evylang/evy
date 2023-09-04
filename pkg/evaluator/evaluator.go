@@ -321,8 +321,45 @@ func (e *Evaluator) evalAssignment(assignment *parser.AssignmentStmt) error {
 	if err != nil {
 		return err
 	}
+	targetType := target.Type()
+	if targetType != parser.ANY_TYPE && !targetType.Equals(val.Type()) {
+		if !parser.IsCompositeLiteral(assignment.Value) || !targetType.IsComposite() {
+			err := fmt.Errorf("%w: assignment type miss-match: %s != %s", ErrType, targetType, val.Type())
+			return newErr(assignment, err)
+		}
+		anyWrapCompositeLit(val, targetType)
+	}
+
 	target.Set(val)
 	return nil
+}
+
+func anyWrapCompositeLit(compositeVal value, targetType *parser.Type) {
+	if targetType.Sub == nil {
+		panic("anyWrapCompositeLit: nil target type")
+	}
+	switch v := compositeVal.(type) {
+	case *arrayVal:
+		if targetType.Sub == parser.ANY_TYPE {
+			v.anyWrap()
+		} else {
+			v.T = targetType
+			for _, el := range *v.Elements {
+				anyWrapCompositeLit(el, targetType.Sub)
+			}
+		}
+	case *mapVal:
+		if targetType.Sub == parser.ANY_TYPE {
+			v.anyWrap()
+		} else {
+			v.T = targetType
+			for _, mv := range v.Pairs {
+				anyWrapCompositeLit(mv, targetType.Sub)
+			}
+		}
+	default:
+		panic("anyWrapCompositeLit: not a composite " + v.Type().String())
+	}
 }
 
 func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
@@ -330,14 +367,11 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
 	if err != nil {
 		return nil, err
 	}
-	if arr.T.Sub.Name == parser.ANY {
-		for i, e := range elements {
-			if _, ok := e.(*anyVal); !ok {
-				elements[i] = &anyVal{V: e}
-			}
-		}
+	arrVal := &arrayVal{Elements: &elements, T: arr.T}
+	if arr.T.Sub == parser.ANY_TYPE {
+		arrVal.anyWrap()
 	}
-	return &arrayVal{Elements: &elements, T: arr.T}, nil
+	return arrVal, nil
 }
 
 func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
@@ -347,16 +381,15 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
 		if err != nil {
 			return nil, err
 		}
-		if m.T.Sub.Name == parser.ANY {
-			if _, ok := val.(*anyVal); !ok {
-				val = &anyVal{V: val}
-			}
-		}
 		pairs[key] = copyOrRef(val)
 	}
 	order := make([]string, len(m.Order))
 	copy(order, m.Order)
-	return &mapVal{Pairs: pairs, Order: &order, T: m.T}, nil
+	mVal := &mapVal{Pairs: pairs, Order: &order, T: m.T}
+	if m.T.Sub == parser.ANY_TYPE {
+		mVal.anyWrap()
+	}
+	return mVal, nil
 }
 
 func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
@@ -402,18 +435,16 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 
 func typeArg(arg value, paramType *parser.Type) value {
 	argType := arg.Type()
-	if argType.Equals(paramType) {
+	switch {
+	case argType.Equals(paramType):
 		return arg
-	}
-	if argType.IsUntyped() && paramType.Name == parser.ARRAY {
+	case argType.IsUntyped() && paramType.Name == parser.ARRAY:
 		arg.(*arrayVal).T = paramType
 		return arg
-	}
-	if argType.IsUntyped() && paramType.Name == parser.MAP {
+	case argType.IsUntyped() && paramType.Name == parser.MAP:
 		arg.(*mapVal).T = paramType
 		return arg
-	}
-	if paramType == parser.ANY_TYPE {
+	case paramType == parser.ANY_TYPE:
 		if argType.IsUntyped() {
 			switch a := arg.(type) {
 			case *arrayVal:
@@ -423,8 +454,13 @@ func typeArg(arg value, paramType *parser.Type) value {
 			}
 		}
 		return &anyVal{V: arg}
+	default:
+		if !paramType.IsComposite() {
+			panic(fmt.Sprintf("typeArg: cannot convert argument of type %v to required parameter type %v", argType, paramType))
+		}
+		anyWrapCompositeLit(arg, paramType)
+		return arg
 	}
-	panic(fmt.Sprintf("typeArg: cannot convert argument of type %v to required parameter type %v", argType, paramType))
 }
 
 func (e *Evaluator) evalReturn(ret *parser.ReturnStmt) (value, error) {

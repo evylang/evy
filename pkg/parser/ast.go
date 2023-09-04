@@ -1044,6 +1044,14 @@ func (m *MapLiteral) Type() *Type {
 	return m.T
 }
 
+// IsCompositeLiteral returns true if the node is an array or map
+// literal.
+func IsCompositeLiteral(n Node) bool {
+	_, aok := n.(*ArrayLiteral)
+	_, mok := n.(*MapLiteral)
+	return aok || mok
+}
+
 func newlineList(nodes []Node) string {
 	lines := make([]string, len(nodes))
 	for i, n := range nodes {

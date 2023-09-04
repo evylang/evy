@@ -287,6 +287,64 @@ print "6" f4==f1
 	assert.Equal(t, want, got)
 }
 
+func TestAnyArray(t *testing.T) {
+	prog := `
+x:[]any
+x = [1 2 true]
+print x
+x[1] = [3 4 5]
+print x
+`
+	want := "[1 2 true]\n[1 [3 4 5] true]\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestNestedAnyArray(t *testing.T) {
+	prog := `
+x:[][]any
+a:any
+a = 1
+x = [[a 2 true]]
+print x
+a = 5
+x[0][1] = [3 4 a]
+print x
+`
+	want := "[[1 2 true]]\n[[1 [3 4 5] true]]\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestAnyMap(t *testing.T) {
+	prog := `
+x:{}any
+x = {a:1 b:2 c:true}
+print x
+x.b = [3 4 5]
+print x
+`
+	want := "{a:1 b:2 c:true}\n{a:1 b:[3 4 5] c:true}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestNestedAnyMap(t *testing.T) {
+	prog := `
+x:{}{}any
+a:any
+a = 1
+x = {A:{A:a B:2 C:true}}
+print x
+a = 5
+x.A.B = [3 4 a]
+print x
+`
+	want := "{A:{A:1 B:2 C:true}}\n{A:{A:1 B:[3 4 5] C:true}}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestIf(t *testing.T) {
 	tests := []string{
 		`

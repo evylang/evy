@@ -330,6 +330,13 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
 	if err != nil {
 		return nil, err
 	}
+	if arr.T.Sub.Name == parser.ANY {
+		for i, e := range elements {
+			if _, ok := e.(*anyVal); !ok {
+				elements[i] = &anyVal{V: e}
+			}
+		}
+	}
 	return &arrayVal{Elements: &elements, T: arr.T}, nil
 }
 
@@ -339,6 +346,11 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
 		val, err := e.eval(node)
 		if err != nil {
 			return nil, err
+		}
+		if m.T.Sub.Name == parser.ANY {
+			if _, ok := val.(*anyVal); !ok {
+				val = &anyVal{V: val}
+			}
 		}
 		pairs[key] = copyOrRef(val)
 	}

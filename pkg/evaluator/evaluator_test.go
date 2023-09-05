@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
@@ -129,6 +130,36 @@ f2 := fox2
 print f2
 `
 	want := "1\n🦊\n🦊\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
+func TestErrVarNotSet(t *testing.T) {
+	prog := `
+fn "hello"
+
+v := "world"
+
+func fn s:string
+    print s v  // line 7
+end
+`
+
+	rt := &testRT{}
+	rt.UnimplementedRuntime.print = rt.Print
+	eval := NewEvaluator(DefaultBuiltins(&testRT{}))
+	err := eval.Run(prog)
+	assert.Equal(t, true, errors.Is(err, ErrVarNotSet))
+	evalErr := &Error{}
+	assert.Equal(t, true, errors.As(err, &evalErr))
+	assert.Equal(t, "line 7 column 13", evalErr.token.Location())
+}
+
+func TestLenString(t *testing.T) {
+	prog := `
+print (len "🌟✨🌙🪐") // 4 runes, 4 graphemes
+print (len "⭐️") // 2 runes(!), 1 cluster/grapheme`
+	want := "4\n2\n"
 	got := run(prog)
 	assert.Equal(t, want, got)
 }

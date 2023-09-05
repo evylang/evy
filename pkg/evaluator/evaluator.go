@@ -22,12 +22,12 @@ var (
 	ErrSlice         = fmt.Errorf("%w: bad slice", ErrPanic)
 	ErrBadArguments  = fmt.Errorf("%w: bad arguments", ErrPanic)
 	ErrAnyConversion = fmt.Errorf("%w: error converting any to type", ErrPanic)
+	ErrVarNotSet     = fmt.Errorf("%w: variable has not been set yet", ErrPanic)
 
 	ErrInternal         = errors.New("internal error")
 	ErrUnknownNode      = fmt.Errorf("%w: unknown AST node", ErrInternal)
 	ErrType             = fmt.Errorf("%w: type error", ErrInternal)
 	ErrRangeType        = fmt.Errorf("%w: bad range type", ErrInternal)
-	ErrNoVarible        = fmt.Errorf("%w: no variable", ErrInternal)
 	ErrOperation        = fmt.Errorf("%w: unknown operation", ErrInternal)
 	ErrAssignmentTarget = fmt.Errorf("%w: bad assignment target", ErrInternal)
 )
@@ -504,7 +504,7 @@ func (e *Evaluator) evalVar(v *parser.Var) (Value, error) {
 	if val, ok := e.scope.get(v.Name); ok {
 		return val, nil
 	}
-	return nil, newErr(v, fmt.Errorf("%w: %s", ErrNoVarible, v.Name))
+	return nil, newErr(v, fmt.Errorf("%w: %s", ErrVarNotSet, v.Name))
 }
 
 func (e *Evaluator) evalExprList(terms []parser.Node) ([]Value, error) {

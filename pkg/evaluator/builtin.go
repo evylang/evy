@@ -448,7 +448,7 @@ func lenFunc(_ *scope, args []Value) (Value, error) {
 	case *Array:
 		return &Num{Val: float64(len(*arg.Elements))}, nil
 	case *String:
-		return &Num{Val: float64(len(arg.Val))}, nil
+		return &Num{Val: float64(len(arg.runes()))}, nil
 	}
 	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].Type())
 }

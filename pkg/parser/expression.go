@@ -541,7 +541,9 @@ func (p *parser) lookupVar() Node {
 	}
 	if v, ok := p.scope.get(name); ok {
 		v.isUsed = true
-		return v
+		v2 := *v
+		v2.token = tok
+		return &v2
 	}
 	if _, ok := p.funcs[name]; ok {
 		msg := fmt.Sprintf("function call must be parenthesized: (%s ...)", name)

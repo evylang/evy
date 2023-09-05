@@ -1,9 +1,3 @@
-// Package parser creates an abstract syntax tree (ast) from input
-// string in parser.Run() function. The parser is also responsible for
-// type analysis, unreachable code analysis, unused variable analysis
-// and other semantic checks. The generated ast is syntactically and
-// semantically correct and may not contain any further compile time
-// errors, only potential run time errors.
 package parser
 
 import (
@@ -14,12 +8,18 @@ import (
 	"foxygo.at/evy/pkg/lexer"
 )
 
+// Builtins holds all predefined, built-in function and event handler
+// signatures, such as print and on animate. It also holds all global
+// variables, such as err. The parsing process validates the Evy source
+// code against the known built-ins.
 type Builtins struct {
 	Funcs         map[string]*FuncDefStmt
 	EventHandlers map[string]*EventHandlerStmt
 	Globals       map[string]*Var
 }
 
+// Parse takes an Evy program and predefined builtin declarations
+// and returns program's AST.
 func Parse(input string, builtins Builtins) (*Program, error) {
 	parser := newParser(input, builtins)
 	prog := parser.parse()
@@ -42,6 +42,9 @@ func (e Errors) Error() string {
 	return strings.Join(s, "\n")
 }
 
+// Truncate truncates all parser errors from the length index onwards.
+// This can make the result string of [Errors.Error] shorter if the
+// combined error message is too long due to follow-on errors.
 func (e Errors) Truncate(length int) Errors {
 	if len(e) <= length {
 		return e

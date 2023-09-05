@@ -2,8 +2,13 @@ package parser
 
 import "foxygo.at/evy/pkg/lexer"
 
+// Operator represents the operators used in binary and unary
+// expressions. For example, the OP_ASTERISK operator represents the
+// multiplication operator (*).
 type Operator int
 
+// Operators are represented as constants and are used in
+// [BinaryExpression] and [UnaryExpression].
 const (
 	OP_ILLEGAL Operator = iota
 	OP_PLUS
@@ -85,6 +90,8 @@ func op(tok *lexer.Token) Operator {
 	return OP_ILLEGAL
 }
 
+// String returns a string representation of the operator, such as "+"
+// for OP_PLUS.
 func (o Operator) String() string {
 	return operatorStrings[o]
 }

@@ -155,6 +155,15 @@ end
 	assert.Equal(t, "line 7 column 13", evalErr.token.Location())
 }
 
+func TestLenString(t *testing.T) {
+	prog := `
+print (len "🌟✨🌙🪐") // 4 runes, 4 graphemes
+print (len "⭐️") // 2 runes(!), 1 cluster/grapheme`
+	want := "4\n2\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestBreak(t *testing.T) {
 	tests := []string{
 		`

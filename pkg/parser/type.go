@@ -24,9 +24,9 @@ const (
 	NONE // for functions without return value, declaration statements, etc.
 )
 
-// Basic types, any, none, and generic arrays and generic maps are
+// Basic types, any, none, and untyped arrays and untyped maps are
 // [interned] into variables for reuse, such as [NUM_TYPE] or
-// [GENERIC_MAP].
+// [UNTYPED_MAP].
 //
 // [interned]: https://en.wikipedia.org/wiki/Interning_(computer_science)
 var (
@@ -36,8 +36,8 @@ var (
 	STRING_TYPE   = &Type{Name: STRING}
 	ANY_TYPE      = &Type{Name: ANY}
 	NONE_TYPE     = &Type{Name: NONE}
-	GENERIC_ARRAY = &Type{Name: ARRAY, Sub: NONE_TYPE}
-	GENERIC_MAP   = &Type{Name: MAP, Sub: NONE_TYPE}
+	UNTYPED_ARRAY = &Type{Name: ARRAY, Sub: NONE_TYPE}
+	UNTYPED_MAP   = &Type{Name: MAP, Sub: NONE_TYPE}
 )
 
 func compositeTypeName(t lexer.TokenType) TypeName {
@@ -85,7 +85,7 @@ type Type struct {
 }
 
 func (t *Type) String() string {
-	if t.Sub == nil || t == GENERIC_ARRAY || t == GENERIC_MAP {
+	if t.Sub == nil || t == UNTYPED_ARRAY || t == UNTYPED_MAP {
 		return t.Name.String()
 	}
 	return t.Name.String() + t.Sub.String()
@@ -105,8 +105,8 @@ func (t *Type) accepts(t2 *Type) bool {
 }
 
 // Matches returns true if the two types are equal, or if one is a
-// generic array and the other is a specific array, or if one is a
-// generic map and the other is a specific map. This is useful for type
+// untyped array and the other is a specific array, or if one is a
+// untyped map and the other is a specific map. This is useful for type
 // validation in binary expressions, such as array concatenation:
 //
 //	[] + [1]
@@ -124,8 +124,7 @@ func (t *Type) Matches(t2 *Type) bool {
 	if t.Sub == nil || t2.Sub == nil {
 		return false
 	}
-
-	if t == GENERIC_ARRAY || t == GENERIC_MAP || t2 == GENERIC_ARRAY || t2 == GENERIC_MAP {
+	if t == UNTYPED_ARRAY || t == UNTYPED_MAP || t2 == UNTYPED_ARRAY || t2 == UNTYPED_MAP {
 		return true
 	}
 	return t.Sub.Matches(t2.Sub)
@@ -157,11 +156,11 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 		return t.Sub == nil && t2.Sub == nil
 	}
 	// all array types except empty array literal
-	if n == ARRAY && t2 == GENERIC_ARRAY {
+	if n == ARRAY && t2 == UNTYPED_ARRAY {
 		return true
 	}
 	// all map types except empty map literal
-	if n == MAP && t2 == GENERIC_MAP {
+	if n == MAP && t2 == UNTYPED_MAP {
 		return true
 	}
 	return t.Sub.acceptsStrict(t2.Sub)

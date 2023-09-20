@@ -1263,7 +1263,7 @@ num
 
 Empty composite literals, `[]` and `{}`, can be assigned to variables or
 parameters of any subtype, such as `[]string` or `{}num`. This is
-because empty composite literals are generic, meaning that they can be
+because empty composite literals are untyped, meaning that they can be
 matched to any subtype.
 
 ```evy

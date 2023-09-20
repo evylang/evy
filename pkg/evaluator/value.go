@@ -202,8 +202,9 @@ func (a *arrayVal) Set(v value) {
 	if !ok {
 		panic("internal error: Array.Set called with with non-Array value")
 	}
-	// Copy elements but maintain type of assignable `a` as RHS `a2` may be a generic array, e.g. [].
-	// Maintain the type of the assignable as it is specific, e.g. []num.
+	// Copy elements but maintain type of assignable `a` as RHS `a2` may
+	// be an untyped array, e.g. []. Maintain the type of the assignable
+	// as it is specific, e.g. []num.
 	a.Elements = a2.Elements
 }
 
@@ -290,8 +291,9 @@ func (m *mapVal) Set(v value) {
 	if !ok {
 		panic("internal error: Map.Set called with with non-Map value")
 	}
-	// Copy pairs and order but maintain type of assignable `m` as RHS `m2` may be a generic array, e.g. {}.
-	// Maintain the type of the assignable as it is specific, e.g. {}num.
+	// Copy pairs and order but maintain type of assignable `m` as RHS
+	// `m2` may be an untyped array, e.g. {}. Maintain the type of the
+	// assignable as it is specific, e.g. {}num.
 	m.Pairs = m2.Pairs
 	m.Order = m2.Order
 }

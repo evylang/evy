@@ -1061,7 +1061,7 @@ nums []`,
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
-		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
 	}
 }
 
@@ -1080,7 +1080,7 @@ end`,
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
-		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
 	}
 }
 

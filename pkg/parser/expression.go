@@ -342,7 +342,7 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
-	if !leftType.Matches(rightType) {
+	if !leftType.matches(rightType) {
 		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op.String(), leftType.String(), rightType.String())
 		p.appendErrorForToken(msg, tok)
 		return
@@ -456,13 +456,15 @@ func (p *parser) combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
 		if combinedT.accepts(t) {
+			if combinedT.isUntyped() {
+				combinedT = t
+			}
 			continue
 		}
-		if t.accepts(combinedT) {
-			combinedT = t
-			continue
-		}
-		if t.sameComposite(combinedT) {
+		// same composite types can be combined, for instance
+		// []string and []num become []any in
+		// {a:["X" "Y"] b:[1 2]}
+		if t.Name == ARRAY && combinedT.Name == ARRAY || t.Name == MAP && combinedT.Name == MAP {
 			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
 			continue
 		}

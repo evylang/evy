@@ -295,7 +295,7 @@ func (p *parser) addEventParamsToScope(e *EventHandlerStmt) {
 	for i, param := range e.Params {
 		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
-		if !param.Type().Matches(exptectedType) {
+		if !param.Type().matches(exptectedType) {
 			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
 		}
 		p.scope.set(param.Name, param)
@@ -569,7 +569,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
-			if !paramType.accepts(argType) && !paramType.Matches(argType) {
+			if !paramType.accepts(argType) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			}
@@ -588,7 +588,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.accepts(argType) && !paramType.Matches(argType) {
+		if !paramType.accepts(argType) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}

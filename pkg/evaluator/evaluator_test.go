@@ -1114,6 +1114,8 @@ func TestTypeof(t *testing.T) {
 		"a:[]num \n a = []":        "[]num",
 		"a:{}num \n a = {}":        "{}num",
 		"a := [] + [true]":         "[]bool",
+		"a := [[] [1] []]":         "[][]num",
+		"a := [[[]] [[1]] [[]]]":   "[][][]num",
 	}
 	for in, want := range tests {
 		in, want := in, want

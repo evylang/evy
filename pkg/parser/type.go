@@ -91,17 +91,22 @@ func (t *Type) String() string {
 	return t.Name.String() + t.Sub.String()
 }
 
+// Equals returns true if Type t equals to t2, including subtypes.
+func (t *Type) Equals(t2 *Type) bool {
+	if t == t2 {
+		return true
+	}
+	if t.Name != t2.Name {
+		return false
+	}
+	if t.Sub == nil || t2.Sub == nil {
+		return t.Sub == nil && t2.Sub == nil
+	}
+	return t.Sub.Equals(t2.Sub)
+}
+
 func (t *Type) accepts(t2 *Type) bool {
-	if t.acceptsStrict(t2) {
-		return true
-	}
-	n, n2 := t.Name, t2.Name
-	if n == ANY && n2 != ILLEGAL && n2 != NONE {
-		return true
-	}
-	// empty Array of none_type accepted by all arrays.
-	// empty Map of none_type accepted by all maps
-	return false
+	return t.matches(t2) || t == ANY_TYPE
 }
 
 // Matches returns true if the two types are equal, or if one is a
@@ -111,30 +116,38 @@ func (t *Type) accepts(t2 *Type) bool {
 //
 //	[] + [1]
 //	[1] + []
-func (t *Type) Matches(t2 *Type) bool {
+//
+// Additionally some built-in functions make use of the UNTYPED_MAP and
+// UNTYPED_ARRAY type in its parameters to implement generic behavior,
+// such as in the evy built-in functions
+//
+//	// UNTYPED_MAP builtin
+//	has {a:1} "a" // true
+//
+//	// UNTYPED_ARRAY builtin
+//	join [1 2 3] "." // "1.2.3"
+func (t *Type) matches(t2 *Type) bool {
 	if t == t2 {
 		return true
 	}
 	if t.Name != t2.Name {
 		return false
 	}
-	if t.Sub == t2.Sub {
-		return true
-	}
 	if t.Sub == nil || t2.Sub == nil {
-		return false
+		return t.Sub == nil && t2.Sub == nil
 	}
 	if t == UNTYPED_ARRAY || t == UNTYPED_MAP || t2 == UNTYPED_ARRAY || t2 == UNTYPED_MAP {
 		return true
 	}
-	return t.Sub.Matches(t2.Sub)
+	return t.Sub.matches(t2.Sub)
 }
 
 func (t *Type) infer() *Type {
 	if t.Name != ARRAY && t.Name != MAP {
 		return t
 	}
-	if t.Sub == NONE_TYPE {
+	// empty array becomes []any, empty map becomes {}any
+	if t == UNTYPED_ARRAY || t == UNTYPED_MAP {
 		t2 := *t
 		t2.Sub = ANY_TYPE
 		return &t2
@@ -143,35 +156,12 @@ func (t *Type) infer() *Type {
 	return t
 }
 
-// []any (ARRAY ANY) DOES NOT accept []num (ARRAY NUM).
-func (t *Type) acceptsStrict(t2 *Type) bool {
-	n, n2 := t.Name, t2.Name
-	if n == ILLEGAL || n2 == ILLEGAL {
+func (t *Type) isUntyped() bool {
+	if t.Name != ARRAY && t.Name != MAP {
 		return false
 	}
-	if n != n2 {
-		return false
-	}
-	if t.Sub == nil || t2.Sub == nil {
-		return t.Sub == nil && t2.Sub == nil
-	}
-	// all array types except empty array literal
-	if n == ARRAY && t2 == UNTYPED_ARRAY {
+	if t.Sub == NONE_TYPE {
 		return true
 	}
-	// all map types except empty map literal
-	if n == MAP && t2 == UNTYPED_MAP {
-		return true
-	}
-	return t.Sub.acceptsStrict(t2.Sub)
-}
-
-func (t *Type) sameComposite(t2 *Type) bool {
-	if t.Name == ARRAY && t2.Name == ARRAY {
-		return true
-	}
-	if t.Name == MAP && t2.Name == MAP {
-		return true
-	}
-	return false
+	return t.Sub.isUntyped()
 }

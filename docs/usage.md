@@ -1,6 +1,6 @@
 # `evy` Usage
 
-The `evy` toolchain is a set of tools that can be used to compile, run,
+The `evy` toolchain is a set of tools that can be used to parse, run,
 and format Evy source code. You can [install] the Evy toolchain locally
 and run it from your command line. The command-line interface for Evy
 supports all built-in functions except for graphics functions and event
@@ -9,7 +9,7 @@ events.
 
 The Evy toolchain has two subcommands:
 
-- `evy run`: Compile and run Evy source code.
+- `evy run`: Parse and run Evy source code.
 - `evy fmt`: Format Evy source code.
 
 You can also get help for each subcommand by running it with the

@@ -3,6 +3,7 @@ issues:
   exclude:
     - "^don't use ALL_CAPS"
     - "^ST1003: should not use ALL_CAPS"
+    - "^var-naming: don't use ALL_CAPS"
     - "^G304: Potential file inclusion via variable"
 
 linters:
@@ -19,7 +20,6 @@ linters:
     - forcetypeassert
     - funlen
     - gochecknoglobals
-    - gocognit
     - goconst
     - gocyclo
     - godox
@@ -35,15 +35,11 @@ linters:
     - nilnil
     - nosnakecase
     - paralleltest
-    - revive
-    - rowserrcheck
     - scopelint
-    - sqlclosecheck
     - structcheck
     - tagalign
     - testpackage
     - varcheck
     - varnamelen
-    - wastedassign
     - wrapcheck
     - wsl

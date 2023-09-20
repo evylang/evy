@@ -20,9 +20,8 @@ func main() {
 	defer afterStop()
 	actions := getActions()
 
-	rt := newJSRuntime()
 	input := getEvySource()
-	ast, err := parse(input, rt)
+	ast, err := parse(input)
 	if err != nil {
 		jsError(err.Error())
 		return
@@ -31,7 +30,7 @@ func main() {
 		formattedInput := ast.Format()
 		if formattedInput != input {
 			setEvySource(formattedInput)
-			ast, err = parse(formattedInput, rt)
+			ast, err = parse(formattedInput)
 			if err != nil {
 				jsError(err.Error())
 				return
@@ -42,6 +41,7 @@ func main() {
 		prepareUI(ast)
 	}
 	if actions["eval"] {
+		rt := newJSRuntime()
 		err := evaluate(ast, rt)
 		if err == nil || errors.Is(err, evaluator.ErrStopped) {
 			return
@@ -72,8 +72,8 @@ func getEvySource() string {
 	return getStringFromAddr(addr)
 }
 
-func parse(input string, rt evaluator.Runtime) (*parser.Program, error) {
-	builtins := evaluator.DefaultBuiltins(rt).ParserBuiltins()
+func parse(input string) (*parser.Program, error) {
+	builtins := evaluator.BuiltinDecls()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		var parseErrors parser.Errors
@@ -95,10 +95,8 @@ func prepareUI(prog *parser.Program) {
 }
 
 func evaluate(prog *parser.Program, rt *jsRuntime) error {
-	builtins := evaluator.DefaultBuiltins(rt)
-	eval = evaluator.NewEvaluator(builtins)
-	_, err := eval.Eval(prog)
-	if err != nil {
+	eval = evaluator.NewEvaluator(rt)
+	if err := eval.Eval(prog); err != nil {
 		return err
 	}
 	return handleEvents(rt.yielder)

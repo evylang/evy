@@ -1,6 +1,6 @@
 //go:build !tinygo
 
-// Evy compiles, runs, and formats Evy source code.
+// Evy parses, runs, and formats Evy source code.
 //
 // Evy on the command line supports all [built-in functions] except for
 // graphics functions and event handlers. Only the web interface on
@@ -46,10 +46,10 @@ import (
 )
 
 var (
-	version         string = "v0.0.0"
-	errBadWriteFlag        = errors.New("cannot use -w without files")
-	errNotFormatted        = errors.New("not formatted")
-	errParse               = errors.New("parse error")
+	version         = "v0.0.0"
+	errBadWriteFlag = errors.New("cannot use -w without files")
+	errNotFormatted = errors.New("not formatted")
+	errParse        = errors.New("parse error")
 )
 
 // cliRuntime implements evaluator.Runtime.
@@ -150,8 +150,7 @@ func (c *runCmd) Run() error {
 	}
 	rt := newCLIRuntime()
 	rt.skipSleep = c.SkipSleep
-	builtins := evaluator.DefaultBuiltins(rt)
-	eval := evaluator.NewEvaluator(builtins)
+	eval := evaluator.NewEvaluator(rt)
 	err = eval.Run(string(b))
 	handlEvyErr(err)
 	return nil
@@ -214,8 +213,8 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 		return err
 	}
 	in := string(b)
-	parserBuiltins := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
-	prog, err := parser.Parse(in, parserBuiltins)
+	builtins := evaluator.BuiltinDecls()
+	prog, err := parser.Parse(in, builtins)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
@@ -256,8 +255,8 @@ func (c *parseCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	builtinDecls := evaluator.DefaultBuiltins(newCLIRuntime()).ParserBuiltins()
-	ast, err := parser.Parse(string(b), builtinDecls)
+	builtins := evaluator.BuiltinDecls()
+	ast, err := parser.Parse(string(b), builtins)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}

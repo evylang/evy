@@ -32,7 +32,7 @@ func onUp(x, y float64) {
 	events = append(events, newXYEvent("up", x, y))
 }
 
-// onUp is called when pointerdown JS/UI event is triggered
+// onDown is called when pointerdown JS/UI event is triggered
 //
 //export onDown
 func onDown(x, y float64) {

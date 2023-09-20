@@ -151,7 +151,7 @@ func (p *parser) parseBinaryExpr(left Node) Node {
 	if binaryExp.Right == nil {
 		return nil // previous error
 	}
-	if expType == GENERIC_ARRAY {
+	if expType == UNTYPED_ARRAY {
 		binaryExp.T = binaryExp.Right.Type() // array concatenation e.g. [] + [1 2]
 	}
 	p.validateBinaryType(binaryExp)
@@ -417,7 +417,7 @@ func (p *parser) parseArrayLiteral() Node {
 		return nil
 	}
 	p.advance() // advance past ]
-	arrayLit := &ArrayLiteral{token: tok, T: GENERIC_ARRAY}
+	arrayLit := &ArrayLiteral{token: tok, T: UNTYPED_ARRAY}
 	p.formatting.recordMultiline(arrayLit, multi)
 	if len(elements) == 0 {
 		return arrayLit
@@ -475,7 +475,7 @@ func (p *parser) parseMapLiteral() Node {
 	p.pushWSS(false)
 	defer p.popWSS()
 	tok := p.cur
-	mapLit := &MapLiteral{token: tok, Pairs: map[string]Node{}, T: GENERIC_MAP}
+	mapLit := &MapLiteral{token: tok, Pairs: map[string]Node{}, T: UNTYPED_MAP}
 	p.advance() // advance past {
 
 	if ok := p.parseMapPairs(mapLit); !ok {

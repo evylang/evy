@@ -331,7 +331,7 @@ func (f *formatting) formatMapLiteral(n *MapLiteral) {
 
 func (f *formatting) formatType(t *Type) {
 	f.write(t.Name.String())
-	if t.Sub != nil && t != GENERIC_ARRAY && t != GENERIC_MAP {
+	if t.Sub != nil && t != UNTYPED_ARRAY && t != UNTYPED_MAP {
 		f.formatType(t.Sub)
 	}
 }

@@ -30,9 +30,9 @@ func (s *scope) set(name string, val value, t *parser.Type) {
 		return
 	}
 	switch val.Type() {
-	case parser.GENERIC_ARRAY:
+	case parser.UNTYPED_ARRAY:
 		val.(*arrayVal).T = t
-	case parser.GENERIC_MAP:
+	case parser.UNTYPED_MAP:
 		val.(*mapVal).T = t
 	}
 	s.values[name] = val

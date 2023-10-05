@@ -31,8 +31,8 @@ jobs:
           fetch-depth: 0
       - run: ./bin/make release
         env:
-          GITHUB_APP_ID: ${{ secrets.BOXYGOAT_GITHUB_APP_ID }}
-          GITHUB_APP_PEM: ${{ secrets.BOXYGOAT_GITHUB_APP_PEM }}
+          GITHUB_APP_ID: ${{ secrets.EVYLANGBOT_GITHUB_APP_ID }}
+          GITHUB_APP_PEM: ${{ secrets.EVYLANGBOT_GITHUB_APP_PEM }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: ./bin/make firebase-deploy-prod
         env:

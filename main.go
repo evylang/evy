@@ -25,7 +25,7 @@
 //
 //	Run "evy <command> --help" for more information on a command.
 //
-// [built-in functions]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md
+// [built-in functions]: https://github.com/evylang/evy/blob/main/docs/builtins.md
 // [evy.dev/play]: https://evy.dev/play
 package main
 
@@ -39,9 +39,9 @@ import (
 	"runtime"
 	"time"
 
-	"foxygo.at/evy/pkg/evaluator"
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/parser"
 	"github.com/alecthomas/kong"
 )
 

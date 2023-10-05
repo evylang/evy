@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"foxygo.at/evy/pkg/assert"
+	"evylang.dev/evy/pkg/assert"
 )
 
 type testRT struct {

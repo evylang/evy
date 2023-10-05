@@ -15,7 +15,7 @@ import (
 // support. For more details on the built-in functions, see the
 // [built-ins documentation].
 //
-// [built-ins documentation]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md
+// [built-ins documentation]: https://github.com/evylang/evy/blob/main/docs/builtins.md
 type Runtime interface {
 	GraphicsRuntime
 	Print(string)
@@ -29,7 +29,7 @@ type Runtime interface {
 // by the graphics built-ins. For more details see the
 // [graphics built-ins] documentation.
 //
-// [graphics built-ins]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#graphics
+// [graphics built-ins]: https://github.com/evylang/evy/blob/main/docs/builtins.md#graphics
 type GraphicsRuntime interface {
 	Move(x, y float64)
 	Line(x, y float64)

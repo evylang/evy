@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/parser"
 )
 
 type builtin struct {

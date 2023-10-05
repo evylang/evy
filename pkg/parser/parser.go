@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"foxygo.at/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/lexer"
 )
 
 // Builtins holds all predefined, built-in function and event handler

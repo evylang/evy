@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math"
 
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/parser"
 )
 
 // The Evaluator can return the following sentinel errors:
@@ -36,7 +36,7 @@ var (
 // ExitError is returned by [Evaluator.Eval] if Evy's [builtin exit]
 // function is called.
 //
-// [builtin exit]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#exit
+// [builtin exit]: https://github.com/evylang/evy/blob/main/docs/builtins.md#exit
 type ExitError int
 
 // Error implements the error interface and returns message containing the exit status.
@@ -47,7 +47,7 @@ func (e ExitError) Error() string {
 // PanicError is returned by [Evaluator.Eval] if Evy's [builtin panic]
 // function is called or a runtime error occurs.
 //
-// [builtin panic]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#panic
+// [builtin panic]: https://github.com/evylang/evy/blob/main/docs/builtins.md#panic
 type PanicError string
 
 // Error implements the error interface and returns the panic message.
@@ -247,7 +247,7 @@ func (e *Evaluator) eval(node parser.Node) (value, error) {
 //
 // For more details, see the [built-in documentation] on event handlers.
 //
-// [built-in documentation]: https://github.com/foxygoat/evy/blob/master/docs/builtins.md#event-handlers
+// [built-in documentation]: https://github.com/evylang/evy/blob/main/docs/builtins.md#event-handlers
 func (e *Evaluator) HandleEvent(ev Event) error {
 	eh := e.eventHandlers[ev.Name]
 	if eh == nil {

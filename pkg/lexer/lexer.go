@@ -14,8 +14,8 @@
 // Tree(AST), which is a representation of the Evy code's structure.
 // Finally, the [evaluator] walks the AST and executes the program.
 //
-// [parser]: https://pkg.go.dev/foxygo.at/evy/pkg/parser
-// [evaluator]: https://pkg.go.dev/foxygo.at/evy/pkg/evaluator
+// [parser]: https://pkg.go.dev/evylang.dev/evy/pkg/parser
+// [evaluator]: https://pkg.go.dev/evylang.dev/evy/pkg/evaluator
 package lexer
 
 import (

@@ -2,7 +2,7 @@
 
 package main
 
-import "foxygo.at/evy/pkg/evaluator"
+import "evylang.dev/evy/pkg/evaluator"
 
 // This file contains Go/WASM functions exported to and called by JS.
 

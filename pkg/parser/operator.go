@@ -1,6 +1,6 @@
 package parser
 
-import "foxygo.at/evy/pkg/lexer"
+import "evylang.dev/evy/pkg/lexer"
 
 // Operator represents the operators used in binary and unary
 // expressions. For example, the OP_ASTERISK operator represents the

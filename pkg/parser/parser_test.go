@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"foxygo.at/evy/pkg/assert"
+	"evylang.dev/evy/pkg/assert"
 )
 
 func TestParseDecl(t *testing.T) {

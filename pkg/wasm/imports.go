@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"foxygo.at/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/evaluator"
 )
 
 const minSleepDur = time.Millisecond

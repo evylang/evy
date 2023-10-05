@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"foxygo.at/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/lexer"
 )
 
 type precedence int

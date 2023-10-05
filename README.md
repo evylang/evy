@@ -1,8 +1,8 @@
 # Evy
 
 [![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://evy.dev/discord)
-[![GitHub Build](https://img.shields.io/github/actions/workflow/status/foxygoat/evy/cicd.yaml?style=flat-square&branch=master&logo=github)](https://github.com/foxygoat/evy/actions/workflows/cicd.yaml?query=branch%3Amaster)
-[![Go Reference](https://pkg.go.dev/badge/foxygo.at/evy.svg)](https://pkg.go.dev/foxygo.at/evy)
+[![GitHub Build](https://img.shields.io/github/actions/workflow/status/evylang/evy/cicd.yaml?style=flat-square&branch=main&logo=github)](https://github.com/evylang/evy/actions/workflows/cicd.yaml?query=branch%3Amain)
+[![Go Reference](https://pkg.go.dev/badge/evylang.dev/evy.svg)](https://pkg.go.dev/evylang.dev/evy)
 
 Evy is a simple programming language, made to learn coding.
 
@@ -42,7 +42,7 @@ Here is a "hello world" program in Evy
 
 Here are some resources for learning more about Evy:
 
-- [Learn and Practise](https://github.com/foxygoat/evy/wiki): A guided tour that teaches you programming using Evy.
+- [Learn and Practise](https://github.com/evylang/evy/wiki): A guided tour that teaches you programming using Evy.
 - [Syntax by Example](docs/syntax_by_example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
@@ -66,9 +66,9 @@ to your path.
 
 Use [Homebrew] to install `evy`.
 
-    brew install foxygoat/tap/evy
+    brew install evylang/tap/evy
 
-[latest release]: https://github.com/foxygoat/evy/releases/latest
+[latest release]: https://github.com/evylang/evy/releases/latest
 [Homebrew]: https://brew.sh/
 
 ## 💻 Development

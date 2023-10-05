@@ -2,7 +2,7 @@ name: ci/cd
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
         env:
           TERM: vt100
       - run: ./bin/make firebase-deploy
-        if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/master in release job
+        if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/main in release job
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +24,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: [ci]
-    if: ${{ github.event_name == 'push' }} # only run on push to master
+    if: ${{ github.event_name == 'push' }} # only run on push to main
     steps:
       - uses: actions/checkout@v3
         with:

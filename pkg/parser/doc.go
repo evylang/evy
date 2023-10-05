@@ -70,7 +70,7 @@
 //
 // [evaluator]: https://pkg.go.dev/foxygo.at/evy/pkg/evaluator
 // [Abstract Syntax Tree]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
-// [grammar]: https://github.com/foxygoat/evy/blob/master/docs/spec.md#evy-syntax-grammar
-// [language specification]: https://github.com/foxygoat/evy/blob/master/docs/spec.md
+// [grammar]: https://github.com/foxygoat/evy/blob/main/docs/spec.md#evy-syntax-grammar
+// [language specification]: https://github.com/foxygoat/evy/blob/main/docs/spec.md
 // [Pratt parser]: https://en.wikipedia.org/wiki/Operator-precedence_parser#Pratt_parsing
 package parser

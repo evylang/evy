@@ -1,7 +1,7 @@
 # Evy
 
 [![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://evy.dev/discord)
-[![GitHub Build](https://img.shields.io/github/actions/workflow/status/foxygoat/evy/cicd.yaml?style=flat-square&branch=master&logo=github)](https://github.com/foxygoat/evy/actions/workflows/cicd.yaml?query=branch%3Amaster)
+[![GitHub Build](https://img.shields.io/github/actions/workflow/status/foxygoat/evy/cicd.yaml?style=flat-square&branch=main&logo=github)](https://github.com/foxygoat/evy/actions/workflows/cicd.yaml?query=branch%3Amain)
 [![Go Reference](https://pkg.go.dev/badge/foxygo.at/evy.svg)](https://pkg.go.dev/foxygo.at/evy)
 
 Evy is a simple programming language, made to learn coding.

@@ -166,7 +166,7 @@ release: nexttag ## Tag and release binaries for different OS on GitHub release
 	git tag $(NEXTTAG)
 	git push origin $(NEXTTAG)
 	[ -z "$(CI)" ] || GITHUB_TOKEN=$$(.github/scripts/app_token) || exit 1; \
-	goreleaser release --rm-dist
+	goreleaser release --clean
 
 nexttag:
 	$(eval NEXTTAG := $(shell $(NEXTTAG_CMD)))

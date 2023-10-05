@@ -1,4 +1,4 @@
-module foxygo.at/evy
+module evylang.dev/evy
 
 go 1.21
 

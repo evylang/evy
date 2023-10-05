@@ -68,7 +68,7 @@
 // This structure closely resembles the [grammar] of the Evy programming
 // language, as defined in the [language specification].
 //
-// [evaluator]: https://pkg.go.dev/foxygo.at/evy/pkg/evaluator
+// [evaluator]: https://pkg.go.dev/evylang.dev/evy/pkg/evaluator
 // [Abstract Syntax Tree]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
 // [grammar]: https://github.com/foxygoat/evy/blob/main/docs/spec.md#evy-syntax-grammar
 // [language specification]: https://github.com/foxygoat/evy/blob/main/docs/spec.md

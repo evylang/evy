@@ -6,8 +6,8 @@ import (
 	"errors"
 	"strings"
 
-	"foxygo.at/evy/pkg/evaluator"
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/parser"
 )
 
 var (

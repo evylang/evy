@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math"
 
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/parser"
 )
 
 // The Evaluator can return the following sentinel errors:

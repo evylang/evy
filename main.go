@@ -39,9 +39,9 @@ import (
 	"runtime"
 	"time"
 
-	"foxygo.at/evy/pkg/evaluator"
-	"foxygo.at/evy/pkg/lexer"
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/parser"
 	"github.com/alecthomas/kong"
 )
 

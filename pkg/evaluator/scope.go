@@ -1,6 +1,6 @@
 package evaluator
 
-import "foxygo.at/evy/pkg/parser"
+import "evylang.dev/evy/pkg/parser"
 
 type scope struct {
 	values map[string]value

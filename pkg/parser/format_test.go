@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"foxygo.at/evy/pkg/assert"
+	"evylang.dev/evy/pkg/assert"
 )
 
 func TestFuncCallStmtFormat(t *testing.T) {

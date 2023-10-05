@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"foxygo.at/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/lexer"
 )
 
 // TypeName represents the enumerable basic types (such as num, string,

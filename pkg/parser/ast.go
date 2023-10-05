@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"foxygo.at/evy/pkg/lexer"
+	"evylang.dev/evy/pkg/lexer"
 )
 
 // Node represents a node in the AST.

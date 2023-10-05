@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"foxygo.at/evy/pkg/parser"
+	"evylang.dev/evy/pkg/parser"
 )
 
 type value interface {

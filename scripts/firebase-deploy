@@ -77,7 +77,7 @@ post_pr_comment() {
 	pr_num=$(get_pr_num)
 
 	comment_id=$(
-		gh api -H "Accept: application/vnd.github+json" "/repos/foxygoat/evy/issues/${pr_num}/comments" |
+		gh api -H "Accept: application/vnd.github+json" "/repos/evylang/evy/issues/${pr_num}/comments" |
 			jq 'map(select(.body | contains ("<!--- bot:firebase-url --->"))) | .[] .id' |
 			head -n1
 	)
@@ -88,7 +88,7 @@ post_pr_comment() {
 	fi
 	# update comment
 	gh api --method PATCH -H "Accept: application/vnd.github+json" \
-		"/repos/foxygoat/evy/issues/comments/${comment_id}" \
+		"/repos/evylang/evy/issues/comments/${comment_id}" \
 		-f body="${body}"
 }
 

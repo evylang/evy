@@ -1287,7 +1287,7 @@ of type `[]any`.
 x := [1 2 3]
 print "x" (typeof x)
 y:[]any
-// y = [1 2 3] // TODO PR https://github.com/foxygoat/evy/pull/179
+// y = [1 2 3] // TODO PR https://github.com/evylang/evy/pull/179
 print "y" (typeof y)
 // y = x // parse error
 // x = y // parse error

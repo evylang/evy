@@ -25,7 +25,7 @@
 //
 //	Run "evy <command> --help" for more information on a command.
 //
-// [built-in functions]: https://github.com/foxygoat/evy/blob/main/docs/builtins.md
+// [built-in functions]: https://github.com/evylang/evy/blob/main/docs/builtins.md
 // [evy.dev/play]: https://evy.dev/play
 package main
 

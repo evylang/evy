@@ -19,7 +19,7 @@
       },
       {
         "source": "/docs",
-        "destination": "https://github.com/foxygoat/evy/blob/main/docs/README.md",
+        "destination": "https://github.com/evylang/evy/blob/main/docs/README.md",
         "type": 301
       },
       {

@@ -13,7 +13,7 @@ Learn programming with Evy
 - Explore the samples on the [Playground] or the [Gallery].
 - Ask questions or discuss Evy in the [Evy community] on Discord.
 
-[Learn and Practise]: https://github.com/foxygoat/evy/wiki
+[Learn and Practise]: https://github.com/evylang/evy/wiki
 [Playground]: https://evy.dev/play
-[Gallery]: https://github.com/foxygoat/evy/wiki/gallery
+[Gallery]: https://github.com/evylang/evy/wiki/gallery
 [Evy community]: https://evy.dev/discord

@@ -293,7 +293,7 @@ func (e *Evaluator) evalStatments(statements []parser.Node) (value, error) {
 			return nil, err
 		}
 
-		if isReturn(result) || isBreak(result) { // TODO: make single: breakFlow check
+		if isReturn(result) || isBreak(result) {
 			return result, nil
 		}
 	}

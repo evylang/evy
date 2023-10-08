@@ -1,0 +1,139 @@
+// String art
+// Inpsired by https://youtu.be/dLiSXcaBZmk
+
+pi := 3.141592654
+
+lissajousA := 0
+lissajousB := 0
+lissajousPct := 0
+thetaOffset := 0
+nails:[][]num
+
+func drawall
+    draw 80 0.05 0.05 1 20
+    sleep 3
+    draw 80 0 0.05 2 1
+    sleep 3
+    draw 160 0 0.05 2 1
+    sleep 3
+    draw 160 0 0.05 4 1
+    sleep 3
+    drawAnimate 80 0.02
+    sleep 3
+    drawlAnimate 120 2 1 270 pi/4 0.02
+end
+
+func draw n:num dotInterval:num cordInterval:num a:num c:num
+    setnails n 0 0 0 0
+    clear "black"
+    drawNails dotInterval
+    drawCords a c cordInterval
+end
+
+func drawl n:num a:num b:num pct:num toffset:num
+    setnails n a b pct toffset
+    clear "black"
+    drawNails 0
+    drawCords 1 n/4 0
+end
+
+func drawAnimate n:num interval:num
+    for i := range n*2
+        draw n 0 0 1 i+1
+        sleep interval
+    end
+end
+
+func drawlAnimate n:num a:num b:num steps:num toffset:num interval:num
+    for p := range steps -1 -1
+        pct := p / steps
+        drawl n a b pct toffset*(1 - pct)
+        sleep interval
+    end
+end
+
+func drawNails interval:num
+    for i := range (len nails)
+        nail i
+        sleep interval
+    end
+end
+
+func drawCords a:num c:num interval:num
+    for i := range (len nails)
+        j := a * i + c
+        cord i j
+        nail i
+        nail j
+        sleep interval
+    end
+end
+
+func nail n:num
+    color "orange"
+    xy := pos n
+    move xy[0] xy[1]
+    circle 0.6
+end
+
+func cord i:num j:num
+    ixy := pos i
+    jxy := pos j
+    color "lightgreen"
+    width 0.3
+    move ixy[0] ixy[1]
+    line jxy[0] jxy[1]
+end
+
+func pos:[]num n:num
+    return nails[n % (len nails)]
+end
+
+func setnails n:num a:num b:num pct:num toffset:num
+    if (len nails) == n and lissajousA == a and lissajousB == b and lissajousPct == pct and thetaOffset == toffset
+        // No change to computed nail positions
+        return
+    end
+    lissajousA = a
+    lissajousB = b
+    lissajousPct = pct
+    thetaOffset = toffset
+    nails = []
+    for i := range n
+        theta := thetaOffset + (pi * 2 * i / n)
+        nails = nails + [(calcpos theta)]
+    end
+end
+
+func calcpos:[]num theta:num
+    cpos := circlePos theta
+    lpos := lissajousPos theta
+    x := interpolate lpos[0] cpos[0] lissajousPct
+    y := interpolate lpos[1] cpos[1] lissajousPct
+    return [(toCanvas x) (toCanvas y)]
+end
+
+func circlePos:[]num theta:num
+    x := cos theta
+    y := sin theta
+    return [x y]
+end
+
+func lissajousPos:[]num theta:num
+    x := sin lissajousA*theta
+    y := sin lissajousB*theta
+    return [x y]
+end
+
+func toCanvas:num n:num
+    return n * 40 + 50
+end
+
+func interpolate:num a:num b:num pct:num
+    return a * pct + b * (1 - pct)
+end
+
+// Still working on this one
+// drawlAnimate 80 1 4 100 0 0.02
+
+drawall

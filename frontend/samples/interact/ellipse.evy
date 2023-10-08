@@ -83,7 +83,7 @@ on down x:num y:num
     end
 end
 
-on up _:num _:num
+on up
     dragy = -1
     deltay = 0
 end

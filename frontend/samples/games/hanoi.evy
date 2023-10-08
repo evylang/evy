@@ -15,6 +15,7 @@ numPieces := (len towers[startTower])
 towerx := [17 50 83]
 w := 5 // line width
 basey := 20
+font {align:"center" baseline:"top"}
 
 width w
 linecap "round"
@@ -29,6 +30,9 @@ func drawTowers
         color "black"
         move x basey
         line x basey+42
+        if tower == 2
+            text "✨"
+        end
         for n := range (len towers[tower])
             y := n * w + (w / 2) + basey
             if tower == selected and n == (len towers[tower]) - 1
@@ -46,6 +50,7 @@ end
 on down x:num _:num
     tower := floor x/100*3
     if selected == -1 and (len towers[tower]) == 0
+        cls
         print "No pieces on that tower!"
         return
     else if selected == -1
@@ -57,19 +62,26 @@ on down x:num _:num
         selected = -1
     end
     drawTowers
+    checkGameover tower
 end
 
 func movePiece from:num to:num
     if (len towers[to]) > 0 and towers[from][-1] > towers[to][-1]
+        cls
         print "Piece too big to move there."
         return
     end
     towers[to] = towers[to] + [towers[from][-1]]
     towers[from] = towers[from][:-1]
-    if to != startTower and (len towers[to]) == numPieces
-        print "You win. Have some confetti."
-        startTower = to
+end
+
+func checkGameover tower:num
+    if tower == 2 and (len towers[tower]) == numPieces
+        cls
+        print "Well done! 🥳"
+        exit 0
     end
 end
 
 drawTowers
+print "Move all disks to the third pole✨."

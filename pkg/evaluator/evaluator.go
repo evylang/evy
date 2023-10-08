@@ -293,7 +293,7 @@ func (e *Evaluator) evalStatments(statements []parser.Node) (value, error) {
 			return nil, err
 		}
 
-		if isReturn(result) || isBreak(result) { // TODO: make single: breakFlow check
+		if isReturn(result) || isBreak(result) {
 			return result, nil
 		}
 	}
@@ -713,7 +713,7 @@ func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal) (value, erro
 		return nil, fmt.Errorf("%w (array): %v", ErrOperation, op.String())
 	}
 	result := left.Copy()
-	if result.T == parser.GENERIC_ARRAY {
+	if result.T == parser.UNTYPED_ARRAY {
 		result.T = right.T
 	}
 	rightElemnts := *right.Copy().Elements

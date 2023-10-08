@@ -225,7 +225,7 @@ func sprintf(s string, vals []value) string {
 var joinDecl = &parser.FuncDefStmt{
 	Name: "join",
 	Params: []*parser.Var{
-		{Name: "arr", T: parser.GENERIC_ARRAY},
+		{Name: "arr", T: parser.UNTYPED_ARRAY},
 		{Name: "sep", T: parser.STRING_TYPE},
 	},
 	ReturnType: parser.STRING_TYPE,
@@ -464,7 +464,7 @@ func lenFunc(_ *scope, args []value) (value, error) {
 var hasDecl = &parser.FuncDefStmt{
 	Name: "has",
 	Params: []*parser.Var{
-		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "m", T: parser.UNTYPED_MAP},
 		{Name: "key", T: parser.STRING_TYPE},
 	},
 	ReturnType: parser.BOOL_TYPE,
@@ -480,7 +480,7 @@ func hasFunc(_ *scope, args []value) (value, error) {
 var delDecl = &parser.FuncDefStmt{
 	Name: "del",
 	Params: []*parser.Var{
-		{Name: "m", T: parser.GENERIC_MAP},
+		{Name: "m", T: parser.UNTYPED_MAP},
 		{Name: "key", T: parser.STRING_TYPE},
 	},
 	ReturnType: parser.NONE_TYPE,
@@ -671,7 +671,7 @@ func dashFunc(dashFn func([]float64)) builtinFunc {
 
 var fontDecl = &parser.FuncDefStmt{
 	Name:       "font",
-	Params:     []*parser.Var{{Name: "properties", T: parser.GENERIC_MAP}},
+	Params:     []*parser.Var{{Name: "properties", T: parser.UNTYPED_MAP}},
 	ReturnType: parser.NONE_TYPE,
 }
 

@@ -1347,6 +1347,466 @@ print a.([]num) [1]
 	}
 }
 
+/* TODO: fix panic
+func TestAnyArray(t *testing.T) {
+	prog := `
+x:[]any
+x = [1 2 true]
+print x
+x[1] = [3 4 5]
+print x
+`
+	want := "[1 2 true]\n[1 [3 4 5] true]\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix failed parse
+func TestAnyBoolArray(t *testing.T) {
+	prog := `
+x:[]any
+x = [true false]
+print x
+x[1] = [3 4 5]
+print x
+`
+	want := "[true false]\n[true [3 4 5]]\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix panic
+func TestNestedAnyArray(t *testing.T) {
+	prog := `
+x:[][]any
+a:any
+a = 1
+x = [[a 2 true]]
+print x
+x = [[a 2]]
+print x
+a = 5
+x[0][1] = [3 4 a]
+print x
+`
+	want := "[[1 2 true]]\n[[1 2]]\n[[1 [3 4 5]]]\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+/* TODO: fix failed parse
+func TestAnyMap(t *testing.T) {
+	prog := `
+x:{}any
+x = {a:true}
+print (typeof x) x
+x = {a:1 b:2 c:true}
+print x
+x.b = [3 4 5]
+print x
+`
+	want := "{}any {a:true}\n{a:1 b:2 c:true}\n{a:1 b:[3 4 5] c:true}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+/* TODO: fix failed parse
+func TestNestedAnyMap(t *testing.T) {
+	prog := `
+x:{}{}any
+a:any
+a = 1
+x = {A:{A:true}}
+print (typeof x) x
+x = {A:{A:a B:2 C:true}}
+print x
+a = 5
+x.A.B = [3 4 a]
+print x
+`
+	want := "{}{}any {A:{A:true}}\n{A:{A:1 B:2 C:true}}\n{A:{A:1 B:[3 4 5] C:true}}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix failed parse
+func TestAnyParamType(t *testing.T) {
+	prog := `
+func f a:any
+    if (typeof a) == "num"
+        n := a.(num)
+        print "num" n
+    else if (typeof a) == "[]num"
+        na := a.([]num)
+        print "[]num" na
+    else if (typeof a) == "[]any"
+        aa := a.([]any)
+        print "[]any" aa
+    else if (typeof a) == "[][]any"
+        aa := a.([][]any)
+        print "[][]any" aa
+    else
+        print "typeof:" (typeof a)
+    end
+end
+f 1
+f [1 2]
+f []
+f [[] {}]
+f [[]]
+f [{}]
+f [[1]]
+a:any
+f a
+`
+	want := `
+num 1
+[]num [1 2]
+[]any []
+[]any [[] {}]
+[][]any [[]]
+typeof: []{}any
+typeof: [][]num
+typeof: bool
+`[1:]
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/*
+	TODO: fix failed parse
+
+	func TestAnyVariadicParamType(t *testing.T) {
+		prog := `
+
+func f a:any...
+
+	if (len a) == 0
+	    print "no args"
+	    return
+	else if (typeof a[0]) == "num"
+	    n := a[0].(num)
+	    print "num" n
+	else if (typeof a[0]) == "[]num"
+	    na := a[0].([]num)
+	    print "[]num" na
+	else if (typeof a[0]) == "[]any"
+	    aa := a[0].([]any)
+	    print "[]any" aa
+	else if (typeof a[0]) == "[][]any"
+	    aa := a[0].([][]any)
+	    print "[][]any" aa
+	else
+	    print "typeof:" (typeof a[0])
+	end
+
+end
+f 1
+f [1 2]
+f []
+f [[] {}]
+f [[]]
+f [{}]
+f [[1]]
+a:any
+f a
+`
+
+	want := `
+
+num 1
+[]num [1 2]
+[]any []
+[]any [[] {}]
+[][]any [[]]
+typeof: []{}any
+typeof: [][]num
+typeof: bool
+`[1:]
+
+		got := run(prog)
+		assert.Equal(t, want, got)
+	}
+*/
+
+/* TODO: fix incorrect result
+func TestAnyNestedArrayParam(t *testing.T) {
+	prog := `
+func f a:[][]any
+    print "a:" a "typeof a[0]:" (typeof a[0])
+    // a2 := a[0].([]any) // error: value of type assertion must be of type any, not []any
+end
+f [[]]
+`
+	got := run(prog)
+	got = strings.TrimSpace(got)
+	want := "a: [[]] typeof a[0]: []any"
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix evy runtime error
+func TestAnyArrayParam(t *testing.T) {
+	prog := `
+func f a:[]any
+    if (len a) == 0
+        print "typeof a:" (typeof a) "empty a:" a
+    else
+        print "typeof a:" (typeof a) "typeof a[0]:" (typeof a[0]) "a:" a
+    end
+end
+`
+	tests := map[string]string{
+		"f [1 2]":   "typeof a: []any typeof a[0]: num a: [1 2]",
+		"f []":      "typeof a: []any empty a: []",
+		"f [[] {}]": "typeof a: []any typeof a[0]: []any a: [[] {}]",
+		"f [[]]":    "typeof a: []any typeof a[0]: []any a: [[]]",
+		"f [{}]":    "typeof a: []any typeof a[0]: {}any a: [{}]",
+		"f [[1]]":   "typeof a: []any typeof a[0]: []num a: [[1]]",
+		`a:any
+f [a]`: "typeof a: []any typeof a[0]: bool a: [false]",
+	}
+	for input, want := range tests {
+		got := run(prog + input)
+		got = strings.TrimSpace(got)
+		assert.Equal(t, want, got, input)
+	}
+}
+*/
+
+/* TODO: fix incorrect result
+func TestAnyArrayArrayParam(t *testing.T) {
+	prog := `
+func f a:[][]any
+    if (len a) == 0
+        print "1 typeof a:" (typeof a) "a:" a
+    else if (len a[0]) == 0
+        print "2 typeof a:" (typeof a) "typeof a[0]:" (typeof a[0]) "a:" a
+    else
+        print "3 typeof a:" (typeof a)  "typeof a[0]:" (typeof a[0]) "typeof a[0][0]:" (typeof a[0][0]) "a:" a
+    end
+end
+`
+	tests := map[string]string{
+		"f [[1 2]]": "3 typeof a: [][]any typeof a[0]: []any typeof a[0][0]: num a: [[1 2]]",
+		"f []":      "1 typeof a: [][]any a: []",
+		"f [[] []]": "2 typeof a: [][]any typeof a[0]: []any a: [[] []]",
+		`a:[][]any
+		 f a`: "1 typeof a: [][]any a: []",
+		`a:[]any
+		 f [a]`: "2 typeof a: [][]any typeof a[0]: []any a: [[]]",
+		`a:[]num
+		 f [a]`: "2 typeof a: [][]any typeof a[0]: []any a: [[]]", // TODO: this should cause a parse error
+		`a:any
+		 f [[a]]`: "3 typeof a: [][]any typeof a[0]: []any typeof a[0][0]: bool a: [[false]]",
+	}
+	for input, want := range tests {
+		got := run(prog + input)
+		got = strings.TrimSpace(got)
+		assert.Equal(t, want, got, input)
+	}
+}
+*/
+
+/* TODO: fix evy runtime error
+func TestAnyMapParam(t *testing.T) {
+	prog := `
+func f m:{}any
+     if (len m) == 0
+         print "typeof m:" (typeof m) "empty m:" m
+    else
+         print "typeof m:" (typeof m) "typeof m.a:" (typeof m.a) "m:" m
+    end
+end
+`
+	tests := map[string]string{
+		"f {a:1 b:2}":   "typeof m: {}any typeof m.a: num m: {a:1 b:2}",
+		"f {}":          "typeof m: {}any empty m: {}",
+		"f {a:{} b:[]}": "typeof m: {}any typeof m.a: {}any m: {a:{} b:[]}",
+		"f {a:{}}":      "typeof m: {}any typeof m.a: {}any m: {a:{}}",
+		"f {a:[]}":      "typeof m: {}any typeof m.a: []any m: {a:[]}",
+		"f {a:{a:1}}":   "typeof m: {}any typeof m.a: {}num m: {a:{a:1}}",
+		`a:any
+		f {a:a}`: "typeof m: {}any typeof m.a: bool m: {a:false}",
+	}
+	for input, want := range tests {
+		got := run(prog + input)
+		got = strings.TrimSpace(got)
+		assert.Equal(t, want, got, input)
+	}
+}
+*/
+
+/* TODO: fix evy parse error
+func TestAnyMapMapParam(t *testing.T) {
+	prog := `
+func f m:{}{}any
+     if (len m) == 0
+         print "1 typeof m:" (typeof m) "m:" m
+    else if (len m.a) == 0
+         print "2 typeof m:" (typeof m) "typeof m.a:" (typeof m.a) "m:" m
+    else
+         print "3 typeof m:" (typeof m)  "typeof m.a:" (typeof m.a) "typeof m.a.a:" (typeof m.a.a) "m:" m
+    end
+end
+`
+	tests := map[string]string{
+		"f {a:{a:1 b:2}}": "3 typeof m: {}{}any typeof m.a: {}any typeof m.a.a: num m: {a:{a:1 b:2}}",
+		"f {}":            "1 typeof m: {}{}any m: {}",
+		"f {a:{} b:{}}":   "2 typeof m: {}{}any typeof m.a: {}any m: {a:{} b:{}}",
+		`a:{}{}any
+		 f a`: "1 typeof m: {}{}any m: {}",
+		`a:{}any
+		 f {a:a}`: "2 typeof m: {}{}any typeof m.a: {}any m: {a:{}}",
+		`a:{}num
+		 f {a:a}`: "2 typeof m: {}{}any typeof m.a: {}any m: {a:{}}", // TODO: this should cause a parse error
+		`a:any
+		 f {a:{a:a}}`: "3 typeof m: {}{}any typeof m.a: {}any typeof m.a.a: bool m: {a:{a:false}}",
+	}
+	for input, want := range tests {
+		got := run(prog + input)
+		got = strings.TrimSpace(got)
+		assert.Equal(t, want, got, input)
+	}
+}
+*/
+
+/*
+	TODO: fix failed parse
+
+	func TestAnyReturnType(t *testing.T) {
+		prog := `
+
+func f1:any
+
+	return 1
+
+end
+func f2:any
+
+	a:num
+	return a
+
+end
+func f3:any
+
+	a:any
+	return a
+
+end
+func f4:any
+
+	return [1]
+
+end
+func f5:any
+
+	return {}
+
+end
+print (f1) (f2) (f3) (f4) (f5)
+`
+
+		got := run(prog)
+		got = strings.TrimSpace(got)
+		assert.Equal(t, "1 0 false [1] {}", got)
+	}
+*/
+
+/* TODO: fix failed parse
+func TestAnyCompositeReturnType(t *testing.T) {
+	prog := `
+func f1:[]any
+    return [1]
+end
+func f2:[]any
+    a:num
+    return [a]
+end
+func f3:[][]any
+    return [[[true]]]
+end
+func f4:{}any
+    return {}
+end
+func f5:{}any
+    a:{}num
+    return {A:a}
+end
+func f6:{}{}any
+    return {A:{A:true}}
+end
+func f7:{}{}any
+    return {A:{A:{A:true}}}
+end
+print (f1) (f2) (f3) (f4) (f5) (f6) (f7)
+`
+	got := run(prog)
+	got = strings.TrimSpace(got)
+	assert.Equal(t, "[1] [0] [[[true]]] {} {A:{}} {A:{A:true}} {A:{A:{A:true}}}", got)
+}
+*/
+
+/* TODO: fix failed parse
+func TestAnyCompositeVar(t *testing.T) {
+	prog := `m:{}any
+m = {a:true}
+print (typeof m) m
+m = {a:1 b:2 c:true}
+`
+	want := "{}any {a:true}\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix failed parse
+func TestLateCompositeLiteralTyping(t *testing.T) {
+	prog := `
+a:[]any
+m:{}any
+a = [1 2 3]
+m = {a:true b:false}
+print "a:" a (typeof a) "m:" m (typeof m)
+`
+	want := "a: [1 2 3] []any m: {a:true b:false} {}any\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+/* TODO: fix failing test
+func TestTypeofNestedArray(t *testing.T) {
+	prog := `a := [[]]
+print (typeof a)
+print (typeof a[0])`
+
+	want := "[][]any\n[]any\n"
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+*/
+
+func TestNestedTypeof(t *testing.T) {
+	tests := map[string]string{
+		"a := [[] [1] []]":       "[][]num",
+		"a := [[[]] [[1]] [[]]]": "[][][]num",
+		"a := [[]]":              "[][]any",
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in, func(t *testing.T) {
+			in += "\n print (typeof a)"
+			got := run(in)
+			assert.Equal(t, want+"\n", got)
+		})
+	}
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

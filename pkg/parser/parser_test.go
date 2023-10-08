@@ -1061,7 +1061,7 @@ nums []`,
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
-		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
 	}
 }
 
@@ -1080,7 +1080,7 @@ end`,
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
-		assert.Equal(t, NONE_TYPE, GENERIC_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
 	}
 }
 
@@ -1330,6 +1330,118 @@ print a.([]num)[1]
 	}
 }
 
+/* TODO: fix parse errors
+func TestLateCompositeLiteralTyping(t *testing.T) {
+	inputs := []string{
+		`
+a:[]any
+m:{}any
+a = [1 2 3]
+m = {a:true b:false}
+print a m
+`, `
+func fn m:{}any a:[]any
+    print m a
+end
+fn {} []
+fn {a:1} [true] // {}num []bool`,
+		`has {} "b"`,
+		`has {x:2} "b"`,
+		`has {x:{b:2}} "b"`,
+		`
+func fn a:[]any...
+	 print a
+end
+fn []
+fn [1 2]
+fn [] []
+fn [1] [true]
+`, `
+func fn m:{}any...
+	 print m
+end
+fn {}
+fn {a:1 b:2}
+fn {} {}
+fn {a:1} {b:true}
+`, `
+func fnm:{}any
+	 return {a:{b:2}}
+end
+`, `
+func fna:[]any
+	 return [true]
+end
+`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+*/
+
+func TestLateCompositeLiteralTypingErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+has ["a"] "a"`: `line 2 column 5: "has" takes 1st argument of type {}, found []string`,
+		`
+a:[]any
+b := [1 2]
+a = [1 2]
+a = b
+`: `line 4 column 1: "a" accepts values of type []any, found []num`,
+		`
+b := [1 2]
+b = [] + b + [true]
+`: `line 3 column 12: mismatched type for +: []num, []bool`,
+		`
+a:[]any
+b:[]num
+b = [1 2 3]
+a = [] + b
+`: `line 5 column 1: "a" accepts values of type []any, found []num`,
+		`
+func fn m:{}any...
+	 print m
+end
+m:{}num
+fn m
+`: `line 6 column 4: "fn" takes variadic arguments of type {}any, found {}num`,
+		`
+func fn:{}any
+	m := {a:1}
+	return m
+end
+`: `line 4 column 9: expected return value of type {}any, found {}num`,
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
+func TestMapLitErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+func fnm:{}any
+    return {a:1{b:2}}
+end
+`: `line 3 column 16: expected map key, found "{"`,
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10
@@ -1378,6 +1490,14 @@ func testBuiltins() Builtins {
 			Name:       "len",
 			Params:     []*Var{{Name: "a", T: ANY_TYPE}},
 			ReturnType: NUM_TYPE,
+		},
+		"has": {
+			Name: "has",
+			Params: []*Var{
+				{Name: "map", T: UNTYPED_MAP},
+				{Name: "key", T: STRING_TYPE},
+			},
+			ReturnType: NONE_TYPE,
 		},
 	}
 	eventHandlers := map[string]*EventHandlerStmt{

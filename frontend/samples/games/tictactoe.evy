@@ -181,7 +181,6 @@ on down x:num y:num
     end
 end
 
-// TODO: improve function structure
 func human_bot_turn i:num
     success := human_turn i
     if !success

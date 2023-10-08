@@ -3,30 +3,30 @@
 // o - human
 
 board:[]string
-human_score:num
-bot_score:num
-bot_strength := 2
-bot_start := false
+humanScore:num
+botScore:num
+botStrength := 2
+botStart := false
 turn:string
 
 font {family:"Fira Code, monospace"}
 linecap "round"
 
-new_game
+newGame
 
-func new_game
-    board = new_board
-    if bot_start
+func newGame
+    board = newBoard
+    if botStart
         turn = "x"
         draw
-        bot_turn
+        botTurn
     end
     turn = "o"
     draw
-    bot_start = !bot_start
+    botStart = !botStart
 end
 
-func new_board:[]string
+func newBoard:[]string
     return [
         "." "." "."
         "." "." "."
@@ -34,33 +34,33 @@ func new_board:[]string
     ]
 end
 
-func draw_gameover
+func drawGameover
     msg := "🎀 Tie."
     w := winner
     if w == "o"
-        human_score = human_score + 1
+        humanScore = humanScore + 1
         msg = "🥳 You win!"
     else if w == "x"
-        bot_score = bot_score + 1
+        botScore = botScore + 1
         msg = "🤖 wins."
     end
     clear "white"
-    draw_board
-    draw_winning_line
-    draw_winning_msg msg
+    drawBoard
+    drawWinningLine
+    drawWinningMsg msg
     sleep 0.5
-    new_game
+    newGame
 end
 
 // --- graphics ---
 
 func draw
     clear "white"
-    draw_board
-    draw_score
+    drawBoard
+    drawScore
 end
 
-func draw_board
+func drawBoard
     // grid
     vline 37.5 27 98 1 "black"
     vline 62.5 27 98 1 "black"
@@ -71,20 +71,20 @@ func draw_board
     font {size:20}
     for i := range 9
         if board[i] != "."
-            x := (get_x i) - 6
-            y := (get_y i) - 6
+            x := (getX i) - 6
+            y := (getY i) - 6
             move x y
             text board[i]
         end
     end
 end
 
-func draw_score
+func drawScore
     font {size:4}
     move 13 16
-    text (sprintf "score     🤖:%.0f    you:%.0f" bot_score human_score)
+    text (sprintf "score     🤖:%.0f    you:%.0f" botScore humanScore)
     move 13 10
-    text "strength  "+(repeatstr "🦾" bot_strength)
+    text "strength  "+(repeatstr "🦾" botStrength)
     move 13 4
     if turn == "x"
         text "turn      🤖 thinking…"
@@ -93,19 +93,19 @@ func draw_score
     end
 end
 
-func draw_winning_line
+func drawWinningLine
     w := winner
     if w == "."
         return
     end
-    l := winning_line w
+    l := winningLine w
     color "hsl(330deg 100% 50% / 80%)"
     width 3
-    move (get_x l.i1) (get_y l.i1)
-    line (get_x l.i2) (get_y l.i2)
+    move (getX l.i1) (getY l.i1)
+    line (getX l.i2) (getY l.i2)
 end
 
-func winning_line:{}num s:string
+func winningLine:{}num s:string
     if board[0] == s and board[1] == s and board[2] == s
         return {i1:0 i2:2}
     else if board[3] == s and board[4] == s and board[5] == s
@@ -126,7 +126,7 @@ func winning_line:{}num s:string
     return {}
 end
 
-func draw_winning_msg msg:string
+func drawWinningMsg msg:string
     move 13 10
     color "black"
     font {size:7}
@@ -134,11 +134,11 @@ func draw_winning_msg msg:string
     sleep 1.5
 end
 
-func get_x:num i:num
+func getX:num i:num
     return 24 + (i % 3) * 25
 end
 
-func get_y:num i:num
+func getY:num i:num
     return 88 - (floor i/3) * 25
 end
 
@@ -171,38 +171,38 @@ on down x:num y:num
     if y > 25 and x > 13 and x < 87
         i := floor (x - 12.5)/25
         j := floor (100 - y)/25
-        human_bot_turn i+j*3
+        humanBotTurn i+j*3
         return
     end
     if x > 35 and x < 55 and y > 7 and y < 16
-        bot_strength = bot_strength % 3 + 1
+        botStrength = botStrength % 3 + 1
         draw
         return
     end
 end
 
-func human_bot_turn i:num
-    success := human_turn i
+func humanBotTurn i:num
+    success := humanTurn i
     if !success
         return
     end
-    if (is_gameover)
-        draw_gameover
+    if (isGameover)
+        drawGameover
         return
     end
 
     turn = "x"
     draw
-    bot_turn
+    botTurn
 
     turn = "o"
     draw
-    if (is_gameover)
-        draw_gameover
+    if (isGameover)
+        drawGameover
     end
 end
 
-func human_turn:bool i:num
+func humanTurn:bool i:num
     if board[i] != "."
         return false
     end
@@ -210,11 +210,11 @@ func human_turn:bool i:num
     return true
 end
 
-func is_gameover:bool
-    return (empty_cnt) == 0 or (winner) != "."
+func isGameover:bool
+    return (emptyCnt) == 0 or (winner) != "."
 end
 
-func empty_cnt:num
+func emptyCnt:num
     cnt := 0
     for i := range 9
         if board[i] == "."
@@ -237,18 +237,18 @@ func winner:string
     return "." // no winner
 end
 
-func bot_turn
-    if bot_strength == 1
-        bot1_turn
-    else if bot_strength == 2
-        bot2_turn
+func botTurn
+    if botStrength == 1
+        bot1Turn
+    else if botStrength == 2
+        bot2Turn
     else
-        bot3_turn
+        bot3Turn
     end
 end
 
-func bot1_turn
-    target := rand (empty_cnt)
+func bot1Turn
+    target := rand (emptyCnt)
     cnt := 0
     for i := range 9
         if board[i] == "."
@@ -261,7 +261,7 @@ func bot1_turn
     end
 end
 
-func bot2_turn
+func bot2Turn
     // try to win in next move
     for i := range 9
         if board[i] == "."
@@ -284,13 +284,13 @@ func bot2_turn
         end
     end
     // random move if no win or block possible
-    bot1_turn
+    bot1Turn
 end
 
-func bot3_turn
-    e := empty_cnt
+func bot3Turn
+    e := emptyCnt
     if e == 9
-        bot1_turn
+        bot1Turn
     else if e == 8 and board[4] == "."
         board[4] = "x"
     else if e == 8 // "o" on 4
@@ -303,17 +303,17 @@ func bot3_turn
 end
 
 func minmax:num turn:string depth:num
-    if (is_gameover)
+    if (isGameover)
         return score depth
     end
     scores:[]num
     moves:[]num
-    next_turn := next turn
-    next_depth := depth + 1
+    nextTurn := next turn
+    nextDepth := depth + 1
     for i := range 9
         if board[i] == "."
             board[i] = turn
-            scores = scores + [(minmax next_turn next_depth)]
+            scores = scores + [(minmax nextTurn nextDepth)]
             moves = moves + [i]
             board[i] = "."
         end
@@ -321,9 +321,9 @@ func minmax:num turn:string depth:num
 
     idx:num
     if turn == "x"
-        idx = max_index scores
+        idx = maxIndex scores
     else
-        idx = min_index scores
+        idx = minIndex scores
     end
     if depth != 0
         return scores[idx]
@@ -349,7 +349,7 @@ func next:string turn:string
     return "o"
 end
 
-func min_index:num nums:[]num
+func minIndex:num nums:[]num
     nmin := nums[0]
     idx := 0
     for i := range 1 (len nums)
@@ -361,7 +361,7 @@ func min_index:num nums:[]num
     return idx
 end
 
-func max_index:num nums:[]num
+func maxIndex:num nums:[]num
     nmax := nums[0]
     idx := 0
     for i := range 1 (len nums)

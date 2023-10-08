@@ -8,8 +8,8 @@ towers := [
 ]
 
 selected := -1
-start_tower := 1
-num_pieces := (len towers[start_tower])
+startTower := 1
+numPieces := (len towers[startTower])
 
 // Drawing / positioning
 towerx := [17 50 83]
@@ -19,7 +19,7 @@ basey := 20
 width w
 linecap "round"
 
-func draw_towers
+func drawTowers
     clear "white"
     color "black"
     move 0 basey-(w / 2)
@@ -35,10 +35,10 @@ func draw_towers
                 y = y + w
             end
             piece := towers[tower][n]
-            piece_width := piece * 3 + 5
+            pieceWidth := piece * 3 + 5
             color colors[piece - 1]
-            move x-(piece_width / 2) y
-            line x+(piece_width / 2) y
+            move x-(pieceWidth / 2) y
+            line x+(pieceWidth / 2) y
         end
     end
 end
@@ -53,23 +53,23 @@ on down x:num _:num
     else if selected == tower
         selected = -1
     else
-        move_piece selected tower
+        movePiece selected tower
         selected = -1
     end
-    draw_towers
+    drawTowers
 end
 
-func move_piece from:num to:num
+func movePiece from:num to:num
     if (len towers[to]) > 0 and towers[from][-1] > towers[to][-1]
         print "Piece too big to move there."
         return
     end
     towers[to] = towers[to] + [towers[from][-1]]
     towers[from] = towers[from][:-1]
-    if to != start_tower and (len towers[to]) == num_pieces
+    if to != startTower and (len towers[to]) == numPieces
         print "You win. Have some confetti."
-        start_tower = to
+        startTower = to
     end
 end
 
-draw_towers
+drawTowers

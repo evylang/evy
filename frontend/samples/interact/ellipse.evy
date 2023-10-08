@@ -13,19 +13,19 @@ draw
 
 func draw
     clear "hsl(210deg 5% 15%)" // near black
-    draw_ellipse
-    draw_text
-    draw_highlight cur
+    drawEllipse
+    drawText
+    drawHighlight cur
 end
 
-func draw_ellipse
+func drawEllipse
     width 2
     fill "red"
     stroke "darkgreen"
     ellipse vals[0] vals[1] vals[2] vals[3] vals[4] vals[5] vals[6]
 end
 
-func draw_text
+func drawText
     font {size:2.7 style:"italic" family:"Fira Code, monospace"}
     width 0.2
     fill "hsl(210deg 13% 72%)" // light grey
@@ -47,7 +47,7 @@ func draw_text
 
 end
 
-func draw_highlight i:num
+func drawHighlight i:num
     fill "none"
     stroke "white"
     width 0.4

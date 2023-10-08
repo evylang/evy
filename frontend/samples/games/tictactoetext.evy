@@ -1,9 +1,9 @@
 // x - bot
 // o - human
 
-play_game "x" (select_strength)
+playGame "x" (selectStrength)
 
-func select_strength:num
+func selectStrength:num
     print "Select strength 1-3."
     while true
         str := read
@@ -16,16 +16,16 @@ func select_strength:num
     return -1
 end
 
-func play_game turn:string strength:num
-    board := new_board
-    print_all strength board
-    while !(is_gameover board)
+func playGame turn:string strength:num
+    board := newBoard
+    printAll strength board
+    while !(isGameover board)
         if turn == "x"
-            bot_turn board strength
+            botTurn board strength
         else
-            human_turn board
+            humanTurn board
         end
-        print_all strength board
+        printAll strength board
         turn = next turn
     end
     result := winner board
@@ -36,7 +36,7 @@ func play_game turn:string strength:num
     end
 end
 
-func new_board:[]string
+func newBoard:[]string
     return [
         "." "." "."
         "." "." "."
@@ -44,8 +44,8 @@ func new_board:[]string
     ]
 end
 
-func is_gameover:bool b:[]string
-    return (empty_cnt b) == 0 or (winner b) != "."
+func isGameover:bool b:[]string
+    return (emptyCnt b) == 0 or (winner b) != "."
 end
 
 func next:string turn:string
@@ -55,7 +55,7 @@ func next:string turn:string
     return "o"
 end
 
-func empty_cnt:num b:[]string
+func emptyCnt:num b:[]string
     cnt := 0
     for i := range 9
         if b[i] == "."
@@ -78,13 +78,13 @@ func winner:string b:[]string
     return "." // no winner
 end
 
-func print_all strength:num b:[]string
+func printAll strength:num b:[]string
     cls
-    print_notes strength
-    print_board b
+    printNotes strength
+    printBoard b
 end
 
-func print_notes strength:num
+func printNotes strength:num
     printf "Strength %0.f.\n\n" strength
     print "Enter index for \"o\" move:"
     print "0 1 2"
@@ -92,14 +92,14 @@ func print_notes strength:num
     print "6 7 8\n"
 end
 
-func print_board b:[]string
+func printBoard b:[]string
     print b[0] b[1] b[2]
     print b[3] b[4] b[5]
     print b[6] b[7] b[8]
     print
 end
 
-func human_turn b:[]string
+func humanTurn b:[]string
     while true
         str := read
         n := str2num str
@@ -111,18 +111,18 @@ func human_turn b:[]string
     end
 end
 
-func bot_turn b:[]string strength:num
+func botTurn b:[]string strength:num
     if strength == 1
-        bot1_turn b
+        bot1Turn b
     else if strength == 2
-        bot2_turn b
+        bot2Turn b
     else
-        bot3_turn b
+        bot3Turn b
     end
 end
 
-func bot1_turn b:[]string
-    target := rand (empty_cnt b)
+func bot1Turn b:[]string
+    target := rand (emptyCnt b)
     cnt := 0
     for i := range 9
         if b[i] == "."
@@ -135,7 +135,7 @@ func bot1_turn b:[]string
     end
 end
 
-func bot2_turn b:[]string
+func bot2Turn b:[]string
     // try to win in next move
     for i := range 9
         if b[i] == "."
@@ -158,13 +158,13 @@ func bot2_turn b:[]string
         end
     end
     // random move if no win or block possible
-    bot1_turn b
+    bot1Turn b
 end
 
-func bot3_turn b:[]string
-    e := empty_cnt b
+func bot3Turn b:[]string
+    e := emptyCnt b
     if e == 9
-        bot1_turn b
+        bot1Turn b
     else if e == 8 and b[4] == "."
         b[4] = "x"
     else if e == 8 // "o" on 4
@@ -177,7 +177,7 @@ func bot3_turn b:[]string
 end
 
 func minmax:num b:[]string turn:string depth:num
-    if (is_gameover b)
+    if (isGameover b)
         return score b depth
     end
     scores:[]num
@@ -195,9 +195,9 @@ func minmax:num b:[]string turn:string depth:num
 
     idx:num
     if turn == "x"
-        idx = max_index scores
+        idx = maxIndex scores
     else
-        idx = min_index scores
+        idx = minIndex scores
     end
     if depth == 0
         b[moves[idx]] = turn
@@ -215,7 +215,7 @@ func score:num b:[]string depth:num
     return 0
 end
 
-func min_index:num nums:[]num
+func minIndex:num nums:[]num
     nmin := nums[0]
     idx := 0
     for i := range 1 (len nums)
@@ -227,7 +227,7 @@ func min_index:num nums:[]num
     return idx
 end
 
-func max_index:num nums:[]num
+func maxIndex:num nums:[]num
     nmax := nums[0]
     idx := 0
     for i := range 1 (len nums)

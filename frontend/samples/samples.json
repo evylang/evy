@@ -34,7 +34,8 @@
         { "id": "movingdot", "title": "Moving Red Dot" },
         { "id": "bounce", "title": "Bounce" },
         { "id": "juggle", "title": "Juggle" },
-        { "id": "splashtrig", "title": "Splash of Trig" }
+        { "id": "splashtrig", "title": "Splash of Trig" },
+        { "id": "stringart", "title": "String Art" }
       ]
     },
     {

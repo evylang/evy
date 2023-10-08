@@ -31,9 +31,9 @@ export default class Yace {
   init() {
     this.textarea = document.createElement("textarea")
     this.textarea.spellcheck = false
-    this.textarea.autocorrect = false
-    this.textarea.autocomplete = false
-    this.textarea.autocapitalize = false
+    this.textarea.autocorrect = "off"
+    this.textarea.autocomplete = "off"
+    this.textarea.autocapitalize = "none"
     this.textarea.wrap = "off"
 
     this.highlighted = document.createElement("pre")

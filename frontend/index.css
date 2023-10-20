@@ -741,6 +741,36 @@ dialog .err {
   margin-right: 8px;
 }
 
+#dialog-about {
+  width: min(100vw, 52rem);
+}
+
+#dialog-about form {
+  display: flex;
+  flex-direction: column;
+}
+
+#dialog-about main {
+  max-height: 100vh;
+  overflow: auto;
+}
+
+#dialog-about p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  margin-top: 2rem;
+}
+
+#dialog-about .tagline {
+  font-weight: 700;
+}
+
+embed {
+  height: min(20vw, 12rem);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* --- Easter egg ---------------------------------------------------- */
 .confetti {
   height: 7vw;

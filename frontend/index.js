@@ -337,6 +337,8 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
+  const about = document.querySelector("#dialog-about")
+  document.querySelector("#sidemenu-about").onclick = () => about.showModal()
   document.querySelector("#sidemenu-share").onclick = share
   document.querySelector("#sidemenu-icon-share").onclick = share
   initModal()

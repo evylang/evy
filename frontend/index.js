@@ -14,6 +14,7 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
+let sidemenu
 
 // --- Initialise ------------------------------------------------------
 
@@ -336,9 +337,15 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
+  const about = document.querySelector("#dialog-about")
+  document.querySelector("#sidemenu-about").onclick = () => about.showModal()
+  document.querySelector("#sidemenu-share").onclick = share
+  document.querySelector("#sidemenu-icon-share").onclick = share
   initModal()
   handleHashChange()
   initEditor()
+  initSidemenu()
+  initDialog()
 }
 
 async function fetchSamples() {
@@ -851,17 +858,6 @@ function hideModal() {
 function showSamples() {
   const samples = document.querySelector("#modal-samples")
   samples.classList.remove("hidden")
-  const share = document.querySelector("#modal-share")
-  share.classList.add("hidden")
-  const modal = document.querySelector("#modal")
-  modal.classList.remove("hidden")
-}
-
-function showSharing() {
-  const share = document.querySelector("#modal-share")
-  share.classList.remove("hidden")
-  const samples = document.querySelector("#modal-samples")
-  samples.classList.add("hidden")
   const modal = document.querySelector("#modal")
   modal.classList.remove("hidden")
 }
@@ -879,6 +875,43 @@ function breadcrumb(s) {
   const li = document.createElement("li")
   li.appendChild(btn)
   return li
+}
+
+// --- UI: sidemenu --------------------------------------------
+
+function initSidemenu() {
+  sidemenu = document.querySelector("#sidemenu")
+  document.querySelector("#hamburger").onclick = showSidemenu
+  document.querySelector("#sidemenu-close").onclick = hideSidemenu
+  document.addEventListener("click", handleOutsideSidemenuClick)
+}
+
+function showSidemenu() {
+  document.querySelector(".editor textarea").style.pointerEvents = "none"
+  document.querySelector("#sidemenu").classList.remove("hidden")
+}
+function hideSidemenu() {
+  document.querySelector(".editor textarea").style.pointerEvents = ""
+  document.querySelector("#sidemenu").classList.add("hidden")
+}
+function handleOutsideSidemenuClick(e) {
+  if (!sidemenu.classList.contains("hidden") && e.pageX > sidemenu.offsetWidth) {
+    hideSidemenu()
+  }
+}
+
+// --- UI: dialog --------------------------------------------
+
+function initDialog() {
+  const input = document.querySelector("#dialog-share .copy input")
+  input.onclick = input.select
+  const copyButton = document.querySelector("#dialog-share .copy button")
+  copyButton.onclick = () => {
+    const url = input.value
+    navigator.clipboard.writeText(url)
+    input.value = "Copied!"
+    setTimeout(() => (input.value = url), 2000)
+  }
 }
 
 // --- UI: Confetti Easter Egg -----------------------------------------
@@ -939,36 +972,19 @@ function showConfetti() {
 // --- Share / load snippets -------------------------------------------
 
 async function share() {
+  hideSidemenu()
   await format()
-  const el = document.querySelector("#modal-share")
 
   if (errors) {
-    const msg = document.createElement("label")
-    msg.textContent = "Fix errors first please."
-    const button = document.createElement("button")
-    button.innerText = "OK"
-    button.onclick = hideModal
-    el.replaceChildren(msg, button)
-    showSharing()
+    document.querySelector("#dialog-error").showModal()
     return
   }
-  const encoded = await encode(editor.value)
-  const msg = document.createElement("label")
-  msg.textContent = "Share"
-  const input = document.createElement("input")
-  input.type = "text"
-  input.onclick = input.select
   const baseurl = window.location.origin + window.location.pathname
+  const encoded = await encode(editor.value)
+  const input = document.querySelector("#dialog-share .copy input")
   input.value = `${baseurl}#content=${encoded}`
-  const button = document.createElement("button")
-  button.className = "copy"
-  button.innerHTML = `<svg><use href="#icon-copy" /></svg>`
-  button.onclick = () => {
-    navigator.clipboard.writeText(input.value)
-    hideModal()
-  }
-  el.replaceChildren(msg, input, button)
-  showSharing()
+  input.setSelectionRange(0, 0)
+  document.querySelector("#dialog-share").showModal()
 }
 
 async function encode(input) {

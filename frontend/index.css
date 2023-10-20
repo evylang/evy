@@ -753,6 +753,7 @@ dialog .err {
 }
 
 #dialog-about main {
+  padding-top: 42px;
   max-height: 100vh;
   overflow: auto;
 }
@@ -768,7 +769,7 @@ dialog .err {
 }
 
 embed {
-  height: min(20vw, 12rem);
+  height: min(50vw, 12rem);
   margin-left: auto;
   margin-right: auto;
 }

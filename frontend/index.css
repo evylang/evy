@@ -519,13 +519,15 @@ main.view-output {
   position: relative;
   top: 0.2em;
   right: 0.2em;
+}
+.header-icon {
   cursor: pointer;
   background: none;
   color: var(--color);
   border: none;
   font-size: 1rem;
 }
-#modal-close:hover {
+.header-icon:hover {
   color: var(--hover-color);
 }
 .modal-main {

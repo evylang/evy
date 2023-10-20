@@ -520,8 +520,10 @@ button.primary {
   transition: background 0.3s ease-in-out;
   text-decoration: none;
 }
-button:hover:enabled.primary {
-  background: var(--btn-bg-hover);
+@media (hover: hover) {
+  button:hover:enabled.primary {
+    background: var(--btn-bg-hover);
+  }
 }
 
 .run button#run,

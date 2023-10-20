@@ -119,6 +119,9 @@ body {
 a {
   transition: all 0.3s ease-in-out;
 }
+button {
+  font-family: var(--ff);
+}
 
 /* --- Header -------------------------------------------------------- */
 header {
@@ -494,8 +497,7 @@ main.view-output {
   border-top: 1px solid var(--output-border-dark);
   background: var(--output-bg);
 }
-.run button#run,
-.run button#run-mobile {
+button.primary {
   color: var(--btn-color);
   background: var(--btn-bg);
   box-shadow:
@@ -510,11 +512,18 @@ main.view-output {
   text-align: center;
   font-family: Inter, sans-serif;
   border: none;
-  width: 100%;
   display: block;
   cursor: pointer;
   transition: background 0.3s ease-in-out;
   text-decoration: none;
+}
+button:hover:enabled.primary {
+  background: var(--btn-bg-hover);
+}
+
+.run button#run,
+.run button#run-mobile {
+  width: 100%;
 }
 .run button:disabled {
   color: var(--btn-color-disabled);
@@ -523,9 +532,6 @@ main.view-output {
     0 16px 12px -8px hsl(0deg 0% 0% / 30%),
     inset 0 -2px 1px 1px hsl(0deg 0% 60%);
   cursor: not-allowed;
-}
-.run button:hover:enabled {
-  background: var(--btn-bg-hover);
 }
 .run button.running#run,
 .run button.running#run-mobile,

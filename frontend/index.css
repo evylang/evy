@@ -6,6 +6,7 @@
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
   --border-color: hsl(0deg 0% 100% / 20%);
+  --border-color-dialog: hsl(0deg 0% 30%);
   --header-bg: hsl(213deg 10% 23%);
   --output-bg: hsl(0deg 0% 100%);
   --output-color: hsl(0deg 0% 0% / 80%);
@@ -58,6 +59,7 @@
   --slide-transition-duration: 0.3s;
   --sidemenu-width: min(100vw, 18rem);
   --sidemenu-transition-duration: 0.2s;
+  --dialog-width: min(100vw, 36rem);
 }
 
 @media (max-width: 767px), (max-height: 550px) {
@@ -354,7 +356,8 @@ main.view-output {
   overflow: auto;
   min-width: 100%;
 }
-.editor pre.highlighted .err {
+.editor pre.highlighted .err,
+dialog .err {
   background: var(--syntax-error-bg);
   border-radius: 6px;
 }
@@ -649,50 +652,93 @@ button:hover:enabled.primary {
   background: var(--modal-circle-color);
 }
 
-#modal-share {
-  justify-content: center;
-  padding-top: 48px;
-}
-#modal-share label {
-  line-height: 2rem;
-}
-#modal-share input,
-#modal-share button {
-  height: 2rem;
-}
-#modal-share button {
-  padding: 4px 16px;
-  margin-left: 16px;
-  color: var(--btn-color);
-  background: var(--btn-bg);
-  font-weight: bold;
-  border: none;
+/* --- Share dialog --------------------------------------------------- */
+dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   border-radius: 6px;
-}
-#modal-share button {
-  cursor: pointer;
-  background: var(--btn-bg-hover);
-}
-#modal-share button.copy {
-  line-height: 0;
-  margin: 0;
+  box-shadow: 4px 4px 0px 0px #00000073;
+  border: 1px solid var(--border-color-dialog);
   padding: 0;
-  width: 2rem;
-  height: 2rem;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 1px solid hsl(0deg 0% 70%);
+  width: var(--dialog-width);
 }
-#modal-share button.copy svg {
-  width: 1rem;
-  height: 1rem;
+::backdrop {
+  background: hsl(210deg 5% 15% / 70%);
 }
-#modal-share input {
-  margin-left: 16px;
-  padding-left: 4px;
-  padding-right: 4px;
-  border: none;
+dialog header {
+  border-bottom: 1px solid var(--border-color);
+  height: unset;
+  line-height: 1.5;
+  padding: 16px 30px;
+  background: var(--bg);
+  border-radius: 5px 5px 0 0;
+  display: flex;
+  justify-content: space-between;
+}
+dialog h1 {
+  font-family: var(--ff);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color);
+  padding: 0;
+}
+dialog main {
+  font-family: var(--ff);
+  padding: 30px 30px 45px;
+  background: var(--bg);
+  border-radius: 0 0 5px 5px;
+  height: unset;
+  flex-direction: column;
+  width: 100%;
+}
+dialog .header-icon {
+  vertical-align: middle;
+  line-height: 0;
   outline: none;
+}
+dialog .copy {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--border-color-dialog);
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: row;
+}
+dialog .copy input {
+  outline: none;
+  background: none;
+  color: var(--modal-color);
+  border: none;
+  font-size: 1rem;
+  line-height: 2;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  padding-right: 16px;
+}
+dialog .copy button {
+  flex: 0;
+  border: none;
+  background: none;
+  color: var(--color);
+  opacity: 60%;
+  stroke: none;
+  cursor: pointer;
+}
+dialog button.primary {
+  width: 100%;
+  margin-top: 30px;
+}
+dialog p {
+  color: var(--modal-color);
+}
+dialog .err {
+  font-family: var(--ff-code);
+  color: var(--color);
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 /* --- Easter egg ---------------------------------------------------- */

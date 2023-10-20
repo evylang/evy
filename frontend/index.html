@@ -124,8 +124,50 @@
           </ul>
         </div>
       </div>
-      <div class="modal-main hidden" id="modal-share"></div>
     </div>
+
+    <!-- Evy sharing dialog -->
+    <dialog id="dialog-share">
+      <form method="dialog">
+        <header>
+          <h1>Share</h1>
+          <button class="header-icon">
+            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
+          </button>
+        </header>
+        <main>
+          <div class="copy">
+            <input type="text" autofocus value="https://evy.dev/play#asldkjfalsdkjf" />
+            <button type="button">
+              <svg width="1.25rem" height="1.25rem">
+                <use href="#icon-copy" />
+              </svg>
+            </button>
+          </div>
+          <button class="primary">Done</button>
+        </main>
+      </form>
+    </dialog>
+
+    <!-- Evy sharing error dialog -->
+    <dialog id="dialog-error">
+      <form method="dialog">
+        <header>
+          <h1>Error</h1>
+          <button class="header-icon">
+            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
+          </button>
+        </header>
+        <main>
+          <p>
+            Fix
+            <span class="err">parse error</span>
+            first, please!
+          </p>
+          <button class="primary">Ok</button>
+        </main>
+      </form>
+    </dialog>
 
     <!-- icons in hidden svg tag for styling and performance -->
     <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">

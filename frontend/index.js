@@ -343,6 +343,7 @@ async function initUI() {
   handleHashChange()
   initEditor()
   initSidemenu()
+  initDialog()
 }
 
 async function fetchSamples() {
@@ -855,17 +856,6 @@ function hideModal() {
 function showSamples() {
   const samples = document.querySelector("#modal-samples")
   samples.classList.remove("hidden")
-  const share = document.querySelector("#modal-share")
-  share.classList.add("hidden")
-  const modal = document.querySelector("#modal")
-  modal.classList.remove("hidden")
-}
-
-function showSharing() {
-  const share = document.querySelector("#modal-share")
-  share.classList.remove("hidden")
-  const samples = document.querySelector("#modal-samples")
-  samples.classList.add("hidden")
   const modal = document.querySelector("#modal")
   modal.classList.remove("hidden")
 }
@@ -905,6 +895,20 @@ function hideSidemenu() {
 function handleOutsideSidemenuClick(e) {
   if (!sidemenu.classList.contains("hidden") && e.pageX > sidemenu.offsetWidth) {
     hideSidemenu()
+  }
+}
+
+// --- UI: dialog --------------------------------------------
+
+function initDialog() {
+  const input = document.querySelector("#dialog-share .copy input")
+  input.onclick = input.select
+  const copyButton = document.querySelector("#dialog-share .copy button")
+  copyButton.onclick = () => {
+    const url = input.value
+    navigator.clipboard.writeText(url)
+    input.value = "Copied!"
+    setTimeout(() => (input.value = url), 2000)
   }
 }
 
@@ -966,36 +970,19 @@ function showConfetti() {
 // --- Share / load snippets -------------------------------------------
 
 async function share() {
+  hideSidemenu()
   await format()
-  const el = document.querySelector("#modal-share")
 
   if (errors) {
-    const msg = document.createElement("label")
-    msg.textContent = "Fix errors first please."
-    const button = document.createElement("button")
-    button.innerText = "OK"
-    button.onclick = hideModal
-    el.replaceChildren(msg, button)
-    showSharing()
+    document.querySelector("#dialog-error").showModal()
     return
   }
-  const encoded = await encode(editor.value)
-  const msg = document.createElement("label")
-  msg.textContent = "Share"
-  const input = document.createElement("input")
-  input.type = "text"
-  input.onclick = input.select
   const baseurl = window.location.origin + window.location.pathname
+  const encoded = await encode(editor.value)
+  const input = document.querySelector("#dialog-share .copy input")
   input.value = `${baseurl}#content=${encoded}`
-  const button = document.createElement("button")
-  button.className = "copy"
-  button.innerHTML = `<svg><use href="#icon-copy" /></svg>`
-  button.onclick = () => {
-    navigator.clipboard.writeText(input.value)
-    hideModal()
-  }
-  el.replaceChildren(msg, input, button)
-  showSharing()
+  input.setSelectionRange(0, 0)
+  document.querySelector("#dialog-share").showModal()
 }
 
 async function encode(input) {

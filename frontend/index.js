@@ -989,6 +989,7 @@ async function share() {
   const input = document.querySelector("#dialog-share .copy input")
   input.value = `${baseurl}#content=${encoded}`
   input.setSelectionRange(0, 0)
+  input.blur()
   document.querySelector("#dialog-share").showModal()
 }
 

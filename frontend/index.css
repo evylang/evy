@@ -44,7 +44,7 @@
   --editor-padding-bottom: 16px;
   --editor-border: 1px solid var(--border-color);
   --editor-margin: 20px 0 16px 16px;
-  --canvas-size: min(33vw, 70vh);
+  --canvas-size: min(33vw, 60vh);
   --wrapper-max-width: calc(75ch + var(--canvas-size) + 32px);
   --console-width: var(--canvas-size);
   --output-width: calc(var(--canvas-size) + 2px);
@@ -60,7 +60,7 @@
   --sidemenu-transition-duration: 0.2s;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-height: 550px) {
   /* responsive mobile */
   :root {
     --display-desktop-only: none;
@@ -429,7 +429,6 @@ main.view-output {
   border-top-width: var(--output-border-top-width);
 }
 .output .canvas {
-  margin-left: auto;
   margin-right: auto;
   background: var(--output-bg);
   width: var(--canvas-size);

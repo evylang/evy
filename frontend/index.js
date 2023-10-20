@@ -14,6 +14,7 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
+let sidemenu
 
 // --- Initialise ------------------------------------------------------
 
@@ -336,9 +337,12 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
+  document.querySelector("#sidemenu-share").onclick = share
+  document.querySelector("#sidemenu-icon-share").onclick = share
   initModal()
   handleHashChange()
   initEditor()
+  initSidemenu()
 }
 
 async function fetchSamples() {
@@ -879,6 +883,29 @@ function breadcrumb(s) {
   const li = document.createElement("li")
   li.appendChild(btn)
   return li
+}
+
+// --- UI: sidemenu --------------------------------------------
+
+function initSidemenu() {
+  sidemenu = document.querySelector("#sidemenu")
+  document.querySelector("#hamburger").onclick = showSidemenu
+  document.querySelector("#sidemenu-close").onclick = hideSidemenu
+  document.addEventListener("click", handleOutsideSidemenuClick)
+}
+
+function showSidemenu() {
+  document.querySelector(".editor textarea").style.pointerEvents = "none"
+  document.querySelector("#sidemenu").classList.remove("hidden")
+}
+function hideSidemenu() {
+  document.querySelector(".editor textarea").style.pointerEvents = ""
+  document.querySelector("#sidemenu").classList.add("hidden")
+}
+function handleOutsideSidemenuClick(e) {
+  if (!sidemenu.classList.contains("hidden") && e.pageX > sidemenu.offsetWidth) {
+    hideSidemenu()
+  }
 }
 
 // --- UI: Confetti Easter Egg -----------------------------------------

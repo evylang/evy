@@ -31,7 +31,6 @@
   --modal-color-hover: hsl(0deg 0% 100% / 100%);
   --modal-circle-color: hsl(0deg 0% 35%);
   --modal-circle-bg: hsl(0deg 0% 13%);
-  --slide-transition-duration: 0.3s;
 
   /* responsive desktop */
   --display-desktop-only: initial;
@@ -56,6 +55,9 @@
   --output-border-width: 1px;
   --modal-section-width: 18rem;
   --slide: 0;
+  --slide-transition-duration: 0.3s;
+  --sidemenu-width: min(100vw, 18rem);
+  --sidemenu-transition-duration: 0.2s;
 }
 
 @media (max-width: 767px) {
@@ -86,6 +88,7 @@
 @media (prefers-reduced-motion) {
   :root {
     --slide-transition-duration: 0;
+    --sidemenu-transition-duration: 0;
   }
 }
 
@@ -133,19 +136,26 @@ header .breadcrumbs {
   text-align: center;
   justify-content: center;
 }
-header .logo {
+#hamburger {
+  position: relative;
+  left: 0.2em;
+  top: 0.05em;
+  padding-right: 16px;
+}
+header .left {
   text-align: left;
   justify-content: left;
 }
 header .logo img {
   position: relative;
   height: 1.2em;
-  top: var(--header-img-top);
+  top: 0.1em;
 }
 #share {
   text-align: right;
   color: var(--color);
   cursor: pointer;
+  min-width: 2rem;
 }
 #share:hover {
   color: var(--color-hover);
@@ -183,6 +193,63 @@ header .logo img {
   color: var(--color-hover);
 }
 
+/* --- Main ---------------------------------------------------------- */
+#sidemenu {
+  display: block;
+  background-color: #34393f;
+  color: #ffffffe5;
+  font-family: arial;
+  height: 100%;
+  width: var(--sidemenu-width);
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 1px 4px 0px 0px #00000040;
+  transition-property: translate;
+  transition-timing-function: ease-in-out;
+  transition-duration: var(--sidemenu-transition-duration);
+}
+#sidemenu.hidden {
+  translate: -100%;
+}
+
+#sidemenu header {
+  border-bottom: 1px solid var(--border-color);
+  color: white;
+}
+
+#sidemenu header button {
+  padding: 5px;
+}
+
+#sidemenu a,
+#sidemenu button {
+  font-family: var(--ff);
+  color: white;
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+#sidemenu a:hover,
+#sidemenu button:hover {
+  color: var(--color-hover);
+}
+#sidemenu ul {
+  list-style: none;
+  padding: 20px;
+  line-height: 2.5;
+}
+#sidemenu ul.icons {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 32px 20px;
+  border-top: 1px solid var(--border-color);
+}
 /* --- Main ---------------------------------------------------------- */
 main {
   background: var(--bg);
@@ -516,7 +583,7 @@ main.view-output {
   font-size: 1rem;
 }
 .header-icon:hover {
-  color: var(--hover-color);
+  color: var(--color-hover);
 }
 .modal-main {
   font-family: var(--ff);

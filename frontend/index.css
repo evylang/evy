@@ -5,6 +5,7 @@
   --bg: hsl(210deg 5% 15%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
+  --border-color: hsl(0deg 0% 100% / 20%);
   --header-bg: hsl(213deg 10% 23%);
   --output-bg: hsl(0deg 0% 100%);
   --output-color: hsl(0deg 0% 0% / 80%);
@@ -41,13 +42,14 @@
   --main-width: 100%;
   --main-translate: none;
   --editor-width: auto;
-  --editor-padding: 32px;
   --editor-padding-bottom: 16px;
+  --editor-border: 1px solid var(--border-color);
+  --editor-margin: 20px 0 16px 16px;
   --canvas-size: min(33vw, 70vh);
   --wrapper-max-width: calc(75ch + var(--canvas-size) + 32px);
   --console-width: var(--canvas-size);
   --output-width: calc(var(--canvas-size) + 2px);
-  --output-margin: 20px 20px 16px;
+  --output-margin: 20px 16px 16px 24px;
   --output-border: 1px solid var(--output-border-mid);
   --output-border-top-width: 23px;
   --output-border-radius: 6px;
@@ -64,15 +66,16 @@
     --header-img-top: 0.2em;
     --main-width: 200vw;
     --main-translate: 0;
-    --editor-padding-bottom: 72px;
     --output-width: 100vw;
     --output-margin: 0;
     --output-border: none;
     --output-border-top-width: 0;
     --output-border-radius: 0;
     --output-border-width: 0;
+    --editor-border: none;
+    --editor-margin: 4px 0 0 0;
+    --editor-padding-bottom: 72px;
     --editor-width: 100vw;
-    --editor-padding: 16px;
     --canvas-size: min(100vw, 60vh);
     --console-width: 100vw;
     --modal-section-width: 100vw;
@@ -106,7 +109,7 @@ body {
   font-family: var(--ff);
   letter-spacing: 0.15px;
   tab-size: 4;
-  background: black;
+  background: var(--bg);
   color: var(--color);
   overflow: clip;
 }
@@ -211,16 +214,20 @@ main.view-output {
 
 /* --- Editor -------------------------------------------------------- */
 .editor-wrap {
-  margin-top: var(--editor-padding);
+  margin: var(--editor-margin);
   padding-bottom: var(--editor-padding-bottom);
+  padding-top: 10px;
+  padding-right: 1em;
   font-size: 1rem;
   flex: 1;
   overflow: auto;
   width: var(--editor-width);
+  background: var(--bg);
+  border-radius: 6px;
+  border: var(--editor-border);
 }
 .editor {
   color: var(--color);
-  background: var(--bg);
   font-size: 1rem;
   font-family: var(--ff-code);
   font-variant-ligatures: none;
@@ -486,14 +493,12 @@ main.view-output {
   z-index: 10;
   inset: 0;
   overflow: clip;
-}
-#modal .max-width-wrapper {
   height: 100%;
   background: var(--modal-bg);
 }
 
 #modal header {
-  border-bottom: 1px solid hsl(0deg 0% 100% / 30%);
+  border-bottom: 1px solid var(--border-color);
   color: hsl(0deg 0% 70%);
   background: none;
   justify-content: right;
@@ -515,7 +520,7 @@ main.view-output {
 }
 .modal-main {
   font-family: var(--ff);
-  padding: 36px 32px;
+  padding: 36px;
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;

@@ -16,21 +16,22 @@
     <script src="index.js" type="module" defer></script>
   </head>
   <body>
+    <header>
+      <a href="/" class="logo">
+        <img src="img/logo.svg" alt="Evy logo" class="desktop" />
+        <img src="img/logo-sm.svg" alt="Small evy logo" class="mobile" width="20" height="20" />
+      </a>
+      <ul class="breadcrumbs">
+        <li><button>Tour</button></li>
+        <li><button>Welcome</button></li>
+      </ul>
+      <div id="share">
+        <svg width="1.2em" height="1.2em"><use href="#icon-share" /></svg>
+        <span>Share</span>
+      </div>
+    </header>
+
     <div class="max-width-wrapper">
-      <header>
-        <a href="/" class="logo">
-          <img src="img/logo.svg" alt="Evy logo" class="desktop" />
-          <img src="img/logo-sm.svg" alt="Small evy logo" class="mobile" width="20" height="20" />
-        </a>
-        <ul class="breadcrumbs">
-          <li><button>Tour</button></li>
-          <li><button>Welcome</button></li>
-        </ul>
-        <div id="share">
-          <svg width="1.2em" height="1.2em"><use href="#icon-share" /></svg>
-          <span>Share</span>
-        </div>
-      </header>
       <main>
         <div class="editor-wrap">
           <div class="editor"></div>
@@ -61,23 +62,21 @@
 
     <!-- Modal evy code sample selection, hidden on load, showed on breadcrumb click-->
     <div class="hidden" id="modal">
-      <div class="max-width-wrapper">
-        <header>
-          <button id="modal-close" class="header-icon">
-            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-          </button>
-        </header>
-        <div class="modal-main" id="modal-samples">
-          <div class="item">
-            <h2>🌱 Getting Started</h2>
-            <ul>
-              <li><a href="#helloworld">Hello, World</a></li>
-              <li><a href="#welcome">Welcome</a></li>
-            </ul>
-          </div>
+      <header>
+        <button id="modal-close" class="header-icon">
+          <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
+        </button>
+      </header>
+      <div class="modal-main" id="modal-samples">
+        <div class="item">
+          <h2>🌱 Getting Started</h2>
+          <ul>
+            <li><a href="#helloworld">Hello, World</a></li>
+            <li><a href="#welcome">Welcome</a></li>
+          </ul>
         </div>
-        <div class="modal-main hidden" id="modal-share"></div>
       </div>
+      <div class="modal-main hidden" id="modal-share"></div>
     </div>
     <!-- icons in hidden svg tag for styling and performance -->
     <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">

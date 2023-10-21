@@ -337,8 +337,7 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
-  const about = document.querySelector("#dialog-about")
-  document.querySelector("#sidemenu-about").onclick = () => about.showModal()
+  document.querySelector("#sidemenu-about").onclick = showAbout
   document.querySelector("#sidemenu-share").onclick = share
   document.querySelector("#sidemenu-icon-share").onclick = share
   initModal()
@@ -914,6 +913,12 @@ function initDialog() {
   }
 }
 
+function showAbout() {
+  const about = document.querySelector("#dialog-about")
+  hideSidemenu()
+  about.showModal()
+}
+
 // --- UI: Confetti Easter Egg -----------------------------------------
 //
 // When code input string contains the sub string "confetti" show
@@ -984,6 +989,7 @@ async function share() {
   const input = document.querySelector("#dialog-share .copy input")
   input.value = `${baseurl}#content=${encoded}`
   input.setSelectionRange(0, 0)
+  input.blur()
   document.querySelector("#dialog-share").showModal()
 }
 

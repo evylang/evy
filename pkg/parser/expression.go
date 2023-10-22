@@ -292,7 +292,7 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 	p.advance() // advance past (
 	t := p.parseType()
 	switch t {
-	case ILLEGAL_TYPE:
+	case nil:
 		msg := fmt.Sprintf("invalid type in type assertion of %q", left.String())
 		p.appendErrorForToken(msg, tok)
 	case ANY_TYPE:

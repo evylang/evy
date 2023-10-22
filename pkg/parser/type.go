@@ -166,16 +166,6 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 	return t.Sub.acceptsStrict(t2.Sub)
 }
 
-func (t *Type) sameComposite(t2 *Type) bool {
-	if t.Name == ARRAY && t2.Name == ARRAY {
-		return true
-	}
-	if t.Name == MAP && t2.Name == MAP {
-		return true
-	}
-	return false
-}
-
 func combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
@@ -186,7 +176,7 @@ func combineTypes(types []*Type) *Type {
 			combinedT = t
 			continue
 		}
-		if t.sameComposite(combinedT) {
+		if (t.Name == ARRAY || t.Name == MAP) && t.Name == combinedT.Name {
 			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
 			continue
 		}

@@ -175,3 +175,22 @@ func (t *Type) sameComposite(t2 *Type) bool {
 	}
 	return false
 }
+
+func combineTypes(types []*Type) *Type {
+	combinedT := types[0]
+	for _, t := range types[1:] {
+		if combinedT.accepts(t) {
+			continue
+		}
+		if t.accepts(combinedT) {
+			combinedT = t
+			continue
+		}
+		if t.sameComposite(combinedT) {
+			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
+			continue
+		}
+		return ANY_TYPE
+	}
+	return combinedT
+}

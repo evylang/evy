@@ -67,6 +67,7 @@ type Type struct {
 	Sub  *Type    // e.g.: `[]int` : Type{Name: "array", Sub: &Type{Name: "int"} }
 }
 
+// String returns a string representation of the Type.
 func (t *Type) String() string {
 	if t == nil {
 		return "ILLEGAL"

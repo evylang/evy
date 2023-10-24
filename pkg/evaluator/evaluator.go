@@ -195,6 +195,8 @@ func (e *Evaluator) eval(node parser.Node) (value, error) {
 		return &stringVal{V: node.Value}, nil
 	case *parser.BoolLiteral:
 		return &boolVal{V: node.Value}, nil
+	case *parser.Any:
+		return e.evalAny(node)
 	case *parser.ArrayLiteral:
 		return e.evalArrayLiteral(node)
 	case *parser.MapLiteral:
@@ -305,9 +307,6 @@ func (e *Evaluator) evalDecl(decl *parser.Decl) error {
 	if err != nil {
 		return err
 	}
-	if decl.Type() == parser.ANY_TYPE && val.Type() != parser.ANY_TYPE {
-		val = &anyVal{V: val}
-	}
 	e.scope.set(decl.Var.Name, copyOrRef(val), decl.Type())
 	return nil
 }
@@ -323,6 +322,17 @@ func (e *Evaluator) evalAssignment(assignment *parser.AssignmentStmt) error {
 	}
 	target.Set(val)
 	return nil
+}
+
+func (e *Evaluator) evalAny(a *parser.Any) (value, error) {
+	val, err := e.eval(a.Value)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := val.(*anyVal); ok {
+		panic("nested any value " + a.String())
+	}
+	return &anyVal{V: val}, nil
 }
 
 func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
@@ -634,7 +644,7 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (value, error)
 	case *boolVal:
 		val, err = evalBinaryBoolExpr(op, l, right.(*boolVal))
 	case *arrayVal:
-		val, err = evalBinaryArrayExpr(op, l, right.(*arrayVal))
+		val, err = evalBinaryArrayExpr(op, l, right.(*arrayVal), expr.Type())
 	default:
 		err = fmt.Errorf("%w (binary): %v", ErrOperation, expr)
 	}
@@ -708,14 +718,12 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *boolVal) (value, error)
 	return nil, fmt.Errorf("%w (bool): %v", ErrOperation, op.String())
 }
 
-func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal) (value, error) {
+func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal, t *parser.Type) (value, error) {
 	if op != parser.OP_PLUS {
 		return nil, fmt.Errorf("%w (array): %v", ErrOperation, op.String())
 	}
 	result := left.Copy()
-	if result.T == parser.UNTYPED_ARRAY {
-		result.T = right.T
-	}
+	result.T = t
 	rightElemnts := *right.Copy().Elements
 	*result.Elements = append(*result.Elements, rightElemnts...)
 	return result, nil

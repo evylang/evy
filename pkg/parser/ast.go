@@ -492,6 +492,88 @@ type MapLiteral struct {
 	T     *Type
 }
 
+// Any is an AST node that wraps literals and non-any variables if the target
+// assignable requires it.
+type Any struct {
+	token *lexer.Token
+	Value Node
+}
+
+// Type always returns [ANY_TYPE].
+func (*Any) Type() *Type { return ANY_TYPE }
+
+// Token returns the token of the Evy source program associated with the
+// Any node.
+func (a *Any) Token() *lexer.Token { return a.Value.Token() }
+
+// String returns a string representation of the Program node.
+func (a *Any) String() string { return "any(" + a.Value.String() + ")" }
+
+type inferrer interface {
+	infer()
+}
+
+func wrapAny(val Node, targetType *Type) Node {
+	valType := val.Type()
+	if targetType.Equals(valType) {
+		return val
+	}
+	if targetType == ANY_TYPE {
+		if inf, ok := val.(inferrer); ok {
+			inf.infer()
+		}
+		return &Any{token: val.Token(), Value: val}
+	}
+	if targetType == UNTYPED_ARRAY || targetType == UNTYPED_MAP { // generic builtins
+		return val
+	}
+	if valType == UNTYPED_ARRAY {
+		switch v := val.(type) {
+		case *ArrayLiteral:
+			v.T = targetType
+			return v
+		case *BinaryExpression:
+			v.Left = wrapAny(v.Left, targetType)
+			v.Right = wrapAny(v.Right, targetType)
+			v.T = targetType
+			return v
+		case *GroupExpression:
+			v.Expr = wrapAny(v.Expr, targetType)
+			return v
+		}
+		panic(fmt.Sprintf("internal error: untyped array: %s incompatible types: target %v, value %v", val.Token().Location(), targetType, valType))
+	}
+	if valType == UNTYPED_MAP {
+		switch v := val.(type) {
+		case *MapLiteral:
+			v.T = targetType
+			return v
+		case *GroupExpression:
+			v.Expr = wrapAny(v.Expr, targetType)
+			return v
+		}
+		panic(fmt.Sprintf("internal error: untyped map: %s incompatible types: target %v, value %v", val.Token().Location(), targetType, valType))
+	}
+
+	arrayLit, ok := val.(*ArrayLiteral)
+	if targetType.Name == ARRAY && ok {
+		for i, el := range arrayLit.Elements {
+			arrayLit.Elements[i] = wrapAny(el, targetType.Sub)
+		}
+		arrayLit.T = targetType
+		return arrayLit
+	}
+	mapLit, ok := val.(*MapLiteral)
+	if targetType.Name == MAP && ok {
+		for key, val := range mapLit.Pairs {
+			mapLit.Pairs[key] = wrapAny(val, targetType.Sub)
+		}
+		mapLit.T = targetType
+		return mapLit
+	}
+	panic(fmt.Sprintf("internal error: %s incompatible types: target %v, value %v", val.Token().Location(), targetType, valType))
+}
+
 func isCompositeConst(n Node) bool {
 	if arrayLit, ok := n.(*ArrayLiteral); ok {
 		return isConst(arrayLit)
@@ -647,6 +729,12 @@ func (b *BinaryExpression) Type() *Type {
 	return b.T
 }
 
+func (b *BinaryExpression) infer() {
+	if b.T == UNTYPED_ARRAY {
+		b.T = &Type{Name: ARRAY, Sub: ANY_TYPE}
+	}
+}
+
 // Token returns the token of the Evy source program associated with the
 // IndexExpression node.
 func (i *IndexExpression) Token() *lexer.Token {
@@ -738,6 +826,12 @@ func (d *GroupExpression) String() string {
 // 2*(3+4).
 func (d *GroupExpression) Type() *Type {
 	return d.Expr.Type()
+}
+
+func (d *GroupExpression) infer() {
+	if d.Type() == UNTYPED_ARRAY {
+		d.Expr.(inferrer).infer()
+	}
 }
 
 // Token returns the token of the Evy source program associated with the
@@ -1067,6 +1161,15 @@ func (a *ArrayLiteral) Type() *Type {
 	return a.T
 }
 
+func (a *ArrayLiteral) infer() {
+	a.T = a.T.infer()
+	for _, el := range a.Elements {
+		if inf, ok := el.(inferrer); ok {
+			inf.infer()
+		}
+	}
+}
+
 // String returns a string representation of the MapLiteral node.
 func (m *MapLiteral) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
@@ -1080,6 +1183,15 @@ func (m *MapLiteral) String() string {
 // Type returns the type of the map literal such as {}num for {a:1 b:2}.
 func (m *MapLiteral) Type() *Type {
 	return m.T
+}
+
+func (m *MapLiteral) infer() {
+	m.T = m.T.infer()
+	for _, val := range m.Pairs {
+		if inf, ok := val.(inferrer); ok {
+			inf.infer()
+		}
+	}
 }
 
 func newlineList(nodes []Node) string {

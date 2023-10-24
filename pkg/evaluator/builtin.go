@@ -183,7 +183,7 @@ func printfFunc(printFn func(string)) builtinFunc {
 		if len(args) < 1 {
 			return nil, fmt.Errorf(`%w: "printf" takes at least 1 argument`, ErrBadArguments)
 		}
-		format, ok := args[0].(*stringVal)
+		format, ok := args[0].(*anyVal).V.(*stringVal)
 		if !ok {
 			return nil, fmt.Errorf(`%w: first argument of "printf" must be a string`, ErrBadArguments)
 		}
@@ -207,7 +207,7 @@ func sprintfFunc(_ *scope, args []value) (value, error) {
 	if len(args) < 1 {
 		return nil, fmt.Errorf(`%w: "sprintf" takes at least 1 argument`, ErrBadArguments)
 	}
-	format, ok := args[0].(*stringVal)
+	format, ok := args[0].(*anyVal).V.(*stringVal)
 	if !ok {
 		return nil, fmt.Errorf(`%w: first argument of "sprintf" must be a string`, ErrBadArguments)
 	}
@@ -450,7 +450,7 @@ var lenDecl = &parser.FuncDefStmt{
 }
 
 func lenFunc(_ *scope, args []value) (value, error) {
-	switch arg := args[0].(type) {
+	switch arg := args[0].(*anyVal).V.(type) {
 	case *mapVal:
 		return &numVal{V: float64(len(arg.Pairs))}, nil
 	case *arrayVal:

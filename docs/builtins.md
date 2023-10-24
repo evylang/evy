@@ -359,7 +359,7 @@ typeof "abcd": string
 typeof {kind:true strong:true}: {}bool
 typeof [[1 2] [3 4]]: [][]num
 typeof [1 2 true]: []any
-typeof []: []
+typeof []: []any
 ```
 
 #### Reference

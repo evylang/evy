@@ -426,9 +426,13 @@ func (p *parser) parseArrayLiteral() Node {
 	for i, e := range elements {
 		types[i] = e.Type()
 	}
-	arrayLit.T = &Type{Name: ARRAY, Sub: combineTypes(types)}
+	sub := combineTypes(types)
+	arrayLit.T = &Type{Name: ARRAY, Sub: sub}
+	for i, e := range elements {
+		elements[i] = wrapAny(e, sub)
+	}
 	arrayLit.Elements = elements
-	return arrayLit
+	return wrapAny(arrayLit, arrayLit.T)
 }
 
 func (p *parser) parseExprList() []Node {
@@ -473,7 +477,11 @@ func (p *parser) parseMapLiteral() Node {
 	for _, n := range mapLit.Pairs {
 		types = append(types, n.Type())
 	}
-	mapLit.T = &Type{Name: MAP, Sub: combineTypes(types)}
+	sub := combineTypes(types)
+	for key, val := range mapLit.Pairs {
+		mapLit.Pairs[key] = wrapAny(val, sub)
+	}
+	mapLit.T = &Type{Name: MAP, Sub: sub}
 	return mapLit
 }
 

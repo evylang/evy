@@ -829,7 +829,7 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 	if !ok {
 		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
 	}
-	if !a.V.Type().Matches(ta.T) {
+	if !a.V.Type().Equals(ta.T) {
 		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.V.Type()))
 	}
 	return a.V, nil

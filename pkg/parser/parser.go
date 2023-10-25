@@ -295,7 +295,7 @@ func (p *parser) addEventParamsToScope(e *EventHandlerStmt) {
 	for i, param := range e.Params {
 		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
-		if !param.Type().Matches(exptectedType) {
+		if !param.Type().Equals(exptectedType) {
 			p.appendError(fmt.Sprintf("wrong type for parameter %s, expected %s, got %s", param.Name, exptectedType, param.Type()))
 		}
 		p.scope.set(param.Name, param)
@@ -378,7 +378,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		p.advancePastNL()
 		return nil
 	}
-	if !target.Type().accepts(value.Type()) {
+	if !target.Type().accepts(value.Type(), isCompositeConst(value)) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	}
@@ -570,7 +570,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.VariadicParam.Type()
 		for _, arg := range args {
 			argType := arg.Type()
-			if !paramType.accepts(argType) && !paramType.Matches(argType) {
+			if !paramType.accepts(argType, isCompositeConst(arg)) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			}
@@ -589,7 +589,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.accepts(argType) && !paramType.Matches(argType) {
+		if !paramType.accepts(argType, isCompositeConst(arg)) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		}
@@ -779,9 +779,10 @@ func (p *parser) parseReturnStatement() Node {
 			p.assertEOL()
 		}
 	}
-	if p.scope.returnType == nil {
+	switch {
+	case p.scope.returnType == nil:
 		p.appendErrorForToken("return statement not allowed here", retValueToken)
-	} else if !p.scope.returnType.accepts(ret.T) {
+	case !p.scope.returnType.accepts(ret.T, isCompositeConst(ret.Value)):
 		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
 		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()

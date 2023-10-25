@@ -44,9 +44,11 @@ To get an intuitive understanding of Evy, you can either look at its
 20. [**Break and Return**](#break-and-return)
 21. [**Typeof**](#typeof)
 22. [**Type Assertion**](#type-assertion)
-23. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
-24. [**Execution Model and Event Handlers**](#execution-model-and-event-handlers)
-25. [**Runtimes**](#runtimes)
+23. [**Assignability**](#assignability)  
+    [Assignability of variable values](#assignability-of-variable-values), [Assignability of constant values](#assignability-of-constant-values), [Assignability of empty composite literals](#assignability-of-empty-composite-literals)
+24. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
+25. [**Execution Model and Event Handlers**](#execution-model-and-event-handlers)
+26. [**Runtimes**](#runtimes)
 
 <!-- genend:toc -->
 
@@ -175,16 +177,16 @@ listing contains the complete syntax grammar for Evy.
     break_stmt  = "break" nl .
 
     /* --- Statement ---- */
-    assign_stmt        = assignable "=" toplevel_expr nl .
+    assign_stmt        = target "=" toplevel_expr nl .
     typed_decl_stmt    = typed_decl nl .
     inferred_decl_stmt = ident ":=" toplevel_expr nl .
     func_call_stmt     = func_call nl .
 
     /* --- Assignment --- */
-    assignable     = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
+    target         = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
     ident          = LETTER { LETTER | UNICODE_DIGIT } .
-    index_expr     = assignable "[" <+ toplevel_expr +> "]" .
-    dot_expr       = assignable "." ident .
+    index_expr     = target "[" <+ toplevel_expr +> "]" .
+    dot_expr       = target "." ident .
 
     /* --- Type --- */
     typed_decl     = ident ":" type .
@@ -204,9 +206,9 @@ listing contains the complete syntax grammar for Evy.
     tight_expr = <- expr -> . /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
     expr       = operand | unary_expr | binary_expr .
 
-    operand    = literal | assignable | slice | type_assertion | group_expr .
+    operand    = literal | target | slice | type_assertion | group_expr .
     group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
-    type_assertion = <- assignable ".(" -> type ")" . /* no WS around `.` */
+    type_assertion = <- target ".(" -> type ")" . /* no WS around `.` */
 
     unary_expr = <- UNARY_OP -> expr .  /* no WS after UNARY_OP */
     UNARY_OP   = "-" | "!" .
@@ -219,7 +221,7 @@ listing contains the complete syntax grammar for Evy.
     MUL_OP        = "*" | "/" | "%" .
 
     /* --- Slice and Literals --- */
-    slice       = <- assignable "[" slice_expr "]" -> .
+    slice       = <- target "[" slice_expr "]" -> .
     slice_expr  = <+ [expr] ":" [expr] +> .
     literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
     num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
@@ -359,11 +361,13 @@ declarations. Otherwise the empty map literal assumes the map type
 
 ## Assignments
 
-Assignments are defined by an equal sign `=`. The left-hand side of the
-`=` must contain an **assignable**, a variable, an indexed array, or a
-map field. Before the assignment the variable must be declared via
-inferred or typed declaration. Only values of the correct type can be
-assigned to a variable.
+Assignments are defined by an equal sign `=`. The left-hand side of the `=`
+must contain an **assignment target**, a variable, an indexed array, or a map
+field. The assignment target must be declared before the assignment, either
+implicitly via type inference or explicitly via a type declaration. It can
+also be a parameter of a function or event handler definition.
+[Assignability](#assignability) provides rules on which value types can be
+assigned to which target types.
 
 For example, the following code declares a string variable named `s` and
 initializes it to the value `"a"` through inference. Then, it assigns
@@ -1287,7 +1291,7 @@ of type `[]any`.
 x := [1 2 3]
 print "x" (typeof x)
 y:[]any
-// y = [1 2 3] // TODO PR https://github.com/evylang/evy/pull/179
+y = [1 2 3]
 print "y" (typeof y)
 // y = x // parse error
 // x = y // parse error
@@ -1339,7 +1343,7 @@ type `[]any` can be type assert, for example `arr[0].(num)`,
 ```evy
 x:[]any
 x = [1 2 3 true]
-x = x[:-1] // TODO remove, use x := [1 2 3] , PR 175, 179
+x = [1 2 3]
 print "x:" x "typeof x:" (typeof x)
 // print x.([]num) // parse error
 // print x[0].(string) // run-time panic
@@ -1350,6 +1354,70 @@ outputs
 ```evy:output
 x: [1 2 3] typeof x: []any
 ```
+
+## Assignability
+
+**Assignability** determines whether a value of one type can be assigned to a
+variable of another type. This means that the variable _accepts_ the value.
+Assignability rules apply to:
+
+- assignments
+- function parameters
+- return values
+
+In the assignment `target = val`, `val` can be a variable, a constant, or an
+expression. A _constant_ is either a literal of type `num`, `string`, or
+`bool`, or it is a composite literal that does not contain any variables. For
+example, `[1 2 {}]` is a constant, but `[1 2 x]` is not. If `val` in
+`target = val` is an expression that only contains constants, it is treated
+like a constant; otherwise, it is treated like a variable.
+
+### Assignability of variable values
+
+If `target` is of type `t` and `val` is a _variable_ of type `t2`, `target`
+accepts `val` if:
+
+- `t` and `t2` are identical, or
+- `t` is of type `any`
+
+### Assignability of constant values
+
+If `target` is of type `t` and `val` is a _constant_ of type `t2`, `target`
+accepts `val` if:
+
+- `t` and `t2` are identical, or
+- `t` is of type `any`, or
+- `t` is a composite with basic subtype `any` and `t2` can be **converted** to it.
+
+A constant of type `t2` can be **converted** to type `t` if both types are
+composite types of the same structure and the final subtype of `t` is `any`.
+This means, for instance, that the literal array `[1 2 3]` of type
+`[]num` can be assigned to a variable of type `[]any`.
+
+The following code:
+
+```evy
+arr:[]{}any
+arr = [{a:1} {b:[1 2 {}]} {}]
+print (typeof arr)
+print (typeof arr[0])
+print (typeof arr[0].a)
+```
+
+will output:
+
+```evy:output
+[]{}any
+{}num
+num
+```
+
+### Assignability of empty composite literals
+
+Empty composite literals `[]`, `{}`, or nested emtpy composite literals of
+them, such as `[[]]`, follow the same rules as
+[inferred declarations](#variables-and-declarations): `[]` gets converted to
+type `[]any`, `{}` gets converted to type `{}any` and `[[]]` to type `[][]any`.
 
 ## Run-time Panics and Recoverable Errors
 

@@ -175,16 +175,16 @@ listing contains the complete syntax grammar for Evy.
     break_stmt  = "break" nl .
 
     /* --- Statement ---- */
-    assign_stmt        = assignable "=" toplevel_expr nl .
+    assign_stmt        = target "=" toplevel_expr nl .
     typed_decl_stmt    = typed_decl nl .
     inferred_decl_stmt = ident ":=" toplevel_expr nl .
     func_call_stmt     = func_call nl .
 
     /* --- Assignment --- */
-    assignable     = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
+    target         = <- ident | index_expr | dot_expr -> . /* no WS before `[` and around `.` */
     ident          = LETTER { LETTER | UNICODE_DIGIT } .
-    index_expr     = assignable "[" <+ toplevel_expr +> "]" .
-    dot_expr       = assignable "." ident .
+    index_expr     = target "[" <+ toplevel_expr +> "]" .
+    dot_expr       = target "." ident .
 
     /* --- Type --- */
     typed_decl     = ident ":" type .
@@ -204,9 +204,9 @@ listing contains the complete syntax grammar for Evy.
     tight_expr = <- expr -> . /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
     expr       = operand | unary_expr | binary_expr .
 
-    operand    = literal | assignable | slice | type_assertion | group_expr .
+    operand    = literal | target | slice | type_assertion | group_expr .
     group_expr = "(" <+ toplevel_expr +> ")" . /* WS can be used freely within `(…)` */
-    type_assertion = <- assignable ".(" -> type ")" . /* no WS around `.` */
+    type_assertion = <- target ".(" -> type ")" . /* no WS around `.` */
 
     unary_expr = <- UNARY_OP -> expr .  /* no WS after UNARY_OP */
     UNARY_OP   = "-" | "!" .
@@ -219,7 +219,7 @@ listing contains the complete syntax grammar for Evy.
     MUL_OP        = "*" | "/" | "%" .
 
     /* --- Slice and Literals --- */
-    slice       = <- assignable "[" slice_expr "]" -> .
+    slice       = <- target "[" slice_expr "]" -> .
     slice_expr  = <+ [expr] ":" [expr] +> .
     literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
     num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
@@ -359,11 +359,11 @@ declarations. Otherwise the empty map literal assumes the map type
 
 ## Assignments
 
-Assignments are defined by an equal sign `=`. The left-hand side of the
-`=` must contain an **assignable**, a variable, an indexed array, or a
-map field. Before the assignment the variable must be declared via
-inferred or typed declaration. Only values of the correct type can be
-assigned to a variable.
+Assignments are defined by an equal sign `=`. The left-hand side of the `=`
+must contain an **assignment target**, a variable, an indexed array, or a map
+field. Before the assignment the variable must be declared via inferred or
+typed declaration. Only values of the correct type can be assigned to a
+variable.
 
 For example, the following code declares a string variable named `s` and
 initializes it to the value `"a"` through inference. Then, it assigns

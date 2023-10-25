@@ -162,7 +162,7 @@ type GroupExpression struct {
 type Decl struct {
 	token *lexer.Token
 	Var   *Var
-	Value Node // literal, expression, assignable, ...
+	Value Node // literal, expression, variable, ...
 }
 
 // TypedDeclStmt is an AST node that represents a typed declaration
@@ -194,7 +194,7 @@ type InferredDeclStmt struct {
 type AssignmentStmt struct {
 	token  *lexer.Token
 	Target Node // Variable, index or field expression
-	Value  Node // literal, expression, assignable, ...
+	Value  Node // literal, expression, variable...
 }
 
 // ReturnStmt is an AST node that represents a return statement. A
@@ -208,7 +208,7 @@ type AssignmentStmt struct {
 // ReturnStmt implements the [Node] interface.
 type ReturnStmt struct {
 	token *lexer.Token
-	Value Node // literal, expression, assignable, ...
+	Value Node // literal, expression, variable, ...
 	T     *Type
 }
 

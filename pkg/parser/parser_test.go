@@ -1060,7 +1060,7 @@ func TestEmptyArray(t *testing.T) {
 		parser := newParser(input, testBuiltins())
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
-		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, EMPTY_ARRAY.Sub)
 	}
 }
 
@@ -1079,7 +1079,7 @@ end`,
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
 
-		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
+		assert.Equal(t, NONE_TYPE, EMPTY_ARRAY.Sub)
 	}
 }
 
@@ -1638,7 +1638,7 @@ func testBuiltins() Builtins {
 		"has": {
 			Name: "has",
 			Params: []*Var{
-				{Name: "map", T: UNTYPED_MAP},
+				{Name: "map", T: GENERIC_MAP},
 				{Name: "key", T: STRING_TYPE},
 			},
 			ReturnType: NONE_TYPE,
@@ -1646,7 +1646,7 @@ func testBuiltins() Builtins {
 		"join": {
 			Name: "join",
 			Params: []*Var{
-				{Name: "arr", T: UNTYPED_MAP},
+				{Name: "arr", T: GENERIC_MAP},
 				{Name: "sep", T: STRING_TYPE},
 			},
 			ReturnType: STRING_TYPE,

@@ -524,10 +524,10 @@ func wrapAny(val Node, targetType *Type) Node {
 		}
 		return &Any{token: val.Token(), Value: val}
 	}
-	if targetType == UNTYPED_ARRAY || targetType == UNTYPED_MAP { // generic builtins
+	if targetType == GENERIC_ARRAY || targetType == GENERIC_MAP { // generic builtins
 		return val
 	}
-	if valType == UNTYPED_ARRAY {
+	if valType == EMPTY_ARRAY {
 		switch v := val.(type) {
 		case *ArrayLiteral:
 			v.T = targetType
@@ -543,7 +543,7 @@ func wrapAny(val Node, targetType *Type) Node {
 		}
 		panic(fmt.Sprintf("internal error: untyped array: %s incompatible types: target %v, value %v", val.Token().Location(), targetType, valType))
 	}
-	if valType == UNTYPED_MAP {
+	if valType == EMPTY_MAP {
 		switch v := val.(type) {
 		case *MapLiteral:
 			v.T = targetType
@@ -730,7 +730,7 @@ func (b *BinaryExpression) Type() *Type {
 }
 
 func (b *BinaryExpression) infer() {
-	if b.T == UNTYPED_ARRAY {
+	if b.T == EMPTY_ARRAY {
 		b.T = &Type{Name: ARRAY, Sub: ANY_TYPE}
 	}
 }
@@ -829,7 +829,7 @@ func (d *GroupExpression) Type() *Type {
 }
 
 func (d *GroupExpression) infer() {
-	if d.Type() == UNTYPED_ARRAY {
+	if d.Type() == EMPTY_ARRAY {
 		d.Expr.(inferrer).infer()
 	}
 }

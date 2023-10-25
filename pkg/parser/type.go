@@ -21,7 +21,7 @@ const (
 
 // Basic types, any, none, and untyped arrays and untyped maps are
 // [interned] into variables for reuse, such as [NUM_TYPE] or
-// [UNTYPED_MAP].
+// [EMPTY_MAP].
 //
 // [interned]: https://en.wikipedia.org/wiki/Interning_(computer_science)
 var (
@@ -30,8 +30,10 @@ var (
 	STRING_TYPE   = &Type{Name: STRING}
 	ANY_TYPE      = &Type{Name: ANY}
 	NONE_TYPE     = &Type{Name: NONE}
-	UNTYPED_ARRAY = &Type{Name: ARRAY, Sub: NONE_TYPE}
-	UNTYPED_MAP   = &Type{Name: MAP, Sub: NONE_TYPE}
+	EMPTY_ARRAY   = &Type{Name: ARRAY, Sub: NONE_TYPE}
+	EMPTY_MAP     = &Type{Name: MAP, Sub: NONE_TYPE}
+	GENERIC_ARRAY = &Type{Name: ARRAY}
+	GENERIC_MAP   = &Type{Name: MAP}
 )
 
 type typeNameString struct {
@@ -72,7 +74,7 @@ func (t *Type) String() string {
 	if t == nil {
 		return "ILLEGAL"
 	}
-	if t.Sub == nil || t == UNTYPED_ARRAY || t == UNTYPED_MAP {
+	if t.Sub == nil || t == EMPTY_ARRAY || t == EMPTY_MAP {
 		return t.Name.String()
 	}
 	return t.Name.String() + t.Sub.String()
@@ -116,10 +118,10 @@ func (t *Type) accepts(t2 *Type, constant bool) bool {
 			return true
 		case left.Name != right.Name:
 			return false
-		case left == UNTYPED_ARRAY, left == UNTYPED_MAP:
+		case left == GENERIC_ARRAY, left == GENERIC_MAP:
 			// "generic" builtins parameter such as `has` for maps.
 			return true
-		case right == UNTYPED_ARRAY, right == UNTYPED_MAP:
+		case right == EMPTY_ARRAY, right == EMPTY_MAP:
 			return true
 		}
 		left, right = left.Sub, right.Sub
@@ -142,7 +144,7 @@ func (t *Type) matches(t2 *Type) bool {
 			return true
 		case left.Name != right.Name:
 			return false
-		case left == UNTYPED_ARRAY, left == UNTYPED_MAP, right == UNTYPED_ARRAY, right == UNTYPED_MAP:
+		case left == EMPTY_ARRAY, left == EMPTY_MAP, right == EMPTY_ARRAY, right == EMPTY_MAP:
 			return true
 		}
 		left, right = left.Sub, right.Sub
@@ -154,10 +156,10 @@ func (t *Type) infer() *Type {
 	if t.Name != ARRAY && t.Name != MAP {
 		return t
 	}
-	if t == UNTYPED_ARRAY {
+	if t == EMPTY_ARRAY {
 		return &Type{Name: ARRAY, Sub: ANY_TYPE}
 	}
-	if t == UNTYPED_MAP {
+	if t == EMPTY_MAP {
 		return &Type{Name: MAP, Sub: ANY_TYPE}
 	}
 	t2 := *t
@@ -173,8 +175,8 @@ func combineTypes(types []*Type) *Type {
 		}
 		if (t.Name == ARRAY || t.Name == MAP) && t.Name == combinedT.Name {
 			switch {
-			case t == UNTYPED_ARRAY, t == UNTYPED_MAP:
-			case combinedT == UNTYPED_ARRAY, combinedT == UNTYPED_MAP:
+			case t == EMPTY_ARRAY, t == EMPTY_MAP:
+			case combinedT == EMPTY_ARRAY, combinedT == EMPTY_MAP:
 				combinedT = t
 			case t.Name == ARRAY && combinedT.Name == ARRAY, t.Name == MAP && combinedT.Name == MAP:
 				sub := combineTypes([]*Type{t.Sub, combinedT.Sub})

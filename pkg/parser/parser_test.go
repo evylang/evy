@@ -1390,7 +1390,7 @@ a:[]any
 b := [1 2]
 a = [1 2]
 a = b
-`: `line 4 column 1: "a" accepts values of type []any, found []num`,
+`: `line 5 column 1: "a" accepts values of type []any, found []num`,
 		`
 b := [1 2]
 b = [] + b + [true]

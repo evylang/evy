@@ -342,7 +342,7 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
-	if !leftType.Matches(rightType) {
+	if !leftType.matches(rightType) {
 		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op.String(), leftType.String(), rightType.String())
 		p.appendErrorForToken(msg, tok)
 		return

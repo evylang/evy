@@ -78,99 +78,110 @@ func (t *Type) String() string {
 	return t.Name.String() + t.Sub.String()
 }
 
-func (t *Type) accepts(t2 *Type) bool {
-	if t == nil || t2 == nil {
-		return t == t2
+// Equals returns if t and t2 and all their sub types are equal in Name.
+func (t *Type) Equals(t2 *Type) bool {
+	left, right := t, t2
+	for (left != nil) && (right != nil) {
+		switch {
+		case left == right:
+			return true
+		case left.Name != right.Name:
+			return false
+		}
+		left, right = left.Sub, right.Sub
 	}
-	if t.acceptsStrict(t2) {
-		return true
-	}
-	n, n2 := t.Name, t2.Name
-	if n == ANY && n2 != NONE {
-		return true
-	}
-	// empty Array of none_type accepted by all arrays.
-	// empty Map of none_type accepted by all maps
-	return false
+	return left == right
 }
 
-// Matches returns true if the two types are equal, or if one is a
-// untyped array and the other is a specific array, or if one is a
-// untyped map and the other is a specific map. This is useful for type
-// validation in binary expressions, such as array concatenation:
+// accepts returns true if a variable v of Type t and a value v2 of Type t2
+// can form the valid assignment statement v = v2.
+//
+// Assignability rules are stricter for composite variables than for composite
+// constants. Specifically, an any composite type, such as []any, can accept
+// a non-any composite type, such as []num, if the non-any composite type is
+// the type of a constant, such as [1 2].
+//
+//	anyArr := &Type{Name ARRAY: Type: ANY} // []any
+//	numArr := &Type{Name ARRAY: Type: NUM} // []num
+//	fmt.Println(anyArray.accepts(numArray, true /* constant */)) // true
+//	fmt.Println(anyArray.accepts(numArray, false /* constant */)) // false
+func (t *Type) accepts(t2 *Type, constant bool) bool {
+	left, right := t, t2
+	for (left != nil) && (right != nil) {
+		switch {
+		case left == right:
+			return true
+		case left.Name == ANY && right.Name != NONE && (left == t || constant):
+			// left == t allows, e.g., any = num but not []any = []num
+			return true
+		case left.Name != right.Name:
+			return false
+		case left == UNTYPED_ARRAY, left == UNTYPED_MAP:
+			// "generic" builtins parameter such as `has` for maps.
+			return true
+		case right == UNTYPED_ARRAY, right == UNTYPED_MAP:
+			return true
+		}
+		left, right = left.Sub, right.Sub
+	}
+	return left == right
+}
+
+// matches returns true if the two types are equal, or if one is a untyped
+// array and the other is a specific array, or if one is a untyped map and
+// the other is a specific map. This is used only for type validation in
+// binary expressions, such as array concatenation:
 //
 //	[] + [1]
 //	[1] + []
-func (t *Type) Matches(t2 *Type) bool {
-	if t == nil || t2 == nil {
-		return t == t2
+func (t *Type) matches(t2 *Type) bool {
+	left, right := t, t2
+	for (left != nil) && (right != nil) {
+		switch {
+		case left == right:
+			return true
+		case left.Name != right.Name:
+			return false
+		case left == UNTYPED_ARRAY, left == UNTYPED_MAP, right == UNTYPED_ARRAY, right == UNTYPED_MAP:
+			return true
+		}
+		left, right = left.Sub, right.Sub
 	}
-	if t == t2 {
-		return true
-	}
-	if t.Name != t2.Name {
-		return false
-	}
-	if t.Sub == t2.Sub {
-		return true
-	}
-	if t.Sub == nil || t2.Sub == nil {
-		return false
-	}
-	if t == UNTYPED_ARRAY || t == UNTYPED_MAP || t2 == UNTYPED_ARRAY || t2 == UNTYPED_MAP {
-		return true
-	}
-	return t.Sub.Matches(t2.Sub)
+	return left == right
 }
 
 func (t *Type) infer() *Type {
 	if t.Name != ARRAY && t.Name != MAP {
 		return t
 	}
-	if t.Sub == NONE_TYPE {
-		t2 := *t
-		t2.Sub = ANY_TYPE
-		return &t2
+	if t == UNTYPED_ARRAY {
+		return &Type{Name: ARRAY, Sub: ANY_TYPE}
 	}
-	t.Sub = t.Sub.infer()
-	return t
-}
-
-// []any (ARRAY ANY) DOES NOT accept []num (ARRAY NUM).
-func (t *Type) acceptsStrict(t2 *Type) bool {
-	if t == nil || t2 == nil {
-		return t == t2
+	if t == UNTYPED_MAP {
+		return &Type{Name: MAP, Sub: ANY_TYPE}
 	}
-	n, n2 := t.Name, t2.Name
-	if n != n2 {
-		return false
-	}
-	if t.Sub == nil || t2.Sub == nil {
-		return t.Sub == nil && t2.Sub == nil
-	}
-	// all array types except empty array literal
-	if n == ARRAY && t2 == UNTYPED_ARRAY {
-		return true
-	}
-	// all map types except empty map literal
-	if n == MAP && t2 == UNTYPED_MAP {
-		return true
-	}
-	return t.Sub.acceptsStrict(t2.Sub)
+	t2 := *t
+	t2.Sub = t.Sub.infer()
+	return &t2
 }
 
 func combineTypes(types []*Type) *Type {
 	combinedT := types[0]
 	for _, t := range types[1:] {
-		if combinedT.accepts(t) {
-			continue
-		}
-		if t.accepts(combinedT) {
-			combinedT = t
+		if combinedT.Equals(t) {
 			continue
 		}
 		if (t.Name == ARRAY || t.Name == MAP) && t.Name == combinedT.Name {
-			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
+			switch {
+			case t == UNTYPED_ARRAY, t == UNTYPED_MAP:
+			case combinedT == UNTYPED_ARRAY, combinedT == UNTYPED_MAP:
+				combinedT = t
+			case t.Name == ARRAY && combinedT.Name == ARRAY, t.Name == MAP && combinedT.Name == MAP:
+				sub := combineTypes([]*Type{t.Sub, combinedT.Sub})
+				combinedT = &Type{Name: t.Name, Sub: sub}
+			default:
+				combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
+			}
 			continue
 		}
 		return ANY_TYPE

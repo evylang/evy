@@ -492,6 +492,44 @@ type MapLiteral struct {
 	T     *Type
 }
 
+func isCompositeConst(n Node) bool {
+	if arrayLit, ok := n.(*ArrayLiteral); ok {
+		return isConst(arrayLit)
+	}
+	if mapLit, ok := n.(*MapLiteral); ok {
+		return isConst(mapLit)
+	}
+	return false
+}
+
+func isConst(node Node) bool {
+	switch n := node.(type) {
+	case *NumLiteral, *StringLiteral, *BoolLiteral:
+		return true
+	case *BinaryExpression:
+		return isConst(n.Left) && isConst(n.Right)
+	case *UnaryExpression:
+		return isConst(n.Right)
+	case *GroupExpression:
+		return isConst(n.Expr)
+	case *ArrayLiteral:
+		for _, el := range n.Elements {
+			if !isConst(el) {
+				return false
+			}
+		}
+		return true
+	case *MapLiteral:
+		for _, val := range n.Pairs {
+			if !isConst(val) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // Token returns the token of the Evy source program associated with the
 // Program node.
 func (p *Program) Token() *lexer.Token {

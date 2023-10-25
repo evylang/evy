@@ -597,10 +597,11 @@ button.primary {
 }
 .modal-main {
   font-family: var(--ff);
-  padding: 36px;
+  padding: 36px 36px 16px;
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
+  height: calc(100% - var(--header-height));
 }
 #modal .modal-main .section {
   width: var(--modal-section-width);

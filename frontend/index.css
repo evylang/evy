@@ -541,7 +541,9 @@ button.primary {
 .run button.running#run,
 .run button.running#run-mobile,
 .run button.running#run:hover,
-.run button.running#run-mobile:hover {
+.run button.running#run:active,
+.run button.running#run-mobile:hover,
+.run button.running#run-mobile:active {
   color: var(--btn-color-active);
   letter-spacing: 0.2em;
   transition: 0s;

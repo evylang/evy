@@ -18,17 +18,15 @@ let sidemenu
 
 // --- Initialise ------------------------------------------------------
 
-initWasm()
+await initWasm()
 initUI()
 initCanvas()
 
 // --- Wasm ------------------------------------------------------------
 
 // initWasm loads bytecode and initialises execution environment.
-function initWasm() {
-  WebAssembly.compileStreaming(fetch("evy.wasm"))
-    .then((obj) => (wasmModule = obj))
-    .catch((err) => console.error(err))
+async function initWasm() {
+  wasmModule = await WebAssembly.compileStreaming(fetch("evy.wasm"))
   const runButton = document.querySelector("#run")
   const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
@@ -341,10 +339,10 @@ async function initUI() {
   document.querySelector("#sidemenu-share").onclick = share
   document.querySelector("#sidemenu-icon-share").onclick = share
   initModal()
-  handleHashChange()
   initEditor()
   initSidemenu()
   initDialog()
+  handleHashChange()
 }
 
 async function fetchSamples() {

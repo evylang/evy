@@ -1036,31 +1036,30 @@ func TestEmptyArray(t *testing.T) {
 		`print []+[]`,
 		`print [[]]+[[]]`,
 		`
-for i := range []
-	print i
-end`,
+		for i := range []
+			print i
+		end`,
 
 		`
-arr := []
-for i := range arr
-	print i
-end`,
+		arr := []
+		for i := range arr
+			print i
+		end`,
 		`
-a := []
-b := []+[]
-print a b`,
+		a := []
+		b := []+[]
+		print a b`,
 		`
-func nums n:[]num
-	print n
-end
+		func nums n:[]num
+			print n
+		end
 
-nums []`,
+		nums []`,
 	}
 	for _, input := range inputs {
 		parser := newParser(input, testBuiltins())
 		_ = parser.parse()
 		assertNoParseError(t, parser, input)
-
 		assert.Equal(t, NONE_TYPE, UNTYPED_ARRAY.Sub)
 	}
 }

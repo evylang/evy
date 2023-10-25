@@ -292,7 +292,7 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 	p.advance() // advance past (
 	t := p.parseType()
 	switch t {
-	case ILLEGAL_TYPE:
+	case nil:
 		msg := fmt.Sprintf("invalid type in type assertion of %q", left.String())
 		p.appendErrorForToken(msg, tok)
 	case ANY_TYPE:
@@ -426,7 +426,7 @@ func (p *parser) parseArrayLiteral() Node {
 	for i, e := range elements {
 		types[i] = e.Type()
 	}
-	arrayLit.T = &Type{Name: ARRAY, Sub: p.combineTypes(types)}
+	arrayLit.T = &Type{Name: ARRAY, Sub: combineTypes(types)}
 	arrayLit.Elements = elements
 	return arrayLit
 }
@@ -452,25 +452,6 @@ func (p *parser) parseExprWSS() Node {
 	return p.parseExpr(lowestPrec)
 }
 
-func (p *parser) combineTypes(types []*Type) *Type {
-	combinedT := types[0]
-	for _, t := range types[1:] {
-		if combinedT.accepts(t) {
-			continue
-		}
-		if t.accepts(combinedT) {
-			combinedT = t
-			continue
-		}
-		if t.sameComposite(combinedT) {
-			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
-			continue
-		}
-		return ANY_TYPE
-	}
-	return combinedT
-}
-
 func (p *parser) parseMapLiteral() Node {
 	p.pushWSS(false)
 	defer p.popWSS()
@@ -492,7 +473,7 @@ func (p *parser) parseMapLiteral() Node {
 	for _, n := range mapLit.Pairs {
 		types = append(types, n.Type())
 	}
-	mapLit.T = &Type{Name: MAP, Sub: p.combineTypes(types)}
+	mapLit.T = &Type{Name: MAP, Sub: combineTypes(types)}
 	return mapLit
 }
 

@@ -1,9 +1,5 @@
 package parser
 
-import (
-	"evylang.dev/evy/pkg/lexer"
-)
-
 // TypeName represents the enumerable basic types (such as num, string,
 // and bool), categories of composite types (such as array and map),
 // the dynamic type (any), and the none type, which is used where no
@@ -14,8 +10,7 @@ type TypeName int
 // The enumerated basic types, categories of composite types, any and
 // none are defined as constants.
 const (
-	ILLEGAL TypeName = iota
-	NUM
+	NUM TypeName = iota
 	STRING
 	BOOL
 	ANY
@@ -30,7 +25,6 @@ const (
 //
 // [interned]: https://en.wikipedia.org/wiki/Interning_(computer_science)
 var (
-	ILLEGAL_TYPE  = &Type{Name: ILLEGAL}
 	NUM_TYPE      = &Type{Name: NUM}
 	BOOL_TYPE     = &Type{Name: BOOL}
 	STRING_TYPE   = &Type{Name: STRING}
@@ -40,30 +34,19 @@ var (
 	UNTYPED_MAP   = &Type{Name: MAP, Sub: NONE_TYPE}
 )
 
-func compositeTypeName(t lexer.TokenType) TypeName {
-	switch t {
-	case lexer.LBRACKET:
-		return ARRAY
-	case lexer.LCURLY:
-		return MAP
-	}
-	return ILLEGAL
-}
-
 type typeNameString struct {
 	name   string
 	format string
 }
 
 var typeNameStrings = map[TypeName]typeNameString{
-	ILLEGAL: {name: "ILLEGAL", format: "ILLEGAL"},
-	NUM:     {name: "num", format: "num"},
-	STRING:  {name: "string", format: "string"},
-	BOOL:    {name: "bool", format: "bool"},
-	ANY:     {name: "any", format: "any"},
-	ARRAY:   {name: "array", format: "[]"},
-	MAP:     {name: "map", format: "{}"},
-	NONE:    {name: "none", format: "none"},
+	NUM:    {name: "num", format: "num"},
+	STRING: {name: "string", format: "string"},
+	BOOL:   {name: "bool", format: "bool"},
+	ANY:    {name: "any", format: "any"},
+	ARRAY:  {name: "array", format: "[]"},
+	MAP:    {name: "map", format: "{}"},
+	NONE:   {name: "none", format: "none"},
 }
 
 func (t TypeName) String() string {
@@ -84,7 +67,11 @@ type Type struct {
 	Sub  *Type    // e.g.: `[]int` : Type{Name: "array", Sub: &Type{Name: "int"} }
 }
 
+// String returns a string representation of the Type.
 func (t *Type) String() string {
+	if t == nil {
+		return "ILLEGAL"
+	}
 	if t.Sub == nil || t == UNTYPED_ARRAY || t == UNTYPED_MAP {
 		return t.Name.String()
 	}
@@ -92,11 +79,14 @@ func (t *Type) String() string {
 }
 
 func (t *Type) accepts(t2 *Type) bool {
+	if t == nil || t2 == nil {
+		return t == t2
+	}
 	if t.acceptsStrict(t2) {
 		return true
 	}
 	n, n2 := t.Name, t2.Name
-	if n == ANY && n2 != ILLEGAL && n2 != NONE {
+	if n == ANY && n2 != NONE {
 		return true
 	}
 	// empty Array of none_type accepted by all arrays.
@@ -112,6 +102,9 @@ func (t *Type) accepts(t2 *Type) bool {
 //	[] + [1]
 //	[1] + []
 func (t *Type) Matches(t2 *Type) bool {
+	if t == nil || t2 == nil {
+		return t == t2
+	}
 	if t == t2 {
 		return true
 	}
@@ -145,10 +138,10 @@ func (t *Type) infer() *Type {
 
 // []any (ARRAY ANY) DOES NOT accept []num (ARRAY NUM).
 func (t *Type) acceptsStrict(t2 *Type) bool {
-	n, n2 := t.Name, t2.Name
-	if n == ILLEGAL || n2 == ILLEGAL {
-		return false
+	if t == nil || t2 == nil {
+		return t == t2
 	}
+	n, n2 := t.Name, t2.Name
 	if n != n2 {
 		return false
 	}
@@ -166,12 +159,21 @@ func (t *Type) acceptsStrict(t2 *Type) bool {
 	return t.Sub.acceptsStrict(t2.Sub)
 }
 
-func (t *Type) sameComposite(t2 *Type) bool {
-	if t.Name == ARRAY && t2.Name == ARRAY {
-		return true
+func combineTypes(types []*Type) *Type {
+	combinedT := types[0]
+	for _, t := range types[1:] {
+		if combinedT.accepts(t) {
+			continue
+		}
+		if t.accepts(combinedT) {
+			combinedT = t
+			continue
+		}
+		if (t.Name == ARRAY || t.Name == MAP) && t.Name == combinedT.Name {
+			combinedT = &Type{Name: t.Name, Sub: ANY_TYPE}
+			continue
+		}
+		return ANY_TYPE
 	}
-	if t.Name == MAP && t2.Name == MAP {
-		return true
-	}
-	return false
+	return combinedT
 }

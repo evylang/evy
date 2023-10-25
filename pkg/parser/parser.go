@@ -433,7 +433,7 @@ func (p *parser) parseFuncDefSignature() *FuncDefStmt {
 	if p.cur.TokenType() == lexer.COLON {
 		p.advance() // advance past `:` of return type declaration, e.g. in `func rand:num`
 		fd.ReturnType = p.parseType()
-		if fd.ReturnType.Name == ILLEGAL {
+		if fd.ReturnType == nil {
 			p.appendErrorForToken("invalid return type: "+p.cur.Format(), fd.token)
 		}
 	}
@@ -460,7 +460,7 @@ func (p *parser) parseFuncDefSignature() *FuncDefStmt {
 
 func (p *parser) parseTypedDeclStatement() Node {
 	decl := p.parseTypedDecl()
-	if decl.Type().Name != ILLEGAL && p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
+	if decl.Type() != nil && p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		p.scope.set(decl.Var.Name, decl.Var)
 		p.assertEOL()
 	}
@@ -482,12 +482,13 @@ func (p *parser) parseTypedDecl() *Decl {
 	p.advance() // advance past IDENT
 	p.advance() // advance past `:`
 	v := p.parseType()
-	decl.Var.T = v
-	decl.Value = zeroValue(v, p.cur)
-	if v == ILLEGAL_TYPE {
+	if v == nil {
 		msg := fmt.Sprintf("invalid type declaration for %q", varName)
 		p.appendErrorForToken(msg, decl.token)
+		return decl
 	}
+	decl.Var.T = v
+	decl.Value = zeroValue(v, p.cur)
 	return decl
 }
 
@@ -772,7 +773,7 @@ func (p *parser) parseReturnStatement() Node {
 	} else {
 		ret.Value = p.parseTopLevelExpr()
 		if ret.Value == nil {
-			ret.T = ILLEGAL_TYPE
+			ret.T = nil
 		} else {
 			ret.T = ret.Value.Type()
 			p.assertEOL()
@@ -991,16 +992,22 @@ func (p *parser) parseType() *Type {
 		return BOOL_TYPE
 	case lexer.ANY:
 		return ANY_TYPE
-	case lexer.LBRACKET, lexer.LCURLY:
-		tt2 := p.cur.TokenType()
-		if (tt == lexer.LBRACKET && tt2 == lexer.RBRACKET) || (tt == lexer.LCURLY && tt2 == lexer.RCURLY) {
+	case lexer.LBRACKET:
+		if p.cur.TokenType() == lexer.RBRACKET {
 			p.advance()
-			if sub := p.parseType(); sub != ILLEGAL_TYPE {
-				return &Type{Name: compositeTypeName(tt), Sub: sub}
+			if sub := p.parseType(); sub != nil {
+				return &Type{Name: ARRAY, Sub: sub}
+			}
+		}
+	case lexer.LCURLY:
+		if p.cur.TokenType() == lexer.RCURLY {
+			p.advance()
+			if sub := p.parseType(); sub != nil {
+				return &Type{Name: MAP, Sub: sub}
 			}
 		}
 	}
-	return ILLEGAL_TYPE
+	return nil
 }
 
 func (p *parser) recordComment(n Node) {

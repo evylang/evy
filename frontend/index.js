@@ -30,9 +30,9 @@ async function initWasm() {
   const runButton = document.querySelector("#run")
   const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
-  runButton.disabled = false
+  runButton.classList.remove("loading")
   runButtonMob.onclick = handleMobRun
-  runButtonMob.disabled = false
+  runButtonMob.classList.remove("loading")
 }
 
 function newEvyGo() {

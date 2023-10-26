@@ -44,7 +44,36 @@
     <div class="max-width-wrapper">
       <main>
         <div class="editor-wrap">
-          <div class="editor"></div>
+          <div class="editor" style="padding-left: calc(2ch + 1.5rem)">
+            <!-- These editor sample contents are replaced by JS,  once evy toolchain and yace-editor are downloaded. -->
+            <pre class="lines">
+<span class="num">  1</span>
+<span class="num">  2</span>
+<span class="num">  3</span>
+<span class="num">  4</span>
+<span class="num">  5</span>
+<span class="num">  6</span>
+<span class="num">  7</span>
+<span class="num">  8</span>
+<span class="num">  9</span>
+<span class="num"> 10</span>
+<span class="num"> 11</span>
+<span class="num"> 12</span>
+            </pre>
+            <pre class="highlighted">
+<span class="builtin">move</span> <span class="num">10</span> <span class="num">20</span>
+<span class="builtin">line</span> <span class="num">50</span> <span class="num">50</span>
+<span class="builtin">rect</span> <span class="num">25</span> <span class="num">25</span>
+<span class="builtin">color</span> <span class="str">"red"</span>
+<span class="builtin">circle</span> <span class="num">10</span>
+
+<span class="ident">x</span> <span class="op">:=</span> <span class="num">12</span>
+<span class="builtin">print</span> <span class="str">"x:"</span> <span class="ident">x</span>
+<span class="keyword">if</span> <span class="ident">x</span> <span class="op">&gt;</span> <span class="num">10</span>
+<span class="builtin">    print</span> <span class="str">"🍦 big x"</span>
+<span class="keyword">end</span><br>
+            </pre>
+          </div>
         </div>
         <div class="output">
           <div class="canvas">
@@ -60,13 +89,25 @@
           </div>
           <div class="console" id="console"></div>
           <div class="run desktop">
-            <button id="run" disabled class="primary">Run</button>
+            <button
+              id="run"
+              class="primary loading"
+              onclick="document.querySelector('#dialog-loading').showModal()"
+            >
+              Run
+            </button>
           </div>
         </div>
       </main>
       <!-- Add separate mobile button because of position:fixed and output transform -->
       <div class="run mobile">
-        <button id="run-mobile" disabled class="primary">Run</button>
+        <button
+          id="run-mobile"
+          class="primary loading"
+          onclick="document.querySelector('#dialog-loading').showModal()"
+        >
+          Run
+        </button>
       </div>
     </div>
 
@@ -164,6 +205,22 @@
             <span class="err">parse error</span>
             first, please!
           </p>
+          <button class="primary">Ok</button>
+        </main>
+      </form>
+    </dialog>
+
+    <!-- Evy sharing error dialog -->
+    <dialog id="dialog-loading">
+      <form method="dialog">
+        <header>
+          <h1>Loading</h1>
+          <button class="header-icon">
+            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
+          </button>
+        </header>
+        <main>
+          <p>Hold tight, getting the editor and compiler ready. 🧘</p>
           <button class="primary">Ok</button>
         </main>
       </form>

@@ -42,9 +42,7 @@ export default class Yace {
     this.lines.classList.add("lines")
     this.errorLines = {}
 
-    this.root.appendChild(this.textarea)
-    this.root.appendChild(this.lines)
-    this.root.appendChild(this.highlighted)
+    this.root.replaceChildren(this.textarea, this.lines, this.highlighted)
 
     this.addTextareaEvents()
     this.update({ value: this.options.value })

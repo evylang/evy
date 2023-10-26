@@ -62,7 +62,7 @@
   --dialog-width: min(100vw, 36rem);
 }
 
-@media (max-width: 767px), (max-height: 550px) {
+@media (max-width: 767px) {
   /* responsive mobile */
   :root {
     --display-desktop-only: none;
@@ -448,6 +448,13 @@ dialog .err {
   height: 100%;
   touch-action: pinch-zoom;
 }
+@media (max-height: 500px) {
+  .output .canvas canvas,
+  .output .canvas {
+    width: calc(100vh - 250px);
+    height: calc(100vh - 250px);
+  }
+}
 .read {
   display: flex;
 }
@@ -530,18 +537,20 @@ button.primary {
 .run button#run-mobile {
   width: 100%;
 }
-.run button:disabled {
+.run button:disabled,
+.run button.loading {
   color: var(--btn-color-disabled);
   box-shadow:
     0 4px 0 hsl(0deg 0% 60%),
     0 16px 12px -8px hsl(0deg 0% 0% / 30%),
     inset 0 -2px 1px 1px hsl(0deg 0% 60%);
-  cursor: not-allowed;
 }
 .run button.running#run,
 .run button.running#run-mobile,
 .run button.running#run:hover,
-.run button.running#run-mobile:hover {
+.run button.running#run:active,
+.run button.running#run-mobile:hover,
+.run button.running#run-mobile:active {
   color: var(--btn-color-active);
   letter-spacing: 0.2em;
   transition: 0s;
@@ -597,10 +606,11 @@ button.primary {
 }
 .modal-main {
   font-family: var(--ff);
-  padding: 36px;
+  padding: 36px 36px 16px;
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
+  height: calc(100% - var(--header-height));
 }
 #modal .modal-main .section {
   width: var(--modal-section-width);

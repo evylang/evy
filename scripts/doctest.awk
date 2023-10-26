@@ -37,6 +37,7 @@ BEGIN {
 	reset()
 	"clear" | getline clear
 	close("clear")
+	error_count = 0
 }
 
 function reset() {
@@ -55,8 +56,10 @@ function accumulate_line(line, buffer) {
 
 # execute executes cmd with the given input returning the output of
 # the command with the trailing newline stripped. If the command
-# exited with an error, an error is written to stderr and -1 is returned
-# instead.
+# exited with an error, an error is written to stderr and "" is returned
+# instead. An empty string should never be returned otherwise -
+# a formatted program must contain text, and an output block would
+# contain some output.
 function execute(cmd, input) {
 	tempfile = "/tmp/doctest.tmp"
 	print input | (cmd ">" tempfile " 2>&1")
@@ -71,10 +74,10 @@ function execute(cmd, input) {
 
 	if (rv != 0 && expect_err == 0) {
 		split(cmd, args)
-		print "Error running 'evy " args[2] "' for:", builtin > "/dev/stderr"
+		print "Line " code_line ": Error running 'evy " args[2] "' for:", builtin > "/dev/stderr"
 		print o > "/dev/stderr"
 		close("/dev/stderr")
-		return -1
+		return ""
 	}
 	return o
 }
@@ -94,6 +97,7 @@ function execute(cmd, input) {
 /^```evy(:err)?$/ {
 	reset()
 	in_code = 1
+	code_line = NR
 	if ($1 ~ /:err/) {
 		expect_err = 1
 	}
@@ -102,11 +106,12 @@ function execute(cmd, input) {
 /^```$/ && in_code {
 	in_code = 0
 	v = execute("evy fmt", code)
-	if (v == -1) {
+	if (v == "") {
 		# error formatting code. just print out the original code.
 		# an error has already been written to stderr
 		print code
 		code = "" # empty it so we don't try to run it later
+		error_count++
 	} else {
 		print v
 	}
@@ -154,9 +159,10 @@ in_input {
 	v = execute("evy run --skip-sleep " filename, input)
 	system("rm " filename)
 
-	if (v == -1) {
+	if (v == "") {
 		# Error with evy run. Just print the original output instead
 		print output
+		error_count++
 	} else {
 		# Remove all text before a "clear" escape sequence, including the
 		# escape sequence. Keep doing until there are none left.
@@ -173,3 +179,10 @@ in_output {
 }
 
 { print }
+
+END {
+	if (error_count > 0) {
+		print error_count, "error(s) detected" > "/dev/stderr"
+		exit 1
+	}
+}

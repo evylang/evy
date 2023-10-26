@@ -8,7 +8,7 @@ import (
 
 func TestInfer(t *testing.T) {
 	// arr := [[]]
-	arr := &Type{Name: ARRAY, Sub: UNTYPED_ARRAY}
+	arr := &Type{Name: ARRAY, Sub: EMPTY_ARRAY}
 	got := arr.infer()
 	want := &Type{
 		Name: ARRAY,

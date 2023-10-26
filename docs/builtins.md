@@ -474,7 +474,7 @@ fraction of a second, e.g. `sleep 0.1`.
 
 #### Example
 
-```evy expect_err
+```evy:err
 input := "not a number"
 n := str2num input
 
@@ -501,7 +501,7 @@ immediately. It is used to report unrecoverable errors.
 
 #### Example
 
-```evy exepect_err
+```evy:err
 scale := -5
 
 if (scale) <= 0

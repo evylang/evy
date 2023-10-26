@@ -1,7 +1,5 @@
 package evaluator
 
-import "evylang.dev/evy/pkg/parser"
-
 type scope struct {
 	values map[string]value
 	outer  *scope
@@ -25,15 +23,9 @@ func (s *scope) get(name string) (value, bool) {
 	return s.outer.get(name)
 }
 
-func (s *scope) set(name string, val value, t *parser.Type) {
+func (s *scope) set(name string, val value) {
 	if name == "_" {
 		return
-	}
-	switch val.Type() {
-	case parser.UNTYPED_ARRAY:
-		val.(*arrayVal).T = t
-	case parser.UNTYPED_MAP:
-		val.(*mapVal).T = t
 	}
 	s.values[name] = val
 }

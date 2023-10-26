@@ -381,6 +381,8 @@ func (p *parser) parseAssignmentStatement() Node {
 	if !target.Type().accepts(value.Type(), isCompositeConst(value)) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
+	} else {
+		value = wrapAny(value, target.Type())
 	}
 	p.assertEOL()
 	stmt := &AssignmentStmt{token: tok, Target: target, Value: value}
@@ -488,7 +490,7 @@ func (p *parser) parseTypedDecl() *Decl {
 		return decl
 	}
 	decl.Var.T = v
-	decl.Value = zeroValue(v, p.cur)
+	decl.Value = wrapAny(zeroValue(v, p.cur), v)
 	return decl
 }
 
@@ -535,11 +537,11 @@ func (p *parser) parseInferredDeclStatement() Node {
 		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
-	decl.Var.T = val.Type().infer() // assign ANY to sub_type to empty arrays and maps.
+	decl.Var.T = val.Type().infer() // assign ANY to sub_type for empty arrays and maps.
 	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
-	decl.Value = val
+	decl.Value = wrapAny(val, decl.Var.T)
 	p.scope.set(varName, decl.Var)
 	p.assertEOL()
 
@@ -568,11 +570,13 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	funcName := decl.Name
 	if decl.VariadicParam != nil {
 		paramType := decl.VariadicParam.Type()
-		for _, arg := range args {
+		for i, arg := range args {
 			argType := arg.Type()
 			if !paramType.accepts(argType, isCompositeConst(arg)) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
+			} else {
+				args[i] = wrapAny(arg, paramType)
 			}
 		}
 		return
@@ -592,6 +596,8 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		if !paramType.accepts(argType, isCompositeConst(arg)) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
+		} else {
+			args[i] = wrapAny(arg, paramType)
 		}
 	}
 }
@@ -788,6 +794,9 @@ func (p *parser) parseReturnStatement() Node {
 			msg = "expected no return value, found " + ret.T.String()
 		}
 		p.appendErrorForToken(msg, retValueToken)
+	case ret.Value != nil:
+		ret.Value = wrapAny(ret.Value, p.scope.returnType)
+		ret.T = ret.Value.Type()
 	}
 	p.recordComment(ret)
 	p.advancePastNL()

@@ -43,6 +43,8 @@ func (f *formatting) format(n Node) {
 		f.formatProgram(n)
 	case *EmptyStmt:
 		f.writeComment(n)
+	case *Any:
+		f.format(n.Value)
 	case *TypedDeclStmt:
 		f.format(n.Decl)
 		f.writeComment(n)

@@ -352,7 +352,7 @@ generates the output
 ```evy:output
 1 [] []num
 2 [] []num
-3 []
+3 []any
 ```
 
 Similarly, the empty map literal becomes `{}any` in inferred
@@ -1408,7 +1408,7 @@ will output:
 
 ```evy:output
 []{}any
-{}num
+{}any
 num
 ```
 

@@ -16,7 +16,7 @@ func TestParseDecl(t *testing.T) {
 		`a := "abc"
 		b:bool
 		c := true
-		print a b c`: {`a="abc"`, "b=false", "c=true", "print(a, b, c)"},
+		print a b c`: {`a="abc"`, "b=false", "c=true", "print(any(a), any(b), any(c))"},
 		"a:[]num":                            {"a=[]"},
 		"a:{}[]num":                          {"a={}"},
 		"a:{}[]any":                          {"a={}"},
@@ -28,13 +28,13 @@ func TestParseDecl(t *testing.T) {
 		"a := {digits: [] nums: [4]}":        {"a={digits:[], nums:[4]}"},
 		"a := {digits: [4] nums: []}":        {"a={digits:[4], nums:[]}"},
 		"a := [{}]":                          {"a=[{}]"},
-		"a := {a:1 b:true}":                  {"a={a:1, b:true}"},
-		"a := {a:1 b:true c:[1]}":            {"a={a:1, b:true, c:[1]}"},
+		"a := {a:1 b:true}":                  {"a={a:any(1), b:any(true)}"},
+		"a := {a:1 b:true c:[1]}":            {"a={a:any(1), b:any(true), c:any([1])}"},
 		"a := [{a:1}]":                       {"a=[{a:1}]"},
 	}
 	for input, wantSlice := range tests {
 		input += "\n print a"
-		wantSlice = append(wantSlice, "print(a)")
+		wantSlice = append(wantSlice, "print(any(a))")
 		want := strings.Join(wantSlice, "\n") + "\n"
 		parser := newParser(input, testBuiltins())
 		got := parser.parse()
@@ -99,16 +99,16 @@ print m[s]`: `line 3 column 6: unknown variable name "name"`,
 func TestFunccall(t *testing.T) {
 	tests := map[string][]string{
 		"print":                          {"print()"},
-		"print 123":                      {"print(123)"},
-		`print 123 "abc"`:                {`print(123, "abc")`},
-		"a:=1 \n print a":                {"a=1", "print(a)"},
-		`a := len "abc"` + " \n print a": {`a=len("abc")`, "print(a)"},
-		`len "abc"`:                      {`len("abc")`},
-		`len []`:                         {"len([])"},
-		"a:string \n print a":            {`a=""`, "print(a)"},
+		"print 123":                      {"print(any(123))"},
+		`print 123 "abc"`:                {`print(any(123), any("abc"))`},
+		"a:=1 \n print a":                {"a=1", "print(any(a))"},
+		`a := len "abc"` + " \n print a": {`a=len(any("abc"))`, "print(any(a))"},
+		`len "abc"`:                      {`len(any("abc"))`},
+		`len []`:                         {"len(any([]))"},
+		"a:string \n print a":            {`a=""`, "print(any(a))"},
 		`a:=true
 		b:string
-		print a b`: {`a=true`, `b=""`, `print(a, b)`},
+		print a b`: {`a=true`, `b=""`, `print(any(a), any(b))`},
 	}
 	for input, wantSlice := range tests {
 		want := strings.Join(wantSlice, "\n") + "\n"
@@ -158,7 +158,7 @@ if true
 	print "TRUE"
 end`: `
 if (true) {
-print("TRUE")
+print(any("TRUE"))
 }
 `,
 		`
@@ -169,7 +169,7 @@ if true
 end`: `
 if (true) {
 if (true) {
-print("TRUE")
+print(any("TRUE"))
 }
 }
 `,
@@ -191,8 +191,8 @@ print x
 	got := parser.parse()
 	assertNoParseError(t, parser, input)
 	want := `
-x=len("123")
-print(x)
+x=len(any("123"))
+print(any(x))
 `
 	assert.Equal(t, want, got.String())
 }
@@ -1329,7 +1329,6 @@ print a.([]num)[1]
 	}
 }
 
-/* TODO: fix parse errors
 func TestLateCompositeLiteralTyping(t *testing.T) {
 	inputs := []string{
 		`
@@ -1379,7 +1378,6 @@ end
 		assertNoParseError(t, parser, input)
 	}
 }
-*/
 
 func TestLateCompositeLiteralTypingErr(t *testing.T) {
 	inputs := map[string]string{
@@ -1388,8 +1386,8 @@ has ["a"] "a"`: `line 2 column 5: "has" takes 1st argument of type {}, found []s
 		`
 a:[]any
 b := [1 2]
-a = [1 2]
-a = b
+a = [1 2] // ok, literal becomes []any
+a = b  // fail
 `: `line 5 column 1: "a" accepts values of type []any, found []num`,
 		`
 b := [1 2]
@@ -1441,6 +1439,153 @@ end
 	}
 }
 
+func TestInferredVarType(t *testing.T) {
+	input := `
+arr := [[]]
+print arr`
+	want := `
+arr=[[]]
+print(any(arr))
+`
+	parser := newParser(input, testBuiltins())
+	prog := parser.parse()
+	assertNoParseError(t, parser, input)
+	got := prog.String()
+	assert.Equal(t, want, got)
+	stmt, ok := prog.Statements[1].(*InferredDeclStmt)
+	assert.Equal(t, true, ok, "%v %T", stmt, stmt)
+
+	want = "[][]any"
+	got = stmt.Decl.Type().String()
+	assert.Equal(t, want, got)
+
+	want = "[][]any"
+	got = stmt.Decl.Value.Type().String()
+	assert.Equal(t, want, got)
+
+	arrayLit, ok := stmt.Decl.Value.(*ArrayLiteral)
+	assert.Equal(t, true, ok, "%v %T", arrayLit, arrayLit)
+
+	want = "[]any"
+	got = arrayLit.Elements[0].Type().String()
+	assert.Equal(t, want, got)
+}
+
+func TestAnyWrapArray(t *testing.T) {
+	input := `
+x:[]any
+x = [1 2 true]
+print x
+`
+	want := `
+x=[]
+x = [any(1), any(2), any(true)]
+print(any(x))
+`
+	parser := newParser(input, testBuiltins())
+	prog := parser.parse()
+	assertNoParseError(t, parser, input)
+	got := prog.String()
+	assert.Equal(t, want, got)
+
+	stmt, ok := prog.Statements[2].(*AssignmentStmt)
+	assert.Equal(t, true, ok, "%v %T", stmt, stmt)
+
+	arrayLit, ok := stmt.Value.(*ArrayLiteral)
+	assert.Equal(t, true, ok, "%v %T", arrayLit, arrayLit)
+
+	want = "any"
+	got = arrayLit.Elements[0].Type().String()
+	assert.Equal(t, want, got)
+}
+
+func TestAnyWrapParam(t *testing.T) {
+	input := `
+f []
+f [[]]
+func f a:any
+    print a
+end`
+	want := `
+f(any([]))
+f(any([[]]))
+f(a){
+print(a)
+}
+
+`
+	parser := newParser(input, testBuiltins())
+	prog := parser.parse()
+	assertNoParseError(t, parser, input)
+	got := prog.String()
+	assert.Equal(t, want, got)
+
+	stmt, ok := prog.Statements[1].(*FuncCallStmt)
+	assert.Equal(t, true, ok, "%v %T", stmt, stmt)
+
+	arrayLit, ok := stmt.FuncCall.Arguments[0].(*Any).Value.(*ArrayLiteral)
+	assert.Equal(t, true, ok, "%v %T", stmt.FuncCall.Arguments[0], stmt.FuncCall.Arguments[0].(*Any).Value)
+
+	want = "[]any"
+	got = arrayLit.Type().String()
+	assert.Equal(t, want, got)
+
+	stmt, ok = prog.Statements[2].(*FuncCallStmt)
+	assert.Equal(t, true, ok, "%v %T", stmt, stmt)
+
+	arrayLit, ok = stmt.FuncCall.Arguments[0].(*Any).Value.(*ArrayLiteral)
+	assert.Equal(t, true, ok, "%v %T", stmt.FuncCall.Arguments[0], stmt.FuncCall.Arguments[0].(*Any).Value)
+
+	want = "[][]any"
+	got = arrayLit.Type().String()
+	assert.Equal(t, want, got)
+
+	arrayLit, ok = arrayLit.Elements[0].(*ArrayLiteral)
+	assert.Equal(t, true, ok, "%v %T", stmt.FuncCall.Arguments[0], stmt.FuncCall.Arguments[0].(*Any).Value)
+
+	want = "[]any"
+	got = arrayLit.Type().String()
+	assert.Equal(t, want, got)
+}
+
+func TestBadArrayParamType(t *testing.T) {
+	inputs := map[string]string{
+		`
+func fn a:[][]any
+    print a
+end
+a:[]num
+fn [a]
+`: `line 6 column 4: "fn" takes 1st argument of type [][]any, found [][]num`,
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
+func TestBadMapParamType(t *testing.T) {
+	inputs := map[string]string{
+		`
+func fn a:{}{}any
+    print a
+end
+a:{}num
+fn {x:a}
+`: `line 6 column 4: "fn" takes 1st argument of type {}{}any, found {}{}num`,
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
 func TestDemo(t *testing.T) {
 	input := `
 move 10 10
@@ -1460,9 +1605,9 @@ end`
 	want := `
 
 x=12
-print("x:", x)
+print(any("x:"), any(x))
 if ((x>10)) {
-print("🍦 big x")
+print(any("🍦 big x"))
 }
 `
 	assert.Equal(t, want, got.String())
@@ -1497,6 +1642,14 @@ func testBuiltins() Builtins {
 				{Name: "key", T: STRING_TYPE},
 			},
 			ReturnType: NONE_TYPE,
+		},
+		"join": {
+			Name: "join",
+			Params: []*Var{
+				{Name: "arr", T: UNTYPED_MAP},
+				{Name: "sep", T: STRING_TYPE},
+			},
+			ReturnType: STRING_TYPE,
 		},
 	}
 	eventHandlers := map[string]*EventHandlerStmt{

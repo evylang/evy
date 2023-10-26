@@ -26,6 +26,12 @@
 # ```evy:output
 # Hello Fox
 # ```
+#
+# If an evy code block is specified with the language "evy:err" then the code
+# block is taken as evy code that is executed but any evy error should not be
+# treated as a failure. This is useful for evy code blocks that demonstrate
+# errors. The output is still captured and placed in the next "evy:output"
+# block.
 
 BEGIN {
 	reset()
@@ -36,8 +42,7 @@ BEGIN {
 function reset() {
 	code = input = output = ""
 	in_code = in_input = in_output = 0
-	for (i in flags)
-		delete flags[i]
+	expect_err = 0
 }
 
 # accumulate lines in a buffer, leaving off the final newline
@@ -64,7 +69,7 @@ function execute(cmd, input) {
 	close(tempfile)
 	system("rm " tempfile)
 
-	if (rv != 0 && !flags["expect_err"]) {
+	if (rv != 0 && expect_err == 0) {
 		split(cmd, args)
 		print "Error running 'evy " args[2] "' for:", builtin > "/dev/stderr"
 		print o > "/dev/stderr"
@@ -86,11 +91,11 @@ function execute(cmd, input) {
 # we get to the end of the code block. If `evy fmt` returns an error,
 # just print out the original code and send the error to stderr. Otherwise
 # output the formatted code in the place of the code.
-/^```evy( .*)?$/ {
+/^```evy(:err)?$/ {
 	reset()
 	in_code = 1
-	for (i = 2; i <= NF; i++) {
-		flags[$i]=1
+	if ($1 ~ /:err/) {
+		expect_err = 1
 	}
 	print; next
 }

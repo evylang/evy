@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"sort"
 	"strings"
 	"testing"
@@ -1584,6 +1585,25 @@ fn {x:a}
 		gotErr := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, gotErr.Error())
 	}
+}
+
+func TestBadFuncSignature(t *testing.T) {
+	input := `
+left_pos := {x:0 y:50}
+
+func draw_paddle paddle:map
+    print paddle.x paddle.y-10
+end
+
+draw_paddle left_pos
+`
+	_, err := Parse(input, testBuiltins())
+	parseErrors := &Errors{}
+	assert.Equal(t, true, errors.As(err, parseErrors))
+
+	got := (*parseErrors)[0].Error()
+	want := `line 4 column 18: invalid type declaration for "paddle"`
+	assert.Equal(t, want, got)
 }
 
 func TestDemo(t *testing.T) {

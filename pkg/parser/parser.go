@@ -22,8 +22,11 @@ type Builtins struct {
 // and returns program's AST.
 func Parse(input string, builtins Builtins) (*Program, error) {
 	parser := newParser(input, builtins)
+	if len(parser.errors) > 0 {
+		return nil, parser.errors
+	}
 	prog := parser.parse()
-	if parser.errors != nil {
+	if len(parser.errors) > 0 {
 		return nil, parser.errors
 	}
 	return prog, nil

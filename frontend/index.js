@@ -15,6 +15,8 @@ let actions = "fmt,ui,eval"
 let editor
 let errors = false
 let sidemenu
+// how frequently to store code state in URL hash, set to -1 to disable entirely
+const codeBackupDelayMillis = 1000
 
 // --- Initialise ------------------------------------------------------
 
@@ -331,6 +333,10 @@ function clearOutput() {
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
+  if (codeBackupDelayMillis >= 0) {
+    // periodic backup of code text area to the URL hash
+    document.addEventListener("keydown", codeUpdateListener)
+  }
   await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
@@ -361,6 +367,14 @@ function ctrlEnterListener(e) {
     document.querySelector(".editor textarea").blur()
     handleRun()
   }
+}
+
+// on keypress within code editor, update history with current code
+function codeUpdateListener(e) {
+  // skip if not an event in the code editor
+  if (!e.target.matches(".editor, .editor *")) return
+
+  updateHistoryThrottled()
 }
 
 // --- UI: URL-hash change handling ------------------------------------
@@ -983,12 +997,19 @@ async function share() {
     return
   }
   const baseurl = window.location.origin + window.location.pathname
-  const encoded = await encode(editor.value)
   const input = document.querySelector("#dialog-share .copy input")
-  input.value = `${baseurl}#content=${encoded}`
+  const hash = await contentHash()
+  input.value = `${baseurl}${hash}`
   input.setSelectionRange(0, 0)
   input.blur()
   document.querySelector("#dialog-share").showModal()
+}
+
+// get encoded state of editor as a URL hash
+// used by share() and codeUpdateListener()/updateHistory()
+async function contentHash() {
+  const encoded = await encode(editor.value)
+  return `#content=${encoded}`
 }
 
 async function encode(input) {
@@ -1038,6 +1059,28 @@ async function bufferFromStream(stream) {
   return buffer
 }
 
+async function updateHistory() {
+  const hash = await contentHash()
+  const currentHash = window.location.hash
+  if (hash === currentHash) {
+    // no changes detected
+    return
+  }
+
+  // update history without triggering hashchange event
+  // if no hash is present yet, create a new history entry otherwise just
+  // replace the most recent one to avoid cluttering the history
+  if (currentHash === "") {
+    history.pushState({}, "", hash)
+  } else {
+    history.replaceState({}, "", hash)
+  }
+}
+
+// throttled version of the updateHistory function
+// (to avoid calling encode() too frequently)
+let updateHistoryThrottled = throttle(updateHistory, codeBackupDelayMillis)
+
 // --- Utilities -------------------------------------------------------
 
 function getElements(q) {
@@ -1058,4 +1101,16 @@ function showElements(q) {
 
 function hideElements(q) {
   getElements(q).map((el) => el.classList.add("hidden"))
+}
+
+function throttle(funcToThrottle, waitTimeMillis) {
+  let timer = null
+  return async function (...args) {
+    if (timer === null) {
+      timer = setTimeout(() => {
+        funcToThrottle(...args)
+        timer = null
+      }, waitTimeMillis)
+    }
+  }
 }

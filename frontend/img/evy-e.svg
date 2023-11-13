@@ -1,127 +1,135 @@
-<svg onload="initEvySVG(evt)" width="482" height="508" viewBox="0 0 241 254" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg
+  onload="initEvySVG(evt)"
+  width="482"
+  height="508"
+  viewBox="0 0 241 254"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
   <style>
-      path {
-        transition-property: stroke, stroke-width;
-      }
-      path.animate,
-      svg:hover path.animate {
-        transition-duration: 0.2s;
+    path {
+      transition-property: stroke, stroke-width;
+    }
+    path.animate,
+    svg:hover path.animate {
+      transition-duration: 0.2s;
+      stroke-width: 12;
+    }
+    path:not(.animate) {
+      transition:
+        stroke-width 0.1s,
+        stroke 1s;
+    }
+    path:hover,
+    path.highlight.animate,
+    svg:hover path.highlight.animate {
+      transition-duration: 0.05s;
+      stroke-width: 13;
+    }
+    svg:hover path {
+      animation-duration: 0.7s;
+      animation-name: blip;
+    }
+    @keyframes blip {
+      0% {
         stroke-width: 12;
       }
-      path:not(.animate) {
-        transition:
-          stroke-width 0.1s,
-          stroke 1s;
-      }
-      path:hover,
-      path.highlight.animate,
-      svg:hover path.highlight.animate {
-        transition-duration: 0.05s;
+      30% {
         stroke-width: 13;
       }
-      svg:hover path {
-        animation-duration: 0.7s;
-        animation-name: blip;
+      100% {
+        stroke-width: 12;
       }
-      @keyframes blip {
-        0% {
-          stroke-width: 12;
-        }
-        30% {
-          stroke-width: 13;
-        }
-        100% {
-          stroke-width: 12;
-        }
+    }
+    @media not (prefers-reduced-motion) {
+      path.highlight.animate,
+      path:hover:not(.animate) {
+        stroke: #ffcf00;
+        stroke-width: 13;
       }
-      @media not (prefers-reduced-motion) {
-        path.highlight.animate,
-        path:hover:not(.animate) {
-          stroke: #ffcf00;
-          stroke-width: 13;
-        }
+    }
+  </style>
+  <script>
+    //<![CDATA[
+    function initEvySVG(e) {
+      const svg = e.target.ownerDocument
+      const colors = []
+      const paths = []
+      let interval
+      let timeout
+      for (const path of svg.querySelectorAll("path")) {
+        paths.push(path)
+        colors.push(path.getAttribute("stroke"))
       }
-    </style>
-    <script>//<![CDATA[
-      function initEvySVG(e) {
-        const svg = e.target.ownerDocument;
-        const colors = []
-        const paths = []
-        let interval
-        let timeout
-        for (const path of svg.querySelectorAll("path")) {
-          paths.push(path)
-          colors.push(path.getAttribute("stroke"))
-        }
 
-        function highlight(start, offsets) {
-          const l = colors.length
-          for (const offset of offsets) {
-            const i = (start + offset) % l
-            paths[i].classList.remove("highlight")
-            paths[(i + 1) % l].classList.add("highlight")
+      function highlight(start, offsets) {
+        const l = colors.length
+        for (const offset of offsets) {
+          const i = (start + offset) % l
+          paths[i].classList.remove("highlight")
+          paths[(i + 1) % l].classList.add("highlight")
+        }
+      }
+      function reset() {
+        paths.map((p) => p.classList.remove("highlight"))
+        const fn = () => paths.map((p) => p.classList.remove("animate"))
+        timeout = setTimeout(fn, 200)
+        clearInterval(interval)
+      }
+
+      function animate(tick) {
+        clearInterval(interval)
+        clearTimeout(timeout)
+        paths.map((p) => p.classList.add("animate"))
+        let i = 0
+        const fn = () => {
+          highlight(i++, [0, 7, 15, 22])
+          if (i % colors.length == 0) {
+            reset()
           }
         }
-        function reset() {
-          paths.map((p) => p.classList.remove("highlight"))
-          const fn = () => paths.map((p) => p.classList.remove("animate"))
-          timeout = setTimeout(fn, 200)
-          clearInterval(interval)
-        }
-
-        function animate(tick) {
-          clearInterval(interval)
-          clearTimeout(timeout)
-          paths.map((p) => p.classList.add("animate"))
-          let i = 0
-          const fn = () => {
-            highlight(i++, [0, 7, 15, 22])
-            if (i % colors.length == 0) {
-              reset()
-            }
-          }
-          interval = setInterval(fn, tick)
-        }
-        svg.onclick = () => animate(100)
-        svg.ondblclick = () => animate(150)
+        interval = setInterval(fn, tick)
       }
-      //]]>
-    </script>
+      svg.onclick = () => animate(100)
+      svg.ondblclick = () => animate(150)
+    }
+    //]]>
+  </script>
   <g stroke-linecap="round" stroke-width="12">
     <!-- Line 1 -->
-    <path d="M81,6 H89" stroke="#FFCF00"/>
+    <path d="M81,6 H89" stroke="#FFCF00" />
     <path d="M106,6 H164" stroke="#EB5D96" />
     <!-- Line 2 -->
-    <path d="M47,33 H81" stroke="#D95644"/>
-    <path d="M101,33 H203" stroke="#41BEFF"/>
+    <path d="M47,33 H81" stroke="#D95644" />
+    <path d="M101,33 H203" stroke="#41BEFF" />
     <!-- Line 3 -->
-    <path d="M23,59 H83" stroke="#3CB679"/>
-    <path d="M165,59 H198" stroke="#4551BE"/>
-    <path d="M215,59 H221" stroke="#D95644"/>
+    <path d="M23,59 H83" stroke="#3CB679" />
+    <path d="M165,59 H198" stroke="#4551BE" />
+    <path d="M215,59 H221" stroke="#D95644" />
     <!-- Line 4 -->
-    <path d="M8,85 H43" stroke="#FFCF00"/>
-    <path d="M59,85 H66" stroke="#4551BE"/>
-    <path d="M176 85 H232" stroke="#EB5D96"/>
+    <path d="M8,85 H43" stroke="#FFCF00" />
+    <path d="M59,85 H66" stroke="#4551BE" />
+    <path d="M176 85 H232" stroke="#EB5D96" />
     <!-- Line 5 -->
-    <path d="M6,112 H73" stroke="#D95644"/>
-    <path d="M90,112 H111" stroke="#41BEFF"/>
-    <path d="M130,112 H161" stroke="#4551BE"/>
-    <path d="M179,112 H235" stroke="#3CB679"/>
+    <path d="M6,112 H73" stroke="#D95644" />
+    <path d="M90,112 H111" stroke="#41BEFF" />
+    <path d="M130,112 H161" stroke="#4551BE" />
+    <path d="M179,112 H235" stroke="#3CB679" />
     <!-- Line 6 -->
-    <path d="M6,138 H150" stroke="#EB5D96"/>
-    <path d="M168,138 H188" stroke="#FFCF00"/>
-    <path d="M206,138 H228" stroke="#D95644"/>
+    <path d="M6,138 H150" stroke="#EB5D96" />
+    <path d="M168,138 H188" stroke="#FFCF00" />
+    <path d="M206,138 H228" stroke="#D95644" />
     <!-- Line 7 -->
-    <path d="M11,164 H17" stroke="#4551BE"/>
-    <path d="M34,164 H78" stroke="#41BEFF"/>
+    <path d="M11,164 H17" stroke="#4551BE" />
+    <path d="M34,164 H78" stroke="#41BEFF" />
     <!-- Line 8 -->
-    <path d="M22,190 H89" stroke="#3CB679"/>
-    <path d="M176,190 H216" stroke="#4551BE"/>
+    <path d="M22,190 H89" stroke="#3CB679" />
+    <path d="M176,190 H216" stroke="#4551BE" />
     <!-- Line 9 -->
-    <path d="M42,216 H136" stroke="#4551BE"/>
-    <path d="M153,216 H160" stroke="#FFCF00"/>
-    <path d="M177,216 H208" stroke="#EB5D96"/>
+    <path d="M42,216 H136" stroke="#4551BE" />
+    <path d="M153,216 H160" stroke="#FFCF00" />
+    <path d="M177,216 H208" stroke="#EB5D96" />
     <!-- Line 10 -->
-    <path d="M95,242 H165" stroke="#D95644"/>
+    <path d="M95,242 H165" stroke="#D95644" />
   </g>
 </svg>

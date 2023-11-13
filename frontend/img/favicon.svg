@@ -1,12 +1,12 @@
 <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="90" height="100" rx="6" fill="#232527"/>
+  <rect width="90" height="100" rx="6" fill="#232527" />
   <g stroke-linecap="round" stroke-width="10" transform="translate(15 25) scale(1.2)">
-    <path d="M0,0 h0" stroke="#FFCF00"/>
-    <path d="M15,0 h32" stroke="#EB5D96"/>
-    <path d="M0,15 h0" stroke="#D95644"/>
-    <path d="M15,15 h17" stroke="#41BEFF"/>
-    <path d="M0,30 h0" stroke="#3CB679"/>
-    <path d="M15,30 h29" stroke="#4551BE"/>
+    <path d="M0,0 h0" stroke="#FFCF00" />
+    <path d="M15,0 h32" stroke="#EB5D96" />
+    <path d="M0,15 h0" stroke="#D95644" />
+    <path d="M15,15 h17" stroke="#41BEFF" />
+    <path d="M0,30 h0" stroke="#3CB679" />
+    <path d="M15,30 h29" stroke="#4551BE" />
   </g>
 </svg>
 <!-- Generate favicon.ico with:

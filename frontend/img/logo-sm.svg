@@ -1,11 +1,17 @@
-<svg width="142.5" height="100" viewBox="0 0 142.5 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg
+  width="142.5"
+  height="100"
+  viewBox="0 0 142.5 100"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
   <g stroke-linecap="round" stroke-width="25">
     <!-- width:142.5 height:100 -->
-    <path d="M12.5,12.5 h0" stroke="hsl(49deg 100% 50%) "/>
-    <path d="M50,12.5 h80" stroke="hsl(336deg 78% 64%)"/>
-    <path d="M12.5,50 h0" stroke="hsl(7deg 66% 56%)"/>
-    <path d="M50,50 h42.5" stroke="hsl(201deg 100% 63%)"/>
-    <path d="M12.5,87.5 h0" stroke="hsl(150deg 50% 47%) "/>
-    <path d="M50,87.5 h72.5" stroke="hsl(234deg 48% 51%)"/>
+    <path d="M12.5,12.5 h0" stroke="hsl(49deg 100% 50%) " />
+    <path d="M50,12.5 h80" stroke="hsl(336deg 78% 64%)" />
+    <path d="M12.5,50 h0" stroke="hsl(7deg 66% 56%)" />
+    <path d="M50,50 h42.5" stroke="hsl(201deg 100% 63%)" />
+    <path d="M12.5,87.5 h0" stroke="hsl(150deg 50% 47%) " />
+    <path d="M50,87.5 h72.5" stroke="hsl(234deg 48% 51%)" />
   </g>
 </svg>

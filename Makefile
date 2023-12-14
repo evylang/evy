@@ -28,23 +28,27 @@ CMDS = .
 build: | $(O) ## Build evy binaries
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
-install: ## Build and install binaries in $GOBIN
+## Build and install binaries in $GOBIN
+install:
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 # Use `go version` to ensure the right go version is installed when using tinygo.
 go-version:
 	go version
 
-# Optimise tinygo output for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
-tiny: go-version | $(O) ## Build for tinygo / wasm
+## Build with tinygo targeting wasm
+# optimise for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
+tiny: go-version | $(O)
 	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
 	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/evy.wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
 
-tidy: ## Tidy go modules with "go mod tidy"
+## Tidy go modules with "go mod tidy"
+tidy:
 	go mod tidy
 
-fmt: ## Format all go files with gofumpt, a stricter gofmt
+## Format all go files with gofumpt, a stricter gofmt
+fmt:
 	gofumpt -w $(GOFILES)
 
 clean::
@@ -56,16 +60,20 @@ clean::
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
 
-test: | $(O) ## Run non-tinygo tests and generate a coverage file
+## Run non-tinygo tests and generate a coverage file
+test: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
 
-test-tiny: go-version | $(O) ## Run tinygo tests
+## Run tinygo tests
+test-tiny: go-version | $(O)
 	tinygo test ./...
 
-check-coverage: test ## Check that test coverage meets the required level
+## Check that test coverage meets the required level
+check-coverage: test
 	@go tool cover -func=$(COVERFILE) | $(CHECK_COVERAGE) || $(FAIL_COVERAGE)
 
-cover: test ## Show test coverage in your browser
+## Show test coverage in your browser
+cover: test
 	go tool cover -html=$(COVERFILE)
 
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
@@ -75,10 +83,13 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 
 # --- Lint ---------------------------------------------------------------------
 EVY_FILES = $(shell find frontend/samples -name '*.evy')
-lint: ## Lint go source code
+
+## Lint go source code
+lint:
 	golangci-lint run
 
-evy-fmt: ## Format evy sample code
+## Format evy sample code
+evy-fmt:
 	go run . fmt --write $(EVY_FILES)
 
 check-evy-fmt:
@@ -114,17 +125,21 @@ godoc: install
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib
 
-frontend: tiny | $(O) ## Build frontend, typically iterate with npm and inside frontend
+## Build frontend, typically iterate with npm and inside frontend
+frontend: tiny | $(O)
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
 
-frontend-serve: frontend ## Build frontend and serve on free port
+## Build frontend and serve on free port
+frontend-serve: frontend
 	servedir $(O)/public
 
-prettier: | $(NODELIB) ## Format code with prettier
+## Format code with prettier
+prettier: | $(NODELIB)
 	npx -y prettier --write .
 
-check-prettier: | $(NODELIB)  ## Ensure code is formatted with prettier
+## Ensure code is formatted with prettier
+check-prettier: | $(NODELIB)
 	npx -y prettier --check .
 
 $(NODELIB):
@@ -134,13 +149,16 @@ $(NODELIB):
 
 # --- firebase -----------------------------------------------------------------
 
-firebase-deploy-prod: firebase-public ## Deploy to live channel on firebase, use with care!
+## Deploy to live channel on firebase, use with care!
+firebase-deploy-prod: firebase-public
 	./scripts/firebase-deploy live
 
-firebase-deploy: firebase-public ## Deploy to dev (or other) channel on firebase
+## Deploy to dev (or other) channel on firebase
+firebase-deploy: firebase-public
 	./scripts/firebase-deploy
 
-firebase-emulate: firebase-public ## Run firebase emulator for auth, hosting and datastore
+## Run firebase emulator for auth, hosting and datastore
+firebase-emulate: firebase-public
 	firebase --config firebase/firebase.json emulators:start
 
 firebase-public: frontend
@@ -152,11 +170,13 @@ firebase-public: frontend
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token
 
-sh-lint: ## Lint script files with shellcheck and shfmt
+## Lint script files with shellcheck and shfmt
+sh-lint:
 	shellcheck $(SCRIPTS)
 	shfmt --diff $(SCRIPTS)
 
-sh-fmt:  ## Format script files
+## Format script files
+sh-fmt:
 	shfmt --write $(SCRIPTS)
 
 .PHONY: sh-fmt sh-lint
@@ -191,12 +211,23 @@ COLOUR_GREEN  = $(shell tput setaf 2 2>/dev/null)
 COLOUR_WHITE  = $(shell tput setaf 7 2>/dev/null)
 
 help:
-	@awk -F ':.*## ' 'NF == 2 && $$1 ~ /^[A-Za-z0-9%_-]+$$/ { printf "$(COLOUR_WHITE)%-25s$(COLOUR_NORMAL)%s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+	$(eval export HELP_AWK)
+	@awk "$${HELP_AWK}" $(MAKEFILE_LIST) | sort | column -s "$$(printf \\t)" -t
 
 $(O):
 	@mkdir -p $@
 
 .PHONY: help
+
+# Awk script to extract and print target descriptions for `make help`.
+define HELP_AWK
+/^## / { desc = desc substr($$0, 3) }
+/^[A-Za-z0-9%_-]+:/ && desc {
+	sub(/:$$/, "", $$1)
+	printf "$(COLOUR_WHITE)%s$(COLOUR_NORMAL)\t%s\n", $$1, desc
+	desc = ""
+}
+endef
 
 define nl
 

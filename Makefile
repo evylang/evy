@@ -129,6 +129,7 @@ NODELIB = .hermit/node/lib
 frontend: tiny | $(O)
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
+	echo '{ "version": "$(VERSION)" }' | jq > $(O)/public/version.json
 
 ## Build frontend and serve on free port
 frontend-serve: frontend

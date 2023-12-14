@@ -5,7 +5,7 @@
 [![Go Reference](https://pkg.go.dev/badge/evylang.dev/evy.svg)](https://pkg.go.dev/evylang.dev/evy)
 [![GitHub Sponsorship](https://img.shields.io/badge/sponsor-%E2%99%A5-eb5c95?style=flat-square&logo=github&logoColor=white)](https://github.com/sponsors/evylang)
 
-Evy is a simple programming language, made to learn coding.
+Evy is a simple programming language, made to learn coding. [Try it out].
 
 Evy bridges the gap between block-based languages like [Scratch] and
 conventional languages like Python or JavaScript. It has a minimalist
@@ -15,6 +15,7 @@ programming languages. Evy has a small set of
 remember, but it still is powerful enough for user interaction, games,
 and animations.
 
+[Try it out]: https://evy.dev/play
 [Scratch]: https://scratch.mit.edu/
 
 ## 🌱 Getting Started

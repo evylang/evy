@@ -3,7 +3,7 @@
 main() {
 	set -euo pipefail
 	on_ci && set -x
-	local channel result url environ
+	local channel result urls environ
 
 	if (($# > 2)); then
 		exit_error "usage [ENV=stage [CHANNEL=dev]]"
@@ -14,16 +14,18 @@ main() {
 	environ=$(get_environment "${1:-stage}") || exit $?
 	channel=$(get_channel "${2:-}")
 	if [[ "${channel}" == "live" ]]; then
+		# `firebase deploy` must be used with live channel
 		firebase --config firebase/firebase.json --project "${environ}" deploy --only hosting
 		exit 0
 	fi
 
+	# `firebase hosting:channel:deploy` must be used with preview/non-live channels
 	result=$(firebase --json --config firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
 	check_deploy_error "${result}"
-	url=$(jq -r ".result| values[].url" <<<"${result}")
-	echo "Deployed to ${url}"
+	urls=$(get_urls "${result}")
+	printf "Deployed to \n%s\n" "${urls}"
 
-	on_ci && post_pr_comment "${url}"
+	on_ci && post_pr_comment "${urls}"
 	exit 0
 }
 
@@ -79,16 +81,44 @@ check_deploy_error() {
 	fi
 }
 
+# get_urls extracts key (target name) and URL from deployment result
+#  For example get_urls called with the following deployment result:
+#
+#       {
+#         "status": "success",
+#         "result": {
+#           "apex": {
+#             "url": "https://evy-lang-stage--dev-hx5gnhrl.web.app",
+#             //....
+#           },
+#           "docs": {
+#             "url": "https://evy-lang-stage-docs--dev-d5kp6w0d.web.app"
+#           },
+#           // ...
+#         }
+#       }
+#
+#  returns
+#
+#      - apex: https://evy-lang-stage--dev-hx5gnhrl.web.app
+#      - docs: https://evy-lang-stage-docs--dev-d5kp6w0d.web.app
+get_urls() {
+	local result="$1"
+	jq -r '.result | to_entries[] | "- \(.key): \(.value.url)"' <<<"${result}"
+}
+
 post_pr_comment() {
-	local url="$1" sha body comment_id pr_num
+	local urls="$1" sha body comment_id pr_num
 	sha=$(git rev-parse "origin/${GITHUB_HEAD_REF}")
-	body="firebase-deployment: ${url} (${sha})"
-	body+=$'\n<!--- bot:firebase-url --->' # marker to find correct comment for update
+	body="firebase-deployment for ${sha}"
+	body+=$'\n\n'
+	body+="${urls}"
+	body+=$'\n\n<!--- bot:firebase-urls --->' # marker to find correct comment for update
 	pr_num=$(get_pr_num)
 
 	comment_id=$(
 		gh api -H "Accept: application/vnd.github+json" "/repos/evylang/evy/issues/${pr_num}/comments" |
-			jq 'map(select(.body | contains ("<!--- bot:firebase-url --->"))) | .[] .id' |
+			jq 'map(select(.body | contains ("<!--- bot:firebase-urls --->"))) | .[] .id' |
 			head -n1
 	)
 	if [[ -z "${comment_id}" ]]; then

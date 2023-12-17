@@ -3,5 +3,46 @@
     "default": "evy-lang-stage",
     "stage": "evy-lang-stage",
     "prod": "evy-lang"
-  }
+  },
+  "targets": {
+    "evy-lang-stage": {
+      "hosting": {
+        "apex": [
+          "evy-lang-stage"
+        ],
+        "discord": [
+          "evy-lang-stage-discord"
+        ],
+        "docs": [
+          "evy-lang-stage-docs"
+        ],
+        "learn": [
+          "evy-lang-stage-learn"
+        ],
+        "play": [
+          "evy-lang-stage-play"
+        ]
+      }
+    },
+    "evy-lang": {
+      "hosting": {
+        "apex": [
+          "evy-lang"
+        ],
+        "discord": [
+          "evy-lang-discord"
+        ],
+        "docs": [
+          "evy-lang-docs"
+        ],
+        "learn": [
+          "evy-lang-learn"
+        ],
+        "play": [
+          "evy-lang-play"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

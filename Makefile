@@ -151,10 +151,12 @@ $(NODELIB):
 # --- firebase -----------------------------------------------------------------
 
 ## Deploy to live channel on firebase, use with care!
+## `firebase login` for first time local usage
 firebase-deploy-prod: firebase-public
 	./scripts/firebase-deploy live
 
-## Deploy to dev (or other) channel on firebase
+## Deploy to dev (or other) channel on firebase.
+## `firebase login` for first time local usage
 firebase-deploy: firebase-public
 	./scripts/firebase-deploy
 

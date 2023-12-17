@@ -23,6 +23,7 @@ main() {
 	echo "Deployed to ${url}"
 
 	on_ci && post_pr_comment "${url}"
+	exit 0
 }
 
 on_ci() {

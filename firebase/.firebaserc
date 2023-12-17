@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "evy-lang"
+    "default": "evy-lang-stage",
+    "stage": "evy-lang-stage",
+    "prod": "evy-lang"
   }
 }

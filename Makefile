@@ -150,15 +150,20 @@ $(NODELIB):
 
 # --- firebase -----------------------------------------------------------------
 
-## Deploy to live channel on firebase, use with care!
+## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
 firebase-deploy-prod: firebase-public
-	./scripts/firebase-deploy live
+	./scripts/firebase-deploy prod live
 
-## Deploy to dev (or other) channel on firebase.
+## Deploy to live channel on firebase stage.
+## `firebase login` for first time local usage
+firebase-deploy-stage: frontend
+	./scripts/firebase-deploy stage live
+
+## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
 firebase-deploy: firebase-public
-	./scripts/firebase-deploy
+	./scripts/firebase-deploy stage
 
 ## Run firebase emulator for auth, hosting and datastore
 firebase-emulate: firebase-public

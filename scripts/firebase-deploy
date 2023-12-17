@@ -3,23 +3,24 @@
 main() {
 	set -euo pipefail
 	on_ci && set -x
-	local channel result url
+	local channel result url environ
 
-	if (($# > 1)); then
-		exit_error "usage [CHANNEL=dev]"
+	if (($# > 2)); then
+		exit_error "usage [ENV=stage [CHANNEL=dev]]"
 	fi
 
 	on_ci && setup_ci_creds
 
-	channel=$(get_channel "${1:-}")
+	environ=$(get_environment "${1:-stage}") || exit $?
+	channel=$(get_channel "${2:-}")
 	if [[ "${channel}" == "live" ]]; then
-		firebase --config firebase/firebase.json deploy --only hosting
+		firebase --config firebase/firebase.json --project "${environ}" deploy --only hosting
 		exit 0
 	fi
 
-	result=$(firebase --json --config firebase/firebase.json hosting:channel:deploy "${channel}")
+	result=$(firebase --json --config firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
 	check_deploy_error "${result}"
-	url=$(jq -r '.result."evy-lang".url' <<<"${result}")
+	url=$(jq -r ".result| values[].url" <<<"${result}")
 	echo "Deployed to ${url}"
 
 	on_ci && post_pr_comment "${url}"
@@ -36,6 +37,14 @@ setup_ci_creds() {
 	fi
 	export GOOGLE_APPLICATION_CREDENTIALS=out/gac.json
 	printenv FIREBASE_SERVICE_ACCOUNT >"${GOOGLE_APPLICATION_CREDENTIALS}"
+}
+
+get_environment() {
+	local environ="$1"
+	if [[ "${environ}" != "stage" && "${environ}" != "default" && "${environ}" != "prod" ]]; then
+		exit_error "unknown environment: ${environ} (expected: stage, default or prod)"
+	fi
+	echo "${environ}"
 }
 
 get_channel() {
@@ -94,7 +103,7 @@ post_pr_comment() {
 }
 
 exit_error() {
-	echo "$*"
+	echo "$*" >&2
 	exit 1
 }
 

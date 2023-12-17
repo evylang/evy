@@ -27,6 +27,12 @@
         "destination": "/",
         "type": 301
       }
+    ],
+    "rewrites": [
+      {
+        "source": "/version",
+        "destination": "/version.json"
+      }
     ]
   },
   "emulators": {

@@ -13,7 +13,10 @@ main() {
 
 	environ=$(get_environment "${1:-stage}") || exit $?
 	channel=$(get_channel "${2:-}")
+	rm -rf firebase/public
+	cp -r out/public firebase
 	if [[ "${channel}" == "live" ]]; then
+		update_links "${environ}"
 		# `firebase deploy` must be used with live channel
 		firebase --config firebase/firebase.json --project "${environ}" deploy --only hosting
 		exit 0
@@ -67,6 +70,31 @@ get_pr_num() {
 	pr_num=${pr_num#refs/pull/}
 	pr_num=${pr_num%/merge}
 	echo "${pr_num}"
+}
+
+# update_links_in_file updates links in the given HTML file to subdomain,
+# e.g.: href="/docs" → href="https://docs.evy.dev" relevant subdomains are:
+# discord, docs, learn and play.
+update_links_in_file() {
+	local domain="$1" file="$2" target
+	target="firebase/${file#out/}"
+	sed -E \
+		-e 's href="/(discord|docs|learn|play) href="https://\1.'"${domain} g" \
+		-e 's value="/(discord|docs|learn|play) value="https://\1.'"${domain} g" \
+		"${file}" >"${target}"
+	diff -u "${file}" "${target}"
+}
+
+export -f update_links_in_file
+
+update_links() {
+	local environ="$1" domain="evystage.dev"
+	if [[ "${environ}" == "prod" ]]; then
+		domain="evy.dev"
+	fi
+
+	echo "update links $domain"
+	find out/public -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
 }
 
 check_deploy_error() {

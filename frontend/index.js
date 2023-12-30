@@ -365,54 +365,80 @@ function ctrlEnterListener(e) {
 
 // --- UI: URL-hash change handling ------------------------------------
 
+// handleHashChange is triggered by browser back/forwards buttons, manual
+// address bar update or click on link e.g. #new-example.
+// It first resets UI and waits for all previous actions to finish.
+// Then, it loads new source code depending on URL hash contents.
+// Finally it updates editor.
 async function handleHashChange() {
   hideModal()
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
-  if (opts.content) {
-    const decoded = await decode(opts.content)
-    editor.update({ value: decoded, errorLines: {} })
-    return
-  }
   if (!opts.source && !opts.sample && !opts.content) {
     opts = { sample: "welcome" }
+    history.replaceState({}, "", "#welcome")
   }
-  let crumbs
-  if (opts.sample) {
-    const sample = sampleData.byID[opts.sample]
-    opts.source = `samples/${sample.sectionID}/${opts.sample}.evy`
-    crumbs = [sample.sectionTitle, sample.title]
-  }
-  try {
-    const response = await fetch(opts.source)
-    if (response.status < 200 || response.status > 299) {
-      throw new Error("invalid response status", response.status)
-    }
-    const source = await response.text()
-    editor.update({ value: source, errorLines: {} })
-    document.querySelector(".editor-wrap").scrollTo(0, 0)
-    crumbs && updateBreadcrumbs(crumbs)
-    clearOutput()
-    format()
-  } catch (err) {
-    console.error(err)
-  }
+  const { source, crumbs } = await fetchSourceWithCrumbs(opts)
+  editor.update({ value: source, errorLines: {} })
+  document.querySelector(".editor-wrap").scrollTo(0, 0)
+  crumbs && updateBreadcrumbs(crumbs)
+  clearOutput()
+  await format()
 }
 
+// parseHash parses URL fragment into object e.g.:
+//
+//    https://evy.dev#key1=v1&key2=v2  →
+//    { key1: "v1", key2: "v2" }
+//
+// so, `&` separates key-value entries and `=` separates keys from values,
+// just like in a query string. There is a shortcut to known evy samples:
+//
+//    #abc   →
+//    { sample: "abc" }
 function parseHash() {
-  // parse url fragment into object
-  // e.g. https://example.com#a=1&b=2 into {a: "1", b: "2"}
-  // then fetch source from URL and write it to code input.
   const strs = window.location.hash.substring(1).split("&") //  ["a=1", "b=2"]
   const entries = strs.map((s) => s.split("=")) // [["a", "1"], ["b", "2"]]
   if (entries.length === 1 && entries[0].length === 1) {
-    // shortcut for evy.dev#lines loading evy.dev/samples/draw/lines.evy
+    // shortcut for evy.dev#abc loading evy.dev/samples/draw/abc.evy
     const sample = entries[0][0]
     if (sampleData && sampleData.byID[sample]) {
       return { sample }
     }
   }
   return Object.fromEntries(entries)
+}
+
+async function fetchSourceWithCrumbs({ content, sample, source }) {
+  if (content) {
+    const src = await decode(content)
+    return { source: src }
+  }
+  if (source) {
+    const src = await fetchSource(source)
+    return { source: src }
+  }
+  // sample ID is set
+  const s = sampleData.byID[sample]
+  const crumbs = [s.sectionTitle, s.title]
+  const url = `samples/${s.sectionID}/${sample}.evy`
+  const src = await fetchSource(url)
+  return { crumbs, source: src }
+}
+
+async function fetchSource(url) {
+  let source
+  try {
+    const response = await fetch(url)
+    if (response.status < 200 || response.status > 299) {
+      throw new Error("invalid response status", response.status)
+    }
+    source = await response.text()
+  } catch (err) {
+    console.error(err)
+    source = "Oops! Could not load source code."
+  }
+  return source
 }
 
 // --- Canvas graphics -------------------------------------------------
@@ -729,18 +755,7 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  const value = `move 10 20
-line 50 50
-rect 25 25
-color "red"
-circle 10
-
-x := 12
-print "x:" x
-if x > 10
-    print "🍦 big x"
-end`
-  editor = new Yace(".editor", { value })
+  editor = new Yace(".editor")
 }
 
 // --- eventHandlers, evy `on` -----------------------------------------

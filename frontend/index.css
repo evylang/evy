@@ -732,6 +732,7 @@ dialog .copy input {
 }
 dialog .copy button {
   flex: 0;
+  font-size: 1rem;
   border: none;
   background: none;
   color: var(--color);

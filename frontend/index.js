@@ -338,11 +338,10 @@ async function initUI() {
   document.querySelector("#sidemenu-about").onclick = showAbout
   document.querySelector("#sidemenu-share").onclick = share
   document.querySelector("#sidemenu-icon-share").onclick = share
+  handleHashChange()
   initModal()
-  initEditor()
   initSidemenu()
   initDialog()
-  handleHashChange()
 }
 
 async function fetchSamples() {
@@ -375,11 +374,17 @@ async function handleHashChange() {
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
   if (!opts.source && !opts.sample && !opts.content) {
+    if (hasEditorSession()) {
+      !editor && initEditor()
+      editor.loadSession()
+      return
+    }
     opts = { sample: "welcome" }
     history.replaceState({}, "", "#welcome")
   }
   const { source, crumbs } = await fetchSourceWithCrumbs(opts)
 
+  !editor && initEditor()
   editor.onUpdate(null)
   editor.update({ value: source, errorLines: {} })
 
@@ -387,7 +392,9 @@ async function handleHashChange() {
   crumbs && updateBreadcrumbs(crumbs)
   clearOutput()
   await format()
-  editor.onUpdate(clearHash)
+  // Clear hash right away for the long ugly gzip/b64 content URL fragments,
+  // keep the fragment until the first edit for the rest.
+  opts.content ? clearHash() : editor.onUpdate(clearHash)
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -765,7 +772,12 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  editor = new Yace(".editor")
+  editor = new Yace(".editor", { sessionKey: "evy-editor" })
+  document.querySelector(".editor-wrap").classList.remove("noscrollbar")
+}
+
+function hasEditorSession() {
+  return !!sessionStorage.getItem("evy-editor")
 }
 
 // --- eventHandlers, evy `on` -----------------------------------------

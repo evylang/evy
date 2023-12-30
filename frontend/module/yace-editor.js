@@ -77,6 +77,8 @@ export default class Yace {
     }
     if (value != null && value != undefined) {
       this.value = value
+      const key = this.options.sessionKey
+      key && value && sessionStorage.setItem(key, value) // don't set for empty value
     }
     this.errorLines = errorLines || this.errorLines
     const lines = this.value.split("\n")
@@ -124,6 +126,11 @@ export default class Yace {
 
   onUpdate(callback) {
     this.updateCallback = callback
+  }
+
+  loadSession() {
+    const value = sessionStorage.getItem(this.options.sessionKey) || ""
+    this.update({ value, errorLines: {} })
   }
 }
 

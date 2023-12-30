@@ -379,11 +379,15 @@ async function handleHashChange() {
     history.replaceState({}, "", "#welcome")
   }
   const { source, crumbs } = await fetchSourceWithCrumbs(opts)
+
+  editor.onUpdate(null)
   editor.update({ value: source, errorLines: {} })
+
   document.querySelector(".editor-wrap").scrollTo(0, 0)
   crumbs && updateBreadcrumbs(crumbs)
   clearOutput()
   await format()
+  editor.onUpdate(clearHash)
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -439,6 +443,12 @@ async function fetchSource(url) {
     source = "Oops! Could not load source code."
   }
   return source
+}
+
+function clearHash() {
+  history.pushState({}, "", window.location.origin + window.location.pathname)
+  // Clear hash only on first edit
+  editor.onUpdate(null)
 }
 
 // --- Canvas graphics -------------------------------------------------

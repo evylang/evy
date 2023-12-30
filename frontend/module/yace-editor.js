@@ -2,11 +2,7 @@
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/index.js
 export default class Yace {
   constructor(selector, options = {}) {
-    if (!selector) {
-      throw new Error("selector is not defined")
-    }
-
-    this.root = selector instanceof Node ? selector : document.querySelector(selector)
+    this.root = document.querySelector(selector)
 
     if (!this.root) {
       throw new Error(`element with "${selector}" selector does not exist`)
@@ -15,7 +11,6 @@ export default class Yace {
     const defaultOptions = {
       value: "",
       lineNumbers: true,
-      styles: {},
       plugins: [preserveIndent(), history(), tab()],
       highlighter: highlightEvy,
     }

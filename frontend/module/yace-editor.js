@@ -9,7 +9,7 @@ export default class Yace {
     this.root = selector instanceof Node ? selector : document.querySelector(selector)
 
     if (!this.root) {
-      throw new Error(`element with "${selector}" selector is not exist`)
+      throw new Error(`element with "${selector}" selector does not exist`)
     }
 
     const defaultOptions = {
@@ -433,6 +433,7 @@ const tab =
       }
     }
   }
+
 // evy highlighter
 function highlightEvy(val, errorLines) {
   const tokens = tokenize(val, errorLines)

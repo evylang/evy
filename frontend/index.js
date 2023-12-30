@@ -16,7 +16,7 @@ let editor
 let errors = false
 let sidemenu
 
-// --- Initialise ------------------------------------------------------
+// --- Initialize ------------------------------------------------------
 
 await initWasm()
 initUI()
@@ -24,7 +24,7 @@ initCanvas()
 
 // --- Wasm ------------------------------------------------------------
 
-// initWasm loads bytecode and initialises execution environment.
+// initWasm loads byte-code and initializes execution environment.
 async function initWasm() {
   wasmModule = await WebAssembly.compileStreaming(fetch("evy.wasm"))
   const runButton = document.querySelector("#run")
@@ -248,7 +248,7 @@ async function handleMobRun() {
 }
 
 // start calls evy wasm/go main(). It parses, formats and evaluates evy
-// code and initialises the output ui.
+// code and initialize the output ui.
 async function start() {
   stopped = false
   errors = false
@@ -327,7 +327,7 @@ function clearOutput() {
   resetCanvas()
 }
 
-// --- UI: initialisation ----------------------------------------------
+// --- UI: initialization ----------------------------------------------
 
 async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)

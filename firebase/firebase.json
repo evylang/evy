@@ -3,38 +3,35 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "hosting": {
-    "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "redirects": [
-      {
-        "source": "/discord",
-        "destination": "https://discord.gg/XHHXf6y29n",
-        "type": 301
-      },
-      {
-        "source": "/discord-server",
-        "destination": "https://discord.com/channels/1008553546058313738",
-        "type": 301
-      },
-      {
-        "source": "/docs",
-        "destination": "https://github.com/evylang/evy/blob/main/docs/README.md",
-        "type": 301
-      },
-      {
-        "source": "/play",
-        "destination": "/",
-        "type": 301
-      }
-    ],
-    "rewrites": [
-      {
-        "source": "/version",
-        "destination": "/version.json"
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "target": "apex",
+      "public": "public",
+      "rewrites": [
+        {
+          "source": "/version",
+          "destination": "/version.json"
+        }
+      ]
+    },
+    {
+      "target": "discord",
+      "public": "public/discord",
+      "cleanUrls": true
+    },
+    {
+      "target": "docs",
+      "public": "public/docs"
+    },
+    {
+      "target": "learn",
+      "public": "public/learn"
+    },
+    {
+      "target": "play",
+      "public": "public/play"
+    }
+  ],
   "emulators": {
     "auth": {
       "port": 9099

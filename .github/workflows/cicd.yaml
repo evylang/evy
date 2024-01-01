@@ -18,7 +18,7 @@ jobs:
       - run: ./bin/make firebase-deploy
         if: ${{ github.event_name == 'pull_request' }} # only run on PR, deploy prod/main in release job
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG_STAGE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:

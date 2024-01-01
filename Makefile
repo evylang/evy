@@ -150,23 +150,26 @@ $(NODELIB):
 
 # --- firebase -----------------------------------------------------------------
 
-## Deploy to live channel on firebase, use with care!
-firebase-deploy-prod: firebase-public
-	./scripts/firebase-deploy live
+## Deploy to live channel on firebase prod, use with care!
+## `firebase login` for first time local usage
+firebase-deploy-prod: frontend
+	./scripts/firebase-deploy prod live
 
-## Deploy to dev (or other) channel on firebase
-firebase-deploy: firebase-public
-	./scripts/firebase-deploy
+## Deploy to live channel on firebase stage.
+## `firebase login` for first time local usage
+firebase-deploy-stage: frontend
+	./scripts/firebase-deploy stage live
+
+## Deploy to dev (or other) channel on firebase stage.
+## `firebase login` for first time local usage
+firebase-deploy: frontend
+	./scripts/firebase-deploy stage
 
 ## Run firebase emulator for auth, hosting and datastore
-firebase-emulate: firebase-public
+firebase-emulate: frontend
 	firebase --config firebase/firebase.json emulators:start
 
-firebase-public: frontend
-	rm -rf firebase/public
-	cp -r $(O)/public firebase
-
-.PHONY: firebase-deploy firebase-deploy-prod firebase-emulate firebase-public
+.PHONY: firebase-deploy firebase-deploy-prod firebase-emulate
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token

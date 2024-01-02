@@ -43,7 +43,7 @@
 
     <div class="max-width-wrapper">
       <main>
-        <div class="editor-wrap">
+        <div class="editor-wrap noscrollbar">
           <div class="editor" style="padding-left: calc(2ch + 1.5rem)">
             <!-- These editor sample contents are replaced by JS,  once evy toolchain and yace-editor are downloaded. -->
             <pre class="lines">
@@ -60,7 +60,7 @@
 <span class="num"> 11</span>
 <span class="num"> 12</span>
             </pre>
-            <pre class="highlighted">
+            <pre class="highlighted placeholder">
 <span class="builtin">move</span> <span class="num">10</span> <span class="num">20</span>
 <span class="builtin">line</span> <span class="num">50</span> <span class="num">50</span>
 <span class="builtin">rect</span> <span class="num">25</span> <span class="num">25</span>
@@ -181,7 +181,7 @@
           <div class="copy">
             <input type="text" value="/play#gzipped+and+base64+encoded+evy+code+content" />
             <button type="button">
-              <svg width="1.25rem" height="1.25rem">
+              <svg width="1em" height="1em">
                 <use href="#icon-copy" />
               </svg>
             </button>
@@ -299,5 +299,13 @@
         />
       </symbol>
     </svg>
+    <script type="text/javascript">
+      // Avoid flicker of placeholder sample in editor if we have a saved session.
+      // Syntax coloring is added once Yace editor is loaded.
+      if (sessionStorage.getItem("evy-editor")) {
+        document.querySelector(".placeholder").innerText = sessionStorage.getItem("evy-editor")
+        document.querySelector(".lines").innerText = ""
+      }
+    </script>
   </body>
 </html>

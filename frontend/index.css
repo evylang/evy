@@ -298,6 +298,10 @@ main.view-output {
   border-radius: 6px;
   border: var(--editor-border);
 }
+.noscrollbar {
+  /*only used on initialization to avoid scrollbar flicker*/
+  scrollbar-width: none;
+}
 .editor {
   color: var(--color);
   font-size: 1rem;
@@ -353,7 +357,7 @@ main.view-output {
   top: 0;
   left: 0;
   pointer-events: none;
-  overflow: auto;
+  overflow: hidden;
   min-width: 100%;
 }
 .editor pre.highlighted .err,
@@ -732,6 +736,7 @@ dialog .copy input {
 }
 dialog .copy button {
   flex: 0;
+  font-size: 1rem;
   border: none;
   background: none;
   color: var(--color);

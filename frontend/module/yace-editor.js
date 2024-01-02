@@ -2,20 +2,15 @@
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/index.js
 export default class Yace {
   constructor(selector, options = {}) {
-    if (!selector) {
-      throw new Error("selector is not defined")
-    }
-
-    this.root = selector instanceof Node ? selector : document.querySelector(selector)
+    this.root = document.querySelector(selector)
 
     if (!this.root) {
-      throw new Error(`element with "${selector}" selector is not exist`)
+      throw new Error(`element with "${selector}" selector does not exist`)
     }
 
     const defaultOptions = {
       value: "",
       lineNumbers: true,
-      styles: {},
       plugins: [preserveIndent(), history(), tab()],
       highlighter: highlightEvy,
     }
@@ -82,6 +77,8 @@ export default class Yace {
     }
     if (value != null && value != undefined) {
       this.value = value
+      const key = this.options.sessionKey
+      key && value && sessionStorage.setItem(key, value) // don't set for empty value
     }
     this.errorLines = errorLines || this.errorLines
     const lines = this.value.split("\n")
@@ -129,6 +126,11 @@ export default class Yace {
 
   onUpdate(callback) {
     this.updateCallback = callback
+  }
+
+  loadSession() {
+    const value = sessionStorage.getItem(this.options.sessionKey) || ""
+    this.update({ value, errorLines: {} })
   }
 }
 
@@ -433,6 +435,7 @@ const tab =
       }
     }
   }
+
 // evy highlighter
 function highlightEvy(val, errorLines) {
   const tokens = tokenize(val, errorLines)

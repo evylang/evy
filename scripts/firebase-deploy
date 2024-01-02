@@ -28,12 +28,16 @@ main() {
 	urls=$(get_urls "${result}")
 	printf "Deployed to \n%s\n" "${urls}"
 
-	on_ci && post_pr_comment "${urls}"
+	on_pr && post_pr_comment "${urls}"
 	exit 0
 }
 
 on_ci() {
 	[[ -n "${CI:-}" ]]
+}
+
+on_pr() {
+	on_ci && [[ "${GITHUB_REF:-}" == refs/pull/* ]]
 }
 
 setup_ci_creds() {
@@ -56,13 +60,13 @@ get_channel() {
 	local channel="$1"
 	if [[ -n "${channel}" ]]; then
 		echo "${channel}"
-		return
-	fi
-	if [[ -z "${CI:-}" ]]; then
+	elif on_pr; then
+		get_pr_num
+	elif on_ci; then
+		echo "live"
+	else
 		echo "dev"
-		return
 	fi
-	get_pr_num
 }
 
 get_pr_num() {

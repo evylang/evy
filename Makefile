@@ -132,9 +132,9 @@ frontend: tiny | $(O)
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
 
-## Build frontend and serve on free port
-frontend-serve: frontend
-	servedir $(O)/public
+## Serve frontend on free port
+serve:
+	servedir frontend
 
 ## Format code with prettier
 prettier: | $(NODELIB)
@@ -147,7 +147,7 @@ check-prettier: | $(NODELIB)
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier frontend frontend-serve prettier
+.PHONY: check-prettier frontend prettier serve
 
 # --- firebase -----------------------------------------------------------------
 

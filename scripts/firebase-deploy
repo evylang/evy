@@ -76,6 +76,16 @@ get_pr_num() {
 	echo "${pr_num}"
 }
 
+update_links() {
+	local environ="$1" domain="evystage.dev"
+	if [[ "${environ}" == "prod" ]]; then
+		domain="evy.dev"
+	fi
+
+	echo "update links $domain"
+	find frontend -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
+}
+
 # update_links_in_file updates links in the given HTML file to subdomain,
 # e.g.: href="/docs" → href="https://docs.evy.dev" relevant subdomains are:
 # discord, docs, learn and play.
@@ -89,16 +99,6 @@ update_links_in_file() {
 }
 
 export -f update_links_in_file
-
-update_links() {
-	local environ="$1" domain="evystage.dev"
-	if [[ "${environ}" == "prod" ]]; then
-		domain="evy.dev"
-	fi
-
-	echo "update links $domain"
-	find frontend -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
-}
 
 check_deploy_error() {
 	local result="$1" status

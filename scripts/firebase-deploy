@@ -14,7 +14,7 @@ main() {
 	environ=$(get_environment "${1:-stage}") || exit $?
 	channel=$(get_channel "${2:-}")
 	rm -rf firebase/public
-	cp -r out/public firebase
+	cp -r frontend firebase/public
 	if [[ "${channel}" == "live" ]]; then
 		update_links "${environ}"
 		# `firebase deploy` must be used with live channel
@@ -81,7 +81,7 @@ get_pr_num() {
 # discord, docs, learn and play.
 update_links_in_file() {
 	local domain="$1" file="$2" target
-	target="firebase/${file#out/}"
+	target="firebase/public/${file#frontend/}"
 	sed -E \
 		-e 's (href|value)="/(discord|docs|learn|play) \1="https://\2.'"${domain} g" \
 		"${file}" >"${target}"
@@ -97,7 +97,7 @@ update_links() {
 	fi
 
 	echo "update links $domain"
-	find out/public -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
+	find frontend -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
 }
 
 check_deploy_error() {

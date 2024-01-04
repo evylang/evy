@@ -127,11 +127,6 @@ godoc: install
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib
 
-## Build frontend, typically iterate with npm and inside frontend
-frontend: tiny | $(O)
-	rm -rf $(O)/public
-	cp -r frontend $(O)/public
-
 ## Serve frontend on free port
 serve:
 	servedir frontend
@@ -147,30 +142,30 @@ check-prettier: | $(NODELIB)
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier frontend prettier serve
+.PHONY: check-prettier prettier serve
 
 # --- firebase -----------------------------------------------------------------
 
 ## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
-firebase-deploy-prod: frontend
+firebase-deploy-prod: tiny
 	./scripts/firebase-deploy prod live
 
 ## Deploy to live channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy-stage: frontend
+firebase-deploy-stage: tiny
 	./scripts/firebase-deploy stage live
 
 ## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy: frontend
+firebase-deploy: tiny
 	./scripts/firebase-deploy stage
 
 ## Run firebase emulator for auth, hosting and datastore
-firebase-emulate: frontend
+firebase-emulate: tiny
 	firebase --config firebase/firebase.json emulators:start
 
-.PHONY: firebase-deploy firebase-deploy-prod firebase-emulate
+.PHONY: firebase-deploy firebase-deploy-prod firebase-deploy-stage firebase-emulate
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token

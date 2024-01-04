@@ -42,6 +42,7 @@ tiny: go-version | $(O)
 	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
 	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/evy.wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
+	echo '{ "version": "$(VERSION)" }' | jq > frontend/version.json
 
 ## Tidy go modules with "go mod tidy"
 tidy:
@@ -54,6 +55,7 @@ fmt:
 clean::
 	-rm -f frontend/evy.wasm
 	-rm -f frontend/wasm_exec.js
+	-rm -f frontend/version.json
 
 .PHONY: build go-version install tidy tiny
 
@@ -129,7 +131,6 @@ NODELIB = .hermit/node/lib
 frontend: tiny | $(O)
 	rm -rf $(O)/public
 	cp -r frontend $(O)/public
-	echo '{ "version": "$(VERSION)" }' | jq > $(O)/public/version.json
 
 ## Build frontend and serve on free port
 frontend-serve: frontend

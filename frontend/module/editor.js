@@ -1,6 +1,6 @@
 // https://github.com/petersolopov/yace - MIT licensed
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/index.js
-export default class Yace {
+export default class Editor {
   constructor(selector, options = {}) {
     this.root = document.querySelector(selector)
 

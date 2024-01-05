@@ -1,5 +1,5 @@
 "use strict"
-import Yace from "./module/yace-editor.js"
+import Editor from "./module/editor.js"
 
 // --- Globals ---------------------------------------------------------
 
@@ -772,7 +772,7 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  editor = new Yace(".editor", { sessionKey: "evy-editor" })
+  editor = new Editor(".editor", { sessionKey: "evy-editor" })
   document.querySelector(".editor-wrap").classList.remove("noscrollbar")
 }
 

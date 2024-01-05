@@ -144,28 +144,24 @@ $(NODELIB):
 
 .PHONY: check-prettier prettier serve
 
-# --- firebase -----------------------------------------------------------------
+# --- deploy -----------------------------------------------------------------
 
 ## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
-firebase-deploy-prod: tiny
+deploy-prod: tiny
 	./scripts/firebase-deploy prod live
 
 ## Deploy to live channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy-stage: tiny
+deploy-stage: tiny
 	./scripts/firebase-deploy stage live
 
 ## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy: tiny
+deploy: tiny
 	./scripts/firebase-deploy stage
 
-## Run firebase emulator for auth, hosting and datastore
-firebase-emulate: tiny
-	firebase --config firebase/firebase.json emulators:start
-
-.PHONY: firebase-deploy firebase-deploy-prod firebase-deploy-stage firebase-emulate
+.PHONY: deploy deploy-prod deploy-stage
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token

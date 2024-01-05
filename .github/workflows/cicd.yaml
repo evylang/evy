@@ -16,7 +16,7 @@ jobs:
       - run: ./bin/make ci
         env:
           TERM: vt100
-      - run: ./bin/make firebase-deploy
+      - run: ./bin/make deploy
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,7 +35,7 @@ jobs:
           GITHUB_APP_ID: ${{ secrets.EVYLANGBOT_GITHUB_APP_ID }}
           GITHUB_APP_PEM: ${{ secrets.EVYLANGBOT_GITHUB_APP_PEM }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: ./bin/make firebase-deploy-prod
+      - run: ./bin/make deploy-prod
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
 

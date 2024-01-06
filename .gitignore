@@ -1,7 +1,7 @@
 /.hermit/
 /firebase/*.log
 /firebase/.firebase/
-/firebase/public/
 /frontend/evy.wasm
+/frontend/version.json
 /frontend/wasm_exec.js
 /out/

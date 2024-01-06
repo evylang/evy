@@ -42,6 +42,7 @@ tiny: go-version | $(O)
 	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
 	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/evy.wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
+	echo '{ "version": "$(VERSION)" }' | jq > frontend/version.json
 
 ## Tidy go modules with "go mod tidy"
 tidy:
@@ -54,6 +55,7 @@ fmt:
 clean::
 	-rm -f frontend/evy.wasm
 	-rm -f frontend/wasm_exec.js
+	-rm -f frontend/version.json
 
 .PHONY: build go-version install tidy tiny
 
@@ -125,15 +127,9 @@ godoc: install
 # --- frontend -----------------------------------------------------------------
 NODELIB = .hermit/node/lib
 
-## Build frontend, typically iterate with npm and inside frontend
-frontend: tiny | $(O)
-	rm -rf $(O)/public
-	cp -r frontend $(O)/public
-	echo '{ "version": "$(VERSION)" }' | jq > $(O)/public/version.json
-
-## Build frontend and serve on free port
-frontend-serve: frontend
-	servedir $(O)/public
+## Serve frontend on free port
+serve:
+	servedir frontend
 
 ## Format code with prettier
 prettier: | $(NODELIB)
@@ -146,30 +142,26 @@ check-prettier: | $(NODELIB)
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier frontend frontend-serve prettier
+.PHONY: check-prettier prettier serve
 
-# --- firebase -----------------------------------------------------------------
+# --- deploy -----------------------------------------------------------------
 
 ## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
-firebase-deploy-prod: frontend
+deploy-prod: tiny
 	./scripts/firebase-deploy prod live
 
 ## Deploy to live channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy-stage: frontend
+deploy-stage: tiny
 	./scripts/firebase-deploy stage live
 
 ## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
-firebase-deploy: frontend
+deploy: tiny
 	./scripts/firebase-deploy stage
 
-## Run firebase emulator for auth, hosting and datastore
-firebase-emulate: frontend
-	firebase --config firebase/firebase.json emulators:start
-
-.PHONY: firebase-deploy firebase-deploy-prod firebase-emulate
+.PHONY: deploy deploy-prod deploy-stage
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token

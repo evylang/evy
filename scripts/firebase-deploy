@@ -13,17 +13,18 @@ main() {
 
 	environ=$(get_environment "${1:-stage}") || exit $?
 	channel=$(get_channel "${2:-}")
-	rm -rf firebase/public
-	cp -r out/public firebase
+	rm -rf out/firebase
+	cp -r firebase out/
+	cp -r frontend out/firebase/public
 	if [[ "${channel}" == "live" ]]; then
 		update_links "${environ}"
 		# `firebase deploy` must be used with live channel
-		firebase --config firebase/firebase.json --project "${environ}" deploy --only hosting
+		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
 		exit 0
 	fi
 
 	# `firebase hosting:channel:deploy` must be used with preview/non-live channels
-	result=$(firebase --json --config firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
+	result=$(firebase --json --config out/firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
 	check_deploy_error "${result}"
 	urls=$(get_urls "${result}")
 	printf "Deployed to \n%s\n" "${urls}"
@@ -76,20 +77,6 @@ get_pr_num() {
 	echo "${pr_num}"
 }
 
-# update_links_in_file updates links in the given HTML file to subdomain,
-# e.g.: href="/docs" → href="https://docs.evy.dev" relevant subdomains are:
-# discord, docs, learn and play.
-update_links_in_file() {
-	local domain="$1" file="$2" target
-	target="firebase/${file#out/}"
-	sed -E \
-		-e 's (href|value)="/(discord|docs|learn|play) \1="https://\2.'"${domain} g" \
-		"${file}" >"${target}"
-	diff -u "${file}" "${target}"
-}
-
-export -f update_links_in_file
-
 update_links() {
 	local environ="$1" domain="evystage.dev"
 	if [[ "${environ}" == "prod" ]]; then
@@ -97,8 +84,22 @@ update_links() {
 	fi
 
 	echo "update links $domain"
-	find out/public -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
+	find frontend -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
 }
+
+# update_links_in_file updates links in the given HTML file to subdomain,
+# e.g.: href="/docs" → href="https://docs.evy.dev" relevant subdomains are:
+# discord, docs, learn and play.
+update_links_in_file() {
+	local domain="$1" file="$2" target
+	target="out/firebase/public/${file#frontend/}"
+	sed -E \
+		-e 's (href|value)="/(discord|docs|learn|play) \1="https://\2.'"${domain} g" \
+		"${file}" >"${target}"
+	diff -u "${file}" "${target}"
+}
+
+export -f update_links_in_file
 
 check_deploy_error() {
 	local result="$1" status

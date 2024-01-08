@@ -26,6 +26,7 @@ linters:
     - golint
     - gomnd
     - ifshort
+    - inamedparam
     - interfacer
     - interfacebloat
     - ireturn

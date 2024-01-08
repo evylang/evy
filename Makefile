@@ -125,7 +125,8 @@ godoc: install
 .PHONY: doc doctest godoc toc usage
 
 # --- frontend -----------------------------------------------------------------
-NODELIB = .hermit/node/lib
+NODEPREFIX = .hermit/node
+NODELIB = $(NODEPREFIX)/lib
 
 ## Serve frontend on free port
 serve:
@@ -133,11 +134,11 @@ serve:
 
 ## Format code with prettier
 prettier: | $(NODELIB)
-	npx -y prettier --write .
+	npx --prefix $(NODEPREFIX) -y prettier --write .
 
 ## Ensure code is formatted with prettier
 check-prettier: | $(NODELIB)
-	npx -y prettier --check .
+	npx --prefix $(NODEPREFIX) -y prettier --check .
 
 $(NODELIB):
 	@mkdir -p $@

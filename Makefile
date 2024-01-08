@@ -11,7 +11,7 @@ all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
-ci: clean check-uptodate all ## Full clean build and up-to-date checks as run on CI
+ci: clean check-uptodate all e2e ## Full clean build and up-to-date checks as run on CI
 
 check-uptodate: tidy fmt doc
 	test -z "$$(git status --porcelain)" || { git status; false; }
@@ -127,6 +127,10 @@ godoc: install
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node
 NODELIB = $(NODEPREFIX)/lib
+# TODO: BASEURL should be calculated dynamically for CI/PR.
+# BASEURL needs to be in the environment so that `e2e/playwright.config.js`
+# can see it when the `e2e` target is called.
+export BASEURL = https://evy.dev
 
 ## Serve frontend on free port
 serve:
@@ -140,10 +144,16 @@ prettier: | $(NODELIB)
 check-prettier: | $(NODELIB)
 	npx --prefix $(NODEPREFIX) -y prettier --check .
 
+e2e:
+	@echo "testing $(BASEURL)"
+	npm --prefix e2e ci
+	npx --prefix e2e playwright install --with-deps chromium
+	npx --prefix e2e playwright test --config e2e
+
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier prettier serve
+.PHONY: check-prettier e2e prettier serve
 
 # --- deploy -----------------------------------------------------------------
 

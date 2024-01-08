@@ -1,7 +1,10 @@
 /.hermit/
+/e2e/test-results
 /firebase/*.log
 /firebase/.firebase/
 /frontend/evy.wasm
 /frontend/version.json
 /frontend/wasm_exec.js
 /out/
+
+node_modules/

@@ -789,23 +789,6 @@ embed {
   margin-right: auto;
 }
 
-/* --- Easter egg ---------------------------------------------------- */
-.confetti {
-  height: 7vw;
-  width: 7vw;
-  line-height: 7vw;
-  border-radius: 50%;
-  position: absolute;
-  font-size: 4vw;
-  user-select: none;
-  text-align: center;
-  color: hsl(0deg 0% 100%);
-}
-.confetti.fadeout {
-  opacity: 0;
-  transition: opacity 1.5s ease-in-out;
-}
-
 /* --- Utilities ----------------------------------------------------- */
 .desktop {
   display: var(--display-desktop-only);

@@ -7,16 +7,19 @@ COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
-all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend ## Build, test, check coverage and lint
+## Build, test, check coverage and lint
+all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
-ci: clean check-uptodate all e2e ## Full clean build and up-to-date checks as run on CI
+## Full clean build and up-to-date checks as run on CI
+ci: clean check-uptodate all e2e
 
 check-uptodate: tidy fmt doc
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
-clean:: ## Remove generated files
+## Remove generated files
+clean::
 	-rm -rf $(O)
 
 .PHONY: all check-uptodate ci clean
@@ -25,7 +28,8 @@ clean:: ## Remove generated files
 GO_LDFLAGS = -X main.version=$(VERSION)
 CMDS = .
 
-build: | $(O) ## Build evy binaries
+## Build evy binaries
+build: | $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 ## Build and install binaries in $GOBIN
@@ -189,7 +193,8 @@ sh-fmt:
 .PHONY: sh-fmt sh-lint
 
 # --- Release -------------------------------------------------------------------
-release: nexttag ## Tag and release binaries for different OS on GitHub release
+## Tag and release binaries for different OS on GitHub release
+release: nexttag
 	git tag $(NEXTTAG)
 	git push origin $(NEXTTAG)
 	[ -z "$(CI)" ] || GITHUB_TOKEN=$$(.github/scripts/app_token) || exit 1; \
@@ -230,7 +235,7 @@ $(O):
 define HELP_AWK
 /^## / { desc = desc substr($$0, 3) }
 /^[A-Za-z0-9%_-]+:/ && desc {
-	sub(/:$$/, "", $$1)
+	sub(/::?$$/, "", $$1)
 	printf "$(COLOUR_WHITE)%s$(COLOUR_NORMAL)\t%s\n", $$1, desc
 	desc = ""
 }

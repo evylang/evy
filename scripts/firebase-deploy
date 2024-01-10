@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+declare -A env_urls
+env_urls[stage]='{
+  "result": {
+    "apex": {  "target": "apex", "url": "https://evystage.dev"},
+    "discord": {  "target": "discord", "url": "https://discord.evystage.dev"},
+    "docs": {  "target": "docs", "url": "https://docs.evystage.dev"},
+    "learn": {  "target": "learn", "url": "https://learn.evystage.dev"},
+    "play": {  "target": "play", "url": "https://play.evystage.dev"}
+  }
+}'
+env_urls[prod]='{
+  "result": {
+    "apex": { "target": "apex", "url": "https://evy.dev"},
+    "discord": { "target": "discord", "url": "https://discord.evy.dev"},
+    "docs": { "target": "docs", "url": "https://docs.evy.dev"},
+    "learn": { "target": "learn", "url": "https://learn.evy.dev"},
+    "play": { "target": "play", "url": "https://play.evy.dev"}
+  }
+}'
+
 main() {
 	set -euo pipefail
 	on_ci && set -x
@@ -21,6 +41,7 @@ main() {
 		update_refs "${environ}"
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
+		on_ci && setup_github_env "${env_urls[${environ}]}"
 		exit 0
 	fi
 
@@ -31,6 +52,7 @@ main() {
 	printf "Deployed to \n%s\n" "${urls}"
 
 	on_pr && post_pr_comment "${urls}"
+	on_ci && setup_github_env "${result}"
 	exit 0
 }
 
@@ -276,6 +298,17 @@ post_pr_comment() {
 	gh api --method PATCH -H "Accept: application/vnd.github+json" \
 		"/repos/evylang/evy/issues/comments/${comment_id}" \
 		-f body="${body}"
+}
+
+setup_github_env() {
+	local json_result="$1"
+	# The following jq command generates the following output and appends it to $GITHUB_ENV:
+	# BASEURL_APEX=https://evy-lang-stage--dev-mtnwzsbm.web.app
+	# BASEURL_DISCORD=https://evy-lang-stage-discord--dev-pap726z0.web.app
+	# BASEURL_DOCS=https://evy-lang-stage-docs--dev-62qb1rk7.web.app
+	# BASEURL_LEARN=https://evy-lang-stage-learn--dev-txkb2kn8.web.app
+	# BASEURL_PLAY=https://evy-lang-stage-play--dev-t9r8zjux.web.app
+	jq -r '.result.[] | "BASEURL_\(.target | ascii_upcase)=\(.url)"' <<<"${json_result}" >>"$GITHUB_ENV"
 }
 
 exit_error() {

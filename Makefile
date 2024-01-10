@@ -13,7 +13,7 @@ all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
 ## Full clean build and up-to-date checks as run on CI
-ci: clean check-uptodate all e2e
+ci: clean check-uptodate all
 
 check-uptodate: tidy fmt doc
 	test -z "$$(git status --porcelain)" || { git status; false; }
@@ -131,12 +131,14 @@ godoc: install
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node
 NODELIB = $(NODEPREFIX)/lib
-# TODO: BASEURL should be calculated dynamically for CI/PR.
+
 # BASEURL needs to be in the environment so that `e2e/playwright.config.js`
 # can see it when the `e2e` target is called.
-export BASEURL = https://evy.dev
+# The firebase-deploy script sets BASEURL to the deployment URL on GitHub CI.
+export SERVEDIR_PORT ?= 8080
+export BASEURL ?= http://localhost:$(SERVEDIR_PORT)
 
-## Serve frontend on free port
+## Serve frontend on port 8080 by default to work with e2e target
 serve:
 	servedir frontend
 

@@ -7,6 +7,17 @@
     {
       "target": "apex",
       "public": "public",
+      "headers": [
+        {
+          "source": "**/*.*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        }
+      ],
       "rewrites": [
         {
           "source": "/version",

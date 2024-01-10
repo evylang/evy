@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+declare -A env_urls
+env_urls[stage]='{
+  "result": {
+    "apex": {  "target": "apex", "url": "https://evystage.dev"},
+    "discord": {  "target": "discord", "url": "https://discord.evystage.dev"},
+    "docs": {  "target": "docs", "url": "https://docs.evystage.dev"},
+    "learn": {  "target": "learn", "url": "https://learn.evystage.dev"},
+    "play": {  "target": "play", "url": "https://play.evystage.dev"}
+  }
+}'
+env_urls[prod]='{
+  "result": {
+    "apex": { "target": "apex", "url": "https://evy.dev"},
+    "discord": { "target": "discord", "url": "https://discord.evy.dev"},
+    "docs": { "target": "docs", "url": "https://docs.evy.dev"},
+    "learn": { "target": "learn", "url": "https://learn.evy.dev"},
+    "play": { "target": "play", "url": "https://play.evy.dev"}
+  }
+}'
+
 main() {
 	set -euo pipefail
 	on_ci && set -x
@@ -17,9 +37,11 @@ main() {
 	cp -r firebase out/
 	cp -r frontend out/firebase/public
 	if [[ "${channel}" == "live" ]]; then
-		update_links "${environ}"
+		hash_css_js out/firebase/public
+		update_refs "${environ}"
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
+		on_ci && setup_github_env "${env_urls[${environ}]}"
 		exit 0
 	fi
 
@@ -30,6 +52,7 @@ main() {
 	printf "Deployed to \n%s\n" "${urls}"
 
 	on_pr && post_pr_comment "${urls}"
+	on_ci && setup_github_env "${result}"
 	exit 0
 }
 
@@ -77,29 +100,142 @@ get_pr_num() {
 	echo "${pr_num}"
 }
 
-update_links() {
-	local environ="$1" domain="evystage.dev"
+hash_css_js() {
+	local dir="$1" files file hash hashed_file
+	mapfile -t files < <(find "${dir}" -name '*.css' -o -name '*.js')
+	for file in "${files[@]}"; do
+		hash=$(get_hash "${file}")
+		hashed_file="${file%.*}.${hash}.${file##*.}"
+		mv "${file}" "${hashed_file}"
+		ln -s "${hashed_file##*/}" "${file}"
+	done
+}
+
+get_hash() {
+	local file="$1"
+	#  Hashes with 32 bits, or 8 chars[0-9a-f] and 100 file changes in a year
+	#  (cache expiry is one year) has a collision probability of less than
+	#  0.0000000005%.
+	shasum -a 256 "${file}" | cut -c -8
+}
+
+# udpate_refs updates references in hrefs and src attributes and also
+# generates an importmap in all **.html files in the frontend directory.
+update_refs() {
+	local environ="$1" domain="evystage.dev" file htmlfiles
 	if [[ "${environ}" == "prod" ]]; then
 		domain="evy.dev"
 	fi
-
-	echo "update links $domain"
-	find frontend -name "*.html" -exec bash -c 'update_links_in_file "$1" "$2"' _ ${domain} {} \;
+	echo "update hrefs for subdomains on $domain"
+	mapfile -t htmlfiles < <(find frontend -name '*.html')
+	for file in "${htmlfiles[@]}"; do
+		update_refs_in_file "${domain}" "${file}"
+	done
 }
 
-# update_links_in_file updates links in the given HTML file to subdomain,
-# e.g.: href="/docs" → href="https://docs.evy.dev" relevant subdomains are:
-# discord, docs, learn and play.
-update_links_in_file() {
-	local domain="$1" file="$2" target
+# update_refs_in_file updates references in hrefs and src attributes and also
+# generates an importmap in given HTML file.
+update_refs_in_file() {
+	local domain="$1" file="$2" target cssfiles jsfiles modulefiles
 	target="out/firebase/public/${file#frontend/}"
-	sed -E \
-		-e 's (href|value)="/(discord|docs|learn|play) \1="https://\2.'"${domain} g" \
-		"${file}" >"${target}"
-	diff -u "${file}" "${target}"
+
+	# TODO this needs to be reworked for `../css/index.css` and other relative file paths.
+	mapfile -t cssfiles < <(cd out/firebase/public && find css -name '*.*.css')
+	mapfile -t jsfiles < <(cd out/firebase/public && find . -name '*.*.js' | cut -c3-)
+	mapfile -t modulefiles < <(cd out/firebase/public && find ./module -name '*.*.js')
+	update_subdomain_href "${domain}" <"${file}" |
+		update_css_href "${cssfiles[@]}" |
+		update_js_src "${jsfiles[@]}" |
+		update_importmap "${modulefiles[@]}" \
+			>"${target}"
+
+	diff -u "${file}" "${target}" || true
 }
 
-export -f update_links_in_file
+# update_subdomain_href replaces hrefs and values starting
+# with /discord, /docs, /learn or /play with the correct subdomain, e.g.:
+#
+#   href="/discord" -> href="https://discord.evy.dev"
+update_subdomain_href() {
+	local domain="$1"
+	sed -E 's (href|value)="/(discord|docs|learn|play) \1="https://\2.'"${domain} g"
+}
+
+# update_css_href updates CSS file name links in the HTML contents provided
+# on stdin and writes the result to stdout.
+#
+# update_css_href takes a list of target CSS file names with hashes as input.
+# Filenames must match "NAME.HASH.css", e.g.: css/index.123bf.css.
+# update_css_href replaces the the unhashed CSS file names with the hashes
+# target CSS filenames:
+#
+#   target: css/index.123bf.css
+#   source: css/index.css
+#   match: <link rel="stylesheet" href="css/index.css" type="text/css" />
+#
+# Using hashed CSS filenames allows to set a long cache lifetime for CSS.
+update_css_href() {
+	local src target args=()
+	for target in "$@"; do
+		src="${target%.*.css}.css"
+		args+=(-e "s href=\"${src}\" href=\"${target}\" ")
+	done
+	sed "${args[@]}"
+}
+
+# update_js_src updates JS file name src attributes in the HTML contents
+# provided on stdin and writes the result to stdout.
+#
+# update_js_src takes a list of target JS file names with hashes as input.
+# Filenames must match "NAME.HASH.js", e.g.: js/index.123bf.js.
+# update_js_src replaces the the unhashed JS file names with the hashes
+# target JS filenames:
+#
+#   target: js/index.123bf.js
+#   source: js/index.js
+#   match: <script src="js/index.js" type="module" defer></script>
+#
+# Using hashed JS filenames allows to set a long cache lifetime for JS.
+update_js_src() {
+	local src target args=()
+	for target in "$@"; do
+		src="${target%.*.js}.js"
+		args+=(-e "s src=\"${src}\" src=\"${target}\" ")
+	done
+	sed "${args[@]}"
+}
+
+# update_importmap generates an [importmap] JSON and places it inside the
+# matched `<script type="importmap></script>` tag.
+#
+# update_importmap takes a list of target JS file names with hashes as input.
+# Filenames must match "js/NAME.HASH.css", e.g.: js/index.123bf.js. The
+# unhashed import has the `js/` directory stripped:
+#
+#   target: js/index.123bf.js
+#   source: index.js
+#   match: <script type="importmap"></script>
+#   generate:
+#   {
+#     "imports": {
+#       "index.js": "js/index.123bf.js",
+#       "yace-editor.js": "js/yace-editor-2346675.js"
+#     }
+#   }
+#
+# [importmap]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+update_importmap() {
+	local src target args=()
+	for target in "$@"; do
+		src="${target%.*.js}.js"
+		src="${src#js/}"
+		args+=("${src}" "${target}")
+	done
+	printf -v importmap '\\n    "%s": "%s",' "${args[@]}"
+	importmap=${importmap%,}
+	printf -v importmap '\\n{\\n  "imports": {%s\\n  }\\n}' "${importmap}"
+	sed -e "s|^\( *\)<script type=\"importmap\"></script>|\1<script type=\"importmap\">${importmap//\\n/\\n\\1  }\n\1</script>|"
+}
 
 check_deploy_error() {
 	local result="$1" status
@@ -162,6 +298,17 @@ post_pr_comment() {
 	gh api --method PATCH -H "Accept: application/vnd.github+json" \
 		"/repos/evylang/evy/issues/comments/${comment_id}" \
 		-f body="${body}"
+}
+
+setup_github_env() {
+	local json_result="$1"
+	# The following jq command generates the following output and appends it to $GITHUB_ENV:
+	# BASEURL_APEX=https://evy-lang-stage--dev-mtnwzsbm.web.app
+	# BASEURL_DISCORD=https://evy-lang-stage-discord--dev-pap726z0.web.app
+	# BASEURL_DOCS=https://evy-lang-stage-docs--dev-62qb1rk7.web.app
+	# BASEURL_LEARN=https://evy-lang-stage-learn--dev-txkb2kn8.web.app
+	# BASEURL_PLAY=https://evy-lang-stage-play--dev-t9r8zjux.web.app
+	jq -r '.result.[] | "BASEURL_\(.target | ascii_upcase)=\(.url)"' <<<"${json_result}" >>"$GITHUB_ENV"
 }
 
 exit_error() {

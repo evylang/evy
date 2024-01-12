@@ -1,25 +1,5 @@
 #!/usr/bin/env bash
 
-declare -A env_urls
-env_urls[stage]='{
-  "result": {
-    "apex": {  "target": "apex", "url": "https://evystage.dev"},
-    "discord": {  "target": "discord", "url": "https://discord.evystage.dev"},
-    "docs": {  "target": "docs", "url": "https://docs.evystage.dev"},
-    "learn": {  "target": "learn", "url": "https://learn.evystage.dev"},
-    "play": {  "target": "play", "url": "https://play.evystage.dev"}
-  }
-}'
-env_urls[prod]='{
-  "result": {
-    "apex": { "target": "apex", "url": "https://evy.dev"},
-    "discord": { "target": "discord", "url": "https://discord.evy.dev"},
-    "docs": { "target": "docs", "url": "https://docs.evy.dev"},
-    "learn": { "target": "learn", "url": "https://learn.evy.dev"},
-    "play": { "target": "play", "url": "https://play.evy.dev"}
-  }
-}'
-
 main() {
 	set -euo pipefail
 	on_ci && set -x
@@ -41,7 +21,7 @@ main() {
 		update_refs "${environ}"
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
-		on_ci && setup_github_env "${env_urls[${environ}]}"
+		on_ci && make_env_urls "${environ}" >>"$GITHUB_ENV"
 		exit 0
 	fi
 
@@ -52,7 +32,7 @@ main() {
 	printf "Deployed to \n%s\n" "${urls}"
 
 	on_pr && post_pr_comment "${urls}"
-	on_ci && setup_github_env "${result}"
+	on_ci && make_pr_urls "${result}" >>"$GITHUB_ENV"
 	exit 0
 }
 
@@ -300,15 +280,30 @@ post_pr_comment() {
 		-f body="${body}"
 }
 
-setup_github_env() {
+make_env_urls() {
+	local env="$1"
+	# Generate URLs for the deployment environment for a live firebase site, with an
+	# APEX url and a bunch of subdomain URLS.
+
+	local -A domains=([stage]=evystage.dev [prod]=evy.dev)
+	local subdomains=(discord docs learn play)
+	local domain="${domains[${env}]?"Unknown environment: '${env}'. Must be one of: ${!domains[*]}"}"
+
+	printf 'BASEURL_APEX=https://%s\n' "${domain}"
+	for sub in "${subdomains[@]}"; do
+		printf 'BASEURL_%s=https://%s.%s\n' "${sub^^}" "${sub}" "${domain}"
+	done
+}
+
+make_pr_urls() {
 	local json_result="$1"
-	# The following jq command generates the following output and appends it to $GITHUB_ENV:
+	# The following jq command generates the following output from a firebase deployment result:
 	# BASEURL_APEX=https://evy-lang-stage--dev-mtnwzsbm.web.app
 	# BASEURL_DISCORD=https://evy-lang-stage-discord--dev-pap726z0.web.app
 	# BASEURL_DOCS=https://evy-lang-stage-docs--dev-62qb1rk7.web.app
 	# BASEURL_LEARN=https://evy-lang-stage-learn--dev-txkb2kn8.web.app
 	# BASEURL_PLAY=https://evy-lang-stage-play--dev-t9r8zjux.web.app
-	jq -r '.result.[] | "BASEURL_\(.target | ascii_upcase)=\(.url)"' <<<"${json_result}" >>"$GITHUB_ENV"
+	jq -r '.result.[] | "BASEURL_\(.target | ascii_upcase)=\(.url)"' <<<"${json_result}"
 }
 
 exit_error() {

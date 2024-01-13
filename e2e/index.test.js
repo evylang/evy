@@ -12,4 +12,5 @@ test("console output", async ({ page, baseURL }) => {
   const console = page.locator("css=#console")
   await expect(console).toContainText("x: 12")
   await expect(console).toContainText("🍦 big x")
+  await expect(page).toHaveScreenshot("console-output.png")
 })

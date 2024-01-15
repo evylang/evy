@@ -1,0 +1,32 @@
+name: stage
+run-name: Staging Deployment
+
+on:
+  pull_request:
+  workflow_call:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ./bin/make ci
+        env:
+          TERM: vt100
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: stage
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ./bin/make deploy
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: ./bin/make e2e
+        env:
+          BASEURL: ${{ env.BASEURL_APEX }}

@@ -30,6 +30,9 @@ jobs:
     needs: release
     environment: prod
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - run: ./bin/make deploy-prod
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}

@@ -7,13 +7,19 @@ import (
 )
 
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}},
-	OpAdd:      {"OpAdd", []int{}},
+	OpConstant:  {"OpConstant", []int{2}},
+	OpAdd:       {"OpAdd", []int{}},
+	OpPop:       {"OpPop", []int{}},
+	OpGetGlobal: {"OpGetGlobal", []int{2}},
+	OpSetGlobal: {"OpSetGlobal", []int{2}},
 }
 
 const (
 	OpConstant Opcode = iota
 	OpAdd
+	OpPop
+	OpGetGlobal
+	OpSetGlobal
 )
 
 type Instructions []byte

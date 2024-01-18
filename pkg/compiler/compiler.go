@@ -73,6 +73,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		switch node.Op {
 		case parser.OP_PLUS:
 			c.emit(code.OpAdd)
+		case parser.OP_MINUS:
+			c.emit(code.OpSubtract)
 		default:
 			return fmt.Errorf("unknown operator %s", node.Op)
 		}

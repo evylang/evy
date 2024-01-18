@@ -18,16 +18,29 @@ type compilerTestCase struct {
 func TestIntegerArithmetic(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input: `add := 1 + 2
-add = add`,
+			input: `poop := 1 + 2
+poop = poop`,
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
-				code.Make(code.OpConstant, 1), // 2
+				code.Make(code.OpConstant, 1),
 				code.Make(code.OpAdd),
-				code.Make(code.OpSetGlobal, 0), // put 'add' into the symbol table at 0
-				code.Make(code.OpGetGlobal, 0), // get 'add' out of the symbol table at 0
-				code.Make(code.OpSetGlobal, 1), // set value to 'add'
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := 1 - 2
+x = x`,
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSubtract),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
 			},
 		},
 	}

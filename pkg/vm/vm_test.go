@@ -13,7 +13,10 @@ func TestIntegerArithmetic(t *testing.T) {
 	tests := []vmTestCase{
 		{"one := 1\none = one", 1},
 		{"two := 2\ntwo = two", 2},
-		//{"add := 1 + 2\nadd = add", 3},
+		{"x := 1 + 2\nx = x", 3},
+		{"x := 2 + 1\nx = x", 3},
+		{"x := 2 - 1\nx = x", 1},
+		{"x := 1 - 2\nx = x", -1},
 	}
 
 	runVmTests(t, tests)
@@ -45,8 +48,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		}
 
 		stackElem := vm.LastPoppedStackElem()
-
-		testExpectedObject(t, tt.expected, stackElem)
+		testExpectedObject(t, tt.expected, stackElem, tt.input)
 	}
 }
 
@@ -54,6 +56,7 @@ func testExpectedObject(
 	t *testing.T,
 	expected interface{},
 	actual object.Object,
+	input string,
 ) {
 	t.Helper()
 
@@ -61,7 +64,7 @@ func testExpectedObject(
 	case int:
 		err := testIntegerObject(int64(expected), actual)
 		if err != nil {
-			t.Errorf("testIntegerObject failed: %s", err)
+			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
 		}
 	}
 }

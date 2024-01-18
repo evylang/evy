@@ -17,6 +17,7 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"x := 2 + 1\nx = x", 3},
 		{"x := 2 - 1\nx = x", 1},
 		{"x := 1 - 2\nx = x", -1},
+		{"x := 2 - 3 + 2\nx = x", 1},
 	}
 
 	runVmTests(t, tests)

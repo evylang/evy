@@ -18,8 +18,8 @@ type compilerTestCase struct {
 func TestIntegerArithmetic(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input: `poop := 1 + 2
-poop = poop`,
+			input: `x := 1 + 2
+x = x`,
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
@@ -37,6 +37,36 @@ x = x`,
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSubtract),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := 1 - 2 + 3
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSubtract),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := 1 + 2 - 3
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpConstant, 2),
 				code.Make(code.OpSubtract),
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpGetGlobal, 0),

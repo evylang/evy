@@ -13,19 +13,17 @@ func TestIntegerArithmetic(t *testing.T) {
 	tests := []vmTestCase{
 		{"one := 1\none = one", 1},
 		{"two := 2\ntwo = two", 2},
-
 		{"x := 1 + 2\nx = x", 3},
 		{"x := 2 + 1\nx = x", 3},
-
 		{"x := 2 - 1\nx = x", 1},
 		{"x := 1 - 2\nx = x", -1},
-
 		{"x := 2 - 3 + 2\nx = x", 1},
-
 		{"x := 2 * 2\n x = x", 4},
 		{"x := 2 * 1\n x = x", 2},
-
 		{"x := 1 * 3 - 2 + 4\n x = x", 5},
+		{"x := 2 / 2\n x = x", 1},
+		{"x := 2 / 1\n x = x", 0.5},
+		{"x := 4 / 2 - 2 + 4\n x = x", 4},
 	}
 
 	runVmTests(t, tests)

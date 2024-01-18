@@ -142,27 +142,21 @@ x = x`,
 				code.Make(code.OpSetGlobal, 1),
 			},
 		},
-		// 		 {
-		// 			// FIXME: this creates groupdecls and they are not handled
-		// 			// x=(2+((3*3)*(3+2)))
-		// 			input: `x := 2 + (3 * 3) * (3 + 2)
-		// x = x`,
-		// 			expectedConstants: []interface{}{2, 3, 3, 3, 2},
-		// 			expectedInstructions: []code.Instructions{
-		// 				code.Make(code.OpConstant, 0), // 2
-		// 				code.Make(code.OpConstant, 1), // 3
-		// 				code.Make(code.OpConstant, 2), // 3
-		// 				code.Make(code.OpMultiply),    // (3 * 3)
-		// 				code.Make(code.OpConstant, 3), // 3
-		// 				code.Make(code.OpConstant, 4), // 2
-		// 				code.Make(code.OpAdd),         // (3 + 2)
-		// 				code.Make(code.OpMultiply),    // ((3 * 3) * (3 + 2))
-		// 				code.Make(code.OpAdd),         // (2 + ((3 * 3) * (3 + 2))
-		// 				code.Make(code.OpSetGlobal, 0),
-		// 				code.Make(code.OpGetGlobal, 0),
-		// 				code.Make(code.OpSetGlobal, 1),
-		// 			},
-		// 		},
+		{
+			input: `x := 1 / 2 / 3
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpDivide),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpDivide),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

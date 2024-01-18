@@ -79,6 +79,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 			c.emit(code.OpMultiply)
 		case parser.OP_SLASH:
 			c.emit(code.OpDivide)
+		case parser.OP_PERCENT:
+			c.emit(code.OpModulo)
 		default:
 			return fmt.Errorf("unknown operator %s", node.Op)
 		}

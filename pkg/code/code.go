@@ -11,6 +11,7 @@ var definitions = map[Opcode]*Definition{
 	OpAdd:       {"OpAdd", []int{}},
 	OpSubtract:  {"OpSubtract", []int{}},
 	OpMultiply:  {"OpMultiply", []int{}},
+	OpModulo:    {"OpModulo", []int{}},
 	OpDivide:    {"OpDivide", []int{}},
 	OpPop:       {"OpPop", []int{}},
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
@@ -23,6 +24,7 @@ const (
 	OpAdd
 	OpSubtract
 	OpMultiply
+	OpModulo
 	OpDivide
 
 	OpPop

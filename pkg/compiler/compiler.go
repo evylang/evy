@@ -75,6 +75,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 			c.emit(code.OpAdd)
 		case parser.OP_MINUS:
 			c.emit(code.OpSubtract)
+		case parser.OP_ASTERISK:
+			c.emit(code.OpMultiply)
 		default:
 			return fmt.Errorf("unknown operator %s", node.Op)
 		}

@@ -73,6 +73,96 @@ x = x`,
 				code.Make(code.OpSetGlobal, 1),
 			},
 		},
+		// FIXME:
+		{
+			input: `x := 1 * 2 * 3
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpMultiply),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpMultiply),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		}, {
+			input: `x := 1 * 2 + 3 - 4
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3, 4},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpMultiply),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpAdd),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSubtract),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := 1 - 2 + 3 * 4
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3, 4},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSubtract),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpMultiply),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			// x=((2+((3*3)*3))+2)
+			input: `x := 2 + 3 * 3 * 3 + 2
+x = x`,
+			expectedConstants: []interface{}{2, 3, 3, 3, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0), // 2
+				code.Make(code.OpConstant, 1), // (3
+				code.Make(code.OpConstant, 2), // 3)
+				code.Make(code.OpMultiply),    // (3 * 3)
+				code.Make(code.OpConstant, 3), // 3))
+				code.Make(code.OpMultiply),    // ((3 * 3) * 3)
+				code.Make(code.OpAdd),         // (2 + ((3 * 3) * 3))
+				code.Make(code.OpConstant, 4), // 2
+				code.Make(code.OpAdd),         // ((2 + ((3 * 3) * 3)) + 2)
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		// 		 {
+		// 			// FIXME: this creates groupdecls and they are not handled
+		// 			// x=(2+((3*3)*(3+2)))
+		// 			input: `x := 2 + (3 * 3) * (3 + 2)
+		// x = x`,
+		// 			expectedConstants: []interface{}{2, 3, 3, 3, 2},
+		// 			expectedInstructions: []code.Instructions{
+		// 				code.Make(code.OpConstant, 0), // 2
+		// 				code.Make(code.OpConstant, 1), // 3
+		// 				code.Make(code.OpConstant, 2), // 3
+		// 				code.Make(code.OpMultiply),    // (3 * 3)
+		// 				code.Make(code.OpConstant, 3), // 3
+		// 				code.Make(code.OpConstant, 4), // 2
+		// 				code.Make(code.OpAdd),         // (3 + 2)
+		// 				code.Make(code.OpMultiply),    // ((3 * 3) * (3 + 2))
+		// 				code.Make(code.OpAdd),         // (2 + ((3 * 3) * (3 + 2))
+		// 				code.Make(code.OpSetGlobal, 0),
+		// 				code.Make(code.OpGetGlobal, 0),
+		// 				code.Make(code.OpSetGlobal, 1),
+		// 			},
+		// 		},
 	}
 
 	runCompilerTests(t, tests)
@@ -115,6 +205,7 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 		if err != nil {
 			t.Fatalf("parser error: %s", err)
 		}
+		t.Log(program.String())
 
 		compiler := New()
 		if err := compiler.Compile(program); err != nil {
@@ -122,11 +213,7 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 		}
 
 		bytecode := compiler.Bytecode()
-
-		err = testInstructions(tt.expectedInstructions, bytecode.Instructions)
-		if err != nil {
-			t.Fatalf("testInstructions failed: %s", err)
-		}
+		testInstructions(t, tt.expectedInstructions, bytecode.Instructions, tt.input)
 
 		err = testConstants(t, tt.expectedConstants, bytecode.Constants)
 		if err != nil {
@@ -136,24 +223,22 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 }
 
 func testInstructions(
+	t *testing.T,
 	expected []code.Instructions,
 	actual code.Instructions,
-) error {
+	input string,
+) {
 	concatted := concatInstructions(expected)
-
 	if len(actual) != len(concatted) {
-		return fmt.Errorf("wrong instructions length.\nwant=%q\ngot =%q",
-			concatted, actual)
+		t.Fatalf("input %s\nwrong instructions length.\nwant=%s\ngot =%s",
+			input, concatted, actual)
 	}
-
 	for i, ins := range concatted {
 		if actual[i] != ins {
-			return fmt.Errorf("wrong instruction at %d.\nwant=%q\ngot =%q",
-				i, concatted, actual)
+			t.Fatalf("input %s\nwrong instruction at %d.\nwant=%s\ngot =%s",
+				input, i, concatted, actual)
 		}
 	}
-
-	return nil
 }
 
 func concatInstructions(s []code.Instructions) code.Instructions {

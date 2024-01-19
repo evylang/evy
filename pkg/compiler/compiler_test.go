@@ -73,7 +73,6 @@ x = x`,
 				code.Make(code.OpSetGlobal, 1),
 			},
 		},
-		// FIXME:
 		{
 			input: `x := 1 * 2 * 3
 x = x`,

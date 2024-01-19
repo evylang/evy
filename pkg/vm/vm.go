@@ -14,6 +14,11 @@ const (
 	GlobalsSize = 65536 // FIXME: limited to 65536 globals, re-eval // TODO: change fixme to todo
 )
 
+var (
+	True  = &object.Boolean{Value: true}
+	False = &object.Boolean{Value: false}
+)
+
 type VM struct {
 	constants    []object.Object
 	instructions code.Instructions
@@ -73,7 +78,16 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
-
+		case code.OpTrue:
+			err := vm.push(True)
+			if err != nil {
+				return err
+			}
+		case code.OpFalse:
+			err := vm.push(False)
+			if err != nil {
+				return err
+			}
 		case code.OpSetGlobal:
 			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2

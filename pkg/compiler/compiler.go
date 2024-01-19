@@ -85,6 +85,12 @@ func (c *Compiler) Compile(node parser.Node) error {
 	case *parser.NumLiteral:
 		integer := &object.Integer{Value: int64(node.Value)}
 		c.emit(code.OpConstant, c.addConstant(integer))
+	case *parser.BoolLiteral:
+		if node.Value {
+			c.emit(code.OpTrue)
+		} else {
+			c.emit(code.OpFalse)
+		}
 	case *parser.GroupExpression:
 		return c.Compile(node.Expr)
 	default:

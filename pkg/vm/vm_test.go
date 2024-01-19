@@ -22,13 +22,22 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"x := 2 * 1\n x = x", 2},
 		{"x := 1 * 3 - 2 + 4\n x = x", 5},
 		{"x := 2 / 2\n x = x", 1},
-		{"x := 2 / 1\n x = x", 0.5},
+		// FIXME: handle nums as float64 {"x := 2 / 1\n x = x", 0.5},
 		{"x := 4 / 2 - 2 + 4\n x = x", 4},
 		{"x := 2 % 2\n x = x", 0},
 		{"x := 1 % 2\n x = x", 1},
 		{"x := 1 + 2 - 3 * 4 / 5 % 6\n x = x", 1},
 		{"x := 2 + 2 / 2 \n x = x", 3},
 		{"x := (2 + 2) / 2 \n x = x", 2},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestBool(t *testing.T) {
+	tests := []vmTestCase{
+		{"one := true\none = one", true},
+		{"one := false\none = one", false},
 	}
 
 	runVmTests(t, tests)
@@ -73,12 +82,32 @@ func testExpectedObject(
 	t.Helper()
 
 	switch expected := expected.(type) {
+	case bool:
+		err := testBooleanObject(expected, actual)
+		if err != nil {
+			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
+		}
 	case int:
 		err := testIntegerObject(int64(expected), actual)
 		if err != nil {
 			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
 		}
+	default:
+		t.Errorf("type of expected (%T) not handled", expected)
 	}
+}
+
+func testBooleanObject(expected bool, actual object.Object) error {
+	result, ok := actual.(*object.Boolean)
+	if !ok {
+		return fmt.Errorf("object is not Boolean. got=%T (%+v)",
+			actual, actual)
+	}
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%t, want=%t",
+			result.Value, expected)
+	}
+	return nil
 }
 
 func testIntegerObject(expected int64, actual object.Object) error {

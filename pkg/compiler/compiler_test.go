@@ -225,6 +225,35 @@ x = x`,
 	runCompilerTests(t, tests)
 }
 
+func TestBool(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `one := true
+			one = one`,
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpTrue),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `two := false
+			two = two`,
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpFalse),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestGlobalVarStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{

@@ -16,6 +16,8 @@ var definitions = map[Opcode]*Definition{
 	OpPop:       {"OpPop", []int{}},
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
+	OpTrue:      {"OpTrue", []int{}},
+	OpFalse:     {"OpFalse", []int{}},
 }
 
 const (
@@ -31,6 +33,9 @@ const (
 
 	OpGetGlobal
 	OpSetGlobal
+
+	OpTrue
+	OpFalse
 )
 
 type Instructions []byte
@@ -90,6 +95,8 @@ func Lookup(op byte) (*Definition, error) {
 	return def, nil
 }
 
+// TODO: Make panics when you specify a number of operands that
+// is different from what the definiton expects
 func Make(op Opcode, operands ...int) []byte {
 	def, ok := definitions[op]
 	if !ok {

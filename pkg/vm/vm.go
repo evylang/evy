@@ -83,6 +83,27 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpBang:
+			operand := vm.pop()
+			switch operand {
+			case True:
+				err := vm.push(False)
+				if err != nil {
+					return err
+				}
+			case False:
+				err := vm.push(True)
+				if err != nil {
+					return err
+				}
+			}
+		case code.OpMinus:
+			obj := vm.pop()
+			num, ok := obj.(*object.Integer)
+			if !ok {
+				return fmt.Errorf("unsupported type for negation: %s", obj.Type())
+			}
+			vm.push(&object.Integer{Value: -num.Value})
 		case code.OpTrue:
 			err := vm.push(True)
 			if err != nil {
@@ -149,68 +170,61 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 func (vm *VM) executeComparison(op code.Opcode) error {
 	right := vm.pop()
 	left := vm.pop()
+	result := False
 	switch op {
 	case code.OpEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value == right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 		if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
 			if left.(*object.Boolean).Value == right.(*object.Boolean).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	case code.OpNotEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value != right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 		if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
 			if left.(*object.Boolean).Value != right.(*object.Boolean).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	case code.OpGreaterThan:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value > right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	case code.OpGreaterThanEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value >= right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	case code.OpLessThan:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value < right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	case code.OpLessThanEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value <= right.(*object.Integer).Value {
-				return vm.push(True)
-			} else {
-				return vm.push(False)
+				result = True
 			}
+			return vm.push(result)
 		}
 	default:
 		return fmt.Errorf("unknown comparison operator: %d", op)

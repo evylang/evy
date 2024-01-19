@@ -29,6 +29,7 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"x := 1 + 2 - 3 * 4 / 5 % 6\n x = x", 1},
 		{"x := 2 + 2 / 2 \n x = x", 3},
 		{"x := (2 + 2) / 2 \n x = x", 2},
+		{"x := (5 + 10 * 2 + 15 / 3) * 2 + -10 \n x = x", 50},
 	}
 
 	runVmTests(t, tests)
@@ -59,6 +60,10 @@ func TestBool(t *testing.T) {
 		{"x := (1 < 2) == false\nx = x", false},
 		{"x := (1 > 2) == true\nx = x", false},
 		{"x := (1 > 2) == false\nx = x", true},
+		{"x := !!true\nx = x", true},
+		{"x := !!!!!!!!true\nx = x", true},
+		{"x := true\n x = !!!!x", true},
+		{"x := true\n x = x != !x\n", true},
 	}
 
 	runVmTests(t, tests)
@@ -106,7 +111,7 @@ func testExpectedObject(
 	case bool:
 		err := testBooleanObject(expected, actual)
 		if err != nil {
-			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
+			t.Errorf("testBooleanObject failed: %s. Input: %q", err, input)
 		}
 	case int:
 		err := testIntegerObject(int64(expected), actual)

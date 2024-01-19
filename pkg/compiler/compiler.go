@@ -94,6 +94,17 @@ func (c *Compiler) Compile(node parser.Node) error {
 		case parser.OP_NOT_EQ:
 			c.emit(code.OpNotEqual)
 		}
+	case *parser.UnaryExpression:
+		err := c.Compile(node.Right)
+		if err != nil {
+			return err
+		}
+		switch node.Op {
+		case parser.OP_MINUS:
+			c.emit(code.OpMinus)
+		case parser.OP_BANG:
+			c.emit(code.OpBang)
+		}
 	case *parser.NumLiteral:
 		integer := &object.Integer{Value: int64(node.Value)}
 		c.emit(code.OpConstant, c.addConstant(integer))

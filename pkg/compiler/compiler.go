@@ -81,12 +81,14 @@ func (c *Compiler) Compile(node parser.Node) error {
 			c.emit(code.OpDivide)
 		case parser.OP_PERCENT:
 			c.emit(code.OpModulo)
-		default:
-			return fmt.Errorf("unknown operator %s", node.Op)
 		}
 	case *parser.NumLiteral:
 		integer := &object.Integer{Value: int64(node.Value)}
 		c.emit(code.OpConstant, c.addConstant(integer))
+	case *parser.GroupExpression:
+		return c.Compile(node.Expr)
+	default:
+		return fmt.Errorf("unknown node type %s", node.Type())
 	}
 	return nil
 }

@@ -27,6 +27,8 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"x := 2 % 2\n x = x", 0},
 		{"x := 1 % 2\n x = x", 1},
 		{"x := 1 + 2 - 3 * 4 / 5 % 6\n x = x", 1},
+		{"x := 2 + 2 / 2 \n x = x", 3},
+		{"x := (2 + 2) / 2 \n x = x", 2},
 	}
 
 	runVmTests(t, tests)

@@ -171,6 +171,36 @@ x = x`,
 			},
 		},
 		{
+			input: `x := 2 + 2 / 2
+x = x`,
+			expectedConstants: []interface{}{2, 2, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpDivide),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := (2 + 2) / 2
+x = x`,
+			expectedConstants: []interface{}{2, 2, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpDivide),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
 			input: `x := 1 + 2 - 3 * 4 / 5 % 6
 x = x`,
 			expectedConstants: []interface{}{1, 2, 3, 4, 5, 6},

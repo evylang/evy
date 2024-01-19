@@ -73,6 +73,11 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpEqual, code.OpNotEqual, code.OpGreaterThan, code.OpGreaterThanEqual, code.OpLessThan, code.OpLessThanEqual:
+			err := vm.executeComparison(op)
+			if err != nil {
+				return err
+			}
 		case code.OpAdd, code.OpSubtract, code.OpMultiply, code.OpDivide, code.OpModulo:
 			err := vm.executeBinaryOperation(op)
 			if err != nil {
@@ -139,6 +144,78 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 		return fmt.Errorf("unsupported types for binary operation: %s %s",
 			leftType, rightType)
 	}
+}
+
+func (vm *VM) executeComparison(op code.Opcode) error {
+	right := vm.pop()
+	left := vm.pop()
+	switch op {
+	case code.OpEqual:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value == right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+		if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
+			if left.(*object.Boolean).Value == right.(*object.Boolean).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	case code.OpNotEqual:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value != right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+		if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
+			if left.(*object.Boolean).Value != right.(*object.Boolean).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	case code.OpGreaterThan:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value > right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	case code.OpGreaterThanEqual:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value >= right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	case code.OpLessThan:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value < right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	case code.OpLessThanEqual:
+		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+			if left.(*object.Integer).Value <= right.(*object.Integer).Value {
+				return vm.push(True)
+			} else {
+				return vm.push(False)
+			}
+		}
+	default:
+		return fmt.Errorf("unknown comparison operator: %d", op)
+	}
+	panic(fmt.Sprintf("invalid comparison between %s and %s", left.Inspect(), right.Inspect()))
 }
 
 func (vm *VM) executeBinaryIntegerOperation(

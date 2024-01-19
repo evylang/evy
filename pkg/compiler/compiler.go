@@ -81,6 +81,18 @@ func (c *Compiler) Compile(node parser.Node) error {
 			c.emit(code.OpDivide)
 		case parser.OP_PERCENT:
 			c.emit(code.OpModulo)
+		case parser.OP_LT:
+			c.emit(code.OpLessThan)
+		case parser.OP_LTEQ:
+			c.emit(code.OpLessThanEqual)
+		case parser.OP_GT:
+			c.emit(code.OpGreaterThan)
+		case parser.OP_GTEQ:
+			c.emit(code.OpGreaterThanEqual)
+		case parser.OP_EQ:
+			c.emit(code.OpEqual)
+		case parser.OP_NOT_EQ:
+			c.emit(code.OpNotEqual)
 		}
 	case *parser.NumLiteral:
 		integer := &object.Integer{Value: int64(node.Value)}

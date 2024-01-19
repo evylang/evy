@@ -36,8 +36,29 @@ func TestIntegerArithmetic(t *testing.T) {
 
 func TestBool(t *testing.T) {
 	tests := []vmTestCase{
-		{"one := true\none = one", true},
-		{"one := false\none = one", false},
+		{"x := true\nx = x", true},
+		{"x := false\nx = x", false},
+		{"x := 1 < 2\nx = x", true},
+		{"x := 1 > 2\nx = x", false},
+		{"x := 1 < 1\nx = x", false},
+		{"x := 1 > 1\nx = x", false},
+		{"x := 1 <= 1\nx = x", true},
+		{"x := 2 <= 1\nx = x", false},
+		{"x := 1 >= 1\nx = x", true},
+		{"x := 1 >= 2\nx = x", false},
+		{"x := 1 == 1\nx = x", true},
+		{"x := 1 != 1\nx = x", false},
+		{"x := 1 == 2\nx = x", false},
+		{"x := 1 != 2\nx = x", true},
+		{"x := true == true\nx = x", true},
+		{"x := false == false\nx = x", true},
+		{"x := true == false\nx = x", false},
+		{"x := true != false\nx = x", true},
+		{"x := false != true\nx = x", true},
+		{"x := (1 < 2) == true\nx = x", true},
+		{"x := (1 < 2) == false\nx = x", false},
+		{"x := (1 > 2) == true\nx = x", false},
+		{"x := (1 > 2) == false\nx = x", true},
 	}
 
 	runVmTests(t, tests)

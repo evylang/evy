@@ -7,17 +7,23 @@ import (
 )
 
 var definitions = map[Opcode]*Definition{
-	OpConstant:  {"OpConstant", []int{2}},
-	OpAdd:       {"OpAdd", []int{}},
-	OpSubtract:  {"OpSubtract", []int{}},
-	OpMultiply:  {"OpMultiply", []int{}},
-	OpModulo:    {"OpModulo", []int{}},
-	OpDivide:    {"OpDivide", []int{}},
-	OpPop:       {"OpPop", []int{}},
-	OpGetGlobal: {"OpGetGlobal", []int{2}},
-	OpSetGlobal: {"OpSetGlobal", []int{2}},
-	OpTrue:      {"OpTrue", []int{}},
-	OpFalse:     {"OpFalse", []int{}},
+	OpConstant:         {"OpConstant", []int{2}},
+	OpAdd:              {"OpAdd", []int{}},
+	OpSubtract:         {"OpSubtract", []int{}},
+	OpMultiply:         {"OpMultiply", []int{}},
+	OpModulo:           {"OpModulo", []int{}},
+	OpDivide:           {"OpDivide", []int{}},
+	OpPop:              {"OpPop", []int{}},
+	OpGetGlobal:        {"OpGetGlobal", []int{2}},
+	OpSetGlobal:        {"OpSetGlobal", []int{2}},
+	OpTrue:             {"OpTrue", []int{}},
+	OpFalse:            {"OpFalse", []int{}},
+	OpEqual:            {"OpEqual", []int{}},
+	OpNotEqual:         {"OpNotEqual", []int{}},
+	OpLessThan:         {"OpLessThan", []int{}},
+	OpLessThanEqual:    {"OpLessThanEqual", []int{}},
+	OpGreaterThan:      {"OpGreaterThan", []int{}},
+	OpGreaterThanEqual: {"OpGreaterThanEqual", []int{}},
 }
 
 const (
@@ -36,6 +42,12 @@ const (
 
 	OpTrue
 	OpFalse
+	OpEqual
+	OpNotEqual
+	OpGreaterThan
+	OpGreaterThanEqual
+	OpLessThan
+	OpLessThanEqual
 )
 
 type Instructions []byte
@@ -96,7 +108,7 @@ func Lookup(op byte) (*Definition, error) {
 }
 
 // TODO: Make panics when you specify a number of operands that
-// is different from what the definiton expects
+// is different from what the definiton expect
 func Make(op Opcode, operands ...int) []byte {
 	def, ok := definitions[op]
 	if !ok {

@@ -36,7 +36,7 @@ jobs:
       - run: ./bin/make deploy-prod
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
-      - run: ./bin/make e2e
+      - run: ./bin/make e2e-docker
         env:
           BASEURL: ${{ env.BASEURL_APEX }}
 

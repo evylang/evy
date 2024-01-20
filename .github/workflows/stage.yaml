@@ -27,6 +27,6 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: ./bin/make e2e
+      - run: ./bin/make e2e-docker
         env:
           BASEURL: ${{ env.BASEURL_APEX }}

@@ -214,7 +214,7 @@ header .logo img {
   color: var(--color-hover);
 }
 
-/* --- Main ---------------------------------------------------------- */
+/* --- Sidemenu ---------------------------------------------------------- */
 #sidemenu {
   display: block;
   background-color: #34393f;
@@ -240,10 +240,6 @@ header .logo img {
   color: white;
 }
 
-#sidemenu header button {
-  padding: 5px;
-}
-
 #sidemenu a,
 #sidemenu button {
   font-family: var(--ff);
@@ -253,6 +249,10 @@ header .logo img {
   border: none;
   font-size: 1rem;
   cursor: pointer;
+}
+
+#sidemenu header button {
+  padding: 5px;
 }
 
 #sidemenu a:hover,
@@ -390,8 +390,8 @@ main.view-output {
   min-width: 100%;
 }
 
-.editor pre.highlighted .err,
-dialog .err {
+dialog .err,
+.editor pre.highlighted .err {
   background: var(--syntax-error-bg);
   border-radius: 6px;
 }
@@ -591,13 +591,15 @@ button.primary {
   }
 }
 
-.run button#run,
-.run button#run-mobile {
+button#run,
+button#run-mobile {
   width: 100%;
 }
 
-.run button:disabled,
-.run button.loading {
+button#run:disabled,
+button#run-mobile:disabled,
+button#run.loading,
+button#run-mobile.loading {
   color: var(--btn-color-disabled);
   box-shadow:
     0 4px 0 hsl(0deg 0% 60%),
@@ -605,12 +607,12 @@ button.primary {
     inset 0 -2px 1px 1px hsl(0deg 0% 60%);
 }
 
-.run button.running#run,
-.run button.running#run-mobile,
-.run button.running#run:hover,
-.run button.running#run:active,
-.run button.running#run-mobile:hover,
-.run button.running#run-mobile:active {
+button.running#run,
+button.running#run-mobile,
+button.running#run:hover,
+button.running#run:active,
+button.running#run-mobile:hover,
+button.running#run-mobile:active {
   color: var(--btn-color-active);
   letter-spacing: 0.2em;
   transition: 0s;
@@ -700,6 +702,7 @@ button.primary {
   line-height: 1.6;
 }
 
+/* stylelint-disable no-descending-specificity */
 #modal li a {
   font-family: var(--ff);
   color: var(--modal-color);
@@ -707,6 +710,7 @@ button.primary {
   text-decoration: none;
   position: relative;
 }
+/* stylelint-enable no-descending-specificity */
 
 #modal ul li a:hover {
   color: var(--modal-color-hover);
@@ -737,6 +741,7 @@ button.primary {
 }
 
 /* --- Share dialog --------------------------------------------------- */
+/* stylelint-disable no-descending-specificity */
 dialog {
   position: absolute;
   top: 50%;
@@ -749,10 +754,6 @@ dialog {
   width: var(--dialog-width);
 }
 
-::backdrop {
-  background: hsl(210deg 5% 15% / 70%);
-}
-
 dialog header {
   border-bottom: 1px solid var(--border-color);
   height: unset;
@@ -762,6 +763,28 @@ dialog header {
   border-radius: 5px 5px 0 0;
   display: flex;
   justify-content: space-between;
+}
+
+dialog .header-icon {
+  vertical-align: middle;
+  line-height: 0;
+  outline: none;
+}
+
+dialog .copy button {
+  flex: 0;
+  font-size: 1rem;
+  border: none;
+  background: none;
+  color: var(--color);
+  opacity: 0.6;
+  stroke: none;
+  cursor: pointer;
+}
+/* stylelint-enable no-descending-specificity */
+
+::backdrop {
+  background: hsl(210deg 5% 15% / 70%);
 }
 
 dialog h1 {
@@ -780,12 +803,6 @@ dialog main {
   height: unset;
   flex-direction: column;
   width: 100%;
-}
-
-dialog .header-icon {
-  vertical-align: middle;
-  line-height: 0;
-  outline: none;
 }
 
 dialog .copy {
@@ -810,17 +827,6 @@ dialog .copy input {
   padding-right: 16px;
 }
 
-dialog .copy button {
-  flex: 0;
-  font-size: 1rem;
-  border: none;
-  background: none;
-  color: var(--color);
-  opacity: 0.6;
-  stroke: none;
-  cursor: pointer;
-}
-
 dialog button.primary {
   width: 100%;
   margin-top: 30px;
@@ -830,7 +836,7 @@ dialog p {
   color: var(--modal-color);
 }
 
-dialog .err {
+#dialog-error .err {
   font-family: var(--ff-code);
   color: var(--color);
   margin-left: 8px;

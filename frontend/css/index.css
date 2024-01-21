@@ -219,7 +219,7 @@ header .logo img {
   display: block;
   background-color: #34393f;
   color: #ffffffe5;
-  font-family: arial;
+  font-family: arial, sans-serif;
   height: 100%;
   width: var(--sidemenu-width);
   position: absolute;

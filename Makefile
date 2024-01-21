@@ -8,7 +8,7 @@ VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
 ## Build, test, check coverage and lint
-all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend
+all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-style check-evy-fmt frontend
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -162,6 +162,16 @@ prettier: | $(NODELIB)
 ## Ensure code is formatted with prettier
 check-prettier: | $(NODELIB)
 	npx --prefix $(NODEPREFIX) -y prettier --check .
+
+## Fix CSS files with stylelint
+style: | $(NODELIB)
+	npm --prefix $(NODEPREFIX) ci
+	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json --fix frontend/**/*.css
+
+## Lint CSS files with stylelint
+check-style: | $(NODELIB)
+	npm --prefix $(NODEPREFIX) ci
+	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json frontend/**/*.css
 
 ## Install playwright on host system for `e2e` to use.
 install-playwright:

@@ -106,7 +106,7 @@ func (c *Compiler) Compile(node parser.Node) error {
 			c.emit(code.OpBang)
 		}
 	case *parser.NumLiteral:
-		integer := &object.Integer{Value: int64(node.Value)}
+		integer := &object.Integer{Value: node.Value}
 		c.emit(code.OpConstant, c.addConstant(integer))
 	case *parser.BoolLiteral:
 		if node.Value {

@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"math"
 
 	"evylang.dev/evy/pkg/code"
 	"evylang.dev/evy/pkg/compiler"
@@ -239,7 +240,7 @@ func (vm *VM) executeBinaryIntegerOperation(
 	leftValue := left.(*object.Integer).Value
 	rightValue := right.(*object.Integer).Value
 
-	var result int64
+	var result float64
 
 	switch op {
 	case code.OpAdd:
@@ -251,7 +252,7 @@ func (vm *VM) executeBinaryIntegerOperation(
 	case code.OpDivide:
 		result = leftValue / rightValue
 	case code.OpModulo:
-		result = leftValue % rightValue
+		result = math.Mod(leftValue, rightValue)
 	default:
 		return fmt.Errorf("unknown integer operator: %d", op)
 	}

@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"math"
 	"testing"
 
 	"evylang.dev/evy/pkg/compiler"
@@ -22,11 +23,11 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"x := 2 * 1\n x = x", 2},
 		{"x := 1 * 3 - 2 + 4\n x = x", 5},
 		{"x := 2 / 2\n x = x", 1},
-		// FIXME: handle nums as float64 {"x := 2 / 1\n x = x", 0.5},
+		{"x := 1 / 2\n x = x", 0.5},
 		{"x := 4 / 2 - 2 + 4\n x = x", 4},
 		{"x := 2 % 2\n x = x", 0},
 		{"x := 1 % 2\n x = x", 1},
-		{"x := 1 + 2 - 3 * 4 / 5 % 6\n x = x", 1},
+		{"x := 1 + 2 - 3 * 4 / 5 % 6\n x = x", 1 + 2 - math.Mod(3.0*4.0/5.0, 6.0)},
 		{"x := 2 + 2 / 2 \n x = x", 3},
 		{"x := (2 + 2) / 2 \n x = x", 2},
 		{"x := (5 + 10 * 2 + 15 / 3) * 2 + -10 \n x = x", 50},
@@ -82,6 +83,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		if err != nil {
 			t.Fatalf("parser error: %s", err)
 		}
+		t.Log(program.String())
 
 		comp := compiler.New()
 		if err := comp.Compile(program); err != nil {
@@ -114,7 +116,12 @@ func testExpectedObject(
 			t.Errorf("testBooleanObject failed: %s. Input: %q", err, input)
 		}
 	case int:
-		err := testIntegerObject(int64(expected), actual)
+		err := testIntegerObject(float64(expected), actual)
+		if err != nil {
+			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
+		}
+	case float64:
+		err := testIntegerObject(expected, actual)
 		if err != nil {
 			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
 		}
@@ -136,7 +143,7 @@ func testBooleanObject(expected bool, actual object.Object) error {
 	return nil
 }
 
-func testIntegerObject(expected int64, actual object.Object) error {
+func testIntegerObject(expected float64, actual object.Object) error {
 	result, ok := actual.(*object.Integer)
 	if !ok {
 		return fmt.Errorf("object is not Integer. got=%T (%+v)",
@@ -144,7 +151,7 @@ func testIntegerObject(expected int64, actual object.Object) error {
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("object has wrong value. got=%d, want=%d",
+		return fmt.Errorf("object has wrong value. got=%f, want=%f",
 			result.Value, expected)
 	}
 

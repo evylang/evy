@@ -132,11 +132,24 @@ godoc: install
 NODEPREFIX = .hermit/node
 NODELIB = $(NODEPREFIX)/lib
 
+define PLAYWRIGHT_CMD
+	npm --prefix e2e ci
+	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
+endef
+
+PLAYWRIGHT_IMG = mcr.microsoft.com/playwright:v1.40.0-jammy
+PLAYWRIGHT_CMD_DOCKER = docker run --rm \
+  --volume $$(pwd):/work/ -w /work/ \
+  --network host --add-host=host.docker.internal:host-gateway \
+  --env BASEURL=$(BASEURL) \
+  $(PLAYWRIGHT_IMG) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD))"
+
 # BASEURL needs to be in the environment so that `e2e/playwright.config.js`
 # can see it when the `e2e` target is called.
 # The firebase-deploy script sets BASEURL to the deployment URL on GitHub CI.
+SERVEDIR_HOST = localhost
 export SERVEDIR_PORT ?= 8080
-export BASEURL ?= http://localhost:$(SERVEDIR_PORT)
+export BASEURL ?= http://$(SERVEDIR_HOST):$(SERVEDIR_PORT)
 
 ## Serve frontend on port 8080 by default to work with e2e target
 serve:
@@ -150,11 +163,29 @@ prettier: | $(NODELIB)
 check-prettier: | $(NODELIB)
 	npx --prefix $(NODEPREFIX) -y prettier --check .
 
+## Install playwright on host system for `e2e` to use.
+install-playwright:
+	npx --prefix e2e playwright install --with-deps chromium
+
 e2e:
 	@echo "testing $(BASEURL)"
-	npm --prefix e2e ci
-	npx --prefix e2e playwright install --with-deps chromium
-	npx --prefix e2e playwright test --config e2e
+	$(PLAYWRIGHT_CMD)
+
+## Make end-to-end testing golden screenshots with Docker, used on Linux CI
+e2e-docker: SERVEDIR_HOST = host.docker.internal
+e2e-docker:
+	$(PLAYWRIGHT_CMD_DOCKER)
+
+## Make end-to-end testing golden screenshots for local OS
+snaps: PLAYWRIGHT_ARGS = --update-snapshots
+snaps:
+	$(PLAYWRIGHT_CMD)
+
+## Make end-to-end testing golden screenshots with Docker, used on Linux CI
+snaps-docker: SERVEDIR_HOST = host.docker.internal
+snaps-docker: PLAYWRIGHT_ARGS = --update-snapshots
+snaps-docker:
+	$(PLAYWRIGHT_CMD_DOCKER)
 
 $(NODELIB):
 	@mkdir -p $@

@@ -36,16 +36,18 @@ jobs:
       - run: ./bin/make deploy-prod
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
-      - run: ./bin/make e2e
+      - run: ./bin/make e2e-docker
         env:
           BASEURL: ${{ env.BASEURL_APEX }}
 
   howl-on-fail:
     runs-on: ubuntu-latest
     needs: [deploy-stage, release, deploy-prod]
-    if: failure()
+    if: always() && contains(join(needs.*.result, ','), 'failure')
     steps:
-      - uses: foxygoat/howl@v1
+      - uses: actions/checkout@v4
+      - run: ./bin/howl
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_TEXT: <!here|here>
+          # Notify evy Discord server on channel #evydev
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_TEXT: "@here"

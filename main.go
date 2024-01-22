@@ -4,7 +4,7 @@
 //
 // Evy on the command line supports all [built-in functions] except for
 // graphics functions and event handlers. Only the web interface on
-// [evy.dev/play] supports graphics and events.
+// [play.evy.dev] supports graphics and events.
 //
 // The Evy toolchain has two subcommands: run and fmt.
 //
@@ -26,7 +26,7 @@
 //	Run "evy <command> --help" for more information on a command.
 //
 // [built-in functions]: https://github.com/evylang/evy/blob/main/docs/builtins.md
-// [evy.dev/play]: https://evy.dev/play
+// [play.evy.dev]: https://play.evy.dev
 package main
 
 import (

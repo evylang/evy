@@ -14,6 +14,6 @@ Learn programming with Evy
 - Ask questions or discuss Evy in the [Evy community] on Discord.
 
 [Learn and Practise]: https://github.com/evylang/evy/wiki
-[Playground]: https://evy.dev/play
+[Playground]: https://play.evy.dev
 [Gallery]: https://github.com/evylang/evy/wiki/gallery
 [Evy community]: https://evy.dev/discord

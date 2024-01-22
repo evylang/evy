@@ -1,0 +1,18 @@
+:root {
+  /* theme */
+  --font-family: "Inter", sans-serif;
+  --font-family-code: "Fira Code", monospace;
+  --background: hsl(210deg 5% 15%);
+  --color: hsl(0deg 0% 100%);
+  --color-hover: hsl(0deg 0% 100% / 70%);
+
+  /* desktop */
+  --display-desktop-only: initial;
+  --display-mobile-only: none;
+
+  /* mobile */
+  @media (width <= 767px) {
+    --display-desktop-only: none;
+    --display-mobile-only: initial;
+  }
+}

@@ -1,10 +1,5 @@
 :root {
   /* theme */
-  --font-family: "Inter", sans-serif;
-  --font-family-code: "Fira Code", monospace;
-  --background: hsl(210deg 5% 15%);
-  --color: hsl(0deg 0% 100%);
-  --color-hover: hsl(0deg 0% 100% / 70%);
   --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-dialog: hsl(0deg 0% 30%);
   --header-background: hsl(213deg 10% 23%);
@@ -32,10 +27,6 @@
   --modal-color-hover: hsl(0deg 0% 100% / 100%);
   --modal-circle-color: hsl(0deg 0% 35%);
   --modal-circle-background: hsl(0deg 0% 13%);
-
-  /* responsive desktop */
-  --display-desktop-only: initial;
-  --display-mobile-only: none;
   --header-img-top: 0.3em;
   --header-padding: 16px;
   --header-height: calc(var(--header-padding) * 2 + 1.5rem + 1px);
@@ -65,8 +56,6 @@
 @media (width <= 767px) {
   /* responsive mobile */
   :root {
-    --display-desktop-only: none;
-    --display-mobile-only: initial;
     --header-img-top: 0.2em;
     --main-width: 200vw;
     --main-translate: 0;

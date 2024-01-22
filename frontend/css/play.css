@@ -1,3 +1,4 @@
+/* TODO: move this file to play/css/index.css once hashing is fixed in scripts/firebase-deploy */
 :root {
   /* theme */
   --border-color: hsl(0deg 0% 100% / 20%);

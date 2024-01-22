@@ -1,4 +1,7 @@
 import { test, expect } from "@playwright/test"
+import config from "../playwright.config.js"
+
+test.use({ baseURL: `${config.use.baseURL}/play` })
 
 test("title", async ({ page, baseURL }) => {
   await page.goto(baseURL)

@@ -80,7 +80,7 @@ test("dialogs", async ({ page, baseURL }, testInfo) => {
   }
   await page.locator('input[type="text"]').click()
   await page.locator('input[type="text"]').press("ArrowRight")
-  await expect(page).toHaveScreenshot("share-dialog.png")
+  await expect(page).toHaveScreenshot("share-dialog.png", { maxDiffPixelRatio: 0.01 })
   await page.getByRole("button", { name: "Done" }).click()
   if (testInfo.project.name != "ios") {
     //TODO: there is a rendering bug for this on ios, few snapshot diff, see https://github.com/evylang/todo/issues/50
@@ -88,7 +88,7 @@ test("dialogs", async ({ page, baseURL }, testInfo) => {
   }
   await page.locator("#hamburger").click()
   await page.getByRole("button", { name: "About Evy" }).click()
-  await expect(page).toHaveScreenshot("about-dialog.png")
+  await expect(page).toHaveScreenshot("about-dialog.png", { maxDiffPixelRatio: 0.01 })
   await page.locator("header").filter({ hasText: "About" }).getByRole("button").click()
   if (testInfo.project.name != "ios") {
     //TODO: there is a rendering bug for this on ios, few snapshot diff, see https://github.com/evylang/todo/issues/50

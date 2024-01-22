@@ -13,4 +13,5 @@ export default defineConfig({
       use: { ...devices["iPhone 14"] },
     },
   ],
+  testMatch: "*test.js",
 })

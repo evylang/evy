@@ -98,6 +98,7 @@ end
       }
       await page.locator("#hamburger").click()
       await page.getByRole("button", { name: "About Evy" }).click()
+      await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("about-dialog.png", { maxDiffPixelRatio: 0.01 })
       await page.locator("header").filter({ hasText: "About" }).getByRole("button").click()
       if (testInfo.project.name != "ios") {

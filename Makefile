@@ -12,9 +12,9 @@ all: test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
-test: build-go test-go build-tiny test-tiny check-coverage check-evy-fmt
+test: build-go test-go build-tiny test-tiny check-coverage
 
-lint: lint-go sh-lint check-prettier check-style
+lint: lint-go lint-sh check-prettier check-style check-fmt-evy
 
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
@@ -99,13 +99,13 @@ lint-go:
 	golangci-lint run
 
 ## Format evy sample code
-evy-fmt:
+fmt-evy:
 	go run . fmt --write $(EVY_FILES)
 
-check-evy-fmt:
+check-fmt-evy:
 	go run . fmt --check $(EVY_FILES)
 
-.PHONY: check-evy-fmt evy-fmt lint-go
+.PHONY: check-fmt-evy fmt-evy lint-go
 
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage
@@ -229,15 +229,15 @@ deploy: build-tiny
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token
 
 ## Lint script files with shellcheck and shfmt
-sh-lint:
+lint-sh:
 	shellcheck $(SCRIPTS)
 	shfmt --diff $(SCRIPTS)
 
 ## Format script files
-sh-fmt:
+fmt-sh:
 	shfmt --write $(SCRIPTS)
 
-.PHONY: sh-fmt sh-lint
+.PHONY: fmt-sh lint-sh
 
 # --- Release -------------------------------------------------------------------
 ## Tag and release binaries for different OS on GitHub release

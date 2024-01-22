@@ -39,6 +39,7 @@ jobs:
       - run: ./bin/make e2e-docker
         env:
           BASEURL: ${{ env.BASEURL_APEX }}
+          BASEURL_PLAY: ${{ env.BASEURL_PLAY }}
 
   howl-on-fail:
     runs-on: ubuntu-latest

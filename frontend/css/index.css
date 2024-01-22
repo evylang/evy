@@ -1,14 +1,14 @@
 :root {
   /* theme */
-  --ff: "Inter", sans-serif;
-  --ff-code: "Fira Code", monospace;
-  --bg: hsl(210deg 5% 15%);
+  --font-family: "Inter", sans-serif;
+  --font-family-code: "Fira Code", monospace;
+  --background: hsl(210deg 5% 15%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
   --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-dialog: hsl(0deg 0% 30%);
-  --header-bg: hsl(213deg 10% 23%);
-  --output-bg: hsl(0deg 0% 100%);
+  --header-background: hsl(213deg 10% 23%);
+  --output-background: hsl(0deg 0% 100%);
   --output-color: hsl(0deg 0% 0% / 80%);
   --output-border-dark: hsl(0deg 0% 80%);
   --output-border-mid: hsl(0deg 0% 85%);
@@ -20,18 +20,18 @@
   --syntax-builtin: hsl(27deg 100% 74%);
   --syntax-keyword: hsl(359deg 100% 75%);
   --syntax-comment: hsl(210deg 13% 72%);
-  --syntax-error-line-bg: hsl(210deg 7% 20%);
-  --syntax-error-bg: hsl(209deg 100% 33%);
+  --syntax-error-line-background: hsl(210deg 7% 20%);
+  --syntax-error-background: hsl(209deg 100% 33%);
   --btn-color: hsl(0deg 0% 33%);
   --btn-color-active: hsl(0deg 0% 100%);
   --btn-color-disabled: hsl(0deg 0% 33% / 50%);
-  --btn-bg: hsl(0deg 0% 92%);
-  --btn-bg-hover: hsl(0deg 0% 80%);
-  --modal-bg: hsl(210deg 5% 15% / 95%);
+  --btn-background: hsl(0deg 0% 92%);
+  --btn-background-hover: hsl(0deg 0% 80%);
+  --modal-background: hsl(210deg 5% 15% / 95%);
   --modal-color: hsl(0deg 0% 100% / 80%);
   --modal-color-hover: hsl(0deg 0% 100% / 100%);
   --modal-circle-color: hsl(0deg 0% 35%);
-  --modal-circle-bg: hsl(0deg 0% 13%);
+  --modal-circle-background: hsl(0deg 0% 13%);
 
   /* responsive desktop */
   --display-desktop-only: initial;
@@ -100,10 +100,10 @@
 }
 
 body {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   letter-spacing: 0.15px;
   tab-size: 4;
-  background: var(--bg);
+  background: var(--background);
   color: var(--color);
   overflow: clip;
   height: 100dvh;
@@ -114,14 +114,14 @@ a {
 }
 
 button {
-  font-family: var(--ff);
+  font-family: var(--font-family);
 }
 
 /* --- Header -------------------------------------------------------- */
 header {
   background: #34393f;
   padding: var(--header-padding);
-  font-family: var(--ff);
+  font-family: var(--font-family);
   height: var(--header-height);
   display: flex;
   flex-direction: row;
@@ -231,7 +231,7 @@ header .logo img {
 
 #sidemenu a,
 #sidemenu button {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   color: white;
   text-decoration: none;
   background: none;
@@ -267,7 +267,7 @@ header .logo img {
 
 /* --- Main ---------------------------------------------------------- */
 main {
-  background: var(--bg);
+  background: var(--background);
   width: var(--main-width);
   translate: var(--main-translate);
   height: calc(100vh - var(--header-height));
@@ -291,7 +291,7 @@ main.view-output {
   flex-direction: column;
   height: 100%;
   overflow: clip;
-  font-family: var(--ff-code);
+  font-family: var(--font-family-code);
   font-variant-ligatures: none;
   font-size: 1rem;
 }
@@ -306,7 +306,7 @@ main.view-output {
   flex: 1;
   overflow: auto;
   width: var(--editor-width);
-  background: var(--bg);
+  background: var(--background);
   border-radius: 6px;
   border: var(--editor-border);
 }
@@ -319,7 +319,7 @@ main.view-output {
 .editor {
   color: var(--color);
   font-size: 1rem;
-  font-family: var(--ff-code);
+  font-family: var(--font-family-code);
   font-variant-ligatures: none;
   position: relative;
   overflow: hidden;
@@ -381,7 +381,7 @@ main.view-output {
 
 dialog .err,
 .editor pre.highlighted .err {
-  background: var(--syntax-error-bg);
+  background: var(--syntax-error-background);
   border-radius: 6px;
 }
 
@@ -407,7 +407,7 @@ dialog .err,
 }
 
 .editor .error {
-  background: var(--syntax-error-bg);
+  background: var(--syntax-error-background);
   color: var(--color);
   font-style: italic;
 }
@@ -434,7 +434,7 @@ dialog .err,
 }
 
 .editor .lines .err.num {
-  background: var(--syntax-error-bg);
+  background: var(--syntax-error-background);
   color: var(--color);
 }
 
@@ -442,7 +442,7 @@ dialog .err,
   left: calc(2ch + 1.2rem);
   right: 0;
   padding-left: 0.3rem;
-  background: var(--syntax-error-line-bg);
+  background: var(--syntax-error-line-background);
   border-radius: 6px;
   position: absolute;
 }
@@ -473,7 +473,7 @@ dialog .err,
 
 .output .canvas {
   margin-right: auto;
-  background: var(--output-bg);
+  background: var(--output-background);
   width: var(--canvas-size);
   height: var(--canvas-size);
   border-top: 1px solid var(--output-border-dark);
@@ -503,9 +503,9 @@ dialog .err,
 .output .read,
 .output .input {
   padding: 16px;
-  background: var(--output-bg);
+  background: var(--output-background);
   color: var(--output-color);
-  font-family: var(--ff-code);
+  font-family: var(--font-family-code);
   font-variant-ligatures: none;
   border-top: 1px solid var(--output-border-dark);
   border-bottom: 1px solid var(--output-border-light);
@@ -514,7 +514,7 @@ dialog .err,
 
 .output .read textarea {
   font-size: 1rem;
-  font-family: var(--ff-code);
+  font-family: var(--font-family-code);
   font-variant-ligatures: none;
   color: var(--output-color);
   -webkit-text-fill-color: var(--output-color);
@@ -550,12 +550,12 @@ dialog .err,
 
 .run.desktop {
   border-top: 1px solid var(--output-border-dark);
-  background: var(--output-bg);
+  background: var(--output-background);
 }
 
 button.primary {
   color: var(--btn-color);
-  background: var(--btn-bg);
+  background: var(--btn-background);
   box-shadow:
     0 4px 0 hsl(0deg 0% 42%),
     0 16px 12px -8px hsl(0deg 0% 0% / 42%),
@@ -576,7 +576,7 @@ button.primary {
 
 @media (hover: hover) {
   button:hover:enabled.primary {
-    background: var(--btn-bg-hover);
+    background: var(--btn-background-hover);
   }
 }
 
@@ -631,7 +631,7 @@ button.running#run-mobile:active {
   inset: 0;
   overflow: clip;
   height: 100%;
-  background: var(--modal-bg);
+  background: var(--modal-background);
 }
 
 #modal header {
@@ -659,7 +659,7 @@ button.running#run-mobile:active {
 }
 
 .modal-main {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   padding: 36px 36px 16px;
   overflow-y: auto;
   display: flex;
@@ -673,7 +673,7 @@ button.running#run-mobile:active {
 }
 
 #modal .modal-main h2 {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   font-weight: 700;
   font-size: 1rem;
   padding-bottom: 8px;
@@ -692,7 +692,7 @@ button.running#run-mobile:active {
 
 /* stylelint-disable no-descending-specificity */
 #modal li a {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   color: var(--modal-color);
   padding-left: 1.5rem;
   text-decoration: none;
@@ -713,7 +713,7 @@ button.running#run-mobile:active {
   width: 1rem;
   border: 2px solid var(--modal-circle-color);
   border-radius: 50%;
-  background: var(--modal-circle-bg);
+  background: var(--modal-circle-background);
   display: inline-block;
   z-index: 1;
 }
@@ -747,7 +747,7 @@ dialog header {
   height: unset;
   line-height: 1.5;
   padding: 16px 30px;
-  background: var(--bg);
+  background: var(--background);
   border-radius: 5px 5px 0 0;
   display: flex;
   justify-content: space-between;
@@ -775,7 +775,7 @@ dialog .copy button {
 }
 
 dialog h1 {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   font-weight: 700;
   font-size: 1.5rem;
   color: var(--color);
@@ -783,9 +783,9 @@ dialog h1 {
 }
 
 dialog main {
-  font-family: var(--ff);
+  font-family: var(--font-family);
   padding: 30px 30px 45px;
-  background: var(--bg);
+  background: var(--background);
   border-radius: 0 0 5px 5px;
   height: unset;
   flex-direction: column;
@@ -824,7 +824,7 @@ dialog p {
 }
 
 #dialog-error .err {
-  font-family: var(--ff-code);
+  font-family: var(--font-family-code);
   color: var(--color);
   margin-left: 8px;
   margin-right: 8px;

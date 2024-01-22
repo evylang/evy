@@ -5,7 +5,7 @@ test("title", async ({ page, baseURL }) => {
   await expect(page).toHaveTitle("evy | Playground")
 })
 
-test("console output", async ({ page, baseURL }) => {
+test("console-out", async ({ page, baseURL }) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
   await page.getByRole("button", { name: "Run" }).click()
@@ -13,7 +13,7 @@ test("console output", async ({ page, baseURL }) => {
   await expect(page).toHaveScreenshot("console-output.png")
 })
 
-test("header navigation", async ({ page, baseURL }) => {
+test("header-nav", async ({ page, baseURL }) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
   const modal = page.locator("#modal")
@@ -37,7 +37,7 @@ end
   )
 })
 
-test("side menu", async ({ page, baseURL }, testInfo) => {
+test("sidemenu", async ({ page, baseURL }, testInfo) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
 

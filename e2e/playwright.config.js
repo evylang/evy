@@ -1,5 +1,5 @@
-const { defineConfig, devices } = require("@playwright/test")
-module.exports = defineConfig({
+import { defineConfig, devices } from "@playwright/test"
+export default defineConfig({
   use: {
     baseURL: process.env.BASEURL || "http://localhost:8080",
   },
@@ -13,4 +13,5 @@ module.exports = defineConfig({
       use: { ...devices["iPhone 14"] },
     },
   ],
+  testMatch: "*test.js",
 })

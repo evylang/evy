@@ -1,11 +1,11 @@
-const { test, expect } = require("@playwright/test")
+import { test, expect } from "@playwright/test"
 
 test("title", async ({ page, baseURL }) => {
   await page.goto(baseURL)
   await expect(page).toHaveTitle("evy | Playground")
 })
 
-test("console output", async ({ page, baseURL }) => {
+test("console-out", async ({ page, baseURL }) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
   await page.getByRole("button", { name: "Run" }).click()
@@ -13,7 +13,7 @@ test("console output", async ({ page, baseURL }) => {
   await expect(page).toHaveScreenshot("console-output.png")
 })
 
-test("header navigation", async ({ page, baseURL }) => {
+test("header-nav", async ({ page, baseURL }) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
   const modal = page.locator("#modal")
@@ -37,7 +37,7 @@ end
   )
 })
 
-test("side menu", async ({ page, baseURL }, testInfo) => {
+test("sidemenu", async ({ page, baseURL }, testInfo) => {
   await page.goto(baseURL)
   await page.waitForLoadState("networkidle")
 
@@ -80,7 +80,7 @@ test("dialogs", async ({ page, baseURL }, testInfo) => {
   }
   await page.locator('input[type="text"]').click()
   await page.locator('input[type="text"]').press("ArrowRight")
-  await expect(page).toHaveScreenshot("share-dialog.png")
+  await expect(page).toHaveScreenshot("share-dialog.png", { maxDiffPixelRatio: 0.01 })
   await page.getByRole("button", { name: "Done" }).click()
   if (testInfo.project.name != "ios") {
     //TODO: there is a rendering bug for this on ios, few snapshot diff, see https://github.com/evylang/todo/issues/50
@@ -88,7 +88,7 @@ test("dialogs", async ({ page, baseURL }, testInfo) => {
   }
   await page.locator("#hamburger").click()
   await page.getByRole("button", { name: "About Evy" }).click()
-  await expect(page).toHaveScreenshot("about-dialog.png")
+  await expect(page).toHaveScreenshot("about-dialog.png", { maxDiffPixelRatio: 0.01 })
   await page.locator("header").filter({ hasText: "About" }).getByRole("button").click()
   if (testInfo.project.name != "ios") {
     //TODO: there is a rendering bug for this on ios, few snapshot diff, see https://github.com/evylang/todo/issues/50

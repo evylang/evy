@@ -15,12 +15,12 @@ programming languages. Evy has a small set of
 remember, but it still is powerful enough for user interaction, games,
 and animations.
 
-[Try it out]: https://evy.dev/play
+[Try it out]: https://play.evy.dev
 [Scratch]: https://scratch.mit.edu/
 
 ## 🌱 Getting Started
 
-You can try Evy online at [evy.dev/play] and browse the examples.
+You can try Evy online at [play.evy.dev] and browse the examples.
 Alternatively you can [install](#-installation) the `evy` toolchain
 locally.
 
@@ -37,8 +37,8 @@ Here is a "hello world" program in Evy
 
 </details>
 
-[evy.dev/play]: https://evy.dev/play
-[Animation source code]: https://evy.dev/play#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
+[play.evy.dev]: https://play.evy.dev
+[Animation source code]: https://play.evy.dev#content=H4sIAAAAAAAAEzWLwQqAIBBE7/sVg/fSiC6BHyO2B0FXWazvz4qGGXjMMKVejM09thaRpbNSrLkqTDu1ZTak2D1WRzFpzAwlqoIgqYTOhKHRBn1J4UcmuHn5lv/CctAN/HT8mWwAAAA=
 
 ## 📖 Documentation
 
@@ -143,7 +143,7 @@ Evy would not be here today without the help of many people.
 [@ckaser]: https://github.com/ckaser
 [easylang]: https://easylang.online/
 [@fcostin]: https://github.com/fcostin
-[Splash of Trig]: https://evy.dev/play#splashtrig
+[Splash of Trig]: https://play.evy.dev#splashtrig
 [@starkcoffee]: https://github.com/starkcoffee
 [@loislambeth]: https://github.com/loislambeth
 [@alecthomas]: https://github.com/alecthomas

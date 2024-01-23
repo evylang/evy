@@ -79,11 +79,11 @@ test-tiny: go-version | $(O)
 	tinygo test ./...
 
 ## Check that test coverage meets the required level
-check-coverage: test
+check-coverage: test-go
 	@go tool cover -func=$(COVERFILE) | $(CHECK_COVERAGE) || $(FAIL_COVERAGE)
 
 ## Show test coverage in your browser
-cover: test
+cover: test-go
 	go tool cover -html=$(COVERFILE)
 
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'

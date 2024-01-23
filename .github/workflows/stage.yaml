@@ -6,15 +6,22 @@ on:
   workflow_call:
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make ci
+      - run: ./bin/make check-uptodate
         env:
           TERM: vt100
+      - run: ./bin/make test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./bin/make lint
 
   deploy:
     runs-on: ubuntu-latest

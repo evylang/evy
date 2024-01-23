@@ -8,9 +8,13 @@ VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
 ## Build, test, check coverage and lint
-all: build test lint tiny test-tiny check-coverage sh-lint check-prettier check-evy-fmt frontend
+all: test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
+
+test: build-go test-go build-tiny test-tiny check-coverage
+
+lint: lint-go lint-sh check-prettier check-style check-fmt-evy
 
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
@@ -22,14 +26,14 @@ check-uptodate: tidy fmt doc
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate ci clean
+.PHONY: all check-uptodate ci test lint clean
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)
 CMDS = .
 
 ## Build evy binaries
-build: | $(O)
+build-go: | $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 ## Build and install binaries in $GOBIN
@@ -42,7 +46,7 @@ go-version:
 
 ## Build with tinygo targeting wasm
 # optimise for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
-tiny: go-version | $(O)
+build-tiny: go-version | $(O)
 	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
 	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/evy.wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
@@ -61,13 +65,13 @@ clean::
 	-rm -f frontend/wasm_exec.js
 	-rm -f frontend/version.json
 
-.PHONY: build go-version install tidy tiny
+.PHONY: build-go build-tiny go-version install tidy
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
 
 ## Run non-tinygo tests and generate a coverage file
-test: | $(O)
+test-go: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
 
 ## Run tinygo tests
@@ -85,23 +89,23 @@ cover: test
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
 FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_NORMAL)'; exit 1; }
 
-.PHONY: check-coverage cover test test-tiny
+.PHONY: check-coverage cover test-go test-tiny
 
 # --- Lint ---------------------------------------------------------------------
 EVY_FILES = $(shell find frontend/samples -name '*.evy')
 
 ## Lint go source code
-lint:
+lint-go:
 	golangci-lint run
 
 ## Format evy sample code
-evy-fmt:
+fmt-evy:
 	go run . fmt --write $(EVY_FILES)
 
-check-evy-fmt:
+check-fmt-evy:
 	go run . fmt --check $(EVY_FILES)
 
-.PHONY: check-evy-fmt evy-fmt lint
+.PHONY: check-fmt-evy fmt-evy lint-go
 
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage
@@ -163,6 +167,16 @@ prettier: | $(NODELIB)
 check-prettier: | $(NODELIB)
 	npx --prefix $(NODEPREFIX) -y prettier --check .
 
+## Fix CSS files with stylelint
+style: | $(NODELIB)
+	npm --prefix $(NODEPREFIX) ci
+	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json --fix frontend/**/*.css
+
+## Lint CSS files with stylelint
+check-style: | $(NODELIB)
+	npm --prefix $(NODEPREFIX) ci
+	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json frontend/**/*.css
+
 ## Install playwright on host system for `e2e` to use.
 install-playwright:
 	npx --prefix e2e playwright install --with-deps chromium
@@ -196,17 +210,17 @@ $(NODELIB):
 
 ## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
-deploy-prod: tiny
+deploy-prod: build-tiny
 	./scripts/firebase-deploy prod live
 
 ## Deploy to live channel on firebase stage.
 ## `firebase login` for first time local usage
-deploy-stage: tiny
+deploy-stage: build-tiny
 	./scripts/firebase-deploy stage live
 
 ## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
-deploy: tiny
+deploy: build-tiny
 	./scripts/firebase-deploy stage
 
 .PHONY: deploy deploy-prod deploy-stage
@@ -215,15 +229,15 @@ deploy: tiny
 SCRIPTS = scripts/firebase-deploy .github/scripts/app_token
 
 ## Lint script files with shellcheck and shfmt
-sh-lint:
+lint-sh:
 	shellcheck $(SCRIPTS)
 	shfmt --diff $(SCRIPTS)
 
 ## Format script files
-sh-fmt:
+fmt-sh:
 	shfmt --write $(SCRIPTS)
 
-.PHONY: sh-fmt sh-lint
+.PHONY: fmt-sh lint-sh
 
 # --- Release -------------------------------------------------------------------
 ## Tag and release binaries for different OS on GitHub release

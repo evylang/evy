@@ -1,0 +1,111 @@
+:root {
+  --footer-color: hsl(0deg 0% 100% / 40%);
+}
+
+body {
+  font-family: var(--font-family);
+  letter-spacing: 0.15px;
+  background: var(--background);
+  color: var(--color-dimmed);
+  width: 100vw;
+}
+
+.max-width-wrapper {
+  max-width: calc(51rem + 32px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main,
+footer {
+  width: 100%;
+}
+
+.evy-e {
+  width: 227px;
+  margin-top: 124px;
+  margin-bottom: 70px;
+}
+
+.evy-logo {
+  width: 108px;
+}
+
+.action {
+  width: 18rem;
+  margin-top: 65px;
+  margin-bottom: 78px;
+}
+
+.action button {
+  width: 100%;
+}
+
+h1 {
+  width: 100%;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+h2 {
+  width: 100%;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 28px;
+  margin-bottom: 20px;
+  line-height: 2;
+}
+
+p {
+  width: 100%;
+  font-size: 1.125rem;
+  line-height: 2;
+}
+
+.screencast {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 80px;
+}
+
+footer {
+  border-top: 1px solid var(--border-color);
+  height: 80px;
+}
+
+footer ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 0;
+
+  @media (width <= 767px) {
+    & {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+}
+
+footer a {
+  color: var(--footer-color);
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+
+footer a:hover {
+  color: var(--color);
+}

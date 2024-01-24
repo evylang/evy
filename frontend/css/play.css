@@ -18,11 +18,11 @@
   --syntax-comment: hsl(210deg 13% 72%);
   --syntax-error-line-background: hsl(210deg 7% 20%);
   --syntax-error-background: hsl(209deg 100% 33%);
-  --btn-color: hsl(0deg 0% 33%);
-  --btn-color-active: hsl(0deg 0% 100%);
-  --btn-color-disabled: hsl(0deg 0% 33% / 50%);
-  --btn-background: hsl(0deg 0% 92%);
-  --btn-background-hover: hsl(0deg 0% 80%);
+  --primary-button-color: hsl(0deg 0% 33%);
+  --run-button-color-active: hsl(0deg 0% 100%);
+  --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
+  --primary-button-background: hsl(0deg 0% 92%);
+  --primary-button-background-hover: hsl(0deg 0% 80%);
   --modal-background: hsl(210deg 5% 15% / 95%);
   --modal-color: hsl(0deg 0% 100% / 80%);
   --modal-color-hover: hsl(0deg 0% 100% / 100%);
@@ -540,8 +540,8 @@ dialog .err,
 }
 
 button.primary {
-  color: var(--btn-color);
-  background: var(--btn-background);
+  color: var(--primary-button-color);
+  background: var(--primary-button-background);
   box-shadow:
     0 4px 0 hsl(0deg 0% 42%),
     0 16px 12px -8px hsl(0deg 0% 0% / 42%),
@@ -559,10 +559,9 @@ button.primary {
   transition: background 0.3s ease-in-out;
   text-decoration: none;
 }
-
 @media (hover: hover) {
   button:hover:enabled.primary {
-    background: var(--btn-background-hover);
+    background: var(--primary-button-background-hover);
   }
 }
 
@@ -575,7 +574,7 @@ button#run:disabled,
 button#run-mobile:disabled,
 button#run.loading,
 button#run-mobile.loading {
-  color: var(--btn-color-disabled);
+  color: var(--primary-button-color-disabled);
   box-shadow:
     0 4px 0 hsl(0deg 0% 60%),
     0 16px 12px -8px hsl(0deg 0% 0% / 30%),
@@ -588,7 +587,7 @@ button.running#run:hover,
 button.running#run:active,
 button.running#run-mobile:hover,
 button.running#run-mobile:active {
-  color: var(--btn-color-active);
+  color: var(--run-button-color-active);
   letter-spacing: 0.2em;
   transition: 0s;
   background: linear-gradient(

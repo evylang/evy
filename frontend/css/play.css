@@ -1,7 +1,6 @@
 /* TODO: move this file to play/css/index.css once hashing is fixed in scripts/firebase-deploy */
 :root {
   /* theme */
-  --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-dialog: hsl(0deg 0% 30%);
   --header-background: hsl(213deg 10% 23%);
   --output-background: hsl(0deg 0% 100%);
@@ -18,14 +17,8 @@
   --syntax-comment: hsl(210deg 13% 72%);
   --syntax-error-line-background: hsl(210deg 7% 20%);
   --syntax-error-background: hsl(209deg 100% 33%);
-  --primary-button-color: hsl(0deg 0% 33%);
   --run-button-color-active: hsl(0deg 0% 100%);
-  --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
-  --primary-button-background: hsl(0deg 0% 92%);
-  --primary-button-background-hover: hsl(0deg 0% 80%);
   --modal-background: hsl(210deg 5% 15% / 95%);
-  --modal-color: hsl(0deg 0% 100% / 80%);
-  --modal-color-hover: hsl(0deg 0% 100% / 100%);
   --modal-circle-color: hsl(0deg 0% 35%);
   --modal-circle-background: hsl(0deg 0% 13%);
   --header-img-top: 0.3em;
@@ -531,32 +524,6 @@ dialog .err,
   background: var(--output-background);
 }
 
-button.primary {
-  color: var(--primary-button-color);
-  background: var(--primary-button-background);
-  box-shadow:
-    0 4px 0 hsl(0deg 0% 42%),
-    0 16px 12px -8px hsl(0deg 0% 0% / 42%),
-    inset 0 -2px 1px 1px hsl(0deg 0% 42%);
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 1.25rem;
-  line-height: 52px;
-  height: 52px;
-  text-align: center;
-  font-family: Inter, sans-serif;
-  border: none;
-  display: block;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-  text-decoration: none;
-}
-@media (hover: hover) {
-  button:hover:enabled.primary {
-    background: var(--primary-button-background-hover);
-  }
-}
-
 button#run,
 button#run-mobile {
   width: 100%;
@@ -670,7 +637,7 @@ button.running#run-mobile:active {
 /* stylelint-disable no-descending-specificity */
 #modal li a {
   font-family: var(--font-family);
-  color: var(--modal-color);
+  color: var(--color-dimmed);
   padding-left: 1.5rem;
   text-decoration: none;
   position: relative;
@@ -678,7 +645,7 @@ button.running#run-mobile:active {
 /* stylelint-enable no-descending-specificity */
 
 #modal ul li a:hover {
-  color: var(--modal-color-hover);
+  color: var(--color);
 }
 
 #modal ul li a::before {
@@ -781,7 +748,7 @@ dialog .copy {
 dialog .copy input {
   outline: none;
   background: none;
-  color: var(--modal-color);
+  color: var(--color-dimmed);
   border: none;
   font-size: 1rem;
   line-height: 2;
@@ -797,7 +764,7 @@ dialog button.primary {
 }
 
 dialog p {
-  color: var(--modal-color);
+  color: var(--color-dimmed);
 }
 
 #dialog-error .err {

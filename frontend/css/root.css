@@ -5,6 +5,12 @@
   --background: hsl(210deg 5% 15%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
+  --color-dimmed: hsl(0deg 0% 80%);
+  --border-color: hsl(0deg 0% 100% / 20%);
+  --primary-button-color: hsl(0deg 0% 33%);
+  --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
+  --primary-button-background: hsl(0deg 0% 92%);
+  --primary-button-background-hover: hsl(0deg 0% 80%);
 
   /* desktop */
   --display-desktop-only: initial;

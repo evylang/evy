@@ -9,12 +9,6 @@
       "options": {
         "parser": "html"
       }
-    },
-    {
-      "files": "*.html",
-      "options": {
-        "printWidth": 115
-      }
     }
   ]
 }

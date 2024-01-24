@@ -12,7 +12,7 @@ for (const baseURL of baseURLs) {
 
     test("title", async ({ page, baseURL }) => {
       await page.goto(baseURL)
-      await expect(page).toHaveTitle("evy | Playground")
+      await expect(page).toHaveTitle("evy · Playground")
     })
 
     test("console-out", async ({ page, baseURL }) => {

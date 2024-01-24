@@ -95,14 +95,6 @@ body {
   height: 100dvh;
 }
 
-a {
-  transition: all 0.3s ease-in-out;
-}
-
-button {
-  font-family: var(--font-family);
-}
-
 /* --- Header -------------------------------------------------------- */
 header {
   background: #34393f;

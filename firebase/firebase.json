@@ -40,7 +40,13 @@
     },
     {
       "target": "play",
-      "public": "public/play"
+      "public": "public/play",
+      "rewrites": [
+        {
+          "source": "/version",
+          "destination": "/version.json"
+        }
+      ]
     }
   ],
   "emulators": {

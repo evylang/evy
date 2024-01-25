@@ -1,3 +1,2 @@
-frontend/wasm_exec.js
-*.css
-
+/frontend/wasm_exec.js
+resets.css

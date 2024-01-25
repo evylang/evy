@@ -92,7 +92,7 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 .PHONY: check-coverage cover test-go test-tiny
 
 # --- Lint ---------------------------------------------------------------------
-EVY_FILES = $(shell find frontend/samples -name '*.evy')
+EVY_FILES = $(shell find frontend/play/samples -name '*.evy')
 
 ## Lint go source code
 lint-go:

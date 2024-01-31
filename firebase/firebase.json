@@ -18,6 +18,13 @@
           ]
         }
       ],
+      "redirects": [
+        {
+          "source": "/evy-2401.pdf",
+          "destination": "https://raw.githubusercontent.com/evylang/evy/v0.1.25/docs/papers/evy-2401.pdf",
+          "type": 301
+        }
+      ],
       "rewrites": [
         {
           "source": "/version",

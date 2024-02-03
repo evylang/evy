@@ -12,10 +12,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make check-uptodate
+      - run: ./bin/make check-uptodate build-go test
         env:
           TERM: vt100
-      - run: ./bin/make test
 
   lint:
     runs-on: ubuntu-latest

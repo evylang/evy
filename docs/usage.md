@@ -37,6 +37,12 @@ You can also get help for each subcommand by running it with the
       fmt [<files> ...]
         Format Evy files.
 
+      serve export <dir>
+        Export embedded content
+
+      serve start
+        Start server, default action, use as "evy serve"
+
     Run "evy <command> --help" for more information on a command.
 
 <!-- genend -->

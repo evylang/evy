@@ -27,7 +27,7 @@ initCanvas()
 
 // initWasm loads byte-code and initializes execution environment.
 async function initWasm() {
-  wasmModule = await WebAssembly.compileStreaming(fetch("module/evy.wasm"))
+  wasmModule = await WebAssembly.compileStreaming(fetch(wasmImports["./module/evy.wasm"]))
   const runButton = document.querySelector("#run")
   const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun

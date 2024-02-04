@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="css/play.css" type="text/css" />
     <link rel="stylesheet" href="css/fonts.css" type="text/css" />
     <script type="importmap"></script>
+    <script>
+      const wasmImports = {
+        // Replaced for cache busting, e.g. as "./module/evy.wasm": "./module/evy.11738cdd.wasm"
+        "./module/evy.wasm": "./module/evy.wasm",
+      }
+    </script>
     <script src="module/wasm_exec.js"></script>
     <script src="index.js" type="module"></script>
   </head>

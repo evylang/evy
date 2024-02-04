@@ -48,8 +48,8 @@ go-version:
 # optimise for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
 build-tiny: go-version | $(O)
 	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
-	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/evy.wasm
-	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/
+	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/module/evy.wasm
+	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/module/
 	echo '{ "version": "$(VERSION)" }' | jq > frontend/version.json
 
 ## Tidy go modules with "go mod tidy"
@@ -61,8 +61,8 @@ fmt:
 	gofumpt -w $(GOFILES)
 
 clean::
-	-rm -f frontend/evy.wasm
-	-rm -f frontend/wasm_exec.js
+	-rm -f frontend/module/evy.wasm
+	-rm -f frontend/module/wasm_exec.js
 	-rm -f frontend/version.json
 
 .PHONY: build-go build-tiny go-version install tidy

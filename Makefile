@@ -110,22 +110,22 @@ check-fmt-evy:
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage
 
-DOCTEST_CMD = ./scripts/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 DOCTESTS = docs/builtins.md docs/spec.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
-TOC_CMD = ./scripts/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 TOCFILES = docs/builtins.md docs/spec.md
 toc:
 	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
 
-USAGE_CMD = ./scripts/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 USAGEFILES = docs/usage.md
 usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
-GODOC_CMD = ./scripts/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
+GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
 GODOCFILES = main.go
 godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
@@ -211,22 +211,22 @@ $(NODELIB):
 ## Deploy to live channel on firebase prod, use with care!
 ## `firebase login` for first time local usage
 deploy-prod: build-tiny
-	./scripts/firebase-deploy prod live
+	./build-tools/firebase-deploy prod live
 
 ## Deploy to live channel on firebase stage.
 ## `firebase login` for first time local usage
 deploy-stage: build-tiny
-	./scripts/firebase-deploy stage live
+	./build-tools/firebase-deploy stage live
 
 ## Deploy to dev (or other) channel on firebase stage.
 ## `firebase login` for first time local usage
 deploy: build-tiny
-	./scripts/firebase-deploy stage
+	./build-tools/firebase-deploy stage
 
 .PHONY: deploy deploy-prod deploy-stage
 
 # --- scripts ------------------------------------------------------------------
-SCRIPTS = scripts/firebase-deploy .github/scripts/app_token
+SCRIPTS = build-tools/firebase-deploy .github/scripts/app_token
 
 ## Lint script files with shellcheck and shfmt
 lint-sh:

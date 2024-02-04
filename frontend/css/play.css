@@ -1,4 +1,4 @@
-/* TODO: move this file to play/css/index.css once hashing is fixed in scripts/firebase-deploy */
+/* TODO: move this file to play/css/index.css once hashing is fixed in build-tools/firebase-deploy */
 :root {
   /* theme */
   --border-color-dialog: hsl(0deg 0% 30%);

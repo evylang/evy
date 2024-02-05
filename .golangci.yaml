@@ -32,6 +32,7 @@ linters:
     - ireturn
     - lll
     - maligned
+    - nestif
     - nlreturn
     - nilnil
     - nosnakecase

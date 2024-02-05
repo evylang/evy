@@ -181,11 +181,12 @@ check-style: | $(NODELIB)
 install-playwright:
 	npx --prefix e2e playwright install --with-deps chromium
 
+## Run end-to-end test on host system, could be MacOS, Linux or other
 e2e:
 	@echo "testing $(BASEURL)"
 	$(PLAYWRIGHT_CMD)
 
-## Make end-to-end testing golden screenshots with Docker, used on Linux CI
+## Run end-to-end tests with Docker, used on Linux CI
 e2e-docker: SERVEDIR_HOST = host.docker.internal
 e2e-docker:
 	$(PLAYWRIGHT_CMD_DOCKER)

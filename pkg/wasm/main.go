@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 
+	"evylang.dev/evy/pkg/abi"
 	"evylang.dev/evy/pkg/evaluator"
 	"evylang.dev/evy/pkg/parser"
 )
@@ -43,10 +44,10 @@ func main() {
 	if actions["eval"] {
 		rt := newJSRuntime()
 		err := evaluate(ast, rt)
-		if err == nil || errors.Is(err, evaluator.ErrStopped) {
+		if err == nil || errors.Is(err, abi.ErrStopped) {
 			return
 		}
-		var exitErr evaluator.ExitError
+		var exitErr abi.ExitError
 		if errors.As(err, &exitErr) && exitErr == 0 {
 			return
 		}
@@ -73,7 +74,7 @@ func getEvySource() string {
 }
 
 func parse(input string) (*parser.Program, error) {
-	builtins := evaluator.BuiltinDecls()
+	builtins := abi.BuiltinDecls()
 	prog, err := parser.Parse(input, builtins)
 	if err != nil {
 		var parseErrors parser.Errors

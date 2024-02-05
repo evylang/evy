@@ -6,11 +6,12 @@ import (
 	"strings"
 	"testing"
 
+	"evylang.dev/evy/pkg/abi"
 	"evylang.dev/evy/pkg/assert"
 )
 
 type testRT struct {
-	UnimplementedRuntime
+	abi.UnimplementedRuntime
 	b bytes.Buffer
 }
 
@@ -18,13 +19,13 @@ func (rt *testRT) Print(s string) {
 	rt.b.WriteString(s)
 }
 
-func (*testRT) Yielder() Yielder {
+func (*testRT) Yielder() abi.Yielder {
 	return nil
 }
 
 func run(input string) string {
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedRuntime.DefaultPrint = rt.Print
 	eval := NewEvaluator(rt)
 	err := eval.Run(input)
 	if err != nil {
@@ -146,10 +147,10 @@ end
 `
 
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedRuntime.DefaultPrint = rt.Print
 	eval := NewEvaluator(&testRT{})
 	err := eval.Run(prog)
-	assert.Equal(t, true, errors.Is(err, ErrVarNotSet))
+	assert.Equal(t, true, errors.Is(err, abi.ErrVarNotSet))
 	evalErr := &Error{}
 	assert.Equal(t, true, errors.As(err, &evalErr))
 	assert.Equal(t, "line 7 column 13", evalErr.Token.Location())
@@ -1769,7 +1770,7 @@ func TestNestedTypeof(t *testing.T) {
 			in += "\n print (typeof a)"
 			var got string
 			rt := &testRT{}
-			rt.UnimplementedRuntime.print = rt.Print
+			rt.UnimplementedRuntime.DefaultPrint = rt.Print
 			eval := NewEvaluator(rt)
 			err := eval.Run(in)
 			if err != nil {

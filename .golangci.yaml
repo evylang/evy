@@ -5,7 +5,11 @@ issues:
     - "^ST1003: should not use ALL_CAPS"
     - "^var-naming: don't use ALL_CAPS"
     - "^G304: Potential file inclusion via variable"
-
+  exclude-rules: # TODO: Fix godocs in abi package and re-enable
+    - path: pkg/abi
+      linters:
+        - stylecheck
+        - revive
 linters:
   enable-all: true
   disable:

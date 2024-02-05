@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/abi"
 )
 
 const minSleepDur = time.Millisecond
@@ -26,7 +26,7 @@ func newJSRuntime() *jsRuntime {
 	return &jsRuntime{yielder: newSleepingYielder()}
 }
 
-func (rt *jsRuntime) Yielder() evaluator.Yielder       { return rt.yielder }
+func (rt *jsRuntime) Yielder() abi.Yielder             { return rt.yielder }
 func (rt *jsRuntime) Print(s string)                   { jsPrint(s) }
 func (rt *jsRuntime) Cls()                             { jsCls() }
 func (rt *jsRuntime) Read() string                     { return rt.yielder.Read() }

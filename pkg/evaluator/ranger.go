@@ -1,33 +1,35 @@
 package evaluator
 
+import "evylang.dev/evy/pkg/abi"
+
 type ranger interface {
 	next() bool
 }
 
 type stepRange struct {
-	loopVar *numVal
+	loopVar *abi.NumVal
 	cur     float64
 	stop    float64
 	step    float64
 }
 
 type arrayRange struct {
-	loopVar value
+	loopVar abi.Value
 	cur     int
-	array   *arrayVal
+	array   *abi.ArrayVal
 }
 
 type mapRange struct {
-	loopVar  value
+	loopVar  abi.Value
 	cur      int // index of Map.Order slice of keys
-	mapValal *mapVal
+	mapValal *abi.MapVal
 	order    []string // copy of order in case map entry gets deleted during iteration
 }
 
 type stringRange struct {
-	loopVar *stringVal
+	loopVar *abi.StringVal
 	cur     int
-	str     *stringVal
+	str     *abi.StringVal
 	runes   []rune
 }
 
@@ -64,7 +66,7 @@ func (m *mapRange) next() bool {
 		m.cur++
 		if _, ok := m.mapValal.Pairs[key]; ok { // ensure value hasn't been deleted
 			if m.loopVar != nil {
-				m.loopVar.(*stringVal).V = key
+				m.loopVar.(*abi.StringVal).V = key
 			}
 			return true
 		}
@@ -74,7 +76,7 @@ func (m *mapRange) next() bool {
 
 func (s *stringRange) next() bool {
 	if s.runes == nil {
-		s.runes = s.str.runes()
+		s.runes = s.str.Runes()
 	}
 	if s.cur >= len(s.runes) {
 		return false

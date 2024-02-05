@@ -39,6 +39,7 @@ import (
 	"runtime"
 	"time"
 
+	"evylang.dev/evy/pkg/abi"
 	"evylang.dev/evy/pkg/evaluator"
 	"evylang.dev/evy/pkg/lexer"
 	"evylang.dev/evy/pkg/parser"
@@ -54,7 +55,7 @@ var (
 
 // cliRuntime implements evaluator.Runtime.
 type cliRuntime struct {
-	evaluator.UnimplementedRuntime
+	abi.UnimplementedRuntime
 	reader    *bufio.Reader
 	skipSleep bool
 }
@@ -99,7 +100,7 @@ func (rt *cliRuntime) Sleep(dur time.Duration) {
 // Yielder returns a no-op yielder for CLI evy as it is not needed. By
 // contrast, browser Evy needs to explicitly hand over control to JS
 // host with Yielder.
-func (*cliRuntime) Yielder() evaluator.Yielder { return nil }
+func (*cliRuntime) Yielder() abi.Yielder { return nil }
 
 const description = `
 evy is a tool for managing evy source code.
@@ -160,7 +161,7 @@ func handlEvyErr(err error) {
 	if err == nil {
 		return
 	}
-	var exitErr evaluator.ExitError
+	var exitErr abi.ExitError
 	if errors.As(err, &exitErr) {
 		os.Exit(int(exitErr))
 	}
@@ -213,7 +214,7 @@ func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
 		return err
 	}
 	in := string(b)
-	builtins := evaluator.BuiltinDecls()
+	builtins := abi.BuiltinDecls()
 	prog, err := parser.Parse(in, builtins)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))
@@ -255,7 +256,7 @@ func (c *parseCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	builtins := evaluator.BuiltinDecls()
+	builtins := abi.BuiltinDecls()
 	ast, err := parser.Parse(string(b), builtins)
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))

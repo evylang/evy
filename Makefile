@@ -141,7 +141,7 @@ define PLAYWRIGHT_CMD
 	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
 endef
 
-PLAYWRIGHT_IMG = mcr.microsoft.com/playwright:v1.40.0-jammy
+PLAYWRIGHT_IMG = mcr.microsoft.com/playwright:v1.41.1-jammy
 PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
   --network host --add-host=host.docker.internal:host-gateway \

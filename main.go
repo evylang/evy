@@ -105,7 +105,7 @@ const description = `
 evy is a tool for managing evy source code.
 `
 
-type config struct {
+type app struct {
 	Version kong.VersionFlag `short:"V" help:"Print version information"`
 	Run     runCmd           `cmd:"" help:"Run Evy program."`
 	Fmt     fmtCmd           `cmd:"" help:"Format Evy files."`
@@ -119,7 +119,7 @@ func main() {
 		kong.Description(description),
 		kong.Vars{"version": version},
 	}
-	kctx := kong.Parse(&config{}, kopts...)
+	kctx := kong.Parse(&app{}, kopts...)
 	kctx.FatalIfErrorf(kctx.Run())
 }
 

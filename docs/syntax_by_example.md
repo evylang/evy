@@ -1,4 +1,4 @@
-# Evy Syntax by Example
+# Syntax by Example
 
 The following examples will help you understand the syntax of Evy. For a
 more formal definition of the syntax, see the

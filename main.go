@@ -24,10 +24,10 @@
 //	    Format Evy files.
 //
 //	  serve export <dir>
-//	    Export embedded content
+//	    Export embedded content.
 //
 //	  serve start
-//	    Start server, default action, use as "evy serve"
+//	    Start web server, default for "evy serve".
 //
 //	Run "evy <command> --help" for more information on a command.
 //
@@ -151,8 +151,8 @@ type fmtCmd struct {
 }
 
 type serveCmd struct {
-	Export exportCmd `help:"Export embedded content" cmd:""`
-	Start  startCmd  `help:"Start server, default action, use as \"evy serve\"" cmd:"" default:"withargs"`
+	Export exportCmd `help:"Export embedded content." cmd:""`
+	Start  startCmd  `help:"Start web server, default for \"evy serve\"." cmd:"" default:"withargs"`
 }
 
 type exportCmd struct {

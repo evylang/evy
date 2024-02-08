@@ -1,0 +1,1549 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Language Specification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="./css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="./css/root.css" type="text/css" />
+    <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/index.css" type="text/css" />
+    <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <main class="max-width-wrapper">
+      <h1>Language Specification</h1>
+      <p>
+        Evy is a
+        <a href="https://developer.mozilla.org/en-US/docs/Glossary/Static_typing"
+          >statically typed</a
+        >,
+        <a href="https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)"
+          >garbage collected</a
+        >, <a href="https://en.wikipedia.org/wiki/Procedural_programming">procedural</a> programming
+        language. Its main design goal is to help learn programming. Evy aims for simplicity and
+        directness in its tooling and syntax. Several features typical of modern programming
+        languages are purposefully left out.
+      </p>
+      <p>
+        To get an intuitive understanding of Evy, you can either look at its
+        <a href="syntax_by_example.html">syntax by example</a> or read through the
+        <a href="builtins.html">built-ins documentation</a>.
+      </p>
+      <h4>Table of Contents</h4>
+      <!-- gen:toc -->
+      <ol>
+        <li>
+          <a href="#syntax-grammar"><strong>Syntax Grammar</strong></a
+          ><br />
+          <a href="#wsn-syntax-grammar">WSN Syntax Grammar</a>,
+          <a href="#evy-syntax-grammar">Evy Syntax Grammar</a>
+        </li>
+        <li>
+          <a href="#comments"><strong>Comments</strong></a>
+        </li>
+        <li>
+          <a href="#types"><strong>Types</strong></a>
+        </li>
+        <li>
+          <a href="#variables-and-declarations"><strong>Variables and Declarations</strong></a>
+        </li>
+        <li>
+          <a href="#zero-values"><strong>Zero Values</strong></a>
+        </li>
+        <li>
+          <a href="#assignments"><strong>Assignments</strong></a>
+        </li>
+        <li>
+          <a href="#copy-and-reference"><strong>Copy and Reference</strong></a>
+        </li>
+        <li>
+          <a href="#variable-names"><strong>Variable Names</strong></a>
+        </li>
+        <li>
+          <a href="#scope"><strong>Scope</strong></a>
+        </li>
+        <li>
+          <a href="#strings"><strong>Strings</strong></a>
+        </li>
+        <li>
+          <a href="#arrays"><strong>Arrays</strong></a>
+        </li>
+        <li>
+          <a href="#maps"><strong>Maps</strong></a>
+        </li>
+        <li>
+          <a href="#index-and-slice"><strong>Index and Slice</strong></a>
+        </li>
+        <li>
+          <a href="#operators-and-expressions"><strong>Operators and Expressions</strong></a
+          ><br />
+          <a href="#arithmetic-and-concatenation-operators"
+            >Arithmetic and Concatenation Operators</a
+          >, <a href="#logical-operators">Logical Operators</a>,
+          <a href="#comparison-operators">Comparison Operators</a>,
+          <a href="#unary-operators">Unary Operators</a>
+        </li>
+        <li>
+          <a href="#precedence"><strong>Precedence</strong></a>
+        </li>
+        <li>
+          <a href="#statements"><strong>Statements</strong></a>
+        </li>
+        <li>
+          <a href="#whitespace"><strong>Whitespace</strong></a
+          ><br />
+          <a href="#vertical-whitespace">Vertical Whitespace</a>
+        </li>
+        <li>
+          <a href="#horizontal-whitespace"><strong>Horizontal Whitespace</strong></a>
+        </li>
+        <li>
+          <a href="#functions"><strong>Functions</strong></a
+          ><br />
+          <a href="#bare-returns">Bare Returns</a>, <a href="#function-names">Function Names</a>,
+          <a href="#anonymous-parameters">Anonymous Parameters</a>,
+          <a href="#variadic-functions">Variadic Functions</a>
+        </li>
+        <li>
+          <a href="#break-and-return"><strong>Break and Return</strong></a>
+        </li>
+        <li>
+          <a href="#typeof"><strong>Typeof</strong></a>
+        </li>
+        <li>
+          <a href="#type-assertion"><strong>Type Assertion</strong></a>
+        </li>
+        <li>
+          <a href="#assignability"><strong>Assignability</strong></a
+          ><br />
+          <a href="#assignability-of-variable-values">Assignability of variable values</a>,
+          <a href="#assignability-of-constant-values">Assignability of constant values</a>,
+          <a href="#assignability-of-empty-composite-literals"
+            >Assignability of empty composite literals</a
+          >
+        </li>
+        <li>
+          <a href="#run-time-panics-and-recoverable-errors"
+            ><strong>Run-time Panics and Recoverable Errors</strong></a
+          >
+        </li>
+        <li>
+          <a href="#execution-model-and-event-handlers"
+            ><strong>Execution Model and Event Handlers</strong></a
+          >
+        </li>
+        <li>
+          <a href="#runtimes"><strong>Runtimes</strong></a>
+        </li>
+      </ol>
+      <!-- genend:toc -->
+      <h2>Syntax Grammar</h2>
+      <p>
+        The Evy syntax grammar is a
+        <a href="https://en.wikipedia.org/wiki/Wirth_syntax_notation">WSN</a> grammar, which is a
+        formal set of rules that define how Evy programs are written. The Evy interpreter uses the
+        syntax grammar to parse Evy source code, which means that it checks that the code follows
+        the rules of the grammar.
+      </p>
+      <h3>WSN Syntax Grammar</h3>
+      <p>
+        Evy's syntax is specified using a WSN grammar, a variant of
+        <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">EBNF</a> grammars,
+        borrowing concepts from the
+        <a href="https://go.dev/ref/spec">Go Programming Language Specification</a>.
+      </p>
+      <p>
+        <strong>Productions</strong> are the top-level elements of a WSN grammar. For example, the
+        production
+        <code>OPERATOR = &quot;+&quot; | &quot;-&quot; | &quot;*&quot; | &quot;/&quot; .</code>
+        specifies that an operator can be one of the characters <code>+</code>, <code>-</code>,
+        <code>*</code>, or <code>/</code>.
+      </p>
+      <p>
+        A production consists of an <strong>expression</strong> assigned to an
+        <strong>identifier</strong> or production name. Each production is terminated by a period
+        <code>.</code>. An expression consists of <strong>terms</strong> and the following
+        <strong>operators</strong> in increasing precedence:
+      </p>
+      <ul>
+        <li>
+          <strong>Alternation:</strong> <code>|</code> stands for &quot;or&quot;. For example,
+          <code>a | b</code> stands for <code>a</code> or <code>b</code>.
+        </li>
+        <li>
+          <strong>Grouping:</strong> <code>()</code> stands for grouping. For example,
+          <code>(a|b)c</code> stands for <code>ac</code> or <code>bc</code>.
+        </li>
+        <li>
+          <strong>Optionality:</strong> <code>[]</code> stands for optionality. For example,
+          <code>[a]b</code> stands for <code>ab</code> or <code>b</code>.
+        </li>
+        <li>
+          <strong>Repetition:</strong> <code>{}</code> stands for repetition. For example,
+          <code>{a}</code> stands for the empty string, <code>a</code>, <code>aa</code>,
+          <code>aaa</code>, ...&quot;.
+        </li>
+      </ul>
+      <p>
+        <code>a … b</code> stands for a range of single characters from <code>a</code> to
+        <code>b</code>, inclusive.
+      </p>
+      <p>Here is a WSN defining itself:</p>
+      <pre><code>syntax     = { production } .
+production = identifier &quot;=&quot; expression &quot;.&quot; .
+expression = terms { &quot;|&quot; terms } .
+terms      = term { term } .
+term       = identifier |
+             literal |
+             &quot;[&quot; expression &quot;]&quot; |
+             &quot;(&quot; expression &quot;)&quot; |
+             &quot;{&quot; expression &quot;}&quot; .
+identifier = LETTER { LETTER } .
+literal    = &quot;&quot;&quot; CHARACTER { CHARACTER } &quot;&quot;&quot; . /* &quot;&quot;&quot;&quot; is a literal `&quot;` */
+LETTER     = &quot;a&quot; … &quot;z&quot; | &quot;A&quot; … &quot;Z&quot; | &quot;_&quot; .
+CHARACTER  = /* an arbitrary Unicode code point */ .
+</code></pre>
+      <p>
+        <strong>Terminals</strong> are the leaves in the grammar that cannot be expanded further. By
+        convention, terminals are identified by production names in uppercase.
+      </p>
+      <p>
+        <strong>Non-terminals</strong>, on the other hand, can be expanded into other productions.
+        This means that they can be replaced by a more complex expression. By convention,
+        non-terminals are identified by production names in lowercase.
+      </p>
+      <p>
+        <strong>Literals</strong> or lexical tokens are enclosed in double quotes
+        <code>&quot;&quot;</code>. Comments are fenced by <code>/*</code> … <code>*/</code>.
+      </p>
+      <p>
+        There are two special fencing tokens in Evy's grammar related to
+        <strong>horizontal whitespace</strong>, <code>&lt;-</code> … <code>-&gt;</code> and
+        <code>&lt;+</code> … <code>+&gt;</code>. <code>&lt;-</code> … <code>-&gt;</code> means no
+        horizontal whitespace is allowed between the terminals of the enclosed expression, e.g.
+        <code>3+5</code> inside <code>&lt;-</code> … <code>-&gt;</code> is allowed, but
+        <code>3 + 5</code> is not. The fencing tokens <code>&lt;+</code> … <code>+&gt;</code> are
+        the default and mean horizontal whitespace is allowed (again) between terminals.
+      </p>
+      <p>See the section on <a href="#whitespace">whitespace</a> for further details.</p>
+      <h3>Evy Syntax Grammar</h3>
+      <p>
+        Evy source code is UTF-8 encoded, which means that it can contain any Unicode character. The
+        NUL character <code>U+0000</code> is not allowed, as it is a special character that is used
+        during compilation.
+      </p>
+      <p>
+        The <code>WS</code> abbreviation in the grammar comments below refers to horizontal
+        whitespace, which is any combination of spaces and tabs. The following listing contains the
+        complete syntax grammar for Evy.
+      </p>
+      <pre><code>program    = { statement | func | event_handler | nl } eof .
+statements = { nl } statement { statement | nl } .
+statement  = typed_decl_stmt | inferred_decl_stmt |
+             assign_stmt |
+             func_call_stmt |
+             return_stmt | break_stmt |
+             if_stmt | while_stmt | for_stmt .
+
+/* --- Functions and Event handlers ---- */
+func            = &quot;func&quot; ident func_signature nl
+                      statements
+                  &quot;end&quot; nl .
+func_signature  = [ &quot;:&quot; type ] params .
+params          = { typed_decl } | variadic_param .
+variadic_param  = typed_decl &quot;...&quot; .
+
+event_handler   = &quot;on&quot; ident params nl
+                      statements
+                  &quot;end&quot; nl .
+
+/* --- Control flow --- */
+if_stmt         = &quot;if&quot; toplevel_expr nl
+                        statements
+                  { &quot;else&quot; &quot;if&quot; toplevel_expr nl
+                        statements }
+                  [ &quot;else&quot; nl
+                        statements ]
+                  &quot;end&quot; nl .
+
+while_stmt      = &quot;while&quot; toplevel_expr nl
+                      statements
+                  &quot;end&quot; nl .
+
+for_stmt   = &quot;for&quot; range nl
+                  statements
+             &quot;end&quot; nl .
+range      = [ ident &quot;:=&quot; ] &quot;range&quot; range_args .
+range_args = &lt;- expr -&gt; [ &lt;- expr -&gt; [ &lt;- expr -&gt; ] ] .
+
+return_stmt = &quot;return&quot; [ toplevel_expr ]  nl .
+break_stmt  = &quot;break&quot; nl .
+
+/* --- Statement ---- */
+assign_stmt        = target &quot;=&quot; toplevel_expr nl .
+typed_decl_stmt    = typed_decl nl .
+inferred_decl_stmt = ident &quot;:=&quot; toplevel_expr nl .
+func_call_stmt     = func_call nl .
+
+/* --- Assignment --- */
+target         = &lt;- ident | index_expr | dot_expr -&gt; . /* no WS before `[` and around `.` */
+ident          = LETTER { LETTER | UNICODE_DIGIT } .
+index_expr     = target &quot;[&quot; &lt;+ toplevel_expr +&gt; &quot;]&quot; .
+dot_expr       = target &quot;.&quot; ident .
+
+/* --- Type --- */
+typed_decl     = ident &quot;:&quot; type .
+type           = BASIC_TYPE | DYNAMIC_TYPE | composite_type .
+BASIC_TYPE     = &quot;num&quot; | &quot;string&quot; | &quot;bool&quot; .
+DYNAMIC_TYPE   = &quot;any&quot; .
+composite_type = array_type | map_type .
+array_type     = &quot;[&quot; &quot;]&quot; type .
+map_type       = &quot;{&quot; &quot;}&quot; type .
+
+/* --- Expressions --- */
+toplevel_expr = func_call | expr .
+
+func_call = ident args .
+args      = { tight_expr } . /* no WS within single arg, WS is arg separator */
+
+tight_expr = &lt;- expr -&gt; . /* no WS allowed unless within `(…)`, `[…]`, or `{…}` */
+expr       = operand | unary_expr | binary_expr .
+
+operand    = literal | target | slice | type_assertion | group_expr .
+group_expr = &quot;(&quot; &lt;+ toplevel_expr +&gt; &quot;)&quot; . /* WS can be used freely within `(…)` */
+type_assertion = &lt;- target &quot;.(&quot; -&gt; type &quot;)&quot; . /* no WS around `.` */
+
+unary_expr = &lt;- UNARY_OP -&gt; expr .  /* no WS after UNARY_OP */
+UNARY_OP   = &quot;-&quot; | &quot;!&quot; .
+
+binary_expr   = expr binary_op expr .
+binary_op     = LOGICAL_OP | COMPARISON_OP | ADD_OP | MUL_OP .
+LOGICAL_OP    = &quot;or&quot; | &quot;and&quot; .
+COMPARISON_OP = &quot;==&quot; | &quot;!=&quot; | &quot;&lt;&quot; | &quot;&lt;=&quot; | &quot;&gt;&quot; | &quot;&gt;=&quot; .
+ADD_OP        = &quot;+&quot; | &quot;-&quot; .
+MUL_OP        = &quot;*&quot; | &quot;/&quot; | &quot;%&quot; .
+
+/* --- Slice and Literals --- */
+slice       = &lt;- target &quot;[&quot; slice_expr &quot;]&quot; -&gt; .
+slice_expr  = &lt;+ [expr] &quot;:&quot; [expr] +&gt; .
+literal     = num_lit | string_lit | BOOL_CONST | array_lit | map_lit .
+num_lit     = DECIMAL_DIGIT { DECIMAL_DIGIT } |
+              DECIMAL_DIGIT { DECIMAL_DIGIT } &quot;.&quot; { DECIMAL_DIGIT } .
+string_lit  = &quot;&quot;&quot; { UNICODE_CHAR } &quot;&quot;&quot; .
+BOOL_CONST  = &quot;true&quot; | &quot;false&quot; .
+array_lit   = &quot;[&quot; &lt;+ array_elems +&gt; &quot;]&quot; . /* WS can be used freely within `[…]`, but not inside the elements */
+array_elems = { tight_expr [nl] } .
+map_lit     = &quot;{&quot; &lt;+ map_elems +&gt; &quot;}&quot; . /* WS can be used freely within `{…}`, but not inside the values */
+map_elems   = { ident &quot;:&quot; tight_expr [nl] } .
+nl          = [ comment ] NL .
+eof         = [ comment ] EOF .
+comment     = &quot;//&quot; { UNICODE_CHAR } .
+
+/* --- Terminals --- */
+LETTER         = UNICODE_LETTER | &quot;_&quot; .
+UNICODE_LETTER = /* a Unicode code point categorized as &quot;Letter&quot; (category L) */ .
+UNICODE_DIGIT  = /* a Unicode code point categorized as &quot;Number, decimal digit&quot; */ .
+UNICODE_CHAR   = /* an arbitrary Unicode code point except newline */ .
+DECIMAL_DIGIT  = &quot;0&quot; … &quot;9&quot; .
+NL             = &quot;\n&quot;  . /* end of file */
+EOF            = &quot;&quot; . /* end of file */
+</code></pre>
+      <h2>Comments</h2>
+      <p>
+        There is only one type of comment, the line comment which starts with <code>//</code> and
+        stops at the end of the line. Line comments cannot start inside string literals.
+      </p>
+      <h2>Types</h2>
+      <p>
+        Evy has a static <strong>type system</strong> where the types of variables, parameters and
+        expressions are known at parse time. This means that the parser can check for type errors
+        before the program is run.
+      </p>
+      <p>
+        There are three <strong>basic types</strong>: <code>num</code>, <code>string</code> and
+        <code>bool</code> as well as two <strong>composite types</strong>: arrays
+        <code>[]</code> and maps <code>{}</code>. The <strong>dynamic</strong> type
+        <code>any</code> can hold any of the previously listed types.
+      </p>
+      <p>
+        Composite types can nest further composite types, for example <code>[]{}string</code> is an
+        array of maps with string values.
+      </p>
+      <p>A <code>bool</code> value is either <code>true</code> or <code>false</code>.</p>
+      <p>
+        A number value can be expressed as integer <code>1234</code> or decimal <code>56.78</code>.
+        Internally a number is represented as a
+        <a href="https://en.wikipedia.org/wiki/Double-precision_floating-point_format"
+          >double-precision floating-point number</a
+        >
+        according to the IEEE-754 64-bit floating point standard.
+      </p>
+      <h2>Variables and Declarations</h2>
+      <p>
+        Variables hold values of a specific type. They must be <strong>declared</strong> before they
+        can be used. A declared variable must be used at least once, meaning it must be used in the
+        right hand side of an assignment or passed as an argument to a function call. There are two
+        types of variable declarations: inferred declarations and typed declarations.
+      </p>
+      <p>
+        <strong>Inferred declarations</strong> do not specify the type of the variable explicitly.
+        The type of the variable is inferred from the value that it is initialized to. For example,
+        the following code declares a variable <code>n</code> and initializes it to the value
+        <code>1</code>. The type of <code>n</code> is inferred to be <code>num</code>.
+      </p>
+      <pre><code>n := 1
+</code></pre>
+      <p>
+        <strong>Typed declarations</strong> explicitly specify the type of the variable. The
+        variable is initialized to the type's zero value. For example, the following code declares a
+        variable <code>s</code> of type <code>string</code> and initializes it to the empty string
+        <code>&quot;&quot;</code>.
+      </p>
+      <pre><code>s:string
+</code></pre>
+      <p>
+        <code>arr := []</code> infers an array of type any, <code>[]any</code>.
+        <code>map := {}</code> infers a map of type any, <code>{}any</code>. The strictest possible
+        type is inferred for composite types:
+      </p>
+      <pre><code class="language-evy">arr1 := [1 2 3] // []num
+arr2 := [1] + [] // []num
+print 1 (typeof arr1) (typeof arr2)
+
+arr3 := [1 &quot;a&quot;] // []any
+arr4 := [[1] [&quot;a&quot;]] // [][]any
+arr5 := [] // []any
+print 2 (typeof arr3) (typeof arr4) (typeof arr5)
+
+map1 := {} // {}any
+map2 := {age:10} // {}num
+print 3 (typeof map1) (typeof map2)
+</code></pre>
+      <p>
+        The <a href="#typeof"><code>typeof</code></a> function returns the type as string
+        representation, so the code above outputs:
+      </p>
+      <pre><code class="language-evy:output">1 []num []num
+2 []any [][]any []any
+3 {}any {}num
+</code></pre>
+      <h2>Zero Values</h2>
+      <p>
+        Variables declared via typed declaration are initialized to the zero value of their type:
+      </p>
+      <ul>
+        <li>Number: <code>0</code></li>
+        <li>String: <code>&quot;&quot;</code></li>
+        <li>Boolean: <code>false</code></li>
+        <li>Any: <code>false</code></li>
+        <li>Array: <code>[]</code></li>
+        <li>Map: <code>{}</code></li>
+      </ul>
+      <p>
+        The empty array becomes <code>[]any</code> in inferred declarations. Otherwise the empty
+        array literal assumes the array type <code>[]TYPE</code> required by the assigned variable
+        or parameter. For example, the following code
+      </p>
+      <pre><code class="language-evy">arr:[]num
+print 1 arr (typeof arr)
+arr = []
+print 2 arr (typeof arr)
+print 3 (typeof [])
+</code></pre>
+      <p>generates the output</p>
+      <pre><code class="language-evy:output">1 [] []num
+2 [] []num
+3 []any
+</code></pre>
+      <p>
+        Similarly, the empty map literal becomes <code>{}any</code> in inferred declarations.
+        Otherwise the empty map literal assumes the map type <code>{}TYPE</code> required.
+      </p>
+      <h2>Assignments</h2>
+      <p>
+        Assignments are defined by an equal sign <code>=</code>. The left-hand side of the
+        <code>=</code> must contain an <strong>assignment target</strong>, a variable, an indexed
+        array, or a map field. The assignment target must be declared before the assignment, either
+        implicitly via type inference or explicitly via a type declaration. It can also be a
+        parameter of a function or event handler definition.
+        <a href="#assignability">Assignability</a> provides rules on which value types can be
+        assigned to which target types.
+      </p>
+      <p>
+        For example, the following code declares a string variable named <code>s</code> and
+        initializes it to the value <code>&quot;a&quot;</code> through inference. Then, it assigns
+        the value <code>&quot;b&quot;</code> to <code>s</code>. Finally, it tries to assign the
+        value <code>100</code> to <code>s</code>, which will cause a parse error because
+        <code>s</code> is a string variable and <code>100</code> is a number.
+      </p>
+      <pre><code class="language-evy">s := &quot;a&quot;
+print 1 s
+s = &quot;b&quot;
+print 2 s
+// s = 100 // parse error, wrong type
+</code></pre>
+      <p>Output</p>
+      <pre><code class="language-evy:output">1 a
+2 b
+</code></pre>
+      <h2>Copy and Reference</h2>
+      <p>
+        When a variable of a basic type <code>num</code>, <code>string</code>, or
+        <code>bool</code> is the value of an assignment, a <strong>copy</strong> of its value is
+        made. A copy is also made when a variable of a basic type is used as the value in an
+        inferred declaration or passed as an argument to a function.
+      </p>
+      <pre><code class="language-evy">a := 1
+b := a
+print a b
+a = 2 // `b` keeps its initial value
+print a b
+</code></pre>
+      <p>generates the output</p>
+      <pre><code class="language-evy:output">1 1
+2 1
+</code></pre>
+      <p>
+        By contrast, composite types - maps and arrays - are
+        <strong>passed by reference</strong> and no copy is made. Modifying the contents of an array
+        referenced by one variable also modifies the contents of the array referenced by another
+        variable. This is also true for argument passing and inferred declarations:
+      </p>
+      <pre><code class="language-evy">a := [1]
+b := a
+print a b
+a[0] = 2 // the value of `b` is also updated
+print a b
+</code></pre>
+      <p>generates the output</p>
+      <pre><code class="language-evy:output">[1] [1]
+[2] [2]
+</code></pre>
+      <p>
+        For the dynamic type <code>any</code>, a copy is made if the value is a basic type. The
+        variable is passed by reference if the value is a composite type.
+      </p>
+      <h2>Variable Names</h2>
+      <p>
+        Variable names in Evy must start with a letter or underscore, and can contain any
+        combination of letters, numbers, and underscores. They cannot be the same as keywords, such
+        as <code>if</code>, <code>func</code>, or any built-in or defined function names.
+      </p>
+      <h2>Scope</h2>
+      <p><strong>Scope</strong> refers to the visibility of a variable or function.</p>
+      <p>
+        Functions can only be defined at the top level of the program, known as
+        <strong>global scope</strong>. A function does not have to be defined before it can be
+        called; it can also be defined afterwards. This allows for
+        <a href="https://en.wikipedia.org/wiki/Mutual_recursion">mutual recursion</a>, where
+        function <code>a</code> calls function <code>b</code> and function <code>b</code> calls
+        function <code>a</code>.
+      </p>
+      <p>
+        Variables, by contrast, must be declared and given an unchangeable type before they can be
+        used. Variables can be declared at the top level of the program, at
+        <strong>global scope</strong>, or within a block-statement, at <em>block scope</em>.
+      </p>
+      <p>
+        A <strong>block-statement</strong> is a block of statements that ends with the keyword
+        <code>end</code>. A function's parameter declaration and the function body following the
+        line starting with <code>func</code> is a block-statement. The statements between
+        <code>if</code> and <code>else</code> are a block. The statements between
+        <code>while</code>/<code>for</code>/<code>else</code> and <code>end</code> are a block.
+        Blocks can be nested within other blocks.
+      </p>
+      <p>
+        A variable declared inside a block only exists until the end of the block. It cannot be used
+        outside the block.
+      </p>
+      <p>
+        Variable names in an inner block can <strong>shadow</strong> or override the same variable
+        name from an outer block, which makes the variable of the outer block inaccessible to the
+        inner block. However, when the inner block is finished, the variable from the outer block is
+        restored and unchanged:
+      </p>
+      <pre><code class="language-evy">x := &quot;outer&quot;
+print 1 x
+for range 1
+    x := true
+    print 2 x
+end
+print 3 x
+</code></pre>
+      <p>This program will print</p>
+      <pre><code class="language-evy:output">1 outer
+2 true
+3 outer
+</code></pre>
+      <h2>Strings</h2>
+      <p>
+        A <strong>string</strong> is a sequence of
+        <a href="https://en.wikipedia.org/wiki/Unicode">Unicode code points</a>. Unicode is a
+        standard that defines a unique code point for every character in every language. This means
+        that a string can contain characters from any language, including English, French, Spanish,
+        Chinese, Japanese, and Korean.
+      </p>
+      <p>
+        A <strong>string literal</strong> is a sequence of characters enclosed by double quotes. The
+        characters in a string literal are interpreted as Unicode code points. This means that a
+        string literal can contain any character that has a Unicode code point, including letters,
+        numbers, punctuation marks, and emojis.
+      </p>
+      <p>
+        The example code <code>str := &quot;Hallöchen Welt 👋🌍&quot;</code> defines a string
+        variable <code>str</code> and initializes it with a string literal that contains the German
+        words &quot;Hallöchen Welt&quot; and the emojis &quot;👋🌍&quot;.
+      </p>
+      <p>
+        The <code>len str</code> function returns the number of Unicode code points, or
+        <strong>characters</strong>, in the string. The loop
+        <code>for ch := range str</code> iterates over all characters of the string. Individual
+        characters of a string can be read by index, starting at <code>0</code>. Strings can be
+        concatenated with the <code>+</code> operator.
+      </p>
+      <p>
+        The backslash character <code>\</code> can be used to represent special characters in
+        strings. For example, the <code>\t</code> escape sequence represents a tab character, and
+        the <code>\n</code> escape sequence represents a newline character. Quotes in string
+        literals must also be escaped with backslashes. To print a backslash character, use
+        <code>\\</code>.
+      </p>
+      <p>For example the following code</p>
+      <pre><code class="language-evy">str := &quot;hello&quot;
+str = str + &quot;, &quot; + str // hello, hello
+str = &quot;H&quot; + str[1:] // Hello, hello
+str = &quot;She said, \&quot;&quot; + str + &quot;!\&quot;&quot;
+print str
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">She said, &quot;Hello, hello!&quot;
+</code></pre>
+      <h2>Arrays</h2>
+      <p>
+        <strong>Arrays</strong> are collections of elements that have the same type. They are
+        declared with brackets <code>[]</code>, and the elements are separated by a space. For
+        example, the following code declares two arrays of numbers
+      </p>
+      <pre><code class="language-evy">arr1 := [1 2 3]
+arr2:[]num
+print arr1 arr2
+</code></pre>
+      <p>The output is</p>
+      <pre><code class="language-evy:output">[1 2 3] []
+</code></pre>
+      <p>
+        Arrays can also be nested, meaning that they can contain other arrays or maps. For example,
+        the following code declares an array of maps of strings <code>arr:[]{}string</code>.
+      </p>
+      <p>
+        An array composed of different types becomes an array of type any, <code>[]any</code>, for
+        example
+      </p>
+      <pre><code class="language-evy">arr := [&quot;abc&quot; 123] // []any
+print &quot;Type of arr:&quot; (typeof arr)
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">Type of arr: []any
+</code></pre>
+      <p>
+        The function <code>len arr</code> returns the length of the array, which is the number of
+        elements in the array. The loop <code>for el := range arr</code> iterates over all elements
+        of the array in order. Arrays can be concatenated with the <code>+</code> operator, for
+        example <code>arr2 := arr + arr</code>.
+      </p>
+      <p>
+        The elements of an array can be accessed via index starting at <code>0</code>. In the
+        example <code>arr := [&quot;abc&quot; 123]</code> the first element in the array
+        <code>arr[0]</code> is <code>&quot;abc&quot;</code>.
+      </p>
+      <p>
+        The empty array becomes <code>[]any</code> in inferred declarations, otherwise the empty
+        array literal assumes the array type required by the assigned variable or parameter.
+        <code>arr:[]any</code> and <code>arr := []</code> are equivalent.
+      </p>
+      <p>
+        In order to distinguish between array literals and array indices, there cannot be any
+        whitespace between array variable and index. For example, the following code
+      </p>
+      <pre><code class="language-evy">arr := [&quot;a&quot; &quot;b&quot;]
+print 1 arr[1] // index
+print 2 arr [1] // literal
+arr[0] = &quot;A&quot;
+print 3 arr
+// arr [1] = &quot;B&quot; // whitespace before `[` is invalid
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">1 b
+2 [a b] [1]
+3 [A b]
+</code></pre>
+      <h2>Maps</h2>
+      <p>
+        <strong>Maps</strong> are key-value stores, where the values can be looked up by their key,
+        for example <code>map := { key1:&quot;value1&quot; key2:&quot;value2&quot; }</code>.
+      </p>
+      <p>
+        Map values can be accessed with the dot expression, for example <code>map.key1</code>. If
+        maps are accessed via the dot expression the key must match the grammars
+        <code>ident</code> production. Map values can also be accessed with an index expression
+        which allows for evaluation, non-ident keys and variable usage. For example the following
+        code
+      </p>
+      <pre><code class="language-evy">m := {letters:&quot;abc&quot;}
+print 1 m.letters
+print 2 m[&quot;letters&quot;]
+
+key := &quot;German letters&quot;
+m[key] = &quot;äöü&quot;
+print 3 m[key]
+print 4 m[&quot;German letters&quot;]
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">1 abc
+2 abc
+3 äöü
+4 äöü
+</code></pre>
+      <p>
+        The <code>has</code> function tests for the existence of a key in a map. The following code
+      </p>
+      <pre><code class="language-evy">m := {letters:&quot;abc&quot;}
+print 1 (has m &quot;letters&quot;)
+print 2 (has m &quot;digits&quot;)
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">1 true
+2 false
+</code></pre>
+      <p>
+        The <code>del</code> function deletes a key from a map if it exists and does nothing if the
+        key does not exist. The following code
+      </p>
+      <pre><code class="language-evy">m := {letters:&quot;abc&quot;}
+del m &quot;letters&quot;
+print m
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">{}
+</code></pre>
+      <p>
+        The loop <code>for key := range map</code> iterates over all map keys. It is safe to delete
+        values from the map with the built-in function <code>del</code> while iterating. The keys
+        are iterated in the order in which they are inserted. Any values inserted into the map
+        during the iteration will not be included in the iteration.
+      </p>
+      <p>The function <code>len m</code> returns the number of key-value pairs in the map.</p>
+      <p>
+        The empty map literal becomes <code>{}any</code> in inferred declarations, otherwise the
+        empty map literal assumes the type required by the map type of the assigned variable or
+        parameter. <code>m:{}any</code> and <code>m := {}</code> are equivalent.
+      </p>
+      <p>
+        No whitespace is allowed around the dot expression <code>.</code>, and before the index
+        expression <code>[</code>.
+      </p>
+      <h2>Index and Slice</h2>
+      <p>
+        An array or string <strong>index</strong> in Evy is a number that is used to access a
+        specific element of an array or character of a string. Array indices start at
+        <code>0</code>, so the first element of an array is <code>arr[0]</code>. A negative index
+        <code>-i</code> is a shorthand for <code>(len arr) - i</code>, so
+        <code>arr[-1]</code> refers to the last element of arr.
+      </p>
+      <p>For example, the following code</p>
+      <pre><code class="language-evy">arr := [&quot;a&quot; &quot;b&quot; &quot;c&quot;]
+print 1 arr[0]
+print 2 arr[-1]
+</code></pre>
+      <p>will print the first and last elements of the array</p>
+      <pre><code class="language-evy:output">1 a
+2 c
+</code></pre>
+      <p>
+        A <strong>slice</strong> is a way to access portions of an array or a string. It is a
+        substring or subarray that is copied from the original array or string. The slice expression
+        <code>arr[start:end]</code> copies a substring or subarray starting with the value at index
+        <code>arr[start]</code>. The length of the slice is <code>end-start</code>. The end index
+        <code>arr[end]</code> is not included in the slice. If <code>start</code> is left out, it
+        defaults to <code>0</code>. If <code>end</code> is left out, it defaults to
+        <code>len arr</code>. For example, the following code
+      </p>
+      <pre><code class="language-evy">s := &quot;abcd&quot;
+print 1 s[1:3]
+print 2 s[:2]
+print 3 s[2:]
+print 4 s[:]
+print 5 s[:-1]
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">1 bc
+2 ab
+3 cd
+4 abcd
+5 abc
+</code></pre>
+      <p>
+        If you try to access an element of an array or string that is out of bounds, a
+        <a href="#run-time-panics-and-recoverable-errors">runtime panic</a> will occur. Slice
+        expressions must not be preceded by whitespace before the <code>[</code> character, just
+        like indexing an array or string. For more details, see the section on
+        <a href="#whitespace">whitespace</a>.
+      </p>
+      <h2>Operators and Expressions</h2>
+      <p>
+        <strong>Operators</strong> are special symbols or identifiers that combine the values of
+        their operands into a single value. <strong>Operands</strong> are the variables or literal
+        values that the operator acts on. The combination of operands and operators is called
+        expression. An <strong>expression</strong> is a combination of literal values, operators,
+        variables, and further nested expressions that evaluates to a single value.
+      </p>
+      <p>In Evy, there are two types of operators: unary operators and binary operators:</p>
+      <ul>
+        <li>
+          <strong>Unary operators</strong> act on a single operand. For example, the unary operator
+          <code>-</code> negates the value of its operand.
+        </li>
+        <li>
+          <strong>Binary operators</strong> act on two operands. For example, the binary operator
+          <code>+</code> adds the two operands together.
+        </li>
+      </ul>
+      <p>
+        Operators can be combined to form larger expressions, for example, the expression
+        <code>-delta + 3</code> would first negate the value of the variable <code>delta</code> and
+        then add literal number <code>3</code> to the result.
+      </p>
+      <p>
+        Binary expressions can only be evaluated if the operands are of the same type. For example,
+        you cannot add a string to a number. There is no automated type conversion of operands.
+      </p>
+      <p>
+        There are a variety of binary operators: arithmetic, concatenation, logical, and comparison
+        operators.
+      </p>
+      <p>
+        | Operator | Operands | Result | Description | | ------------------- | --------- | --------
+        | ------------- | | <code>+</code> <code>-</code> <code>*</code> <code>/</code>
+        <code>%</code> | <code>num</code> | <code>num</code> | arithmetic | | <code>+</code> |
+        <code>string</code> | <code>string</code> | concatenation | | <code>+</code> | array | array
+        | concatenation | | <code>and</code> <code>or</code> | <code>bool</code> |
+        <code>bool</code> | logical | | <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code>
+        <code>&gt;=</code> | <code>num</code> | <code>bool</code> | comparison | |
+        <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> |
+        <code>string</code> | <code>bool</code> | comparison | | <code>==</code> <code>!=</code> |
+        all types | <code>bool</code> | comparison |
+      </p>
+      <h3>Arithmetic and Concatenation Operators</h3>
+      <p>
+        The <strong>arithmetic operators</strong> <code>+</code>, <code>-</code>, <code>*</code>,
+        <code>/</code>, and <code>%</code> stand for addition, subtraction, multiplication,
+        division, and the
+        <a href="https://en.wikipedia.org/wiki/Modulo_operation">modulo operator</a>. The symbol
+        <code>+</code> can also be used to concatenate strings and arrays.
+      </p>
+      <p>
+        The <strong>modulo operator</strong> <code>%</code>, also known as the remainder operator,
+        returns the remainder of a division operation. For example, <code>10 % 3</code> results in
+        <code>1</code>, because <code>10</code> divided by <code>3</code> has a remainder of
+        <code>1</code>.
+      </p>
+      <p>
+        The <strong>concatenation operator</strong> <code>+</code>, combines two strings or two
+        arrays together. For example, <code>&quot;fire&quot;</code> +
+        <code>&quot;engine&quot;</code> combines into the string
+        <code>&quot;fireengine&quot;</code>.
+      </p>
+      <h3>Logical Operators</h3>
+      <p>
+        The <strong>logical operators</strong> <code>and</code> and <code>or</code> are used to
+        perform
+        <a href="https://en.wikipedia.org/wiki/Truth_table#Logical_conjunction_(AND)"
+          >logical conjunction</a
+        >
+        and
+        <a href="https://en.wikipedia.org/wiki/Truth_table#Logical_disjunction_(OR)"
+          >logical disjunction</a
+        >. They are used to perform logical operations on boolean values with type
+        <code>bool</code>.
+      </p>
+      <p>
+        The <code>and</code> operator evaluates to <code>true</code> if both operands are
+        <code>true</code>. The <code>or</code> operator evaluates to <code>true</code> if either
+        operand is <code>true</code>.
+      </p>
+      <p>
+        These operators perform
+        <a href="https://en.wikipedia.org/wiki/Short-circuit_evaluation">short-circuit evaluation</a
+        >, which means that the right-hand side of the operator is not evaluated if the result of
+        the operation can be determined from the left-hand side alone.
+      </p>
+      <p>
+        For example, the expression <code>false and true</code> evaluates to
+        <code>false</code> because the first operand is <code>false</code>. The second operand does
+        not need to be evaluated because the result of the expression is already known to be
+        <code>false</code>.
+      </p>
+      <h3>Comparison Operators</h3>
+      <p>
+        The <strong>comparison operators</strong> <code>&lt;</code> <code>&lt;=</code>
+        <code>&gt;</code> <code>&gt;=</code> stand for less, less or equal, greater, greater or
+        equal. Their operands may be <code>num</code> or <code>string</code> values. For
+        <code>string</code> types
+        <a href="https://en.wikipedia.org/wiki/Lexicographic_order">lexicographical comparison</a>
+        is used.
+      </p>
+      <p>
+        The <strong>comparison operators</strong> <code>==</code> and <code>!=</code> compare two
+        operands of the same type for equality and inequality. The operands of these operators can
+        be basic types, such as numbers and strings, or composite types, such as arrays and maps.
+        The result of a comparison operation is the boolean value <code>true</code> or
+        <code>false</code>.
+      </p>
+      <h3>Unary Operators</h3>
+      <p>
+        <strong>Unary operators</strong> are operators that operate on a single operand. In Evy,
+        there are two unary operators: <code>-</code> and <code>!</code>.
+      </p>
+      <ul>
+        <li>
+          The unary operator <code>-</code> negates the value of a numeric operand. For example,
+          <code>-delta</code> negates the value of <code>delta</code>.
+        </li>
+        <li>
+          The unary operator <code>!</code> performs
+          <a href="https://en.wikipedia.org/wiki/Truth_table#Logical_negation">logical negation</a>
+          on a boolean operand. For example, <code>!true</code> evaluates to <code>false</code>.
+        </li>
+      </ul>
+      <p>
+        Unary operators must not be immediately followed by whitespace. For example, the
+        <code>-delta</code> is valid, but <code>- delta</code> is not.
+      </p>
+      <p>The following sample illustrates the care needed with operators and whitespace</p>
+      <pre><code class="language-evy">a := 10
+b := 3
+print 1 a-b
+print 2 (a - b)
+print 3 a -b
+// print a - b // parse error
+</code></pre>
+      <p>Output:</p>
+      <pre><code class="language-evy:output">1 7
+2 7
+3 10 -3
+</code></pre>
+      <p>
+        For more information about whitespace, see the <a href="#whitespace">whitespace</a> section.
+      </p>
+      <h2>Precedence</h2>
+      <p>
+        Operators in Evy are evaluated in a specific order, called <strong>precedence</strong>. The
+        order of precedence is as follows:
+      </p>
+      <ol>
+        <li>
+          Indexing, dot notation and grouped expressions: <code>a[i]</code> <code>a.b</code>
+          <code>(</code> … <code>)</code>
+        </li>
+        <li>Unary operators: <code>-delta</code> <code>!true</code></li>
+        <li>
+          Binary operators
+          <ol>
+            <li>
+              Multiplication, division, and modulo: <code>*</code> <code>/</code> <code>%</code>
+            </li>
+            <li>Addition and subtraction: <code>+</code> <code>-</code></li>
+            <li>
+              Comparison operators: <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code>
+              <code>&gt;=</code>
+            </li>
+            <li>Equality operators: <code>==</code> <code>!=</code></li>
+            <li>Logical conjunction: <code>and</code></li>
+            <li>Logical disjunction: <code>or</code></li>
+          </ol>
+        </li>
+      </ol>
+      <p>
+        Operators of the same precedence are evaluated from left to right. For example, the
+        expression <code>a[i] - 5 * 2</code> will be evaluated as follows:
+      </p>
+      <ul>
+        <li>The index <code>a[i]</code> will be evaluated first.</li>
+        <li>The multiplication <code>5 * 2</code> will be evaluated next.</li>
+        <li>The subtraction <code>- 5 * 2</code> will be evaluated last.</li>
+      </ul>
+      <p>
+        If you want to change the order of precedence, you can use parentheses to group expressions.
+        For example, the expression <code>(a[i] - 5) * 2</code> will be evaluated as follows:
+      </p>
+      <ul>
+        <li>The expression <code>a[i] - 5</code> will be evaluated first.</li>
+        <li>The multiplication <code>* 2</code> will be evaluated next.</li>
+      </ul>
+      <h2>Statements</h2>
+      <p>
+        A <strong>statement</strong> is a unit of code that performs an action. Statements are the
+        building blocks of programs, and they can be used to control the flow of execution.
+      </p>
+      <p>Statements can be divided into two categories: block statements and basic statements.</p>
+      <ul>
+        <li>
+          <strong>Basic statements</strong> are statements that cannot be broken down into further
+          statements.
+        </li>
+        <li><strong>Block statements</strong> are statements that contain further statements.</li>
+      </ul>
+      <p>There are 5 types of block statements in Evy:</p>
+      <ul>
+        <li>Function definition</li>
+        <li>Event Handler definitions</li>
+        <li>If statements</li>
+        <li>For statements</li>
+        <li>While statements</li>
+      </ul>
+      <p>There are 5 types of basic statements in Evy:</p>
+      <ul>
+        <li>Variable declaration statement</li>
+        <li>Assignment statement</li>
+        <li>Function call statement</li>
+        <li>Return statement</li>
+        <li>Break statement</li>
+      </ul>
+      <p>
+        Not all statements are allowed in all contexts. For example, a return statement may only be
+        used within a function definition.
+      </p>
+      <h2>Whitespace</h2>
+      <p>
+        Whitespace in Evy is used to separate different parts of a program. There are two types of
+        whitespace in Evy: vertical whitespace and horizontal whitespace.
+      </p>
+      <h3>Vertical Whitespace</h3>
+      <p>
+        Vertical whitespace is a sequence of one or more newline characters that can optionally
+        contain comments. It is used to terminate or end basic statements in Evy. A basic statement
+        is a statement that cannot be broken up into smaller statements, such as a variable
+        declaration, an assignment or a function call.
+      </p>
+      <p>
+        Evy does not allow multiple statements on a single line. For example, the following code is
+        invalid because it contains two statements, a declaration and a function call, on one line:
+      </p>
+      <p><code>x := 1 print x</code></p>
+      <p>
+        It is also not possible to break up a single basic statement over more than one line. For
+        example, the following code is invalid because the arithmetic expression
+        <code>1 + 2</code> is split over two lines:
+      </p>
+      <pre><code>x := 1 +
+     2
+</code></pre>
+      <p>
+        The rule that basic statements cannot be split across multiple lines has one exception:
+        Array literals and map literals can be broken up over multiple lines, as long as each line
+        is a complete expression. For example, the following code is valid because it is a
+        declaration with a multiline map literal:
+      </p>
+      <pre><code class="language-evy">person := {
+    name:&quot;Jane Goddall&quot;
+    born:1934
+}
+print person
+</code></pre>
+      <h2>Horizontal Whitespace</h2>
+      <p>
+        <strong>Horizontal whitespace</strong> is a sequence of tabs or spaces that is used to
+        separate elements in lists. Lists include the argument list to a function call, the element
+        list of an array literal, and the value in the key-value pairs of a map literal. However,
+        horizontal whitespace is not allowed <em>within</em> this list elements.
+      </p>
+      <p>
+        Horizontal whitespace is not allowed around the dot expression <code>.</code> or before the
+        opening brace <code>[</code> in an index expression or slice expression. However, it is
+        allowed <em>within</em> the grouping expression, index expression, and slice expression,
+        even if the expression is an element of a list such as an argument to a function call.
+      </p>
+      <p>
+        Assignments, inferred variable declarations, return statements and the the expression inside
+        an index expression <code>[ … ]</code> <em>can</em> have whitespace around their binary
+        operators. The whitespace around the operators is optional, but it is often used to improve
+        the readability of the code, for example:
+      </p>
+      <pre><code class="language-evy">x := 5 + 3
+x = 7 - 2
+
+arr := [1 2 3]
+arr[3 - 2] = 10
+
+func fn:num
+    return 7 + 1
+end
+
+print x arr (fn)
+</code></pre>
+      <p>
+        More formally, horizontal whitespace <code>WS</code> between tokens or terminals as defined
+        in the grammar is ignored and can be used freely with the addition of the following rules:
+      </p>
+      <ol>
+        <li><code>WS</code> is not allowed around dot <code>.</code> in dot expressions.</li>
+        <li>
+          <code>WS</code> is not allowed before the <code>[</code> in index or slice expressions.
+        </li>
+        <li>
+          <code>WS</code> is not allowed following the unary operators <code>-</code> and
+          <code>!</code>.
+        </li>
+        <li><code>WS</code> is not allowed within arguments to a function call</li>
+        <li><code>WS</code> is not allowed within elements of an array literal</li>
+        <li>
+          <code>WS</code> is not allowed within the values of a map literal's key-value pairs.
+        </li>
+        <li>
+          <code>WS</code> is allowed within any grouping expression <code>(</code> … <code>)</code>.
+        </li>
+        <li>
+          <code>WS</code> is allowed within an index expression <code>[</code> … <code>]</code>.
+        </li>
+        <li>
+          <code>WS</code> is allowed within a slice expression <code>[</code> … <code>:</code> …
+          <code>]</code>.
+        </li>
+      </ol>
+      <p>
+        Here are some examples of incorrect uses of horizontal whitespace, along with their correct
+        uses.
+      </p>
+      <p>Invalid:</p>
+      <pre><code>print - 5
+len &quot;a&quot; + &quot;b&quot;
+
+arr := [1 + 1]
+arr [0] = 3 + 2
+print 2 + arr [0]
+
+map := {address: &quot;10 Downing &quot; + &quot;Street&quot;}
+map.  address = &quot;221B Baker Street&quot;
+
+print len map
+</code></pre>
+      <p>Valid:</p>
+      <pre><code class="language-evy">print -5
+len &quot;a&quot;+&quot;b&quot;
+
+arr := [1+1]
+arr[0] = 3 + 2
+print 2+arr[0]
+
+map := {address:&quot;10 Downing &quot;+&quot;Street&quot;}
+map.address = &quot;221B Baker Street&quot;
+
+print (len map)
+</code></pre>
+      <h2>Functions</h2>
+      <p>
+        <strong>Functions</strong> are blocks of code that are used to perform a specific task. They
+        are often used to encapsulate code that is used repeatedly, so that it can be called from
+        different parts of a program.
+      </p>
+      <p>
+        A <strong>function definition</strong> binds an identifier, the function name, to a
+        function. As part of the function definition, the
+        <strong>function signature</strong> declares the number, order and types of input parameters
+        as well as the result or return type of the function. If the return type is left out, the
+        function does not return a value.
+      </p>
+      <p>
+        For example, the following code defines a function called <code>validate</code> that takes
+        two parameters, <code>s</code> and <code>maxl</code>, and returns a boolean result. The
+        <code>s</code> parameter is of type <code>string</code> and the <code>maxl</code> parameter
+        is of type <code>num</code>. The return type of the function is <code>bool</code>.
+      </p>
+      <pre><code class="language-evy">func validate:bool s:string maxl:num
+    return (len s) &lt;= maxl
+end
+</code></pre>
+      <h3>Bare Returns</h3>
+      <p>
+        <strong>Bare returns</strong> are return statements without values. They can be used in
+        functions without result type. For example, the following code defines a function called
+        <code>reverse</code> that takes a string array as an argument and does not return a value.
+        The return statement in the if statement simply exits the function early.
+      </p>
+      <pre><code class="language-evy">func reverse arr:[]string
+    if arr == []
+        return
+    end
+    // ...
+end
+</code></pre>
+      <p>
+        Function calls used as arguments to other function calls must be parenthesized to avoid
+        ambiguity, for example:
+      </p>
+      <pre><code class="language-evy">print &quot;length of abc:&quot; (len &quot;abc&quot;)
+</code></pre>
+      <p>Output</p>
+      <pre><code class="language-evy:out">length of abc: 3
+</code></pre>
+      <p>
+        Function names must be unique within an Evy program. This means that no two functions can
+        have the same name. Function names also cannot be the same as a variable name.
+      </p>
+      <h3>Function Names</h3>
+      <p>
+        Function names in Evy must start with a letter or underscore, and can contain any
+        combination of letters, numbers, and underscores. They cannot be the same as keywords, such
+        as <code>if</code>, <code>func</code>, or any built-in or other defined function names.
+      </p>
+      <h3>Anonymous Parameters</h3>
+      <p>
+        The anonymous parameter <code>_</code> is a special parameter in Evy that can be used as a
+        placeholder for a named parameter. It can be used for multiple parameters in a single
+        function, but it cannot be read. For example, the following code defines an event handler
+        for the pointer down event that only uses the <code>y</code> parameter:
+      </p>
+      <pre><code class="language-evy">on down _:num y:num
+    print &quot;y:&quot; (round y)
+end
+</code></pre>
+      <h3>Variadic Functions</h3>
+      <p>
+        <strong>Variadic functions</strong> in Evy are functions that can take zero or more
+        arguments of a specific type. The type of the variadic parameter is an array with the
+        element type of the parameter. The length of the array is the number of arguments passed to
+        the function.
+      </p>
+      <p>
+        For example, the following code defines a variadic function called <code>quote</code> that
+        can take any number of arguments of any type
+      </p>
+      <pre><code class="language-evy">func quote args:any...
+    words:[]string
+    for arg := range args
+        word := sprintf &quot;«%v»&quot; arg
+        words = words + [word]
+    end
+    print (join words &quot; &quot;)
+end
+
+quote &quot;Life, universe and everything?&quot; 42
+</code></pre>
+      <p>Output</p>
+      <pre><code class="language-evy:output">«Life, universe and everything?» «42»
+</code></pre>
+      <p>
+        Unlike other languages, arrays cannot be turned into variadic arguments in Evy. The call
+        arguments must be listed individually.
+      </p>
+      <h2>Break and Return</h2>
+      <p>
+        <code>break</code> and <code>return</code> are <strong>terminating statements</strong> in
+        Evy. They interrupt the regular flow of control.
+      </p>
+      <ul>
+        <li>
+          <code>break</code> is used to exit from the innermost loop body. This means that it will
+          skip the rest of the loop body and continue with the next statement after the loop.
+        </li>
+        <li>
+          <code>return</code> is used to exit from a function. It can be followed by an expression
+          whose value is returned by the function call.
+        </li>
+      </ul>
+      <p>
+        For example, the following code shows how the <code>break</code> statement can be used to
+        exit from a loop:
+      </p>
+      <pre><code class="language-evy">for x := range 2
+    y := 0
+    while y &lt; 10
+        if y == 2
+            print &quot;break&quot; y
+            break
+        end
+        print &quot;no break&quot; y
+        y = y + 1
+    end
+    print &quot;x&quot; x &quot;y&quot; y
+    print
+end
+</code></pre>
+      <p>This code will print the following output:</p>
+      <pre><code class="language-evy:output">no break 0
+no break 1
+break 2
+x 0 y 2
+
+no break 0
+no break 1
+break 2
+x 1 y 2
+
+</code></pre>
+      <p>
+        As you can see, the <code>break</code> statement causes the loop to exit when the value of
+        <code>y</code> is equal to 2. The next statement after the loop is then executed. Note how
+        <code>break</code> only exits the innermost loop.
+      </p>
+      <p>The following code shows how the return statement can be used to exit from a function:</p>
+      <pre><code class="language-evy">func foo:string
+    if (rand1) &lt; 0.7
+        return &quot;bar&quot;
+    else
+        return &quot;baz&quot;
+    end
+end
+</code></pre>
+      <p>
+        This code will return the value of <code>&quot;bar&quot;</code> 70% of the time and
+        <code>&quot;baz&quot;</code> otherwise. The names
+        <a href="https://en.wikipedia.org/wiki/Foobar">foo, bar, and baz</a> are common placeholder
+        names used in code.
+      </p>
+      <h2>Typeof</h2>
+      <p>
+        The <code>typeof</code> function returns the concrete type of a value held by a variable as
+        a string. It returns a string that is the same as the type in an Evy program, such as
+        <code>&quot;num&quot;</code>, <code>&quot;bool&quot;</code>,
+        <code>&quot;string&quot;</code>, <code>&quot;[]num&quot;</code>,
+        <code>&quot;{}[]any&quot;</code>, etc. It is particularly useful to determine the concrete
+        type of an <code>any</code> variable together with type assertions.
+      </p>
+      <p>Here is an example of how the <code>typeof</code> function works</p>
+      <pre><code class="language-evy">print (typeof &quot;abc&quot;)
+print (typeof true)
+print
+
+arr := [&quot;abc&quot; 1]
+print (typeof arr)
+print (typeof arr[0])
+print (typeof arr[1])
+</code></pre>
+      <p>The output of this code is</p>
+      <pre><code class="language-evy:output">string
+bool
+
+[]any
+string
+num
+</code></pre>
+      <p>
+        Empty composite literals, <code>[]</code> and <code>{}</code>, can be assigned to variables
+        or parameters of any subtype, such as <code>[]string</code> or <code>{}num</code>. This is
+        because empty composite literals are untyped, meaning that they can be matched to any
+        subtype.
+      </p>
+      <pre><code class="language-evy">func fn nums:[]num
+    print nums
+end
+
+fn []
+</code></pre>
+      <p>
+        The <code>typeof</code> functions will return <code>&quot;[]&quot;</code> or
+        <code>&quot;{}&quot;</code> for an empty composite literal.
+      </p>
+      <p>
+        An array literal, such as <code>[1 2 3]</code>, has a type of <code>[]num</code>. However,
+        it is possible to assign an array literal of any type to a variable of type
+        <code>[]any</code>. It is important to note that this only applies to array literals. A
+        variable of type <code>[]num</code> cannot be assigned to a variable of type
+        <code>[]any</code>.
+      </p>
+      <pre><code class="language-evy">x := [1 2 3]
+print &quot;x&quot; (typeof x)
+y:[]any
+y = [1 2 3]
+print &quot;y&quot; (typeof y)
+// y = x // parse error
+// x = y // parse error
+</code></pre>
+      <p>will output</p>
+      <pre><code class="language-evy:output">x []num
+y []any
+</code></pre>
+      <h2>Type Assertion</h2>
+      <p>
+        A type assertion <code>x.(TYPE)</code> asserts that the value of the variable
+        <code>x</code> is of the given <code>TYPE</code>. <code>TYPE</code> can be any basic or
+        composite type, such as <code>num</code> or <code>[]string</code>. If the assertion does not
+        hold, a <a href="#run-time-panics-and-recoverable-errors">run-time panic</a> occurs.
+      </p>
+      <pre><code class="language-evy">x:any
+x = [1 2 3 4]
+num_array := x.([]num)
+print &quot;typeof x:&quot; (typeof x)
+print &quot;typeof num_array&quot; (typeof num_array)
+print
+
+x = &quot;abc&quot;
+str := x.(string)
+print &quot;typeof x:&quot; (typeof x)
+print &quot;typeof str:&quot; (typeof str)
+</code></pre>
+      <p>Will generate the output</p>
+      <pre><code class="language-ev:output">typeof x: any
+typeof num_array: []num
+
+typeof x: any
+typeof str: string
+</code></pre>
+      <p>
+        Only values of type <code>any</code> can be type asserted. That means an array of type any,
+        <code>[]any</code>, <em>cannot</em> be type asserted to be an array of type
+        <code>[]num</code> or any other concrete type. However, the elements of an array of type
+        <code>[]any</code> can be type assert, for example <code>arr[0].(num)</code>,
+      </p>
+      <pre><code class="language-evy">x:[]any
+x = [1 2 3 true]
+x = [1 2 3]
+print &quot;x:&quot; x &quot;typeof x:&quot; (typeof x)
+// print x.([]num) // parse error
+// print x[0].(string) // run-time panic
+</code></pre>
+      <p>outputs</p>
+      <pre><code class="language-evy:output">x: [1 2 3] typeof x: []any
+</code></pre>
+      <h2>Assignability</h2>
+      <p>
+        <strong>Assignability</strong> determines whether a value of one type can be assigned to a
+        variable of another type. This means that the variable <em>accepts</em> the value.
+        Assignability rules apply to:
+      </p>
+      <ul>
+        <li>assignments</li>
+        <li>function parameters</li>
+        <li>return values</li>
+      </ul>
+      <p>
+        In the assignment <code>target = val</code>, <code>val</code> can be a variable, a constant,
+        or an expression. A <em>constant</em> is either a literal of type <code>num</code>,
+        <code>string</code>, or <code>bool</code>, or it is a composite literal that does not
+        contain any variables. For example, <code>[1 2 {}]</code> is a constant, but
+        <code>[1 2 x]</code> is not. If <code>val</code> in <code>target = val</code> is an
+        expression that only contains constants, it is treated like a constant; otherwise, it is
+        treated like a variable.
+      </p>
+      <h3>Assignability of variable values</h3>
+      <p>
+        If <code>target</code> is of type <code>t</code> and <code>val</code> is a
+        <em>variable</em> of type <code>t2</code>, <code>target</code> accepts <code>val</code> if:
+      </p>
+      <ul>
+        <li><code>t</code> and <code>t2</code> are identical, or</li>
+        <li><code>t</code> is of type <code>any</code></li>
+      </ul>
+      <h3>Assignability of constant values</h3>
+      <p>
+        If <code>target</code> is of type <code>t</code> and <code>val</code> is a
+        <em>constant</em> of type <code>t2</code>, <code>target</code> accepts <code>val</code> if:
+      </p>
+      <ul>
+        <li><code>t</code> and <code>t2</code> are identical, or</li>
+        <li><code>t</code> is of type <code>any</code>, or</li>
+        <li>
+          <code>t</code> is a composite with basic subtype <code>any</code> and <code>t2</code> can
+          be <strong>converted</strong> to it.
+        </li>
+      </ul>
+      <p>
+        A constant of type <code>t2</code> can be <strong>converted</strong> to type
+        <code>t</code> if both types are composite types of the same structure and the final subtype
+        of <code>t</code> is <code>any</code>. This means, for instance, that the literal array
+        <code>[1 2 3]</code> of type <code>[]num</code> can be assigned to a variable of type
+        <code>[]any</code>.
+      </p>
+      <p>The following code:</p>
+      <pre><code class="language-evy">arr:[]{}any
+arr = [{a:1} {b:[1 2 {}]} {}]
+print (typeof arr)
+print (typeof arr[0])
+print (typeof arr[0].a)
+</code></pre>
+      <p>will output:</p>
+      <pre><code class="language-evy:output">[]{}any
+{}any
+num
+</code></pre>
+      <h3>Assignability of empty composite literals</h3>
+      <p>
+        Empty composite literals <code>[]</code>, <code>{}</code>, or nested emtpy composite
+        literals of them, such as <code>[[]]</code>, follow the same rules as
+        <a href="#variables-and-declarations">inferred declarations</a>: <code>[]</code> gets
+        converted to type <code>[]any</code>, <code>{}</code> gets converted to type
+        <code>{}any</code> and <code>[[]]</code> to type <code>[][]any</code>.
+      </p>
+      <h2>Run-time Panics and Recoverable Errors</h2>
+      <p>
+        <strong>Run-time panics</strong> are unrecoverable errors that can occur during the
+        execution of an Evy program. They can be caused by a variety of things, such as trying to
+        index an array out of bounds, accessing a map value for a key that does not exist, or a
+        failed type assertion. When a run-time panic occurs, the Evy program will stop and error
+        details will be printed. You can trigger a panic in your own code by calling the built-in
+        function <code>panic &quot;msg&quot;</code>.
+      </p>
+      <p>
+        <strong>Recoverable errors</strong> are errors that can be handled by the Evy program. They
+        are typically caused by user input or external factors that the Evy program cannot control.
+        Functions that can cause recoverable errors set the global <code>err</code> variable to
+        <code>true</code> and the string variable <code>errmsg</code> to a description of the error.
+        The Evy program can then check the value of <code>err</code> and handle the error
+        accordingly. You can trigger a recoverable error in your own code by setting
+        <code>err</code> and <code>errmsg</code>.
+      </p>
+      <p>
+        For more information on run-time panics and recoverable errors, see the built-in
+        documentation on the <a href="builtins.html#panic">panic function</a> and the
+        <a href="builtins.html#errors">errors section</a>.
+      </p>
+      <h2>Execution Model and Event Handlers</h2>
+      <p>
+        Evy first executes all top-level code in the order it appears in the source code. If there
+        is at least one event handler, Evy then enters an event loop. In the event loop, Evy waits
+        for external events, such as a key press or a pointer down event. When an event occurs, Evy
+        calls the corresponding event handler function if it has been implemented. The event handler
+        function can optionally receive arguments, such as the key character or the pointer
+        coordinates. Once the event handler function has finished, Evy returns to the event loop and
+        waits for the next event.
+      </p>
+      <p>
+        Event handlers are declared using the <code>on</code> keyword. Only predefined events can be
+        handled: <code>key</code>, <code>down</code>, <code>up</code>, <code>move</code>,
+        <code>animate</code>, and <code>input</code>. The parameters to the event handlers must
+        match the expected signature. The parameters can be fully omitted or fully specified. If
+        only some parameters are needed, use the anonymous <code>_</code> parameter.
+      </p>
+      <p>
+        For more information on individual event handlers, see the
+        <a href="builtins.html#event-handlers">built-in documentation</a>.
+      </p>
+      <h2>Runtimes</h2>
+      <p>
+        Evy has two runtimes: the <strong>terminal runtime</strong> and the
+        <strong>browser runtime</strong>.
+      </p>
+      <p>
+        The browser runtime can be tried at <a href="/play">play.evy.dev</a>. It fully supports all
+        built-in functions and event handlers as described in the
+        <a href="builtin.html">built-in documentation</a>.
+      </p>
+      <p>To use the terminal runtime, first install Evy and then run</p>
+      <pre><code>evy run FILE.evy
+</code></pre>
+      <p>
+        in the terminal. This will execute the source code in the given file. You can also use the
+        evy command to format your source code with
+      </p>
+      <pre><code>evy fmt FILE.evy
+</code></pre>
+      <p>
+        For more details, run <code>evy run --help</code> or <code>evy fmt --help</code>. The
+        terminal runtime does not support event handlers or graphics functions.
+      </p>
+    </main>
+  </body>
+</html>

@@ -19,7 +19,7 @@ lint: lint-go lint-sh check-prettier check-style check-fmt-evy
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
 
-check-uptodate: tidy fmt doc
+check-uptodate: tidy fmt doc docs
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files
@@ -154,7 +154,18 @@ GODOCFILES = main.go
 godoc: install-slim
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
-.PHONY: doc doctest godoc toc usage
+DOCS_TARGET_DIR = frontend/preview
+
+## Generate static HTML documentation in frontend/preview from MarkDown in /docs
+docs:
+	go run ./build-tools/md docs $(DOCS_TARGET_DIR) # TODO: move to `frontend/docs/` when ready
+	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
+
+clean::
+	find $(DOCS_TARGET_DIR) -mindepth 1 ! -regex '$(DOCS_TARGET_DIR)/css.*' -delete
+
+
+.PHONY: doc docs doctest godoc sdocs toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node

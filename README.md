@@ -1,6 +1,6 @@
 # Evy
 
-[![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://evy.dev/discord)
+[![Discord Chat](https://img.shields.io/badge/discord-chat-414eed?style=flat-square&logo=discord&logoColor=white)](https://discord.evy.dev)
 [![GitHub Build](https://img.shields.io/github/actions/workflow/status/evylang/evy/prod.yaml?style=flat-square&branch=main&logo=github)](https://github.com/evylang/evy/actions/workflows/prod.yaml?query=branch%3Amain)
 [![Go Reference](https://pkg.go.dev/badge/evylang.dev/evy.svg)](https://pkg.go.dev/evylang.dev/evy)
 [![GitHub Sponsorship](https://img.shields.io/badge/sponsor-%E2%99%A5-eb5c95?style=flat-square&logo=github&logoColor=white)](https://github.com/sponsors/evylang)
@@ -51,7 +51,7 @@ Here are some resources for learning more about Evy:
 
 For questions and discussions, join the [Evy community] on Discord.
 
-[Evy community]: https://evy.dev/discord
+[Evy community]: https://discord.evy.dev
 
 ## 📦 Installation
 

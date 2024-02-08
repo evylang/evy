@@ -1,4 +1,4 @@
-# Evy language specification
+# Language Specification
 
 Evy is a [statically typed], [garbage collected],
 [procedural] programming language. Its main design goal is to help

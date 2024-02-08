@@ -1,7 +1,7 @@
 {
   "semi": false,
   "singleQuote": false,
-  "htmlWhitespaceSensitivity": "ignore",
+  "htmlWhitespaceSensitivity": "css",
   "printWidth": 100,
   "overrides": [
     {

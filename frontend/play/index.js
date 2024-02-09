@@ -394,9 +394,7 @@ async function handleHashChange() {
   crumbs && updateBreadcrumbs(crumbs)
   clearOutput()
   await format()
-  // Clear hash right away for the long ugly gzip/b64 content URL fragments,
-  // keep the fragment until the first edit for the rest.
-  opts.content ? clearHash() : editor.onUpdate(clearHash)
+  editor.onUpdate(clearHash)
 }
 
 // parseHash parses URL fragment into object e.g.:

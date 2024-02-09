@@ -768,7 +768,7 @@ function leaveXY(e) {
 }
 
 function clamp(val, min, max) {
-  return Math.min(Math.max(this, min), max)
+  return Math.min(Math.max(val, min), max)
 }
 
 function initEditor() {

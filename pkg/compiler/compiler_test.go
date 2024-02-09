@@ -398,6 +398,93 @@ func TestBool(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestConditionals(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `x := 1
+			if x == 1
+				x = 2
+			end
+			x = x`,
+			expectedConstants: []interface{}{1, 1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpEqual),
+				code.Make(code.OpJumpNotTruthy, 25),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpJump, 25),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 2),
+			},
+		},
+		{
+			input: `x := 10
+			if x > 5
+				x = 20
+			else
+				x = 5
+			end
+			x = x`,
+			expectedConstants: []interface{}{10, 5, 20, 5},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpJumpNotTruthy, 25),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpJump, 31),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSetGlobal, 2),
+				code.Make(code.OpGetGlobal, 2),
+				code.Make(code.OpSetGlobal, 3),
+			},
+		},
+		{
+			input: `x := 10
+			if x > 10
+				x = 10
+			else if x > 5
+				x = 5
+			else
+				x = 1
+			end
+			x = x`,
+			expectedConstants: []interface{}{10, 10, 10, 5, 5, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpJumpNotTruthy, 25),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpJump, 50), // If the first condition is true, jump to the end after statement
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpJumpNotTruthy, 41),
+				code.Make(code.OpConstant, 4),
+				code.Make(code.OpSetGlobal, 2),
+				code.Make(code.OpJump, 50),
+				code.Make(code.OpConstant, 5),
+				code.Make(code.OpSetGlobal, 3),
+				code.Make(code.OpGetGlobal, 3),
+				code.Make(code.OpSetGlobal, 4),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestGlobalVarStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{

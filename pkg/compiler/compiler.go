@@ -116,6 +116,62 @@ func (c *Compiler) Compile(node parser.Node) error {
 		}
 	case *parser.GroupExpression:
 		return c.Compile(node.Expr)
+	case *parser.IfStmt:
+		if err := c.Compile(node.IfBlock.Condition); err != nil {
+			return err
+		}
+
+		// emit 9999 as a placeholder value, this will be backfilled
+		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
+
+		// compile node consequence
+		if err := c.Compile(node.IfBlock.Block); err != nil {
+			return err
+		}
+
+		jumpPositions := []int{c.emit(code.OpJump, 9999)}
+
+		afterConsequencePos := len(c.instructions)
+		c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
+
+		// compile all conditional alternatives
+		for _, elseif := range node.ElseIfBlocks {
+			if err := c.Compile(elseif.Condition); err != nil {
+				return err
+			}
+
+			// emit 9999 as a placeholder value, this will be backfilled
+			jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
+
+			if err := c.Compile(elseif.Block); err != nil {
+				return err
+			}
+
+			afterConsequencePos := len(c.instructions)
+			c.changeOperand(jumpNotTruthyPos, afterConsequencePos)
+
+			jumpPositions = append(jumpPositions, c.emit(code.OpJump, 9999))
+		}
+
+		// compile node alternative
+		if node.Else != nil {
+			if err := c.Compile(node.Else); err != nil {
+				return err
+			}
+		}
+
+		afterAlternativePos := len(c.instructions)
+		for _, jumpPos := range jumpPositions {
+			c.changeOperand(jumpPos, afterAlternativePos)
+		}
+	case *parser.BlockStatement:
+		for _, s := range node.Statements {
+			err := c.Compile(s)
+			if err != nil {
+				return err
+			}
+		}
+
 	default:
 		return fmt.Errorf("unknown node type %s", node.Type())
 	}
@@ -144,4 +200,16 @@ func (c *Compiler) addInstruction(ins []byte) int {
 	posNewInstruction := len(c.instructions)
 	c.instructions = append(c.instructions, ins...)
 	return posNewInstruction
+}
+
+func (c *Compiler) changeOperand(opPosition int, operand int) {
+	op := code.Opcode(c.instructions[opPosition])
+	newInstruction := code.Make(op, operand)
+	c.replaceInstruction(opPosition, newInstruction)
+}
+
+func (c *Compiler) replaceInstruction(pos int, newInstruction []byte) {
+	for i := 0; i < len(newInstruction); i++ {
+		c.instructions[pos+i] = newInstruction[i]
+	}
 }

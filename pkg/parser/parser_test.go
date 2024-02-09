@@ -1169,6 +1169,10 @@ end
 on down x:num
    print "pointer down:" x
 end`: `line 3 column 4: wrong number of parameters expected 2, got 1`,
+		`
+on down x:num y:num z:num
+    print x y z
+end`: `line 3 column 5: wrong number of parameters expected 2, got 3`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())

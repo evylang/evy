@@ -296,6 +296,9 @@ func (p *parser) addEventParamsToScope(e *EventHandlerStmt) {
 		p.appendError(fmt.Sprintf("wrong number of parameters expected %d, got %d", len(expectedParams), len(e.Params)))
 	}
 	for i, param := range e.Params {
+		if i >= len(expectedParams) {
+			return
+		}
 		p.validateVarDecl(param, param.token, true /* allowUnderscore */)
 		exptectedType := expectedParams[i].Type()
 		if !param.Type().Equals(exptectedType) {

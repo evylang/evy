@@ -1,0 +1,231 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Syntax by Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="./css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="./css/root.css" type="text/css" />
+    <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/index.css" type="text/css" />
+    <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <main class="max-width-wrapper">
+      <h1>Syntax by Example</h1>
+      <p>
+        The following examples will help you understand the syntax of Evy. For a more formal
+        definition of the syntax, see the <a href="spec.html">Language Specification</a>. Built-in
+        functions, such as <code>print</code> and <code>circle</code>, are documented in the<a
+          href="builtins.html"
+          >Built-ins section</a
+        >.
+      </p>
+      <h2>Comment</h2>
+      <pre><code>// This is a comment
+</code></pre>
+      <h2>Declaration</h2>
+      <pre><code>x:num     // declaration: num, string, bool, any, []num, {}string
+y := 1    // declaration through type inference (num)
+</code></pre>
+      <h2>Assignment</h2>
+      <pre><code>z = 5
+</code></pre>
+      <h2>Expression</h2>
+      <pre><code>x := 5 * (y + z)  - 2 / 7.6           // arithmetic number expression
+b := !trace and debug or level == &quot;&quot;  // bool expressions
+</code></pre>
+      <h2>Strings</h2>
+      <pre><code>s1 := &quot;quotation mark : \&quot; &quot;          // escaping
+s2 := &quot;abc&quot; + &quot;🥪123&quot;                 // concatenation
+s3 := &quot;newline: \n indentation: \t&quot;
+s4 := s2[0]                           // &quot;a&quot;
+s5 := s2[1:5]                         // &quot;bc🥪1&quot;
+</code></pre>
+      <h2><code>if</code> statements</h2>
+      <pre><code>if z &gt; 0 and x != 0
+    print &quot;block 1&quot;
+else if y != 0 or a == &quot;abc&quot;
+    print &quot;block 2&quot;
+else
+    print &quot;block 3&quot;
+end
+</code></pre>
+      <h3>Nested <code>if</code></h3>
+      <pre><code>if z &gt; 0 and x != 0
+    if startswith str &quot;a&quot;
+        print &quot;nested block 1&quot;
+    else
+        print &quot;nested block 2&quot;
+    end
+end
+</code></pre>
+      <h2>Loop statements</h2>
+      <h3><code>while</code> loop</h3>
+      <pre><code>x := 0
+while x &lt; 10
+    print x
+    x = x + 1
+end
+</code></pre>
+      <h3><code>for</code> … <code>range</code> number</h3>
+      <pre><code>for x := range 5
+    print x           // 0 1 2 3 4
+end
+
+for x := range 5 10
+    print x           // 5 6 7 8 9
+end
+
+for x := range 1 10 2 // from to step
+    print x           // 1 3 5 7 9
+end
+
+for x := range -10
+    print x        // nothing. step is 1 by default.
+end
+</code></pre>
+      <h3><code>for</code> … <code>range</code> array</h3>
+      <pre><code>for x := range [1 2 3]
+    print x        // 1 2 3
+end
+</code></pre>
+      <h3><code>for</code> … <code>range</code> map</h3>
+      <pre><code>m := { name:&quot;Mali&quot; sport:&quot;climbing&quot; }
+for key := range m
+    print key m[key]
+end
+</code></pre>
+      <h3><code>break</code></h3>
+      <pre><code>x := 0
+while true
+    print &quot;tick... &quot;
+    sleep 1
+    if x &gt; 9
+        print &quot;💥&quot;
+        break  // `break` breaks out of the innermost loop
+    end
+    x = x + 1
+end
+</code></pre>
+      <h2>Function definition</h2>
+      <pre><code>func add:num a:num b:num
+    return a + b
+end
+</code></pre>
+      <h3>No return type</h3>
+      <pre><code>func foxprint s:string
+    print &quot;🦊 &quot; + s
+end
+</code></pre>
+      <h3>Variadic</h3>
+      <pre><code>func list args:any...
+    for arg := range args[:-1]
+        printf &quot;%v, &quot; arg
+    end
+    printf &quot;%v&quot; args[-1]
+end
+</code></pre>
+      <h3>Function calls</h3>
+      <pre><code>n := add 1 2        // 3
+foxprint &quot;🐾&quot;       // 🦊 🐾
+list 2 true &quot;blue&quot;  // 2, true, blue
+</code></pre>
+      <h2>Array</h2>
+      <pre><code>a1:[]num
+a2:[][]string
+a1 = [1 2 3 4]              // type: num[]
+a2 = [[&quot;1&quot; &quot;2&quot;] [&quot;a&quot; &quot;b&quot;]]  // type: string[][]
+a3 := [true false]          // type: bool[]
+a4 := [&quot;s1&quot;                 // line break allowed
+       &quot;s2&quot;]                // type: string[]
+a5 := [&quot;chars&quot; 123]         // type: any[]
+a6:[]any                    // type: any[]
+</code></pre>
+      <h3>Array element access</h3>
+      <pre><code>a1 := [1 2 3 4]
+a2 := [[&quot;1&quot; &quot;2&quot;] [&quot;a&quot; &quot;b&quot;]]
+print a1[1]                  // 2
+print a2[1][0]               // &quot;a&quot;
+print a1[-1]                  // 4
+</code></pre>
+      <h3>Concatenation</h3>
+      <pre><code>a := [1 2 3 4]
+a = a + [ 100 ]          // [1 2 3 4 100]; optional extra whitespace
+a = [0] + a + [101 102]  // [0 1 2 3 4 100 101 102]
+</code></pre>
+      <h3>Slicing</h3>
+      <pre><code>a := [1 2 3]
+b := a[:2]         // [1 2]
+b = a[1:2]         // [2]
+b = a[-2:]         // [2 3]
+</code></pre>
+      <h2>Map</h2>
+      <pre><code>m1:{}any // keys used in literals or with `.` must be identifiers.
+m1.name = &quot;fox&quot;
+m1.age = 42
+m1[&quot;key with space&quot;] = &quot;🔑🪐&quot;
+
+m2 := {letters:&quot;abc&quot; name:&quot;Jill&quot;} // type: {}string
+m3 := {}                          // type: {}any
+m4 := {
+    letters:&quot;abc&quot;                 // line break allowed
+    nums:123
+}                                 // type: {}any
+m5:{}[]num                        // map of array of numbers
+m5.digits = [1 2 3]
+m6:{}num
+//m6.x = &quot;y&quot;                      // invalid, only num values allowed
+</code></pre>
+      <h3>Map value access</h3>
+      <pre><code>m := {letters:&quot;abc&quot; name:&quot;Jill&quot;}
+s := &quot;letters&quot;
+print m.letters    // abc
+print m[s]         // abc
+print m[&quot;letters&quot;] // abc
+</code></pre>
+      <h2><code>any</code></h2>
+      <pre><code>x:any     // any type, default value: false
+m1:{}any  // map with any value type
+m2 := { letter:&quot;a&quot; number:1 }
+arr1:[]any
+arr2 := [ &quot;b&quot; 2 ]
+</code></pre>
+      <h2>Type assertion</h2>
+      <pre><code>x:any
+x = [ 1 2 3 4 ]  // concrete type num[]
+s := x.([]num)
+</code></pre>
+      <h2>Type reflection</h2>
+      <pre><code>typeof &quot;abc&quot;          // &quot;string&quot;
+typeof true           // &quot;bool&quot;
+typeof [ 1 2 ]        // &quot;[]num&quot;
+typeof [[1 2] [3 4]]  // &quot;[][]num&quot;
+
+v:any
+v = &quot;🐐&quot;
+if (typeof v) == &quot;string&quot;
+    print &quot;v is a string:&quot; v
+    s := v.(string) // type assertion
+    print s+s       // 🐐🐐
+end
+</code></pre>
+      <h2>Event handling</h2>
+      <pre><code>on key
+    print &quot;key pressed&quot;
+end
+</code></pre>
+      <p>
+        Evy can only handle a limited set of events, such as key presses, pointer movements, or
+        periodic screen redraws.
+      </p>
+      <h3>Event handlers with parameters</h3>
+      <pre><code>on key k:string
+    printf &quot;%q pressed\n&quot; k
+end
+</code></pre>
+    </main>
+  </body>
+</html>

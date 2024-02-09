@@ -1,3 +1,10 @@
 a {
   transition: all 0.3s ease-in-out;
 }
+
+body {
+  font-family: var(--font-family);
+  letter-spacing: 0.15px;
+  background: var(--background);
+  color: var(--color-dimmed);
+}

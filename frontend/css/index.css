@@ -2,14 +2,6 @@
   --footer-color: hsl(0deg 0% 100% / 40%);
 }
 
-body {
-  font-family: var(--font-family);
-  letter-spacing: 0.15px;
-  background: var(--background);
-  color: var(--color-dimmed);
-  width: 100vw;
-}
-
 .max-width-wrapper {
   max-width: calc(51rem + 32px);
   margin-left: auto;
@@ -23,6 +15,20 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 28px;
+  margin-bottom: 20px;
+  line-height: 2;
 }
 
 main,
@@ -48,22 +54,6 @@ footer {
 
 .action button {
   width: 100%;
-}
-
-h1 {
-  width: 100%;
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-h2 {
-  width: 100%;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-top: 28px;
-  margin-bottom: 20px;
-  line-height: 2;
 }
 
 p {

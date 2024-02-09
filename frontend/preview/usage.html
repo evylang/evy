@@ -1,0 +1,130 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Command Line Usage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="./css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="./css/root.css" type="text/css" />
+    <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/index.css" type="text/css" />
+    <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <main class="max-width-wrapper">
+      <h1>Command Line Usage</h1>
+      <p>
+        The <code>evy</code> toolchain is a set of tools that can be used to parse, run, and format
+        Evy source code. It can also be used to serve the Evy web contents locally. You can
+        <a href="../index.html#-installation">install</a> the Evy toolchain locally and run it from
+        your command line. The command-line interface for Evy supports all built-in functions except
+        for graphics functions and event handlers. Only the web interface on
+        <a href="/play">play.evy.dev</a> supports graphics and events.
+      </p>
+      <p>The Evy toolchain has three subcommands:</p>
+      <ul>
+        <li><code>evy run</code>: Parse and run Evy source code.</li>
+        <li><code>evy fmt</code>: Format Evy source code.</li>
+        <li><code>evy sever</code>: Format Evy source code.</li>
+      </ul>
+      <p>
+        You can also get help for each subcommand by running it with the <code>--help</code> flag.
+      </p>
+      <h4>evy --help</h4>
+      <!-- gen:evy --help -->
+      <pre><code>Usage: evy &lt;command&gt;
+
+evy is a tool for managing evy source code.
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+Commands:
+  run [&lt;source&gt;]
+    Run Evy program.
+
+  fmt [&lt;files&gt; ...]
+    Format Evy files.
+
+  serve export &lt;dir&gt;
+    Export embedded content.
+
+  serve start
+    Start web server, default for &quot;evy serve&quot;.
+
+Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
+</code></pre>
+      <!-- genend -->
+      <h4>evy run --help</h4>
+      <!-- gen:evy run --help -->
+      <pre><code>Usage: evy run [&lt;source&gt;]
+
+Run Evy program.
+
+Arguments:
+  [&lt;source&gt;]    Source file. Default stdin
+
+Flags:
+  -h, --help          Show context-sensitive help.
+  -V, --version       Print version information
+
+      --skip-sleep    skip evy sleep command ($EVY_SKIP_SLEEP)
+</code></pre>
+      <!-- genend -->
+      <h4>evy fmt --help</h4>
+      <!-- gen:evy fmt --help -->
+      <pre><code>Usage: evy fmt [&lt;files&gt; ...]
+
+Format Evy files.
+
+Arguments:
+  [&lt;files&gt; ...]    Source files. Default stdin
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+  -w, --write      update .evy file
+  -c, --check      check if already formatted
+</code></pre>
+      <!-- genend -->
+      <h4>evy serve [start] --help</h4>
+      <!-- gen:evy serve start --help -->
+      <pre><code>Usage: evy serve start
+
+Start web server, default for &quot;evy serve&quot;.
+
+Flags:
+  -h, --help              Show context-sensitive help.
+  -V, --version           Print version information
+
+  -p, --port=8080         Port to listen on ($EVY_PORT)
+  -a, --all-interfaces    Listen only on all interfaces not just localhost
+                          ($EVY_ALL_INTERFACES)
+  -d, --dir=DIR           Directory to serve instead of embedded content
+      --root=DIR          Directory to use as root for serving, subdirectory of
+                          DIR if given, eg &quot;play&quot;, &quot;docs&quot;
+</code></pre>
+      <!-- genend -->
+      <h4>evy serve export --help</h4>
+      <!-- gen:evy serve export --help -->
+      <pre><code>Usage: evy serve export &lt;dir&gt;
+
+Export embedded content.
+
+Arguments:
+  &lt;dir&gt;    Directory to export embedded content to
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+  -f, --force      Use non-empty directory
+</code></pre>
+      <!-- genend -->
+    </main>
+  </body>
+</html>

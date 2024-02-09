@@ -1483,4 +1483,4 @@ with
 For more details, run `evy run --help` or `evy fmt --help`. The terminal
 runtime does not support event handlers or graphics functions.
 
-[play.evy.dev](https://play.evy.dev)
+[play.evy.dev]: https://play.evy.dev

@@ -1,0 +1,59 @@
+.max-width-wrapper {
+  max-width: calc(51rem + 32px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 32px 0 16px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 32px 0 8px;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+p {
+  line-height: 1.75;
+}
+
+ul,
+ol {
+  margin: 16px 32px;
+}
+
+li {
+  line-height: 2;
+}
+
+a {
+  color: var(--color-dimmed);
+  & :hover {
+    color: var(--color);
+  }
+}
+
+pre {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+}

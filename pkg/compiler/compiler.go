@@ -48,10 +48,10 @@ func (c *Compiler) Compile(node parser.Node) error {
 		symbol := c.symbolTable.Define(node.Decl.Var.Name)
 		c.emit(code.OpSetGlobal, symbol.Index)
 	case *parser.AssignmentStmt:
-		if err := c.Compile(node.Target); err != nil {
+		if err := c.Compile(node.Value); err != nil {
 			return err
 		}
-		symbol := c.symbolTable.Define(node.Value.String())
+		symbol := c.symbolTable.Define(node.Target.String())
 		c.emit(code.OpSetGlobal, symbol.Index)
 	case *parser.Var:
 		symbol, ok := c.symbolTable.Resolve(node.Name)

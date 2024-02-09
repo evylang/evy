@@ -70,6 +70,14 @@ func TestBool(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestConstantAssignments(t *testing.T) {
+	tests := []vmTestCase{
+		{"x := 10\ny := x\ny = y", 10},
+		{"x := 10\nx = 5\nx = x", 5},
+	}
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}

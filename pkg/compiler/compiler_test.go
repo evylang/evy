@@ -422,6 +422,20 @@ func TestGlobalVarStatements(t *testing.T) {
 				code.Make(code.OpSetGlobal, 1),
 			},
 		},
+		{
+			input: `three := 3
+			three = 30
+			three = three`,
+			expectedConstants: []interface{}{3, 30},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 2),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

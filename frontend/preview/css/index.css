@@ -57,3 +57,25 @@ pre {
   border-radius: 8px;
   overflow-x: auto;
 }
+
+.anchored {
+  position: relative;
+  margin-left: -24px;
+  padding-left: 24px;
+}
+
+.anchored > .anchor {
+  text-decoration: none;
+  outline: none;
+}
+
+.anchored > .anchor > svg {
+  display: none;
+}
+
+.anchored:hover > .anchor > svg {
+  display: inline-block;
+  position: absolute;
+  left: -4px;
+  top: 8px;
+}

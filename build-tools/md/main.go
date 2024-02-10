@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -140,16 +141,42 @@ func md2html(mdBytes []byte) (string, string) {
 		AutoLinkText: true, // turn URLs into links even without []()
 	}
 	doc := p.Parse(string(mdBytes))
-	walk(doc, walkFn)
+	w := walker{headingIDs: map[string]bool{}}
+	walk(doc, w.walk)
 	title := extractTitle(doc)
 	return title, markdown.ToHTML(doc)
 }
 
-func walkFn(n node) node {
-	if mdl, ok := n.(*markdown.Link); ok {
-		return updateLink(mdl)
+type walker struct {
+	headingIDs map[string]bool
+}
+
+func (w *walker) walk(n node) node {
+	switch n := n.(type) {
+	case *markdown.Heading:
+		return w.updateHeading(n)
+	case *markdown.Link:
+		return updateLink(n)
 	}
 	return n
+}
+
+func (w *walker) updateHeading(h *markdown.Heading) node {
+	return newAnchoredHeading(h, w.headingID(h))
+}
+
+var reHeadingID = regexp.MustCompile(`[^\pL0-9]+`)
+
+func (w *walker) headingID(h *markdown.Heading) string {
+	id := inlineText(h.Text.Inline)
+	id = strings.ToLower(id)
+	id = reHeadingID.ReplaceAllString(id, "-")
+	orig := id
+	for i := 1; w.headingIDs[id]; i++ {
+		id = fmt.Sprintf("%s-%d", orig, i)
+	}
+	w.headingIDs[id] = true
+	return id
 }
 
 func updateLink(mdl *markdown.Link) node {
@@ -160,11 +187,14 @@ func updateLink(mdl *markdown.Link) node {
 	}
 	if u.IsAbs() {
 		if rootDir, found := strings.CutSuffix(u.Hostname(), ".evy.dev"); found { //  subdomain link
-			mdl.URL, err = url.JoinPath("/", rootDir, u.Path)
+			u.Path, err = url.JoinPath("/", rootDir, u.Path)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error creating URL %q %q %q: %v\n", "/", rootDir, u.Path, err)
 				return nil
 			}
+			u.Host = ""
+			u.Scheme = ""
+			mdl.URL = u.String()
 		}
 		return mdl
 	}
@@ -178,7 +208,7 @@ func extractTitle(doc *markdown.Document) string {
 	level := 100
 	var titleText *markdown.Text
 	for _, block := range doc.Blocks {
-		if h, ok := block.(*markdown.Heading); ok {
+		if h, ok := block.(*anchoredHeading); ok {
 			if h.Level < level {
 				level = h.Level
 				titleText = h.Text
@@ -188,8 +218,12 @@ func extractTitle(doc *markdown.Document) string {
 	if titleText == nil {
 		return ""
 	}
+	return inlineText(titleText.Inline)
+}
+
+func inlineText(inlines []markdown.Inline) string {
 	buf := &bytes.Buffer{}
-	for _, inline := range titleText.Inline {
+	for _, inline := range inlines {
 		inline.PrintText(buf)
 	}
 	return buf.String()

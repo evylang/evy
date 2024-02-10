@@ -14,7 +14,12 @@
   </head>
   <body>
     <main class="max-width-wrapper">
-      <h1>Built-ins</h1>
+      <h1 class="anchored">
+        <a id="built-ins" href="#built-ins" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Built-ins
+      </h1>
       <p>
         <strong>Built-ins</strong> in Evy are pre-defined functions and events that allow for user
         interaction, graphics, animation, mathematical operations, and more.
@@ -29,7 +34,12 @@
         <a href="spec.html">Language Specification</a>, and for an intuitive understanding see
         <a href="syntax_by_example.html">syntax by example</a>.
       </p>
-      <h4>Table of Contents</h4>
+      <h4 class="anchored">
+        <a id="table-of-contents" href="#table-of-contents" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Table of Contents
+      </h4>
       <!-- gen:toc -->
       <ol>
         <li>
@@ -102,13 +112,28 @@
         </li>
       </ol>
       <!-- genend:toc -->
-      <h2>Input and Output</h2>
-      <h3><code>print</code></h3>
+      <h2 class="anchored">
+        <a id="input-and-output" href="#input-and-output" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Input and Output
+      </h2>
+      <h3 class="anchored">
+        <a id="print" href="#print" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>print</code>
+      </h3>
       <p>
         <code>print</code> prints the arguments given to it to the output area. It separates them by
         a single space and outputs a newline character at the end.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example" href="#example" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print &quot;Hello&quot;
 print 2 true &quot;blue&quot;
 print &quot;array:&quot; [1 2 3]
@@ -120,7 +145,12 @@ print &quot;map:&quot; {name:&quot;Scholl&quot; age:21}
 array: [1 2 3]
 map: {name:Scholl age:21}
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference" href="#reference" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>print a:any...
 </code></pre>
       <p>
@@ -146,12 +176,22 @@ She said: &quot;Thank you!&quot;
         from the command line interface, <code>print</code> prints to standard out.
       </p>
       <hr />
-      <h3><code>read</code></h3>
+      <h3 class="anchored">
+        <a id="read" href="#read" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>read</code>
+      </h3>
       <p>
         <code>read</code> reads a line of input from the user and returns it as a string. The
         newline character is not included in the returned string.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-1" href="#example-1" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">name := read
 print &quot;Hello, &quot;+name+&quot;!&quot;
 </code></pre>
@@ -161,7 +201,12 @@ print &quot;Hello, &quot;+name+&quot;!&quot;
       <p>Output</p>
       <pre><code class="language-evy:output">Hello, Mary Jackson!
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-1" href="#reference-1" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>read:string
 </code></pre>
       <p>
@@ -175,9 +220,19 @@ print &quot;Hello, &quot;+name+&quot;!&quot;
         from the command line interface, <code>read</code> reads from standard in.
       </p>
       <hr />
-      <h3><code>cls</code></h3>
+      <h3 class="anchored">
+        <a id="cls" href="#cls" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>cls</code>
+      </h3>
       <p><code>cls</code> clears the output area of all printed text.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-2" href="#example-2" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print &quot;Hello&quot;
 sleep 1
 cls
@@ -186,7 +241,12 @@ print &quot;Bye&quot;
       <p>Output</p>
       <pre><code class="language-evy:output">Bye
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-2" href="#reference-2" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>cls
 </code></pre>
       <p>
@@ -196,7 +256,12 @@ print &quot;Bye&quot;
         <code>cls</code> commands.
       </p>
       <hr />
-      <h3><code>printf</code></h3>
+      <h3 class="anchored">
+        <a id="printf" href="#printf" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>printf</code>
+      </h3>
       <p><code>printf</code> stands for print formatted.</p>
       <p>
         <code>printf</code> prints its arguments to the output area according to a
@@ -211,7 +276,12 @@ print &quot;Bye&quot;
         <code>%v</code> | the argument in its default format | | <code>%q</code> | a double-quoted
         string | | <code>%%</code> | a percent sign <code>%</code> |
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-3" href="#example-3" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">printf &quot;The tank is 100%% full.\n\n&quot;
 
 weather := &quot;rainy&quot;
@@ -237,7 +307,12 @@ They said: &quot;Wow!&quot;
 Array: [1 2 3]
 Map: {a:1 b:2}
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-3" href="#reference-3" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>printf format:string a:any...
 </code></pre>
       <p>
@@ -306,13 +381,28 @@ printf &quot;zeropad:|%07.2f|\n&quot; 1.2345
 left:   |ab     |
 zeropad:|0001.23|
 </code></pre>
-      <h2>Types</h2>
-      <h3><code>len</code></h3>
+      <h2 class="anchored">
+        <a id="types" href="#types" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Types
+      </h2>
+      <h3 class="anchored">
+        <a id="len" href="#len" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>len</code>
+      </h3>
       <p>
         <code>len</code> returns the number of characters in a string, the number of elements in an
         array or the number of key-value pairs in a map.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-4" href="#example-4" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">l := len &quot;abcd&quot;
 print &quot;len \&quot;abcd\&quot;:&quot; l
 
@@ -327,7 +417,12 @@ print &quot;len {a:3 b:4 c:5}:&quot; l
 len [1 2]: 2
 len {a:3 b:4 c:5}: 3
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-4" href="#reference-4" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>len:num a:any
 </code></pre>
       <p>
@@ -338,9 +433,19 @@ len {a:3 b:4 c:5}: 3
         the map. If the argument is of any other type, a panic will occur.
       </p>
       <hr />
-      <h3><code>typeof</code></h3>
+      <h3 class="anchored">
+        <a id="typeof" href="#typeof" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>typeof</code>
+      </h3>
       <p><code>typeof</code> returns the type of the argument as string value.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-5" href="#example-5" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">a:any
 a = &quot;abcd&quot;
 t := typeof a
@@ -364,7 +469,12 @@ typeof [[1 2] [3 4]]: [][]num
 typeof [1 2 true]: []any
 typeof []: []any
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-5" href="#reference-5" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>typeof:string a:any
 </code></pre>
       <p>
@@ -376,10 +486,25 @@ typeof []: []any
         it can be matched to any subtype, e.g. <code>[]</code> can be passed to a function that
         takes an argument of <code>[]num</code>, or <code>[]string</code>.
       </p>
-      <h2>Map</h2>
-      <h3><code>has</code></h3>
+      <h2 class="anchored">
+        <a id="map" href="#map" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Map
+      </h2>
+      <h3 class="anchored">
+        <a id="has" href="#has" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>has</code>
+      </h3>
       <p><code>has</code> returns whether a map has a given key or not.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-6" href="#example-6" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">map := {a:1}
 printf &quot;has %v %q: %t\n&quot; map &quot;a&quot; (has map &quot;a&quot;)
 printf &quot;has %v %q: %t\n&quot; map &quot;X&quot; (has map &quot;X&quot;)
@@ -388,7 +513,12 @@ printf &quot;has %v %q: %t\n&quot; map &quot;X&quot; (has map &quot;X&quot;)
       <pre><code class="language-evy:output">has {a:1} &quot;a&quot;: true
 has {a:1} &quot;X&quot;: false
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-6" href="#reference-6" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>has:bool map:{} key:string
 </code></pre>
       <p>
@@ -397,9 +527,19 @@ has {a:1} &quot;X&quot;: false
         type, such as <code>{}num</code> or <code>{}[]any</code> and the key can be any string.
       </p>
       <hr />
-      <h3><code>del</code></h3>
+      <h3 class="anchored">
+        <a id="del" href="#del" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>del</code>
+      </h3>
       <p><code>del</code> deletes a key-value entry from a map.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-7" href="#example-7" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">map := {a:1 b:2}
 del map &quot;b&quot;
 print map
@@ -407,7 +547,12 @@ print map
       <p>Output</p>
       <pre><code class="language-evy:output">{a:1}
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-7" href="#reference-7" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>del map:{} key:string
 </code></pre>
       <p>
@@ -416,14 +561,29 @@ print map
         The map can have any value type, and the key can be any string. It is safe to delete values
         from the map with <code>del</code> while iterating with a <code>for … range</code> loop.
       </p>
-      <h2>Program control</h2>
-      <h3><code>sleep</code></h3>
+      <h2 class="anchored">
+        <a id="program-control" href="#program-control" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Program control
+      </h2>
+      <h3 class="anchored">
+        <a id="sleep" href="#sleep" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>sleep</code>
+      </h3>
       <p><code>sleep</code> pauses the program for the given number of seconds.</p>
       <p>
         <code>sleep</code> can be used to create delays in Evy programs. For example, you could use
         sleep to create a countdown timer.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-8" href="#example-8" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print &quot;2&quot;
 sleep 1
 print &quot;1&quot;
@@ -432,7 +592,12 @@ print &quot;1&quot;
       <pre><code class="language-evy:output">2
 1
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-8" href="#reference-8" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>sleep seconds:num
 </code></pre>
       <p>
@@ -441,9 +606,19 @@ print &quot;1&quot;
         <code>sleep 0.1</code>.
       </p>
       <hr />
-      <h3><code>exit</code></h3>
+      <h3 class="anchored">
+        <a id="exit" href="#exit" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>exit</code>
+      </h3>
       <p><code>exit</code> terminates the program with the given status code.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-9" href="#example-9" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy:err">input := &quot;not a number&quot;
 n := str2num input
 
@@ -458,12 +633,22 @@ print n
       <pre><code class="language-evy:output">str2num: cannot parse &quot;not a number&quot;
 </code></pre>
       <hr />
-      <h3><code>panic</code></h3>
+      <h3 class="anchored">
+        <a id="panic" href="#panic" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>panic</code>
+      </h3>
       <p>
         <code>panic</code> prints the given error message and terminates the program immediately. It
         is used to report unrecoverable errors.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-10" href="#example-10" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy:err">scale := -5
 
 if (scale) &lt;= 0
@@ -473,20 +658,40 @@ end
       <p>Output</p>
       <pre><code class="language-evy:output">line 4 column 5: scale must be positive
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-9" href="#reference-9" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>panic msg:string
 </code></pre>
       <p>
         The <code>panic</code> function takes a single argument, which is the error message that the
         program will print before it terminates with exit status 1.
       </p>
-      <h2>Conversion</h2>
-      <h3><code>str2num</code></h3>
+      <h2 class="anchored">
+        <a id="conversion" href="#conversion" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Conversion
+      </h2>
+      <h3 class="anchored">
+        <a id="str2num" href="#str2num" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>str2num</code>
+      </h3>
       <p>
         <code>str2num</code> converts a string to a number. If the string is not a valid number, it
         returns <code>0</code> and sets the global <code>err</code> variable to <code>true</code>.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-11" href="#example-11" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">n:num
 n = str2num &quot;1&quot;
 print &quot;n:&quot; n &quot;err:&quot; err
@@ -497,7 +702,12 @@ print &quot;n:&quot; n &quot;err:&quot; err
       <pre><code class="language-evy:output">n: 1 err: false
 n: 0 err: true
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-10" href="#reference-10" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>str2num:num s:string
 </code></pre>
       <p>
@@ -508,13 +718,23 @@ n: 0 err: true
         <a href="#recoverable-errors">Recoverable Errors section</a>.
       </p>
       <hr />
-      <h3><code>str2bool</code></h3>
+      <h3 class="anchored">
+        <a id="str2bool" href="#str2bool" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>str2bool</code>
+      </h3>
       <p>
         <code>str2bool</code> converts a string to a boolean. If the string is not a valid boolean,
         it returns <code>false</code> and sets the global <code>err</code> variable to
         <code>true</code>.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-12" href="#example-12" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">b:bool
 b = str2bool &quot;true&quot;
 print &quot;b:&quot; b &quot;err:&quot; err
@@ -525,7 +745,12 @@ print &quot;b:&quot; b &quot;err:&quot; err
       <pre><code class="language-evy:output">b: true err: false
 b: false err: true
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-11" href="#reference-11" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>str2bool:bool s:string
 </code></pre>
       <p>
@@ -539,7 +764,12 @@ b: false err: true
         string is not a valid boolean. For more information on <code>err</code>, see the
         <a href="#recoverable-errors">Recoverable Errors section</a>.
       </p>
-      <h2>Errors</h2>
+      <h2 class="anchored">
+        <a id="errors" href="#errors" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Errors
+      </h2>
       <p>Evy has two types of errors: parse errors and run-time errors.</p>
       <ul>
         <li>
@@ -577,7 +807,12 @@ print &quot;n:&quot; n &quot;error:&quot; err
           is handled.
         </li>
       </ul>
-      <h3>Panic</h3>
+      <h3 class="anchored">
+        <a id="panic-1" href="#panic-1" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Panic
+      </h3>
       <p>
         A panic causes the program to exit immediately and print an error message. Panics typically
         occur when the program encounters a situation that it cannot handle, such as trying to
@@ -611,7 +846,12 @@ print &quot;This line will not be executed&quot;
         cannot continue. For more information, see the <a href="#panic">Panic</a> section under
         Program Control above.
       </p>
-      <h3>Recoverable Errors</h3>
+      <h3 class="anchored">
+        <a id="recoverable-errors" href="#recoverable-errors" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Recoverable Errors
+      </h3>
       <p>
         The global <code>err</code> variable is used to indicate whether a recoverable error has
         occurred. The global <code>errmsg</code> variable stores a detailed message about the error
@@ -655,14 +895,29 @@ errmsg: str2num: cannot parse &quot;NOT A NUM&quot;
         <code>errmsg</code> variable to a message describing the error in the error case. In the
         non-error case, make sure to set the <code>err</code> variable to <code>false</code>.
       </p>
-      <h2>String</h2>
-      <h3><code>sprint</code></h3>
+      <h2 class="anchored">
+        <a id="string" href="#string" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        String
+      </h2>
+      <h3 class="anchored">
+        <a id="sprint" href="#sprint" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>sprint</code>
+      </h3>
       <p><code>sprint</code> stands for print to string.</p>
       <p>
         It returns a string representation of the arguments given to it. It separates them by a
         single space. Unlike <code>print</code>, there is no newline added to the end.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-13" href="#example-13" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := sprint &quot;a&quot; [true] {a:1 b:2}
 printf &quot;%q\n&quot; s
 printf &quot;%q\n&quot; (sprint)
@@ -671,7 +926,12 @@ printf &quot;%q\n&quot; (sprint)
       <pre><code class="language-evy:output">&quot;a [true] {a:1 b:2}&quot;
 &quot;&quot;
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-12" href="#reference-12" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>sprint:string a:any...
 </code></pre>
       <p>
@@ -681,7 +941,12 @@ printf &quot;%q\n&quot; (sprint)
         newline added to the end of the string.
       </p>
       <hr />
-      <h3><code>sprintf</code></h3>
+      <h3 class="anchored">
+        <a id="sprintf" href="#sprintf" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>sprintf</code>
+      </h3>
       <p><code>sprintf</code> stands for print formatted to string.</p>
       <p>
         <code>sprintf</code> returns a string representation of its arguments according to a
@@ -689,14 +954,24 @@ printf &quot;%q\n&quot; (sprint)
         <code>printf</code> work the same way, see <a href="#printf"><code>printf</code></a
         >.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-14" href="#example-14" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := sprintf &quot;%10q: %.f&quot; &quot;val&quot; 123.45
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">     &quot;val&quot;: 123
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-13" href="#reference-13" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>sprintf:string format:string a:any...
 </code></pre>
       <p>
@@ -708,19 +983,34 @@ print s
         >.
       </p>
       <hr />
-      <h3><code>join</code></h3>
+      <h3 class="anchored">
+        <a id="join" href="#join" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>join</code>
+      </h3>
       <p>
         <code>join</code> concatenates the elements of an array of strings into a single string,
         with the given separator string placed between elements.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-15" href="#example-15" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := join [&quot;a&quot; &quot;b&quot; &quot;c&quot;] &quot;, &quot;
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">a, b, c
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-14" href="#reference-14" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>join:string elems:[]string sep:string
 </code></pre>
       <p>
@@ -733,12 +1023,22 @@ print s
         elements in the list of strings, with the separator string placed between elements.
       </p>
       <hr />
-      <h3><code>split</code></h3>
+      <h3 class="anchored">
+        <a id="split" href="#split" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>split</code>
+      </h3>
       <p>
         <code>split</code> splits a string into a list of substrings separated by the given
         separator. The separator can be any string, including the empty string.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-16" href="#example-16" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (split &quot;a,b,c&quot; &quot;,&quot;)
 print (split &quot;a,b,c&quot; &quot;.&quot;)
 print (split &quot;a,b,c&quot; &quot;&quot;)
@@ -748,7 +1048,12 @@ print (split &quot;a,b,c&quot; &quot;&quot;)
 [a,b,c]
 [a , b , c]
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-15" href="#reference-15" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>split:[]string s:string sep:string
 </code></pre>
       <p>
@@ -774,16 +1079,31 @@ print (split &quot;a,b,c&quot; &quot;&quot;)
         empty list.
       </p>
       <hr />
-      <h3><code>upper</code></h3>
+      <h3 class="anchored">
+        <a id="upper" href="#upper" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>upper</code>
+      </h3>
       <p><code>upper</code> returns a string with all lowercase letters converted to uppercase.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-17" href="#example-17" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := upper &quot;abc D e ü&quot;
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">ABC D E Ü
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-16" href="#reference-16" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>upper:string s:string
 </code></pre>
       <p>
@@ -796,16 +1116,31 @@ print s
         characters are lowercase and their equivalent uppercase form.
       </p>
       <hr />
-      <h3><code>lower</code></h3>
+      <h3 class="anchored">
+        <a id="lower" href="#lower" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>lower</code>
+      </h3>
       <p><code>lower</code> returns a string with all uppercase letters converted to lowercase.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-18" href="#example-18" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := lower &quot;abc D e ü&quot;
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">abc d e ü
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-17" href="#reference-17" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>lower:string s:string
 </code></pre>
       <p>
@@ -818,19 +1153,34 @@ print s
         characters are uppercase and their equivalent lowercase form.
       </p>
       <hr />
-      <h3><code>index</code></h3>
+      <h3 class="anchored">
+        <a id="index" href="#index" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>index</code>
+      </h3>
       <p>
         <code>index</code> returns the position of a substring in a string, or -1 if the substring
         is not present.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-19" href="#example-19" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">n := index &quot;abcde&quot; &quot;de&quot;
 print n
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">3
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-18" href="#reference-18" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>index:num s:string sub:string
 </code></pre>
       <p>
@@ -839,16 +1189,31 @@ print n
         <code>s</code>, or -1 if the substring is not present.
       </p>
       <hr />
-      <h3><code>startswith</code></h3>
+      <h3 class="anchored">
+        <a id="startswith" href="#startswith" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>startswith</code>
+      </h3>
       <p><code>startswith</code> tests whether a string begins with a given prefix.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-20" href="#example-20" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">b := startswith &quot;abcde&quot; &quot;ab&quot;
 print b
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">true
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-19" href="#reference-19" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>startswith:bool s:string prefix:string
 </code></pre>
       <p>
@@ -857,16 +1222,31 @@ print b
         <code>prefix</code>, <code>false</code> otherwise.
       </p>
       <hr />
-      <h3><code>endswith</code></h3>
+      <h3 class="anchored">
+        <a id="endswith" href="#endswith" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>endswith</code>
+      </h3>
       <p><code>endswith</code> tests whether a string ends with a given suffix.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-21" href="#example-21" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">b := endswith &quot;abcde&quot; &quot;ab&quot;
 print b
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">false
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-20" href="#reference-20" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>endswith:bool s:string suffix:string
 </code></pre>
       <p>
@@ -875,16 +1255,31 @@ print b
         <code>suffix</code>, <code>false</code> otherwise.
       </p>
       <hr />
-      <h3><code>trim</code></h3>
+      <h3 class="anchored">
+        <a id="trim" href="#trim" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>trim</code>
+      </h3>
       <p><code>trim</code> removes leading and trailing characters from a string.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-22" href="#example-22" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := trim &quot;.,..abc.de.&quot; &quot;.,&quot;
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">abc.de
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-21" href="#reference-21" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>trim:string s:string cutset:string
 </code></pre>
       <p>
@@ -892,29 +1287,59 @@ print s
         beginning and end of string <code>s</code>. It returns a copy of the resulting string.
       </p>
       <hr />
-      <h3><code>replace</code></h3>
+      <h3 class="anchored">
+        <a id="replace" href="#replace" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>replace</code>
+      </h3>
       <p>
         <code>replace</code> replaces all occurrences of a substring with another substring in a
         string.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-23" href="#example-23" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">s := replace &quot;abc123xyzabc abc&quot; &quot;abc&quot; &quot;ABC&quot;
 print s
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">ABC123xyzABC ABC
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-22" href="#reference-22" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>replace:string s:string old:string new:string
 </code></pre>
       <p>
         The <code>replace</code> function replaces all occurrences of the substring
         <code>old</code> in the string <code>s</code> with the substring <code>new</code>.
       </p>
-      <h2>Random</h2>
-      <h3><code>rand</code></h3>
+      <h2 class="anchored">
+        <a id="random" href="#random" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Random
+      </h2>
+      <h3 class="anchored">
+        <a id="rand" href="#rand" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>rand</code>
+      </h3>
       <p><code>rand</code> returns a random, non-negative integer less than the argument.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-24" href="#example-24" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (rand 3)
 print (rand 3)
 </code></pre>
@@ -922,7 +1347,12 @@ print (rand 3)
       <pre><code>2
 0
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-23" href="#reference-23" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>rand:num n:num
 </code></pre>
       <p>
@@ -930,9 +1360,19 @@ print (rand 3)
         half-open interval <code>[0,n)</code>. A panic occurs for <code>n &lt;= 0</code>.
       </p>
       <hr />
-      <h3><code>rand1</code></h3>
+      <h3 class="anchored">
+        <a id="rand1" href="#rand1" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>rand1</code>
+      </h3>
       <p><code>rand1</code> returns a random, non-negative floating point number less than 1.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-25" href="#example-25" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (rand1)
 print (rand1)
 </code></pre>
@@ -940,46 +1380,96 @@ print (rand1)
       <pre><code>0.7679753163102002
 0.6349044894123325
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-24" href="#reference-24" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>rand1:num
 </code></pre>
       <p>
         The <code>rand1</code> function returns a pseudo-random floating point number in the
         half-open interval <code>[0.0,1.0)</code>.
       </p>
-      <h2>Math</h2>
-      <h3><code>min</code></h3>
+      <h2 class="anchored">
+        <a id="math" href="#math" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Math
+      </h2>
+      <h3 class="anchored">
+        <a id="min" href="#min" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>min</code>
+      </h3>
       <p><code>min</code> returns the smaller of the two given numbers.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-26" href="#example-26" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (min 3 1)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">1
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-25" href="#reference-25" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>min:num n1:num n2:num
 </code></pre>
       <p>The <code>min</code> function returns the smaller of the two given number arguments.</p>
       <hr />
-      <h3><code>max</code></h3>
+      <h3 class="anchored">
+        <a id="max" href="#max" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>max</code>
+      </h3>
       <p><code>max</code> returns the greater of the two given numbers.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-27" href="#example-27" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (min 3 1)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">1
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-26" href="#reference-26" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>max:num n1:num n2:num
 </code></pre>
       <p>The <code>max</code> function returns the greater of the two given number arguments.</p>
       <hr />
-      <h3><code>floor</code></h3>
+      <h3 class="anchored">
+        <a id="floor" href="#floor" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>floor</code>
+      </h3>
       <p>
         <code>floor</code> returns the greatest integer value less than or equal to the given
         number.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-28" href="#example-28" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (floor 2.7)
 print (floor 3)
 </code></pre>
@@ -987,7 +1477,12 @@ print (floor 3)
       <pre><code class="language-evy:output">2
 3
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-27" href="#reference-27" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>floor:num n:num
 </code></pre>
       <p>
@@ -995,11 +1490,21 @@ print (floor 3)
         number argument <code>n</code>.
       </p>
       <hr />
-      <h3><code>ceil</code></h3>
+      <h3 class="anchored">
+        <a id="ceil" href="#ceil" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>ceil</code>
+      </h3>
       <p>
         <code>ceil</code> returns the smallest integer greater than or equal to the given number.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-29" href="#example-29" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (ceil 2.1)
 print (ceil 4)
 </code></pre>
@@ -1007,7 +1512,12 @@ print (ceil 4)
       <pre><code>3
 4
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-28" href="#reference-28" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>ceil:num n:num
 </code></pre>
       <p>
@@ -1015,12 +1525,22 @@ print (ceil 4)
         number argument <code>n</code>.
       </p>
       <hr />
-      <h3><code>round</code></h3>
+      <h3 class="anchored">
+        <a id="round" href="#round" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>round</code>
+      </h3>
       <p>
         <code>round</code> returns the nearest integer to the given number, rounding half away from
         0.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-30" href="#example-30" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (round 2.4)
 print (round 2.5)
 </code></pre>
@@ -1028,7 +1548,12 @@ print (round 2.5)
       <pre><code>2
 3
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-29" href="#reference-29" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>round:num n:num
 </code></pre>
       <p>
@@ -1036,18 +1561,33 @@ print (round 2.5)
         <code>n</code>, rounding half away from 0.
       </p>
       <hr />
-      <h3><code>pow</code></h3>
+      <h3 class="anchored">
+        <a id="pow" href="#pow" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>pow</code>
+      </h3>
       <p>
         <code>pow</code> returns the value of the first number raised to the power of the second
         number.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-31" href="#example-31" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (pow 2 3)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">8
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-30" href="#reference-30" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>pow:num b:num exp:num
 </code></pre>
       <p>
@@ -1056,9 +1596,19 @@ print (round 2.5)
         <code>exp</code> is the exponent.
       </p>
       <hr />
-      <h3><code>log</code></h3>
+      <h3 class="anchored">
+        <a id="log" href="#log" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>log</code>
+      </h3>
       <p><code>log</code> returns the logarithm of the given number, to the base of e.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-32" href="#example-32" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">printf &quot;%.2f\n&quot; (log 1)
 printf &quot;%.2f\n&quot; (log 2.7183) // e
 </code></pre>
@@ -1066,7 +1616,12 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
       <pre><code class="language-evy:output">0.00
 1.00
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-31" href="#reference-31" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>log:num n:num
 </code></pre>
       <p>
@@ -1074,15 +1629,30 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
         of the given number argument <code>n</code>, to the base of <code>e</code>.
       </p>
       <hr />
-      <h3><code>sqrt</code></h3>
+      <h3 class="anchored">
+        <a id="sqrt" href="#sqrt" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>sqrt</code>
+      </h3>
       <p><code>sqrt</code> returns the square root of the given number.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-33" href="#example-33" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">print (sqrt 9)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">3
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-32" href="#reference-32" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>sqrt:num n:num
 </code></pre>
       <p>
@@ -1090,32 +1660,62 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
         <code>n</code>.
       </p>
       <hr />
-      <h3><code>sin</code></h3>
+      <h3 class="anchored">
+        <a id="sin" href="#sin" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>sin</code>
+      </h3>
       <p><code>sin</code> returns the sine of the given angle in radians.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-34" href="#example-34" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">pi := 3.14159265
 print (sin 0.5*pi)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">1
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-33" href="#reference-33" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>sin:num n:num
 </code></pre>
       <p>
         The <code>sin</code> function returns the sine of the given angle <code>n</code> in radians.
       </p>
       <hr />
-      <h3><code>cos</code></h3>
+      <h3 class="anchored">
+        <a id="cos" href="#cos" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>cos</code>
+      </h3>
       <p><code>cos</code> returns the cosine of the given angle in radians.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-35" href="#example-35" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">pi := 3.14159265
 print (cos pi)
 </code></pre>
       <p>Output</p>
       <pre><code class="language-evy:output">-1
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-34" href="#reference-34" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>cos:num n:num
 </code></pre>
       <p>
@@ -1123,12 +1723,22 @@ print (cos pi)
         radians.
       </p>
       <hr />
-      <h3><code>atan2</code></h3>
+      <h3 class="anchored">
+        <a id="atan2" href="#atan2" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>atan2</code>
+      </h3>
       <p>
         <code>atan2</code> returns the angle in radians between the positive x-axis and the ray from
         the origin to the point <code>x y</code>.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-36" href="#example-36" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">pi := 3.14159265
 rad := atan2 1 1
 degrees := rad * 180 / pi
@@ -1137,7 +1747,12 @@ printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
       <p>Output</p>
       <pre><code class="language-evy:output">rad: 0.79 degrees: 45.00
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-35" href="#reference-35" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>atan2:num y:num x:num
 </code></pre>
       <p>
@@ -1146,7 +1761,12 @@ printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
         tangent of <code>y/x</code> for given arguments <code>y</code> and <code>x</code>, using the
         signs of the two to determine the quadrant of the return value.
       </p>
-      <h2>Graphics</h2>
+      <h2 class="anchored">
+        <a id="graphics" href="#graphics" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Graphics
+      </h2>
       <p>
         Evy on the web outputs drawing commands to a drawing area called the
         <strong>canvas</strong>.
@@ -1167,7 +1787,12 @@ printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
         alt="Cartesian coordinates with x and y axes and point (30, 60)"
         src="img/coords.png"
       />
-      <p><a href="/play">Evy source: coordinates</a>.</p>
+      <p>
+        <a
+          href="/play#content=H4sIAAAAAAAAE0WRwW6EIBCG7/MUE86NAV1w8dqkL7HxYJFtSVE2rmnXNn33DgL2NDMfA///h7fFjWCCDwuyVz+YDwZfblzfkVcnAO9mixwF5zCFz9jyxIhQC7fgN7zsQ48XfUZRydTEOfG8tL8SYSVRn/sIcokc4BrmFX/u7tt2J7wOk/Nbx17cMuBzGO0TTmEO99tgLPtNXrREAat9rMgeLCFBMKPtQGWJM0ioOVJQp3gJqY48hKUma7VG2VJtRK47z0t0qGKeus3LLSrRF56laomqzvq72OFBYK2L1e6fC5JQJVXXRJ4/Z7EjO/yTV+MW4+kC/AGSFdVbwgEAAA=="
+          >Evy source: coordinates</a
+        >.
+      </p>
       <p>
         The canvas ranges from coordinates <code>0 0</code> to <code>100 100</code>. The center of
         the canvas has the coordinates <code>50 50</code>.
@@ -1184,16 +1809,31 @@ printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
         subsequent drawing commands.
       </p>
       <hr />
-      <h3><code>move</code></h3>
+      <h3 class="anchored">
+        <a id="move" href="#move" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>move</code>
+      </h3>
       <p><code>move</code> sets the position of the pen to the given coordinates.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-37" href="#example-37" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">grid
 move 30 60
 circle 1
 </code></pre>
       <p>Output</p>
       <img width="300" alt="small black dot at coords 30 60" src="img/move-30-60.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-36" href="#reference-36" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>move x:num y:num
 </code></pre>
       <p>
@@ -1202,12 +1842,22 @@ circle 1
         <code>0 0</code>.
       </p>
       <hr />
-      <h3><code>line</code></h3>
+      <h3 class="anchored">
+        <a id="line" href="#line" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>line</code>
+      </h3>
       <p>
         <code>line</code> draws a line from the current position of the pen to the given
         coordinates.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-38" href="#example-38" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>The following example draws a triangle.</p>
       <pre><code class="language-evy">move 30 20
 line 70 20
@@ -1216,7 +1866,12 @@ line 30 20
 </code></pre>
       <p>Output</p>
       <img width="300" alt="triangle in bottom half of canvas" src="img/triangle.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-37" href="#reference-37" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>line x:num y:num
 </code></pre>
       <p>
@@ -1225,12 +1880,22 @@ line 30 20
         given coordinates, which allows for easy polygon drawing.
       </p>
       <hr />
-      <h3><code>rect</code></h3>
+      <h3 class="anchored">
+        <a id="rect" href="#rect" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>rect</code>
+      </h3>
       <p>
         <code>rect</code> draws a rectangle with the given width and height at the pen's current
         position.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-39" href="#example-39" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">grid
 move 40 20
 rect 10 30
@@ -1238,7 +1903,12 @@ rect 40 20
 </code></pre>
       <p>Output</p>
       <img width="300" alt="two black rectangles with touching vertices" src="img/rects.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-38" href="#reference-38" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>rect width:num height:num
 </code></pre>
       <p>
@@ -1248,16 +1918,31 @@ rect 40 20
         the opposite corner of the rectangle is at the new cursor position.
       </p>
       <hr />
-      <h3><code>circle</code></h3>
+      <h3 class="anchored">
+        <a id="circle" href="#circle" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>circle</code>
+      </h3>
       <p><code>circle</code> draws a circle with given radius at the pen's current position.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-40" href="#example-40" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">grid
 move 50 50
 circle 10
 </code></pre>
       <p>Output</p>
       <img width="300" alt="black circle in the canvas center" src="img/circle.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-39" href="#reference-39" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>circle radius:num
 </code></pre>
       <p>
@@ -1265,7 +1950,12 @@ circle 10
         at the current cursor position. The cursor position does not change after drawing a circle.
       </p>
       <hr />
-      <h3><code>color</code></h3>
+      <h3 class="anchored">
+        <a id="color" href="#color" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>color</code>
+      </h3>
       <p>
         <code>color</code> changes the color of the pen. All
         <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value"
@@ -1276,13 +1966,23 @@ circle 10
         , such as <code>&quot;red&quot;</code>, <code>&quot;darkmagenta&quot;</code>, and
         <code>&quot;springgreen&quot;</code>.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-41" href="#example-41" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">color &quot;darkmagenta&quot;
 rect 20 20
 </code></pre>
       <p>Output</p>
       <img width="300" alt="dark magenta square in bottom left corner" src="img/magenta.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-40" href="#reference-40" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>color c:string
 </code></pre>
       <p>
@@ -1305,16 +2005,31 @@ rect 20 20
         not change. The initial color is <code>&quot;black&quot;</code>.
       </p>
       <hr />
-      <h3><code>colour</code></h3>
+      <h3 class="anchored">
+        <a id="colour" href="#colour" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>colour</code>
+      </h3>
       <p>
         <code>colour</code> is an alternate spelling of <code>color</code>. See
         <a href="#color"><code>color</code></a
         >.
       </p>
       <hr />
-      <h3><code>width</code></h3>
+      <h3 class="anchored">
+        <a id="width" href="#width" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>width</code>
+      </h3>
       <p><code>width</code> sets the thickness of the lines drawn by the pen.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-42" href="#example-42" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">width 10
 line 30 30
 width 1
@@ -1325,7 +2040,12 @@ grid
 </code></pre>
       <p>Output</p>
       <img width="300" alt="diagonal lines of different width" src="img/width.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-41" href="#reference-41" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>width n:num
 </code></pre>
       <p>
@@ -1336,12 +2056,22 @@ grid
         <code>fill &quot;none&quot;</code>. The initial stroke width it 0.1 units.
       </p>
       <hr />
-      <h3><code>clear</code></h3>
+      <h3 class="anchored">
+        <a id="clear" href="#clear" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>clear</code>
+      </h3>
       <p>
         <code>clear</code> clears the canvas. Optionally, it can take a color argument to clear the
         canvas to.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-43" href="#example-43" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>
         The following example code shows how to draw a magenta square, clear the canvas, and then
         draw a blue circle. The final result is a canvas with a blue circle centered at
@@ -1357,7 +2087,12 @@ grid
 </code></pre>
       <p>Output</p>
       <img width="300" alt="blue circle in bottom left corner" src="img/blue-circle.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-42" href="#reference-42" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>clear [c:string]
 </code></pre>
       <p>
@@ -1368,17 +2103,32 @@ grid
         <code>&quot;transparent&quot;</code>.
       </p>
       <hr />
-      <h3><code>grid</code></h3>
+      <h3 class="anchored">
+        <a id="grid" href="#grid" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>grid</code>
+      </h3>
       <p>
         <code>grid</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and
         each grid line is spaced 10 units apart.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-44" href="#example-44" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">grid
 </code></pre>
       <p>Output</p>
       <img width="300" alt="10x10 grid lines" src="img/grid.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-43" href="#reference-43" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>grid
 </code></pre>
       <p>
@@ -1410,18 +2160,33 @@ for i := range 0 101 10
 end
 </code></pre>
       <hr />
-      <h3><code>gridn</code></h3>
+      <h3 class="anchored">
+        <a id="gridn" href="#gridn" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>gridn</code>
+      </h3>
       <p>
         <code>gridn</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and
         each grid line is spaced the given number of units apart. The color of the grid is set to
         the given color.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-45" href="#example-45" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">gridn 2 &quot;red&quot;
 </code></pre>
       <p>Output</p>
       <img width="300" alt="50x50 red grid lines" src="img/gridn.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-44" href="#reference-44" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>gridn n:num c:string
 </code></pre>
       <p>
@@ -1454,9 +2219,19 @@ for i := range 0 101 n
 end
 </code></pre>
       <hr />
-      <h3><code>poly</code></h3>
+      <h3 class="anchored">
+        <a id="poly" href="#poly" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>poly</code>
+      </h3>
       <p><code>poly</code> draws polylines and polygons for the given coordinates.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-46" href="#example-46" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>The following code draws a w-shaped red polyline and a yellow triangle.</p>
       <pre><code class="language-evy">width 1
 color &quot;red&quot;
@@ -1469,7 +2244,12 @@ poly [10 20] [50 50] [20 10] [10 20]
 </code></pre>
       <p>Output</p>
       <img width="300" alt="w-shaped red polyline, yellow triangle" src="img/poly.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-45" href="#reference-45" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>poly xy:[]num...
 </code></pre>
       <p>
@@ -1491,12 +2271,22 @@ poly [10 20] [50 50] [20 10] [10 20]
         <code>poly</code> function does not use or change the cursor position.
       </p>
       <hr />
-      <h3><code>ellipse</code></h3>
+      <h3 class="anchored">
+        <a id="ellipse" href="#ellipse" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>ellipse</code>
+      </h3>
       <p>
         <code>ellipse</code> draws an ellipse for given center, radii and optional tilt, start and
         end angles.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-47" href="#example-47" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">// red circle
 color &quot;red&quot;
 ellipse 50 50 40
@@ -1519,7 +2309,12 @@ ellipse 50 50 40 10 135 0 180
         alt="red circle with yellow ellilpse, tilted blue ellipse and whit half-ellipse"
         src="img/ellipse.png"
       />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-46" href="#reference-46" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>ellipse x:num y:num rx:num [ry:num [tilt:num [start:num end:num]]]
 </code></pre>
       <p>
@@ -1536,9 +2331,19 @@ ellipse 50 50 40 10 135 0 180
         default values of 0 and 360, respectively.
       </p>
       <hr />
-      <h3><code>stroke</code></h3>
+      <h3 class="anchored">
+        <a id="stroke" href="#stroke" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>stroke</code>
+      </h3>
       <p><code>stroke</code> sets the color of the outline of shapes.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-48" href="#example-48" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>The following code draws two red squares, one with a blue outline.</p>
       <pre><code class="language-evy">width 1
 color &quot;red&quot;
@@ -1549,7 +2354,12 @@ rect 30 30
 </code></pre>
       <p>Output</p>
       <img width="300" alt="two red sqaures one with blue outline" src="img/stroke.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-47" href="#reference-47" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>stroke c:string
 </code></pre>
       <p>
@@ -1559,9 +2369,19 @@ rect 30 30
         initial stroke color is <code>&quot;black&quot;</code>.
       </p>
       <hr />
-      <h3><code>fill</code></h3>
+      <h3 class="anchored">
+        <a id="fill" href="#fill" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>fill</code>
+      </h3>
       <p><code>fill</code> sets the color of the interior of shapes.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-49" href="#example-49" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>The following code draws a red square and a blue square with a red outline.</p>
       <pre><code class="language-evy">width 1
 color &quot;red&quot;
@@ -1572,7 +2392,12 @@ rect 30 30
 </code></pre>
       <p>Output</p>
       <img width="300" alt="a red sqaures and a blue square with red outline" src="img/fill.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-48" href="#reference-48" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>fill c:string
 </code></pre>
       <p>
@@ -1581,9 +2406,19 @@ rect 30 30
         is <code>&quot;black&quot;</code>.
       </p>
       <hr />
-      <h3><code>dash</code></h3>
+      <h3 class="anchored">
+        <a id="dash" href="#dash" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>dash</code>
+      </h3>
       <p><code>dash</code> sets the line dash pattern.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-50" href="#example-50" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">width 2
 
 dash 5 // same as: dash 5 5, dash 5 5 5
@@ -1608,7 +2443,12 @@ end
 </code></pre>
       <p>Output</p>
       <img width="300" alt="dash patterns" src="img/dashes.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-49" href="#reference-49" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>dash segments:num...
 </code></pre>
       <p>
@@ -1624,9 +2464,19 @@ end
       </p>
       <p>The initial dash pattern is a solid line.</p>
       <hr />
-      <h3><code>linecap</code></h3>
+      <h3 class="anchored">
+        <a id="linecap" href="#linecap" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>linecap</code>
+      </h3>
       <p><code>linecap</code> sets the shape of the ends of lines.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-51" href="#example-51" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">width 5
 grid
 
@@ -1646,7 +2496,12 @@ end
 </code></pre>
       <p>Output</p>
       <img width="300" alt="round and square line caps" src="img/linecaps.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-50" href="#reference-50" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>linecap style:string
 </code></pre>
       <p>
@@ -1665,9 +2520,19 @@ end
       </p>
       <p>The initial linecap style is <code>&quot;round&quot;</code>.</p>
       <hr />
-      <h3><code>text</code></h3>
+      <h3 class="anchored">
+        <a id="text" href="#text" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>text</code>
+      </h3>
       <p><code>text</code> prints text to the canvas at the current cursor position.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-52" href="#example-52" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">move 20 70
 text &quot;“Time is an illusion.&quot;
 move 20 63
@@ -1677,7 +2542,12 @@ text &quot;― Douglas Adams&quot;
 </code></pre>
       <p>Output</p>
       <img width="300" alt="text sample" src="img/text.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-51" href="#reference-51" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>text s:string
 </code></pre>
       <p>
@@ -1689,13 +2559,23 @@ text &quot;― Douglas Adams&quot;
         >.
       </p>
       <hr />
-      <h3><code>font</code></h3>
+      <h3 class="anchored">
+        <a id="font" href="#font" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>font</code>
+      </h3>
       <p>
         <code>font</code> sets the font properties for text. The font properties are
         <code>family</code>,<code>size</code>, <code>weight</code>, <code>style</code>,
         <code>letterspacing</code>, <code>baseline</code>, and <code>align</code>.
       </p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-53" href="#example-53" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">font {family:&quot;Bradley Hand, cursive&quot; size:4}
 
 move 10 65
@@ -1780,7 +2660,12 @@ text &quot;alphabetic&quot;
 </code></pre>
       <p>Output</p>
       <img width="300" alt="styled text sample" src="img/align.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-52" href="#reference-52" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>font props:{}any
 </code></pre>
       <p>
@@ -1842,7 +2727,12 @@ text &quot;alphabetic&quot;
         This code sets the font properties to use the Fira Code font, a size of 9, a weight of 700,
         an italic style, a letterspacing of 0.5, a top baseline, and a center alignment.
       </p>
-      <h2>Event Handlers</h2>
+      <h2 class="anchored">
+        <a id="event-handlers" href="#event-handlers" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Event Handlers
+      </h2>
       <p>
         Evy first executes all top-level code in the order it appears in the source code. If there
         is at least one event handler, Evy then enters an event loop. In the event loop, Evy waits
@@ -1877,9 +2767,19 @@ end
         interact with the canvas.
       </p>
       <hr />
-      <h3><code>key</code></h3>
+      <h3 class="anchored">
+        <a id="key" href="#key" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>key</code>
+      </h3>
       <p><code>key</code> is called when a key on the keyboard is pressed.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-54" href="#example-54" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">on key k:string
     print k
 end
@@ -1890,7 +2790,12 @@ Shift
 R
 o
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-53" href="#reference-53" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>key k:string
 </code></pre>
       <p>
@@ -1914,9 +2819,19 @@ o
         <code>&quot;A&quot;</code>.
       </p>
       <hr />
-      <h3><code>down</code></h3>
+      <h3 class="anchored">
+        <a id="down" href="#down" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>down</code>
+      </h3>
       <p><code>down</code> is called when the pointer is pressed down.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-55" href="#example-55" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">on down x:num y:num
     printf &quot;x: %2.0f y: %2.0f\n&quot; x y
 end
@@ -1925,7 +2840,12 @@ end
       <pre><code>x: 42 y: 85
 x:  7 y:  6
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-54" href="#reference-54" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>down x:num y:num
 </code></pre>
       <p>
@@ -1935,9 +2855,19 @@ x:  7 y:  6
         pressed down. The pointer is typically a mouse, stylus or finger.
       </p>
       <hr />
-      <h3><code>up</code></h3>
+      <h3 class="anchored">
+        <a id="up" href="#up" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>up</code>
+      </h3>
       <p><code>up</code> is called when the pointer is lifted up.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-56" href="#example-56" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">on up x:num y:num
     move x y
     color &quot;red&quot;
@@ -1946,7 +2876,12 @@ end
 </code></pre>
       <p>Sample output</p>
       <img width="300" alt="red dots" src="img/up.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-55" href="#reference-55" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>up x:num y:num
 </code></pre>
       <p>
@@ -1956,9 +2891,19 @@ end
         lifted up. The pointer is typically a mouse, stylus or finger.
       </p>
       <hr />
-      <h3><code>move</code></h3>
+      <h3 class="anchored">
+        <a id="move-1" href="#move-1" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>move</code>
+      </h3>
       <p><code>move</code> is called when the pointer is moved.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-57" href="#example-57" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <p>The following sample draws a line following the pointer's movement.</p>
       <pre><code class="language-evy">down := false
 width 1
@@ -1980,7 +2925,12 @@ end
 </code></pre>
       <p>Sample output</p>
       <img width="300" alt="black line tracking short and fast mouse movement" src="img/move.png" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-56" href="#reference-56" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>move x:num y:num
 </code></pre>
       <p>
@@ -1990,9 +2940,19 @@ end
         pointer is typically a mouse, stylus or finger.
       </p>
       <hr />
-      <h3><code>animate</code></h3>
+      <h3 class="anchored">
+        <a id="animate" href="#animate" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>animate</code>
+      </h3>
       <p><code>animate</code> gets called periodically around 60 times per second.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-58" href="#example-58" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">semiblack := &quot;hsl(0deg 0% 0% / 10%)&quot;
 width 1
 fill semiblack
@@ -2007,7 +2967,12 @@ end
 </code></pre>
       <p>Output</p>
       <img width="300" alt="red circle reapeated falling" src="img/animate.gif" />
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-57" href="#reference-57" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>animate elapsed:num
 </code></pre>
       <p>
@@ -2022,9 +2987,19 @@ end
         animation and to update the animation accordingly.
       </p>
       <hr />
-      <h3><code>input</code></h3>
+      <h3 class="anchored">
+        <a id="input" href="#input" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        <code>input</code>
+      </h3>
       <p><code>input</code> is called when the value of an input element changes.</p>
-      <h4>Example</h4>
+      <h4 class="anchored">
+        <a id="example-59" href="#example-59" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Example
+      </h4>
       <pre><code class="language-evy">on input id:string val:string
     print &quot;id:&quot; id &quot;val:&quot; val
 end
@@ -2034,7 +3009,12 @@ end
 id: slidery val: 0
 id: slidery val: 100
 </code></pre>
-      <h4>Reference</h4>
+      <h4 class="anchored">
+        <a id="reference-58" href="#reference-58" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Reference
+      </h4>
       <pre><code>input id:string val:id
 </code></pre>
       <p>
@@ -2053,5 +3033,13 @@ id: slidery val: 100
         new position value of the slider.
       </p>
     </main>
+    <!-- icons  -->
+    <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="icon-link" fill="none" stroke-width="1" stroke="currentColor" viewBox="0 0 16 16">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
+        ></path>
+      </symbol>
+    </svg>
   </body>
 </html>

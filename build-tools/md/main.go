@@ -140,33 +140,38 @@ func md2html(mdBytes []byte) (string, string) {
 		AutoLinkText: true, // turn URLs into links even without []()
 	}
 	doc := p.Parse(string(mdBytes))
-	walk(doc, updateLinks)
+	walk(doc, walkFn)
 	title := extractTitle(doc)
 	return title, markdown.ToHTML(doc)
 }
 
-func updateLinks(n node) {
-	mdl, ok := n.(*markdown.Link)
-	if !ok {
-		return
+func walkFn(n node) node {
+	if mdl, ok := n.(*markdown.Link); ok {
+		return updateLink(mdl)
 	}
+	return n
+}
+
+func updateLink(mdl *markdown.Link) node {
 	u, err := url.Parse(mdl.URL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error parsing URL %q: %v\n", mdl.URL, err)
-		return
+		return nil
 	}
 	if u.IsAbs() {
 		if rootDir, found := strings.CutSuffix(u.Hostname(), ".evy.dev"); found { //  subdomain link
 			mdl.URL, err = url.JoinPath("/", rootDir, u.Path)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error creating URL %q %q %q: %v\n", "/", rootDir, u.Path, err)
+				return nil
 			}
 		}
-		return
+		return mdl
 	}
 	// relative path, fix *.md filenames
 	u.Path = htmlFilename(u.Path)
 	mdl.URL = u.String()
+	return mdl
 }
 
 func extractTitle(doc *markdown.Document) string {

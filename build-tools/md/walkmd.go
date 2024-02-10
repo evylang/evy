@@ -11,43 +11,47 @@ type node interface {
 	PrintHTML(*bytes.Buffer)
 }
 
-func walk(node node, f func(node)) {
-	f(node)
+type walkFunc func(node) node
+
+func walk(node node, f walkFunc) node {
 	switch n := node.(type) {
-	case *markdown.Del:
-		walkNodes(n.Inner, f)
-	case *markdown.Document:
-		walkNodes(n.Blocks, f)
-	case *markdown.Emph:
-		walkNodes(n.Inner, f)
-	case *markdown.Heading:
-		walk(n.Text, f)
-	case *markdown.Image:
-		walkNodes(n.Inner, f)
-	case *markdown.Item:
-		walkNodes(n.Blocks, f)
-	case *markdown.Link:
-		walkNodes(n.Inner, f)
-	case *markdown.List:
-		walkNodes(n.Items, f)
 	case *markdown.Paragraph:
-		walk(n.Text, f)
+		n.Text = walk(n.Text, f).(*markdown.Text)
+	case *markdown.Heading:
+		n.Text = walk(n.Text, f).(*markdown.Text)
+	case *markdown.Del:
+		n.Inner = walkNodes(n.Inner, f)
+	case *markdown.Document:
+		n.Blocks = walkNodes(n.Blocks, f)
+	case *markdown.Emph:
+		n.Inner = walkNodes(n.Inner, f)
+	case *markdown.Image:
+		n.Inner = walkNodes(n.Inner, f)
+	case *markdown.Item:
+		n.Blocks = walkNodes(n.Blocks, f)
+	case *markdown.Link:
+		n.Inner = walkNodes(n.Inner, f)
+	case *markdown.List:
+		n.Items = walkNodes(n.Items, f)
 	case *markdown.Quote:
-		walkNodes(n.Blocks, f)
+		n.Blocks = walkNodes(n.Blocks, f)
 	case *markdown.Strong:
-		walkNodes(n.Inner, f)
+		n.Inner = walkNodes(n.Inner, f)
 	case *markdown.Table:
-		walkNodes(n.Header, f)
-		for _, row := range n.Rows {
-			walkNodes(row, f)
+		n.Header = walkNodes(n.Header, f)
+		for i, row := range n.Rows {
+			n.Rows[i] = walkNodes(row, f)
 		}
 	case *markdown.Text:
-		walkNodes(n.Inline, f)
+		n.Inline = walkNodes(n.Inline, f)
 	}
+	return f(node)
 }
 
-func walkNodes[T node](nodes []T, f func(node)) {
+func walkNodes[T node](nodes []T, f walkFunc) []T {
+	result := make([]T, 0, len(nodes))
 	for _, n := range nodes {
-		walk(n, f)
+		result = append(result, walk(n, f).(T))
 	}
+	return result
 }

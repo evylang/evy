@@ -13,6 +13,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
+	"slices"
 	"strings"
 	"text/template"
 
@@ -141,16 +143,29 @@ func md2html(mdBytes []byte) (string, string) {
 		Table:        true, //
 	}
 	doc := p.Parse(string(mdBytes))
-	walk(doc, updateLinks)
+	w := &walker{anchorIDs: map[string]bool{}}
+	walk(doc, w.walk)
 	title := extractTitle(doc)
 	return title, markdown.ToHTML(doc)
 }
 
-func updateLinks(n node) {
-	mdl, ok := n.(*markdown.Link)
-	if !ok {
-		return
+type walker struct {
+	anchorIDs map[string]bool
+	// majorHeading is the last heading level 1-3, to be used as prefix in anchors level 4-6
+	// this is to avoid #example-21 in favour of #print-example in builtins.
+	majorHeadingID string
+}
+
+func (w *walker) walk(n node) {
+	switch n := n.(type) {
+	case *markdown.Link:
+		updateLink(n)
+	case *markdown.Heading:
+		w.updateHeading(n)
 	}
+}
+
+func updateLink(mdl *markdown.Link) {
 	u, err := url.Parse(mdl.URL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error parsing URL %q: %v\n", mdl.URL, err)
@@ -158,16 +173,47 @@ func updateLinks(n node) {
 	}
 	if u.IsAbs() {
 		if rootDir, found := strings.CutSuffix(u.Hostname(), ".evy.dev"); found { //  subdomain link
-			mdl.URL, err = url.JoinPath("/", rootDir, u.Path)
+			u.Path, err = url.JoinPath("/", rootDir, u.Path)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error creating URL %q %q %q: %v\n", "/", rootDir, u.Path, err)
 			}
+			u.Host = ""
+			u.Scheme = ""
+			mdl.URL = u.String()
 		}
 		return
 	}
 	// relative path, fix *.md filenames
 	u.Path = htmlFilename(u.Path)
 	mdl.URL = u.String()
+}
+
+// updateHeading inserts a [markdown.Inline] element at the start of a
+// [markdown.Heading]s Text slice that renders a link marker linking
+// to the heading, allowing for easily copying links to a heading.
+func (w *walker) updateHeading(h *markdown.Heading) {
+	text := inlineText(h.Text.Inline)
+	var majorHeading string
+	if h.Level > 3 {
+		majorHeading = w.majorHeadingID
+	}
+	id := makeID(text, majorHeading, w.anchorIDs)
+	if h.Level <= 3 {
+		w.majorHeadingID = id
+	}
+	anchor := markdown.Inline(newAnchor(id))
+	h.Text.Inline = slices.Insert(h.Text.Inline, 0, anchor)
+}
+
+func newAnchor(id string) *markdown.HTMLTag {
+	format := `
+<a id="%s" href="#%s" class="anchor">
+    <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+</a>
+`
+	return &markdown.HTMLTag{
+		Text: fmt.Sprintf(format, id, id),
+	}
 }
 
 func extractTitle(doc *markdown.Document) string {
@@ -184,8 +230,12 @@ func extractTitle(doc *markdown.Document) string {
 	if titleText == nil {
 		return ""
 	}
+	return inlineText(titleText.Inline)
+}
+
+func inlineText(inlines []markdown.Inline) string {
 	buf := &bytes.Buffer{}
-	for _, inline := range titleText.Inline {
+	for _, inline := range inlines {
 		inline.PrintText(buf)
 	}
 	return buf.String()
@@ -206,4 +256,20 @@ func toRoot(p string) string {
 		return strings.Repeat("/..", c)[1:]
 	}
 	return "."
+}
+
+var reHeadingID = regexp.MustCompile(`[^\pL\pN]+`)
+
+func makeID(s, majorHeading string, ids map[string]bool) string {
+	id := strings.ToLower(s)
+	id = reHeadingID.ReplaceAllString(id, "-")
+	if ids[id] && majorHeading != "" {
+		id = majorHeading + "-" + id
+	}
+	orig := id
+	for i := 1; ids[id]; i++ {
+		id = fmt.Sprintf("%s-%d", orig, i)
+	}
+	ids[id] = true
+	return id
 }

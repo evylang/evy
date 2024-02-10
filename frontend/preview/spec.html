@@ -14,7 +14,12 @@
   </head>
   <body>
     <main class="max-width-wrapper">
-      <h1>Language Specification</h1>
+      <h1>
+        <a id="language-specification" href="#language-specification" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Language Specification
+      </h1>
       <p>
         Evy is a
         <a href="https://developer.mozilla.org/en-US/docs/Glossary/Static_typing"
@@ -32,7 +37,12 @@
         <a href="syntax_by_example.html">syntax by example</a> or read through the
         <a href="builtins.html">built-ins documentation</a>.
       </p>
-      <h4>Table of Contents</h4>
+      <h4>
+        <a id="table-of-contents" href="#table-of-contents" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Table of Contents
+      </h4>
       <!-- gen:toc -->
       <ol>
         <li>
@@ -140,7 +150,12 @@
         </li>
       </ol>
       <!-- genend:toc -->
-      <h2>Syntax Grammar</h2>
+      <h2>
+        <a id="syntax-grammar" href="#syntax-grammar" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Syntax Grammar
+      </h2>
       <p>
         The Evy syntax grammar is a
         <a href="https://en.wikipedia.org/wiki/Wirth_syntax_notation">WSN</a> grammar, which is a
@@ -148,7 +163,12 @@
         syntax grammar to parse Evy source code, which means that it checks that the code follows
         the rules of the grammar.
       </p>
-      <h3>WSN Syntax Grammar</h3>
+      <h3>
+        <a id="wsn-syntax-grammar" href="#wsn-syntax-grammar" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        WSN Syntax Grammar
+      </h3>
       <p>
         Evy's syntax is specified using a WSN grammar, a variant of
         <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">EBNF</a> grammars,
@@ -229,7 +249,12 @@ CHARACTER  = /* an arbitrary Unicode code point */ .
         the default and mean horizontal whitespace is allowed (again) between terminals.
       </p>
       <p>See the section on <a href="#whitespace">whitespace</a> for further details.</p>
-      <h3>Evy Syntax Grammar</h3>
+      <h3>
+        <a id="evy-syntax-grammar" href="#evy-syntax-grammar" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Evy Syntax Grammar
+      </h3>
       <p>
         Evy source code is UTF-8 encoded, which means that it can contain any Unicode character. The
         NUL character <code>U+0000</code> is not allowed, as it is a special character that is used
@@ -351,12 +376,22 @@ DECIMAL_DIGIT  = &quot;0&quot; … &quot;9&quot; .
 NL             = &quot;\n&quot;  . /* end of file */
 EOF            = &quot;&quot; . /* end of file */
 </code></pre>
-      <h2>Comments</h2>
+      <h2>
+        <a id="comments" href="#comments" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Comments
+      </h2>
       <p>
         There is only one type of comment, the line comment which starts with <code>//</code> and
         stops at the end of the line. Line comments cannot start inside string literals.
       </p>
-      <h2>Types</h2>
+      <h2>
+        <a id="types" href="#types" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Types
+      </h2>
       <p>
         Evy has a static <strong>type system</strong> where the types of variables, parameters and
         expressions are known at parse time. This means that the parser can check for type errors
@@ -381,7 +416,12 @@ EOF            = &quot;&quot; . /* end of file */
         >
         according to the IEEE-754 64-bit floating point standard.
       </p>
-      <h2>Variables and Declarations</h2>
+      <h2>
+        <a id="variables-and-declarations" href="#variables-and-declarations" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Variables and Declarations
+      </h2>
       <p>
         Variables hold values of a specific type. They must be <strong>declared</strong> before they
         can be used. A declared variable must be used at least once, meaning it must be used in the
@@ -430,7 +470,12 @@ print 3 (typeof map1) (typeof map2)
 2 []any [][]any []any
 3 {}any {}num
 </code></pre>
-      <h2>Zero Values</h2>
+      <h2>
+        <a id="zero-values" href="#zero-values" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Zero Values
+      </h2>
       <p>
         Variables declared via typed declaration are initialized to the zero value of their type:
       </p>
@@ -462,7 +507,12 @@ print 3 (typeof [])
         Similarly, the empty map literal becomes <code>{}any</code> in inferred declarations.
         Otherwise the empty map literal assumes the map type <code>{}TYPE</code> required.
       </p>
-      <h2>Assignments</h2>
+      <h2>
+        <a id="assignments" href="#assignments" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Assignments
+      </h2>
       <p>
         Assignments are defined by an equal sign <code>=</code>. The left-hand side of the
         <code>=</code> must contain an <strong>assignment target</strong>, a variable, an indexed
@@ -489,7 +539,12 @@ print 2 s
       <pre><code class="language-evy:output">1 a
 2 b
 </code></pre>
-      <h2>Copy and Reference</h2>
+      <h2>
+        <a id="copy-and-reference" href="#copy-and-reference" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Copy and Reference
+      </h2>
       <p>
         When a variable of a basic type <code>num</code>, <code>string</code>, or
         <code>bool</code> is the value of an assignment, a <strong>copy</strong> of its value is
@@ -526,13 +581,23 @@ print a b
         For the dynamic type <code>any</code>, a copy is made if the value is a basic type. The
         variable is passed by reference if the value is a composite type.
       </p>
-      <h2>Variable Names</h2>
+      <h2>
+        <a id="variable-names" href="#variable-names" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Variable Names
+      </h2>
       <p>
         Variable names in Evy must start with a letter or underscore, and can contain any
         combination of letters, numbers, and underscores. They cannot be the same as keywords, such
         as <code>if</code>, <code>func</code>, or any built-in or defined function names.
       </p>
-      <h2>Scope</h2>
+      <h2>
+        <a id="scope" href="#scope" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Scope
+      </h2>
       <p><strong>Scope</strong> refers to the visibility of a variable or function.</p>
       <p>
         Functions can only be defined at the top level of the program, known as
@@ -578,7 +643,12 @@ print 3 x
 2 true
 3 outer
 </code></pre>
-      <h2>Strings</h2>
+      <h2>
+        <a id="strings" href="#strings" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Strings
+      </h2>
       <p>
         A <strong>string</strong> is a sequence of
         <a href="https://en.wikipedia.org/wiki/Unicode">Unicode code points</a>. Unicode is a
@@ -621,7 +691,12 @@ print str
       <p>outputs</p>
       <pre><code class="language-evy:output">She said, &quot;Hello, hello!&quot;
 </code></pre>
-      <h2>Arrays</h2>
+      <h2>
+        <a id="arrays" href="#arrays" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Arrays
+      </h2>
       <p>
         <strong>Arrays</strong> are collections of elements that have the same type. They are
         declared with brackets <code>[]</code>, and the elements are separated by a space. For
@@ -680,7 +755,12 @@ print 3 arr
 2 [a b] [1]
 3 [A b]
 </code></pre>
-      <h2>Maps</h2>
+      <h2>
+        <a id="maps" href="#maps" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Maps
+      </h2>
       <p>
         <strong>Maps</strong> are key-value stores, where the values can be looked up by their key,
         for example <code>map := { key1:&quot;value1&quot; key2:&quot;value2&quot; }</code>.
@@ -745,7 +825,12 @@ print m
         No whitespace is allowed around the dot expression <code>.</code>, and before the index
         expression <code>[</code>.
       </p>
-      <h2>Index and Slice</h2>
+      <h2>
+        <a id="index-and-slice" href="#index-and-slice" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Index and Slice
+      </h2>
       <p>
         An array or string <strong>index</strong> in Evy is a number that is used to access a
         specific element of an array or character of a string. Array indices start at
@@ -792,7 +877,12 @@ print 5 s[:-1]
         like indexing an array or string. For more details, see the section on
         <a href="#whitespace">whitespace</a>.
       </p>
-      <h2>Operators and Expressions</h2>
+      <h2>
+        <a id="operators-and-expressions" href="#operators-and-expressions" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Operators and Expressions
+      </h2>
       <p>
         <strong>Operators</strong> are special symbols or identifiers that combine the values of
         their operands into a single value. <strong>Operands</strong> are the variables or literal
@@ -878,7 +968,16 @@ print 5 s[:-1]
           </tr>
         </tbody>
       </table>
-      <h3>Arithmetic and Concatenation Operators</h3>
+      <h3>
+        <a
+          id="arithmetic-and-concatenation-operators"
+          href="#arithmetic-and-concatenation-operators"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Arithmetic and Concatenation Operators
+      </h3>
       <p>
         The <strong>arithmetic operators</strong> <code>+</code>, <code>-</code>, <code>*</code>,
         <code>/</code>, and <code>%</code> stand for addition, subtraction, multiplication,
@@ -898,7 +997,12 @@ print 5 s[:-1]
         <code>&quot;engine&quot;</code> combines into the string
         <code>&quot;fireengine&quot;</code>.
       </p>
-      <h3>Logical Operators</h3>
+      <h3>
+        <a id="logical-operators" href="#logical-operators" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Logical Operators
+      </h3>
       <p>
         The <strong>logical operators</strong> <code>and</code> and <code>or</code> are used to
         perform
@@ -928,7 +1032,12 @@ print 5 s[:-1]
         not need to be evaluated because the result of the expression is already known to be
         <code>false</code>.
       </p>
-      <h3>Comparison Operators</h3>
+      <h3>
+        <a id="comparison-operators" href="#comparison-operators" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Comparison Operators
+      </h3>
       <p>
         The <strong>comparison operators</strong> <code>&lt;</code> <code>&lt;=</code>
         <code>&gt;</code> <code>&gt;=</code> stand for less, less or equal, greater, greater or
@@ -944,7 +1053,12 @@ print 5 s[:-1]
         The result of a comparison operation is the boolean value <code>true</code> or
         <code>false</code>.
       </p>
-      <h3>Unary Operators</h3>
+      <h3>
+        <a id="unary-operators" href="#unary-operators" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Unary Operators
+      </h3>
       <p>
         <strong>Unary operators</strong> are operators that operate on a single operand. In Evy,
         there are two unary operators: <code>-</code> and <code>!</code>.
@@ -980,7 +1094,12 @@ print 3 a -b
       <p>
         For more information about whitespace, see the <a href="#whitespace">whitespace</a> section.
       </p>
-      <h2>Precedence</h2>
+      <h2>
+        <a id="precedence" href="#precedence" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Precedence
+      </h2>
       <p>
         Operators in Evy are evaluated in a specific order, called <strong>precedence</strong>. The
         order of precedence is as follows:
@@ -1025,7 +1144,12 @@ print 3 a -b
         <li>The expression <code>a[i] - 5</code> will be evaluated first.</li>
         <li>The multiplication <code>* 2</code> will be evaluated next.</li>
       </ul>
-      <h2>Statements</h2>
+      <h2>
+        <a id="statements" href="#statements" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Statements
+      </h2>
       <p>
         A <strong>statement</strong> is a unit of code that performs an action. Statements are the
         building blocks of programs, and they can be used to control the flow of execution.
@@ -1058,12 +1182,22 @@ print 3 a -b
         Not all statements are allowed in all contexts. For example, a return statement may only be
         used within a function definition.
       </p>
-      <h2>Whitespace</h2>
+      <h2>
+        <a id="whitespace" href="#whitespace" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Whitespace
+      </h2>
       <p>
         Whitespace in Evy is used to separate different parts of a program. There are two types of
         whitespace in Evy: vertical whitespace and horizontal whitespace.
       </p>
-      <h3>Vertical Whitespace</h3>
+      <h3>
+        <a id="vertical-whitespace" href="#vertical-whitespace" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Vertical Whitespace
+      </h3>
       <p>
         Vertical whitespace is a sequence of one or more newline characters that can optionally
         contain comments. It is used to terminate or end basic statements in Evy. A basic statement
@@ -1095,7 +1229,12 @@ print 3 a -b
 }
 print person
 </code></pre>
-      <h2>Horizontal Whitespace</h2>
+      <h2>
+        <a id="horizontal-whitespace" href="#horizontal-whitespace" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Horizontal Whitespace
+      </h2>
       <p>
         <strong>Horizontal whitespace</strong> is a sequence of tabs or spaces that is used to
         separate elements in lists. Lists include the argument list to a function call, the element
@@ -1185,7 +1324,12 @@ map.address = &quot;221B Baker Street&quot;
 
 print (len map)
 </code></pre>
-      <h2>Functions</h2>
+      <h2>
+        <a id="functions" href="#functions" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Functions
+      </h2>
       <p>
         <strong>Functions</strong> are blocks of code that are used to perform a specific task. They
         are often used to encapsulate code that is used repeatedly, so that it can be called from
@@ -1208,7 +1352,12 @@ print (len map)
     return (len s) &lt;= maxl
 end
 </code></pre>
-      <h3>Bare Returns</h3>
+      <h3>
+        <a id="bare-returns" href="#bare-returns" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Bare Returns
+      </h3>
       <p>
         <strong>Bare returns</strong> are return statements without values. They can be used in
         functions without result type. For example, the following code defines a function called
@@ -1235,13 +1384,23 @@ end
         Function names must be unique within an Evy program. This means that no two functions can
         have the same name. Function names also cannot be the same as a variable name.
       </p>
-      <h3>Function Names</h3>
+      <h3>
+        <a id="function-names" href="#function-names" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Function Names
+      </h3>
       <p>
         Function names in Evy must start with a letter or underscore, and can contain any
         combination of letters, numbers, and underscores. They cannot be the same as keywords, such
         as <code>if</code>, <code>func</code>, or any built-in or other defined function names.
       </p>
-      <h3>Anonymous Parameters</h3>
+      <h3>
+        <a id="anonymous-parameters" href="#anonymous-parameters" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Anonymous Parameters
+      </h3>
       <p>
         The anonymous parameter <code>_</code> is a special parameter in Evy that can be used as a
         placeholder for a named parameter. It can be used for multiple parameters in a single
@@ -1252,7 +1411,12 @@ end
     print &quot;y:&quot; (round y)
 end
 </code></pre>
-      <h3>Variadic Functions</h3>
+      <h3>
+        <a id="variadic-functions" href="#variadic-functions" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Variadic Functions
+      </h3>
       <p>
         <strong>Variadic functions</strong> in Evy are functions that can take zero or more
         arguments of a specific type. The type of the variadic parameter is an array with the
@@ -1281,7 +1445,12 @@ quote &quot;Life, universe and everything?&quot; 42
         Unlike other languages, arrays cannot be turned into variadic arguments in Evy. The call
         arguments must be listed individually.
       </p>
-      <h2>Break and Return</h2>
+      <h2>
+        <a id="break-and-return" href="#break-and-return" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Break and Return
+      </h2>
       <p>
         <code>break</code> and <code>return</code> are <strong>terminating statements</strong> in
         Evy. They interrupt the regular flow of control.
@@ -1346,7 +1515,12 @@ end
         <a href="https://en.wikipedia.org/wiki/Foobar">foo, bar, and baz</a> are common placeholder
         names used in code.
       </p>
-      <h2>Typeof</h2>
+      <h2>
+        <a id="typeof" href="#typeof" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Typeof
+      </h2>
       <p>
         The <code>typeof</code> function returns the concrete type of a value held by a variable as
         a string. It returns a string that is the same as the type in an Evy program, such as
@@ -1408,7 +1582,12 @@ print &quot;y&quot; (typeof y)
       <pre><code class="language-evy:output">x []num
 y []any
 </code></pre>
-      <h2>Type Assertion</h2>
+      <h2>
+        <a id="type-assertion" href="#type-assertion" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Type Assertion
+      </h2>
       <p>
         A type assertion <code>x.(TYPE)</code> asserts that the value of the variable
         <code>x</code> is of the given <code>TYPE</code>. <code>TYPE</code> can be any basic or
@@ -1450,7 +1629,12 @@ print &quot;x:&quot; x &quot;typeof x:&quot; (typeof x)
       <p>outputs</p>
       <pre><code class="language-evy:output">x: [1 2 3] typeof x: []any
 </code></pre>
-      <h2>Assignability</h2>
+      <h2>
+        <a id="assignability" href="#assignability" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Assignability
+      </h2>
       <p>
         <strong>Assignability</strong> determines whether a value of one type can be assigned to a
         variable of another type. This means that the variable <em>accepts</em> the value.
@@ -1470,7 +1654,16 @@ print &quot;x:&quot; x &quot;typeof x:&quot; (typeof x)
         expression that only contains constants, it is treated like a constant; otherwise, it is
         treated like a variable.
       </p>
-      <h3>Assignability of variable values</h3>
+      <h3>
+        <a
+          id="assignability-of-variable-values"
+          href="#assignability-of-variable-values"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Assignability of variable values
+      </h3>
       <p>
         If <code>target</code> is of type <code>t</code> and <code>val</code> is a
         <em>variable</em> of type <code>t2</code>, <code>target</code> accepts <code>val</code> if:
@@ -1479,7 +1672,16 @@ print &quot;x:&quot; x &quot;typeof x:&quot; (typeof x)
         <li><code>t</code> and <code>t2</code> are identical, or</li>
         <li><code>t</code> is of type <code>any</code></li>
       </ul>
-      <h3>Assignability of constant values</h3>
+      <h3>
+        <a
+          id="assignability-of-constant-values"
+          href="#assignability-of-constant-values"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Assignability of constant values
+      </h3>
       <p>
         If <code>target</code> is of type <code>t</code> and <code>val</code> is a
         <em>constant</em> of type <code>t2</code>, <code>target</code> accepts <code>val</code> if:
@@ -1511,7 +1713,16 @@ print (typeof arr[0].a)
 {}any
 num
 </code></pre>
-      <h3>Assignability of empty composite literals</h3>
+      <h3>
+        <a
+          id="assignability-of-empty-composite-literals"
+          href="#assignability-of-empty-composite-literals"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Assignability of empty composite literals
+      </h3>
       <p>
         Empty composite literals <code>[]</code>, <code>{}</code>, or nested emtpy composite
         literals of them, such as <code>[[]]</code>, follow the same rules as
@@ -1519,7 +1730,16 @@ num
         converted to type <code>[]any</code>, <code>{}</code> gets converted to type
         <code>{}any</code> and <code>[[]]</code> to type <code>[][]any</code>.
       </p>
-      <h2>Run-time Panics and Recoverable Errors</h2>
+      <h2>
+        <a
+          id="run-time-panics-and-recoverable-errors"
+          href="#run-time-panics-and-recoverable-errors"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Run-time Panics and Recoverable Errors
+      </h2>
       <p>
         <strong>Run-time panics</strong> are unrecoverable errors that can occur during the
         execution of an Evy program. They can be caused by a variety of things, such as trying to
@@ -1542,7 +1762,16 @@ num
         documentation on the <a href="builtins.html#panic">panic function</a> and the
         <a href="builtins.html#errors">errors section</a>.
       </p>
-      <h2>Execution Model and Event Handlers</h2>
+      <h2>
+        <a
+          id="execution-model-and-event-handlers"
+          href="#execution-model-and-event-handlers"
+          class="anchor"
+        >
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Execution Model and Event Handlers
+      </h2>
       <p>
         Evy first executes all top-level code in the order it appears in the source code. If there
         is at least one event handler, Evy then enters an event loop. In the event loop, Evy waits
@@ -1563,7 +1792,12 @@ num
         For more information on individual event handlers, see the
         <a href="builtins.html#event-handlers">built-in documentation</a>.
       </p>
-      <h2>Runtimes</h2>
+      <h2>
+        <a id="runtimes" href="#runtimes" class="anchor">
+          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+        </a>
+        Runtimes
+      </h2>
       <p>
         Evy has two runtimes: the <strong>terminal runtime</strong> and the
         <strong>browser runtime</strong>.
@@ -1587,5 +1821,13 @@ num
         terminal runtime does not support event handlers or graphics functions.
       </p>
     </main>
+    <!-- icons  -->
+    <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="icon-link" fill="none" stroke-width="1" stroke="currentColor" viewBox="0 0 16 16">
+        <path
+          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
+        ></path>
+      </symbol>
+    </svg>
   </body>
 </html>

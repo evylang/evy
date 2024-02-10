@@ -162,8 +162,12 @@ docs:
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
 clean::
-	find $(DOCS_TARGET_DIR) -mindepth 1 ! -regex '$(DOCS_TARGET_DIR)/css.*' -delete
-
+	find $(DOCS_TARGET_DIR) -mindepth 1 \
+			! -regex '$(DOCS_TARGET_DIR)/css.*' \
+			! -regex '$(DOCS_TARGET_DIR)/img.*' \
+			! -regex '$(DOCS_TARGET_DIR)/favicon.ico' \
+			! -regex '$(DOCS_TARGET_DIR)/404.html' \
+			-delete
 
 .PHONY: doc docs doctest godoc sdocs toc usage
 

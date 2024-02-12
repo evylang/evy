@@ -145,6 +145,7 @@ func (vm *VM) push(o object.Object) error {
 	return nil
 }
 
+// TODO: Potential memory leak when popping pointers from the stack, see https://github.com/evylang/evy/pull/249#discussion_r1485655693
 func (vm *VM) pop() object.Object {
 	o := vm.stack[vm.sp-1]
 	vm.sp--

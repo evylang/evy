@@ -70,11 +70,115 @@ func TestBool(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestConstantAssignments(t *testing.T) {
+func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
-		{"x := 10\ny := x\ny = y", 10},
-		{"x := 10\nx = 5\nx = x", 5},
+		{
+			`x := 1
+			if true
+				x = 10
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if true
+				x = 10
+			else
+				x = 20
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if false
+				x = 10
+			else
+				x = 20
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 1
+			if 1 < 2
+				x = 10
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if 1 < 2
+				x = 10
+			else
+				x = 20
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if 1 > 2
+				x = 10
+			else
+				x = 20
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 1
+			if 1 > 2
+				x = 10
+			else if 1 < 2
+				x = 20
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 1
+			if 1 > 2
+				x = 10
+			else if 1 < 2
+				x = 20
+			else
+				x = 100
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 1
+			if x > 2 
+				x = 10
+			else if x < 2
+				x = 20
+			else
+				x = 100
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 3
+			if x > 2 
+				x = 10
+			else if x == 10
+				x = 0
+			else
+				x = 100
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if x == 1
+				x = 2
+			else if x == 2
+				x = 3
+			else if x == 3
+				x = 4
+			else 
+				x = 5
+			end	
+			x = x`, 2,
+		},
 	}
+
 	runVmTests(t, tests)
 }
 
@@ -91,7 +195,6 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		if err != nil {
 			t.Fatalf("parser error: %s", err)
 		}
-		t.Log(program.String())
 
 		comp := compiler.New()
 		if err := comp.Compile(program); err != nil {

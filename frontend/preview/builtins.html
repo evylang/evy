@@ -206,11 +206,28 @@ print &quot;Bye&quot;
         format string. The rest of the format string is printed to the output area without changes.
       </p>
       <p>Here are some valid specifiers in Evy:</p>
-      <p>
-        | Specifier | Description | | --------- | ---------------------------------- | |
-        <code>%v</code> | the argument in its default format | | <code>%q</code> | a double-quoted
-        string | | <code>%%</code> | a percent sign <code>%</code> |
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Specifier</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>%v</code></td>
+            <td>the argument in its default format</td>
+          </tr>
+          <tr>
+            <td><code>%q</code></td>
+            <td>a double-quoted string</td>
+          </tr>
+          <tr>
+            <td><code>%%</code></td>
+            <td>a percent sign <code>%</code></td>
+          </tr>
+        </tbody>
+      </table>
       <h4>Example</h4>
       <pre><code class="language-evy">printf &quot;The tank is 100%% full.\n\n&quot;
 
@@ -250,15 +267,44 @@ Map: {a:1 b:2}
         <code>first: A, second: B</code>.
       </p>
       <p>Full list of valid specifiers in Evy:</p>
-      <p>
-        | Specifier | Description | | --------- |
-        ------------------------------------------------------ | | <code>%v</code> | the argument in
-        a default format | | <code>%t</code> | the word <code>true</code> or <code>false</code> | |
-        <code>%f</code> | decimal point (floating-point) number, e.g. 123.456000 | |
-        <code>%e</code> | scientific notation, e.g. -1.234456e+78 | | <code>%s</code> | string value
-        | | <code>%q</code> | a double-quoted string | | <code>%%</code> | a literal percent sign
-        <code>%</code>; consumes no value |
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Specifier</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>%v</code></td>
+            <td>the argument in a default format</td>
+          </tr>
+          <tr>
+            <td><code>%t</code></td>
+            <td>the word <code>true</code> or <code>false</code></td>
+          </tr>
+          <tr>
+            <td><code>%f</code></td>
+            <td>decimal point (floating-point) number, e.g. 123.456000</td>
+          </tr>
+          <tr>
+            <td><code>%e</code></td>
+            <td>scientific notation, e.g. -1.234456e+78</td>
+          </tr>
+          <tr>
+            <td><code>%s</code></td>
+            <td>string value</td>
+          </tr>
+          <tr>
+            <td><code>%q</code></td>
+            <td>a double-quoted string</td>
+          </tr>
+          <tr>
+            <td><code>%%</code></td>
+            <td>a literal percent sign <code>%</code>; consumes no value</td>
+          </tr>
+        </tbody>
+      </table>
       <p>
         If the arguments for the <code>%s</code>, <code>%q</code>, <code>%f</code>, <code>%e</code>,
         and <code>%t</code> specifiers do not match the required type, a panic will occur.
@@ -282,12 +328,36 @@ Map: {a:1 b:2}
         Here is a table that shows the different ways to specify the width and precision of a
         floating-point number:
       </p>
-      <p>
-        | Verb | Description | | ------- | -------------------------------- | | <code>%f</code> |
-        default width, default precision | | <code>%7f</code> | width 7, default precision | |
-        <code>%.2f</code> | default width, precision 2 | | <code>%7.2f</code> | width 7, precision 2
-        | | <code>%7.f</code> | width 7, precision 0 |
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Verb</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>%f</code></td>
+            <td>default width, default precision</td>
+          </tr>
+          <tr>
+            <td><code>%7f</code></td>
+            <td>width 7, default precision</td>
+          </tr>
+          <tr>
+            <td><code>%.2f</code></td>
+            <td>default width, precision 2</td>
+          </tr>
+          <tr>
+            <td><code>%7.2f</code></td>
+            <td>width 7, precision 2</td>
+          </tr>
+          <tr>
+            <td><code>%7.f</code></td>
+            <td>width 7, precision 0</td>
+          </tr>
+        </tbody>
+      </table>
       <p>
         If the width/precision is preceded by a <code>-</code>, the value is padded with spaces on
         the right rather than the left. If it is preceded by a 0, the value is padded with leading
@@ -1655,14 +1725,31 @@ end
         <code>&quot;butt&quot;</code> or <code>&quot;square&quot;</code>. An invalid style takes no
         effect.
       </p>
-      <p>
-        | Style | Description | | ---------- |
-        ---------------------------------------------------------------------------------------------------------------------
-        | | <code>&quot;round&quot;</code> | The ends of the line are rounded. | |
-        <code>&quot;butt&quot;</code> | The ends of the line are squared off at the endpoints. | |
-        <code>&quot;square&quot;</code> | The ends of the line are squared off by adding a box with
-        an equal width and half the height of the line's thickness. |
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Style</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>&quot;round&quot;</code></td>
+            <td>The ends of the line are rounded.</td>
+          </tr>
+          <tr>
+            <td><code>&quot;butt&quot;</code></td>
+            <td>The ends of the line are squared off at the endpoints.</td>
+          </tr>
+          <tr>
+            <td><code>&quot;square&quot;</code></td>
+            <td>
+              The ends of the line are squared off by adding a box with an equal width and half the
+              height of the line's thickness.
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <p>The initial linecap style is <code>&quot;round&quot;</code>.</p>
       <hr />
       <h3><code>text</code></h3>

@@ -824,18 +824,60 @@ print 5 s[:-1]
         There are a variety of binary operators: arithmetic, concatenation, logical, and comparison
         operators.
       </p>
-      <p>
-        | Operator | Operands | Result | Description | | ------------------- | --------- | --------
-        | ------------- | | <code>+</code> <code>-</code> <code>*</code> <code>/</code>
-        <code>%</code> | <code>num</code> | <code>num</code> | arithmetic | | <code>+</code> |
-        <code>string</code> | <code>string</code> | concatenation | | <code>+</code> | array | array
-        | concatenation | | <code>and</code> <code>or</code> | <code>bool</code> |
-        <code>bool</code> | logical | | <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code>
-        <code>&gt;=</code> | <code>num</code> | <code>bool</code> | comparison | |
-        <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> |
-        <code>string</code> | <code>bool</code> | comparison | | <code>==</code> <code>!=</code> |
-        all types | <code>bool</code> | comparison |
-      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Operator</th>
+            <th>Operands</th>
+            <th>Result</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code></td>
+            <td><code>num</code></td>
+            <td><code>num</code></td>
+            <td>arithmetic</td>
+          </tr>
+          <tr>
+            <td><code>+</code></td>
+            <td><code>string</code></td>
+            <td><code>string</code></td>
+            <td>concatenation</td>
+          </tr>
+          <tr>
+            <td><code>+</code></td>
+            <td>array</td>
+            <td>array</td>
+            <td>concatenation</td>
+          </tr>
+          <tr>
+            <td><code>and</code> <code>or</code></td>
+            <td><code>bool</code></td>
+            <td><code>bool</code></td>
+            <td>logical</td>
+          </tr>
+          <tr>
+            <td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code></td>
+            <td><code>num</code></td>
+            <td><code>bool</code></td>
+            <td>comparison</td>
+          </tr>
+          <tr>
+            <td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code></td>
+            <td><code>string</code></td>
+            <td><code>bool</code></td>
+            <td>comparison</td>
+          </tr>
+          <tr>
+            <td><code>==</code> <code>!=</code></td>
+            <td>all types</td>
+            <td><code>bool</code></td>
+            <td>comparison</td>
+          </tr>
+        </tbody>
+      </table>
       <h3>Arithmetic and Concatenation Operators</h3>
       <p>
         The <strong>arithmetic operators</strong> <code>+</code>, <code>-</code>, <code>*</code>,

@@ -138,6 +138,7 @@ func genHTMLFile(mdFile, htmlFile, root string) error {
 func md2html(mdBytes []byte) (string, string) {
 	p := markdown.Parser{
 		AutoLinkText: true, // turn URLs into links even without []()
+		Table:        true, //
 	}
 	doc := p.Parse(string(mdBytes))
 	walk(doc, updateLinks)

@@ -12,9 +12,14 @@ test("landing", async ({ page, baseURL }, testInfo) => {
   await expect(page).toHaveScreenshot("landing-top.png")
 
   if (testInfo.project.name != "ios") {
+    // let's make sure we don't take snapshots of the gif
+    // Set height to a small value and scroll to bottom
+    await page.setViewportSize({ width: 1280, height: 250 })
     // Programmatic scrolling does not work on mobile / ios in playwright.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
     await expect(page).toHaveScreenshot("landing-bottom.png")
+    // reset to default size
+    await page.setViewportSize({ width: 1280, height: 720 })
   }
   await page.waitForLoadState("networkidle")
   await page.getByRole("link", { name: "Try It Out" }).click()

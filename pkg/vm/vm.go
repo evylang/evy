@@ -128,6 +128,27 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpJumpNotTruthy:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			// Increment the pointer so that we skip the two bytes of this operand in the next loop
+			ip += 2
+
+			condition := vm.pop()
+			// If the condition isn't truthy we want to want to execute the jump
+			// so we need to backtrack the pointer to be right before the target
+			// so that the loop will evaluate it
+			truthy, err := isTruthy(condition)
+			if err != nil {
+				return err
+			}
+			if !truthy {
+				// set ip to the position - 1 because the for loop will increment it
+				ip = pos - 1
+			}
+		case code.OpJump:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			// set ip to the position - 1 because the for loop will increment it
+			ip = pos - 1
 		}
 	}
 
@@ -145,7 +166,6 @@ func (vm *VM) push(o object.Object) error {
 	return nil
 }
 
-// TODO: Potential memory leak when popping pointers from the stack, see https://github.com/evylang/evy/pull/249#discussion_r1485655693
 func (vm *VM) pop() object.Object {
 	o := vm.stack[vm.sp-1]
 	vm.sp--
@@ -259,4 +279,13 @@ func (vm *VM) executeBinaryIntegerOperation(
 	}
 
 	return vm.push(&object.Integer{Value: result})
+}
+
+func isTruthy(obj object.Object) (bool, error) {
+	switch obj := obj.(type) {
+	case *object.Boolean:
+		return obj.Value, nil
+	default:
+		return false, fmt.Errorf("cannot evaluate truthy for type: %v", obj)
+	}
 }

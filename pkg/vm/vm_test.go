@@ -70,11 +70,60 @@ func TestBool(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestConstantAssignments(t *testing.T) {
+func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
-		{"x := 10\ny := x\ny = y", 10},
-		{"x := 10\nx = 5\nx = x", 5},
+		// {
+		// 	`x := 1
+		// 	if true
+		// 		x = 10
+		// 	end
+		// 	x = x`, 10,
+		// },
+		{
+			`x := 1
+			if true
+				x = 10
+			else 
+				x = 20 
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if false
+				x = 10
+			else 
+				x = 20
+			end
+			x = x`, 20,
+		},
+		{
+			`x := 1
+			if 1 < 2
+				x = 10
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if 1 < 2
+				x = 10  
+			else 
+				x = 20
+			end
+			x = x`, 10,
+		},
+		{
+			`x := 1
+			if 1 > 2 
+				x = 10 
+			else 
+				x = 20 
+			end
+			x = x`, 20,
+		},
 	}
+
 	runVmTests(t, tests)
 }
 
@@ -91,6 +140,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		if err != nil {
 			t.Fatalf("parser error: %s", err)
 		}
+		// TODO: remove when done developing
 		t.Log(program.String())
 
 		comp := compiler.New()

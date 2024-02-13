@@ -1,15 +1,19 @@
 package bytecode
 
 import (
-	"errors"
 	"fmt"
 
 	"evylang.dev/evy/pkg/parser"
 )
 
-// ErrUndefinedVar is returned when a variable name cannot
-// be resolved in the symbol table.
-var ErrUndefinedVar = errors.New("undefined variable")
+var (
+	// ErrUndefinedVar is returned when a variable name cannot
+	// be resolved in the symbol table.
+	ErrUndefinedVar = fmt.Errorf("%w: undefined variable", ErrPanic)
+	// ErrUnknownOperator is returned when an operator cannot
+	// be resolved.
+	ErrUnknownOperator = fmt.Errorf("%w: unknown operator", ErrInternal)
+)
 
 // Compiler is responsible for turning a parsed evy program into
 // bytecode.
@@ -43,10 +47,12 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileDecl(node.Decl)
 	case *parser.AssignmentStmt:
 		return c.compileAssignment(node)
+	case *parser.BinaryExpression:
+		return c.compileBinaryExpression(node)
 	case *parser.Var:
 		return c.compileVar(node)
 	case *parser.NumLiteral:
-		num := &numVal{V: node.Value}
+		num := numVal(node.Value)
 		if err := c.emit(OpConstant, c.addConstant(num)); err != nil {
 			return err
 		}
@@ -84,6 +90,24 @@ func (c *Compiler) emit(op Opcode, operands ...int) error {
 	}
 	c.addInstruction(ins)
 	return nil
+}
+
+func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error {
+	if err := c.Compile(expr.Left); err != nil {
+		return err
+	}
+	if err := c.Compile(expr.Right); err != nil {
+		return err
+	}
+	switch expr.Op {
+	case parser.OP_PLUS:
+		return c.emit(OpAdd)
+	case parser.OP_MINUS:
+		return c.emit(OpSubtract)
+		// more operators to follow (*, /, %).
+	default:
+		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
+	}
 }
 
 func (c *Compiler) compileProgram(prog *parser.Program) error {

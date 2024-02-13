@@ -1,7 +1,7 @@
 package bytecode
 
 import (
-	"errors"
+	"fmt"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 )
 
 // ErrStackOverflow is returned when the stack exceeds its size limit.
-var ErrStackOverflow = errors.New("stack overflow")
+var ErrStackOverflow = fmt.Errorf("%w: stack overflow", ErrPanic)
 
 // VM is responsible for executing evy programs from bytecode.
 type VM struct {
@@ -48,21 +48,29 @@ func (vm *VM) Run() error {
 		case OpConstant:
 			constIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
-			err := vm.push(vm.constants[constIndex])
-			if err != nil {
+			if err := vm.push(vm.constants[constIndex]); err != nil {
 				return err
 			}
 		case OpGetGlobal:
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
-			err := vm.push(vm.globals[globalIndex])
-			if err != nil {
+			if err := vm.push(vm.globals[globalIndex]); err != nil {
 				return err
 			}
 		case OpSetGlobal:
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
 			vm.globals[globalIndex] = vm.pop()
+		case OpAdd:
+			right, left := vm.popBinaryNums()
+			if err := vm.push(numVal(left + right)); err != nil {
+				return err
+			}
+		case OpSubtract:
+			right, left := vm.popBinaryNums()
+			if err := vm.push(numVal(left - right)); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -92,4 +100,26 @@ func (vm *VM) pop() value {
 	o := vm.stack[vm.sp-1]
 	vm.sp--
 	return o
+}
+
+// popBinaryNums pops the top two elements of the stack (the left
+// and right sides of the binary expressions) as nums and returns both.
+func (vm *VM) popBinaryNums() (float64, float64) {
+	// the right was compiled last, so is higher on the stack
+	// than the left
+	right := vm.popNumVal()
+	left := vm.popNumVal()
+	return float64(right), float64(left)
+}
+
+// popNumVal pops an element from the stack and casts it to a num
+// before returning the value. If elem is not a num it will error.
+func (vm *VM) popNumVal() numVal {
+	elem := vm.pop()
+	val, ok := elem.(numVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop numVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
 }

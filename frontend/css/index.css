@@ -3,7 +3,7 @@
 }
 
 .max-width-wrapper {
-  max-width: calc(51rem + 32px);
+  max-width: calc(54rem + 32px);
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
@@ -38,6 +38,7 @@ footer {
 
 .evy-e {
   width: 227px;
+  height: 240px;
   margin-top: 124px;
   margin-bottom: 70px;
 }

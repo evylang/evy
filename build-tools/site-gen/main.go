@@ -68,7 +68,7 @@ func (a *app) Run() error {
 // update any references to renamed files in them. Return the skipped files
 // (html) and a map of the files we renamed, or an error if something went
 // wrong.
-func (a *app) copyTree() ([]string, map[string]string, error) {
+func (a *app) copyTree() ([]string, map[string]string, error) { //nolint: gocognit
 	skippedFiles := []string{}
 	renamedFiles := make(map[string]string)
 
@@ -130,12 +130,18 @@ func (a *app) copyTree() ([]string, map[string]string, error) {
 			}
 			basename := strings.TrimSuffix(filepath.Base(filename), ext)
 			target := basename + "." + shortSha + ext
-			destfile = filepath.Join(filepath.Dir(destfile), target)
 			if _, ok := renamedFiles[filename]; ok {
 				//nolint:goerr113 // dynamic errors in package main is ok
 				return fmt.Errorf("duplicate filename: %s", srcfile)
 			}
 			renamedFiles[filename] = target
+			if ext == ".js" {
+				// also keep original JS filename for those who cannot use an `importmap` (e.g. ios 16.2)
+				if err := copyFile(srcfile, destfile); err != nil {
+					return err
+				}
+			}
+			destfile = filepath.Join(filepath.Dir(destfile), target)
 		}
 		return copyFile(srcfile, destfile)
 	})

@@ -47,7 +47,7 @@
   --dialog-width: min(100vw, 36rem);
 }
 
-@media (width <= 767px) {
+@media (max-width: 767px) {
   /* responsive mobile */
   :root {
     --header-img-top: 0.2em;
@@ -458,7 +458,7 @@ dialog .err,
   touch-action: pinch-zoom;
 }
 
-@media (height <= 500px) {
+@media (max-height: 500px) {
   .output .canvas canvas,
   .output .canvas {
     width: calc(100vh - 250px);

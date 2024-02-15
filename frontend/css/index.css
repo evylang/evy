@@ -81,12 +81,12 @@ footer ul {
   gap: 20px;
   width: 100%;
   padding: 20px 0;
+}
 
-  @media (width <= 767px) {
-    & {
-      flex-direction: column;
-      gap: 10px;
-    }
+@media (max-width: 767px) {
+  footer ul {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 

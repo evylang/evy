@@ -14,6 +14,9 @@
 //     javascript imports.
 //     e.g. "./module/editor.js": "./module/editor.js"
 //     becomes "./module/editor.js": "./module/editor.1a2b3c4d.js"
+//   - Copy .js files with their original filename so that clients that do
+//     not support import map can still import the .js files. They miss out
+//     on cache busting and may need to sometimes force-reload.
 //   - Update the wasmImports map in .html files to include the short-sha in
 //     wasm imports. The wasmImports allows for cache busting hashed filenames
 //     for wasm files. The replacements are of the same form as the importmap.
@@ -44,36 +47,37 @@ type app struct {
 	Domain    string `help:"Rewrite top-level paths to subdomains"`
 	SrcDir    string `arg:"" required:""`
 	DestDir   string `arg:"" required:""`
+
+	skippedFiles []string
+	renamedFiles map[string]string
 }
 
 func main() {
-	kctx := kong.Parse(&app{})
+	kctx := kong.Parse(&app{
+		renamedFiles: make(map[string]string),
+	})
 	kctx.FatalIfErrorf(kctx.Run())
 }
 
 func (a *app) Run() error {
-	skippedFiles, renamedFiles, err := a.copyTree()
-	if err != nil {
+	if err := a.copyTree(); err != nil {
 		return err
 	}
 
-	return a.copyHTMLFiles(skippedFiles, renamedFiles)
+	return a.copyHTMLFiles()
 }
 
 // Copy the contents of the `src` filetree to the `dest` directory. When we
 // copy it, files with extension `.css`, `.js`, or `.wasm` are renamed to put a
 // short sha into the name for cache busting purposes (e.g. foo.css ->
-// foo.1a2b3c4d.css). We delay copying html files until after we have walked
-// the src filetree and copy them in a second pass afterwards so that we can
-// update any references to renamed files in them. Return the skipped files
-// (html) and a map of the files we renamed, or an error if something went
-// wrong.
-func (a *app) copyTree() ([]string, map[string]string, error) { //nolint: gocognit
-	skippedFiles := []string{}
-	renamedFiles := make(map[string]string)
-
+// foo.1a2b3c4d.css). `.js` files are also copied with their original filename
+// for web clients that do not support `importmap`. We delay copying html files
+// until after we have walked the src filetree and copy them in a second pass
+// afterwards so that we can update any references to renamed files in them.
+// Return an error if something went wrong.
+func (a *app) copyTree() error {
 	srcFS := os.DirFS(a.SrcDir)
-	err := fs.WalkDir(srcFS, ".", func(filename string, d fs.DirEntry, err error) error {
+	return fs.WalkDir(srcFS, ".", func(filename string, d fs.DirEntry, err error) error {
 		if err != nil {
 			// Errors from WalkDir do not include `src` in the path making
 			// the error messages not useful. Add src back in.
@@ -84,81 +88,95 @@ func (a *app) copyTree() ([]string, map[string]string, error) { //nolint: gocogn
 			}
 			return err
 		}
+
 		srcfile := filepath.Join(a.SrcDir, filename)
 		destfile := filepath.Join(a.DestDir, filename)
-		ext := filepath.Ext(filename)
 
 		switch mode := d.Type() & fs.ModeType; mode {
 		case fs.ModeDir:
 			return os.Mkdir(destfile, 0o777) //nolint:gosec // erroneous linter
 		case fs.ModeSymlink:
-			// Treat symlinks as files, duplicating the contents.
-			// This is because sometimes we want to embed the site
-			// into evy and Go embedding will not embed symlinks.
-			// Symlinks to directories are hard (loops, recursion,
-			// nested mappings and so on), so error out if we see
-			// one.
-			target, err := filepath.EvalSymlinks(srcfile)
-			if err != nil {
+			if err := checkSymlink(srcfile); err != nil {
 				return err
 			}
-			fi, err := os.Stat(target)
-			if err != nil {
-				return err
-			}
-			if fi.Mode()&fs.ModeType == fs.ModeDir {
-				//nolint:goerr113 // dynamic errors in package main is ok
-				return fmt.Errorf("symlink dirs not allowed: %s", srcfile)
-			}
-			// continues past switch to copying files
-
+			return a.handleFile(filename) // copy symlink to file as a normal file
 		case 0: // normal file
-			// handled below
+			return a.handleFile(filename)
 		default:
 			//nolint:goerr113 // dynamic errors in package main is ok
 			return fmt.Errorf("unknown file type: %s: %s", mode, srcfile)
 		}
-
-		if ext == ".html" {
-			skippedFiles = append(skippedFiles, filename)
-			return nil
-		}
-		if a.CacheBust && (ext == ".js" || ext == ".css" || ext == ".wasm") {
-			shortSha, err := hashFile(srcfile)
-			if err != nil {
-				return err
-			}
-			basename := strings.TrimSuffix(filepath.Base(filename), ext)
-			target := basename + "." + shortSha + ext
-			if _, ok := renamedFiles[filename]; ok {
-				//nolint:goerr113 // dynamic errors in package main is ok
-				return fmt.Errorf("duplicate filename: %s", srcfile)
-			}
-			renamedFiles[filename] = target
-			if ext == ".js" {
-				// also keep original JS filename for those who cannot use an `importmap` (e.g. ios 16.2)
-				if err := copyFile(srcfile, destfile); err != nil {
-					return err
-				}
-			}
-			destfile = filepath.Join(filepath.Dir(destfile), target)
-		}
-		return copyFile(srcfile, destfile)
 	})
-	if err != nil {
-		return nil, nil, err
-	}
-	return skippedFiles, renamedFiles, nil
 }
 
-func (a *app) copyHTMLFiles(skippedFiles []string, renamedFiles map[string]string) error {
-	for _, filename := range skippedFiles {
+// checkSymlink checks the target of srcfile to ensure it is a regular file.
+// It returns an error if it is not.
+func checkSymlink(srcfile string) error {
+	target, err := filepath.EvalSymlinks(srcfile)
+	if err != nil {
+		return err
+	}
+	fi, err := os.Stat(target)
+	if err != nil {
+		return err
+	}
+	mode := fi.Mode() & fs.ModeType
+	if mode == fs.ModeDir {
+		//nolint:goerr113 // dynamic errors in package main is ok
+		return fmt.Errorf("symlink dirs not allowed: %s", srcfile)
+	}
+	if mode != 0 {
+		//nolint:goerr113 // dynamic errors in package main is ok
+		return fmt.Errorf("symlink to unknown file type: %s: %s", mode, srcfile)
+	}
+	return nil
+}
+
+// handleFile checks the extension of filename and processes it according
+// to the rules of this program:
+// - Record .html filename for later processing.
+// - Copy .js, .css and .wasm files with a hash in their name.
+// - Copy .js and all other files with their original name.
+func (a *app) handleFile(filename string) error {
+	srcfile := filepath.Join(a.SrcDir, filename)
+	destfile := filepath.Join(a.DestDir, filename)
+	ext := filepath.Ext(filename)
+
+	if ext == ".html" {
+		a.skippedFiles = append(a.skippedFiles, filename)
+		return nil
+	}
+	if a.CacheBust && (ext == ".js" || ext == ".css" || ext == ".wasm") {
+		shortSha, err := hashFile(srcfile)
+		if err != nil {
+			return err
+		}
+		basename := strings.TrimSuffix(filepath.Base(filename), ext)
+		target := basename + "." + shortSha + ext
+		if _, ok := a.renamedFiles[filename]; ok {
+			//nolint:goerr113 // dynamic errors in package main is ok
+			return fmt.Errorf("duplicate filename: %s", srcfile)
+		}
+		a.renamedFiles[filename] = target
+		if ext == ".js" {
+			// also keep original JS filename for those who cannot use an `importmap` (e.g. ios 16.2)
+			if err := copyFile(srcfile, destfile); err != nil {
+				return err
+			}
+		}
+		destfile = filepath.Join(filepath.Dir(destfile), target)
+	}
+	return copyFile(srcfile, destfile)
+}
+
+func (a *app) copyHTMLFiles() error {
+	for _, filename := range a.skippedFiles {
 		in, out, err := openInOut(filepath.Join(a.SrcDir, filename), filepath.Join(a.DestDir, filename))
 		if err != nil {
 			return err
 		}
 		defer in.Close() //nolint:errcheck // don't care about close failing on read-only files
-		err = a.updateHTMLFile(out, in, filename, renamedFiles)
+		err = a.updateHTMLFile(out, in, filename)
 		if err != nil {
 			out.Close() //nolint:errcheck,gosec // we're returning the more important error
 			return err
@@ -232,7 +250,7 @@ var (
 //     .js file was renamed to include a hash.
 //   - The .wasm files referenced in the wasmImports map are updated if the
 //     referenced .wasm file was renamed to include a hash.
-func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string, renamedFiles map[string]string) error {
+func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 	inImportmap := false
 	inWASMImports := false
 	scanner := bufio.NewScanner(r)
@@ -259,12 +277,12 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string, renamedF
 				inWASMImports = false
 			}
 
-			line = updateRefs(filename, line, renamedFiles)
+			line = updateRefs(filename, line, a.renamedFiles)
 			if inImportmap {
-				line = updateImportMap(filename, line, renamedFiles)
+				line = updateImportMap(filename, line, a.renamedFiles)
 			}
 			if inWASMImports {
-				line = updateWASMImports(filename, line, renamedFiles)
+				line = updateWASMImports(filename, line, a.renamedFiles)
 			}
 		}
 

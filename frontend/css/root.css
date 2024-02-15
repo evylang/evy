@@ -15,9 +15,11 @@
   /* desktop */
   --display-desktop-only: initial;
   --display-mobile-only: none;
+}
 
-  /* mobile */
-  @media (width <= 767px) {
+/* mobile */
+@media (max-width: 767px) {
+  :root {
     --display-desktop-only: none;
     --display-mobile-only: initial;
   }

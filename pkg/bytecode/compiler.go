@@ -49,6 +49,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileAssignment(node)
 	case *parser.BinaryExpression:
 		return c.compileBinaryExpression(node)
+	case *parser.GroupExpression:
+		return c.Compile(node.Expr)
 	case *parser.Var:
 		return c.compileVar(node)
 	case *parser.NumLiteral:
@@ -104,7 +106,12 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 		return c.emit(OpAdd)
 	case parser.OP_MINUS:
 		return c.emit(OpSubtract)
-		// more operators to follow (*, /, %).
+	case parser.OP_ASTERISK:
+		return c.emit(OpMultiply)
+	case parser.OP_SLASH:
+		return c.emit(OpDivide)
+	case parser.OP_PERCENT:
+		return c.emit(OpModulo)
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}

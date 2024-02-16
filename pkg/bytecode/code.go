@@ -16,10 +16,23 @@ const (
 	// OpSetGlobal adds a symbol to the specified index in the symbol
 	// table.
 	OpSetGlobal
+	// OpAdd instructs the virtual machine to perform an addition.
+	OpAdd
+	// OpSubtract instructs the virtual machine to perform a subtraction.
+	OpSubtract
 )
 
-// ErrUnknownOp is returned when an unknown opcode is encountered.
-var ErrUnknownOp = errors.New("unknown opcode")
+var (
+	// ErrInternal and errors wrapping ErrInternal report internal
+	// errors of the VM that should not occur during normal
+	// program execution.
+	ErrInternal = errors.New("internal error")
+	// ErrPanic and errors wrapping ErrPanic report runtime errors, such
+	// as an index out of bounds or a stack overflow.
+	ErrPanic = errors.New("user error")
+	// ErrUnknownOpcode is returned when an unknown opcode is encountered.
+	ErrUnknownOpcode = fmt.Errorf("%w: unknown opcode", ErrInternal)
+)
 
 // definitions is a mapping of OpCode to OpDefinition.
 var definitions = map[Opcode]*OpDefinition{
@@ -29,6 +42,11 @@ var definitions = map[Opcode]*OpDefinition{
 	OpConstant:  {"OpConstant", []int{2}},
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
+	// Operations like OpAdd have no operand width because the virtual
+	// machine is expected to pop the values from the stack when reading
+	// this instruction.
+	OpAdd:      {"OpAdd", nil},
+	OpSubtract: {"OpSubtract", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.
@@ -92,7 +110,7 @@ func ReadUint16(ins Instructions) uint16 {
 func Lookup(op Opcode) (*OpDefinition, error) {
 	def, ok := definitions[op]
 	if !ok {
-		return nil, fmt.Errorf("%w: %d", ErrUnknownOp, op)
+		return nil, fmt.Errorf("%w: %d", ErrUnknownOpcode, op)
 	}
 	return def, nil
 }

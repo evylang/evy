@@ -3,6 +3,7 @@
   --font-family: "Inter", sans-serif;
   --font-family-code: "Fira Code", monospace;
   --background: hsl(210deg 5% 15%);
+  --background-dimmed: hsla(213, 10%, 23%, 1);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
   --color-dimmed: hsl(0deg 0% 80%);
@@ -11,16 +12,18 @@
   --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
   --primary-button-background: hsl(0deg 0% 92%);
   --primary-button-background-hover: hsl(0deg 0% 80%);
-
-  /* desktop */
-  --display-desktop-only: initial;
-  --display-mobile-only: none;
 }
 
 /* mobile */
 @media (max-width: 767px) {
-  :root {
-    --display-desktop-only: none;
-    --display-mobile-only: initial;
+  .desktop {
+    /* !important is used to override any other display properties that have higher specificity */
+    display: none !important;
+  }
+}
+@media (min-width: 767px) {
+  .mobile {
+    /* !important is used to override any other display properties that have higher specificity */
+    display: none !important;
   }
 }

@@ -58,6 +58,14 @@ func (c *Compiler) Compile(node parser.Node) error {
 		if err := c.emit(OpConstant, c.addConstant(num)); err != nil {
 			return err
 		}
+	case *parser.BoolLiteral:
+		opcode := OpFalse
+		if node.Value {
+			opcode = OpTrue
+		}
+		if err := c.emit(opcode); err != nil {
+			return err
+		}
 	}
 	return nil
 }

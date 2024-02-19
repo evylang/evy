@@ -47,6 +47,7 @@ func NewVM(bytecode *Bytecode) *VM {
 // Run executes the provided bytecode instructions in order, any error
 // will stop the execution.
 func (vm *VM) Run() error {
+	var err error
 	for ip := 0; ip < len(vm.instructions); ip++ {
 		// This loop is the hot path of the vm, avoid unnecessary
 		// lookups or memory movement.
@@ -55,51 +56,44 @@ func (vm *VM) Run() error {
 		case OpConstant:
 			constIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
-			if err := vm.push(vm.constants[constIndex]); err != nil {
-				return err
-			}
+			err = vm.push(vm.constants[constIndex])
 		case OpGetGlobal:
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
-			if err := vm.push(vm.globals[globalIndex]); err != nil {
-				return err
-			}
+			err = vm.push(vm.globals[globalIndex])
 		case OpSetGlobal:
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
 			vm.globals[globalIndex] = vm.pop()
 		case OpAdd:
 			right, left := vm.popBinaryNums()
-			if err := vm.push(numVal(left + right)); err != nil {
-				return err
-			}
+			err = vm.push(numVal(left + right))
 		case OpSubtract:
 			right, left := vm.popBinaryNums()
-			if err := vm.push(numVal(left - right)); err != nil {
-				return err
-			}
+			err = vm.push(numVal(left - right))
 		case OpMultiply:
 			right, left := vm.popBinaryNums()
-			if err := vm.push(numVal(left * right)); err != nil {
-				return err
-			}
+			err = vm.push(numVal(left * right))
 		case OpDivide:
 			right, left := vm.popBinaryNums()
 			if right == 0 {
 				return ErrDivideByZero
 			}
-			if err := vm.push(numVal(left / right)); err != nil {
-				return err
-			}
+			err = vm.push(numVal(left / right))
 		case OpModulo:
 			right, left := vm.popBinaryNums()
 			if right == 0 {
 				return ErrDivideByZero
 			}
 			// floating point modulo has to be handled using this math function
-			if err := vm.push(numVal(math.Mod(left, right))); err != nil {
-				return err
-			}
+			err = vm.push(numVal(math.Mod(left, right)))
+		case OpTrue:
+			err = vm.push(boolVal(true))
+		case OpFalse:
+			err = vm.push(boolVal(false))
+		}
+		if err != nil {
+			return err
 		}
 	}
 	return nil

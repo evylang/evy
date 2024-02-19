@@ -91,6 +91,12 @@ func (vm *VM) Run() error {
 			err = vm.push(boolVal(true))
 		case OpFalse:
 			err = vm.push(boolVal(false))
+		case OpNot:
+			val := vm.popBoolVal()
+			err = vm.push(!val)
+		case OpMinus:
+			val := vm.popNumVal()
+			err = vm.push(-val)
 		}
 		if err != nil {
 			return err
@@ -142,6 +148,18 @@ func (vm *VM) popNumVal() numVal {
 	val, ok := elem.(numVal)
 	if !ok {
 		panic(fmt.Errorf("%w: expected to pop numVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
+}
+
+// popBoolVal pops an element from the stack and casts it to a bool
+// before returning the value. If elem is not a bool it will error.
+func (vm *VM) popBoolVal() boolVal {
+	elem := vm.pop()
+	val, ok := elem.(boolVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop boolVal but got %s",
 			ErrInternal, elem.Type()))
 	}
 	return val

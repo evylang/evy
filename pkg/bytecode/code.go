@@ -32,6 +32,12 @@ const (
 	OpTrue
 	// OpFalse represents the boolean literal false.
 	OpFalse
+	// OpNot represents the not unary operator, which performs logical
+	// negation on a boolean operand.
+	OpNot
+	// OpMinus represents the minus unary operator, which negates the
+	// value of a numeric operand.
+	OpMinus
 )
 
 var (
@@ -64,6 +70,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpModulo:   {"OpModulo", nil},
 	OpTrue:     {"OpTrue", nil},
 	OpFalse:    {"OpFalse", nil},
+	OpNot:      {"OpNot", nil},
+	OpMinus:    {"OpMinus", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

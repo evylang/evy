@@ -20,6 +20,14 @@ const (
 	OpAdd
 	// OpSubtract instructs the virtual machine to perform a subtraction.
 	OpSubtract
+	// OpMultiply instructs the virtual machine to perform a multiplication.
+	OpMultiply
+	// OpDivide instructs the virtual machine to perform a division.
+	OpDivide
+	// OpModulo instructs the virtual machine to perform a modulo operation.
+	// Modulo returns the remainder of dividing the left side of an expression
+	// by the right.
+	OpModulo
 )
 
 var (
@@ -47,6 +55,9 @@ var definitions = map[Opcode]*OpDefinition{
 	// this instruction.
 	OpAdd:      {"OpAdd", nil},
 	OpSubtract: {"OpSubtract", nil},
+	OpMultiply: {"OpMultiply", nil},
+	OpDivide:   {"OpDivide", nil},
+	OpModulo:   {"OpModulo", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

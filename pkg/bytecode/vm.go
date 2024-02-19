@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"fmt"
+	"math"
 )
 
 const (
@@ -12,8 +13,14 @@ const (
 	GlobalsSize = 65536
 )
 
-// ErrStackOverflow is returned when the stack exceeds its size limit.
-var ErrStackOverflow = fmt.Errorf("%w: stack overflow", ErrPanic)
+var (
+	// ErrStackOverflow is returned when the stack exceeds its size limit.
+	ErrStackOverflow = fmt.Errorf("%w: stack overflow", ErrPanic)
+	// ErrDivideByZero is returned when a division by zero would
+	// produce an invalid result. In Golang, floating point division
+	// by zero produces +Inf, and modulo by zero produces NaN.
+	ErrDivideByZero = fmt.Errorf("%w: division by zero", ErrPanic)
+)
 
 // VM is responsible for executing evy programs from bytecode.
 type VM struct {
@@ -69,6 +76,28 @@ func (vm *VM) Run() error {
 		case OpSubtract:
 			right, left := vm.popBinaryNums()
 			if err := vm.push(numVal(left - right)); err != nil {
+				return err
+			}
+		case OpMultiply:
+			right, left := vm.popBinaryNums()
+			if err := vm.push(numVal(left * right)); err != nil {
+				return err
+			}
+		case OpDivide:
+			right, left := vm.popBinaryNums()
+			if right == 0 {
+				return ErrDivideByZero
+			}
+			if err := vm.push(numVal(left / right)); err != nil {
+				return err
+			}
+		case OpModulo:
+			right, left := vm.popBinaryNums()
+			if right == 0 {
+				return ErrDivideByZero
+			}
+			// floating point modulo has to be handled using this math function
+			if err := vm.push(numVal(math.Mod(left, right))); err != nil {
 				return err
 			}
 		}

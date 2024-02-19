@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"math"
 	"testing"
 
 	"evylang.dev/evy/pkg/assert"
@@ -48,6 +49,43 @@ func TestVMGlobals(t *testing.T) {
 	}
 }
 
+func TestUserError(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		expectedErr error
+	}{
+		{
+			name: "divide by zero",
+			input: `
+			x := 2 / 0
+			x = x
+			`,
+			expectedErr: ErrDivideByZero,
+		},
+		{
+			name: "modulo by zero",
+			input: `
+			x := 2 % 0
+			x = x
+			`,
+			expectedErr: ErrDivideByZero,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			program, err := parser.Parse(tt.input, parser.Builtins{})
+			assert.NoError(t, err, "parser error")
+			comp := NewCompiler()
+			err = comp.Compile(program)
+			assert.NoError(t, err, "compiler error")
+			vm := NewVM(comp.Bytecode())
+			err = vm.Run()
+			assert.Equal(t, tt.expectedErr, err)
+		})
+	}
+}
+
 func TestVMArithmetic(t *testing.T) {
 	tests := []testCase{
 		{
@@ -85,19 +123,118 @@ func TestVMArithmetic(t *testing.T) {
 			},
 		},
 		{
-			name: "addition and subtraction",
+			name: "multiplication",
 			input: `
-			x := 2 - 1 + 3
+			x := 2 * 1
 			x = x
 			`,
-			expectedStackTop:  4,
-			expectedConstants: []any{2, 1, 3},
+			expectedStackTop:  2,
+			expectedConstants: []any{2, 1},
 			expectedInstructions: []Instructions{
 				mustMake(t, OpConstant, 0),
 				mustMake(t, OpConstant, 1),
-				mustMake(t, OpSubtract),
-				mustMake(t, OpConstant, 2),
+				mustMake(t, OpMultiply),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "division",
+			input: `
+			x := 2 / 1
+			x = x
+			`,
+			expectedStackTop:  2,
+			expectedConstants: []any{2, 1},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpDivide),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "modulo",
+			input: `
+			x := 2 % 1
+			x = x
+			`,
+			expectedStackTop:  0,
+			expectedConstants: []any{2, 1},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpModulo),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "float modulo",
+			input: `
+			x := 2.5 % 1.3
+			x = x
+			`,
+			expectedStackTop:  1.2,
+			expectedConstants: []any{2.5, 1.3},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpModulo),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "all operators",
+			input: `
+			x := 1 + 2 - 3 * 4 / 5 % 6
+			x = x
+			`,
+			expectedStackTop:  1 + 2 - math.Mod(3.0*4.0/5.0, 6.0),
+			expectedConstants: []any{1, 2, 3, 4, 5, 6},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
 				mustMake(t, OpAdd),
+				mustMake(t, OpConstant, 2),
+				mustMake(t, OpConstant, 3),
+				mustMake(t, OpMultiply),
+				mustMake(t, OpConstant, 4),
+				mustMake(t, OpDivide),
+				mustMake(t, OpConstant, 5),
+				mustMake(t, OpModulo),
+				mustMake(t, OpSubtract),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "grouped expressions",
+			input: `
+			x := (1 + 2 - 3) * 4 / 5 % 6
+			x = x
+			`,
+			expectedStackTop:  (1 + 2 - 3) * 4 / math.Mod(5.0, 6.0),
+			expectedConstants: []any{1, 2, 3, 4, 5, 6},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpAdd),
+				mustMake(t, OpConstant, 2),
+				mustMake(t, OpSubtract),
+				mustMake(t, OpConstant, 3),
+				mustMake(t, OpMultiply),
+				mustMake(t, OpConstant, 4),
+				mustMake(t, OpDivide),
+				mustMake(t, OpConstant, 5),
+				mustMake(t, OpModulo),
 				mustMake(t, OpSetGlobal, 0),
 				mustMake(t, OpGetGlobal, 0),
 				mustMake(t, OpSetGlobal, 0),
@@ -149,7 +286,8 @@ type testCase struct {
 func assertInstructions(t *testing.T, expected []Instructions, actual Instructions) {
 	t.Helper()
 	concatted := concatInstructions(expected)
-	assert.Equal(t, len(concatted), len(actual), "wrong instructions length")
+	assert.Equal(t, len(concatted), len(actual), "wrong instructions length\nwant=\n%s\ngot=\n%s",
+		concatted, actual)
 	for i, ins := range concatted {
 		assert.Equal(t, ins, actual[i], "wrong instruction at %04d\nwant=\n%s\ngot=\n%s",
 			i, concatted, actual)

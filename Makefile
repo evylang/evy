@@ -176,7 +176,7 @@ NODEPREFIX = .hermit/node
 NODELIB = $(NODEPREFIX)/lib
 
 define PLAYWRIGHT_CMD_LOCAL
-	npm --prefix e2e ci
+	npm --prefix e2e ci > /dev/null
 	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
 endef
 
@@ -185,6 +185,7 @@ PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
   --network host --add-host=host.docker.internal:host-gateway \
   --env BASEURL=$(BASEURL) \
+  --env NPM_CONFIG_UPDATE_NOTIFIER=false \
   $(PLAYWRIGHT_OCI_IMAGE) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD_LOCAL))"
 
 PLAYWRIGHT_CMD = $(PLAYWRIGHT_CMD_$(if $(USE_DOCKER),DOCKER,LOCAL))
@@ -229,6 +230,12 @@ run-playwright:
 
 ## Run end-to-end tests with playwright (see run-playwright)
 e2e: run-playwright
+
+## Run end-to-end tests and list failed snapshot test image files.
+e2e-diff: PLAYWRIGHT_ARGS = --reporter json
+e2e-diff:
+	$(PLAYWRIGHT_CMD) | \
+	  jq -r '.suites[].suites.[]?.specs[].tests[].results[].attachments?.[].path'
 
 ## Make end-to-end testing golden screenshots with playwright (see run-playwright)
 snaps: PLAYWRIGHT_ARGS = --update-snapshots

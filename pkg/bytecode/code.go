@@ -38,6 +38,10 @@ const (
 	// OpMinus represents the minus unary operator, which negates the
 	// value of a numeric operand.
 	OpMinus
+	// OpEqual represents the equality operator.
+	OpEqual
+	// OpNotEqual represents the inequality operator.
+	OpNotEqual
 )
 
 var (
@@ -72,6 +76,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpFalse:    {"OpFalse", nil},
 	OpNot:      {"OpNot", nil},
 	OpMinus:    {"OpMinus", nil},
+	OpEqual:    {"OpEqual", nil},
+	OpNotEqual: {"OpNotEqual", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

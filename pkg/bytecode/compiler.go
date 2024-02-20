@@ -122,6 +122,10 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 		return c.emit(OpDivide)
 	case parser.OP_PERCENT:
 		return c.emit(OpModulo)
+	case parser.OP_EQ:
+		return c.emit(OpEqual)
+	case parser.OP_NOT_EQ:
+		return c.emit(OpNotEqual)
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}

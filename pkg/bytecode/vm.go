@@ -97,6 +97,14 @@ func (vm *VM) Run() error {
 		case OpMinus:
 			val := vm.popNumVal()
 			err = vm.push(-val)
+		case OpEqual:
+			right := vm.pop()
+			left := vm.pop()
+			err = vm.push(boolVal(left.Equals(right)))
+		case OpNotEqual:
+			right := vm.pop()
+			left := vm.pop()
+			err = vm.push(boolVal(!left.Equals(right)))
 		}
 		if err != nil {
 			return err

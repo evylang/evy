@@ -134,6 +134,40 @@ func TestBoolExpressions(t *testing.T) {
 				mustMake(t, OpSetGlobal, 0),
 			},
 		},
+		{
+			name: "equal operator",
+			input: `
+			x := 1 == 1
+			x = x
+			`,
+			expectedStackTop:  true,
+			expectedConstants: []any{1, 1},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpEqual),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "not operator",
+			input: `
+			x := 1 != 1
+			x = x
+			`,
+			expectedStackTop:  false,
+			expectedConstants: []any{1, 1},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpConstant, 1),
+				mustMake(t, OpNotEqual),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

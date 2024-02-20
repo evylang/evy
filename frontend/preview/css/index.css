@@ -1,46 +1,59 @@
 .max-width-wrapper {
-  max-width: calc(51rem + 32px);
+  max-width: calc(44rem + 32px);
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-h1 {
-  font-size: 2rem;
+body {
+  line-height: 1.6;
+}
+
+:is(h1, h2) {
+  color: var(--color);
   font-weight: 700;
-  margin: 32px 0 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: 1.875rem;
+  margin-top: 36px;
 }
 
 h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 32px 0 8px;
+  font-size: 1.25rem;
+  margin-top: 18px;
+}
+
+:is(h3, h4, h5) {
+  color: var(--color);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 18px;
 }
 
 h3 {
-  font-size: 1.25rem;
   font-weight: 700;
-  margin: 16px 0 8px;
 }
 
-h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 16px 0 8px;
+h5 {
+  color: var(--color-slightly-dimmed);
 }
 
 p {
-  line-height: 1.75;
+  color: var(--color-dimmed);
 }
 
 ul,
 ol {
-  margin: 16px 32px;
+  margin: 24px;
 }
 
 li {
-  line-height: 2;
+  line-height: 1.6;
 }
 
 a {

@@ -8,6 +8,8 @@
   --color-hover: hsl(0deg 0% 100% / 70%);
   --color-dimmed: hsl(0deg 0% 80%);
   --color-slightly-dimmed: hsl(0deg 0% 80%);
+  --color-accent: hsl(201deg 100% 63%);
+  --color-accent-hover: hsl(201deg 100% 73%);
   --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-strong: hsl(0deg 0% 100% / 40%);
   --primary-button-color: hsl(0deg 0% 33%);

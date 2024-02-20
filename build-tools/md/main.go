@@ -192,6 +192,9 @@ func updateLink(mdl *markdown.Link) {
 // [markdown.Heading]s Text slice that renders a link marker linking
 // to the heading, allowing for easily copying links to a heading.
 func (w *walker) updateHeading(h *markdown.Heading) {
+	if h.Level == 1 {
+		return
+	}
 	text := inlineText(h.Text.Inline)
 	var majorHeading string
 	if h.Level > 3 {
@@ -206,11 +209,7 @@ func (w *walker) updateHeading(h *markdown.Heading) {
 }
 
 func newAnchor(id string) *markdown.HTMLTag {
-	format := `
-<a id="%s" href="#%s" class="anchor">
-    <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-</a>
-`
+	format := `<a id="%s" href="#%s" class="anchor">#</a>`
 	return &markdown.HTMLTag{
 		Text: fmt.Sprintf(format, id, id),
 	}

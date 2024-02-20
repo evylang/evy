@@ -71,27 +71,14 @@ td {
   }
 }
 
-:is(h1, h2, h3, h4, h5, h6):has(> .anchor) {
-  position: relative;
-  margin-left: -24px;
-  padding-left: 24px;
-}
-
-:is(h1, h2, h3, h4, h5, h6) > .anchor {
+.anchor {
+  color: var(--color-accent);
   text-decoration: none;
-  outline: none;
+  margin-right: 0.5em;
 }
 
-:is(h1, h2, h3, h4, h5, h6) > .anchor > svg {
-  display: none;
-}
-
-:is(h1, h2, h3, h4, h5, h6):hover > .anchor > svg {
-  display: inline-block;
-  position: absolute;
-  left: -4px;
-  top: calc(50% - 10px);
-  vertical-align: middle;
+.anchor:hover {
+  color: var(--color-accent-hover);
 }
 
 .docs {

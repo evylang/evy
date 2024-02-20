@@ -9,10 +9,36 @@
     <link rel="stylesheet" href="./css/resets.css" type="text/css" />
     <link rel="stylesheet" href="./css/root.css" type="text/css" />
     <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/header.css" type="text/css" />
     <link rel="stylesheet" href="./css/index.css" type="text/css" />
     <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
   </head>
   <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">Overview</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <div class="search">
+            <div class="icon-search"></div>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <a href="index.html">Overview</a>
+          <a href="syntax_by_example.html">Documentation</a>
+          <button>About</button>
+        </nav>
+        <a href="/" class="mobile">
+          <svg class="icon"><use href="#icon-evy" /></svg>
+        </a>
+      </div>
+    </header>
     <main class="max-width-wrapper">
       <h1>
         <a id="command-line-usage" href="#command-line-usage" class="anchor">

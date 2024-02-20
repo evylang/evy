@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy · Header demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="../img/favicon.png" />
+    <link rel="stylesheet" href="resets.css" type="text/css" />
+    <link rel="stylesheet" href="root.css" type="text/css" />
+    <link rel="stylesheet" href="elements.css" type="text/css" />
+    <link rel="stylesheet" href="header.css" type="text/css" />
+  </head>
+  <body>
+    <!-- Minimal example -->
+    <header class="topnav">
+      <div class="left" style="border: 3px dashed red">left</div>
+      <div class="center" style="border: 3px dashed yellow">center</div>
+      <div class="right" style="border: 3px dashed green">right</div>
+    </header>
+
+    <!-- Minimal example, left/right only -->
+    <header class="topnav" style="margin-top: 64px">
+      <div class="left" style="border: 3px dashed red">left</div>
+      <div class="right" style="border: 3px dashed green">right</div>
+    </header>
+
+    <!-- Evy play header demo -->
+    <header class="topnav" style="margin-top: 64px">
+      <div class="left">
+        <button class="icon hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <!-- Breadcrumb style is local to playground -->
+      <div class="center">Middle</div>
+      <div class="right">
+        <span class="desktop">About</span>
+        <a href="/" class="mobile logo-small"></a>
+      </div>
+    </header>
+  </body>
+</html>

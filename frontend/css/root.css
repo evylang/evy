@@ -3,7 +3,7 @@
   --font-family: "Inter", sans-serif;
   --font-family-code: "Fira Code", monospace;
   --background: hsl(210deg 5% 15%);
-  --background-dimmed: hsla(213, 10%, 23%, 1);
+  --background-dimmed: hsl(213deg 10% 23% / 100%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
   --color-dimmed: hsl(0deg 0% 80%);
@@ -12,6 +12,10 @@
   --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
   --primary-button-background: hsl(0deg 0% 92%);
   --primary-button-background-hover: hsl(0deg 0% 80%);
+
+  /* size */
+  --topnav-padding: 16px;
+  --topnav-height: calc(var(--topnav-padding) * 2 + 1.5rem);
 }
 
 /* mobile */
@@ -21,6 +25,7 @@
     display: none !important;
   }
 }
+
 @media (min-width: 767px) {
   .mobile {
     /* !important is used to override any other display properties that have higher specificity */

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/root.css" type="text/css" />
     <link rel="stylesheet" href="css/elements.css" type="text/css" />
     <link rel="stylesheet" href="css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="css/header.css" type="text/css" />
     <link rel="stylesheet" href="css/index.css" type="text/css" />
     <link rel="stylesheet" href="css/fonts.css" type="text/css" />
     <script type="importmap">
@@ -30,25 +31,25 @@
   </head>
 
   <body>
-    <header>
+    <header class="topnav">
       <div class="left">
-        <button id="hamburger" class="header-icon">
-          <svg width="1.4em" height="1.4em" class="desktop"><use href="#icon-hamburger" /></svg>
-          <svg width="1.4em" height="1.4em" class="mobile">
-            <use href="#icon-evy" />
-          </svg>
-        </button>
-        <a href="/" class="desktop logo">
-          <img src="img/logo.svg" alt="Evy logo" />
+        <button id="hamburger" class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
         </a>
       </div>
-      <ul class="breadcrumbs">
-        <li><button>Tour</button></li>
-        <li><button>Welcome</button></li>
-      </ul>
-      <div id="share">
-        <svg width="1.2em" height="1.2em"><use href="#icon-share" /></svg>
-        <span>Share</span>
+      <div class="center">
+        <ul class="breadcrumbs">
+          <li><button>Tour</button></li>
+          <li><button>Welcome</button></li>
+        </ul>
+      </div>
+      <div class="right">
+        <button class="desktop share" id="share">
+          <svg><use href="#icon-share" /></svg>
+          <span>Share</span>
+        </button>
+        <a href="/" class="mobile logo-small"></a>
       </div>
     </header>
 
@@ -121,7 +122,7 @@
     </div>
 
     <nav id="sidemenu" class="hidden">
-      <header>
+      <header class="topnav">
         <button id="sidemenu-close" class="header-icon">
           <svg width="1em" height="1em"><use href="#icon-close" /></svg>
         </button>
@@ -159,8 +160,8 @@
 
     <!-- Modal evy code sample selection, showed on breadcrumb click -->
     <div id="modal" class="hidden">
-      <header>
-        <button id="modal-close" class="header-icon">
+      <header class="topnav">
+        <button id="modal-close" class="right header-icon">
           <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
         </button>
       </header>
@@ -279,25 +280,6 @@
         viewBox="0 0 24 24"
       >
         <path d="M3,3 L21,21 M3,21 L21,3" stroke-linecap="square" />
-      </symbol>
-      <symbol
-        id="icon-hamburger"
-        fill="none"
-        stroke-width="2"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M3,17 H21 M3,12 H21 M3,7 H21" />
-      </symbol>
-      <symbol id="icon-evy" fill="none" stroke="currentColor" viewBox="0 0 142.5 100">
-        <g stroke-linecap="round" stroke-width="25">
-          <path d="M12.5,12.5 h0" stroke="hsl(49deg 100% 50%) " />
-          <path d="M50,12.5 h80" stroke="hsl(336deg 78% 64%)" />
-          <path d="M12.5,50 h0" stroke="hsl(7deg 66% 56%)" />
-          <path d="M50,50 h42.5" stroke="hsl(201deg 100% 63%)" />
-          <path d="M12.5,87.5 h0" stroke="hsl(150deg 50% 47%) " />
-          <path d="M50,87.5 h72.5" stroke="hsl(234deg 48% 51%)" />
-        </g>
       </symbol>
       <symbol id="icon-copy" fill="currentColor" stroke-width="0" viewBox="0 0 20 20">
         <path

@@ -175,22 +175,24 @@ clean::
 NODEPREFIX = .hermit/node
 NODELIB = $(NODEPREFIX)/lib
 
-define PLAYWRIGHT_CMD
+define PLAYWRIGHT_CMD_LOCAL
 	npm --prefix e2e ci
 	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
 endef
 
-PLAYWRIGHT_IMG = mcr.microsoft.com/playwright:v1.41.1-jammy
+PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.41.1-jammy
 PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
   --network host --add-host=host.docker.internal:host-gateway \
   --env BASEURL=$(BASEURL) \
-  $(PLAYWRIGHT_IMG) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD))"
+  $(PLAYWRIGHT_OCI_IMAGE) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD_LOCAL))"
+
+PLAYWRIGHT_CMD = $(PLAYWRIGHT_CMD_$(if $(USE_DOCKER),DOCKER,LOCAL))
 
 # BASEURL needs to be in the environment so that `e2e/playwright.config.js`
 # can see it when the `e2e` target is called.
 # The firebase-deploy script sets BASEURL to the deployment URL on GitHub CI.
-SERVEDIR_HOST = localhost
+SERVEDIR_HOST = $(if $(USE_DOCKER),host.docker.internal,localhost)
 export SERVEDIR_PORT ?= 8080
 export BASEURL ?= http://$(SERVEDIR_HOST):$(SERVEDIR_PORT)
 
@@ -220,26 +222,17 @@ check-style: | $(NODELIB)
 install-playwright:
 	npx --prefix e2e playwright install --with-deps chromium
 
-## Run end-to-end test on host system, could be MacOS, Linux or other
-e2e:
-	@echo "testing $(BASEURL)"
+## Run playwright locally, or in docker if run with `make USE_DOCKER=1 ...`
+run-playwright:
+	@echo "running playwright against $(BASEURL)"
 	$(PLAYWRIGHT_CMD)
 
-## Run end-to-end tests with Docker, used on Linux CI
-e2e-docker: SERVEDIR_HOST = host.docker.internal
-e2e-docker:
-	$(PLAYWRIGHT_CMD_DOCKER)
+## Run end-to-end tests with playwright (see run-playwright)
+e2e: run-playwright
 
-## Make end-to-end testing golden screenshots for local OS
+## Make end-to-end testing golden screenshots with playwright (see run-playwright)
 snaps: PLAYWRIGHT_ARGS = --update-snapshots
-snaps:
-	$(PLAYWRIGHT_CMD)
-
-## Make end-to-end testing golden screenshots with Docker, used on Linux CI
-snaps-docker: SERVEDIR_HOST = host.docker.internal
-snaps-docker: PLAYWRIGHT_ARGS = --update-snapshots
-snaps-docker:
-	$(PLAYWRIGHT_CMD_DOCKER)
+snaps: run-playwright
 
 $(NODELIB):
 	@mkdir -p $@

@@ -49,6 +49,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileAssignment(node)
 	case *parser.BinaryExpression:
 		return c.compileBinaryExpression(node)
+	case *parser.UnaryExpression:
+		return c.compileUnaryExpression(node)
 	case *parser.GroupExpression:
 		return c.Compile(node.Expr)
 	case *parser.Var:
@@ -123,6 +125,19 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}
+}
+
+func (c *Compiler) compileUnaryExpression(expr *parser.UnaryExpression) error {
+	if err := c.Compile(expr.Right); err != nil {
+		return err
+	}
+	switch expr.Op {
+	case parser.OP_MINUS:
+		return c.emit(OpMinus)
+	case parser.OP_BANG:
+		return c.emit(OpNot)
+	}
+	return nil
 }
 
 func (c *Compiler) compileProgram(prog *parser.Program) error {

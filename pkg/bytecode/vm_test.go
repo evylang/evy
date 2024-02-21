@@ -118,6 +118,22 @@ func TestBoolExpressions(t *testing.T) {
 				mustMake(t, OpSetGlobal, 0),
 			},
 		},
+		{
+			name: "not operator",
+			input: `
+			x := !true
+			x = x
+			`,
+			expectedStackTop:  false,
+			expectedConstants: []any{},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpTrue),
+				mustMake(t, OpNot),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -234,6 +250,22 @@ func TestVMArithmetic(t *testing.T) {
 				mustMake(t, OpConstant, 0),
 				mustMake(t, OpConstant, 1),
 				mustMake(t, OpModulo),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "minus operator",
+			input: `
+			x := -1
+			x = x
+			`,
+			expectedStackTop:  -1,
+			expectedConstants: []any{1},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpConstant, 0),
+				mustMake(t, OpMinus),
 				mustMake(t, OpSetGlobal, 0),
 				mustMake(t, OpGetGlobal, 0),
 				mustMake(t, OpSetGlobal, 0),

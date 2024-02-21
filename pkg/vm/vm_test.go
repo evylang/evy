@@ -92,6 +92,16 @@ x = x`, true},
 	runVmTests(t, tests)
 }
 
+func TestArray(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			`x := [1 2 3]
+x = x`, []any{1, 2, 3},
+		},
+	}
+	runVmTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
 		{
@@ -206,7 +216,7 @@ func TestConditionals(t *testing.T) {
 
 type vmTestCase struct {
 	input    string
-	expected interface{}
+	expected any
 }
 
 func runVmTests(t *testing.T, tests []vmTestCase) {
@@ -236,7 +246,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 
 func testExpectedObject(
 	t *testing.T,
-	expected interface{},
+	expected any,
 	actual object.Object,
 	input string,
 ) {
@@ -259,9 +269,25 @@ func testExpectedObject(
 		if err := testStringObject(expected, actual); err != nil {
 			t.Errorf("testStringObject failed: %s. Input: %q", err, input)
 		}
+	case []any:
+		if err := testArrayObject(t, expected, actual); err != nil {
+			t.Errorf("testStringObject failed: %s. Input: %q", err, input)
+		}
 	default:
 		t.Errorf("type of expected (%T) not handled", expected)
 	}
+}
+
+func testArrayObject(t *testing.T, expected []any, actual object.Object) error {
+	arr, ok := actual.(*object.Array)
+	if !ok {
+		return fmt.Errorf("object is not Array. got=%T (%+v)",
+			actual, actual)
+	}
+	for i := 0; i < len(expected); i++ {
+		testExpectedObject(t, expected[i], arr.Elements[i], "")
+	}
+	return nil
 }
 
 func testStringObject(expected string, actual object.Object) error {

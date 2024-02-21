@@ -1,8 +1,10 @@
 package object
 
 import (
+	"bytes"
 	"fmt"
 	"hash/fnv"
+	"strings"
 )
 
 type BuiltinFunction func(args ...Object) Object
@@ -15,6 +17,7 @@ const (
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
 	STRING_OBJ  = "STRING"
+	ARRAY_OBJ   = "ARRAY"
 )
 
 type HashKey struct {
@@ -76,4 +79,24 @@ func (s *String) HashKey() HashKey {
 	h.Write([]byte(s.Value))
 
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
+}
+
+type Array struct {
+	Elements []Object
+}
+
+func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
+func (ao *Array) Inspect() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
 }

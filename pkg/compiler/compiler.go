@@ -174,7 +174,13 @@ func (c *Compiler) Compile(node parser.Node) error {
 				return err
 			}
 		}
-
+	case *parser.ArrayLiteral:
+		for _, elem := range node.Elements {
+			if err := c.Compile(elem); err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpArray, len(node.Elements))
 	default:
 		return fmt.Errorf("unknown node type %s", node.Type())
 	}

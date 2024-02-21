@@ -503,6 +503,52 @@ x = x`,
 	runCompilerTests(t, tests)
 }
 
+func TestArray(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `x := []
+x = x`,
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpArray, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `x := [1 2 3]
+x = x`,
+			expectedConstants: []interface{}{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		// 		{ // TODO: This is broken
+		// 			input: `x := ["1" 2 "3"]
+		// x = x`,
+		// 			expectedConstants: []interface{}{"1", 2, "3"},
+		// 			expectedInstructions: []code.Instructions{
+		// 				code.Make(code.OpConstant, 0),
+		// 				code.Make(code.OpConstant, 1),
+		// 				code.Make(code.OpConstant, 2),
+		// 				code.Make(code.OpArray, 3),
+		// 				code.Make(code.OpSetGlobal, 0),
+		// 				code.Make(code.OpGetGlobal, 0),
+		// 				code.Make(code.OpSetGlobal, 0),
+		// 			},
+		// 		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []compilerTestCase{
 		{

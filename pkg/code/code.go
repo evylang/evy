@@ -28,6 +28,7 @@ var definitions = map[Opcode]*Definition{
 	OpBang:             {"OpBang", []int{}},
 	OpJump:             {"OpJump", []int{2}},
 	OpJumpNotTruthy:    {"OpJumpNotTruthy", []int{2}},
+	OpArray:            {"OpArray", []int{2}}, // only lets arrays be 65535 elements long
 }
 
 const (
@@ -54,6 +55,7 @@ const (
 	OpLessThanEqual
 	OpMinus
 	OpBang
+	OpArray
 
 	OpJump
 	OpJumpNotTruthy

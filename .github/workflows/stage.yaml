@@ -33,7 +33,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: ./bin/make e2e-docker
+      - run: ./bin/make e2e USE_DOCKER=1
         env:
           BASEURL: ${{ env.BASEURL_APEX }}
           BASEURL_PLAY: ${{ env.BASEURL_PLAY }}

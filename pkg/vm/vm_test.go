@@ -74,6 +74,8 @@ func TestString(t *testing.T) {
 	tests := []vmTestCase{
 		{`x := "foobar"
 x = x`, "foobar"},
+		{`x := "foo" + "bar"
+x = x`, "foobar"},
 	}
 
 	runVmTests(t, tests)

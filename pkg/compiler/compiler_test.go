@@ -411,6 +411,19 @@ x = x`,
 				code.Make(code.OpSetGlobal, 0),
 			},
 		},
+		{
+			input: `x := "string" + "concat"
+x = x`,
+			expectedConstants: []interface{}{"string", "concat"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

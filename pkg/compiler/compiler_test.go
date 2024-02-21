@@ -398,6 +398,24 @@ func TestBool(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestString(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `x := "string"
+x = x`,
+			expectedConstants: []interface{}{"string"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []compilerTestCase{
 		{

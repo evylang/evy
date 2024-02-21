@@ -114,6 +114,9 @@ func (c *Compiler) Compile(node parser.Node) error {
 		} else {
 			c.emit(code.OpFalse)
 		}
+	case *parser.StringLiteral:
+		str := &object.String{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(str))
 	case *parser.GroupExpression:
 		return c.Compile(node.Expr)
 	case *parser.IfStmt:

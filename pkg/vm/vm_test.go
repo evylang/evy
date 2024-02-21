@@ -70,6 +70,15 @@ func TestBool(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestString(t *testing.T) {
+	tests := []vmTestCase{
+		{`x := "foobar"
+x = x`, "foobar"},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
 		{
@@ -222,23 +231,39 @@ func testExpectedObject(
 
 	switch expected := expected.(type) {
 	case bool:
-		err := testBooleanObject(expected, actual)
-		if err != nil {
+		if err := testBooleanObject(expected, actual); err != nil {
 			t.Errorf("testBooleanObject failed: %s. Input: %q", err, input)
 		}
 	case int:
-		err := testIntegerObject(float64(expected), actual)
-		if err != nil {
+		if err := testIntegerObject(float64(expected), actual); err != nil {
 			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
 		}
 	case float64:
-		err := testIntegerObject(expected, actual)
-		if err != nil {
+		if err := testIntegerObject(expected, actual); err != nil {
 			t.Errorf("testIntegerObject failed: %s. Input: %q", err, input)
+		}
+	case string:
+		if err := testStringObject(expected, actual); err != nil {
+			t.Errorf("testStringObject failed: %s. Input: %q", err, input)
 		}
 	default:
 		t.Errorf("type of expected (%T) not handled", expected)
 	}
+}
+
+func testStringObject(expected string, actual object.Object) error {
+	result, ok := actual.(*object.String)
+	if !ok {
+		return fmt.Errorf("object is not String. got=%T (%+v)",
+			actual, actual)
+	}
+
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%s, want=%s",
+			result.Value, expected)
+	}
+
+	return nil
 }
 
 func testBooleanObject(expected bool, actual object.Object) error {

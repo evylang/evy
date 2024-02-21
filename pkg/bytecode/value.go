@@ -27,3 +27,19 @@ func (n numVal) Equals(v value) bool {
 	}
 	return n == n2
 }
+
+type boolVal bool
+
+func (boolVal) Type() *parser.Type { return parser.BOOL_TYPE }
+
+func (b boolVal) String() string {
+	return strconv.FormatBool(bool(b))
+}
+
+func (b boolVal) Equals(v value) bool {
+	b2, ok := v.(boolVal)
+	if !ok {
+		panic("internal error: Bool.Equals called with non-Bool value")
+	}
+	return b == b2
+}

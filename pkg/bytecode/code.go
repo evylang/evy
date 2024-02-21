@@ -28,6 +28,10 @@ const (
 	// Modulo returns the remainder of dividing the left side of an expression
 	// by the right.
 	OpModulo
+	// OpTrue represents the boolean literal true.
+	OpTrue
+	// OpFalse represents the boolean literal false.
+	OpFalse
 )
 
 var (
@@ -58,6 +62,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpMultiply: {"OpMultiply", nil},
 	OpDivide:   {"OpDivide", nil},
 	OpModulo:   {"OpModulo", nil},
+	OpTrue:     {"OpTrue", nil},
+	OpFalse:    {"OpFalse", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

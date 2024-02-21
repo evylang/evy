@@ -86,6 +86,55 @@ func TestUserError(t *testing.T) {
 	}
 }
 
+func TestBoolExpressions(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "literal true",
+			input: `
+			x := true
+			x = x
+			`,
+			expectedStackTop:  true,
+			expectedConstants: []any{},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpTrue),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+		{
+			name: "literal false",
+			input: `
+			x := false
+			x = x
+			`,
+			expectedStackTop:  false,
+			expectedConstants: []any{},
+			expectedInstructions: []Instructions{
+				mustMake(t, OpFalse),
+				mustMake(t, OpSetGlobal, 0),
+				mustMake(t, OpGetGlobal, 0),
+				mustMake(t, OpSetGlobal, 0),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			program, err := parser.Parse(tt.input, parser.Builtins{})
+			assert.NoError(t, err, "parser error")
+			comp := NewCompiler()
+			err = comp.Compile(program)
+			assert.NoError(t, err, "compiler error")
+			vm := NewVM(comp.Bytecode())
+			err = vm.Run()
+			assert.NoError(t, err, "runtime error")
+			stackElem := vm.lastPoppedStackElem()
+			assertBoolValue(t, tt.expectedStackTop.(bool), stackElem)
+		})
+	}
+}
+
 func TestVMArithmetic(t *testing.T) {
 	tests := []testCase{
 		{
@@ -315,6 +364,13 @@ func assertConstants(t *testing.T, expected []any, actual []value) {
 			t.Errorf("unknown constant type %v", constant)
 		}
 	}
+}
+
+func assertBoolValue(t *testing.T, expected bool, actual value) {
+	t.Helper()
+	result, ok := actual.(boolVal)
+	assert.Equal(t, true, ok, "object is not a boolVal. got=%T (%+v)", actual, actual)
+	assert.Equal(t, expected, bool(result), "object has wrong value")
 }
 
 func assertNumValue(t *testing.T, expected float64, actual value) {

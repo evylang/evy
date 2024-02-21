@@ -424,6 +424,80 @@ x = x`,
 				code.Make(code.OpSetGlobal, 0),
 			},
 		},
+		{
+			input: `x := "string" == "concat"
+x = x`,
+			expectedConstants: []interface{}{"string", "concat"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpEqual),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `x := "string" != "concat"
+x = x`,
+			expectedConstants: []interface{}{"string", "concat"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpNotEqual),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		}, {
+			input: `x := "a" >= "b"
+x = x`,
+			expectedConstants: []interface{}{"a", "b"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThanEqual),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		}, {
+			input: `x := "a" > "b"
+x = x`,
+			expectedConstants: []interface{}{"a", "b"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		}, {
+			input: `x := "a" <= "b"
+x = x`,
+			expectedConstants: []interface{}{"a", "b"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpLessThanEqual),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		}, {
+			input: `x := "a" < "b"
+x = x`,
+			expectedConstants: []interface{}{"a", "b"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpLessThan),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

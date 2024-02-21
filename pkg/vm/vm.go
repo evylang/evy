@@ -224,6 +224,12 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 			}
 			return vm.push(result)
 		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value == right.(*object.String).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
 	case code.OpNotEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value != right.(*object.Integer).Value {
@@ -237,9 +243,21 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 			}
 			return vm.push(result)
 		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value != right.(*object.String).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
 	case code.OpGreaterThan:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value > right.(*object.Integer).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value > right.(*object.String).Value {
 				result = True
 			}
 			return vm.push(result)
@@ -251,6 +269,12 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 			}
 			return vm.push(result)
 		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value >= right.(*object.String).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
 	case code.OpLessThan:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value < right.(*object.Integer).Value {
@@ -258,9 +282,21 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 			}
 			return vm.push(result)
 		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value < right.(*object.String).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
 	case code.OpLessThanEqual:
 		if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
 			if left.(*object.Integer).Value <= right.(*object.Integer).Value {
+				result = True
+			}
+			return vm.push(result)
+		}
+		if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+			if left.(*object.String).Value <= right.(*object.String).Value {
 				result = True
 			}
 			return vm.push(result)

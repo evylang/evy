@@ -76,8 +76,19 @@ func TestString(t *testing.T) {
 x = x`, "foobar"},
 		{`x := "foo" + "bar"
 x = x`, "foobar"},
+		{`x := "foobar" == "fubar"
+x = x`, false},
+		{`x := "foobar" != "fubar"
+x = x`, true},
+		{`x := "foobar" >= "fubar"
+x = x`, false},
+		{`x := "foobar" <= "fubar"
+x = x`, true},
+		{`x := "foobar" > "fubar"
+x = x`, false},
+		{`x := "foobar" < "fubar"
+x = x`, true},
 	}
-
 	runVmTests(t, tests)
 }
 

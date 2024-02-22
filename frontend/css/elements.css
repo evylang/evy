@@ -1,5 +1,6 @@
-a {
-  transition: all 0.3s ease-in-out;
+a,
+button {
+  transition: color 0.3s ease-in-out;
 }
 
 body {

@@ -1,46 +1,59 @@
 .max-width-wrapper {
-  max-width: calc(51rem + 32px);
+  max-width: calc(44rem + 32px);
   margin-left: auto;
   margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-h1 {
-  font-size: 2rem;
+body {
+  line-height: 1.6;
+}
+
+:is(h1, h2) {
+  color: var(--color);
   font-weight: 700;
-  margin: 32px 0 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: 1.875rem;
+  margin-top: 36px;
 }
 
 h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 32px 0 8px;
+  font-size: 1.25rem;
+  margin-top: 18px;
+}
+
+:is(h3, h4, h5) {
+  color: var(--color);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 18px;
 }
 
 h3 {
-  font-size: 1.25rem;
   font-weight: 700;
-  margin: 16px 0 8px;
 }
 
-h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 16px 0 8px;
+h5 {
+  color: var(--color-slightly-dimmed);
 }
 
 p {
-  line-height: 1.75;
+  color: var(--color-dimmed);
 }
 
 ul,
 ol {
-  margin: 16px 32px;
+  margin: 24px;
 }
 
 li {
-  line-height: 2;
+  line-height: 1.6;
 }
 
 a {
@@ -71,25 +84,70 @@ td {
   }
 }
 
-:is(h1, h2, h3, h4, h5, h6):has(> .anchor) {
-  position: relative;
-  margin-left: -24px;
-  padding-left: 24px;
+.anchor {
+  color: var(--color-accent);
+  text-decoration: none;
+  margin-right: 0.5em;
 }
 
-:is(h1, h2, h3, h4, h5, h6) > .anchor {
-  text-decoration: none;
+.anchor:hover {
+  color: var(--color-accent-hover);
+}
+
+.docs {
+  height: calc(var(--topnav-height));
+  border-bottom: 1px solid var(--border-color);
+}
+
+.docs-nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  letter-spacing: 0.5px;
+}
+
+.docs-nav .active {
+  color: var(--color-accent);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color-strong);
+  border-radius: 6px;
+}
+
+.search > .icon-search {
+  height: 0.9em;
+  width: 0.9em;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--color);
+}
+
+.search > input {
+  height: 2.05rem;
+  border: none;
+  background: none;
+  color: var(--color);
+  padding-left: 4px;
+  max-width: 224px;
   outline: none;
 }
 
-:is(h1, h2, h3, h4, h5, h6) > .anchor > svg {
-  display: none;
+.search > input::placeholder {
+  opacity: 1;
+  color: var(--color);
 }
 
-:is(h1, h2, h3, h4, h5, h6):hover > .anchor > svg {
-  display: inline-block;
-  position: absolute;
-  left: -4px;
-  top: calc(50% - 10px);
-  vertical-align: middle;
+/* mobile */
+@media (max-width: 767px) {
+  .docs {
+    height: var(--topnav-height);
+    border-bottom: none;
+  }
+
+  .docs-nav {
+    display: none;
+  }
 }

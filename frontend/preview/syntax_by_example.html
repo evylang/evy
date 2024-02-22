@@ -9,17 +9,38 @@
     <link rel="stylesheet" href="./css/resets.css" type="text/css" />
     <link rel="stylesheet" href="./css/root.css" type="text/css" />
     <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/header.css" type="text/css" />
     <link rel="stylesheet" href="./css/index.css" type="text/css" />
     <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
   </head>
   <body>
-    <main class="max-width-wrapper">
-      <h1>
-        <a id="syntax-by-example" href="#syntax-by-example" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
         </a>
-        Syntax by Example
-      </h1>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">Overview</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <div class="search">
+            <div class="icon-search"></div>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <a href="index.html">Overview</a>
+          <a href="syntax_by_example.html">Documentation</a>
+          <button>About</button>
+        </nav>
+        <a href="/" class="mobile">
+          <svg class="icon"><use href="#icon-evy" /></svg>
+        </a>
+      </div>
+    </header>
+    <main class="max-width-wrapper">
+      <h1>Syntax by Example</h1>
       <p>
         The following examples will help you understand the syntax of Evy. For a more formal
         definition of the syntax, see the <a href="spec.html">Language Specification</a>. Built-in
@@ -28,46 +49,21 @@
           >Built-ins section</a
         >.
       </p>
-      <h2>
-        <a id="comment" href="#comment" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Comment
-      </h2>
+      <h2><a id="comment" href="#comment" class="anchor">#</a>Comment</h2>
       <pre><code>// This is a comment
 </code></pre>
-      <h2>
-        <a id="declaration" href="#declaration" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Declaration
-      </h2>
+      <h2><a id="declaration" href="#declaration" class="anchor">#</a>Declaration</h2>
       <pre><code>x:num     // declaration: num, string, bool, any, []num, {}string
 y := 1    // declaration through type inference (num)
 </code></pre>
-      <h2>
-        <a id="assignment" href="#assignment" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Assignment
-      </h2>
+      <h2><a id="assignment" href="#assignment" class="anchor">#</a>Assignment</h2>
       <pre><code>z = 5
 </code></pre>
-      <h2>
-        <a id="expression" href="#expression" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Expression
-      </h2>
+      <h2><a id="expression" href="#expression" class="anchor">#</a>Expression</h2>
       <pre><code>x := 5 * (y + z)  - 2 / 7.6           // arithmetic number expression
 b := !trace and debug or level == &quot;&quot;  // bool expressions
 </code></pre>
-      <h2>
-        <a id="strings" href="#strings" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Strings
-      </h2>
+      <h2><a id="strings" href="#strings" class="anchor">#</a>Strings</h2>
       <pre><code>s1 := &quot;quotation mark : \&quot; &quot;          // escaping
 s2 := &quot;abc&quot; + &quot;🥪123&quot;                 // concatenation
 s3 := &quot;newline: \n indentation: \t&quot;
@@ -75,10 +71,7 @@ s4 := s2[0]                           // &quot;a&quot;
 s5 := s2[1:5]                         // &quot;bc🥪1&quot;
 </code></pre>
       <h2>
-        <a id="if-statements" href="#if-statements" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>if</code> statements
+        <a id="if-statements" href="#if-statements" class="anchor">#</a><code>if</code> statements
       </h2>
       <pre><code>if z &gt; 0 and x != 0
     print &quot;block 1&quot;
@@ -88,12 +81,7 @@ else
     print &quot;block 3&quot;
 end
 </code></pre>
-      <h3>
-        <a id="nested-if" href="#nested-if" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Nested <code>if</code>
-      </h3>
+      <h3><a id="nested-if" href="#nested-if" class="anchor">#</a>Nested <code>if</code></h3>
       <pre><code>if z &gt; 0 and x != 0
     if startswith str &quot;a&quot;
         print &quot;nested block 1&quot;
@@ -102,18 +90,8 @@ end
     end
 end
 </code></pre>
-      <h2>
-        <a id="loop-statements" href="#loop-statements" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Loop statements
-      </h2>
-      <h3>
-        <a id="while-loop" href="#while-loop" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>while</code> loop
-      </h3>
+      <h2><a id="loop-statements" href="#loop-statements" class="anchor">#</a>Loop statements</h2>
+      <h3><a id="while-loop" href="#while-loop" class="anchor">#</a><code>while</code> loop</h3>
       <pre><code>x := 0
 while x &lt; 10
     print x
@@ -121,10 +99,8 @@ while x &lt; 10
 end
 </code></pre>
       <h3>
-        <a id="for-range-number" href="#for-range-number" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>for</code> … <code>range</code> number
+        <a id="for-range-number" href="#for-range-number" class="anchor">#</a><code>for</code> …
+        <code>range</code> number
       </h3>
       <pre><code>for x := range 5
     print x           // 0 1 2 3 4
@@ -143,32 +119,23 @@ for x := range -10
 end
 </code></pre>
       <h3>
-        <a id="for-range-array" href="#for-range-array" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>for</code> … <code>range</code> array
+        <a id="for-range-array" href="#for-range-array" class="anchor">#</a><code>for</code> …
+        <code>range</code> array
       </h3>
       <pre><code>for x := range [1 2 3]
     print x        // 1 2 3
 end
 </code></pre>
       <h3>
-        <a id="for-range-map" href="#for-range-map" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>for</code> … <code>range</code> map
+        <a id="for-range-map" href="#for-range-map" class="anchor">#</a><code>for</code> …
+        <code>range</code> map
       </h3>
       <pre><code>m := { name:&quot;Mali&quot; sport:&quot;climbing&quot; }
 for key := range m
     print key m[key]
 end
 </code></pre>
-      <h3>
-        <a id="break" href="#break" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>break</code>
-      </h3>
+      <h3><a id="break" href="#break" class="anchor">#</a><code>break</code></h3>
       <pre><code>x := 0
 while true
     print &quot;tick... &quot;
@@ -181,31 +148,19 @@ while true
 end
 </code></pre>
       <h2>
-        <a id="function-definition" href="#function-definition" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Function definition
+        <a id="function-definition" href="#function-definition" class="anchor">#</a>Function
+        definition
       </h2>
       <pre><code>func add:num a:num b:num
     return a + b
 end
 </code></pre>
-      <h3>
-        <a id="no-return-type" href="#no-return-type" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        No return type
-      </h3>
+      <h3><a id="no-return-type" href="#no-return-type" class="anchor">#</a>No return type</h3>
       <pre><code>func foxprint s:string
     print &quot;🦊 &quot; + s
 end
 </code></pre>
-      <h3>
-        <a id="variadic" href="#variadic" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Variadic
-      </h3>
+      <h3><a id="variadic" href="#variadic" class="anchor">#</a>Variadic</h3>
       <pre><code>func list args:any...
     for arg := range args[:-1]
         printf &quot;%v, &quot; arg
@@ -213,22 +168,12 @@ end
     printf &quot;%v&quot; args[-1]
 end
 </code></pre>
-      <h3>
-        <a id="function-calls" href="#function-calls" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Function calls
-      </h3>
+      <h3><a id="function-calls" href="#function-calls" class="anchor">#</a>Function calls</h3>
       <pre><code>n := add 1 2        // 3
 foxprint &quot;🐾&quot;       // 🦊 🐾
 list 2 true &quot;blue&quot;  // 2, true, blue
 </code></pre>
-      <h2>
-        <a id="array" href="#array" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Array
-      </h2>
+      <h2><a id="array" href="#array" class="anchor">#</a>Array</h2>
       <pre><code>a1:[]num
 a2:[][]string
 a1 = [1 2 3 4]              // type: num[]
@@ -240,10 +185,8 @@ a5 := [&quot;chars&quot; 123]         // type: any[]
 a6:[]any                    // type: any[]
 </code></pre>
       <h3>
-        <a id="array-element-access" href="#array-element-access" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Array element access
+        <a id="array-element-access" href="#array-element-access" class="anchor">#</a>Array element
+        access
       </h3>
       <pre><code>a1 := [1 2 3 4]
 a2 := [[&quot;1&quot; &quot;2&quot;] [&quot;a&quot; &quot;b&quot;]]
@@ -251,33 +194,18 @@ print a1[1]                  // 2
 print a2[1][0]               // &quot;a&quot;
 print a1[-1]                  // 4
 </code></pre>
-      <h3>
-        <a id="concatenation" href="#concatenation" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Concatenation
-      </h3>
+      <h3><a id="concatenation" href="#concatenation" class="anchor">#</a>Concatenation</h3>
       <pre><code>a := [1 2 3 4]
 a = a + [ 100 ]          // [1 2 3 4 100]; optional extra whitespace
 a = [0] + a + [101 102]  // [0 1 2 3 4 100 101 102]
 </code></pre>
-      <h3>
-        <a id="slicing" href="#slicing" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Slicing
-      </h3>
+      <h3><a id="slicing" href="#slicing" class="anchor">#</a>Slicing</h3>
       <pre><code>a := [1 2 3]
 b := a[:2]         // [1 2]
 b = a[1:2]         // [2]
 b = a[-2:]         // [2 3]
 </code></pre>
-      <h2>
-        <a id="map" href="#map" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Map
-      </h2>
+      <h2><a id="map" href="#map" class="anchor">#</a>Map</h2>
       <pre><code>m1:{}any // keys used in literals or with `.` must be identifiers.
 m1.name = &quot;fox&quot;
 m1.age = 42
@@ -295,10 +223,7 @@ m6:{}num
 //m6.x = &quot;y&quot;                      // invalid, only num values allowed
 </code></pre>
       <h3>
-        <a id="map-value-access" href="#map-value-access" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Map value access
+        <a id="map-value-access" href="#map-value-access" class="anchor">#</a>Map value access
       </h3>
       <pre><code>m := {letters:&quot;abc&quot; name:&quot;Jill&quot;}
 s := &quot;letters&quot;
@@ -306,34 +231,19 @@ print m.letters    // abc
 print m[s]         // abc
 print m[&quot;letters&quot;] // abc
 </code></pre>
-      <h2>
-        <a id="any" href="#any" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        <code>any</code>
-      </h2>
+      <h2><a id="any" href="#any" class="anchor">#</a><code>any</code></h2>
       <pre><code>x:any     // any type, default value: false
 m1:{}any  // map with any value type
 m2 := { letter:&quot;a&quot; number:1 }
 arr1:[]any
 arr2 := [ &quot;b&quot; 2 ]
 </code></pre>
-      <h2>
-        <a id="type-assertion" href="#type-assertion" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Type assertion
-      </h2>
+      <h2><a id="type-assertion" href="#type-assertion" class="anchor">#</a>Type assertion</h2>
       <pre><code>x:any
 x = [ 1 2 3 4 ]  // concrete type num[]
 s := x.([]num)
 </code></pre>
-      <h2>
-        <a id="type-reflection" href="#type-reflection" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Type reflection
-      </h2>
+      <h2><a id="type-reflection" href="#type-reflection" class="anchor">#</a>Type reflection</h2>
       <pre><code>typeof &quot;abc&quot;          // &quot;string&quot;
 typeof true           // &quot;bool&quot;
 typeof [ 1 2 ]        // &quot;[]num&quot;
@@ -347,12 +257,7 @@ if (typeof v) == &quot;string&quot;
     print s+s       // 🐐🐐
 end
 </code></pre>
-      <h2>
-        <a id="event-handling" href="#event-handling" class="anchor">
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Event handling
-      </h2>
+      <h2><a id="event-handling" href="#event-handling" class="anchor">#</a>Event handling</h2>
       <pre><code>on key
     print &quot;key pressed&quot;
 end
@@ -362,27 +267,14 @@ end
         periodic screen redraws.
       </p>
       <h3>
-        <a
-          id="event-handlers-with-parameters"
-          href="#event-handlers-with-parameters"
-          class="anchor"
-        >
-          <svg width="20px" height="20px"><use href="#icon-link" /></svg>
-        </a>
-        Event handlers with parameters
+        <a id="event-handlers-with-parameters" href="#event-handlers-with-parameters" class="anchor"
+          >#</a
+        >Event handlers with parameters
       </h3>
       <pre><code>on key k:string
     printf &quot;%q pressed\n&quot; k
 end
 </code></pre>
     </main>
-    <!-- icons  -->
-    <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">
-      <symbol id="icon-link" fill="none" stroke-width="1" stroke="currentColor" viewBox="0 0 16 16">
-        <path
-          d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
-        ></path>
-      </symbol>
-    </svg>
   </body>
 </html>

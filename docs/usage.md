@@ -11,7 +11,7 @@ The Evy toolchain has three subcommands:
 
 - `evy run`: Parse and run Evy source code.
 - `evy fmt`: Format Evy source code.
-- `evy sever`: Format Evy source code.
+- `evy serve`: Serve Evy website(s) locally.
 
 You can also get help for each subcommand by running it with the
 `--help` flag.

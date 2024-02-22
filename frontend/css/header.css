@@ -1,0 +1,82 @@
+/* Header navigation. Minimal demo: ./header.html */
+.topnav {
+  display: flex;
+  width: 100%;
+  height: var(--topnav-height);
+  background: var(--background-dimmed);
+  color: var(--color);
+  padding: 0 18px;
+}
+
+.topnav > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.topnav .left {
+  justify-content: flex-start;
+}
+
+.topnav .center {
+  justify-content: center;
+}
+
+.topnav .right {
+  justify-content: flex-end;
+}
+
+.topnav button {
+  background: none;
+  color: var(--color);
+  border: none;
+  outline: none;
+  align-items: center;
+}
+
+.topnav button:hover {
+  color: var(--color-hover);
+  cursor: pointer;
+}
+
+.topnav a {
+  color: var(--color);
+  text-decoration: none;
+}
+
+.topnav a:hover {
+  color: var(--color-hover);
+}
+
+.topnav .logo {
+  height: 1.25em;
+  margin-top: 0.25em;
+  margin-left: 20px;
+}
+
+/* SVG icons embedded CSS classes via `mask` or `background` properties.
+   SVG source files are located at /img/icon/*.svg */
+.topnav :is(.icon-hamburger, .icon-search) {
+  height: 1.5em;
+  width: 1.5em;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  background-color: currentcolor;
+}
+
+.topnav .icon-hamburger {
+  mask-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3,17 H21 M3,12 H21 M3,7 H21' stroke-width='2' /%3E%3C/svg%3E");
+}
+
+.topnav .icon-search {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='currentColor' viewBox='0 0 13 13'%3E%3Cpath d='M12 12L8.257 8.25301M9.5 5.25C9.5 6.37717 9.05223 7.45818 8.2552 8.25521C7.45817 9.05224 6.37717 9.50001 5.25 9.50001C4.12283 9.50001 3.04183 9.05224 2.2448 8.25521C1.44777 7.45818 1 6.37717 1 5.25C1 4.12283 1.44777 3.04183 2.2448 2.2448C3.04183 1.44777 4.12283 1 5.25 1C6.37717 1 7.45817 1.44777 8.2552 2.2448C9.05223 3.04183 9.5 4.12283 9.5 5.25Z' stroke-linecap='round' %3E%3C/path%3E%3C/svg%3E%0A");
+}
+
+.topnav .logo-small {
+  height: 1.5em;
+  width: 1.5em;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 142.5 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke-linecap='round' stroke-width='25' fill='none'%3E%3Cpath d='M12.5,12.5 h0' stroke='hsl(49deg 100%25 50%25) ' /%3E%3Cpath d='M50,12.5 h80' stroke='hsl(336deg 78%25 64%25)' /%3E%3Cpath d='M12.5,50 h0' stroke='hsl(7deg 66%25 56%25)' /%3E%3Cpath d='M50,50 h42.5' stroke='hsl(201deg 100%25 63%25)' /%3E%3Cpath d='M12.5,87.5 h0' stroke='hsl(150deg 50%25 47%25) ' /%3E%3Cpath d='M50,87.5 h72.5' stroke='hsl(234deg 48%25 51%25)' /%3E%3C/g%3E%3C/svg%3E");
+}

@@ -3,11 +3,11 @@
   --font-family: "Inter", sans-serif;
   --font-family-code: "Fira Code", monospace;
   --background: hsl(210deg 5% 15%);
-  --background-dimmed: hsl(213deg 10% 23% / 100%);
+  --background-dimmed: hsl(213deg 10% 23%);
   --color: hsl(0deg 0% 100%);
   --color-hover: hsl(0deg 0% 100% / 70%);
   --color-dimmed: hsl(0deg 0% 80%);
-  --color-slightly-dimmed: hsl(0deg 0% 80%);
+  --color-slightly-dimmed: hsl(0deg 0% 90%);
   --color-accent: hsl(201deg 100% 63%);
   --color-accent-hover: hsl(201deg 100% 73%);
   --border-color: hsl(0deg 0% 100% / 20%);

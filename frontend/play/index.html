@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/root.css" type="text/css" />
     <link rel="stylesheet" href="css/elements.css" type="text/css" />
     <link rel="stylesheet" href="css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="css/icons.css" type="text/css" />
     <link rel="stylesheet" href="css/header.css" type="text/css" />
     <link rel="stylesheet" href="css/index.css" type="text/css" />
     <link rel="stylesheet" href="css/fonts.css" type="text/css" />
@@ -46,7 +47,7 @@
       </div>
       <div class="right">
         <button class="desktop share" id="share">
-          <svg><use href="#icon-share" /></svg>
+          <div class="icon-share"></div>
           <span>Share</span>
         </button>
         <a href="/" class="mobile logo-small"></a>
@@ -123,9 +124,7 @@
 
     <nav id="sidemenu" class="hidden">
       <header class="topnav">
-        <button id="sidemenu-close" class="header-icon">
-          <svg width="1em" height="1em"><use href="#icon-close" /></svg>
-        </button>
+        <button id="sidemenu-close" class="left icon-close"></button>
       </header>
       <ul>
         <li><button id="sidemenu-about">About Evy</button></li>
@@ -137,33 +136,17 @@
         <li class="mobile"><button id="sidemenu-share">Share</button></li>
       </ul>
       <ul class="icons">
-        <li>
-          <a href="/discord">
-            <svg width="28px" height="21px"><use href="#icon-discord" /></svg>
-          </a>
-        </li>
-        <li>
-          <a href="https://github.com/evylang/evy">
-            <svg width="26px" height="25px"><use href="#icon-github" /></svg>
-          </a>
-        </li>
-        <li>
-          <a href="mailto:evy@evy.dev">
-            <svg width="23px" height="19px"><use href="#icon-email" /></svg>
-          </a>
-        </li>
-        <li id="sidemenu-icon-share" class="mobile">
-          <svg width="24px" height="24px"><use href="#icon-share" /></svg>
-        </li>
+        <li><a href="/discord" class="icon-discord"></a></li>
+        <li><a href="https://github.com/evylang/evy" class="icon-github"></a></li>
+        <li><a href="mailto:evy@evy.dev" class="icon-email"></a></li>
+        <li id="sidemenu-icon-share" class="mobile"><button class="icon-share"></button></li>
       </ul>
     </nav>
 
     <!-- Modal evy code sample selection, showed on breadcrumb click -->
     <div id="modal" class="hidden">
       <header class="topnav">
-        <button id="modal-close" class="right header-icon">
-          <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-        </button>
+        <button id="modal-close" class="icon-close"></button>
       </header>
       <div class="modal-main" id="modal-samples">
         <div class="item">
@@ -181,16 +164,12 @@
       <form method="dialog">
         <header>
           <h1>Share</h1>
-          <button class="header-icon">
-            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-          </button>
+          <button class="icon-close"></button>
         </header>
         <main>
           <div class="copy">
             <input type="text" value="/play#gzipped+and+base64+encoded+evy+code+content" />
-            <button type="button">
-              <svg width="1em" height="1em"><use href="#icon-copy" /></svg>
-            </button>
+            <button type="button" class="icon-copy"></button>
           </div>
           <button class="primary">Done</button>
         </main>
@@ -202,9 +181,7 @@
       <form method="dialog">
         <header>
           <h1>Error</h1>
-          <button class="header-icon">
-            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-          </button>
+          <button class="icon-close"></button>
         </header>
         <main>
           <p>Fix <span class="err">parse error</span> first, please!</p>
@@ -218,9 +195,7 @@
       <form method="dialog">
         <header>
           <h1>Loading</h1>
-          <button class="header-icon">
-            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-          </button>
+          <button class="icon-close"></button>
         </header>
         <main>
           <p>Hold tight, getting the editor and compiler ready. 🧘</p>
@@ -234,9 +209,7 @@
       <form method="dialog">
         <header>
           <h1>About</h1>
-          <button class="header-icon">
-            <svg width="1.2em" height="1.2em"><use href="#icon-close" /></svg>
-          </button>
+          <button class="icon-close"></button>
         </header>
         <main>
           <embed src="img/evy-e.svg" />
@@ -256,52 +229,6 @@
         </main>
       </form>
     </dialog>
-
-    <!-- SVG icons combined and hidden to avoid extra network round trips -->
-    <svg style="display: none" version="2.0" xmlns="http://www.w3.org/2000/svg">
-      <symbol
-        id="icon-share"
-        fill="none"
-        stroke-width="2"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-        />
-      </symbol>
-      <symbol
-        id="icon-close"
-        fill="none"
-        stroke-width="2"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M3,3 L21,21 M3,21 L21,3" stroke-linecap="square" />
-      </symbol>
-      <symbol id="icon-copy" fill="currentColor" stroke-width="0" viewBox="0 0 20 20">
-        <path
-          d="M19.1667 0H5.83333C5.61232 0 5.40036 0.0877975 5.24408 0.244078C5.0878 0.400358 5 0.61232 5 0.833333V5H0.833333C0.61232 5 0.400358 5.0878 0.244078 5.24408C0.0877975 5.40036 0 5.61232 0 5.83333V19.1667C0 19.3877 0.0877975 19.5996 0.244078 19.7559C0.400358 19.9122 0.61232 20 0.833333 20H14.1667C14.3877 20 14.5996 19.9122 14.7559 19.7559C14.9122 19.5996 15 19.3877 15 19.1667V15H19.1667C19.3877 15 19.5996 14.9122 19.7559 14.7559C19.9122 14.5996 20 14.3877 20 14.1667V0.833333C20 0.61232 19.9122 0.400358 19.7559 0.244078C19.5996 0.0877975 19.3877 0 19.1667 0ZM13.3333 18.3333H1.66667V6.66667H13.3333V18.3333ZM18.3333 13.3333H15V5.83333C15 5.61232 14.9122 5.40036 14.7559 5.24408C14.5996 5.0878 14.3877 5 14.1667 5H6.66667V1.66667H18.3333V13.3333Z"
-        />
-      </symbol>
-      <symbol id="icon-discord" fill="currentColor" viewBox="0 0 28 21">
-        <path
-          d="M23.6915 1.74523C21.9182 0.931691 19.9981 0.341221 17.998 6.03568e-05C17.9805 -0.00049154 17.9631 0.00274697 17.9469 0.00954824C17.9308 0.0163495 17.9164 0.0265484 17.9047 0.0394253C17.6647 0.472437 17.3847 1.03666 17.198 1.46968C15.0766 1.15476 12.9192 1.15476 10.7978 1.46968C10.6112 1.02354 10.3312 0.472437 10.0778 0.0394253C10.0645 0.0131822 10.0245 6.03568e-05 9.98449 6.03568e-05C7.98444 0.341221 6.07772 0.931691 4.291 1.74523C4.27767 1.74523 4.26434 1.75835 4.251 1.77147C0.624236 7.11195 -0.375791 12.3081 0.117555 17.4517C0.117555 17.478 0.130889 17.5042 0.157556 17.5174C2.55762 19.2494 4.86435 20.2991 7.14441 20.9946C7.18442 21.0077 7.22442 20.9946 7.23775 20.9683C7.7711 20.2466 8.25111 19.4856 8.66446 18.6852C8.69112 18.6327 8.66446 18.5802 8.61112 18.5671C7.8511 18.2784 7.13108 17.9372 6.4244 17.5436C6.37106 17.5174 6.37106 17.4386 6.41106 17.3993C6.55773 17.2943 6.7044 17.1762 6.85107 17.0712C6.87774 17.045 6.91774 17.045 6.94441 17.0581C11.5312 19.1182 16.478 19.1182 21.0115 17.0581C21.0381 17.045 21.0781 17.045 21.1048 17.0712C21.2515 17.1893 21.3981 17.2943 21.5448 17.4124C21.5981 17.4517 21.5981 17.5305 21.5315 17.5567C20.8381 17.9635 20.1048 18.2915 19.3447 18.5802C19.2914 18.5933 19.2781 18.6589 19.2914 18.6983C19.7181 19.4987 20.1981 20.2598 20.7181 20.9814C20.7581 20.9946 20.7981 21.0077 20.8381 20.9946C23.1315 20.2991 25.4382 19.2494 27.8383 17.5174C27.865 17.5042 27.8783 17.478 27.8783 17.4517C28.465 11.5077 26.905 6.3509 23.7449 1.77147C23.7315 1.75835 23.7182 1.74523 23.6915 1.74523ZM9.35781 14.3157C7.98444 14.3157 6.83774 13.0691 6.83774 11.5339C6.83774 9.99869 7.95777 8.75214 9.35781 8.75214C10.7712 8.75214 11.8912 10.0118 11.8779 11.5339C11.8779 13.0691 10.7578 14.3157 9.35781 14.3157ZM18.6514 14.3157C17.278 14.3157 16.1313 13.0691 16.1313 11.5339C16.1313 9.99869 17.2514 8.75214 18.6514 8.75214C20.0648 8.75214 21.1848 10.0118 21.1715 11.5339C21.1715 13.0691 20.0648 14.3157 18.6514 14.3157Z"
-        />
-      </symbol>
-      <symbol id="icon-github" fill="currentColor" viewBox="0 0 26 25">
-        <path
-          d="M13 0C11.2928 0 9.60235 0.331349 8.02512 0.975129C6.44788 1.61891 5.01477 2.56251 3.80761 3.75206C1.36964 6.15447 0 9.41282 0 12.8103C0 18.4725 3.731 23.2764 8.892 24.9802C9.542 25.0826 9.75 24.6855 9.75 24.3396V22.1747C6.149 22.9433 5.382 20.4581 5.382 20.4581C4.784 18.9721 3.939 18.575 3.939 18.575C2.756 17.7807 4.03 17.8064 4.03 17.8064C5.33 17.896 6.019 19.1258 6.019 19.1258C7.15 21.073 9.061 20.4965 9.802 20.1891C9.919 19.3564 10.257 18.7928 10.621 18.4725C7.735 18.1522 4.706 17.0506 4.706 12.1698C4.706 10.7479 5.2 9.60775 6.045 8.69822C5.915 8.37796 5.46 7.04569 6.175 5.31629C6.175 5.31629 7.267 4.97041 9.75 6.62294C10.777 6.34112 11.895 6.2002 13 6.2002C14.105 6.2002 15.223 6.34112 16.25 6.62294C18.733 4.97041 19.825 5.31629 19.825 5.31629C20.54 7.04569 20.085 8.37796 19.955 8.69822C20.8 9.60775 21.294 10.7479 21.294 12.1698C21.294 17.0634 18.252 18.1394 15.353 18.4597C15.821 18.8568 16.25 19.6382 16.25 20.8296V24.3396C16.25 24.6855 16.458 25.0955 17.121 24.9802C22.282 23.2636 26 18.4725 26 12.8103C26 11.1281 25.6637 9.46225 25.0104 7.90803C24.3571 6.35381 23.3995 4.94161 22.1924 3.75206C20.9852 2.56251 19.5521 1.61891 17.9749 0.975129C16.3977 0.331349 14.7072 0 13 0Z"
-        />
-      </symbol>
-      <symbol id="icon-email" fill="currentColor" viewBox="0 0 23 19">
-        <path
-          d="M23 2.375C23 1.06875 21.965 0 20.7 0H2.3C1.035 0 0 1.06875 0 2.375V16.625C0 17.9312 1.035 19 2.3 19H20.7C21.965 19 23 17.9312 23 16.625V2.375ZM20.7 2.375L11.5 8.3125L2.3 2.375H20.7ZM20.7 16.625H2.3V4.75L11.5 10.6875L20.7 4.75V16.625Z"
-        />
-      </symbol>
-    </svg>
     <script type="text/javascript">
       // Avoid flicker of placeholder sample in editor if we have a saved session.
       // Syntax coloring is added once Yace editor is loaded.

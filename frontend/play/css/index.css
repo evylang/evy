@@ -115,10 +115,9 @@ button.share {
   display: flex;
 }
 
-button.share > svg {
+button.share > div {
   width: 1.2em;
   height: 1.2em;
-  margin-top: -0.2em;
   margin-right: 8px;
 }
 
@@ -130,6 +129,7 @@ button.share > svg {
     margin-top: -0.2em;
   }
 }
+
 /* --- Sidemenu ---------------------------------------------------------- */
 #sidemenu {
   display: block;
@@ -167,7 +167,7 @@ button.share > svg {
 }
 
 #sidemenu header button {
-  padding: 5px;
+  flex: 0 0 1.2em;
 }
 
 #sidemenu a:hover,
@@ -191,6 +191,14 @@ button.share > svg {
   border-top: 1px solid var(--border-color);
 }
 
+#sidemenu ul.icons a {
+  display: inline-block;
+}
+
+#sidemenu :is(.icon-discord, .icon-github, .icon-email, .icon-share) {
+  width: 28px;
+  height: 28px;
+}
 /* --- Main ---------------------------------------------------------- */
 main {
   background: var(--background);
@@ -374,6 +382,7 @@ dialog .err,
 }
 
 .editor .lines .err.num::after {
+  /* see: /img/icons/err-line.svg */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H2 L10 12 L2 24 H0V0 Z' fill='%230057A8'/%3E%3C/svg%3E%0A");
   background-repeat: no-repeat;
   content: "";
@@ -540,20 +549,8 @@ button.running#run-mobile:active {
 }
 
 #modal-close {
-  position: relative;
-  right: 0.2em;
-}
-
-.header-icon {
-  cursor: pointer;
-  background: none;
-  color: var(--color);
-  border: none;
-  font-size: 1rem;
-}
-
-.header-icon:hover {
-  color: var(--color-hover);
+  flex: 0 0 1.2em;
+  margin-left: auto;
 }
 
 .modal-main {
@@ -647,23 +644,24 @@ dialog header {
   border-radius: 5px 5px 0 0;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
-dialog .header-icon {
-  vertical-align: middle;
-  line-height: 0;
+dialog button {
   outline: none;
-}
-
-dialog .copy button {
-  font-size: 1rem;
-  border: none;
-  background: none;
   color: var(--color);
-  opacity: 0.6;
-  stroke: none;
+  border: none;
   cursor: pointer;
 }
+
+dialog button.icon-close {
+  color: var(--color-dimmed);
+}
+
+dialog button.icon-close:hover {
+  color: var(--color);
+}
+
 /* stylelint-enable no-descending-specificity */
 
 ::backdrop {
@@ -695,6 +693,15 @@ dialog .copy {
   padding: 10px 20px;
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+dialog .icon-copy {
+  color: var(--color-dimmed);
+}
+
+dialog .icon-copy:hover {
+  color: var(--color);
 }
 
 dialog .copy input {

@@ -75,7 +75,7 @@ Use [Homebrew] to install `evy`.
 
 ## 💻 Development
 
-The Evy interpreter is written in [Go] and built using the Go and
+The Evy toolchain is written in [Go] and built using the Go and
 [TinyGo] compilers. TinyGo targets [WebAssembly], which allows Evy
 source code to be parsed and run in a web browser. The browser
 runtime is written in plain JavaScript without the use of frameworks.
@@ -90,7 +90,7 @@ frontend locally with
 
     make help
     make ci
-    make frontend-serve
+    make serve
 
 <details>
   <summary>Hermit automatically installs tools.</summary>

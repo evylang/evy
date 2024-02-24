@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>evy docs · Documentation</title>
+    <title>evy docs · Installation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="img/favicon.png" />
     <link rel="stylesheet" href="./css/resets.css" type="text/css" />
@@ -41,43 +41,45 @@
       </div>
     </header>
     <main class="max-width-wrapper">
-      <h1>Documentation</h1>
-      <p>Learn programming with Evy</p>
-      <ul>
-        <li>
-          Check out the
-          <a href="https://github.com/evylang/evy/wiki">Learn and Practise</a> resources.
-        </li>
-        <li>
-          Explore the samples on the <a href="/play">Playground</a> or the
-          <a href="https://github.com/evylang/evy/wiki/gallery">Gallery</a>.
-        </li>
-        <li>
-          Ask questions or discuss Evy in the <a href="/discord">Evy community</a> on Discord.
-        </li>
-      </ul>
-      <p>Learn more about the Evy language and tools</p>
-      <ul>
-        <li>
-          <a href="syntax_by_example.html">Syntax by Example</a>: Learn the Evy syntax with a
-          collection of examples.
-        </li>
-        <li>
-          <a href="builtins.html">Built-in Documentation</a>: Get details on built-in functions and
-          events in Evy.
-        </li>
-        <li>
-          <a href="spec.html">Language Specification</a>: Read a formal definition of the Evy syntax
-          and language.
-        </li>
-        <li>
-          <a href="usage.html"><code>evy</code> Usage</a>: Learn how to use the
-          <code>evy</code> command line tool.
-        </li>
-      </ul>
+      <h1>Installation</h1>
       <p>
-        If you want to contribute to Evy, please read the the
-        <a href="development/index.html">development guide</a>.
+        You can install the Evy toolchain locally to run it from your command line. To learn how to
+        use the Evy toolchain, read the <a href="docs/usage.html">usage documentation</a> or run
+        <code>evy --help</code>.
+      </p>
+      <h2>
+        <a id="linux-and-windows" href="#linux-and-windows" class="anchor">#</a>Linux and Windows
+      </h2>
+      <p>
+        Download the <a href="https://github.com/evylang/evy/releases/latest">latest release</a> for
+        your platform, unzip it and add <code>evy</code> to your path.
+      </p>
+      <h2><a id="macos" href="#macos" class="anchor">#</a>macOS</h2>
+      <p>Use <a href="https://brew.sh/">Homebrew</a> to install <code>evy</code>.</p>
+      <pre><code>brew install evylang/tap/evy
+</code></pre>
+      <h2><a id="from-source" href="#from-source" class="anchor">#</a>From Source</h2>
+      <p>
+        <a
+          href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository"
+          >Clone</a
+        >
+        the <a href="https://github.com/evylang/evy/">Evy repository</a> and
+        <a
+          href="https://cashapp.github.io/hermit/usage/get-started/?h=activating#activating-an-environment"
+          >activate Hermit</a
+        >
+        in your terminal. Then, install from sources with
+      </p>
+      <pre><code>make install
+</code></pre>
+      <p>and test with</p>
+      <pre><code>evy --version
+evy --help
+</code></pre>
+      <p>
+        The installed evy toolchain is located in <code>&lt;REPO&gt;/out/bin/evy</code>, you may
+        copy it to a location in your path.
       </p>
     </main>
   </body>

@@ -1,0 +1,151 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Getting started with local development</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="../css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="../css/root.css" type="text/css" />
+    <link rel="stylesheet" href="../css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="../css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="../css/header.css" type="text/css" />
+    <link rel="stylesheet" href="../css/index.css" type="text/css" />
+    <link rel="stylesheet" href="../css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">Overview</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <div class="search">
+            <div class="icon-search"></div>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <a href="index.html">Overview</a>
+          <a href="syntax_by_example.html">Documentation</a>
+          <button>About</button>
+        </nav>
+        <a href="/" class="mobile">
+          <svg class="icon"><use href="#icon-evy" /></svg>
+        </a>
+      </div>
+    </header>
+    <main class="max-width-wrapper">
+      <h1>Getting started with local development</h1>
+      <p>
+        The development process for the
+        <a href="https://github.com/evylang/evy/">Evy git repository</a> has been tried and tested
+        on Linux and MacOS systems. For Windows a
+        <a href="https://learn.microsoft.com/en-us/windows/wsl/about">WSL</a> setup is recommended.
+      </p>
+      <p>
+        To build the Evy source code,
+        <a
+          href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository"
+          >clone</a
+        >
+        the repository and
+        <a
+          href="https://cashapp.github.io/hermit/usage/get-started/?h=activating#activating-an-environment"
+          >activate Hermit</a
+        >
+        in your terminal. Then, build the sources with
+      </p>
+      <pre><code>make all
+</code></pre>
+      <p>You can list make targets, execute a full CI run or serve the frontend locally with</p>
+      <pre><code>make help
+make ci
+make serve
+</code></pre>
+      <h2><a id="hermit" href="#hermit" class="anchor">#</a>Hermit</h2>
+      <p>
+        The tools used in the Evy repository, such as Make, Go and Node, are automatically
+        downloaded by <a href="https://cashapp.github.io/hermit">Hermit</a> when needed. Hermit
+        ensures that developers on Mac, Linux, and GitHub Actions CI use the same version of the
+        same tools. Cloning this repo is the only installation step necessary.
+      </p>
+      <p>
+        There are two ways to use the tools in the Evy repository. You can either prefix them with
+        <code>bin/</code>, for example <code>bin/make all</code>. Or, you can activate Hermit in
+        your shell with
+      </p>
+      <pre><code>. ./bin/activate-hermit
+</code></pre>
+      <p>
+        This will add the tools to your path, so you can use them without having to prefix them with
+        <code>bin/</code>.
+      </p>
+      <p>
+        You can auto-activate Hermit when changing into the <code>evy</code> source directory by
+        installing
+        <a href="https://cashapp.github.io/hermit/usage/shell/#shell-hooks">Hermit shell hooks</a>
+        with
+      </p>
+      <pre><code>hermit shell-hooks
+</code></pre>
+      <h2><a id="evy-tool-chain" href="#evy-tool-chain" class="anchor">#</a>Evy tool chain</h2>
+      <p>
+        The Evy toolchain is written in <a href="https://go.dev">Go</a> and built using the Go and
+        <a href="https://tinygo.org">TinyGo</a> compilers. TinyGo targets
+        <a href="https://webassembly.org">WebAssembly</a>, which allows Evy source code to be parsed
+        and executed in a web browser. However, there is also an Evy Command Line Interface that can
+        be used to compile and run Evy source code on your local machine.
+      </p>
+      <p>
+        A good starting point for understanding the components of the toolchain is looking at its
+        <a href="../usage.html">usage</a> documentation. The <code>evy</code> toolchain is a set of
+        tools for parsing, running, and formatting Evy code.
+      </p>
+      <p>GopherconAU talk as overview, Thorston ball books.</p>
+      <!-- TODO:
+### Web Frontend
+
+There is no build process to create the frontend.
+
+- No build process – viewing source should be educational.
+- Keep dependencies minimal.
+- Provide simple demos for "components", ex. header menu, sidebar, evy editor .
+
+Setting up Deployment Previews [link to Firebase setup guide], for established
+members we will provide repo write access.
+
+Relevant make targets:
+
+```sh
+make serve
+make e2e
+make e2e-diff
+make snaps
+make e2e USE_DOCER=1
+make snaps USE_DOCER=1
+make docs
+make prettier
+make style
+make deploy
+```
+
+Snapshot tests with playwright.
+
+### Build tools
+
+- site-gen
+- md
+- firebase-deploy
+- doctest
+
+### Firebase setup, working with your own fork.
+-->
+    </main>
+  </body>
+</html>

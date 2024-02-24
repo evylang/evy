@@ -1,0 +1,85 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Evy Source Philosophy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="../css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="../css/root.css" type="text/css" />
+    <link rel="stylesheet" href="../css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="../css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="../css/header.css" type="text/css" />
+    <link rel="stylesheet" href="../css/index.css" type="text/css" />
+    <link rel="stylesheet" href="../css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">Overview</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <div class="search">
+            <div class="icon-search"></div>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <a href="index.html">Overview</a>
+          <a href="syntax_by_example.html">Documentation</a>
+          <button>About</button>
+        </nav>
+        <a href="/" class="mobile">
+          <svg class="icon"><use href="#icon-evy" /></svg>
+        </a>
+      </div>
+    </header>
+    <main class="max-width-wrapper">
+      <h1>Evy Source Philosophy</h1>
+      <p>
+        Our goal is to keep Evy's codebase as clear and understandable as the language itself. Evy
+        is designed to be a learning experience in every way, and that includes the way the code
+        itself is written. Our main goal is to make programming accessible and inviting, a
+        philosophy we apply to the project's code too.
+      </p>
+      <p>
+        Wherever possible, we avoid using frameworks or extra tools, preferring a &quot;from
+        scratch&quot; approach that emphasizes learning. This means if you explore Evy's website
+        using your browser's &quot;View Page Source&quot; feature, the code you see (HTML, CSS, and
+        JavaScript) is what we wrote – there's no hidden build process changing things. For more on
+        this, see Julia Evans'
+        <a href="https://jvns.ca/blog/2023/02/16/writing-javascript-without-a-build-system/"
+          >Writing Javascript without a build system</a
+        >
+        and David Heinemeier Hansson's
+        <a href="https://world.hey.com/dhh/once-1-is-entirely-nobuild-for-the-front-end-ce56f6d7"
+          >[...] nobuild for the front-end</a
+        >
+      </p>
+      <p>
+        The same applies to our documentation. Whether it's the repository's
+        <a href="https://github.com/evylang/evy/blob/main/README.md">README.md</a>, the guides on
+        <a href="/docs">docs.evy.dev</a>, or the automatically generated [godocs], everything should
+        be well-organized and easy to understand.
+      </p>
+      <p>
+        We favor clear, readable code over complex shortcuts. For example, in JavaScript, we often
+        use for-loops instead of dense map-reduce-filter chains when it makes the code easier to
+        understand. Our Go code strives to follow the best practices outlined
+        <a href="https://go.dev/wiki/CodeReviewComments">Go Code Review Comments</a> and
+        <a href="https://go.dev/doc/effective_go">Effective Go</a>.
+      </p>
+      <p>
+        Finally, we put care into crafting clear commit messages and pull requests following our
+        contributing guidelines. This helps everyone track the project's evolution and track down
+        issues.
+      </p>
+    </main>
+  </body>
+</html>

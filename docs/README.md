@@ -13,6 +13,9 @@ Learn more about the Evy language and tools
 - [Language Specification](spec.md): Read a formal definition of the Evy syntax and language.
 - [`evy` Usage](usage.md): Learn how to use the `evy` command line tool.
 
+If you want to contribute to Evy, please read the the
+[development guide](development/README.md).
+
 [Learn and Practise]: https://github.com/evylang/evy/wiki
 [Playground]: https://play.evy.dev
 [Gallery]: https://github.com/evylang/evy/wiki/gallery

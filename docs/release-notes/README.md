@@ -1,0 +1,21 @@
+# Release Notes
+
+## v0.2.0 Theme : Learn 🚸 WIP
+
+TODO: link to GitHub issues / milestones etc.
+
+## v0.1.0 Theme: Launch 🚀 TODO: Date
+
+- The **Evy language** is now complete and available for use in the browser and command-line environments.
+  [Try It Out]!
+- The **Evy playground** is now complete, as per the [design spec].
+  Thank you [Jason] for donating the graphic design 💝!
+- **Documentation** for the Evy language and built-ins is now complete. For more information see:
+  [Overview] | [Language specification] | [Built-ins documentation]
+
+[Try It Out]: https://play.evy.dev
+[design spec]: https://drive.google.com/file/d/1yFJlt38oykjPNTgRYgcO1YkO90fSsEuW/view?usp=sharing
+[Jason]: https://twitter.com/jasonstrachan
+[Overview]: https://docs.evy.dev
+[Language specification]: https://github.com/evylang/evy/blob/main/docs/spec.md
+[Built-ins documentation]: https://github.com/evylang/evy/blob/main/docs/builtins.md

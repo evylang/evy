@@ -1,0 +1,195 @@
+<!doctype html>
+<!-- ⚠️ This document is generated. Do not edit it directly. ⚠️ -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy docs · Evy Contributing Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="./css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="./css/root.css" type="text/css" />
+    <link rel="stylesheet" href="./css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="./css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="./css/header.css" type="text/css" />
+    <link rel="stylesheet" href="./css/index.css" type="text/css" />
+    <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
+  </head>
+  <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">Overview</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <div class="search">
+            <div class="icon-search"></div>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <a href="index.html">Overview</a>
+          <a href="syntax_by_example.html">Documentation</a>
+          <button>About</button>
+        </nav>
+        <a href="/" class="mobile">
+          <svg class="icon"><use href="#icon-evy" /></svg>
+        </a>
+      </div>
+    </header>
+    <main class="max-width-wrapper">
+      <h1>Evy Contributing Guide</h1>
+      <p>Thank you for wanting to help out with Evy 🙏. There are many ways to contribute:</p>
+      <ul>
+        <li>
+          Share your creation with us! We love to see what you've made with Evy. Post it on Evy's
+          <a href="https://discord.com/channels/1008553546058313738/1008553546582605857">Discord</a
+          >, send us an <a href="mailto:evy@evy.dev">email</a> or share it anonymously with the
+          <a href="https://forms.gle/n6KLGDBmAjTc7Z6NA">web form</a>.
+        </li>
+        <li>
+          Join our Discord community. Ask questions, help others, or just chat about Evy stuff. This
+          is the best place to get started!
+        </li>
+        <li>
+          Report issues. Did you find a bug? Have a neat idea for Evy? Create an [bug report] on
+          GitHub or message us on
+          <a href="https://discord.com/channels/1008553546058313738/1008553546582605857">Discord</a
+          >.
+        </li>
+        <li>
+          Contribute to the codebase. If you're experienced with Go or frontend development and want
+          to help build Evy itself, please follow the details below.
+        </li>
+      </ul>
+      <p>
+        Read our <a href="CODE_OF_CONDUCT.html">Code of Conduct</a> to keep our community safe and
+        welcoming.
+      </p>
+      <h2>
+        <a id="contribute-to-the-codebase" href="#contribute-to-the-codebase" class="anchor">#</a
+        >Contribute to the Codebase
+      </h2>
+      <p>
+        Our goal is to keep Evy's codebase as clear and understandable as the language itself. Evy
+        is designed to be a learning experience in every way – including how the code itself is
+        written. Our main goal is to make programming accessible and inviting, and we believe the
+        project's code should reflect that. This means we need to be disciplined and thoughtful when
+        making changes to the Evy repository, starting with how we put together commit messages and
+        pull requests.
+      </p>
+      <h3><a id="commit-messages" href="#commit-messages" class="anchor">#</a>Commit Messages</h3>
+      <p>Structure:</p>
+      <ul>
+        <li>
+          <strong>Title</strong>: component: Verb phrase completing &quot;This change modifies Evy
+          to...&quot;
+        </li>
+        <li><strong>Body</strong>: Explain the WHY and WHAT, wrap lines at 72 characters.</li>
+      </ul>
+      <p>Example:</p>
+      <pre><code>vm: Create vm package
+
+Create a vm package that executes bytecode created by the compiler. Currently
+it can only support the simplest evy program: an inferred type declaration
+from a constant, followed by an assignment. We are putting structure in place
+here which we will expand.
+</code></pre>
+      <p>
+        Resource: Good commit messages:
+        <a href="https://cbea.ms/git-commit/">https://cbea.ms/git-commit/</a>
+      </p>
+      <h3><a id="pull-requests" href="#pull-requests" class="anchor">#</a>Pull Requests</h3>
+      <p>
+        Your PR description becomes the merge commit message when your PR is merged. Take the same
+        care with it as you do with your commit messages!
+      </p>
+      <h4>
+        <a
+          id="key-idea-make-your-code-reviewer-s-life-easier"
+          href="#key-idea-make-your-code-reviewer-s-life-easier"
+          class="anchor"
+          >#</a
+        >Key Idea: Make Your Code Reviewer's Life Easier
+      </h4>
+      <ul>
+        <li>
+          <strong>Tell a Story:</strong> Use multiple commits to break your changes into logical
+          steps. Each step should work on its own (make ci will check this!).
+        </li>
+        <li>
+          <strong>Tidy History:</strong> Before submitting, clean up your commits. This makes it
+          easier for reviewers to follow your thought process.
+        </li>
+        <li>
+          <strong>Catch Your Own Mistakes:</strong> Do a self-review before asking others. It'll
+          save everyone time!
+        </li>
+      </ul>
+      <p>
+        <strong>Why This Matters:</strong> You're presenting your work. Clear, organized work is
+        easier to understand and helps reviewers give you the best feedback possible.
+      </p>
+      <p>
+        We use a
+        <a href="https://github.com/foxygoat/git-scripts/blob/master/git-pr-merge">merge script</a>
+        that formats the merge commits and adds an emoji - this is for the merge commit only. To see
+        examples, run the following commands on the evy repo:
+      </p>
+      <ul>
+        <li><code>git log --oneline</code></li>
+        <li><code>git log --oneline --graph</code> shows the structure more clearly and</li>
+        <li><code>git log --oneline --first-parent</code> shows merge-commits / PR titles only</li>
+      </ul>
+      <p>
+        If you have non-permanent comments in the PR description, e.g.: &quot;This PR is temporarily
+        deployed at <a href="https://evystage.dev%22">https://evystage.dev&quot;</a>, post them past
+        a <code>---</code>, those sections do not get copied into the merge commit.
+      </p>
+      <p>
+        Use <code>Fixes</code> or <code>Updates</code> keywords with issue numbers after
+        <code>---</code> in your PR description to automatically close or reference GitHub issues.
+      </p>
+      <h3><a id="go-code" href="#go-code" class="anchor">#</a>Go code</h3>
+      <p>
+        Try to follow the best practices outlined
+        <a href="https://go.dev/wiki/CodeReviewComments">Go Code Review Comments</a> and
+        <a href="https://go.dev/doc/effective_go">Effective Go</a>.
+      </p>
+      <h4>
+        <a id="godoc-comments-in-code" href="#godoc-comments-in-code" class="anchor">#</a>godoc
+        comments in code
+      </h4>
+      <p>Wrap at 72 char.</p>
+      <h4><a id="filenames" href="#filenames" class="anchor">#</a>Filenames</h4>
+      <p>
+        Don't use <code>-</code> or <code>_</code> in _.go file names unless used with intention,
+        e.g. <code>_\_test.go</code>, <code>\*\_unix.go</code>, <code>\_ignoreme.go</code>.
+      </p>
+      <h4><a id="code-style" href="#code-style" class="anchor">#</a>Code style</h4>
+      <p>
+        Don't use line breaks within function call (on commas), try and fit one function call on one
+        line. No need for line wrapping of go code - one line is one idea; a function call is one
+        idea. If for whatever reasons it really does feel too long, break it up in a different way,
+        e.g. assign parameters to variables first. Occasional lines with 120 characters are fine.
+        Map and array literals can be split over multiple lines, preferably only in assignments or
+        inferred declarations.
+      </p>
+      <h4><a id="testing" href="#testing" class="anchor">#</a>Testing</h4>
+      <p>
+        Ideally <code>TestSomething</code> is a self-contained function, so that tests can be read
+        without much jumping around - it's ok if these functions get big, they are usually quite
+        linear. Helpers with <code>t.Helper()</code> don't report where the error happened so they
+        should conceptually be a single assertion and also called that e.g.
+      </p>
+      <pre><code class="language-go">func assertNumValue(t *testing.T, want float64, got Value) {
+  t.Helper()
+  // ...
+}
+</code></pre>
+    </main>
+  </body>
+</html>

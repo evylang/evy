@@ -1,11 +1,11 @@
 # Command Line Usage
 
-The `evy` toolchain is a set of tools that can be used to parse, run, and
-format Evy source code. It can also be used to serve the Evy web contents
-locally. You can [install] the Evy toolchain locally and run it from your
-command line. The command-line interface for Evy supports all built-in
-functions except for graphics functions and event handlers. Only the web
-interface on [play.evy.dev] supports graphics and events.
+The `evy` toolchain is a set of tools for parsing, running, and formatting Evy
+code. It also lets you host the Evy web environment locally. You can
+[install](install.md) the toolchain and use it from your command line. While the
+command-line interface supports most built-in functions, graphics and event
+handlers are currently only available within the web interface at
+[play.evy.dev].
 
 The Evy toolchain has three subcommands:
 

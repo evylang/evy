@@ -176,7 +176,6 @@ She said: &quot;Thank you!&quot;
         In a browser environment <code>print</code> outputs to the output area. When running Evy
         from the command line interface, <code>print</code> prints to standard out.
       </p>
-      <hr />
       <h3><a id="read" href="#read" class="anchor">#</a><code>read</code></h3>
       <p>
         <code>read</code> reads a line of input from the user and returns it as a string. The
@@ -205,7 +204,6 @@ print &quot;Hello, &quot;+name+&quot;!&quot;
         In a browser environment <code>read</code> reads from the text input area. When running Evy
         from the command line interface, <code>read</code> reads from standard in.
       </p>
-      <hr />
       <h3><a id="cls" href="#cls" class="anchor">#</a><code>cls</code></h3>
       <p><code>cls</code> clears the output area of all printed text.</p>
       <h4><a id="cls-example" href="#cls-example" class="anchor">#</a>Example</h4>
@@ -226,7 +224,6 @@ print &quot;Bye&quot;
         <code>cls</code> clears the terminal, similar to the Unix <code>clear</code> or Windows
         <code>cls</code> commands.
       </p>
-      <hr />
       <h3><a id="printf" href="#printf" class="anchor">#</a><code>printf</code></h3>
       <p><code>printf</code> stands for print formatted.</p>
       <p>
@@ -438,7 +435,6 @@ len {a:3 b:4 c:5}: 3
         array. If the argument is a map, <code>len</code> returns the number of key-value pairs in
         the map. If the argument is of any other type, a panic will occur.
       </p>
-      <hr />
       <h3><a id="typeof" href="#typeof" class="anchor">#</a><code>typeof</code></h3>
       <p><code>typeof</code> returns the type of the argument as string value.</p>
       <h4><a id="typeof-example" href="#typeof-example" class="anchor">#</a>Example</h4>
@@ -497,7 +493,6 @@ has {a:1} &quot;X&quot;: false
         map has the key, and false if the map does not have the key. The map can be of any value
         type, such as <code>{}num</code> or <code>{}[]any</code> and the key can be any string.
       </p>
-      <hr />
       <h3><a id="del" href="#del" class="anchor">#</a><code>del</code></h3>
       <p><code>del</code> deletes a key-value entry from a map.</p>
       <h4><a id="del-example" href="#del-example" class="anchor">#</a>Example</h4>
@@ -541,7 +536,6 @@ print &quot;1&quot;
         the given number of seconds. Sleep may also pause for a fraction of a second, e.g.
         <code>sleep 0.1</code>.
       </p>
-      <hr />
       <h3><a id="exit" href="#exit" class="anchor">#</a><code>exit</code></h3>
       <p><code>exit</code> terminates the program with the given status code.</p>
       <h4><a id="exit-example" href="#exit-example" class="anchor">#</a>Example</h4>
@@ -558,7 +552,6 @@ print n
       <p>Output</p>
       <pre><code class="language-evy:output">str2num: cannot parse &quot;not a number&quot;
 </code></pre>
-      <hr />
       <h3><a id="panic" href="#panic" class="anchor">#</a><code>panic</code></h3>
       <p>
         <code>panic</code> prints the given error message and terminates the program immediately. It
@@ -608,7 +601,6 @@ n: 0 err: true
         <code>true</code>. For more information on <code>err</code>, see the
         <a href="#recoverable-errors">Recoverable Errors section</a>.
       </p>
-      <hr />
       <h3><a id="str2bool" href="#str2bool" class="anchor">#</a><code>str2bool</code></h3>
       <p>
         <code>str2bool</code> converts a string to a boolean. If the string is not a valid boolean,
@@ -783,7 +775,6 @@ printf &quot;%q\n&quot; (sprint)
         strings, numbers, booleans, and maps. Unlike the <code>print</code> function, there is no
         newline added to the end of the string.
       </p>
-      <hr />
       <h3><a id="sprintf" href="#sprintf" class="anchor">#</a><code>sprintf</code></h3>
       <p><code>sprintf</code> stands for print formatted to string.</p>
       <p>
@@ -810,7 +801,6 @@ print s
         <a href="#printf"><code>printf</code></a
         >.
       </p>
-      <hr />
       <h3><a id="join" href="#join" class="anchor">#</a><code>join</code></h3>
       <p>
         <code>join</code> concatenates the elements of an array of strings into a single string,
@@ -835,7 +825,6 @@ print s
         The <code>join</code> function returns a single string that is the concatenation of the
         elements in the list of strings, with the separator string placed between elements.
       </p>
-      <hr />
       <h3><a id="split" href="#split" class="anchor">#</a><code>split</code></h3>
       <p>
         <code>split</code> splits a string into a list of substrings separated by the given
@@ -876,7 +865,6 @@ print (split &quot;a,b,c&quot; &quot;&quot;)
         If both the string and the separator are empty, the <code>split</code> function returns an
         empty list.
       </p>
-      <hr />
       <h3><a id="upper" href="#upper" class="anchor">#</a><code>upper</code></h3>
       <p><code>upper</code> returns a string with all lowercase letters converted to uppercase.</p>
       <h4><a id="upper-example" href="#upper-example" class="anchor">#</a>Example</h4>
@@ -898,7 +886,6 @@ print s
         The <code>upper</code> function uses the Unicode character database to determine which
         characters are lowercase and their equivalent uppercase form.
       </p>
-      <hr />
       <h3><a id="lower" href="#lower" class="anchor">#</a><code>lower</code></h3>
       <p><code>lower</code> returns a string with all uppercase letters converted to lowercase.</p>
       <h4><a id="lower-example" href="#lower-example" class="anchor">#</a>Example</h4>
@@ -920,7 +907,6 @@ print s
         The <code>lower</code> function uses the Unicode character database to determine which
         characters are uppercase and their equivalent lowercase form.
       </p>
-      <hr />
       <h3><a id="index" href="#index" class="anchor">#</a><code>index</code></h3>
       <p>
         <code>index</code> returns the position of a substring in a string, or -1 if the substring
@@ -941,7 +927,6 @@ print n
         <code>s</code>. It returns the index of the first occurrence of a <code>sub</code> within
         <code>s</code>, or -1 if the substring is not present.
       </p>
-      <hr />
       <h3><a id="startswith" href="#startswith" class="anchor">#</a><code>startswith</code></h3>
       <p><code>startswith</code> tests whether a string begins with a given prefix.</p>
       <h4><a id="startswith-example" href="#startswith-example" class="anchor">#</a>Example</h4>
@@ -961,7 +946,6 @@ print b
         <code>prefix</code> and returns <code>true</code> if <code>s</code> starts with
         <code>prefix</code>, <code>false</code> otherwise.
       </p>
-      <hr />
       <h3><a id="endswith" href="#endswith" class="anchor">#</a><code>endswith</code></h3>
       <p><code>endswith</code> tests whether a string ends with a given suffix.</p>
       <h4><a id="endswith-example" href="#endswith-example" class="anchor">#</a>Example</h4>
@@ -979,7 +963,6 @@ print b
         <code>suffix</code> and returns <code>true</code> if <code>s</code> ends with
         <code>suffix</code>, <code>false</code> otherwise.
       </p>
-      <hr />
       <h3><a id="trim" href="#trim" class="anchor">#</a><code>trim</code></h3>
       <p><code>trim</code> removes leading and trailing characters from a string.</p>
       <h4><a id="trim-example" href="#trim-example" class="anchor">#</a>Example</h4>
@@ -996,7 +979,6 @@ print s
         The <code>trim</code> function removes any characters in <code>cutset</code> from the
         beginning and end of string <code>s</code>. It returns a copy of the resulting string.
       </p>
-      <hr />
       <h3><a id="replace" href="#replace" class="anchor">#</a><code>replace</code></h3>
       <p>
         <code>replace</code> replaces all occurrences of a substring with another substring in a
@@ -1034,7 +1016,6 @@ print (rand 3)
         The <code>rand</code> functions returns, a non-negative pseudo-random integer number in the
         half-open interval <code>[0,n)</code>. A panic occurs for <code>n &lt;= 0</code>.
       </p>
-      <hr />
       <h3><a id="rand1" href="#rand1" class="anchor">#</a><code>rand1</code></h3>
       <p><code>rand1</code> returns a random, non-negative floating point number less than 1.</p>
       <h4><a id="rand1-example" href="#rand1-example" class="anchor">#</a>Example</h4>
@@ -1065,7 +1046,6 @@ print (rand1)
       <pre><code>min:num n1:num n2:num
 </code></pre>
       <p>The <code>min</code> function returns the smaller of the two given number arguments.</p>
-      <hr />
       <h3><a id="max" href="#max" class="anchor">#</a><code>max</code></h3>
       <p><code>max</code> returns the greater of the two given numbers.</p>
       <h4><a id="max-example" href="#max-example" class="anchor">#</a>Example</h4>
@@ -1078,7 +1058,6 @@ print (rand1)
       <pre><code>max:num n1:num n2:num
 </code></pre>
       <p>The <code>max</code> function returns the greater of the two given number arguments.</p>
-      <hr />
       <h3><a id="floor" href="#floor" class="anchor">#</a><code>floor</code></h3>
       <p>
         <code>floor</code> returns the greatest integer value less than or equal to the given
@@ -1099,7 +1078,6 @@ print (floor 3)
         The <code>floor</code> function returns the greatest integer value less than or equal to its
         number argument <code>n</code>.
       </p>
-      <hr />
       <h3><a id="ceil" href="#ceil" class="anchor">#</a><code>ceil</code></h3>
       <p>
         <code>ceil</code> returns the smallest integer greater than or equal to the given number.
@@ -1119,7 +1097,6 @@ print (ceil 4)
         The <code>ceil</code> function returns the smallest integer greater than or equal to its
         number argument <code>n</code>.
       </p>
-      <hr />
       <h3><a id="round" href="#round" class="anchor">#</a><code>round</code></h3>
       <p>
         <code>round</code> returns the nearest integer to the given number, rounding half away from
@@ -1140,7 +1117,6 @@ print (round 2.5)
         The <code>round</code> function returns the nearest integer to the given number argument
         <code>n</code>, rounding half away from 0.
       </p>
-      <hr />
       <h3><a id="pow" href="#pow" class="anchor">#</a><code>pow</code></h3>
       <p>
         <code>pow</code> returns the value of the first number raised to the power of the second
@@ -1160,7 +1136,6 @@ print (round 2.5)
         first number argument <code>b</code> is the base. The second number argument
         <code>exp</code> is the exponent.
       </p>
-      <hr />
       <h3><a id="log" href="#log" class="anchor">#</a><code>log</code></h3>
       <p><code>log</code> returns the logarithm of the given number, to the base of e.</p>
       <h4><a id="log-example" href="#log-example" class="anchor">#</a>Example</h4>
@@ -1178,7 +1153,6 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
         The <code>log</code> function returns the <strong>natural logarithm</strong>, the logarithm
         of the given number argument <code>n</code>, to the base of <code>e</code>.
       </p>
-      <hr />
       <h3><a id="sqrt" href="#sqrt" class="anchor">#</a><code>sqrt</code></h3>
       <p><code>sqrt</code> returns the square root of the given number.</p>
       <h4><a id="sqrt-example" href="#sqrt-example" class="anchor">#</a>Example</h4>
@@ -1194,7 +1168,6 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
         The <code>sqrt</code> function returns the positive square root of the number argument
         <code>n</code>.
       </p>
-      <hr />
       <h3><a id="sin" href="#sin" class="anchor">#</a><code>sin</code></h3>
       <p><code>sin</code> returns the sine of the given angle in radians.</p>
       <h4><a id="sin-example" href="#sin-example" class="anchor">#</a>Example</h4>
@@ -1210,7 +1183,6 @@ print (sin 0.5*pi)
       <p>
         The <code>sin</code> function returns the sine of the given angle <code>n</code> in radians.
       </p>
-      <hr />
       <h3><a id="cos" href="#cos" class="anchor">#</a><code>cos</code></h3>
       <p><code>cos</code> returns the cosine of the given angle in radians.</p>
       <h4><a id="cos-example" href="#cos-example" class="anchor">#</a>Example</h4>
@@ -1227,7 +1199,6 @@ print (cos pi)
         The <code>cos</code> function returns the cosine of the given angle <code>n</code> in
         radians.
       </p>
-      <hr />
       <h3><a id="atan2" href="#atan2" class="anchor">#</a><code>atan2</code></h3>
       <p>
         <code>atan2</code> returns the angle in radians between the positive x-axis and the ray from
@@ -1293,7 +1264,6 @@ printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
         <code>color</code>, <code>width</code>, and <code>font</code> set the style of the pen for
         subsequent drawing commands.
       </p>
-      <hr />
       <h3><a id="move" href="#move" class="anchor">#</a><code>move</code></h3>
       <p><code>move</code> sets the position of the pen to the given coordinates.</p>
       <h4><a id="move-example" href="#move-example" class="anchor">#</a>Example</h4>
@@ -1311,7 +1281,6 @@ circle 1
         <code>x</code> and <code>y</code> coordinates. The initial cursor position is
         <code>0 0</code>.
       </p>
-      <hr />
       <h3><a id="line" href="#line" class="anchor">#</a><code>line</code></h3>
       <p>
         <code>line</code> draws a line from the current position of the pen to the given
@@ -1334,7 +1303,6 @@ line 30 20
         <code>x</code> and <code>y</code> coordinates. The cursor position is then updated to the
         given coordinates, which allows for easy polygon drawing.
       </p>
-      <hr />
       <h3><a id="rect" href="#rect" class="anchor">#</a><code>rect</code></h3>
       <p>
         <code>rect</code> draws a rectangle with the given width and height at the pen's current
@@ -1357,7 +1325,6 @@ rect 40 20
         the position that is the width and height away from the current position. In other words,
         the opposite corner of the rectangle is at the new cursor position.
       </p>
-      <hr />
       <h3><a id="circle" href="#circle" class="anchor">#</a><code>circle</code></h3>
       <p><code>circle</code> draws a circle with given radius at the pen's current position.</p>
       <h4><a id="circle-example" href="#circle-example" class="anchor">#</a>Example</h4>
@@ -1374,7 +1341,6 @@ circle 10
         The <code>circle</code> function draws a circle with the given <code>radius</code> centered
         at the current cursor position. The cursor position does not change after drawing a circle.
       </p>
-      <hr />
       <h3><a id="color" href="#color" class="anchor">#</a><code>color</code></h3>
       <p>
         <code>color</code> changes the color of the pen. All
@@ -1414,14 +1380,12 @@ rect 20 20
         If the color string <code>c</code> is not recognized as a valid CSS color, the color does
         not change. The initial color is <code>&quot;black&quot;</code>.
       </p>
-      <hr />
       <h3><a id="colour" href="#colour" class="anchor">#</a><code>colour</code></h3>
       <p>
         <code>colour</code> is an alternate spelling of <code>color</code>. See
         <a href="#color"><code>color</code></a
         >.
       </p>
-      <hr />
       <h3><a id="width" href="#width" class="anchor">#</a><code>width</code></h3>
       <p><code>width</code> sets the thickness of the lines drawn by the pen.</p>
       <h4><a id="width-example" href="#width-example" class="anchor">#</a>Example</h4>
@@ -1445,7 +1409,6 @@ grid
         <code>line</code> function or any other shape function after setting
         <code>fill &quot;none&quot;</code>. The initial stroke width it 0.1 units.
       </p>
-      <hr />
       <h3><a id="clear" href="#clear" class="anchor">#</a><code>clear</code></h3>
       <p>
         <code>clear</code> clears the canvas. Optionally, it can take a color argument to clear the
@@ -1477,7 +1440,6 @@ grid
         canvas is cleared to <code>&quot;white&quot;</code>, not
         <code>&quot;transparent&quot;</code>.
       </p>
-      <hr />
       <h3><a id="grid" href="#grid" class="anchor">#</a><code>grid</code></h3>
       <p>
         <code>grid</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and
@@ -1519,7 +1481,6 @@ for i := range 0 101 10
     line 100 i
 end
 </code></pre>
-      <hr />
       <h3><a id="gridn" href="#gridn" class="anchor">#</a><code>gridn</code></h3>
       <p>
         <code>gridn</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and
@@ -1563,7 +1524,6 @@ for i := range 0 101 n
     line 100 i
 end
 </code></pre>
-      <hr />
       <h3><a id="poly" href="#poly" class="anchor">#</a><code>poly</code></h3>
       <p><code>poly</code> draws polylines and polygons for the given coordinates.</p>
       <h4><a id="poly-example" href="#poly-example" class="anchor">#</a>Example</h4>
@@ -1600,7 +1560,6 @@ poly [10 20] [50 50] [20 10] [10 20]
         polygon, make sure that the first and last coordinates are the same. The
         <code>poly</code> function does not use or change the cursor position.
       </p>
-      <hr />
       <h3><a id="ellipse" href="#ellipse" class="anchor">#</a><code>ellipse</code></h3>
       <p>
         <code>ellipse</code> draws an ellipse for given center, radii and optional tilt, start and
@@ -1645,7 +1604,6 @@ ellipse 50 50 40 10 135 0 180
         The sixth and seventh arguments are the start and end angles of the ellipse in degrees, with
         default values of 0 and 360, respectively.
       </p>
-      <hr />
       <h3><a id="stroke" href="#stroke" class="anchor">#</a><code>stroke</code></h3>
       <p><code>stroke</code> sets the color of the outline of shapes.</p>
       <h4><a id="stroke-example" href="#stroke-example" class="anchor">#</a>Example</h4>
@@ -1668,7 +1626,6 @@ rect 30 30
         the line function or any other shape function after calling fill &quot;none&quot;. The
         initial stroke color is <code>&quot;black&quot;</code>.
       </p>
-      <hr />
       <h3><a id="fill" href="#fill" class="anchor">#</a><code>fill</code></h3>
       <p><code>fill</code> sets the color of the interior of shapes.</p>
       <h4><a id="fill-example" href="#fill-example" class="anchor">#</a>Example</h4>
@@ -1690,7 +1647,6 @@ rect 30 30
         string argument <code>c</code>. The fill is the interior of a shape. The initial fill color
         is <code>&quot;black&quot;</code>.
       </p>
-      <hr />
       <h3><a id="dash" href="#dash" class="anchor">#</a><code>dash</code></h3>
       <p><code>dash</code> sets the line dash pattern.</p>
       <h4><a id="dash-example" href="#dash-example" class="anchor">#</a>Example</h4>
@@ -1733,7 +1689,6 @@ end
         are given, the line returns to being solid.
       </p>
       <p>The initial dash pattern is a solid line.</p>
-      <hr />
       <h3><a id="linecap" href="#linecap" class="anchor">#</a><code>linecap</code></h3>
       <p><code>linecap</code> sets the shape of the ends of lines.</p>
       <h4><a id="linecap-example" href="#linecap-example" class="anchor">#</a>Example</h4>
@@ -1791,7 +1746,6 @@ end
         </tbody>
       </table>
       <p>The initial linecap style is <code>&quot;round&quot;</code>.</p>
-      <hr />
       <h3><a id="text" href="#text" class="anchor">#</a><code>text</code></h3>
       <p><code>text</code> prints text to the canvas at the current cursor position.</p>
       <h4><a id="text-example" href="#text-example" class="anchor">#</a>Example</h4>
@@ -1815,7 +1769,6 @@ text &quot;― Douglas Adams&quot;
         <strong>font family</strong>, see <a href="#font"><code>font</code></a
         >.
       </p>
-      <hr />
       <h3><a id="font" href="#font" class="anchor">#</a><code>font</code></h3>
       <p>
         <code>font</code> sets the font properties for text. The font properties are
@@ -2003,7 +1956,6 @@ end
         when a pointing input device, such as a mouse, a pen or stylus, or a finger, is used to
         interact with the canvas.
       </p>
-      <hr />
       <h3><a id="key" href="#key" class="anchor">#</a><code>key</code></h3>
       <p><code>key</code> is called when a key on the keyboard is pressed.</p>
       <h4><a id="key-example" href="#key-example" class="anchor">#</a>Example</h4>
@@ -2040,7 +1992,6 @@ o
         presses <code>shift</code>+<code>a</code>, the argument is the string
         <code>&quot;A&quot;</code>.
       </p>
-      <hr />
       <h3><a id="down" href="#down" class="anchor">#</a><code>down</code></h3>
       <p><code>down</code> is called when the pointer is pressed down.</p>
       <h4><a id="down-example" href="#down-example" class="anchor">#</a>Example</h4>
@@ -2061,7 +2012,6 @@ x:  7 y:  6
         <code>y</code>, which are the coordinates of the pointer location when the pointer was
         pressed down. The pointer is typically a mouse, stylus or finger.
       </p>
-      <hr />
       <h3><a id="up" href="#up" class="anchor">#</a><code>up</code></h3>
       <p><code>up</code> is called when the pointer is lifted up.</p>
       <h4><a id="up-example" href="#up-example" class="anchor">#</a>Example</h4>
@@ -2082,7 +2032,6 @@ end
         <code>y</code>, which are the coordinates of the pointer location when the pointer was
         lifted up. The pointer is typically a mouse, stylus or finger.
       </p>
-      <hr />
       <h3><a id="move-1" href="#move-1" class="anchor">#</a><code>move</code></h3>
       <p><code>move</code> is called when the pointer is moved.</p>
       <h4><a id="move-1-example" href="#move-1-example" class="anchor">#</a>Example</h4>
@@ -2116,7 +2065,6 @@ end
         <code>y</code>, which are the coordinates of the position that the pointer has moved to. The
         pointer is typically a mouse, stylus or finger.
       </p>
-      <hr />
       <h3><a id="animate" href="#animate" class="anchor">#</a><code>animate</code></h3>
       <p><code>animate</code> gets called periodically around 60 times per second.</p>
       <h4><a id="animate-example" href="#animate-example" class="anchor">#</a>Example</h4>
@@ -2148,7 +2096,6 @@ end
         milliseconds since the start of the animation. This allows you to track the progress of the
         animation and to update the animation accordingly.
       </p>
-      <hr />
       <h3><a id="input" href="#input" class="anchor">#</a><code>input</code></h3>
       <p><code>input</code> is called when the value of an input element changes.</p>
       <h4><a id="input-example" href="#input-example" class="anchor">#</a>Example</h4>

@@ -19,7 +19,7 @@ You can also get help for each subcommand by running it with the
 [install]: ../README.md#-installation
 [play.evy.dev]: https://play.evy.dev
 
-#### evy --help
+### evy --help
 
 <!-- gen:evy --help -->
 
@@ -48,7 +48,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- genend -->
 
-#### evy run --help
+### evy run --help
 
 <!-- gen:evy run --help -->
 
@@ -67,7 +67,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- genend -->
 
-#### evy fmt --help
+### evy fmt --help
 
 <!-- gen:evy fmt --help -->
 
@@ -87,7 +87,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- genend -->
 
-#### evy serve [start] --help
+### evy serve [start] --help
 
 <!-- gen:evy serve start --help -->
 
@@ -108,7 +108,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- genend -->
 
-#### evy serve export --help
+### evy serve export --help
 
 <!-- gen:evy serve export --help -->
 

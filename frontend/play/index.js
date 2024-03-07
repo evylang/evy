@@ -15,7 +15,6 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
-let sidebar
 
 // --- Initialize ------------------------------------------------------
 
@@ -914,21 +913,22 @@ function breadcrumb(s) {
 // --- UI: sidebar --------------------------------------------
 
 function initSidebar() {
-  sidebar = document.querySelector("#sidebar")
   document.querySelector("#hamburger").onclick = showSidebar
   document.querySelector("#sidebar-close").onclick = hideSidebar
-  document.addEventListener("click", handleOutsideSidebarClick)
 }
 
 function showSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = "none"
   document.querySelector("#sidebar").classList.remove("hidden")
+  document.addEventListener("click", handleOutsideSidebarClick)
 }
 function hideSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = ""
   document.querySelector("#sidebar").classList.add("hidden")
+  document.removeEventListener("click", handleOutsideSidebarClick)
 }
 function handleOutsideSidebarClick(e) {
+  const sidebar = document.querySelector("#sidebar")
   if (!sidebar.classList.contains("hidden") && e.pageX > sidebar.offsetWidth) {
     hideSidebar()
   }

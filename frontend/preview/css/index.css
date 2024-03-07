@@ -1,15 +1,52 @@
-.max-width-wrapper {
-  max-width: calc(44rem + 32px);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
+html {
+  height: 100%;
 }
 
 body {
   line-height: 1.6;
+  height: 100%;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: min-content 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
 }
 
+header {
+  grid-area: header;
+  border-bottom: 1px solid var(--border-color);
+}
+
+main {
+  grid-area: main;
+  height: 100%;
+  overflow: scroll;
+  padding-left: 120px;
+  background-color: var(--background);
+  padding-bottom: 40px;
+}
+main > * {
+  max-width: 60rem;
+}
+
+li::marker {
+  font-size: 0.8em;
+}
+
+#sidebar {
+  grid-area: sidebar;
+  background-color: var(--background-dimmed);
+  border-right: 1px solid var(--border-color);
+  height: 100%;
+  overflow: scroll;
+  padding-bottom: 40px;
+}
+
+:target {
+  scroll-margin-top: 20px;
+}
+/* --- Elements -------------------------------------------------------- */
 :is(h1, h2) {
   color: var(--color);
   font-weight: 700;
@@ -20,19 +57,20 @@ body {
 
 h1 {
   font-size: 1.875rem;
-  margin-top: 36px;
+  margin-top: 40px;
 }
 
 h2 {
   font-size: 1.25rem;
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 :is(h3, h4, h5) {
   color: var(--color);
   font-size: 1rem;
   font-weight: 400;
-  margin-top: 18px;
+  margin-top: 24px;
+  margin-bottom: 8px;
 }
 
 h3 {
@@ -45,6 +83,7 @@ h5 {
 
 p {
   color: var(--color-dimmed);
+  margin-bottom: 24px;
 }
 
 ul,
@@ -57,57 +96,94 @@ li {
 }
 
 a {
-  color: var(--color-dimmed);
-  & :hover {
-    color: var(--color);
+  color: var(--color-primary);
+  &:hover {
+    color: var(--color-primary-accent);
   }
 }
 
 pre {
   margin: 16px 0;
   padding: 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-left: 6px solid var(--border-color);
   overflow-x: auto;
+  background: var(--background-code);
+}
+
+code {
+  padding: 0.25em;
+  font-size: 0.85rem;
+  background-color: var(--background-dimmed);
+  border-radius: 4px;
+  color: var(--color);
+}
+
+pre code {
+  color: var(--color);
+  background: none;
+  margin-bottom: 24px;
 }
 
 table {
   border-collapse: collapse;
-  margin: 16px 0;
+  margin: 16px 0 36px;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
-
+tr {
+  border-bottom: 1px solid var(--border-color);
+}
 th,
 td {
   text-align: left;
-  &:not(:first-child) {
-    padding-left: 16px;
+  line-height: 2;
+  padding: 2px 24px;
+  &:first-child {
+    padding-left: 0px;
   }
 }
 
+th {
+  font-weight: 700;
+  color: var(--color-slightly-dimmed);
+}
+/* --- Headings -------------------------------------------------------- */
 .anchor {
-  color: var(--color-accent);
+  color: var(--color-primary);
   text-decoration: none;
   margin-right: 0.5em;
+  outline: none;
 }
 
 .anchor:hover {
-  color: var(--color-accent-hover);
+  color: var(--color-primary-accent);
 }
 
-.docs {
-  height: calc(var(--topnav-height));
-  border-bottom: 1px solid var(--border-color);
+/* --- Header -------------------------------------------------------- */
+.topnav .logo {
+  margin-left: 0;
+}
+
+.topnav a strong {
+  font-weight: normal;
+  color: var(--color-primary-accent);
+  transition: color filter 0.2s ease-in-out;
+}
+
+.topnav a:hover,
+.topnav button:hover {
+  color: var(--color-primary-accent);
 }
 
 .docs-nav {
   display: flex;
   align-items: center;
   gap: 26px;
-  letter-spacing: 0.5px;
 }
 
 .docs-nav .active {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .search {

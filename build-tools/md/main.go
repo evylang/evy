@@ -147,12 +147,13 @@ func updateASTs(asts map[string]*markdown.Document) {
 
 func (a *app) genHTMLFiles(asts map[string]*markdown.Document) error {
 	for mdf, doc := range asts {
-		if filepath.Base(mdf) == "_sidebar.md" {
+		if filepath.Base(mdf) == "_sidebar.md" || filepath.Base(mdf) == "_header.md" {
 			continue
 		}
 		sidebar := filepath.Join(filepath.Dir(mdf), "_sidebar.md")
+		header := filepath.Join(filepath.Dir(mdf), "_header.md")
 		htmlFile := filepath.Join(a.DestDir, htmlFilename(mdf))
-		err := genHTMLFile(doc, asts[sidebar], htmlFile, mdf)
+		err := genHTMLFile(doc, asts[sidebar], asts[header], htmlFile, mdf)
 		if err != nil {
 			return err
 		}
@@ -167,14 +168,16 @@ type tmplData struct {
 	Title   string
 	Content string
 	Sidebar string
+	Header  string
 }
 
-func genHTMLFile(doc, sidebar *markdown.Document, htmlFile, mdf string) error {
+func genHTMLFile(doc, sidebar, header *markdown.Document, htmlFile, mdf string) error {
 	data := tmplData{
 		Root:    toRoot(mdf),
 		Title:   extractTitle(doc),
 		Content: docToHTML(doc),
 		Sidebar: docToHTML(sidebar),
+		Header:  docToHTML(unwrapParagraph(header)),
 	}
 
 	out, err := os.Create(htmlFile)
@@ -193,6 +196,16 @@ func docToHTML(doc *markdown.Document) string {
 		return ""
 	}
 	return markdown.ToHTML(doc)
+}
+
+func unwrapParagraph(doc *markdown.Document) *markdown.Document {
+	if doc == nil {
+		return nil
+	}
+	p := doc.Blocks[0].(*markdown.Paragraph)
+	return &markdown.Document{
+		Blocks: []markdown.Block{p.Text},
+	}
 }
 
 type walker struct {

@@ -39,6 +39,16 @@
         </a>
       </div>
     </header>
+
+    {{if .Sidebar}}
+      <nav id="sidebar">
+        <header class="topnav mobile">
+          <button class="icon-close" id="sidebar-close"></button>
+        </header>
+        {{.Sidebar}}
+      </nav>
+    {{end}}
+
     <main>{{.Content}}</main>
   </body>
 </html>

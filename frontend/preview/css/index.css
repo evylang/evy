@@ -21,7 +21,7 @@ header {
 main {
   grid-area: main;
   height: 100%;
-  overflow: scroll;
+  overflow: auto;
   padding-left: 120px;
   background-color: var(--background);
   padding-bottom: 40px;
@@ -39,7 +39,7 @@ li::marker {
   background-color: var(--background-dimmed);
   border-right: 1px solid var(--border-color);
   height: 100%;
-  overflow: scroll;
+  overflow: auto;
   padding-bottom: 40px;
 }
 
@@ -216,14 +216,157 @@ th {
   color: var(--color);
 }
 
-/* mobile */
-@media (max-width: 767px) {
-  .docs {
-    height: var(--topnav-height);
-    border-bottom: none;
-  }
+/* --- Sidebar -------------------------------------------------------- */
+#sidebar {
+  width: 320px;
+}
 
+#sidebar h1 {
+  border: none;
+  font-size: 1.25rem;
+  padding: 0;
+  margin: 18px 20px 10px;
+}
+
+#sidebar a {
+  color: var(--color-hover);
+  text-decoration: none;
+  padding-left: 6px;
+  border-left: 3px solid transparent;
+  display: inline-block;
+}
+#sidebar a:hover,
+#sidebar a:hover code {
+  color: var(--color-primary);
+}
+
+#sidebar ul {
+  list-style-type: none;
+  margin: 0;
+  margin-left: 18px;
+}
+#sidebar > ul {
+  margin-left: 38px;
+}
+
+#sidebar li {
+  line-height: 1.2;
+  padding-top: 8px;
+  position: relative;
+}
+
+#sidebar a {
+  margin-right: 16px;
+}
+#sidebar a:has(+ .expander) {
+  margin-right: 2.75em;
+}
+
+#sidebar div.expander {
+  mask: url("data:image/svg+xml,%3Csvg fill='currentColor' stroke='none' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z' %3E%3C/path%3E%3C/svg%3E%0A");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  color: var(--color-dimmed2);
+  background-color: currentcolor;
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  top: calc(9px + 0.1em);
+  right: 1.5em;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+#sidebar div.expander:hover {
+  color: var(--color-primary);
+}
+#sidebar div.expander.show {
+  transform: rotate(90deg);
+}
+#sidebar ul ul {
+  display: none;
+}
+#sidebar ul ul.show {
+  display: block;
+}
+#sidebar .highlight-within {
+  color: var(--color);
+  font-weight: 700;
+}
+#sidebar .highlight,
+#sidebar .highlight code {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* --- responsive -------------------------------------------------------- */
+#hamburger {
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
   .docs-nav {
     display: none;
+  }
+}
+
+@media (max-width: 1600px) {
+  main {
+    padding-left: 88px;
+    padding-right: 88px;
+  }
+  main > * {
+    max-width: 52rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  main {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  main > * {
+    max-width: 48rem;
+  }
+  #sidebar {
+    width: 270px;
+  }
+  #sidebar ul {
+    margin-left: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  main > * {
+    max-width: 100%;
+  }
+  #sidebar {
+    width: 250px;
+  }
+}
+
+@media (max-width: 767px) {
+  main {
+    width: 100vw;
+  }
+  #sidebar {
+    width: 312px;
+    position: absolute;
+    translate: -100%;
+    transition-timing-function: ease-in-out;
+    transition-duration: 0.3s;
+  }
+  #sidebar.show {
+    translate: 0;
+  }
+  #sidebar-close {
+    max-width: 19px;
+    cursor: pointer;
+  }
+  #sidebar > ul {
+    max-width: 600px;
   }
 }

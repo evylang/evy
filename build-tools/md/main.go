@@ -40,7 +40,13 @@ func (a *app) Run() error {
 	if err != nil {
 		return err
 	}
-	return a.genHTMLFiles(mdFiles)
+	asts, err := a.makeASTs(mdFiles)
+	if err != nil {
+		return err
+	}
+	// Add anchors, fill in sidebar, replace .md with .html in links
+	updateASTs(asts)
+	return a.genHTMLFiles(asts)
 }
 
 // Copy the contents of the `src` directory to the `dest` directory.
@@ -93,12 +99,60 @@ func (a *app) copy() ([]string, error) {
 	return mdFiles, nil
 }
 
-func (a *app) genHTMLFiles(mdFiles []string) error {
+// makeASTs creates *markdown.Document ASTs from the markdown files in
+// `mdFiles` and returns them in a map for easier lookup.
+func (a *app) makeASTs(mdFiles []string) (map[string]*markdown.Document, error) {
+	p := markdown.Parser{
+		AutoLinkText: true, // turn URLs into links even without []()
+		Table:        true,
+	}
+	asts := map[string]*markdown.Document{}
 	for _, mdf := range mdFiles {
 		mdFile := filepath.Join(a.SrcDir, mdf)
+		mdBytes, err := os.ReadFile(mdFile)
+		if err != nil {
+			return nil, err
+		}
+		asts[mdf] = p.Parse(string(mdBytes))
+	}
+	return asts, nil
+}
+
+// updateASTs changes the markdown asts to
+//
+// - add anchors to headings
+// - re-write relative links to .md files to .html files
+// - expands sidebar entries with sub-headings.
+func updateASTs(asts map[string]*markdown.Document) {
+	headings := map[string][]heading{}
+	var sidebarFiles []string
+	for mdf, ast := range asts {
+		if filepath.Base(mdf) == "_sidebar.md" {
+			sidebarFiles = append(sidebarFiles, mdf)
+			continue
+		}
+		w := &walker{anchorIDs: map[string]bool{}}
+		walk(ast, w.walk)
+		headings[mdf] = w.headings
+	}
+	for _, sbf := range sidebarFiles {
+		updateSidebar(sbf, asts[sbf], headings)
+		w := &walker{anchorIDs: map[string]bool{}}
+		// we need to walk sidebars _after_ sidebar update with heading
+		// insertion because we look up the inserted headings by markdown and
+		// not html filename.
+		walk(asts[sbf], w.walk)
+	}
+}
+
+func (a *app) genHTMLFiles(asts map[string]*markdown.Document) error {
+	for mdf, doc := range asts {
+		if filepath.Base(mdf) == "_sidebar.md" {
+			continue
+		}
+		sidebar := filepath.Join(filepath.Dir(mdf), "_sidebar.md")
 		htmlFile := filepath.Join(a.DestDir, htmlFilename(mdf))
-		root := toRoot(mdf)
-		err := genHTMLFile(mdFile, htmlFile, root)
+		err := genHTMLFile(doc, asts[sidebar], htmlFile, mdf)
 		if err != nil {
 			return err
 		}
@@ -112,22 +166,20 @@ type tmplData struct {
 	Root    string
 	Title   string
 	Content string
+	Sidebar string
 }
 
-func genHTMLFile(mdFile, htmlFile, root string) error {
-	mdBytes, err := os.ReadFile(mdFile)
-	if err != nil {
-		return err
+func genHTMLFile(doc, sidebar *markdown.Document, htmlFile, mdf string) error {
+	data := tmplData{
+		Root:    toRoot(mdf),
+		Title:   extractTitle(doc),
+		Content: docToHTML(doc),
+		Sidebar: docToHTML(sidebar),
 	}
-	title, htmlContent := md2html(mdBytes)
+
 	out, err := os.Create(htmlFile)
 	if err != nil {
 		return err
-	}
-	data := tmplData{
-		Root:    root,
-		Title:   title,
-		Content: htmlContent,
 	}
 	if err := tmpl.Execute(out, data); err != nil {
 		out.Close() //nolint:errcheck,gosec // we're returning the more important error
@@ -136,21 +188,21 @@ func genHTMLFile(mdFile, htmlFile, root string) error {
 	return out.Close()
 }
 
-// md2html converts markdown to HTML and returns the title and HTML.
-func md2html(mdBytes []byte) (string, string) {
-	p := markdown.Parser{
-		AutoLinkText: true, // turn URLs into links even without []()
-		Table:        true, //
+func docToHTML(doc *markdown.Document) string {
+	if doc == nil {
+		return ""
 	}
-	doc := p.Parse(string(mdBytes))
-	w := &walker{anchorIDs: map[string]bool{}}
-	walk(doc, w.walk)
-	title := extractTitle(doc)
-	return title, markdown.ToHTML(doc)
+	return markdown.ToHTML(doc)
 }
 
 type walker struct {
 	anchorIDs map[string]bool
+	headings  []heading
+}
+
+type heading struct {
+	anchorID string
+	heading  *markdown.Heading
 }
 
 func (w *walker) walk(n node) {
@@ -214,6 +266,8 @@ func (w *walker) updateHeading(h *markdown.Heading) {
 	id := makeID(text, majorHeading, w.anchorIDs)
 	anchor := markdown.Inline(newAnchor(id))
 	h.Text.Inline = slices.Insert(h.Text.Inline, 0, anchor)
+	ah := heading{anchorID: id, heading: h}
+	w.headings = append(w.headings, ah)
 }
 
 func newAnchor(id string) *markdown.HTMLTag {

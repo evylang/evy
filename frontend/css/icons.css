@@ -43,6 +43,7 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 142.5 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke-linecap='round' stroke-width='25' fill='none'%3E%3Cpath d='M12.5,12.5 h0' stroke='hsl(49deg 100%25 50%25) ' /%3E%3Cpath d='M50,12.5 h80' stroke='hsl(336deg 78%25 64%25)' /%3E%3Cpath d='M12.5,50 h0' stroke='hsl(7deg 66%25 56%25)' /%3E%3Cpath d='M50,50 h42.5' stroke='hsl(201deg 100%25 63%25)' /%3E%3Cpath d='M12.5,87.5 h0' stroke='hsl(150deg 50%25 47%25) ' /%3E%3Cpath d='M50,87.5 h72.5' stroke='hsl(234deg 48%25 51%25)' /%3E%3C/g%3E%3C/svg%3E");
 }
 
+.icon-chevron,
 .icon-close,
 .icon-copy,
 .icon-discord,

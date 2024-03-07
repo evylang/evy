@@ -167,6 +167,7 @@ clean::
 			! -regex '$(DOCS_TARGET_DIR)/img.*' \
 			! -regex '$(DOCS_TARGET_DIR)/favicon.ico' \
 			! -regex '$(DOCS_TARGET_DIR)/404.html' \
+			! -regex '$(DOCS_TARGET_DIR)/index.js' \
 			-delete
 
 .PHONY: doc docs doctest godoc sdocs toc usage

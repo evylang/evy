@@ -151,18 +151,32 @@ func md2html(mdBytes []byte) (string, string) {
 
 type walker struct {
 	anchorIDs map[string]bool
-	// majorHeading is the last heading level 1-3, to be used as prefix in anchors level 4-6
-	// this is to avoid #example-21 in favour of #print-example in builtins.
-	majorHeadingID string
 }
 
 func (w *walker) walk(n node) {
 	switch n := n.(type) {
+	case *markdown.Document:
+		removeTOC(n)
 	case *markdown.Link:
 		updateLink(n)
 	case *markdown.Heading:
 		w.updateHeading(n)
 	}
+}
+
+func removeTOC(doc *markdown.Document) {
+	inTOC := false
+	var blocks []markdown.Block
+	for i, b := range doc.Blocks {
+		if h, ok := b.(*markdown.Heading); ok {
+			htext := strings.ToLower(strings.TrimSpace(markdown.ToMarkdown(h.Text)))
+			inTOC = htext == "table of contents"
+		}
+		if !inTOC {
+			blocks = append(blocks, doc.Blocks[i])
+		}
+	}
+	doc.Blocks = blocks
 }
 
 func updateLink(mdl *markdown.Link) {
@@ -192,18 +206,12 @@ func updateLink(mdl *markdown.Link) {
 // [markdown.Heading]s Text slice that renders a link marker linking
 // to the heading, allowing for easily copying links to a heading.
 func (w *walker) updateHeading(h *markdown.Heading) {
-	if h.Level == 1 {
+	if h.Level == 1 || h.Level > 3 {
 		return
 	}
 	text := inlineText(h.Text.Inline)
 	var majorHeading string
-	if h.Level > 3 {
-		majorHeading = w.majorHeadingID
-	}
 	id := makeID(text, majorHeading, w.anchorIDs)
-	if h.Level <= 3 {
-		w.majorHeadingID = id
-	}
 	anchor := markdown.Inline(newAnchor(id))
 	h.Text.Inline = slices.Insert(h.Text.Inline, 0, anchor)
 }

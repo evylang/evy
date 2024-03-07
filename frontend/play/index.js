@@ -15,7 +15,7 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
-let sidemenu
+let sidebar
 
 // --- Initialize ------------------------------------------------------
 
@@ -337,12 +337,12 @@ async function initUI() {
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
-  document.querySelector("#sidemenu-about").onclick = showAbout
-  document.querySelector("#sidemenu-share").onclick = share
-  document.querySelector("#sidemenu-icon-share").onclick = share
+  document.querySelector("#sidebar-about").onclick = showAbout
+  document.querySelector("#sidebar-share").onclick = share
+  document.querySelector("#sidebar-icon-share").onclick = share
   handleHashChange()
   initModal()
-  initSidemenu()
+  initSidebar()
   initDialog()
 }
 
@@ -911,26 +911,26 @@ function breadcrumb(s) {
   return li
 }
 
-// --- UI: sidemenu --------------------------------------------
+// --- UI: sidebar --------------------------------------------
 
-function initSidemenu() {
-  sidemenu = document.querySelector("#sidemenu")
-  document.querySelector("#hamburger").onclick = showSidemenu
-  document.querySelector("#sidemenu-close").onclick = hideSidemenu
-  document.addEventListener("click", handleOutsideSidemenuClick)
+function initSidebar() {
+  sidebar = document.querySelector("#sidebar")
+  document.querySelector("#hamburger").onclick = showSidebar
+  document.querySelector("#sidebar-close").onclick = hideSidebar
+  document.addEventListener("click", handleOutsideSidebarClick)
 }
 
-function showSidemenu() {
+function showSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = "none"
-  document.querySelector("#sidemenu").classList.remove("hidden")
+  document.querySelector("#sidebar").classList.remove("hidden")
 }
-function hideSidemenu() {
+function hideSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = ""
-  document.querySelector("#sidemenu").classList.add("hidden")
+  document.querySelector("#sidebar").classList.add("hidden")
 }
-function handleOutsideSidemenuClick(e) {
-  if (!sidemenu.classList.contains("hidden") && e.pageX > sidemenu.offsetWidth) {
-    hideSidemenu()
+function handleOutsideSidebarClick(e) {
+  if (!sidebar.classList.contains("hidden") && e.pageX > sidebar.offsetWidth) {
+    hideSidebar()
   }
 }
 
@@ -950,14 +950,14 @@ function initDialog() {
 
 function showAbout() {
   const about = document.querySelector("#dialog-about")
-  hideSidemenu()
+  hideSidebar()
   about.showModal()
 }
 
 // --- Share / load snippets -------------------------------------------
 
 async function share() {
-  hideSidemenu()
+  hideSidebar()
   await format()
 
   if (errors) {

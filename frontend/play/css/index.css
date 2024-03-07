@@ -39,8 +39,8 @@
   --modal-section-width: 18rem;
   --slide: 0;
   --slide-transition-duration: 0.3s;
-  --sidemenu-width: min(100vw, 18rem);
-  --sidemenu-transition-duration: 0.2s;
+  --sidebar-width: min(100vw, 18rem);
+  --sidebar-transition-duration: 0.2s;
   --dialog-width: min(100vw, 36rem);
 }
 
@@ -70,7 +70,7 @@
 @media (prefers-reduced-motion) {
   :root {
     --slide-transition-duration: 0;
-    --sidemenu-transition-duration: 0;
+    --sidebar-transition-duration: 0;
   }
 }
 
@@ -130,33 +130,33 @@ button.share > div {
   }
 }
 
-/* --- Sidemenu ---------------------------------------------------------- */
-#sidemenu {
+/* --- Sidebar ---------------------------------------------------------- */
+#sidebar {
   display: block;
   background-color: var(--background-dimmed);
   color: #ffffffe5;
   font-family: arial, sans-serif;
   height: 100%;
-  width: var(--sidemenu-width);
+  width: var(--sidebar-width);
   position: absolute;
   top: 0;
   left: 0;
   box-shadow: 1px 4px 0 0 #00000040;
   transition-property: translate;
   transition-timing-function: ease-in-out;
-  transition-duration: var(--sidemenu-transition-duration);
+  transition-duration: var(--sidebar-transition-duration);
 }
 
-#sidemenu.hidden {
+#sidebar.hidden {
   translate: -100%;
 }
 
-#sidemenu header {
+#sidebar header {
   border-bottom: 1px solid var(--border-color);
 }
 
-#sidemenu a,
-#sidemenu button {
+#sidebar a,
+#sidebar button {
   font-family: var(--font-family);
   color: white;
   text-decoration: none;
@@ -166,22 +166,22 @@ button.share > div {
   cursor: pointer;
 }
 
-#sidemenu header button {
+#sidebar header button {
   flex: 0 0 1.2em;
 }
 
-#sidemenu a:hover,
-#sidemenu button:hover {
+#sidebar a:hover,
+#sidebar button:hover {
   color: var(--color-hover);
 }
 
-#sidemenu ul {
+#sidebar ul {
   list-style: none;
   padding: 20px;
   line-height: 2.5;
 }
 
-#sidemenu ul.icons {
+#sidebar ul.icons {
   line-height: 1;
   display: flex;
   align-items: center;
@@ -191,11 +191,11 @@ button.share > div {
   border-top: 1px solid var(--border-color);
 }
 
-#sidemenu ul.icons a {
+#sidebar ul.icons a {
   display: inline-block;
 }
 
-#sidemenu :is(.icon-discord, .icon-github, .icon-email, .icon-share) {
+#sidebar :is(.icon-discord, .icon-github, .icon-email, .icon-share) {
   width: 28px;
   height: 28px;
 }

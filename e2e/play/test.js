@@ -47,29 +47,29 @@ end
       )
     })
 
-    test("sidemenu", async ({ page, baseURL }, testInfo) => {
+    test("sidebar", async ({ page, baseURL }, testInfo) => {
       await page.goto(baseURL)
       await page.waitForLoadState("networkidle")
 
-      // show side menu
+      // show sidebar
       await page.locator("#hamburger").click()
       await page.getByText("About Evy Docs Discord GitHub").click()
-      await expect(page).toHaveScreenshot("sidemenu.png")
+      await expect(page).toHaveScreenshot("sidebar.png")
 
-      // hide side menu by click on main
+      // hide sidebar by click on main
       if (testInfo.project.name != "ios") {
         await page.getByRole("main").click()
       } else {
-        await page.locator("#sidemenu-close").click()
+        await page.locator("#sidebar-close").click()
       }
-      await expect(page).toHaveScreenshot("no-sidemenu.png")
+      await expect(page).toHaveScreenshot("no-sidebar.png")
 
-      // show side menu again
+      // show sidebar again
       await page.locator("#hamburger").click()
       await page.getByText("About Evy Docs Discord GitHub").click()
-      await expect(page).toHaveScreenshot("sidemenu.png")
+      await expect(page).toHaveScreenshot("sidebar.png")
 
-      // hide side menu by click on top menu
+      // hide sidebar by click on top menu
       if (testInfo.project.name != "ios") {
         await page.getByRole("button", { name: "Welcome" }).click()
         await expect(page).toHaveScreenshot("modal.png")
@@ -81,7 +81,7 @@ end
       await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("no-dialog.png")
 
-      // show side menu
+      // show sidebar
       if (testInfo.project.name != "ios") {
         await page.locator("#share").getByText("Share").click()
       } else {

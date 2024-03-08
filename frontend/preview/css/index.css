@@ -97,9 +97,16 @@ li {
 
 a {
   color: var(--color-primary);
-  &:hover {
+  &:hover,
+  &:hover code {
     color: var(--color-primary-accent);
   }
+}
+
+a > code {
+  color: var(--color-primary);
+  padding-left: 0;
+  padding-right: 0;
 }
 
 pre {

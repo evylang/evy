@@ -305,6 +305,30 @@ th {
   border-color: var(--color-primary);
 }
 
+#sidebar ul.icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 32px 20px;
+  border-top: 1px solid var(--border-color);
+  margin: 40px 0;
+}
+
+#sidebar ul.icons li {
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar ul.icons a {
+  color: var(--color);
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+}
+
 /* --- responsive -------------------------------------------------------- */
 #hamburger {
   cursor: pointer;

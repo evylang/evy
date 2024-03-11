@@ -102,6 +102,15 @@ x = x`, []any{1, 2, 3},
 			`x := [1 "b" 3]
 x = x`, []any{1, "b", 3},
 		},
+		{
+			`x := [1 2] + [3 4]
+x = x`, []any{1, 2, 3, 4},
+		},
+		{
+			`x := ["a" 2] + ["b" 4]
+x = x`, []any{"a", 2, "b", 4},
+		},
+		// TODO: Add test for []string + []int. Currently unsupported at parser level
 	}
 	runVmTests(t, tests)
 }
@@ -224,8 +233,6 @@ type vmTestCase struct {
 }
 
 func runVmTests(t *testing.T, tests []vmTestCase) {
-	t.Helper()
-
 	for _, tt := range tests {
 		program, err := parser.Parse(tt.input, parser.Builtins{})
 		if err != nil {

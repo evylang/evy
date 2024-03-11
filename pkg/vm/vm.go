@@ -194,6 +194,11 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 		return vm.executeBinaryIntegerOperation(op, left, right)
 	case op == code.OpAdd && leftType == object.STRING_OBJ && rightType == object.STRING_OBJ:
 		return vm.executeBinaryStringOperation(op, left, right)
+	case leftType == object.ARRAY_OBJ && rightType == object.ARRAY_OBJ:
+		leftValue := left.(*object.Array)
+		rightValue := right.(*object.Array)
+		leftValue.Elements = append(leftValue.Elements, rightValue.Elements...)
+		return vm.push(leftValue)
 	default:
 		return fmt.Errorf("unsupported types for binary operation: %s %s",
 			leftType, rightType)

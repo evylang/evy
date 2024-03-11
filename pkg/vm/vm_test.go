@@ -88,6 +88,12 @@ x = x`, true},
 x = x`, false},
 		{`x := "foobar" < "fubar"
 x = x`, true},
+		{`x := "hello world!"
+		y := x[0]
+		y = y`, "h"},
+		{`x := "hello world!"
+		y := x[-1]
+		y = y`, "!"},
 	}
 	runVmTests(t, tests)
 }
@@ -111,6 +117,16 @@ x = x`, []any{1, 2, 3, 4},
 x = x`, []any{"a", 2, "b", 4},
 		},
 		// TODO: Add test for []string + []int. Currently unsupported at parser level
+		{
+			`x := ["a" 2 "b" 4]
+y := x[2]
+y = y`, "b",
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[-1]
+y = y`, 4,
+		},
 	}
 	runVmTests(t, tests)
 }
@@ -136,6 +152,11 @@ x = x`, map[string]any{"a": 1, "b": 2},
 		{
 			`x := {a1: 2}
 			x = x`, map[string]any{"a1": 2},
+		},
+		{
+			`x := {a1: 2}
+			y := x["a1"]
+			y = y`, 2,
 		},
 	}
 	runVmTests(t, tests)

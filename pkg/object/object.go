@@ -2,6 +2,7 @@ package object
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"strings"
@@ -33,6 +34,10 @@ type Hashable interface {
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+}
+
+type Indexable interface {
+	Index(key Object) (Object, error)
 }
 
 // TODO: rename this to num to match evy spec
@@ -81,6 +86,20 @@ func (s *String) HashKey() HashKey {
 
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }
+func (s *String) Index(key Object) (Object, error) {
+	index, ok := key.(*Integer)
+	if !ok {
+		return nil, errors.New("string index must be an integer")
+	}
+	i := int(index.Value)
+	if i >= len(s.Value) || i < -len(s.Value) {
+		return nil, fmt.Errorf("string index out of bounds: %d len: %d", i, len(s.Value))
+	}
+	if i < 0 {
+		i = len(s.Value) + i
+	}
+	return &String{Value: s.Value[i : i+1]}, nil
+}
 
 type Array struct {
 	Elements []Object
@@ -102,6 +121,21 @@ func (ao *Array) Inspect() string {
 	return out.String()
 }
 
+func (a *Array) Index(key Object) (Object, error) {
+	integer, ok := key.(*Integer)
+	if !ok {
+		return nil, errors.New("map index must be an integer")
+	}
+	i := int(integer.Value)
+	if i >= len(a.Elements) || i < -len(a.Elements) {
+		return nil, fmt.Errorf("array index out of bounds: %d len: %d", i, len(a.Elements))
+	}
+	if i < 0 {
+		i = len(a.Elements) + i
+	}
+	return a.Elements[i], nil
+}
+
 type Map map[string]Object
 
 func (m Map) Type() ObjectType { return MAP_OBJ }
@@ -118,4 +152,17 @@ func (m Map) Inspect() string {
 	out.WriteString("}")
 
 	return out.String()
+}
+
+func (m Map) Index(key Object) (Object, error) {
+	index, ok := key.(*String)
+	if !ok {
+		return nil, errors.New("map index must be a string")
+	}
+	k := index.Value
+	val, ok := m[k]
+	if !ok {
+		return nil, fmt.Errorf("no key %s in map", k)
+	}
+	return val, nil
 }

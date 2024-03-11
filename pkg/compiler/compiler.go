@@ -59,6 +59,16 @@ func (c *Compiler) Compile(node parser.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Name)
 		}
 		c.emit(code.OpGetGlobal, symbol.Index)
+	case *parser.IndexExpression:
+		err := c.Compile(node.Left)
+		if err != nil {
+			return err
+		}
+		err = c.Compile(node.Index)
+		if err != nil {
+			return err
+		}
+		c.emit(code.OpIndex)
 	case *parser.BinaryExpression:
 		err := c.Compile(node.Left)
 		if err != nil {

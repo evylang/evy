@@ -498,6 +498,39 @@ x = x`,
 				code.Make(code.OpSetGlobal, 0),
 			},
 		},
+		{
+			input: `x := "hello"
+			y := x[4]
+			y = y`,
+			expectedConstants: []interface{}{"hello", 4},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpIndex),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := "abc"
+			y := x[-1]
+			y = y`,
+			expectedConstants: []interface{}{"abc", 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpMinus),
+				code.Make(code.OpIndex),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
@@ -544,6 +577,25 @@ func TestArray(t *testing.T) {
 				code.Make(code.OpSetGlobal, 0),
 			},
 		},
+		{
+			input: `x := ["1" 2 "3"]
+			y := x[0]
+			y = y`,
+			expectedConstants: []any{"1", 2, "3", 0},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpIndex),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
@@ -575,6 +627,26 @@ func TestMap(t *testing.T) {
 				code.Make(code.OpSetGlobal, 0),
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `x := {a: 1 b: 2}
+		y := x["a"]
+		y = y`,
+			expectedConstants: []any{"a", 1, "b", 2, "a"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpMap, 4),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 4),
+				code.Make(code.OpIndex),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
 			},
 		},
 	}

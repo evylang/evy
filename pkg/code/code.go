@@ -30,6 +30,7 @@ var definitions = map[Opcode]*Definition{
 	OpJumpNotTruthy:    {"OpJumpNotTruthy", []int{2}},
 	OpArray:            {"OpArray", []int{2}}, // only lets arrays be 65535 elements long
 	OpMap:              {"OpMap", []int{2}},
+	OpIndex:            {"OpIndex", []int{}},
 }
 
 const (
@@ -58,6 +59,7 @@ const (
 	OpBang
 	OpArray
 	OpMap
+	OpIndex
 
 	OpJump
 	OpJumpNotTruthy

@@ -90,6 +90,17 @@ func (vm *VM) Run() error {
 			if err := vm.push(m); err != nil {
 				return err
 			}
+		case code.OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+			indexed := left.(object.Indexable)
+			val, err := indexed.Index(index)
+			if err != nil {
+				return err
+			}
+			if err := vm.push(val); err != nil {
+				return err
+			}
 		case code.OpConstant:
 			constIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2
@@ -224,7 +235,6 @@ func (vm *VM) executeBinaryStringOperation(
 ) error {
 	leftValue := left.(*object.String).Value
 	rightValue := right.(*object.String).Value
-
 	var result string
 	switch op {
 	case code.OpAdd:

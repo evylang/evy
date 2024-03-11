@@ -549,6 +549,39 @@ func TestArray(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestMap(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `x := {}
+		x = x`,
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpMap, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+		{
+			input: `x := {a: 1 b: 2}
+		x = x`,
+			expectedConstants: []interface{}{"a", 1, "b", 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpMap, 4),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []compilerTestCase{
 		{

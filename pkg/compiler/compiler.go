@@ -185,6 +185,16 @@ func (c *Compiler) Compile(node parser.Node) error {
 			}
 		}
 		c.emit(code.OpArray, len(node.Elements))
+	case *parser.MapLiteral:
+		for _, k := range node.Order {
+			str := &object.String{Value: k}
+			c.emit(code.OpConstant, c.addConstant(str))
+
+			if err := c.Compile(node.Pairs[k]); err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpMap, len(node.Pairs)*2)
 	default:
 		return fmt.Errorf("unknown node type %s", node.Type())
 	}

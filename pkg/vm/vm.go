@@ -77,6 +77,19 @@ func (vm *VM) Run() error {
 			if err := vm.push(arr); err != nil {
 				return err
 			}
+		case code.OpMap:
+			mapLen := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			m := make(object.Map, 0)
+			for i := mapLen - 1; i >= 0; i -= 2 {
+				val := vm.pop()
+				key := vm.pop().(*object.String)
+				m[key.Value] = val
+			}
+			if err := vm.push(m); err != nil {
+				return err
+			}
 		case code.OpConstant:
 			constIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2

@@ -18,6 +18,7 @@ const (
 	BOOLEAN_OBJ = "BOOLEAN"
 	STRING_OBJ  = "STRING"
 	ARRAY_OBJ   = "ARRAY"
+	MAP_OBJ     = "MAP"
 )
 
 type HashKey struct {
@@ -97,6 +98,24 @@ func (ao *Array) Inspect() string {
 	out.WriteString("[")
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
+
+	return out.String()
+}
+
+type Map map[string]Object
+
+func (m Map) Type() ObjectType { return MAP_OBJ }
+func (m Map) Inspect() string {
+	var out bytes.Buffer
+
+	pairs := []string{}
+	for k, v := range m {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v.Inspect()))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
 
 	return out.String()
 }

@@ -115,6 +115,32 @@ x = x`, []any{"a", 2, "b", 4},
 	runVmTests(t, tests)
 }
 
+func TestMap(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			`x := {}
+x = x`, map[string]any{},
+		},
+		{
+			`x := {a: 1 b: 2}
+x = x`, map[string]any{"a": 1, "b": 2},
+		},
+		{
+			`x := {a: "1" b: 1}
+			x = x`, map[string]any{"a": "1", "b": 1},
+		},
+		{
+			`x := {a: false}
+			x = x`, map[string]any{"a": false},
+		},
+		{
+			`x := {a1: 2}
+			x = x`, map[string]any{"a1": 2},
+		},
+	}
+	runVmTests(t, tests)
+}
+
 func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
 		{
@@ -261,8 +287,6 @@ func testExpectedObject(
 	actual object.Object,
 	input string,
 ) {
-	t.Helper()
-
 	switch expected := expected.(type) {
 	case bool:
 		if err := testBooleanObject(expected, actual); err != nil {
@@ -282,7 +306,11 @@ func testExpectedObject(
 		}
 	case []any:
 		if err := testArrayObject(t, expected, actual); err != nil {
-			t.Errorf("testStringObject failed: %s. Input: %q", err, input)
+			t.Errorf("testArrayObject failed: %s. Input: %q", err, input)
+		}
+	case map[string]any:
+		if err := testMapObject(t, expected, actual); err != nil {
+			t.Errorf("testMapObject failed: %s. Input: %q", err, input)
 		}
 	default:
 		t.Errorf("type of expected (%T) not handled", expected)
@@ -339,6 +367,23 @@ func testIntegerObject(expected float64, actual object.Object) error {
 	if result.Value != expected {
 		return fmt.Errorf("object has wrong value. got=%f, want=%f",
 			result.Value, expected)
+	}
+
+	return nil
+}
+
+func testMapObject(t *testing.T, expected map[string]any, actual object.Object) error {
+	result, ok := actual.(object.Map)
+	if !ok {
+		return fmt.Errorf("object is not Map. got=%T (%+v)", actual, expected)
+	}
+
+	if len(expected) != len(result) {
+		return fmt.Errorf("wrong length. got=%v want=%v", expected, result)
+	}
+
+	for key, val := range expected {
+		testExpectedObject(t, val, result[key], "")
 	}
 
 	return nil

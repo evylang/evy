@@ -86,14 +86,74 @@ x = x`, false},
 x = x`, true},
 		{`x := "foobar" > "fubar"
 x = x`, false},
-		{`x := "foobar" < "fubar"
-x = x`, true},
-		{`x := "hello world!"
-		y := x[0]
-		y = y`, "h"},
-		{`x := "hello world!"
-		y := x[-1]
-		y = y`, "!"},
+		{
+			`x := "foobar" < "fubar"
+			x = x`, true,
+		},
+		{
+			`x := "hello world!"
+			y := x[0]
+			y = y`, "h",
+		},
+		{
+			`x := "hello world!"
+			y := x[-1]
+			y = y`, "!",
+		},
+		{
+			`x := "hello world!"
+			y := x[:]
+			y = y`, "hello world!",
+		},
+		{
+			`x := "hello world!"
+			y := x[0:5]
+			y = y`, "hello",
+		},
+		{
+			`x := "hello world!"
+			y := x[6:11]
+			y = y`, "world",
+		},
+		{
+			`x := "hello world!"
+			y := x[:-1]
+			y = y`, "hello world",
+		},
+		{
+			`x := "hello world!"
+			y := x[-6:-5]
+			y = y`, "w",
+		}, {
+			`x := "abcd"
+			y := x[-2:-2]
+			y = y`, "",
+		},
+		{
+			`x := "abcd"
+			y := x[2:2]
+			y = y`, "",
+		},
+		{
+			`x := "abcd"
+			y := x[-2:-1]
+			y = y`, "c",
+		},
+		{
+			`x := "abcd"
+			y := x[0:-1]
+			y = y`, "abc",
+		},
+		{
+			`x := "abcd"
+			y := x[0:]
+			y = y`, "abcd",
+		},
+		{
+			`x := "abcd"
+			y := x[-2:]
+			y = y`, "cd",
+		},
 	}
 	runVmTests(t, tests)
 }
@@ -126,6 +186,62 @@ y = y`, "b",
 			`x := ["a" 2 "b" 4]
 y := x[-1]
 y = y`, 4,
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[:]
+y = y`, []any{"a", 2, "b", 4},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[2:]
+y = y`, []any{"b", 4},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[:2]
+y = y`, []any{"a", 2},
+		},
+		{
+			`x := ["a" 2 "b" 4]	
+y := x[0:2]
+y = y`, []any{"a", 2},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[2:4]
+y = y`, []any{"b", 4},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[:-2]
+y = y`, []any{"a", 2},
+		},
+
+		{
+			`x := ["a" 2 "b" 4]
+y := x[-2:]
+y = y`, []any{"b", 4},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[-2:-1]
+y = y`, []any{"b"},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[0:-1]
+y = y`, []any{"a", 2, "b"},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[0:]
+y = y`, []any{"a", 2, "b", 4},
+		},
+		{
+			`x := ["a" 2 "b" 4]
+y := x[-2:-2]
+y = y`, []any{},
 		},
 	}
 	runVmTests(t, tests)
@@ -344,6 +460,9 @@ func testArrayObject(t *testing.T, expected []any, actual object.Object) error {
 		return fmt.Errorf("object is not Array. got=%T (%+v)",
 			actual, actual)
 	}
+	if len(expected) != len(arr.Elements) {
+		return fmt.Errorf("wrong length. got=%v want=%v", expected, arr.Elements)
+	}
 	for i := 0; i < len(expected); i++ {
 		testExpectedObject(t, expected[i], arr.Elements[i], "")
 	}
@@ -398,11 +517,9 @@ func testMapObject(t *testing.T, expected map[string]any, actual object.Object) 
 	if !ok {
 		return fmt.Errorf("object is not Map. got=%T (%+v)", actual, expected)
 	}
-
 	if len(expected) != len(result) {
 		return fmt.Errorf("wrong length. got=%v want=%v", expected, result)
 	}
-
 	for key, val := range expected {
 		testExpectedObject(t, val, result[key], "")
 	}

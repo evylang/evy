@@ -66,6 +66,10 @@ func (vm *VM) Run() error {
 		switch op {
 		case code.OpPop:
 			vm.pop()
+		case code.OpNull:
+			if err := vm.push(&object.Null{}); err != nil {
+				return err
+			}
 		case code.OpArray:
 			arrLen := int(code.ReadUint16(vm.instructions[ip+1:]))
 			ip += 2
@@ -95,6 +99,18 @@ func (vm *VM) Run() error {
 			left := vm.pop()
 			indexed := left.(object.Indexable)
 			val, err := indexed.Index(index)
+			if err != nil {
+				return err
+			}
+			if err := vm.push(val); err != nil {
+				return err
+			}
+		case code.OpSlice:
+			end := vm.pop()
+			start := vm.pop()
+			left := vm.pop()
+			sliced := left.(object.Sliceable)
+			val, err := sliced.Slice(start, end)
 			if err != nil {
 				return err
 			}

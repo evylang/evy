@@ -531,6 +531,74 @@ x = x`,
 				code.Make(code.OpSetGlobal, 1),
 			},
 		},
+		{
+			input: `x := "abc"
+			y := x[0:1]
+			y = y`,
+			expectedConstants: []interface{}{"abc", 0, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := "abc"
+			y := x[:1]
+			y = y`,
+			expectedConstants: []interface{}{"abc", 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpNull),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := "abc"
+			y := x[1:]
+			y = y`,
+			expectedConstants: []interface{}{"abc", 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpNull),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := "abc"
+			y := x[:]
+			y = y`,
+			expectedConstants: []interface{}{"abc"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpNull),
+				code.Make(code.OpNull),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
@@ -591,6 +659,86 @@ func TestArray(t *testing.T) {
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpConstant, 3),
 				code.Make(code.OpIndex),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := [1 2 3]
+			y := x[0:1]
+			y = y`,
+			expectedConstants: []any{1, 2, 3, 0, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpConstant, 4),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := [1 2 3]
+			y := x[:1]
+			y = y`,
+			expectedConstants: []any{1, 2, 3, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpNull),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := [1 2 3]
+			y := x[1:]
+			y = y`,
+			expectedConstants: []any{1, 2, 3, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpNull),
+				code.Make(code.OpSlice),
+				code.Make(code.OpSetGlobal, 1),
+				code.Make(code.OpGetGlobal, 1),
+				code.Make(code.OpSetGlobal, 1),
+			},
+		},
+		{
+			input: `x := [1 2 3]
+			y := x[:]
+			y = y`,
+			expectedConstants: []any{1, 2, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpNull),
+				code.Make(code.OpNull),
+				code.Make(code.OpSlice),
 				code.Make(code.OpSetGlobal, 1),
 				code.Make(code.OpGetGlobal, 1),
 				code.Make(code.OpSetGlobal, 1),

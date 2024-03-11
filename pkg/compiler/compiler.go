@@ -60,26 +60,39 @@ func (c *Compiler) Compile(node parser.Node) error {
 		}
 		c.emit(code.OpGetGlobal, symbol.Index)
 	case *parser.IndexExpression:
-		err := c.Compile(node.Left)
-		if err != nil {
+		if err := c.Compile(node.Left); err != nil {
 			return err
 		}
-		err = c.Compile(node.Index)
-		if err != nil {
+		if err := c.Compile(node.Index); err != nil {
 			return err
 		}
 		c.emit(code.OpIndex)
+	case *parser.SliceExpression:
+		if err := c.Compile(node.Left); err != nil {
+			return err
+		}
+		if node.Start != nil {
+			if err := c.Compile(node.Start); err != nil {
+				return err
+			}
+		} else {
+			c.emit(code.OpNull)
+		}
+		if node.End != nil {
+			if err := c.Compile(node.End); err != nil {
+				return err
+			}
+		} else {
+			c.emit(code.OpNull)
+		}
+		c.emit(code.OpSlice)
 	case *parser.BinaryExpression:
-		err := c.Compile(node.Left)
-		if err != nil {
+		if err := c.Compile(node.Left); err != nil {
 			return err
 		}
-
-		err = c.Compile(node.Right)
-		if err != nil {
+		if err := c.Compile(node.Right); err != nil {
 			return err
 		}
-
 		switch node.Op {
 		case parser.OP_PLUS:
 			c.emit(code.OpAdd)

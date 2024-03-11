@@ -8,6 +8,7 @@ import (
 
 var definitions = map[Opcode]*Definition{
 	OpConstant:         {"OpConstant", []int{2}},
+	OpNull:             {"OpNull", []int{}},
 	OpAdd:              {"OpAdd", []int{}},
 	OpSubtract:         {"OpSubtract", []int{}},
 	OpMultiply:         {"OpMultiply", []int{}},
@@ -31,10 +32,12 @@ var definitions = map[Opcode]*Definition{
 	OpArray:            {"OpArray", []int{2}}, // only lets arrays be 65535 elements long
 	OpMap:              {"OpMap", []int{2}},
 	OpIndex:            {"OpIndex", []int{}},
+	OpSlice:            {"OpSlice", []int{}},
 }
 
 const (
 	OpConstant Opcode = iota
+	OpNull
 
 	OpAdd
 	OpSubtract
@@ -60,6 +63,7 @@ const (
 	OpArray
 	OpMap
 	OpIndex
+	OpSlice
 
 	OpJump
 	OpJumpNotTruthy

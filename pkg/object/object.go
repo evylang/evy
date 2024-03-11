@@ -40,6 +40,10 @@ type Indexable interface {
 	Index(key Object) (Object, error)
 }
 
+type Sliceable interface {
+	Slice(start, end Object) (Object, error)
+}
+
 // TODO: rename this to num to match evy spec
 type Integer struct {
 	Value float64
@@ -92,13 +96,43 @@ func (s *String) Index(key Object) (Object, error) {
 		return nil, errors.New("string index must be an integer")
 	}
 	i := int(index.Value)
-	if i >= len(s.Value) || i < -len(s.Value) {
-		return nil, fmt.Errorf("string index out of bounds: %d len: %d", i, len(s.Value))
+	if err := indexOutOfBounds(i, len(s.Value)); err != nil {
+		return nil, fmt.Errorf("string %w", err)
 	}
 	if i < 0 {
 		i = len(s.Value) + i
 	}
 	return &String{Value: s.Value[i : i+1]}, nil
+}
+
+func (s *String) Slice(start, end Object) (Object, error) {
+	var startIdx, endIdx int
+	// if the starting index _is_ provided, overwrite default with provided value
+	if _, ok := start.(*Integer); ok {
+		startIdx = int(start.(*Integer).Value)
+	}
+	// if the ending index _is not_ provided, then use the length of the string
+	if _, ok := end.(*Null); ok {
+		endIdx = len(s.Value)
+	} else {
+		endIdx = int(end.(*Integer).Value)
+	}
+	if err := indexOutOfBounds(startIdx, len(s.Value)); err != nil {
+		return nil, fmt.Errorf("string slice %w", err)
+	}
+	if startIdx < 0 {
+		startIdx = len(s.Value) + startIdx
+	}
+	if endIdx < -len(s.Value) || endIdx > len(s.Value) {
+		return nil, fmt.Errorf("string slice end index out of bounds: end: %d len: %d", endIdx, len(s.Value))
+	}
+	if endIdx < 0 {
+		endIdx = len(s.Value) + endIdx
+	}
+	if startIdx > endIdx {
+		return nil, fmt.Errorf("string slice index out of bounds: start: %d end: %d", startIdx, endIdx)
+	}
+	return &String{Value: s.Value[startIdx:endIdx]}, nil
 }
 
 type Array struct {
@@ -127,13 +161,43 @@ func (a *Array) Index(key Object) (Object, error) {
 		return nil, errors.New("map index must be an integer")
 	}
 	i := int(integer.Value)
-	if i >= len(a.Elements) || i < -len(a.Elements) {
-		return nil, fmt.Errorf("array index out of bounds: %d len: %d", i, len(a.Elements))
+	if err := indexOutOfBounds(i, len(a.Elements)); err != nil {
+		return nil, fmt.Errorf("array %w", err)
 	}
 	if i < 0 {
 		i = len(a.Elements) + i
 	}
 	return a.Elements[i], nil
+}
+
+func (a *Array) Slice(start, end Object) (Object, error) {
+	var startIdx, endIdx int
+	// if the starting index _is_ provided, overwrite default with provided value
+	if _, ok := start.(*Integer); ok {
+		startIdx = int(start.(*Integer).Value)
+	}
+	// if the ending index _is not_ provided, then use the length of the array
+	if _, ok := end.(*Null); ok {
+		endIdx = len(a.Elements)
+	} else {
+		endIdx = int(end.(*Integer).Value)
+	}
+	if err := indexOutOfBounds(startIdx, len(a.Elements)); err != nil {
+		return nil, fmt.Errorf("array slice %w", err)
+	}
+	if startIdx < 0 {
+		startIdx = len(a.Elements) + startIdx
+	}
+	if endIdx < -len(a.Elements) || endIdx > len(a.Elements) {
+		return nil, fmt.Errorf("array slice end index out of bounds: end: %d len: %d", endIdx, len(a.Elements))
+	}
+	if endIdx < 0 {
+		endIdx = len(a.Elements) + endIdx
+	}
+	if startIdx > endIdx {
+		return nil, fmt.Errorf("array slice index out of bounds: start: %d end: %d", startIdx, endIdx)
+	}
+	return &Array{Elements: a.Elements[startIdx:endIdx]}, nil
 }
 
 type Map map[string]Object
@@ -165,4 +229,11 @@ func (m Map) Index(key Object) (Object, error) {
 		return nil, fmt.Errorf("no key %s in map", k)
 	}
 	return val, nil
+}
+
+func indexOutOfBounds(i, length int) error {
+	if i >= length || i < -length {
+		return fmt.Errorf("index out of bounds: %d len: %d", i, length)
+	}
+	return nil
 }

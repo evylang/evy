@@ -578,8 +578,14 @@ print &quot;Type of arr:&quot; (typeof arr)
       <p>
         The function <code>len arr</code> returns the length of the array, which is the number of
         elements in the array. The loop <code>for el := range arr</code> iterates over all elements
-        of the array in order. Arrays can be concatenated with the <code>+</code> operator, for
-        example <code>arr2 := arr + arr</code>.
+        of the array in order.
+      </p>
+      <p>
+        Arrays can be concatenated with the <code>+</code> operator, for example
+        <code>arr2 := arr + arr</code>. Only arrays of the same type can be concatenated. If you try
+        to concatenate two literals of different types such as
+        <code>arr := [1 2] + [&quot;a&quot; &quot;b&quot;]</code>, you will get a parse error. Use
+        <code>arr := [1 2 &quot;a&quot; &quot;b&quot;]</code> instead.
       </p>
       <p>
         The elements of an array can be accessed via index starting at <code>0</code>. In the

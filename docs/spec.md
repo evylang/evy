@@ -578,10 +578,15 @@ outputs
 Type of arr: []any
 ```
 
-The function `len arr` returns the length of the array, which is the
-number of elements in the array. The loop `for el := range arr`
-iterates over all elements of the array in order. Arrays can be
-concatenated with the `+` operator, for example `arr2 := arr + arr`.
+The function `len arr` returns the length of the array, which is the number of
+elements in the array. The loop `for el := range arr` iterates over all
+elements of the array in order.
+
+Arrays can be concatenated with the `+` operator, for example
+`arr2 := arr + arr`. Only arrays of the same type can be concatenated.
+If you try to concatenate two literals of different types such as
+`arr := [1 2] + ["a" "b"]`, you will get a parse error. Use
+`arr := [1 2 "a" "b"]` instead.
 
 The elements of an array can be accessed via index starting at `0`. In
 the example `arr := ["abc" 123]` the first element in the array

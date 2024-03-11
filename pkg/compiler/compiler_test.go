@@ -507,7 +507,7 @@ func TestArray(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `x := []
-x = x`,
+		x = x`,
 			expectedConstants: []interface{}{},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpArray, 0),
@@ -518,7 +518,7 @@ x = x`,
 		},
 		{
 			input: `x := [1 2 3]
-x = x`,
+		x = x`,
 			expectedConstants: []interface{}{1, 2, 3},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
@@ -530,20 +530,20 @@ x = x`,
 				code.Make(code.OpSetGlobal, 0),
 			},
 		},
-		// 		{ // TODO: This is broken
-		// 			input: `x := ["1" 2 "3"]
-		// x = x`,
-		// 			expectedConstants: []interface{}{"1", 2, "3"},
-		// 			expectedInstructions: []code.Instructions{
-		// 				code.Make(code.OpConstant, 0),
-		// 				code.Make(code.OpConstant, 1),
-		// 				code.Make(code.OpConstant, 2),
-		// 				code.Make(code.OpArray, 3),
-		// 				code.Make(code.OpSetGlobal, 0),
-		// 				code.Make(code.OpGetGlobal, 0),
-		// 				code.Make(code.OpSetGlobal, 0),
-		// 			},
-		// 		},
+		{
+			input: `x := ["1" 2 "3"]
+		x = x`,
+			expectedConstants: []any{"1", 2, "3"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpArray, 3),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpSetGlobal, 0),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
@@ -729,13 +729,11 @@ func testInstructions(
 ) {
 	concatted := concatInstructions(expected)
 	if len(actual) != len(concatted) {
-		t.Fatalf("input %s\nwrong instructions length.\nwant=%s\ngot =%s",
-			input, concatted, actual)
+		t.Fatalf("input %s\nwrong instructions length.\nwant=%s\ngot =%s", input, concatted, actual)
 	}
 	for i, ins := range concatted {
 		if actual[i] != ins {
-			t.Fatalf("input %s\nwrong instruction at %d.\nwant=%s\ngot =%s",
-				input, i, concatted, actual)
+			t.Fatalf("input %s\nwrong instruction at %d.\nwant=%s\ngot =%s", input, i, concatted, actual)
 		}
 	}
 }
@@ -752,7 +750,7 @@ func concatInstructions(s []code.Instructions) code.Instructions {
 
 func testConstants(
 	t *testing.T,
-	expected []interface{},
+	expected []any,
 	actual []object.Object,
 ) error {
 	if len(expected) != len(actual) {
@@ -763,32 +761,46 @@ func testConstants(
 	for i, constant := range expected {
 		switch constant := constant.(type) {
 		case int:
-			err := testIntegerObject(float64(constant), actual[i])
-			if err != nil {
-				return fmt.Errorf("constant %d - testIntegerObject failed: %s",
-					i, err)
+			if err := testIntegerObject(float64(constant), actual[i]); err != nil {
+				return fmt.Errorf("constant %d - testIntegerObject failed: %s", i, err)
 			}
 		case float64:
-			err := testIntegerObject(constant, actual[i])
-			if err != nil {
-				return fmt.Errorf("constant %d - testIntegerObject failed: %s",
-					i, err)
+			if err := testIntegerObject(constant, actual[i]); err != nil {
+				return fmt.Errorf("constant %d - testIntegerObject failed: %s", i, err)
 			}
+		case string:
+			if err := testStringObject(constant, actual[i]); err != nil {
+				return fmt.Errorf("constant %d - testStringObject failed: %s", i, err)
+			}
+		default:
+			t.Errorf("unexpected type %T", constant)
 		}
 	}
-
 	return nil
 }
 
 func testIntegerObject(expected float64, actual object.Object) error {
 	result, ok := actual.(*object.Integer)
 	if !ok {
-		return fmt.Errorf("object is not Integer. got=%T (%+v)",
+		return fmt.Errorf("object is not Integer. got=%T (%+v)", actual, actual)
+	}
+
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%f, want=%f", result.Value, expected)
+	}
+
+	return nil
+}
+
+func testStringObject(expected string, actual object.Object) error {
+	result, ok := actual.(*object.String)
+	if !ok {
+		return fmt.Errorf("object is not String. got=%T (%+v)",
 			actual, actual)
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("object has wrong value. got=%f, want=%f",
+		return fmt.Errorf("object has wrong value. got=%s, want=%s",
 			result.Value, expected)
 	}
 

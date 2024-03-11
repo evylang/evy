@@ -98,6 +98,10 @@ func TestArray(t *testing.T) {
 			`x := [1 2 3]
 x = x`, []any{1, 2, 3},
 		},
+		{
+			`x := [1 "b" 3]
+x = x`, []any{1, "b", 3},
+		},
 	}
 	runVmTests(t, tests)
 }

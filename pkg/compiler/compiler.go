@@ -105,6 +105,10 @@ func (c *Compiler) Compile(node parser.Node) error {
 		case parser.OP_BANG:
 			c.emit(code.OpBang)
 		}
+	case *parser.Any:
+		if err := c.Compile(node.Value); err != nil {
+			return err
+		}
 	case *parser.NumLiteral:
 		integer := &object.Integer{Value: node.Value}
 		c.emit(code.OpConstant, c.addConstant(integer))

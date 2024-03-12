@@ -150,7 +150,7 @@ func TestBoolExpressions(t *testing.T) {
 	}
 }
 
-func TestVMArithmetic(t *testing.T) {
+func TestNumOperations(t *testing.T) {
 	tests := []testCase{
 		{
 			name:         "addition",
@@ -165,7 +165,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "subtraction",
 			input:        "x := 2 - 1",
 			wantStackTop: makeValue(t, 1),
@@ -178,7 +179,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "multiplication",
 			input:        "x := 2 * 1",
 			wantStackTop: makeValue(t, 2),
@@ -191,7 +193,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "division",
 			input:        "x := 2 / 1",
 			wantStackTop: makeValue(t, 2),
@@ -204,7 +207,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "modulo",
 			input:        "x := 2 % 1",
 			wantStackTop: makeValue(t, 0),
@@ -217,7 +221,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "float modulo",
 			input:        "x := 2.5 % 1.3",
 			wantStackTop: makeValue(t, 1.2),
@@ -230,7 +235,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "minus operator",
 			input:        "x := -1",
 			wantStackTop: makeValue(t, -1),
@@ -242,7 +248,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "all operators",
 			input:        "x := 1 + 2 - 3 * 4 / 5 % 6",
 			wantStackTop: makeValue(t, 1+2-math.Mod(3.0*4.0/5.0, 6.0)),
@@ -263,7 +270,8 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
-		}, {
+		},
+		{
 			name:         "grouped expressions",
 			input:        "x := (1 + 2 - 3) * 4 / 5 % 6",
 			wantStackTop: makeValue(t, (1+2-3)*4/math.Mod(5.0, 6.0)),
@@ -281,6 +289,62 @@ func TestVMArithmetic(t *testing.T) {
 					mustMake(t, OpDivide),
 					mustMake(t, OpConstant, 5),
 					mustMake(t, OpModulo),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "less than",
+			input:        "x := 1 < 2",
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumLessThan),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "less than or equal",
+			input:        "x := 1 <= 2",
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumLessThanEqual),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "greater than",
+			input:        "x := 1 > 2",
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumGreaterThan),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "greater than or equal",
+			input:        "x := 1 >= 2",
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumGreaterThanEqual),
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},

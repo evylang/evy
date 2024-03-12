@@ -42,6 +42,18 @@ const (
 	OpEqual
 	// OpNotEqual represents the inequality operator.
 	OpNotEqual
+	// OpNumLessThan represents a less than operator for numeric
+	// operands.
+	OpNumLessThan
+	// OpNumLessThanEqual represents a less than or equal operator for
+	// numeric operands.
+	OpNumLessThanEqual
+	// OpNumGreaterThan represents a greater than operator for numeric
+	// operands.
+	OpNumGreaterThan
+	// OpNumGreaterThanEqual represents a greater than or equal operator
+	// for numeric operands.
+	OpNumGreaterThanEqual
 )
 
 var (
@@ -67,17 +79,21 @@ var definitions = map[Opcode]*OpDefinition{
 	// Operations like OpAdd have no operand width because the virtual
 	// machine is expected to pop the values from the stack when reading
 	// this instruction.
-	OpAdd:      {"OpAdd", nil},
-	OpSubtract: {"OpSubtract", nil},
-	OpMultiply: {"OpMultiply", nil},
-	OpDivide:   {"OpDivide", nil},
-	OpModulo:   {"OpModulo", nil},
-	OpTrue:     {"OpTrue", nil},
-	OpFalse:    {"OpFalse", nil},
-	OpNot:      {"OpNot", nil},
-	OpMinus:    {"OpMinus", nil},
-	OpEqual:    {"OpEqual", nil},
-	OpNotEqual: {"OpNotEqual", nil},
+	OpAdd:                 {"OpAdd", nil},
+	OpSubtract:            {"OpSubtract", nil},
+	OpMultiply:            {"OpMultiply", nil},
+	OpDivide:              {"OpDivide", nil},
+	OpModulo:              {"OpModulo", nil},
+	OpTrue:                {"OpTrue", nil},
+	OpFalse:               {"OpFalse", nil},
+	OpNot:                 {"OpNot", nil},
+	OpMinus:               {"OpMinus", nil},
+	OpEqual:               {"OpEqual", nil},
+	OpNotEqual:            {"OpNotEqual", nil},
+	OpNumLessThan:         {"OpNumLessThan", nil},
+	OpNumLessThanEqual:    {"OpNumLessThanEqual", nil},
+	OpNumGreaterThan:      {"OpNumGreaterThan", nil},
+	OpNumGreaterThanEqual: {"OpNumGreaterThanEqual", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

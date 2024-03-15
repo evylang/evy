@@ -1233,6 +1233,75 @@ fn []
 	}
 }
 
+func TestTypeofCombinedTypes(t *testing.T) {
+	tests := map[string]string{
+		// testcase //01
+		`//01
+n := 0
+na := [1]
+print
+print 1 (typeof [na [true]]) // []any
+print 2 (typeof [[] []]) // [][]any
+print 3 (typeof [[] [2]]) // [][]num
+print 4 (typeof [["string"] [2]]) // [][]any
+print 5 (typeof [[n] [2]]) // [][]num
+print 6 (typeof [na [2]]) // [][]num
+print 7 (typeof [na na]) // [][]num
+print 8 (typeof [[n] [true]]) // [][]any
+print 9 (typeof [na true]) // []any`: `
+1 []any
+2 [][]any
+3 [][]num
+4 [][]any
+5 [][]num
+6 [][]num
+7 [][]num
+8 [][]any
+9 []any
+`, // testcase //02
+		`//02
+arr := [1]
+print
+print 1 (typeof [[arr] [[true]]]) // [][]any
+print 2 (typeof [[[1]] [[true]]]) // [][][]any
+print 3 (typeof [[arr] [[1]]]) // [][][]num
+`: `
+1 [][]any
+2 [][][]any
+3 [][][]num
+`, // testcase //03
+		`//03
+a:[]any
+n := 2
+a = [1 2 n]
+print
+print 1 (typeof [1 2 n]) // []num
+print 2 (typeof a) // []any
+`: `
+1 []num
+2 []any
+`, // testcase //04
+		`//04
+bar:[]bool
+foo := [[1] bar]
+baz := [[true] bar]
+print
+print 1 (typeof foo) // []any
+print 2 (typeof baz) //  [][]bool
+`: `
+1 []any
+2 [][]bool
+`,
+	}
+	for in, want := range tests {
+		in, want := in, want
+		t.Run(in[:4], func(t *testing.T) {
+			got := run(in)
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
 func TestStr2BoolNum(t *testing.T) {
 	prog := `
 print 1 (str2bool "1") err

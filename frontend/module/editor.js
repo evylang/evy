@@ -674,7 +674,7 @@ function readComment(s, i) {
 }
 
 function identType(val, prev, funcs) {
-  if (keywords.has(val)) {
+  if (keywords.has(val) && prev !== ".") {
     return "keyword"
   }
   if (builtins.has(val) && prev !== ".") {

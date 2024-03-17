@@ -621,13 +621,14 @@ print 3 arr
       <p>
         Map values can be accessed with the dot expression, for example <code>map.key1</code>. If
         maps are accessed via the dot expression the key must match the grammars
-        <code>ident</code> production. Map values can also be accessed with an index expression
-        which allows for evaluation, non-ident keys and variable usage. For example the following
-        code
+        <code>ident</code> production. Map keys in dot expression and map literals may be Evy
+        keywords. Map values can also be accessed with an index expression which allows for
+        evaluation, non-ident keys and variable usage.
       </p>
-      <pre><code class="language-evy">m := {letters:&quot;abc&quot;}
-print 1 m.letters
-print 2 m[&quot;letters&quot;]
+      <p>For example the following code</p>
+      <pre><code class="language-evy">m := {letters:&quot;abc&quot; for:&quot;u&quot;}
+print 1 m.letters m.for
+print 2 m[&quot;letters&quot;] m[&quot;for&quot;]
 
 key := &quot;German letters&quot;
 m[key] = &quot;äöü&quot;
@@ -635,8 +636,8 @@ print 3 m[key]
 print 4 m[&quot;German letters&quot;]
 </code></pre>
       <p>outputs</p>
-      <pre><code class="language-evy:output">1 abc
-2 abc
+      <pre><code class="language-evy:output">1 abc u
+2 abc u
 3 äöü
 4 äöü
 </code></pre>

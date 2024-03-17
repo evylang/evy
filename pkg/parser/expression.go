@@ -267,11 +267,12 @@ func (p *parser) parseDotExpr(left Node) Node {
 		p.appendErrorForToken(`field access with "." expects map type, found `+left.Type().String(), tok)
 		return nil
 	}
-	if p.cur.TokenType() != lexer.IDENT {
+	key := p.cur.AsIdent()
+	if key.TokenType() != lexer.IDENT {
 		p.appendErrorForToken(`expected map key, found `+p.cur.TokenType().String(), tok)
 		return nil
 	}
-	expr := &DotExpression{token: tok, Left: left, T: left.Type().Sub, Key: p.cur.Literal}
+	expr := &DotExpression{token: tok, Left: left, T: left.Type().Sub, Key: key.Literal}
 	p.advance() // advance past key IDENT
 	return expr
 }
@@ -490,10 +491,11 @@ func (p *parser) parseMapPairs(mapLit *MapLiteral) bool {
 	tt := p.cur.TokenType()
 
 	for tt != lexer.RCURLY && tt != lexer.EOF {
-		if tt != lexer.IDENT {
-			p.appendError("expected map key, found " + p.cur.Format())
+		keyTok := p.cur.AsIdent()
+		if keyTok.TokenType() != lexer.IDENT {
+			p.appendError("expected map key, found " + keyTok.Format())
 		}
-		key := p.cur.Literal
+		key := keyTok.Literal
 		p.advance() // advance past key IDENT
 		if _, ok := mapLit.Pairs[key]; ok {
 			p.appendError(fmt.Sprintf("duplicated map key %q", key))

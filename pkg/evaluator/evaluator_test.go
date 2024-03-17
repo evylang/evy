@@ -520,6 +520,7 @@ func TestIndexErr(t *testing.T) {
 func TestMapLit(t *testing.T) {
 	tests := map[string]string{
 		"a := {n:1}":                 "{n:1}",
+		"a := {for:1}":               "{for:1}",
 		"a := {}":                    "{}",
 		`a := {name:"fox" age:42}`:   "{name:fox age:42}",
 		`a := {name:"fox" age:40+2}`: "{name:fox age:42}",
@@ -546,13 +547,17 @@ func TestDot(t *testing.T) {
 	tests := map[string]string{
 		// m := {name: "Greta"}
 		"print m.name":    "Greta",
+		"print m.for":     "FFF",
 		`print m["name"]`: "Greta",
+		`print m["for"]`:  "FFF",
 		`s := "name"
 		print m[s]`: "Greta",
+		`s := "for"
+		print m[s]`: "FFF",
 	}
 	for in, want := range tests {
 		in, want := in, want
-		input := `m := {name: "Greta"}` + "\n" + in
+		input := `m := {name: "Greta" for: "FFF"}` + "\n" + in
 		t.Run(input, func(t *testing.T) {
 			got := run(input)
 			assert.Equal(t, want+"\n", got)

@@ -86,6 +86,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 
 		// Map access - dot expressions
 		"map.key":          "(map.key)",
+		"map.end":          "(map.end)",
 		"map.key+3":        "((map.key)+3)",
 		"map2.a.b":         "((map2.a).b)",
 		"map.key+map2.a.b": "((map.key)+((map2.a).b))",
@@ -139,6 +140,7 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"{a: [1] b:2+n2 c: 1+2}": "{a:any([1]), b:any((2+n2)), c:any((1+2))}",
 		"{a: 1}.a":               "({a:1}.a)",
 		`{a: 1}["a"]`:            `({a:1}["a"])`,
+		`{end: 1}["end"]`:        `({end:1}["end"])`,
 
 		// Array concatenation
 		"[1] + [2]":            "([1]+[2])",

@@ -119,6 +119,19 @@ var keywords = map[string]TokenType{
 	"end":    END,
 }
 
+// AsIdent returns t as an IDENT token if t is a keyword and valid as an
+// identifier, otherwise it returns t. This is to allow specific tokens that
+// are also valid identifiers to be used in certain contexts.
+func (t *Token) AsIdent() *Token {
+	tokstr := tokenStrings[t.TokenType()].format
+	if _, ok := keywords[tokstr]; !ok {
+		return t
+	}
+	ident := *t
+	ident.setLiteral(tokstr).setType(IDENT)
+	return &ident
+}
+
 type tokenString struct {
 	string string
 	format string

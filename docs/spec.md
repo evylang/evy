@@ -622,16 +622,18 @@ outputs
 **Maps** are key-value stores, where the values can be looked up by their
 key, for example `map := { key1:"value1" key2:"value2" }`.
 
-Map values can be accessed with the dot expression, for example
-`map.key1`. If maps are accessed via the dot expression the key must
-match the grammars `ident` production. Map values can also be accessed
-with an index expression which allows for evaluation, non-ident keys
-and variable usage. For example the following code
+Map values can be accessed with the dot expression, for example `map.key1`. If
+maps are accessed via the dot expression the key must match the grammars
+`ident` production. Map keys in dot expression and map literals may be Evy
+keywords. Map values can also be accessed with an index expression which
+allows for evaluation, non-ident keys and variable usage.
+
+For example the following code
 
 ```evy
-m := {letters:"abc"}
-print 1 m.letters
-print 2 m["letters"]
+m := {letters:"abc" for:"u"}
+print 1 m.letters m.for
+print 2 m["letters"] m["for"]
 
 key := "German letters"
 m[key] = "äöü"
@@ -642,8 +644,8 @@ print 4 m["German letters"]
 outputs
 
 ```evy:output
-1 abc
-2 abc
+1 abc u
+2 abc u
 3 äöü
 4 äöü
 ```

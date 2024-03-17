@@ -8,80 +8,69 @@ import (
 	"evylang.dev/evy/pkg/parser"
 )
 
+// testCase covers both the compiler and the VM.
+type testCase struct {
+	name string
+	// input is an evy program
+	input string
+	// wantStackTop is the expected last popped element of the stack in the vm.
+	wantStackTop value
+	// wantBytecode is the bytecode expected from the compiler.
+	wantBytecode *Bytecode
+}
+
 func TestVMGlobals(t *testing.T) {
 	tests := []testCase{
 		{
-			name: "global assignment",
-			input: `
-			x := 1
-			x = x
-			`,
-			expectedStackTop:  1,
-			expectedConstants: []any{1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+			name:         "global assignment",
+			input:        "x := 1",
+			wantStackTop: makeValue(t, 1),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			program, err := parser.Parse(tt.input, parser.Builtins{})
-			assert.NoError(t, err, "parser error")
-			comp := NewCompiler()
-			err = comp.Compile(program)
-			assert.NoError(t, err, "compiler error")
-			vm := NewVM(comp.Bytecode())
-			err = vm.Run()
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
 			assert.NoError(t, err, "runtime error")
-			stackElem := vm.lastPoppedStackElem()
-			switch expected := tt.expectedStackTop.(type) {
-			case int:
-				assertNumValue(t, float64(expected), stackElem)
-			case float64:
-				assertNumValue(t, expected, stackElem)
-			default:
-				t.Errorf("unexpected object type %v", expected)
-			}
+
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
 		})
 	}
 }
 
 func TestUserError(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		expectedErr error
+		name    string
+		input   string
+		wantErr error
 	}{
 		{
-			name: "divide by zero",
-			input: `
-			x := 2 / 0
-			x = x
-			`,
-			expectedErr: ErrDivideByZero,
-		},
-		{
-			name: "modulo by zero",
-			input: `
-			x := 2 % 0
-			x = x
-			`,
-			expectedErr: ErrDivideByZero,
+			name:    "divide by zero",
+			input:   "x := 2 / 0",
+			wantErr: ErrDivideByZero,
+		}, {
+			name:    "modulo by zero",
+			input:   "x := 2 % 0",
+			wantErr: ErrDivideByZero,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			program, err := parser.Parse(tt.input, parser.Builtins{})
-			assert.NoError(t, err, "parser error")
-			comp := NewCompiler()
-			err = comp.Compile(program)
-			assert.NoError(t, err, "compiler error")
-			vm := NewVM(comp.Bytecode())
-			err = vm.Run()
-			assert.Equal(t, tt.expectedErr, err)
+			bytecode := compileBytecode(t, tt.input)
+
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.Equal(t, tt.wantErr, err)
 		})
 	}
 }
@@ -89,98 +78,74 @@ func TestUserError(t *testing.T) {
 func TestBoolExpressions(t *testing.T) {
 	tests := []testCase{
 		{
-			name: "literal true",
-			input: `
-			x := true
-			x = x
-			`,
-			expectedStackTop:  true,
-			expectedConstants: []any{},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpTrue),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+			name:         "literal true",
+			input:        "x := true",
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Instructions: makeInstructions(
+					mustMake(t, OpTrue),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "literal false",
-			input: `
-			x := false
-			x = x
-			`,
-			expectedStackTop:  false,
-			expectedConstants: []any{},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpFalse),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "literal false",
+			input:        "x := false",
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Instructions: makeInstructions(
+					mustMake(t, OpFalse),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "not operator",
-			input: `
-			x := !true
-			x = x
-			`,
-			expectedStackTop:  false,
-			expectedConstants: []any{},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpTrue),
-				mustMake(t, OpNot),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "not operator",
+			input:        "x := !true",
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Instructions: makeInstructions(
+					mustMake(t, OpTrue),
+					mustMake(t, OpNot),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "equal operator",
-			input: `
-			x := 1 == 1
-			x = x
-			`,
-			expectedStackTop:  true,
-			expectedConstants: []any{1, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpEqual),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "equal operator",
+			input:        "x := 1 == 1",
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpEqual),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "not operator",
-			input: `
-			x := 1 != 1
-			x = x
-			`,
-			expectedStackTop:  false,
-			expectedConstants: []any{1, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpNotEqual),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "not operator",
+			input:        "x := 1 != 1",
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNotEqual),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			program, err := parser.Parse(tt.input, parser.Builtins{})
-			assert.NoError(t, err, "parser error")
-			comp := NewCompiler()
-			err = comp.Compile(program)
-			assert.NoError(t, err, "compiler error")
-			vm := NewVM(comp.Bytecode())
-			err = vm.Run()
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
 			assert.NoError(t, err, "runtime error")
-			stackElem := vm.lastPoppedStackElem()
-			assertBoolValue(t, tt.expectedStackTop.(bool), stackElem)
+
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
 		})
 	}
 }
@@ -188,260 +153,201 @@ func TestBoolExpressions(t *testing.T) {
 func TestVMArithmetic(t *testing.T) {
 	tests := []testCase{
 		{
-			name: "addition",
-			input: `
-			x := 2 + 1
-			x = x
-			`,
-			expectedStackTop:  3,
-			expectedConstants: []any{2, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpAdd),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+			name:         "addition",
+			input:        "x := 2 + 1",
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "subtraction",
-			input: `
-			x := 2 - 1
-			x = x
-			`,
-			expectedStackTop:  1,
-			expectedConstants: []any{2, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpSubtract),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "subtraction",
+			input:        "x := 2 - 1",
+			wantStackTop: makeValue(t, 1),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpSubtract),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "multiplication",
-			input: `
-			x := 2 * 1
-			x = x
-			`,
-			expectedStackTop:  2,
-			expectedConstants: []any{2, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpMultiply),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "multiplication",
+			input:        "x := 2 * 1",
+			wantStackTop: makeValue(t, 2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpMultiply),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "division",
-			input: `
-			x := 2 / 1
-			x = x
-			`,
-			expectedStackTop:  2,
-			expectedConstants: []any{2, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpDivide),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "division",
+			input:        "x := 2 / 1",
+			wantStackTop: makeValue(t, 2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpDivide),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "modulo",
-			input: `
-			x := 2 % 1
-			x = x
-			`,
-			expectedStackTop:  0,
-			expectedConstants: []any{2, 1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpModulo),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "modulo",
+			input:        "x := 2 % 1",
+			wantStackTop: makeValue(t, 0),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpModulo),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "float modulo",
-			input: `
-			x := 2.5 % 1.3
-			x = x
-			`,
-			expectedStackTop:  1.2,
-			expectedConstants: []any{2.5, 1.3},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpModulo),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "float modulo",
+			input:        "x := 2.5 % 1.3",
+			wantStackTop: makeValue(t, 1.2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 2.5, 1.3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpModulo),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "minus operator",
-			input: `
-			x := -1
-			x = x
-			`,
-			expectedStackTop:  -1,
-			expectedConstants: []any{1},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpMinus),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "minus operator",
+			input:        "x := -1",
+			wantStackTop: makeValue(t, -1),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpMinus),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "all operators",
-			input: `
-			x := 1 + 2 - 3 * 4 / 5 % 6
-			x = x
-			`,
-			expectedStackTop:  1 + 2 - math.Mod(3.0*4.0/5.0, 6.0),
-			expectedConstants: []any{1, 2, 3, 4, 5, 6},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpAdd),
-				mustMake(t, OpConstant, 2),
-				mustMake(t, OpConstant, 3),
-				mustMake(t, OpMultiply),
-				mustMake(t, OpConstant, 4),
-				mustMake(t, OpDivide),
-				mustMake(t, OpConstant, 5),
-				mustMake(t, OpModulo),
-				mustMake(t, OpSubtract),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "all operators",
+			input:        "x := 1 + 2 - 3 * 4 / 5 % 6",
+			wantStackTop: makeValue(t, 1+2-math.Mod(3.0*4.0/5.0, 6.0)),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4, 5, 6),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMultiply),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpDivide),
+					mustMake(t, OpConstant, 5),
+					mustMake(t, OpModulo),
+					mustMake(t, OpSubtract),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
-		},
-		{
-			name: "grouped expressions",
-			input: `
-			x := (1 + 2 - 3) * 4 / 5 % 6
-			x = x
-			`,
-			expectedStackTop:  (1 + 2 - 3) * 4 / math.Mod(5.0, 6.0),
-			expectedConstants: []any{1, 2, 3, 4, 5, 6},
-			expectedInstructions: []Instructions{
-				mustMake(t, OpConstant, 0),
-				mustMake(t, OpConstant, 1),
-				mustMake(t, OpAdd),
-				mustMake(t, OpConstant, 2),
-				mustMake(t, OpSubtract),
-				mustMake(t, OpConstant, 3),
-				mustMake(t, OpMultiply),
-				mustMake(t, OpConstant, 4),
-				mustMake(t, OpDivide),
-				mustMake(t, OpConstant, 5),
-				mustMake(t, OpModulo),
-				mustMake(t, OpSetGlobal, 0),
-				mustMake(t, OpGetGlobal, 0),
-				mustMake(t, OpSetGlobal, 0),
+		}, {
+			name:         "grouped expressions",
+			input:        "x := (1 + 2 - 3) * 4 / 5 % 6",
+			wantStackTop: makeValue(t, (1+2-3)*4/math.Mod(5.0, 6.0)),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4, 5, 6),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpSubtract),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMultiply),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpDivide),
+					mustMake(t, OpConstant, 5),
+					mustMake(t, OpModulo),
+					mustMake(t, OpSetGlobal, 0),
+				),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			program, err := parser.Parse(tt.input, parser.Builtins{})
-			assert.NoError(t, err, "parser error")
-			comp := NewCompiler()
-			err = comp.Compile(program)
-			assert.NoError(t, err, "compiler error")
-			bytecode := comp.Bytecode()
-			assertInstructions(t, tt.expectedInstructions, bytecode.Instructions)
-			assertConstants(t, tt.expectedConstants, bytecode.Constants)
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
 			vm := NewVM(bytecode)
-			err = vm.Run()
+			err := vm.Run()
 			assert.NoError(t, err, "runtime error")
-			stackElem := vm.lastPoppedStackElem()
-			switch expected := tt.expectedStackTop.(type) {
-			case int:
-				assertNumValue(t, float64(expected), stackElem)
-			case float64:
-				assertNumValue(t, expected, stackElem)
-			default:
-				t.Errorf("unexpected object type %v", expected)
-			}
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
 		})
 	}
 }
 
-// testCase covers both the compiler and the VM.
-type testCase struct {
-	name string
-	// input is an evy program
-	input string
-	// expectedStackTop is the result of popping the last
-	// element from the stack in the vm.
-	expectedStackTop any
-	// expectedConstants are the expected constants passed in the
-	// bytecode after compilation.
-	expectedConstants []any
-	// expectedInstructions are the expected compiler instructions
-	// passed in the bytecode after compilation
-	expectedInstructions []Instructions
+func compileBytecode(t *testing.T, input string) *Bytecode {
+	t.Helper()
+	// add x = x to the input so it parses correctly
+	input += "\nx = x"
+	program, err := parser.Parse(input, parser.Builtins{})
+	assert.NoError(t, err, "unexpected parse error")
+	comp := NewCompiler()
+	err = comp.Compile(program)
+	assert.NoError(t, err, "unexpected compile error")
+	bc := comp.Bytecode()
+	// remove the final 2 instructions that represent x = x
+	bc.Instructions = bc.Instructions[:len(bc.Instructions)-6]
+	return bc
 }
 
-func assertInstructions(t *testing.T, expected []Instructions, actual Instructions) {
+func makeValue(t *testing.T, a any) value {
 	t.Helper()
-	concatted := concatInstructions(expected)
-	assert.Equal(t, len(concatted), len(actual), "wrong instructions length\nwant=\n%s\ngot=\n%s",
-		concatted, actual)
-	for i, ins := range concatted {
-		assert.Equal(t, ins, actual[i], "wrong instruction at %04d\nwant=\n%s\ngot=\n%s",
-			i, concatted, actual)
+	switch v := a.(type) {
+	case int:
+		return numVal(v)
+	case float64:
+		return numVal(v)
+	case bool:
+		return boolVal(v)
+	default:
+		t.Fatalf("makeValue(%q): invalid type: %T", a, a)
+		return nil
 	}
 }
 
-func concatInstructions(s []Instructions) Instructions {
-	out := Instructions{}
-	for _, ins := range s {
-		out = append(out, ins...)
+func makeValues(t *testing.T, in ...any) []value {
+	t.Helper()
+	out := make([]value, len(in))
+	for i, a := range in {
+		out[i] = makeValue(t, a)
 	}
 	return out
 }
 
-func assertConstants(t *testing.T, expected []any, actual []value) {
-	t.Helper()
-	assert.Equal(t, len(expected), len(actual), "wrong number of constants")
-	for i, constant := range expected {
-		switch constant := constant.(type) {
-		case int:
-			assertNumValue(t, float64(constant), actual[i])
-		case float64:
-			assertNumValue(t, constant, actual[i])
-		default:
-			t.Errorf("unknown constant type %v", constant)
-		}
+func makeInstructions(in ...Instructions) Instructions {
+	out := Instructions{}
+	for _, instruction := range in {
+		out = append(out, instruction...)
 	}
+	return out
 }
 
-func assertBoolValue(t *testing.T, expected bool, actual value) {
+func assertBytecode(t *testing.T, want, got *Bytecode) {
 	t.Helper()
-	result, ok := actual.(boolVal)
-	assert.Equal(t, true, ok, "object is not a boolVal. got=%T (%+v)", actual, actual)
-	assert.Equal(t, expected, bool(result), "object has wrong value")
-}
-
-func assertNumValue(t *testing.T, expected float64, actual value) {
-	t.Helper()
-	result, ok := actual.(numVal)
-	assert.Equal(t, true, ok, "object is not a NumVal. got=%T (%+v)", actual, actual)
-	assert.Equal(t, expected, float64(result), "object has wrong value")
+	msg := "\nwant instructions:\n%s\ngot instructions:\n%s"
+	assert.Equal(t, want, got, msg, want.Instructions, got.Instructions)
 }

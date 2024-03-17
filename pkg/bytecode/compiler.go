@@ -31,11 +31,7 @@ type Bytecode struct {
 
 // NewCompiler returns a new compiler.
 func NewCompiler() *Compiler {
-	return &Compiler{
-		constants:    []value{},
-		instructions: Instructions{},
-		globals:      NewSymbolTable(),
-	}
+	return &Compiler{globals: NewSymbolTable()}
 }
 
 // Compile accepts an AST node and renders it to bytecode internally.

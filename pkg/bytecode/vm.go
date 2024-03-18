@@ -105,6 +105,18 @@ func (vm *VM) Run() error {
 			right := vm.pop()
 			left := vm.pop()
 			err = vm.push(boolVal(!left.Equals(right)))
+		case OpNumLessThan:
+			right, left := vm.popBinaryNums()
+			err = vm.push(boolVal(left < right))
+		case OpNumLessThanEqual:
+			right, left := vm.popBinaryNums()
+			err = vm.push(boolVal(left <= right))
+		case OpNumGreaterThan:
+			right, left := vm.popBinaryNums()
+			err = vm.push(boolVal(left > right))
+		case OpNumGreaterThanEqual:
+			right, left := vm.popBinaryNums()
+			err = vm.push(boolVal(left >= right))
 		}
 		if err != nil {
 			return err

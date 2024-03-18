@@ -13,6 +13,10 @@ var (
 	// ErrUnknownOperator is returned when an operator cannot
 	// be resolved.
 	ErrUnknownOperator = fmt.Errorf("%w: unknown operator", ErrInternal)
+	// ErrUnsupportedExpression is returned when an expression is not
+	// supported by the compiler, this indicates an error in the compiler
+	// itself, as all parseable evy expressions should be supported.
+	ErrUnsupportedExpression = fmt.Errorf("%w: unsupported expression", ErrInternal)
 )
 
 // Compiler is responsible for turning a parsed evy program into
@@ -107,6 +111,14 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 	if err := c.Compile(expr.Right); err != nil {
 		return err
 	}
+	if expr.Left.Type() == parser.NUM_TYPE && expr.Right.Type() == parser.NUM_TYPE {
+		return c.compileNumBinaryExpression(expr)
+	}
+	return fmt.Errorf("%w: %s with types %s %s", ErrUnsupportedExpression,
+		expr, expr.Left.Type(), expr.Right.Type())
+}
+
+func (c *Compiler) compileNumBinaryExpression(expr *parser.BinaryExpression) error {
 	switch expr.Op {
 	case parser.OP_PLUS:
 		return c.emit(OpAdd)
@@ -122,6 +134,14 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 		return c.emit(OpEqual)
 	case parser.OP_NOT_EQ:
 		return c.emit(OpNotEqual)
+	case parser.OP_LT:
+		return c.emit(OpNumLessThan)
+	case parser.OP_LTEQ:
+		return c.emit(OpNumLessThanEqual)
+	case parser.OP_GT:
+		return c.emit(OpNumGreaterThan)
+	case parser.OP_GTEQ:
+		return c.emit(OpNumGreaterThanEqual)
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}

@@ -24,6 +24,10 @@
   --topnav-height: calc(var(--topnav-padding) * 2 + 1.5rem);
 }
 
+& img.logo {
+  content: url("../img/logo.v1.svg");
+}
+
 /* mobile */
 @media (max-width: 767px) {
   .desktop {

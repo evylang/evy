@@ -269,6 +269,7 @@ func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
 		return
 	}
 	f.write("[")
+	f.indentLevel++
 	if multi[0].isComment() {
 		f.write(" ")
 	}
@@ -287,12 +288,13 @@ func (f *formatting) formatArrayLiteral(n *ArrayLiteral) {
 		// newline or comment
 		f.write(string(m))
 
-		if i+1 == length || !multi[i+1].isNL() { // next is element, comment or `]`
+		if i+1 < length && !multi[i+1].isNL() { // next is element, comment or `]`
 			f.indent()
-			if i+1 < length {
-				f.write(indentStr) // one extra indent for element or comment
-			}
 		}
+	}
+	f.indentLevel--
+	if multi[length-1].isNL() {
+		f.indent()
 	}
 	f.write("]")
 }
@@ -304,6 +306,7 @@ func (f *formatting) formatMapLiteral(n *MapLiteral) {
 		return
 	}
 	f.write("{")
+	f.indentLevel++
 	if multi[0].isComment() {
 		f.write(" ")
 	}
@@ -321,12 +324,13 @@ func (f *formatting) formatMapLiteral(n *MapLiteral) {
 		}
 		// newline or comment
 		f.writes(string(m))
-		if i+1 == length || !multi[i+1].isNL() { // next is pair, comment or `}`
+		if i+1 < length && !multi[i+1].isNL() { // next is pair, comment or `}`
 			f.indent()
-			if i+1 < length {
-				f.write(indentStr) // one extra indent for pair or comment
-			}
 		}
+	}
+	f.indentLevel--
+	if multi[length-1].isNL() {
+		f.indent()
 	}
 	f.write("}")
 }

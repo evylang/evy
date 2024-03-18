@@ -596,6 +596,70 @@ print x
 	assert.Equal(t, want, got)
 }
 
+func TestNestedArrayLiteralFormat(t *testing.T) {
+	input := `x := [
+[
+[1 2 3]
+[1 2 3]
+]
+[
+[1 2 3]
+[1 2 3]
+]
+]
+print x`
+	want := `
+x := [
+    [
+        [1 2 3]
+        [1 2 3]
+    ]
+    [
+        [1 2 3]
+        [1 2 3]
+    ]
+]
+print x
+`[1:]
+	parser := newParser(input, testBuiltins())
+	prog := parser.parse()
+	assertNoParseError(t, parser, input)
+	got := prog.Format()
+	assert.Equal(t, want, got)
+}
+
+func TestNestedMapLiteralFormat(t *testing.T) {
+	input := `x := {
+left:{
+black:[1]
+idx:[0]
+}
+right:{
+black:[1]
+idx:[0]
+}
+}
+print x`
+	want := `
+x := {
+    left:{
+        black:[1]
+        idx:[0]
+    }
+    right:{
+        black:[1]
+        idx:[0]
+    }
+}
+print x
+`[1:]
+	parser := newParser(input, testBuiltins())
+	prog := parser.parse()
+	assertNoParseError(t, parser, input)
+	got := prog.Format()
+	assert.Equal(t, want, got)
+}
+
 func TestNLStringLit(t *testing.T) {
 	input := `
 x := "a\nb"

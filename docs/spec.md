@@ -726,7 +726,15 @@ The slice expression `arr[start:end]` copies a substring or subarray
 starting with the value at index `arr[start]`. The length of the slice
 is `end-start`. The end index `arr[end]` is not included in the slice.
 If `start` is left out, it defaults to `0`. If `end` is left out, it
-defaults to `len arr`. For example, the following code
+defaults to `len arr`.
+
+As with an **index**, the `start` or `end` value of a slice expression
+may be a negative `-i` as a shorthand for the normalized value
+`(len arr) - i`. After `start` and `end` are normalized, their values
+in the expression `arr[start:end]` must satisfy
+`0 <= start <= end <= (len arr)`.
+
+For example, the following code
 
 ```evy
 s := "abcd"

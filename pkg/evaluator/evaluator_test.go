@@ -629,11 +629,13 @@ print "2" arr[1:]
 print "3" arr[1:2]
 print "4" arr[1:1]
 print "5" arr[:1]
+print "6" arr[3:]
+print "7" arr[3:3]
 print
 
 arr2 := arr[:]
 arr2[0] = 11
-print "6" arr arr2
+print "8" arr arr2
 `
 	out := run(prog)
 	want := []string{
@@ -642,8 +644,10 @@ print "6" arr arr2
 		"3 [2]",
 		"4 []",
 		"5 [1]",
+		"6 []",
+		"7 []",
 		"",
-		"6 [1 2 3] [11 2 3]",
+		"8 [1 2 3] [11 2 3]",
 		"",
 	}
 	got := strings.Split(out, "\n")
@@ -661,10 +665,12 @@ print "2" s[1:]
 print "3" s[1:2]
 print "4" s[1:1]
 print "5" s[:1]
+print "6" s[3:]
+print "7" s[3:3]
 print
 
 s2 := "A" + s[1:]
-print "6" s s2
+print "8" s s2
 `
 	out := run(prog)
 	want := []string{
@@ -673,8 +679,10 @@ print "6" s s2
 		"3 b",
 		"4 ",
 		"5 a",
+		"6 ",
+		"7 ",
 		"",
-		"6 abc Abc",
+		"8 abc Abc",
 		"",
 	}
 	got := strings.Split(out, "\n")

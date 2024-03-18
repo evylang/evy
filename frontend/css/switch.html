@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --color-accent: hsl(201deg 100% 42%);
+        /* dark theme  (default without theme toggle) */
+        --text-color: #fff;
+        --background-color: #333;
+      }
+      /* light theme  */
+      :root:has(#dark-theme:not(:checked)) {
+        --text-color: #000;
+        --background-color: #fff;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+        background: var(--background-color);
+      }
+    </style>
+    <link rel="stylesheet" href="switch.css" type="text/css" />
+    <script type="module">
+      /* see ../module/theme.js */
+      function updateTheme(dark) {
+        window.localStorage.setItem("theme", dark ? "dark" : "light")
+        document.querySelector("#dark-theme").checked = dark
+      }
+
+      const toggle = document.querySelector("#dark-theme")
+      toggle.addEventListener("click", (e) => updateTheme(e.target.checked))
+
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+      mediaQuery.addListener(() => updateTheme(mediaQuery.matches))
+    </script>
+  </head>
+  <body>
+    <h1>Theme</h1>
+    <div>
+      <label class="theme switch">
+        <input type="checkbox" id="dark-theme" />
+        <span class="slider"></span>
+        <script>
+          // Inline JS to avoid flash of other theme.
+          const theme = window.localStorage.getItem("theme")
+          const systemDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+          if (theme === "dark" || (!theme && systemDarkTheme)) {
+            document.querySelector("#dark-theme").checked = true
+          }
+        </script>
+      </label>
+    </div>
+  </body>
+</html>

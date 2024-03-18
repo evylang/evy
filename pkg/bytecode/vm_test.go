@@ -363,6 +363,104 @@ func TestNumOperations(t *testing.T) {
 	}
 }
 
+func TestStringExpressions(t *testing.T) {
+	tests := []testCase{
+		{
+			name:         "assignment",
+			input:        `x := "a"`,
+			wantStackTop: makeValue(t, "a"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "concatenate",
+			input:        `x := "a" + "b"`,
+			wantStackTop: makeValue(t, "ab"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpStringConcatenate),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "less than",
+			input:        `x := "a" < "b"`,
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpStringLessThan),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "less than or equal",
+			input:        `x := "a" <= "b"`,
+			wantStackTop: makeValue(t, true),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpStringLessThanEqual),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "greater than",
+			input:        `x := "a" > "b"`,
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpStringGreaterThan),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "greater than or equal",
+			input:        `x := "a" >= "b"`,
+			wantStackTop: makeValue(t, false),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpStringGreaterThanEqual),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
@@ -381,6 +479,8 @@ func compileBytecode(t *testing.T, input string) *Bytecode {
 func makeValue(t *testing.T, a any) value {
 	t.Helper()
 	switch v := a.(type) {
+	case string:
+		return stringVal(v)
 	case int:
 		return numVal(v)
 	case float64:

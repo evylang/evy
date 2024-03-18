@@ -54,6 +54,21 @@ const (
 	// OpNumGreaterThanEqual represents a greater than or equal operator
 	// for numeric operands.
 	OpNumGreaterThanEqual
+	// OpStringLessThan represents a less than operator for string
+	// operands. Strings are compared using lexicographic order.
+	OpStringLessThan
+	// OpStringLessThanEqual represents a less than or equal operator for
+	// string operands. Strings are compared using lexicographic order.
+	OpStringLessThanEqual
+	// OpStringGreaterThan represents a greater than operator for string
+	// operands. Strings are compared using lexicographic order.
+	OpStringGreaterThan
+	// OpStringGreaterThanEqual represents a greater than or equal operator
+	// for string operands. Strings are compared using lexicographic order.
+	OpStringGreaterThanEqual
+	// OpStringConcatenate represents a + operator used to concatenate two
+	// strings.
+	OpStringConcatenate
 )
 
 var (
@@ -79,21 +94,26 @@ var definitions = map[Opcode]*OpDefinition{
 	// Operations like OpAdd have no operand width because the virtual
 	// machine is expected to pop the values from the stack when reading
 	// this instruction.
-	OpAdd:                 {"OpAdd", nil},
-	OpSubtract:            {"OpSubtract", nil},
-	OpMultiply:            {"OpMultiply", nil},
-	OpDivide:              {"OpDivide", nil},
-	OpModulo:              {"OpModulo", nil},
-	OpTrue:                {"OpTrue", nil},
-	OpFalse:               {"OpFalse", nil},
-	OpNot:                 {"OpNot", nil},
-	OpMinus:               {"OpMinus", nil},
-	OpEqual:               {"OpEqual", nil},
-	OpNotEqual:            {"OpNotEqual", nil},
-	OpNumLessThan:         {"OpNumLessThan", nil},
-	OpNumLessThanEqual:    {"OpNumLessThanEqual", nil},
-	OpNumGreaterThan:      {"OpNumGreaterThan", nil},
-	OpNumGreaterThanEqual: {"OpNumGreaterThanEqual", nil},
+	OpAdd:                    {"OpAdd", nil},
+	OpSubtract:               {"OpSubtract", nil},
+	OpMultiply:               {"OpMultiply", nil},
+	OpDivide:                 {"OpDivide", nil},
+	OpModulo:                 {"OpModulo", nil},
+	OpTrue:                   {"OpTrue", nil},
+	OpFalse:                  {"OpFalse", nil},
+	OpNot:                    {"OpNot", nil},
+	OpMinus:                  {"OpMinus", nil},
+	OpEqual:                  {"OpEqual", nil},
+	OpNotEqual:               {"OpNotEqual", nil},
+	OpNumLessThan:            {"OpNumLessThan", nil},
+	OpNumLessThanEqual:       {"OpNumLessThanEqual", nil},
+	OpNumGreaterThan:         {"OpNumGreaterThan", nil},
+	OpNumGreaterThanEqual:    {"OpNumGreaterThanEqual", nil},
+	OpStringLessThan:         {"OpStringLessThan", nil},
+	OpStringLessThanEqual:    {"OpStringLessThanEqual", nil},
+	OpStringGreaterThan:      {"OpStringGreaterThan", nil},
+	OpStringGreaterThanEqual: {"OpStringGreaterThanEqual", nil},
+	OpStringConcatenate:      {"OpStringConcatenate", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

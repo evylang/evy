@@ -235,20 +235,27 @@ func (p *parser) parseSlice(tok *lexer.Token, left, start Node) Node {
 		return nil
 	}
 
-	t := left.Type()
-	if p.cur.Type == lexer.RBRACKET {
-		p.advance()
-		return &SliceExpression{token: tok, Left: left, Start: start, End: nil, T: t}
+	var end Node
+	if p.cur.Type != lexer.RBRACKET {
+		if end = p.parseTopLevelExpr(); end == nil {
+			return nil
+		}
+		if !p.assertToken(lexer.RBRACKET) {
+			return nil
+		}
 	}
-	end := p.parseTopLevelExpr()
-	if end == nil {
+	p.advance() // advance past ]
+
+	if start != nil && start.Type() != NUM_TYPE {
+		p.appendErrorForToken(leftType.name()+" start index expects num, found "+start.Type().String(), tok)
 		return nil
 	}
-	if !p.assertToken(lexer.RBRACKET) {
+	if end != nil && end.Type() != NUM_TYPE {
+		p.appendErrorForToken(leftType.name()+" end index expects num, found "+end.Type().String(), tok)
 		return nil
 	}
-	p.advance()
-	return &SliceExpression{token: tok, Left: left, Start: start, End: end, T: t}
+
+	return &SliceExpression{token: tok, Left: left, Start: start, End: end, T: left.Type()}
 }
 
 func (p *parser) parseDotExpr(left Node) Node {

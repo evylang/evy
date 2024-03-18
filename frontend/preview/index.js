@@ -1,3 +1,7 @@
+import initThemeToggle from "./module/theme.js"
+
+initThemeToggle("#dark-theme", "theme")
+
 // Open and close sidebar on mobile on hamburger click.
 const sidebar = document.querySelector("#sidebar")
 document.querySelector("#hamburger").onclick = showSidebar

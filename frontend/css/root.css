@@ -32,6 +32,25 @@
   }
 }
 
+/* light theme colors
+   minimal example: frontend/css/switch.html */
+:root:has(#dark-theme:not(:checked)) {
+  --background: hsl(0deg 0% 96%); /* main  */
+  --background-dimmed: hsl(0deg 0% 100% / 100%); /* sidebar, header */
+  --background-code: hsl(18deg 11% 82%); /* docs code blocks */
+  --color: hsl(0deg 0% 0%); /* text color, docs h1 */
+  --color-hover: hsl(0deg 0% 0% / 70%);
+  --color-slightly-dimmed: hsl(0deg 0% 10%); /* docs h5, th */
+  --color-dimmed: hsl(0deg 0% 0% / 80%); /* docs paragraph */
+  --color-very-dimmed: hsl(0deg 0% 0% / 30%); /* docs expander icon */
+  --border-color: hsl(0deg 0% 0% / 20%);
+  --border-color-strong: hsl(0deg 0% 0% / 30%);
+
+  & img.logo {
+    content: url("../img/logo-light-theme.v1.svg");
+  }
+}
+
 /* mobile */
 @media (max-width: 767px) {
   .desktop {

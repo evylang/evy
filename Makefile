@@ -165,6 +165,7 @@ clean::
 	find $(DOCS_TARGET_DIR) -mindepth 1 \
 			! -regex '$(DOCS_TARGET_DIR)/css.*' \
 			! -regex '$(DOCS_TARGET_DIR)/img.*' \
+			! -regex '$(DOCS_TARGET_DIR)/module.*' \
 			! -regex '$(DOCS_TARGET_DIR)/favicon.ico' \
 			! -regex '$(DOCS_TARGET_DIR)/404.html' \
 			! -regex '$(DOCS_TARGET_DIR)/index.js' \

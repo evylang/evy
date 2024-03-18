@@ -1795,6 +1795,32 @@ func TestNestedTypeof(t *testing.T) {
 	}
 }
 
+func TestAnyEquals(t *testing.T) {
+	prog := `
+a:any
+b:any
+
+a = 1
+b = "hello"
+print 1 (a == b) (a != b)
+
+a = 1
+b = 2
+print 2 (a == b) (a != b)
+
+a = 1
+b = 1
+print 3 (a == b) (a != b)
+`
+	want := `
+1 false true
+2 false true
+3 true false
+`[1:]
+	got := run(prog)
+	assert.Equal(t, want, got)
+}
+
 func TestDemo(t *testing.T) {
 	prog := `
 move 10 10

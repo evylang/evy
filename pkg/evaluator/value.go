@@ -144,7 +144,7 @@ func (a *anyVal) Equals(v value) bool {
 	if !ok {
 		panic("internal error: Any.Equals called with non-Any value")
 	}
-	return a.V.Equals(a2.V)
+	return a.V.Type().Equals(a2.V.Type()) && a.V.Equals(a2.V)
 }
 
 func (a *anyVal) Set(v value) {

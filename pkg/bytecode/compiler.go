@@ -68,6 +68,11 @@ func (c *Compiler) Compile(node parser.Node) error {
 		if err := c.emit(opcode); err != nil {
 			return err
 		}
+	case *parser.StringLiteral:
+		num := stringVal(node.Value)
+		if err := c.emit(OpConstant, c.addConstant(num)); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -111,8 +116,19 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 	if err := c.Compile(expr.Right); err != nil {
 		return err
 	}
+	// equality and inequality are type agnostic in the vm, so no type checking
+	// is required to decide which opcode to output.
+	switch expr.Op {
+	case parser.OP_EQ:
+		return c.emit(OpEqual)
+	case parser.OP_NOT_EQ:
+		return c.emit(OpNotEqual)
+	}
 	if expr.Left.Type() == parser.NUM_TYPE && expr.Right.Type() == parser.NUM_TYPE {
 		return c.compileNumBinaryExpression(expr)
+	}
+	if expr.Left.Type() == parser.STRING_TYPE && expr.Right.Type() == parser.STRING_TYPE {
+		return c.compileStringBinaryExpression(expr)
 	}
 	return fmt.Errorf("%w: %s with types %s %s", ErrUnsupportedExpression,
 		expr, expr.Left.Type(), expr.Right.Type())
@@ -130,10 +146,6 @@ func (c *Compiler) compileNumBinaryExpression(expr *parser.BinaryExpression) err
 		return c.emit(OpDivide)
 	case parser.OP_PERCENT:
 		return c.emit(OpModulo)
-	case parser.OP_EQ:
-		return c.emit(OpEqual)
-	case parser.OP_NOT_EQ:
-		return c.emit(OpNotEqual)
 	case parser.OP_LT:
 		return c.emit(OpNumLessThan)
 	case parser.OP_LTEQ:
@@ -142,6 +154,23 @@ func (c *Compiler) compileNumBinaryExpression(expr *parser.BinaryExpression) err
 		return c.emit(OpNumGreaterThan)
 	case parser.OP_GTEQ:
 		return c.emit(OpNumGreaterThanEqual)
+	default:
+		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
+	}
+}
+
+func (c *Compiler) compileStringBinaryExpression(expr *parser.BinaryExpression) error {
+	switch expr.Op {
+	case parser.OP_PLUS:
+		return c.emit(OpStringConcatenate)
+	case parser.OP_LT:
+		return c.emit(OpStringLessThan)
+	case parser.OP_LTEQ:
+		return c.emit(OpStringLessThanEqual)
+	case parser.OP_GT:
+		return c.emit(OpStringGreaterThan)
+	case parser.OP_GTEQ:
+		return c.emit(OpStringGreaterThanEqual)
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}

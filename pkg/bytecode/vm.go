@@ -117,6 +117,21 @@ func (vm *VM) Run() error {
 		case OpNumGreaterThanEqual:
 			right, left := vm.popBinaryNums()
 			err = vm.push(boolVal(left >= right))
+		case OpStringLessThan:
+			right, left := vm.popBinaryStrings()
+			err = vm.push(boolVal(left < right))
+		case OpStringLessThanEqual:
+			right, left := vm.popBinaryStrings()
+			err = vm.push(boolVal(left <= right))
+		case OpStringGreaterThan:
+			right, left := vm.popBinaryStrings()
+			err = vm.push(boolVal(left > right))
+		case OpStringGreaterThanEqual:
+			right, left := vm.popBinaryStrings()
+			err = vm.push(boolVal(left >= right))
+		case OpStringConcatenate:
+			right, left := vm.popBinaryStrings()
+			err = vm.push(stringVal(left + right))
 		}
 		if err != nil {
 			return err
@@ -161,8 +176,18 @@ func (vm *VM) popBinaryNums() (float64, float64) {
 	return float64(right), float64(left)
 }
 
+// popBinaryStrings pops the top two elements of the stack (the left
+// and right sides of the binary expressions) as strings and returns both.
+func (vm *VM) popBinaryStrings() (string, string) {
+	// the right was compiled last, so is higher on the stack
+	// than the left
+	right := vm.popStringVal()
+	left := vm.popStringVal()
+	return string(right), string(left)
+}
+
 // popNumVal pops an element from the stack and casts it to a num
-// before returning the value. If elem is not a num it will error.
+// before returning the value. If elem is not a num then it will error.
 func (vm *VM) popNumVal() numVal {
 	elem := vm.pop()
 	val, ok := elem.(numVal)
@@ -174,12 +199,24 @@ func (vm *VM) popNumVal() numVal {
 }
 
 // popBoolVal pops an element from the stack and casts it to a bool
-// before returning the value. If elem is not a bool it will error.
+// before returning the value. If elem is not a bool then it will error.
 func (vm *VM) popBoolVal() boolVal {
 	elem := vm.pop()
 	val, ok := elem.(boolVal)
 	if !ok {
 		panic(fmt.Errorf("%w: expected to pop boolVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
+}
+
+// popNumVal pops an element from the stack and casts it to a string
+// before returning the value. If elem is not a string then it will error.
+func (vm *VM) popStringVal() stringVal {
+	elem := vm.pop()
+	val, ok := elem.(stringVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop stringVal but got %s",
 			ErrInternal, elem.Type()))
 	}
 	return val

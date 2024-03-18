@@ -43,3 +43,19 @@ func (b boolVal) Equals(v value) bool {
 	}
 	return b == b2
 }
+
+type stringVal string
+
+func (s stringVal) Type() *parser.Type { return parser.STRING_TYPE }
+
+func (s stringVal) String() string {
+	return string(s)
+}
+
+func (s stringVal) Equals(v value) bool {
+	s2, ok := v.(stringVal)
+	if !ok {
+		panic("internal error: String.Equals called with non-String value")
+	}
+	return s == s2
+}

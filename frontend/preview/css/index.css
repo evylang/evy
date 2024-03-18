@@ -242,6 +242,9 @@ th {
   border-left: 3px solid transparent;
   display: inline-block;
 }
+#sidebar a code {
+  color: var(--color-hover);
+}
 #sidebar a:hover,
 #sidebar a:hover code {
   color: var(--color-accent);

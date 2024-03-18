@@ -96,15 +96,15 @@ li {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-accent);
   &:hover,
   &:hover code {
-    color: var(--color-primary-accent);
+    color: var(--color-accent-hover);
   }
 }
 
 a > code {
-  color: var(--color-primary);
+  color: var(--color-accent);
   padding-left: 0;
   padding-right: 0;
 }
@@ -157,14 +157,14 @@ th {
 }
 /* --- Headings -------------------------------------------------------- */
 .anchor {
-  color: var(--color-primary);
+  color: var(--color-accent);
   text-decoration: none;
   margin-right: 0.5em;
   outline: none;
 }
 
 .anchor:hover {
-  color: var(--color-primary-accent);
+  color: var(--color-accent-hover);
 }
 
 /* --- Header -------------------------------------------------------- */
@@ -174,13 +174,13 @@ th {
 
 .topnav a strong {
   font-weight: normal;
-  color: var(--color-primary-accent);
+  color: var(--color-accent-hover);
   transition: color filter 0.2s ease-in-out;
 }
 
 .topnav a:hover,
 .topnav button:hover {
-  color: var(--color-primary-accent);
+  color: var(--color-accent-hover);
 }
 
 .docs-nav {
@@ -190,7 +190,7 @@ th {
 }
 
 .docs-nav .active {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .search {
@@ -244,7 +244,7 @@ th {
 }
 #sidebar a:hover,
 #sidebar a:hover code {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 #sidebar ul {
@@ -273,7 +273,7 @@ th {
   mask: url("data:image/svg+xml,%3Csvg fill='currentColor' stroke='none' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z' %3E%3C/path%3E%3C/svg%3E%0A");
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
-  color: var(--color-dimmed2);
+  color: var(--color-very-dimmed);
   background-color: currentcolor;
   position: absolute;
   width: 1em;
@@ -284,7 +284,7 @@ th {
   transition: transform 0.3s;
 }
 #sidebar div.expander:hover {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 #sidebar div.expander.show {
   transform: rotate(90deg);
@@ -301,8 +301,8 @@ th {
 }
 #sidebar .highlight,
 #sidebar .highlight code {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 #sidebar ul.icons {

@@ -239,6 +239,10 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		`[1 2 3]["a"]`: "line 1 column 8: array index expects num, found string",
 		"{a:2}[2]":     "line 1 column 6: map index expects string, found num",
 
+		`"abc"["a":]`:    "line 1 column 6: string start index expects num, found string",
+		`"abc"["a":"b"]`: "line 1 column 6: string start index expects num, found string",
+		`"abc"[:"b"]`:    "line 1 column 6: string end index expects num, found string",
+
 		"{a:}": `line 1 column 4: unexpected "}"`,
 		"{:a}": `line 1 column 2: expected map key, found ":"`,
 

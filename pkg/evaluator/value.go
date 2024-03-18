@@ -96,7 +96,7 @@ func (s *stringVal) runes() []rune {
 
 func (s *stringVal) Index(idx value) (value, error) {
 	runes := s.runes()
-	i, err := normalizeIndex(idx, len(runes))
+	i, err := normalizeIndex(idx, len(runes), indexExpression)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +206,7 @@ func (a *arrayVal) Set(v value) {
 }
 
 func (a *arrayVal) Index(idx value) (value, error) {
-	i, err := normalizeIndex(idx, len(*a.Elements))
+	i, err := normalizeIndex(idx, len(*a.Elements), indexExpression)
 	if err != nil {
 		return nil, err
 	}
@@ -335,34 +335,44 @@ func normalizeSliceIndices(start, end value, length int) (int, int, error) {
 	startIdx := 0
 	var err error
 	if start != nil {
-		startIdx, err = normalizeIndex(start, length)
+		startIdx, err = normalizeIndex(start, length, sliceExpression)
 		if err != nil {
 			return 0, 0, err
 		}
 	}
 	endIdx := length
 	if end != nil {
-		// length is a valid end slice index, but not a valid ordinary index (out of bounds)
-		if endNum, ok := end.(*numVal); ok && int(endNum.V) != length {
-			endIdx, err = normalizeIndex(end, length)
-			if err != nil {
-				return 0, 0, err
-			}
+		endIdx, err = normalizeIndex(end, length, sliceExpression)
+		if err != nil {
+			return 0, 0, err
 		}
 	}
+
 	if startIdx > endIdx {
 		return 0, 0, fmt.Errorf("%w: %d > %d", ErrSlice, startIdx, endIdx)
 	}
 	return startIdx, endIdx, nil
 }
 
-func normalizeIndex(idx value, length int) (int, error) {
+type indexType int
+
+const (
+	indexExpression indexType = iota
+	sliceExpression
+)
+
+func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
+	limit := length - 1
+	if indexType == sliceExpression {
+		limit++ // slice expression indices can index one past the end
+	}
+
 	index, ok := idx.(*numVal)
 	if !ok {
 		return 0, fmt.Errorf("%w: expected num, found %v", ErrType, idx.Type())
 	}
 	i := int(index.V)
-	if i < -length || i >= length {
+	if i < -length || i > limit {
 		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}
 	if i < 0 {

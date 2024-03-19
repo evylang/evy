@@ -529,27 +529,28 @@
     </nav>
 
     <main>
-      <h1>Command Line Usage</h1>
-      <p>
-        The <code>evy</code> toolchain is a set of tools that can be used to parse, run, and format
-        Evy source code. It can also be used to serve the Evy web contents locally. You can
-        <a href="../index.html#-installation">install</a> the Evy toolchain locally and run it from
-        your command line. The command-line interface for Evy supports all built-in functions except
-        for graphics functions and event handlers. Only the web interface on
-        <a href="/play">play.evy.dev</a> supports graphics and events.
-      </p>
-      <p>The Evy toolchain has three subcommands:</p>
-      <ul>
-        <li><code>evy run</code>: Parse and run Evy source code.</li>
-        <li><code>evy fmt</code>: Format Evy source code.</li>
-        <li><code>evy serve</code>: Serve Evy website(s) locally.</li>
-      </ul>
-      <p>
-        You can also get help for each subcommand by running it with the <code>--help</code> flag.
-      </p>
-      <h3><a id="evy-help" href="#evy-help" class="anchor">#</a>evy --help</h3>
-      <!-- gen:evy --help -->
-      <pre><code>Usage: evy &lt;command&gt;
+      <div class="max-width-wrapper">
+        <h1>Command Line Usage</h1>
+        <p>
+          The <code>evy</code> toolchain is a set of tools that can be used to parse, run, and
+          format Evy source code. It can also be used to serve the Evy web contents locally. You can
+          <a href="../index.html#-installation">install</a> the Evy toolchain locally and run it
+          from your command line. The command-line interface for Evy supports all built-in functions
+          except for graphics functions and event handlers. Only the web interface on
+          <a href="/play">play.evy.dev</a> supports graphics and events.
+        </p>
+        <p>The Evy toolchain has three subcommands:</p>
+        <ul>
+          <li><code>evy run</code>: Parse and run Evy source code.</li>
+          <li><code>evy fmt</code>: Format Evy source code.</li>
+          <li><code>evy serve</code>: Serve Evy website(s) locally.</li>
+        </ul>
+        <p>
+          You can also get help for each subcommand by running it with the <code>--help</code> flag.
+        </p>
+        <h3><a id="evy-help" href="#evy-help" class="anchor">#</a>evy --help</h3>
+        <!-- gen:evy --help -->
+        <pre><code>Usage: evy &lt;command&gt;
 
 evy is a tool for managing evy source code.
 
@@ -572,10 +573,10 @@ Commands:
 
 Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
 </code></pre>
-      <!-- genend -->
-      <h3><a id="evy-run-help" href="#evy-run-help" class="anchor">#</a>evy run --help</h3>
-      <!-- gen:evy run --help -->
-      <pre><code>Usage: evy run [&lt;source&gt;]
+        <!-- genend -->
+        <h3><a id="evy-run-help" href="#evy-run-help" class="anchor">#</a>evy run --help</h3>
+        <!-- gen:evy run --help -->
+        <pre><code>Usage: evy run [&lt;source&gt;]
 
 Run Evy program.
 
@@ -588,10 +589,10 @@ Flags:
 
       --skip-sleep    skip evy sleep command ($EVY_SKIP_SLEEP)
 </code></pre>
-      <!-- genend -->
-      <h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>
-      <!-- gen:evy fmt --help -->
-      <pre><code>Usage: evy fmt [&lt;files&gt; ...]
+        <!-- genend -->
+        <h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>
+        <!-- gen:evy fmt --help -->
+        <pre><code>Usage: evy fmt [&lt;files&gt; ...]
 
 Format Evy files.
 
@@ -605,13 +606,13 @@ Flags:
   -w, --write      update .evy file
   -c, --check      check if already formatted
 </code></pre>
-      <!-- genend -->
-      <h3>
-        <a id="evy-serve-start-help" href="#evy-serve-start-help" class="anchor">#</a>evy serve
-        [start] --help
-      </h3>
-      <!-- gen:evy serve start --help -->
-      <pre><code>Usage: evy serve start
+        <!-- genend -->
+        <h3>
+          <a id="evy-serve-start-help" href="#evy-serve-start-help" class="anchor">#</a>evy serve
+          [start] --help
+        </h3>
+        <!-- gen:evy serve start --help -->
+        <pre><code>Usage: evy serve start
 
 Start web server, default for &quot;evy serve&quot;.
 
@@ -626,13 +627,13 @@ Flags:
       --root=DIR          Directory to use as root for serving, subdirectory of
                           DIR if given, eg &quot;play&quot;, &quot;docs&quot;
 </code></pre>
-      <!-- genend -->
-      <h3>
-        <a id="evy-serve-export-help" href="#evy-serve-export-help" class="anchor">#</a>evy serve
-        export --help
-      </h3>
-      <!-- gen:evy serve export --help -->
-      <pre><code>Usage: evy serve export &lt;dir&gt;
+        <!-- genend -->
+        <h3>
+          <a id="evy-serve-export-help" href="#evy-serve-export-help" class="anchor">#</a>evy serve
+          export --help
+        </h3>
+        <!-- gen:evy serve export --help -->
+        <pre><code>Usage: evy serve export &lt;dir&gt;
 
 Export embedded content.
 
@@ -645,7 +646,8 @@ Flags:
 
   -f, --force      Use non-empty directory
 </code></pre>
-      <!-- genend -->
+        <!-- genend -->
+      </div>
     </main>
   </body>
 </html>

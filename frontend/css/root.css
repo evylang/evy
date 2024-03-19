@@ -19,6 +19,7 @@
   --background: hsl(210deg 5% 15%); /* main  */
   --background-dimmed: hsl(213deg 10% 23%); /* sidebar, header */
   --background-code: hsl(200deg 11% 18%); /* docs code blocks */
+  --background-inline-code: hsl(213deg 10% 23%); /* docs inline code */
   --color: hsl(0deg 0% 100%); /* text color, docs h1 */
   --color-hover: hsl(0deg 0% 100% / 70%);
   --color-slightly-dimmed: hsl(0deg 0% 90%); /* docs h5, th */
@@ -37,7 +38,8 @@
 :root:has(#dark-theme:not(:checked)) {
   --background: hsl(0deg 0% 96%); /* main  */
   --background-dimmed: hsl(0deg 0% 100% / 100%); /* sidebar, header */
-  --background-code: hsl(18deg 11% 82%); /* docs code blocks */
+  --background-code: hsl(200deg 13% 91%); /* docs code blocks */
+  --background-inline-code: hsl(200deg 13% 91%); /* docs inline code */
   --color: hsl(0deg 0% 0%); /* text color, docs h1 */
   --color-hover: hsl(0deg 0% 0% / 70%);
   --color-slightly-dimmed: hsl(0deg 0% 10%); /* docs h5, th */

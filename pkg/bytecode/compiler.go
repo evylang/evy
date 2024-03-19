@@ -73,6 +73,15 @@ func (c *Compiler) Compile(node parser.Node) error {
 		if err := c.emit(OpConstant, c.addConstant(num)); err != nil {
 			return err
 		}
+	case *parser.ArrayLiteral:
+		for _, elem := range node.Elements {
+			if err := c.Compile(elem); err != nil {
+				return err
+			}
+		}
+		if err := c.emit(OpArray, len(node.Elements)); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -129,6 +138,9 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 	}
 	if expr.Left.Type() == parser.STRING_TYPE && expr.Right.Type() == parser.STRING_TYPE {
 		return c.compileStringBinaryExpression(expr)
+	}
+	if expr.Left.Type().Name == parser.ARRAY && expr.Right.Type().Name == parser.ARRAY && expr.Op == parser.OP_PLUS {
+		return c.emit(OpArrayConcatenate)
 	}
 	return fmt.Errorf("%w: %s with types %s %s", ErrUnsupportedExpression,
 		expr, expr.Left.Type(), expr.Right.Type())

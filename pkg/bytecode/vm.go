@@ -132,6 +132,24 @@ func (vm *VM) Run() error {
 		case OpStringConcatenate:
 			right, left := vm.popBinaryStrings()
 			err = vm.push(stringVal(left + right))
+		case OpArray:
+			arrLen := int(ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			arr := arrayVal{Elements: make([]value, arrLen)}
+			// fill the array in reverse because elements were
+			// added onto the stack LIFO
+			for i := arrLen - 1; i >= 0; i-- {
+				arr.Elements[i] = vm.pop()
+			}
+			err = vm.push(arr)
+		case OpArrayConcatenate:
+			right := vm.popArrayVal()
+			left := vm.popArrayVal()
+			concatenated := arrayVal{Elements: []value{}}
+			concatenated.Elements = append(concatenated.Elements, left.Elements...)
+			concatenated.Elements = append(concatenated.Elements, right.Elements...)
+			err = vm.push(concatenated)
 		}
 		if err != nil {
 			return err
@@ -210,13 +228,25 @@ func (vm *VM) popBoolVal() boolVal {
 	return val
 }
 
-// popNumVal pops an element from the stack and casts it to a string
+// popStringVal pops an element from the stack and casts it to a string
 // before returning the value. If elem is not a string then it will error.
 func (vm *VM) popStringVal() stringVal {
 	elem := vm.pop()
 	val, ok := elem.(stringVal)
 	if !ok {
 		panic(fmt.Errorf("%w: expected to pop stringVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
+}
+
+// popArrayVal pops an element from the stack and casts it to an arrayVal
+// before returning the value. If elem is not an arrayVal then it will error.
+func (vm *VM) popArrayVal() arrayVal {
+	elem := vm.pop()
+	val, ok := elem.(arrayVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop arrayVal but got %s",
 			ErrInternal, elem.Type()))
 	}
 	return val

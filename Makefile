@@ -6,6 +6,7 @@ O = out
 COVERAGE = 80
 VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
+BUILD_TARGET ?= wasm
 
 ## Build, test, check coverage and lint
 all: build-go test lint
@@ -51,7 +52,7 @@ go-version:
 ## Build with tinygo targeting wasm
 # optimise for size, see https://www.fermyon.com/blog/optimizing-tinygo-wasm
 build-tiny: go-version | $(O)
-	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/wasm
+	GOOS=wasip1 GOARCH=wasm tinygo build -o $(O)/evy-unopt.wasm -no-debug -ldflags='$(GO_LDFLAGS)' -stack-size=512kb ./pkg/$(BUILD_TARGET)
 	wasm-opt -O3 $(O)/evy-unopt.wasm -o frontend/module/evy.wasm
 	cp -f $$(tinygo env TINYGOROOT)/targets/wasm_exec.js frontend/module/
 	echo '{ "version": "$(VERSION)" }' | jq > frontend/version.json

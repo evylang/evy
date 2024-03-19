@@ -22,12 +22,18 @@ main {
   grid-area: main;
   height: 100%;
   overflow: auto;
-  padding-left: 120px;
   background-color: var(--background);
-  padding-bottom: 40px;
 }
-main > * {
+
+/* max-width-wrapper is responsible for centering content in main area.
+   If we applied the same rules to main, the scrollbar would show up offset from the
+   right edge, at `margin-right:auto` distance. */
+main .max-width-wrapper {
   max-width: 60rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 32px;
 }
 
 li::marker {
@@ -57,7 +63,6 @@ li::marker {
 
 h1 {
   font-size: 1.875rem;
-  margin-top: 40px;
 }
 
 h2 {
@@ -343,24 +348,7 @@ th {
   }
 }
 
-@media (max-width: 1600px) {
-  main {
-    padding-left: 88px;
-    padding-right: 88px;
-  }
-  main > * {
-    max-width: 52rem;
-  }
-}
-
 @media (max-width: 1280px) {
-  main {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-  main > * {
-    max-width: 48rem;
-  }
   #sidebar {
     width: 270px;
   }
@@ -370,12 +358,9 @@ th {
 }
 
 @media (max-width: 1024px) {
-  main {
+  main .max-width-wrapper {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  main > * {
-    max-width: 100%;
   }
   #sidebar {
     width: 250px;
@@ -383,9 +368,6 @@ th {
 }
 
 @media (max-width: 767px) {
-  main {
-    width: 100vw;
-  }
   #sidebar {
     width: 312px;
     position: absolute;

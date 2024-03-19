@@ -572,6 +572,50 @@ func TestArrays(t *testing.T) {
 	}
 }
 
+func TestMap(t *testing.T) {
+	tests := []testCase{
+		{
+			name:         "empty",
+			input:        "x := {}",
+			wantStackTop: makeValue(t, map[string]any{}),
+			wantBytecode: &Bytecode{
+				Constants: nil,
+				Instructions: makeInstructions(
+					mustMake(t, OpMap, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "assignment",
+			input:        "x := {a: 1 b: 2}",
+			wantStackTop: makeValue(t, map[string]any{"a": 1, "b": 2}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", 1, "b", 2),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMap, 4),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
@@ -592,6 +636,12 @@ func makeValue(t *testing.T, a any) value {
 	switch v := a.(type) {
 	case []any:
 		return arrayVal{Elements: makeValues(t, v...)}
+	case map[string]any:
+		m := mapVal{}
+		for key, val := range v {
+			m[key] = makeValue(t, val)
+		}
+		return m
 	case string:
 		return stringVal(v)
 	case int:

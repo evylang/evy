@@ -1,2 +1,2 @@
 [**Documentation**](README.md)
-[Contributing](contributing/README.md)
+[Playground](/play)

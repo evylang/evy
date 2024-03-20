@@ -90,6 +90,10 @@ p {
   color: var(--color-dimmed);
   margin-bottom: 24px;
 }
+/* Reduce margin bottom if code block follows */
+p:has(+ pre) {
+  margin-bottom: 8px;
+}
 
 ul,
 ol {
@@ -115,7 +119,7 @@ a > code {
 }
 
 pre {
-  margin: 16px 0;
+  margin: 16px 0 24px;
   padding: 16px;
   border-left: 6px solid var(--border-color);
   overflow-x: auto;

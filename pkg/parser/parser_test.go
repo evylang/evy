@@ -1384,6 +1384,50 @@ end
 	}
 }
 
+func TestArrayTypeCombiningNoErr(t *testing.T) {
+	inputs := []string{
+		`
+n := 0
+na := [1]
+print [na [true]] // []any
+print [[] []] // [][]any
+print [[] [2]] // [][]num
+print [["string"] [2]] // [][]any
+print [[n] [2]] // [][]num
+print [na [2]] // [][]num
+print [na na] // [][]num
+print [[n] [true]] // [][]any
+print [na true] // []any
+`,
+		`
+arr := [1]
+print [[arr] [[true]]] // [][]any
+print [[[1]] [[true]]] // [][][]any
+print [[arr] [[1]]] // [][][]num
+`,
+		`
+a:[]any
+n := 2
+a = [1 2 n]
+print "[1 2 n]" [1 2 n] // [1 2 n] []num
+print a a // [1 2 2] []any
+`,
+		`
+ba:[]bool
+foo := [[1] ba]
+print foo
+foo2 := [[true] ba] // []any
+print foo2 // [][]bool
+		`,
+	}
+
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		parser.parse()
+		assertNoParseError(t, parser, input)
+	}
+}
+
 func TestLateCompositeLiteralTypingErr(t *testing.T) {
 	inputs := map[string]string{
 		`
@@ -1474,6 +1518,21 @@ print(any(arr))
 	want = "[]any"
 	got = arrayLit.Elements[0].Type().String()
 	assert.Equal(t, want, got)
+}
+
+func TestWrapArrayNoError(t *testing.T) {
+	inputs := []string{
+		`
+a:[]any
+n := 2
+a = [1 2 n]
+print "[1 2 n]" (typeof [1 2 n])
+print a (typeof a)`,
+	}
+	for _, input := range inputs {
+		parser := newParser(input, testBuiltins())
+		assertNoParseError(t, parser, input)
+	}
 }
 
 func TestAnyWrapArray(t *testing.T) {

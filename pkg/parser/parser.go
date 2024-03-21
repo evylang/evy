@@ -243,7 +243,7 @@ func (p *parser) addParamsToScope(fd *FuncDefStmt) {
 		vParamAsArray := &Var{
 			token: vParam.token,
 			Name:  vParam.Name,
-			T:     fd.VariadicParamType,
+			T:     fixedType(fd.VariadicParamType),
 		}
 		p.scope.set(vParam.Name, vParamAsArray)
 	}
@@ -384,7 +384,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		p.advancePastNL()
 		return nil
 	}
-	if !target.Type().accepts(value.Type(), isCompositeConst(value)) {
+	if !target.Type().accepts(value.Type()) {
 		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
 		p.appendErrorForToken(msg, tok)
 	} else {
@@ -495,7 +495,7 @@ func (p *parser) parseTypedDecl() *Decl {
 		p.appendErrorForToken(msg, decl.token)
 		return decl
 	}
-	decl.Var.T = v
+	decl.Var.T = fixedType(v)
 	decl.Value = wrapAny(zeroValue(v, p.cur), v)
 	return decl
 }
@@ -543,7 +543,7 @@ func (p *parser) parseInferredDeclStatement() Node {
 		p.appendError(fmt.Sprintf("invalid declaration, function %q has no return value", valToken.Literal))
 		return nil
 	}
-	decl.Var.T = val.Type().infer() // assign ANY to sub_type for empty arrays and maps.
+	decl.Var.T = fixedType(val.Type().infer()) // assign ANY to sub_type for empty arrays and maps.
 	if !p.validateVarDecl(decl.Var, decl.token, false /* allowUnderscore */) {
 		return nil
 	}
@@ -578,7 +578,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.VariadicParam.Type()
 		for i, arg := range args {
 			argType := arg.Type()
-			if !paramType.accepts(argType, isCompositeConst(arg)) {
+			if !paramType.accepts(argType) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
 				p.appendErrorForToken(msg, arg.Token())
 			} else {
@@ -599,7 +599,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 	for i, arg := range args {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
-		if !paramType.accepts(argType, isCompositeConst(arg)) {
+		if !paramType.accepts(argType) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
 			p.appendErrorForToken(msg, arg.Token())
 		} else {
@@ -794,7 +794,7 @@ func (p *parser) parseReturnStatement() Node {
 	switch {
 	case p.scope.returnType == nil:
 		p.appendErrorForToken("return statement not allowed here", retValueToken)
-	case !p.scope.returnType.accepts(ret.T, isCompositeConst(ret.Value)):
+	case !p.scope.returnType.accepts(ret.T):
 		msg := "expected return value of type " + p.scope.returnType.String() + ", found " + ret.T.String()
 		if p.scope.returnType == NONE_TYPE && ret.T != NONE_TYPE {
 			msg = "expected no return value, found " + ret.T.String()

@@ -643,7 +643,7 @@ func (b *BinaryExpression) Type() *Type {
 
 func (b *BinaryExpression) infer() {
 	if b.T == EMPTY_ARRAY {
-		b.T = &Type{Name: ARRAY, Sub: ANY_TYPE}
+		b.T = &Type{Name: ARRAY, Sub: ANY_TYPE, Fixed: true}
 	}
 }
 
@@ -1149,44 +1149,6 @@ func wrapAny(val Node, targetType *Type) Node {
 		return mapLit
 	}
 	panic(fmt.Sprintf("internal error: %s incompatible types: target %v, value %v", val.Token().Location(), targetType, valType))
-}
-
-func isCompositeConst(n Node) bool {
-	if arrayLit, ok := n.(*ArrayLiteral); ok {
-		return isConst(arrayLit)
-	}
-	if mapLit, ok := n.(*MapLiteral); ok {
-		return isConst(mapLit)
-	}
-	return false
-}
-
-func isConst(node Node) bool {
-	switch n := node.(type) {
-	case *NumLiteral, *StringLiteral, *BoolLiteral:
-		return true
-	case *BinaryExpression:
-		return isConst(n.Left) && isConst(n.Right)
-	case *UnaryExpression:
-		return isConst(n.Right)
-	case *GroupExpression:
-		return isConst(n.Expr)
-	case *ArrayLiteral:
-		for _, el := range n.Elements {
-			if !isConst(el) {
-				return false
-			}
-		}
-		return true
-	case *MapLiteral:
-		for _, val := range n.Pairs {
-			if !isConst(val) {
-				return false
-			}
-		}
-		return true
-	}
-	return false
 }
 
 func alwaysTerms(n Node) bool {

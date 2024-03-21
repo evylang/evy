@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{.Root}}/css/header.css" type="text/css" />
     <link rel="stylesheet" href="{{.Root}}/css/index.css" type="text/css" />
     <link rel="stylesheet" href="{{.Root}}/css/fonts.css" type="text/css" />
+    <script src="{{.Root}}/index.js" type="module"></script>
   </head>
   <body>
     <header class="topnav docs">
@@ -30,8 +31,7 @@
             <div class="icon-search"></div>
             <input type="text" placeholder="Search..." />
           </div>
-          <a href="index.html">Overview</a>
-          <a href="syntax_by_example.html">Documentation</a>
+          {{.Header}}
           <button>About</button>
         </nav>
         <a href="/" class="mobile">
@@ -39,6 +39,16 @@
         </a>
       </div>
     </header>
+
+    {{if .Sidebar}}
+      <nav id="sidebar">
+        <header class="topnav mobile">
+          <button class="icon-close" id="sidebar-close"></button>
+        </header>
+        {{.Sidebar}}
+      </nav>
+    {{end}}
+
     <main>{{.Content}}</main>
   </body>
 </html>

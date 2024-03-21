@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./css/header.css" type="text/css" />
     <link rel="stylesheet" href="./css/index.css" type="text/css" />
     <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
+    <script src="./index.js" type="module"></script>
   </head>
   <body>
     <header class="topnav docs">
@@ -30,8 +31,8 @@
             <div class="icon-search"></div>
             <input type="text" placeholder="Search..." />
           </div>
-          <a href="index.html">Overview</a>
-          <a href="syntax_by_example.html">Documentation</a>
+          <a href="index.html"><strong>Documentation</strong></a>
+          <a href="contributing/index.html">Contributing</a>
           <button>About</button>
         </nav>
         <a href="/" class="mobile">
@@ -39,6 +40,470 @@
         </a>
       </div>
     </header>
+
+    <nav id="sidebar">
+      <header class="topnav mobile">
+        <button class="icon-close" id="sidebar-close"></button>
+      </header>
+      <h1>Documentation</h1>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li>
+          <a href="spec.html">Language Specification</a>
+          <div class="expander"></div>
+          <ul>
+            <li>
+              <a href="spec.html#syntax-grammar">Syntax Grammar</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="spec.html#wsn-syntax-grammar">WSN Syntax Grammar</a></li>
+                <li><a href="spec.html#evy-syntax-grammar">Evy Syntax Grammar</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#comments">Comments</a></li>
+            <li><a href="spec.html#types">Types</a></li>
+            <li><a href="spec.html#variables-and-declarations">Variables and Declarations</a></li>
+            <li><a href="spec.html#zero-values">Zero Values</a></li>
+            <li><a href="spec.html#assignments">Assignments</a></li>
+            <li><a href="spec.html#copy-and-reference">Copy and Reference</a></li>
+            <li><a href="spec.html#variable-names">Variable Names</a></li>
+            <li><a href="spec.html#scope">Scope</a></li>
+            <li><a href="spec.html#strings">Strings</a></li>
+            <li><a href="spec.html#arrays">Arrays</a></li>
+            <li><a href="spec.html#maps">Maps</a></li>
+            <li><a href="spec.html#index-and-slice">Index and Slice</a></li>
+            <li>
+              <a href="spec.html#operators-and-expressions">Operators and Expressions</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="spec.html#arithmetic-and-concatenation-operators"
+                    >Arithmetic and Concatenation Operators</a
+                  >
+                </li>
+                <li><a href="spec.html#logical-operators">Logical Operators</a></li>
+                <li><a href="spec.html#comparison-operators">Comparison Operators</a></li>
+                <li><a href="spec.html#unary-operators">Unary Operators</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#precedence">Precedence</a></li>
+            <li><a href="spec.html#statements">Statements</a></li>
+            <li>
+              <a href="spec.html#whitespace">Whitespace</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="spec.html#vertical-whitespace">Vertical Whitespace</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#horizontal-whitespace">Horizontal Whitespace</a></li>
+            <li>
+              <a href="spec.html#functions">Functions</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="spec.html#bare-returns">Bare Returns</a></li>
+                <li><a href="spec.html#function-names">Function Names</a></li>
+                <li><a href="spec.html#anonymous-parameters">Anonymous Parameters</a></li>
+                <li><a href="spec.html#variadic-functions">Variadic Functions</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#break-and-return">Break and Return</a></li>
+            <li><a href="spec.html#typeof">Typeof</a></li>
+            <li><a href="spec.html#type-assertion">Type Assertion</a></li>
+            <li>
+              <a href="spec.html#assignability">Assignability</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="spec.html#assignability-of-variable-values"
+                    >Assignability of variable values</a
+                  >
+                </li>
+                <li>
+                  <a href="spec.html#assignability-of-constant-values"
+                    >Assignability of constant values</a
+                  >
+                </li>
+                <li>
+                  <a href="spec.html#assignability-of-empty-composite-literals"
+                    >Assignability of empty composite literals</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="spec.html#run-time-panics-and-recoverable-errors"
+                >Run-time Panics and Recoverable Errors</a
+              >
+            </li>
+            <li>
+              <a href="spec.html#execution-model-and-event-handlers"
+                >Execution Model and Event Handlers</a
+              >
+            </li>
+            <li><a href="spec.html#runtimes">Runtimes</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="builtins.html">Built-ins</a>
+          <div class="expander"></div>
+          <ul>
+            <li>
+              <a href="builtins.html#input-and-output">Input and Output</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#print"><code>print</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#read"><code>read</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#cls"><code>cls</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#printf"><code>printf</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#types">Types</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#len"><code>len</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#typeof"><code>typeof</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#map">Map</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#has"><code>has</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#del"><code>del</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#program-control">Program control</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#sleep"><code>sleep</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#exit"><code>exit</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#panic"><code>panic</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#conversion">Conversion</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#str2num"><code>str2num</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#str2bool"><code>str2bool</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#errors">Errors</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="builtins.html#panic-1">Panic</a></li>
+                <li><a href="builtins.html#recoverable-errors">Recoverable Errors</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#string">String</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#sprint"><code>sprint</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#sprintf"><code>sprintf</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#join"><code>join</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#split"><code>split</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#upper"><code>upper</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#lower"><code>lower</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#index"><code>index</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#startswith"><code>startswith</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#endswith"><code>endswith</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#trim"><code>trim</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#replace"><code>replace</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#random">Random</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#rand"><code>rand</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#rand1"><code>rand1</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#math">Math</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#min"><code>min</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#max"><code>max</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#floor"><code>floor</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#ceil"><code>ceil</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#round"><code>round</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#pow"><code>pow</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#log"><code>log</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#sqrt"><code>sqrt</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#sin"><code>sin</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#cos"><code>cos</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#atan2"><code>atan2</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#graphics">Graphics</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#move"><code>move</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#line"><code>line</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#rect"><code>rect</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#circle"><code>circle</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#color"><code>color</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#colour"><code>colour</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#width"><code>width</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#clear"><code>clear</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#grid"><code>grid</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#gridn"><code>gridn</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#poly"><code>poly</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#ellipse"><code>ellipse</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#stroke"><code>stroke</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#fill"><code>fill</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#dash"><code>dash</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#linecap"><code>linecap</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#text"><code>text</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#font"><code>font</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="builtins.html#event-handlers">Event Handlers</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="builtins.html#key"><code>key</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#down"><code>down</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#up"><code>up</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#move-1"><code>move</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#animate"><code>animate</code></a>
+                </li>
+                <li>
+                  <a href="builtins.html#input"><code>input</code></a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="syntax_by_example.html">Syntax by Example</a>
+          <div class="expander"></div>
+          <ul>
+            <li><a href="syntax_by_example.html#comment">Comment</a></li>
+            <li><a href="syntax_by_example.html#declaration">Declaration</a></li>
+            <li><a href="syntax_by_example.html#assignment">Assignment</a></li>
+            <li><a href="syntax_by_example.html#expression">Expression</a></li>
+            <li><a href="syntax_by_example.html#strings">Strings</a></li>
+            <li>
+              <a href="syntax_by_example.html#if-statements"><code>if</code> statements</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#nested-if">Nested <code>if</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#loop-statements">Loop statements</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#while-loop"><code>while</code> loop</a>
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-number"
+                    ><code>for</code> … <code>range</code> number</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-array"
+                    ><code>for</code> … <code>range</code> array</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-map"
+                    ><code>for</code> … <code>range</code> map</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#break"><code>break</code></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#function-definition">Function definition</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="syntax_by_example.html#no-return-type">No return type</a></li>
+                <li><a href="syntax_by_example.html#variadic">Variadic</a></li>
+                <li><a href="syntax_by_example.html#function-calls">Function calls</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#array">Array</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#array-element-access">Array element access</a>
+                </li>
+                <li><a href="syntax_by_example.html#concatenation">Concatenation</a></li>
+                <li><a href="syntax_by_example.html#slicing">Slicing</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#map">Map</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="syntax_by_example.html#map-value-access">Map value access</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#any"><code>any</code></a>
+            </li>
+            <li><a href="syntax_by_example.html#type-assertion">Type assertion</a></li>
+            <li><a href="syntax_by_example.html#type-reflection">Type reflection</a></li>
+            <li>
+              <a href="syntax_by_example.html#event-handling">Event handling</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#event-handlers-with-parameters"
+                    >Event handlers with parameters</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="usage.html">Usage</a>
+          <div class="expander"></div>
+          <ul>
+            <li><a href="usage.html#evy-help">evy --help</a></li>
+            <li><a href="usage.html#evy-run-help">evy run --help</a></li>
+            <li><a href="usage.html#evy-fmt-help">evy fmt --help</a></li>
+            <li><a href="usage.html#evy-serve-start-help">evy serve [start] --help</a></li>
+            <li><a href="usage.html#evy-serve-export-help">evy serve export --help</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
     <main>
       <h1>Syntax by Example</h1>
       <p>

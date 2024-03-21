@@ -758,7 +758,7 @@ dialog p {
   font-weight: 700;
 }
 
-embed {
+.evy-e {
   height: min(50vw, 12rem);
   margin-left: auto;
   margin-right: auto;

@@ -10,8 +10,16 @@
     <link rel="stylesheet" href="../css/elements.css" type="text/css" />
     <link rel="stylesheet" href="../css/icons.css" type="text/css" />
     <link rel="stylesheet" href="../css/header.css" type="text/css" />
+    <link rel="stylesheet" href="../css/switch.css" type="text/css" />
     <link rel="stylesheet" href="../css/index.css" type="text/css" />
     <link rel="stylesheet" href="../css/fonts.css" type="text/css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "./module/theme.js": "./module/theme.js"
+        }
+      }
+    </script>
     <script src="../index.js" type="module"></script>
   </head>
   <body>
@@ -19,7 +27,7 @@
       <div class="left">
         <button class="icon-hamburger mobile" id="hamburger"></button>
         <a href="/" class="desktop">
-          <img src="../img/logo.svg" alt="Evy logo" class="logo" />
+          <img alt="Evy logo" class="logo" />
         </a>
       </div>
       <div class="mobile center">
@@ -33,10 +41,20 @@
           </div>
 
           <button>About</button>
+          <label class="theme switch">
+            <input type="checkbox" id="dark-theme" />
+            <span class="slider"></span>
+            <script>
+              // Inline JS to avoid flash of other theme.
+              const theme = window.localStorage.getItem("theme")
+              const systemDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+              if (theme === "dark" || (!theme && systemDarkTheme)) {
+                document.querySelector("#dark-theme").checked = true
+              }
+            </script>
+          </label>
         </nav>
-        <a href="/" class="mobile">
-          <svg class="icon"><use href="#icon-evy" /></svg>
-        </a>
+        <a href="/" class="mobile logo-small"></a>
       </div>
     </header>
 

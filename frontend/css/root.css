@@ -1,27 +1,54 @@
 :root {
-  /* theme */
+  /* fonts */
   --font-family: "Inter", sans-serif;
   --font-family-code: "Fira Code", monospace;
-  --background: hsl(210deg 5% 15%);
-  --background-dimmed: hsl(213deg 10% 23%);
-  --background-code: hsl(200deg 11% 18%);
-  --color: hsl(0deg 0% 100%);
-  --color-hover: hsl(0deg 0% 100% / 70%);
-  --color-dimmed: hsl(0deg 0% 80%);
-  --color-dimmed2: hsl(0deg 0% 100% / 30%);
-  --color-slightly-dimmed: hsl(0deg 0% 90%);
-  --color-primary: hsl(201deg 100% 42%);
-  --color-primary-accent: hsl(201deg 100% 63%);
-  --border-color: hsl(0deg 0% 100% / 20%);
-  --border-color-strong: hsl(0deg 0% 100% / 40%);
+
+  /* size */
+  --topnav-padding: 16px;
+  --topnav-height: calc(var(--topnav-padding) * 2 + 1.5rem);
+
+  /* colors (all themes) */
+  --color-accent: hsl(201deg 100% 42%);
+  --color-accent-hover: hsl(201deg 100% 63%);
   --primary-button-color: hsl(0deg 0% 33%);
   --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
   --primary-button-background: hsl(0deg 0% 92%);
   --primary-button-background-hover: hsl(0deg 0% 80%);
 
-  /* size */
-  --topnav-padding: 16px;
-  --topnav-height: calc(var(--topnav-padding) * 2 + 1.5rem);
+  /* dark theme colors (default without theme toggle) */
+  --background: hsl(210deg 5% 15%); /* main  */
+  --background-dimmed: hsl(213deg 10% 23%); /* sidebar, header */
+  --background-code: hsl(200deg 11% 18%); /* docs code blocks */
+  --color: hsl(0deg 0% 100%); /* text color, docs h1 */
+  --color-hover: hsl(0deg 0% 100% / 70%);
+  --color-slightly-dimmed: hsl(0deg 0% 90%); /* docs h5, th */
+  --color-dimmed: hsl(0deg 0% 80%); /* docs paragraph */
+  --color-very-dimmed: hsl(0deg 0% 100% / 30%); /* docs expander icon */
+  --border-color: hsl(0deg 0% 100% / 20%);
+  --border-color-strong: hsl(0deg 0% 100% / 40%);
+
+  & img.logo {
+    content: url("../img/logo.v1.svg");
+  }
+}
+
+/* light theme colors
+   minimal example: frontend/css/switch.html */
+:root:has(#dark-theme:not(:checked)) {
+  --background: hsl(0deg 0% 96%); /* main  */
+  --background-dimmed: hsl(0deg 0% 100% / 100%); /* sidebar, header */
+  --background-code: hsl(18deg 11% 82%); /* docs code blocks */
+  --color: hsl(0deg 0% 0%); /* text color, docs h1 */
+  --color-hover: hsl(0deg 0% 0% / 70%);
+  --color-slightly-dimmed: hsl(0deg 0% 10%); /* docs h5, th */
+  --color-dimmed: hsl(0deg 0% 0% / 80%); /* docs paragraph */
+  --color-very-dimmed: hsl(0deg 0% 0% / 30%); /* docs expander icon */
+  --border-color: hsl(0deg 0% 0% / 20%);
+  --border-color-strong: hsl(0deg 0% 0% / 30%);
+
+  & img.logo {
+    content: url("../img/logo-light-theme.v1.svg");
+  }
 }
 
 /* mobile */

@@ -31,15 +31,10 @@
         </a>
       </div>
       <div class="mobile center">
-        <span class="mobile">Overview</span>
+        <span class="mobile">Releasing</span>
       </div>
       <div class="right">
         <nav class="docs-nav">
-          <div class="search">
-            <div class="icon-search"></div>
-            <input type="text" placeholder="Search..." />
-          </div>
-
           <button>About</button>
           <label class="theme switch">
             <input type="checkbox" id="dark-theme" />
@@ -59,40 +54,43 @@
     </header>
 
     <main>
-      <h1>Releasing</h1>
-      <p>
-        Evy automatically releases with every new merge to the <code>main</code> branch on GitHub.
-        This process publishes artifacts for all major operating systems and architectures under
-        <a href="https://github.com/evylang/evy/releases">releases</a> as part of a successful CI
-        run. Additionally, the <code>evylang/tap/evy</code> brew formula is updated to the latest
-        version.
-      </p>
-      <p>
-        By default, each release receives a semantic <strong>patch</strong> bump. For example, if
-        the latest version is <code>v0.2.4</code>, the next one will be <code>v0.2.5</code> by
-        default.
-      </p>
-      <p>
-        To trigger a minor version bump, add a new file to the
-        <a href="https://github.com/evylang/evy/tree/main/docs/release-notes"
-          >release-notes directory</a
-        >. A minor version bump indicates the completion of a
-        <a href="https://github.com/evylang/evy/milestones">milestone</a>. The release notes file
-        should be named according to the new version, for example, <code>v0.2.0.md</code>.
-      </p>
-      <p>
-        To trigger a <strong>minor</strong> version bump a new file must be added to the
-        <a href="https://github.com/evylang/evy/tree/main/docs/release-notes"
-          >release-notes directory</a
-        >. A minor version bump signifies the completion of a milestone. The release notes file is
-        named according to the new version, for example <code>v0.2.0.md</code>.
-      </p>
-      <p>
-        Evy's current major version is still 0, this may change in the future. Evy's language
-        syntax, tooling, and public API are still under development and not yet considered stable.
-        Additionally, for major version 0, the meaning of patch and minor versions does not conform
-        to the standard <a href="https://semver.org/">semantic versioning specifications</a>.
-      </p>
+      <div class="max-width-wrapper">
+        <h1>Releasing</h1>
+        <p>
+          Evy automatically releases with every new merge to the <code>main</code> branch on GitHub.
+          This process publishes artifacts for all major operating systems and architectures under
+          <a href="https://github.com/evylang/evy/releases">releases</a> as part of a successful CI
+          run. Additionally, the <code>evylang/tap/evy</code> brew formula is updated to the latest
+          version.
+        </p>
+        <p>
+          By default, each release receives a semantic <strong>patch</strong> bump. For example, if
+          the latest version is <code>v0.2.4</code>, the next one will be <code>v0.2.5</code> by
+          default.
+        </p>
+        <p>
+          To trigger a minor version bump, add a new file to the
+          <a href="https://github.com/evylang/evy/tree/main/docs/release-notes"
+            >release-notes directory</a
+          >. A minor version bump indicates the completion of a
+          <a href="https://github.com/evylang/evy/milestones">milestone</a>. The release notes file
+          should be named according to the new version, for example, <code>v0.2.0.md</code>.
+        </p>
+        <p>
+          To trigger a <strong>minor</strong> version bump a new file must be added to the
+          <a href="https://github.com/evylang/evy/tree/main/docs/release-notes"
+            >release-notes directory</a
+          >. A minor version bump signifies the completion of a milestone. The release notes file is
+          named according to the new version, for example <code>v0.2.0.md</code>.
+        </p>
+        <p>
+          Evy's current major version is still 0, this may change in the future. Evy's language
+          syntax, tooling, and public API are still under development and not yet considered stable.
+          Additionally, for major version 0, the meaning of patch and minor versions does not
+          conform to the standard
+          <a href="https://semver.org/">semantic versioning specifications</a>.
+        </p>
+      </div>
     </main>
   </body>
 </html>

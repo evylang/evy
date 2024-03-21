@@ -22,12 +22,18 @@ main {
   grid-area: main;
   height: 100%;
   overflow: auto;
-  padding-left: 120px;
   background-color: var(--background);
-  padding-bottom: 40px;
 }
-main > * {
+
+/* max-width-wrapper is responsible for centering content in main area.
+   If we applied the same rules to main, the scrollbar would show up offset from the
+   right edge, at `margin-right:auto` distance. */
+main .max-width-wrapper {
   max-width: 60rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 32px;
 }
 
 li::marker {
@@ -57,7 +63,6 @@ li::marker {
 
 h1 {
   font-size: 1.875rem;
-  margin-top: 40px;
 }
 
 h2 {
@@ -85,6 +90,10 @@ p {
   color: var(--color-dimmed);
   margin-bottom: 24px;
 }
+/* Reduce margin bottom if code block follows */
+p:has(+ pre) {
+  margin-bottom: 8px;
+}
 
 ul,
 ol {
@@ -110,7 +119,7 @@ a > code {
 }
 
 pre {
-  margin: 16px 0;
+  margin: 16px 0 24px;
   padding: 16px;
   border-left: 6px solid var(--border-color);
   overflow-x: auto;
@@ -120,7 +129,7 @@ pre {
 code {
   padding: 0.25em;
   font-size: 0.85rem;
-  background-color: var(--background-dimmed);
+  background-color: var(--background-inline-code);
   border-radius: 4px;
   color: var(--color);
 }
@@ -193,36 +202,6 @@ th {
   color: var(--color-accent);
 }
 
-.search {
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--border-color-strong);
-  border-radius: 6px;
-}
-
-.search > .icon-search {
-  height: 0.9em;
-  width: 0.9em;
-  margin-left: 8px;
-  margin-right: 8px;
-  color: var(--color);
-}
-
-.search > input {
-  height: 2.05rem;
-  border: none;
-  background: none;
-  color: var(--color);
-  padding-left: 4px;
-  max-width: 224px;
-  outline: none;
-}
-
-.search > input::placeholder {
-  opacity: 1;
-  color: var(--color);
-}
-
 /* --- Sidebar -------------------------------------------------------- */
 #sidebar {
   width: 320px;
@@ -244,6 +223,7 @@ th {
 }
 #sidebar a code {
   color: var(--color-hover);
+  background: none;
 }
 #sidebar a:hover,
 #sidebar a:hover code {
@@ -343,24 +323,7 @@ th {
   }
 }
 
-@media (max-width: 1600px) {
-  main {
-    padding-left: 88px;
-    padding-right: 88px;
-  }
-  main > * {
-    max-width: 52rem;
-  }
-}
-
 @media (max-width: 1280px) {
-  main {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-  main > * {
-    max-width: 48rem;
-  }
   #sidebar {
     width: 270px;
   }
@@ -370,12 +333,9 @@ th {
 }
 
 @media (max-width: 1024px) {
-  main {
+  main .max-width-wrapper {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  main > * {
-    max-width: 100%;
   }
   #sidebar {
     width: 250px;
@@ -383,9 +343,6 @@ th {
 }
 
 @media (max-width: 767px) {
-  main {
-    width: 100vw;
-  }
   #sidebar {
     width: 312px;
     position: absolute;

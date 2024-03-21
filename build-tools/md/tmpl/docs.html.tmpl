@@ -23,6 +23,7 @@
     <script src="{{.Root}}/index.js" type="module"></script>
   </head>
   <body>
+
     <header class="topnav docs">
       <div class="left">
         <button class="icon-hamburger mobile" id="hamburger"></button>
@@ -31,14 +32,10 @@
         </a>
       </div>
       <div class="mobile center">
-        <span class="mobile">Overview</span>
+        <span class="mobile">{{.Title}}</span>
       </div>
       <div class="right">
         <nav class="docs-nav">
-          <div class="search">
-            <div class="icon-search"></div>
-            <input type="text" placeholder="Search..." />
-          </div>
           {{.Header}}
           <button>About</button>
           <label class="theme switch">
@@ -53,7 +50,6 @@
               }
             </script>
           </label>
-
         </nav>
         <a href="/" class="mobile logo-small"></a>
       </div>
@@ -66,13 +62,18 @@
         </header>
         {{.Sidebar}}
         <ul class="icons">
-          <li><a href="/discord" class="icon-discord"></a></li>
-          <li><a href="https://github.com/evylang/evy" class="icon-github"></a></li>
-          <li><a href="mailto:evy@evy.dev" class="icon-email"></a></li>
+          <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
+          <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
+          <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
         </ul>
       </nav>
     {{end}}
 
-    <main>{{.Content}}</main>
+    <main>
+      <div class="max-width-wrapper">
+        {{.Content}}
+      </div>
+    </main>
+
   </body>
 </html>

@@ -23,6 +23,7 @@
     <script src="{{.Root}}/index.js" type="module"></script>
   </head>
   <body>
+
     <header class="topnav docs">
       <div class="left">
         <button class="icon-hamburger mobile" id="hamburger"></button>
@@ -35,10 +36,6 @@
       </div>
       <div class="right">
         <nav class="docs-nav">
-          <div class="search">
-            <div class="icon-search"></div>
-            <input type="text" placeholder="Search..." />
-          </div>
           {{.Header}}
           <button>About</button>
           <label class="theme switch">
@@ -53,7 +50,6 @@
               }
             </script>
           </label>
-
         </nav>
         <a href="/" class="mobile logo-small"></a>
       </div>
@@ -78,5 +74,6 @@
         {{.Content}}
       </div>
     </main>
+
   </body>
 </html>

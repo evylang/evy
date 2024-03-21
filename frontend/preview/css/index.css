@@ -202,36 +202,6 @@ th {
   color: var(--color-accent);
 }
 
-.search {
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--border-color-strong);
-  border-radius: 6px;
-}
-
-.search > .icon-search {
-  height: 0.9em;
-  width: 0.9em;
-  margin-left: 8px;
-  margin-right: 8px;
-  color: var(--color);
-}
-
-.search > input {
-  height: 2.05rem;
-  border: none;
-  background: none;
-  color: var(--color);
-  padding-left: 4px;
-  max-width: 224px;
-  outline: none;
-}
-
-.search > input::placeholder {
-  opacity: 1;
-  color: var(--color);
-}
-
 /* --- Sidebar -------------------------------------------------------- */
 #sidebar {
   width: 320px;

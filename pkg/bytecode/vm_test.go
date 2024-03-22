@@ -531,6 +531,33 @@ func TestArrays(t *testing.T) {
 				),
 			},
 		},
+		{
+			name: "concatenate preserve original",
+			input: `x := [1 2]
+			y := [3 4]
+			y = x + y
+			x = x`,
+			wantStackTop: makeValue(t, []any{1, 2}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpArrayConcatenate),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

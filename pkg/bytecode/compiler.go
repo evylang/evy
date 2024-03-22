@@ -219,10 +219,10 @@ func (c *Compiler) compileDecl(decl *parser.Decl) error {
 }
 
 func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
-	if err := c.Compile(stmt.Target); err != nil {
+	if err := c.Compile(stmt.Value); err != nil {
 		return err
 	}
-	symbol := c.globals.Define(stmt.Value.String())
+	symbol := c.globals.Define(stmt.Target.String())
 	return c.emit(OpSetGlobal, symbol.Index)
 }
 

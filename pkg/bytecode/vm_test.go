@@ -22,7 +22,7 @@ type testCase struct {
 func TestVMGlobals(t *testing.T) {
 	tests := []testCase{
 		{
-			name:         "global assignment",
+			name:         "inferred declaration",
 			input:        "x := 1",
 			wantStackTop: makeValue(t, 1),
 			wantBytecode: &Bytecode{
@@ -30,6 +30,29 @@ func TestVMGlobals(t *testing.T) {
 				Instructions: makeInstructions(
 					mustMake(t, OpConstant, 0),
 					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "assignment",
+			input: `x := 1
+			y := x
+			y = x + 1
+			y = y`,
+			wantStackTop: makeValue(t, 2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpSetGlobal, 1),
 				),
 			},
 		},

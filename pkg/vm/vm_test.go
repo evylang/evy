@@ -124,7 +124,8 @@ x = x`, false},
 			`x := "hello world!"
 			y := x[-6:-5]
 			y = y`, "w",
-		}, {
+		},
+		{
 			`x := "abcd"
 			y := x[-2:-2]
 			y = y`, "",

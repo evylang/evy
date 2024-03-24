@@ -90,6 +90,7 @@ func (s *String) HashKey() HashKey {
 
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }
+
 func (s *String) Index(key Object) (Object, error) {
 	index, ok := key.(*Integer)
 	if !ok {

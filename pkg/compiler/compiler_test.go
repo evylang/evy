@@ -87,7 +87,8 @@ x = x`,
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
 			},
-		}, {
+		},
+		{
 			input: `x := 1 * 2 + 3 - 4
 x = x`,
 			expectedConstants: []interface{}{1, 2, 3, 4},
@@ -449,7 +450,8 @@ x = x`,
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
 			},
-		}, {
+		},
+		{
 			input: `x := "a" >= "b"
 x = x`,
 			expectedConstants: []interface{}{"a", "b"},
@@ -461,7 +463,8 @@ x = x`,
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
 			},
-		}, {
+		},
+		{
 			input: `x := "a" > "b"
 x = x`,
 			expectedConstants: []interface{}{"a", "b"},
@@ -473,7 +476,8 @@ x = x`,
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
 			},
-		}, {
+		},
+		{
 			input: `x := "a" <= "b"
 x = x`,
 			expectedConstants: []interface{}{"a", "b"},
@@ -485,7 +489,8 @@ x = x`,
 				code.Make(code.OpGetGlobal, 0),
 				code.Make(code.OpSetGlobal, 0),
 			},
-		}, {
+		},
+		{
 			input: `x := "a" < "b"
 x = x`,
 			expectedConstants: []interface{}{"a", "b"},

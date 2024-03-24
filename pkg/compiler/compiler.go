@@ -194,6 +194,24 @@ func (c *Compiler) Compile(node parser.Node) error {
 		for _, jumpPos := range jumpPositions {
 			c.changeOperand(jumpPos, afterAlternativePos)
 		}
+	case *parser.WhileStmt:
+		startPos := len(c.instructions)
+		if err := c.Compile(node.Condition); err != nil {
+			return err
+		}
+		// Prepare end position of while block, jump to end if not truthy
+		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
+		if err := c.Compile(node.Block); err != nil {
+			return err
+		}
+		// Jump back to start of while condition
+		c.emit(code.OpJump, startPos)
+		// rewrite jumpnottruthy to send the vm over the jump instruction
+		// and continue execution
+		afterBlockPos := len(c.instructions)
+		c.changeOperand(jumpNotTruthyPos, afterBlockPos)
+	case *parser.ForStmt:
+		// TODO:
 	case *parser.BlockStatement:
 		for _, s := range node.Statements {
 			err := c.Compile(s)

@@ -390,6 +390,40 @@ func TestConditionals(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestWhile(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `x := 0
+			while x < 5
+				x = x + 1
+			end	
+			x = x`,
+			expected: 5,
+		},
+		{
+			input: `x := 0
+			while x == 5
+				x = x + 1
+			end	
+			x = x`,
+			expected: 0,
+		},
+		{
+			input: `x := 0
+			while x < 5
+				y := 0			
+				while y < 5
+					y = y + 1
+				end
+				x = x + 1
+			end	
+			x = x`,
+			expected: 5,
+		},
+	}
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected any

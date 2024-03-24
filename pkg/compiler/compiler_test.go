@@ -949,6 +949,33 @@ func TestGlobalVarStatements(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestWhile(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `x := 0
+			while x < 5
+				x = x + 1
+			end`,
+			expectedConstants: []interface{}{0, 5, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpLessThan),
+				code.Make(code.OpJumpNotTruthy, 29),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpJump, 6),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 	t.Helper()
 

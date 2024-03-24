@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"fmt"
+	"slices"
 
 	"evylang.dev/evy/pkg/code"
 	"evylang.dev/evy/pkg/object"
@@ -9,9 +10,10 @@ import (
 )
 
 type Compiler struct {
-	instructions code.Instructions
-	constants    []object.Object
-	symbolTable  *SymbolTable
+	instructions   code.Instructions
+	constants      []object.Object
+	symbolTable    *SymbolTable
+	breakPositions []int
 }
 
 type Bytecode struct {
@@ -210,8 +212,23 @@ func (c *Compiler) Compile(node parser.Node) error {
 		// and continue execution
 		afterBlockPos := len(c.instructions)
 		c.changeOperand(jumpNotTruthyPos, afterBlockPos)
+
+		// handle break statements
+		for i := len(c.breakPositions) - 1; i >= 0; i-- {
+			brkPos := c.breakPositions[i]
+			if brkPos > startPos && brkPos < afterBlockPos {
+				c.changeOperand(brkPos, afterBlockPos)
+				c.breakPositions = slices.Delete(c.breakPositions, i, i+1)
+			} else {
+				break
+			}
+		}
 	case *parser.ForStmt:
-		// TODO:
+		// TODO: remember to write break statement handling
+	case *parser.BreakStmt:
+		// break statements will rewritten in the parent loop
+		breakPos := c.emit(code.OpJump, 9999)
+		c.breakPositions = append(c.breakPositions, breakPos)
 	case *parser.BlockStatement:
 		for _, s := range node.Statements {
 			err := c.Compile(s)

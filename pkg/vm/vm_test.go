@@ -420,6 +420,43 @@ func TestWhile(t *testing.T) {
 			x = x`,
 			expected: 5,
 		},
+		{
+			input: `x := 0
+            while x < 5
+                x = x + 1
+                if x == 3 
+                    break
+                end
+            end
+			x = x`,
+			expected: 3,
+		},
+		{
+			input: `x := 0
+            while x < 5
+                x = x + 1
+                if x == 3 
+                    break
+                end
+				if x == 2 
+                    break
+                end
+            end
+			x = x`,
+			expected: 2,
+		},
+		{
+			input: `x := 0
+			while true
+				while true
+					break
+				end
+				x = x + 1
+				break
+			end
+			x = x`,
+			expected: 1,
+		},
 	}
 	runVmTests(t, tests)
 }

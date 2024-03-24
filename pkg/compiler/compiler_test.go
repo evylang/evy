@@ -971,6 +971,62 @@ func TestWhile(t *testing.T) {
 				code.Make(code.OpJump, 6),
 			},
 		},
+		{
+			input: `x := 0
+		    while x < 6
+		        x = x + 1
+		        if x == 5
+		            break
+		        end
+		    end`,
+			expectedConstants: []interface{}{0, 6, 1, 5},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpLessThan),
+				code.Make(code.OpJumpNotTruthy, 45), // end of all instructions
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 3),
+				code.Make(code.OpEqual),
+				code.Make(code.OpJumpNotTruthy, 42), // fails if, end of if block instructions
+				code.Make(code.OpJump, 45),          // break -- goes to end of all instructions
+				code.Make(code.OpJump, 42),          // enters and completes if, end of if block instructions
+				code.Make(code.OpJump, 6),           // end of while block
+			},
+		},
+		{
+			input: `x := 0
+			while true
+				while true
+					break
+				end
+				x = x + 1
+				break
+			end`,
+			expectedConstants: []any{0, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpTrue),
+				code.Make(code.OpJumpNotTruthy, 36), // begin outer while
+				code.Make(code.OpTrue),
+				code.Make(code.OpJumpNotTruthy, 20), // begin inner while
+				code.Make(code.OpJump, 20),          // first break
+				code.Make(code.OpJump, 10),          // end inner while
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpJump, 36), // second break
+				code.Make(code.OpJump, 6),  //  end outer while
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

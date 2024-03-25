@@ -27,6 +27,7 @@
   --color-very-dimmed: hsl(0deg 0% 100% / 30%); /* docs expander icon */
   --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-strong: hsl(0deg 0% 100% / 40%);
+  --border-color-dialog: hsl(0deg 0% 30%);
 
   & img.logo {
     content: url("../img/logo.v1.svg");
@@ -47,6 +48,7 @@
   --color-very-dimmed: hsl(0deg 0% 0% / 30%); /* docs expander icon */
   --border-color: hsl(0deg 0% 0% / 20%);
   --border-color-strong: hsl(0deg 0% 0% / 30%);
+  --border-color-dialog: hsl(0deg 0% 0% / 10%);
 
   & img.logo {
     content: url("../img/logo-light-theme.v1.svg");

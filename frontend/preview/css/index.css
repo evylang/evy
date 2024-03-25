@@ -18,6 +18,12 @@ header.topnav {
   border-bottom: 1px solid var(--border-color);
 }
 
+header.topnav .center.mobile span {
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 16px;
+}
+
 main {
   grid-area: main;
   height: 100%;

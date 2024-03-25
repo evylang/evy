@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/primary.css" type="text/css" />
     <link rel="stylesheet" href="css/icons.css" type="text/css" />
     <link rel="stylesheet" href="css/header.css" type="text/css" />
+    <link rel="stylesheet" href="css/dialog.css" type="text/css" />
     <link rel="stylesheet" href="css/index.css" type="text/css" />
     <link rel="stylesheet" href="css/fonts.css" type="text/css" />
     <script type="importmap">
@@ -55,7 +56,7 @@
     </header>
 
     <div class="max-width-wrapper">
-      <main>
+      <main class="main">
         <div class="editor-wrap noscrollbar">
           <div class="editor" style="padding-left: calc(2ch + 1.5rem)">
             <!-- These editor sample contents are replaced by JS, once evy toolchain and editor are ready. -->
@@ -205,7 +206,7 @@
     </dialog>
 
     <!-- About Evy -->
-    <dialog id="dialog-about">
+    <dialog id="dialog-about" class="large">
       <form method="dialog">
         <header>
           <h1>About</h1>
@@ -215,7 +216,7 @@
           <object type="image/svg+xml" data="img/evy-e.v1.svg" class="evy-e">
             <img src="img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
           </object>
-          <p class="tagline">Evy is a simple programming language, made to learn coding.</p>
+          <h2>Evy is a simple programming language, made to learn coding.</h2>
           <p>
             Evy is a modern, beginner-friendly programming language that bridges the gap between
             block-based coding and conventional programming languages. Its simple syntax and small

@@ -2,6 +2,12 @@ import initThemeToggle from "./module/theme.js"
 
 initThemeToggle("#dark-theme", "theme")
 
+const aboutDialog = document.querySelector("#dialog-about")
+const showAboutDialog = document.querySelector("#show-dialog-about")
+showAboutDialog.addEventListener("click", () => {
+  aboutDialog.showModal()
+})
+
 // Open and close sidebar on mobile on hamburger click.
 const sidebar = document.querySelector("#sidebar")
 document.querySelector("#hamburger").onclick = showSidebar

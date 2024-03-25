@@ -1,9 +1,5 @@
-/* TODO: move this file to play/css/index.css once hashing is fixed in build-tools/firebase-deploy */
 :root {
   /* theme */
-  --border-color-dialog: hsl(0deg 0% 30%);
-  --header-background: hsl(213deg 10% 23%);
-  --output-background: hsl(0deg 0% 100%);
   --output-color: hsl(0deg 0% 0% / 80%);
   --output-border-dark: hsl(0deg 0% 80%);
   --output-border-mid: hsl(0deg 0% 85%);
@@ -37,11 +33,7 @@
   --output-border-radius: 6px;
   --output-border-width: 1px;
   --modal-section-width: 18rem;
-  --slide: 0;
-  --slide-transition-duration: 0.3s;
   --sidebar-width: min(100vw, 18rem);
-  --sidebar-transition-duration: 0.2s;
-  --dialog-width: min(100vw, 36rem);
 }
 
 @media (max-width: 767px) {
@@ -63,14 +55,6 @@
     --canvas-size: min(100vw, 60vh);
     --console-width: 100vw;
     --modal-section-width: 100vw;
-    --slide: -100vw;
-  }
-}
-
-@media (prefers-reduced-motion) {
-  :root {
-    --slide-transition-duration: 0;
-    --sidebar-transition-duration: 0;
   }
 }
 
@@ -142,13 +126,23 @@ button.share > div {
   top: 0;
   left: 0;
   box-shadow: 1px 4px 0 0 #00000040;
-  transition-property: translate;
-  transition-timing-function: ease-in-out;
-  transition-duration: var(--sidebar-transition-duration);
+  transition: translate 0.2s ease-in-out;
+  opacity: 1;
 }
 
 #sidebar.hidden {
   translate: -100%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion) {
+  #sidebar {
+    transition: opacity 0.2s ease-in-out;
+  }
+  #sidebar.hidden {
+    translate: 0;
+    opacity: 0;
+  }
 }
 
 #sidebar header {
@@ -200,22 +194,39 @@ button.share > div {
   height: 28px;
 }
 /* --- Main ---------------------------------------------------------- */
-main {
+.main {
   background: var(--background);
   width: var(--main-width);
   translate: var(--main-translate);
   height: calc(100vh - var(--topnav-height));
   display: flex;
   overflow: clip;
-  transition-property: translate;
-  transition-timing-function: ease-in-out;
-  transition-duration: var(--slide-transition-duration);
+  transition: translate 0.3s ease-in-out;
 }
 
-main.view-output {
-  translate: var(--slide);
+.main.view-output {
+  translate: -100vw;
 }
 
+@media (prefers-reduced-motion) {
+  .main {
+    transition: translate 0s ease-in-out 0.1s;
+  }
+  .main.animate {
+    animation: fadein 0.2s ease-in forwards;
+  }
+  @keyframes fadein {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
 .max-width-wrapper {
   max-width: var(--wrapper-max-width);
   width: 100%;
@@ -408,7 +419,7 @@ dialog .err,
 
 .output .canvas {
   margin-right: auto;
-  background: var(--output-background);
+  background: var(--color);
   width: var(--canvas-size);
   height: var(--canvas-size);
   border-top: 1px solid var(--output-border-dark);
@@ -438,7 +449,7 @@ dialog .err,
 .output .read,
 .output .input {
   padding: 16px;
-  background: var(--output-background);
+  background: var(--color);
   color: var(--output-color);
   font-family: var(--font-family-code);
   font-variant-ligatures: none;
@@ -485,7 +496,7 @@ dialog .err,
 
 .run.desktop {
   border-top: 1px solid var(--output-border-dark);
-  background: var(--output-background);
+  background: var(--color);
 }
 
 button#run,
@@ -560,11 +571,12 @@ button.running#run-mobile:active {
   display: flex;
   flex-wrap: wrap;
   height: calc(100% - var(--topnav-height));
+  align-content: flex-start;
 }
 
 #modal .modal-main .section {
   width: var(--modal-section-width);
-  padding-bottom: 16px;
+  padding-bottom: 40px;
 }
 
 #modal .modal-main h2 {
@@ -621,71 +633,7 @@ button.running#run-mobile:active {
   background: var(--modal-circle-color);
 }
 
-/* --- Share dialog --------------------------------------------------- */
-/* stylelint-disable no-descending-specificity */
-dialog {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 6px;
-  box-shadow: 4px 4px 0 0 #00000073;
-  border: 1px solid var(--border-color-dialog);
-  padding: 0;
-  width: var(--dialog-width);
-}
-
-dialog header {
-  border-bottom: 1px solid var(--border-color);
-  height: unset;
-  line-height: 1.5;
-  padding: 16px 30px;
-  background: var(--background);
-  border-radius: 5px 5px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-dialog button {
-  outline: none;
-  color: var(--color);
-  border: none;
-  cursor: pointer;
-}
-
-dialog button.icon-close {
-  color: var(--color-dimmed);
-}
-
-dialog button.icon-close:hover {
-  color: var(--color);
-}
-
-/* stylelint-enable no-descending-specificity */
-
-::backdrop {
-  background: hsl(210deg 5% 15% / 70%);
-}
-
-dialog h1 {
-  font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color);
-  padding: 0;
-}
-
-dialog main {
-  font-family: var(--font-family);
-  padding: 30px 30px 45px;
-  background: var(--background);
-  border-radius: 0 0 5px 5px;
-  height: unset;
-  flex-direction: column;
-  width: 100%;
-}
-
+/* --- Dialogs --------------------------------------------------- */
 dialog .copy {
   width: 100%;
   border-radius: 6px;
@@ -717,51 +665,11 @@ dialog .copy input {
   min-width: 10em;
 }
 
-dialog button.primary {
-  width: 100%;
-  margin-top: 30px;
-}
-
-dialog p {
-  color: var(--color-dimmed);
-}
-
 #dialog-error .err {
   font-family: var(--font-family-code);
   color: var(--color);
   margin-left: 8px;
   margin-right: 8px;
-}
-
-#dialog-about {
-  width: min(100vw, 52rem);
-}
-
-#dialog-about form {
-  display: flex;
-  flex-direction: column;
-}
-
-#dialog-about main {
-  padding-top: 42px;
-  max-height: 100vh;
-  overflow: auto;
-}
-
-#dialog-about p {
-  font-size: 1.125rem;
-  line-height: 1.8;
-  margin-top: 2rem;
-}
-
-#dialog-about .tagline {
-  font-weight: 700;
-}
-
-.evy-e {
-  height: min(50vw, 12rem);
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* --- Utilities ----------------------------------------------------- */

@@ -34,7 +34,6 @@
   --output-border-width: 1px;
   --modal-section-width: 18rem;
   --sidebar-width: min(100vw, 18rem);
-  --dialog-width: min(100vw, 36rem);
 }
 
 @media (max-width: 767px) {
@@ -634,72 +633,7 @@ button.running#run-mobile:active {
   background: var(--modal-circle-color);
 }
 
-/* --- Share dialog --------------------------------------------------- */
-/* stylelint-disable no-descending-specificity */
-dialog {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 6px;
-  box-shadow: 4px 4px 0 0 #00000073;
-  border: 1px solid var(--border-color-dialog);
-  padding: 0;
-  width: var(--dialog-width);
-}
-
-dialog header {
-  border-bottom: 1px solid var(--border-color);
-  height: unset;
-  line-height: 1.5;
-  padding: 16px 30px;
-  background: var(--background);
-  border-radius: 5px 5px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-dialog button {
-  outline: none;
-  color: var(--color);
-  border: none;
-  cursor: pointer;
-}
-
-dialog button.icon-close {
-  color: var(--color-dimmed);
-}
-
-dialog button.icon-close:hover {
-  color: var(--color);
-}
-
-/* stylelint-enable no-descending-specificity */
-
-::backdrop {
-  background: hsl(210deg 5% 15% / 70%);
-}
-
-dialog h1 {
-  font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--color);
-  padding: 0;
-}
-
-dialog main {
-  font-family: var(--font-family);
-  padding: 30px 30px 45px;
-  background: var(--background);
-  border-radius: 0 0 5px 5px;
-  height: unset;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
+/* --- Dialogs --------------------------------------------------- */
 dialog .copy {
   width: 100%;
   border-radius: 6px;
@@ -731,51 +665,11 @@ dialog .copy input {
   min-width: 10em;
 }
 
-dialog button.primary {
-  width: 100%;
-  margin-top: 30px;
-}
-
-dialog p {
-  color: var(--color-dimmed);
-}
-
 #dialog-error .err {
   font-family: var(--font-family-code);
   color: var(--color);
   margin-left: 8px;
   margin-right: 8px;
-}
-
-#dialog-about {
-  width: min(100vw, 52rem);
-}
-
-#dialog-about form {
-  display: flex;
-  flex-direction: column;
-}
-
-#dialog-about main {
-  padding-top: 42px;
-  max-height: 100vh;
-  overflow: auto;
-}
-
-#dialog-about p {
-  font-size: 1.125rem;
-  line-height: 1.8;
-  margin-top: 2rem;
-}
-
-#dialog-about .tagline {
-  font-weight: 700;
-}
-
-.evy-e {
-  height: min(50vw, 12rem);
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* --- Utilities ----------------------------------------------------- */

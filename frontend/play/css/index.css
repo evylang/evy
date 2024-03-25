@@ -572,11 +572,12 @@ button.running#run-mobile:active {
   display: flex;
   flex-wrap: wrap;
   height: calc(100% - var(--topnav-height));
+  align-content: flex-start;
 }
 
 #modal .modal-main .section {
   width: var(--modal-section-width);
-  padding-bottom: 16px;
+  padding-bottom: 40px;
 }
 
 #modal .modal-main h2 {

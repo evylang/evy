@@ -154,11 +154,11 @@ GODOCFILES = main.go
 godoc: install-slim
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
-DOCS_TARGET_DIR = frontend/preview
+DOCS_TARGET_DIR = frontend/docs
 
-## Generate static HTML documentation in frontend/preview from MarkDown in /docs
+## Generate static HTML documentation in frontend/docs from MarkDown in /docs
 docs:
-	go run ./build-tools/md docs $(DOCS_TARGET_DIR) # TODO: move to `frontend/docs/` when ready
+	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
 clean::

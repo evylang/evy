@@ -234,6 +234,7 @@ func copyFile(src, dest string) error {
 
 var (
 	subdomainRE = regexp.MustCompile(`(href|value)="/(discord|docs|learn|play)`)
+	apexRE      = regexp.MustCompile(`(href|value)="/`) // Needs to come *after* subdomainRE replacements.
 	jscssRefRE  = regexp.MustCompile(`(href|src)="(.*\.(?:css|js))"`)
 	importmapRE = regexp.MustCompile(`"(.*\.js)": "(.*\.js)"`)
 	wasmmapRE   = regexp.MustCompile(`"(.*\.wasm)": "(.*\.wasm)"`)
@@ -260,6 +261,7 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 		// Rewrite top-level path to subdomain reference
 		if a.Domain != "" {
 			line = subdomainRE.ReplaceAllString(line, `$1="https://$2.`+a.Domain)
+			line = apexRE.ReplaceAllString(line, `$1="https://`+a.Domain+"/")
 		}
 
 		if a.CacheBust {

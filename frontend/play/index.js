@@ -311,7 +311,9 @@ async function slide() {
   const el = document.querySelector("main")
   const cl = el.classList
   return new Promise((resolve) => {
-    el.ontransitionend = resolve
+    el.ontransitionend = () => setTimeout(resolve, 100)
+    el.onanimationend = () => cl.remove("animate")
+    cl.add("animate")
     onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
   })
 }

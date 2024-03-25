@@ -361,3 +361,16 @@ th {
     max-width: 600px;
   }
 }
+
+@media (max-width: 767px) and (prefers-reduced-motion) {
+  #sidebar {
+    translate: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #sidebar.show {
+    translate: 0;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

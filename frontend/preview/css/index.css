@@ -13,7 +13,7 @@ body {
     "sidebar main";
 }
 
-header {
+header.topnav {
   grid-area: header;
   border-bottom: 1px solid var(--border-color);
 }

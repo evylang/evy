@@ -40,6 +40,7 @@ jobs:
         env:
           BASEURL: ${{ env.BASEURL_APEX }}
           BASEURL_PLAY: ${{ env.BASEURL_PLAY }}
+          BASEURL_DOCS: ${{ env.BASEURL_DOCS }}
 
   howl-on-fail:
     runs-on: ubuntu-latest

@@ -141,6 +141,7 @@ code {
 }
 
 pre code {
+  padding: 0;
   color: var(--color);
   background: none;
   margin-bottom: 24px;

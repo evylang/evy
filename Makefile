@@ -154,11 +154,11 @@ GODOCFILES = main.go
 godoc: install-slim
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
-DOCS_TARGET_DIR = frontend/preview
+DOCS_TARGET_DIR = frontend/docs
 
-## Generate static HTML documentation in frontend/preview from MarkDown in /docs
+## Generate static HTML documentation in frontend/docs from MarkDown in /docs
 docs:
-	go run ./build-tools/md docs $(DOCS_TARGET_DIR) # TODO: move to `frontend/docs/` when ready
+	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
 clean::
@@ -171,7 +171,13 @@ clean::
 			! -regex '$(DOCS_TARGET_DIR)/index.js' \
 			-delete
 
-.PHONY: doc docs doctest godoc sdocs toc usage
+test-urls:
+	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
+		sort -u | \
+		xargs -n1 curl  -sL -o /dev/null -w "%{http_code} %{url}\n"  | \
+		grep -v '^200 '
+
+.PHONY: doc docs doctest godoc sdocs test-urls toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node

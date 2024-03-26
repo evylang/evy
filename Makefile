@@ -171,7 +171,13 @@ clean::
 			! -regex '$(DOCS_TARGET_DIR)/index.js' \
 			-delete
 
-.PHONY: doc docs doctest godoc sdocs toc usage
+test-urls:
+	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
+		sort -u | \
+		xargs -n1 curl  -sL -o /dev/null -w "%{http_code} %{url}\n"  | \
+		grep -v '^200 '
+
+.PHONY: doc docs doctest godoc sdocs test-urls toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node

@@ -44,7 +44,7 @@ Here is a "hello world" program in Evy
 
 Here are some resources for learning more about Evy:
 
-- [Learn and Practise](https://github.com/evylang/evy/wiki): A guided tour that teaches you programming using Evy.
+- [Learn and Practise]\: A guided tour that teaches you programming using Evy.
 - [Syntax by Example](docs/syntax_by_example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
@@ -52,6 +52,7 @@ Here are some resources for learning more about Evy:
 For questions and discussions, join the [Evy community] on Discord.
 
 [Evy community]: https://discord.evy.dev
+[Learn and Practise]: https://github.com/evylang/evy/wiki
 
 ## 📦 Installation
 

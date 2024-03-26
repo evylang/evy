@@ -462,6 +462,28 @@ func TestWhile(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestFor(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `x := 0
+			for i := range 10
+				x = i
+			end
+			x = x`,
+			expected: 9,
+		},
+		{
+			input: `x := 0
+			for i := range [1 2 3]
+				x = i
+			end
+			x = x`,
+			expected: 3,
+		},
+	}
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected any
@@ -478,7 +500,6 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		if err := comp.Compile(program); err != nil {
 			t.Fatalf("compiler error: %s", err)
 		}
-
 		vm := New(comp.Bytecode())
 		err = vm.Run()
 		if err != nil {

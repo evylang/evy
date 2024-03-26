@@ -224,7 +224,66 @@ func (c *Compiler) Compile(node parser.Node) error {
 			}
 		}
 	case *parser.ForStmt:
-		// TODO: remember to write break statement handling
+		// push an empty var onto the stack for the loop
+		c.emit(code.OpConstant, c.addConstant(&object.Integer{Value: 0}))
+		symbol := c.symbolTable.Define(node.LoopVar.Name)
+		c.emit(code.OpSetGlobal, symbol.Index)
+		if err := c.Compile(node.LoopVar); err != nil {
+			return err
+		}
+		if err := c.Compile(node.Range); err != nil {
+			return err
+		}
+		// push an iterator onto the iterstack
+		c.emit(code.OpIterPush)
+		startPos := len(c.instructions)
+		// Prepare end position of while block, jump to end if there are no more elements
+		jumpPos := c.emit(code.OpJumpIter, 9999)
+		if err := c.Compile(node.Block); err != nil {
+			return err
+		}
+		// Jump back to start
+		c.emit(code.OpJump, startPos)
+		// rewrite jumpiter to send the vm over the jump instruction
+		// and continue execution
+		afterBlockPos := len(c.instructions)
+		c.changeOperand(jumpPos, afterBlockPos)
+		// pop an iterator from the iterstack
+		c.emit(code.OpIterPop)
+
+		// handle break statements
+		for i := len(c.breakPositions) - 1; i >= 0; i-- {
+			brkPos := c.breakPositions[i]
+			if brkPos > startPos && brkPos < afterBlockPos {
+				c.changeOperand(brkPos, afterBlockPos)
+				c.breakPositions = slices.Delete(c.breakPositions, i, i+1)
+			} else {
+				break
+			}
+		}
+	case *parser.StepRange:
+		start := node.Start
+		if start == nil {
+			start = &parser.NumLiteral{Value: 0}
+		}
+		if err := c.Compile(start); err != nil {
+			return err
+		}
+		step := node.Step
+		if step == nil {
+			step = &parser.NumLiteral{Value: 1}
+		}
+		if err := c.Compile(step); err != nil {
+			return err
+		}
+		stop := node.Stop
+		if stop == nil {
+			stop = &parser.NumLiteral{Value: 1}
+		}
+		if err := c.Compile(stop); err != nil {
+			return err
+		}
+		c.emit(code.OpStepRange)
 	case *parser.BreakStmt:
 		// break statements will rewritten in the parent loop
 		breakPos := c.emit(code.OpJump, 9999)

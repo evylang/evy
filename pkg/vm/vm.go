@@ -27,7 +27,8 @@ type VM struct {
 	stack []object.Object
 	sp    int // Always points to the next value. Top of stack is stack[sp-1]
 
-	globals []object.Object
+	globals   []object.Object
+	iterators []object.Iterable
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
@@ -38,7 +39,8 @@ func New(bytecode *compiler.Bytecode) *VM {
 		stack: make([]object.Object, StackSize),
 		sp:    0,
 
-		globals: make([]object.Object, GlobalsSize),
+		globals:   make([]object.Object, GlobalsSize),
+		iterators: make([]object.Iterable, 10),
 	}
 }
 
@@ -200,6 +202,41 @@ func (vm *VM) Run() error {
 			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
 			// set ip to the position - 1 because the for loop will increment it
 			ip = pos - 1
+		case code.OpJumpIter:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			iter := vm.iterators[len(vm.iterators)-1]
+			if !iter.Next() {
+				// set ip to the position - 1 because the for loop will increment it
+				ip = pos - 1
+			}
+		case code.OpIterPush:
+			iter := vm.pop()
+			loopVar := vm.pop()
+			switch t := iter.(type) {
+			case *object.Array:
+				vm.iterators = append(vm.iterators, &object.ArrayRange{Array: t, LoopVar: loopVar})
+			case *object.StepRange:
+				t.LoopVar = loopVar.(*object.Integer)
+				vm.iterators = append(vm.iterators, t)
+			default:
+				return fmt.Errorf("unrecognised iterator %T", iter)
+			}
+		case code.OpIterPop:
+			vm.iterators = vm.iterators[:len(vm.iterators)-1]
+		case code.OpStepRange:
+			stop := vm.pop().(*object.Integer)
+			step := vm.pop().(*object.Integer)
+			start := vm.pop().(*object.Integer)
+			err := vm.push(&object.StepRange{
+				Cur:  int(start.Value),
+				Stop: int(stop.Value),
+				Step: int(step.Value),
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
 

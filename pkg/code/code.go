@@ -33,6 +33,10 @@ var definitions = map[Opcode]*Definition{
 	OpMap:              {"OpMap", []int{2}},
 	OpIndex:            {"OpIndex", []int{}},
 	OpSlice:            {"OpSlice", []int{}},
+	OpStepRange:        {"OpStepRange", []int{}},
+	OpJumpIter:         {"OpIterJump", []int{2}},
+	OpIterPush:         {"OpIterPush", []int{}},
+	OpIterPop:          {"OpIterPop", []int{}},
 }
 
 const (
@@ -64,6 +68,11 @@ const (
 	OpMap
 	OpIndex
 	OpSlice
+
+	OpStepRange
+	OpIterPush
+	OpIterPop
+	OpJumpIter
 
 	OpJump
 	OpJumpNotTruthy

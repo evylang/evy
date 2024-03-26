@@ -20,6 +20,7 @@ const (
 	STRING_OBJ  = "STRING"
 	ARRAY_OBJ   = "ARRAY"
 	MAP_OBJ     = "MAP"
+	RANGE_OBJ   = "RANGE"
 )
 
 type HashKey struct {
@@ -42,6 +43,10 @@ type Indexable interface {
 
 type Sliceable interface {
 	Slice(start, end Object) (Object, error)
+}
+
+type Iterable interface {
+	Next() bool
 }
 
 // TODO: rename this to num to match evy spec
@@ -201,6 +206,28 @@ func (a *Array) Slice(start, end Object) (Object, error) {
 	return &Array{Elements: a.Elements[startIdx:endIdx]}, nil
 }
 
+type ArrayRange struct {
+	LoopVar Object
+	cur     int
+	Array   *Array
+}
+
+func (a *ArrayRange) Next() bool {
+	elements := a.Array.Elements
+	if a.cur >= len(elements) {
+		return false
+	}
+	if a.LoopVar != nil {
+		v, err := a.Array.Index(&Integer{Value: float64(a.cur)})
+		if err != nil {
+			panic(err.Error())
+		}
+		a.LoopVar = v
+	}
+	a.cur++
+	return true
+}
+
 type Map map[string]Object
 
 func (m Map) Type() ObjectType { return MAP_OBJ }
@@ -237,4 +264,33 @@ func indexOutOfBounds(i, length int) error {
 		return fmt.Errorf("index out of bounds: %d len: %d", i, length)
 	}
 	return nil
+}
+
+// StepRange represents a range over a number as per the spec:
+// https://github.com/evylang/evy/blob/main/docs/syntax_by_example.md#for--range-number
+type StepRange struct {
+	Cur     int
+	Stop    int
+	Step    int
+	LoopVar *Integer
+}
+
+func (r StepRange) Type() ObjectType { return RANGE_OBJ }
+func (r StepRange) Inspect() string {
+	return fmt.Sprintf("[%d %d %d]", r.Cur, r.Stop, r.Step)
+}
+
+// copied from ./pkg/evaluator/ranger.go
+func (s *StepRange) Next() bool {
+	if s.Step > 0 && s.Cur >= s.Stop {
+		return false
+	}
+	if s.Step < 0 && s.Cur <= s.Stop {
+		return false
+	}
+	if s.LoopVar != nil {
+		s.LoopVar.Value = float64(s.Cur)
+	}
+	s.Cur += s.Step
+	return true
 }

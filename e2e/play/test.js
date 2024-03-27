@@ -107,5 +107,11 @@ end
         await expect(page).toHaveScreenshot("no-dialog.png")
       }
     })
+
+    test("read input", async ({ page, baseURL }, testInfo) => {
+      await page.goto(baseURL + "#echo")
+      await page.waitForLoadState("networkidle")
+      await expect(page).toHaveScreenshot("read-input.png")
+    })
   })
 }

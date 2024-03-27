@@ -60,11 +60,11 @@ for (const baseURL of baseURLs) {
       await page.locator(".expander").nth(1).click()
       await expect(page).toHaveScreenshot("expand-1.png", sreenshotOpts)
 
-      const link = await page.getByRole("link", { name: "Evy Syntax Grammar" })
+      const link = await page.getByRole("link", { name: "Comment" })
       await link.hover()
-      await expect(page).toHaveScreenshot("syntax-hover.png", sreenshotOpts)
+      await expect(page).toHaveScreenshot("comment-hover.png", sreenshotOpts)
       await link.click()
-      await expect(page).toHaveScreenshot("syntax-page.png", sreenshotOpts)
+      await expect(page).toHaveScreenshot("comment-page.png", sreenshotOpts)
     })
 
     test("docs crawl", async ({ page, baseURL }) => {

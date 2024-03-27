@@ -319,6 +319,9 @@ th {
   padding: 0;
 }
 
+#sidebar ul.icons li:last-child {
+  margin-left: auto;
+}
 /* --- responsive -------------------------------------------------------- */
 #hamburger {
   cursor: pointer;

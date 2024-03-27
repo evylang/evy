@@ -463,6 +463,7 @@ dialog .err,
   font-family: var(--font-family-code);
   font-variant-ligatures: none;
   color: var(--output-color);
+  background: var(--color);
   -webkit-text-fill-color: var(--output-color);
   line-height: 1.5;
   height: 1.5em;

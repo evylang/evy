@@ -17,14 +17,12 @@ for (const baseURL of baseURLs) {
 
     test("docs about", async ({ page, baseURL }, testInfo) => {
       await page.goto(baseURL)
-      await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("start.png")
       if (page.viewportSize().width <= 767) {
         return // no theme toggle on mobile
       }
 
       await page.getByRole("button", { name: "About" }).click()
-      await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("dialog.png")
 
       await page.getByRole("button", { name: "Done" }).click()
@@ -34,7 +32,6 @@ for (const baseURL of baseURLs) {
       await expect(page).toHaveScreenshot("start-theme.png")
 
       await page.getByRole("button", { name: "About" }).click()
-      await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("dialog-theme.png")
     })
 

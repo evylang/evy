@@ -19,7 +19,7 @@ for (const baseURL of baseURLs) {
       await page.goto(baseURL)
       await page.waitForLoadState("networkidle")
       await page.getByRole("button", { name: "Run" }).click()
-      await new Promise((resolve) => setTimeout(resolve, 200)) // wait for animation to finish.
+      await new Promise((resolve) => setTimeout(resolve, 300)) // wait for animation to finish.
       await expect(page.locator("#console")).toContainText("x: 12 🍦 big x")
       await expect(page).toHaveScreenshot("console-output.png")
     })

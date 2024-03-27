@@ -6,12 +6,12 @@ main() {
 	local channel result urls environ
 
 	if (($# > 2)); then
-		exit_error "usage [ENV=stage [CHANNEL=dev]]"
+		exit_error "usage [ENV=test [CHANNEL=dev]]"
 	fi
 
 	on_ci && setup_ci_creds
 
-	environ=$(get_environment "${1:-stage}") || exit $?
+	environ=$(get_environment "${1:-test}") || exit $?
 	channel=$(get_channel "${2:-}")
 
 	rm -rf out/firebase
@@ -19,8 +19,8 @@ main() {
 
 	if [[ "${channel}" == "live" ]]; then
 		local domain
-		[[ "${environ}" == "prod" ]] && domain="evy.dev" || domain="evystage.dev"
-		go run ./build-tools/site-gen --cache-bust --domain="$domain" frontend out/firebase/public
+		domain=$(get_domain "${environ}")
+		go run ./build-tools/site-gen --cache-bust --domain="${domain}" frontend out/firebase/public
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
 		on_ci && make_env_urls "${environ}" >>"$GITHUB_ENV"
@@ -57,10 +57,16 @@ setup_ci_creds() {
 
 get_environment() {
 	local environ="$1"
-	if [[ "${environ}" != "stage" && "${environ}" != "default" && "${environ}" != "prod" ]]; then
-		exit_error "unknown environment: ${environ} (expected: stage, default or prod)"
+	if [[ "${environ}" != "test" && "${environ}" != "stage" && "${environ}" != "prod" ]]; then
+		exit_error "unknown environment: ${environ} (expected: test, stage or prod)"
 	fi
 	echo "${environ}"
+}
+
+get_domain() {
+	local env="$1"
+	local -A domains=([test]=evytest.dev [stage]=evystage.dev [prod]=evy.dev)
+	echo "${domains[${env}]?"Unknown environment: '${env}'. Must be one of: ${!domains[*]}"}"
 }
 
 get_channel() {
@@ -151,9 +157,8 @@ make_env_urls() {
 	# Generate URLs for the deployment environment for a live firebase site, with an
 	# APEX url and a bunch of subdomain URLS.
 
-	local -A domains=([stage]=evystage.dev [prod]=evy.dev)
-	local subdomains=(discord docs learn play)
-	local domain="${domains[${env}]?"Unknown environment: '${env}'. Must be one of: ${!domains[*]}"}"
+	local domain subdomains=(discord docs learn play)
+	domain=$(get_domain "${env}")
 
 	printf 'BASEURL_APEX=https://%s\n' "${domain}"
 	for sub in "${subdomains[@]}"; do

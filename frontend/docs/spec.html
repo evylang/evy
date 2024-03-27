@@ -40,18 +40,6 @@
           <a href="index.html"><strong>Documentation</strong></a>
           <a href="/play">Playground</a>
           <button id="show-dialog-about">About</button>
-          <label class="theme switch">
-            <input type="checkbox" id="dark-theme" />
-            <span class="slider"></span>
-            <script>
-              // Inline JS to avoid flash of other theme.
-              const theme = window.localStorage.getItem("theme")
-              const systemDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-              if (theme === "dark" || (!theme && systemDarkTheme)) {
-                document.querySelector("#dark-theme").checked = true
-              }
-            </script>
-          </label>
         </nav>
         <a href="/" class="mobile logo-small"></a>
       </div>
@@ -65,98 +53,93 @@
       <ul>
         <li><a href="index.html">Overview</a></li>
         <li>
-          <a href="spec.html">Language Specification</a>
+          <a href="syntax_by_example.html">Syntax by Example</a>
           <div class="expander"></div>
           <ul>
+            <li><a href="syntax_by_example.html#comment">Comment</a></li>
+            <li><a href="syntax_by_example.html#declaration">Declaration</a></li>
+            <li><a href="syntax_by_example.html#assignment">Assignment</a></li>
+            <li><a href="syntax_by_example.html#expression">Expression</a></li>
+            <li><a href="syntax_by_example.html#strings">Strings</a></li>
             <li>
-              <a href="spec.html#syntax-grammar">Syntax Grammar</a>
-              <div class="expander"></div>
-              <ul>
-                <li><a href="spec.html#wsn-syntax-grammar">WSN Syntax Grammar</a></li>
-                <li><a href="spec.html#evy-syntax-grammar">Evy Syntax Grammar</a></li>
-              </ul>
-            </li>
-            <li><a href="spec.html#comments">Comments</a></li>
-            <li><a href="spec.html#types">Types</a></li>
-            <li><a href="spec.html#variables-and-declarations">Variables and Declarations</a></li>
-            <li><a href="spec.html#zero-values">Zero Values</a></li>
-            <li><a href="spec.html#assignments">Assignments</a></li>
-            <li><a href="spec.html#copy-and-reference">Copy and Reference</a></li>
-            <li><a href="spec.html#variable-names">Variable Names</a></li>
-            <li><a href="spec.html#scope">Scope</a></li>
-            <li><a href="spec.html#strings">Strings</a></li>
-            <li><a href="spec.html#arrays">Arrays</a></li>
-            <li><a href="spec.html#maps">Maps</a></li>
-            <li><a href="spec.html#index-and-slice">Index and Slice</a></li>
-            <li>
-              <a href="spec.html#operators-and-expressions">Operators and Expressions</a>
+              <a href="syntax_by_example.html#if-statements"><code>if</code> statements</a>
               <div class="expander"></div>
               <ul>
                 <li>
-                  <a href="spec.html#arithmetic-and-concatenation-operators"
-                    >Arithmetic and Concatenation Operators</a
-                  >
-                </li>
-                <li><a href="spec.html#logical-operators">Logical Operators</a></li>
-                <li><a href="spec.html#comparison-operators">Comparison Operators</a></li>
-                <li><a href="spec.html#unary-operators">Unary Operators</a></li>
-              </ul>
-            </li>
-            <li><a href="spec.html#precedence">Precedence</a></li>
-            <li><a href="spec.html#statements">Statements</a></li>
-            <li>
-              <a href="spec.html#whitespace">Whitespace</a>
-              <div class="expander"></div>
-              <ul>
-                <li><a href="spec.html#vertical-whitespace">Vertical Whitespace</a></li>
-              </ul>
-            </li>
-            <li><a href="spec.html#horizontal-whitespace">Horizontal Whitespace</a></li>
-            <li>
-              <a href="spec.html#functions">Functions</a>
-              <div class="expander"></div>
-              <ul>
-                <li><a href="spec.html#bare-returns">Bare Returns</a></li>
-                <li><a href="spec.html#function-names">Function Names</a></li>
-                <li><a href="spec.html#anonymous-parameters">Anonymous Parameters</a></li>
-                <li><a href="spec.html#variadic-functions">Variadic Functions</a></li>
-              </ul>
-            </li>
-            <li><a href="spec.html#break-and-return">Break and Return</a></li>
-            <li><a href="spec.html#typeof">Typeof</a></li>
-            <li><a href="spec.html#type-assertion">Type Assertion</a></li>
-            <li>
-              <a href="spec.html#assignability">Assignability</a>
-              <div class="expander"></div>
-              <ul>
-                <li>
-                  <a href="spec.html#assignability-of-variable-values"
-                    >Assignability of variable values</a
-                  >
-                </li>
-                <li>
-                  <a href="spec.html#assignability-of-constant-values"
-                    >Assignability of constant values</a
-                  >
-                </li>
-                <li>
-                  <a href="spec.html#assignability-of-empty-composite-literals"
-                    >Assignability of empty composite literals</a
-                  >
+                  <a href="syntax_by_example.html#nested-if">Nested <code>if</code></a>
                 </li>
               </ul>
             </li>
             <li>
-              <a href="spec.html#run-time-panics-and-recoverable-errors"
-                >Run-time Panics and Recoverable Errors</a
-              >
+              <a href="syntax_by_example.html#loop-statements">Loop statements</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#while-loop"><code>while</code> loop</a>
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-number"
+                    ><code>for</code> … <code>range</code> number</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-array"
+                    ><code>for</code> … <code>range</code> array</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#for-range-map"
+                    ><code>for</code> … <code>range</code> map</a
+                  >
+                </li>
+                <li>
+                  <a href="syntax_by_example.html#break"><code>break</code></a>
+                </li>
+              </ul>
             </li>
             <li>
-              <a href="spec.html#execution-model-and-event-handlers"
-                >Execution Model and Event Handlers</a
-              >
+              <a href="syntax_by_example.html#function-definition">Function definition</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="syntax_by_example.html#no-return-type">No return type</a></li>
+                <li><a href="syntax_by_example.html#variadic">Variadic</a></li>
+                <li><a href="syntax_by_example.html#function-calls">Function calls</a></li>
+              </ul>
             </li>
-            <li><a href="spec.html#runtimes">Runtimes</a></li>
+            <li>
+              <a href="syntax_by_example.html#array">Array</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#array-element-access">Array element access</a>
+                </li>
+                <li><a href="syntax_by_example.html#concatenation">Concatenation</a></li>
+                <li><a href="syntax_by_example.html#slicing">Slicing</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#map">Map</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="syntax_by_example.html#map-value-access">Map value access</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="syntax_by_example.html#any"><code>any</code></a>
+            </li>
+            <li><a href="syntax_by_example.html#type-assertion">Type assertion</a></li>
+            <li><a href="syntax_by_example.html#type-reflection">Type reflection</a></li>
+            <li>
+              <a href="syntax_by_example.html#event-handling">Event handling</a>
+              <div class="expander"></div>
+              <ul>
+                <li>
+                  <a href="syntax_by_example.html#event-handlers-with-parameters"
+                    >Event handlers with parameters</a
+                  >
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
@@ -417,93 +400,98 @@
           </ul>
         </li>
         <li>
-          <a href="syntax_by_example.html">Syntax by Example</a>
+          <a href="spec.html">Language Specification</a>
           <div class="expander"></div>
           <ul>
-            <li><a href="syntax_by_example.html#comment">Comment</a></li>
-            <li><a href="syntax_by_example.html#declaration">Declaration</a></li>
-            <li><a href="syntax_by_example.html#assignment">Assignment</a></li>
-            <li><a href="syntax_by_example.html#expression">Expression</a></li>
-            <li><a href="syntax_by_example.html#strings">Strings</a></li>
             <li>
-              <a href="syntax_by_example.html#if-statements"><code>if</code> statements</a>
+              <a href="spec.html#syntax-grammar">Syntax Grammar</a>
               <div class="expander"></div>
               <ul>
-                <li>
-                  <a href="syntax_by_example.html#nested-if">Nested <code>if</code></a>
-                </li>
+                <li><a href="spec.html#wsn-syntax-grammar">WSN Syntax Grammar</a></li>
+                <li><a href="spec.html#evy-syntax-grammar">Evy Syntax Grammar</a></li>
               </ul>
             </li>
+            <li><a href="spec.html#comments">Comments</a></li>
+            <li><a href="spec.html#types">Types</a></li>
+            <li><a href="spec.html#variables-and-declarations">Variables and Declarations</a></li>
+            <li><a href="spec.html#zero-values">Zero Values</a></li>
+            <li><a href="spec.html#assignments">Assignments</a></li>
+            <li><a href="spec.html#copy-and-reference">Copy and Reference</a></li>
+            <li><a href="spec.html#variable-names">Variable Names</a></li>
+            <li><a href="spec.html#scope">Scope</a></li>
+            <li><a href="spec.html#strings">Strings</a></li>
+            <li><a href="spec.html#arrays">Arrays</a></li>
+            <li><a href="spec.html#maps">Maps</a></li>
+            <li><a href="spec.html#index-and-slice">Index and Slice</a></li>
             <li>
-              <a href="syntax_by_example.html#loop-statements">Loop statements</a>
+              <a href="spec.html#operators-and-expressions">Operators and Expressions</a>
               <div class="expander"></div>
               <ul>
                 <li>
-                  <a href="syntax_by_example.html#while-loop"><code>while</code> loop</a>
+                  <a href="spec.html#arithmetic-and-concatenation-operators"
+                    >Arithmetic and Concatenation Operators</a
+                  >
                 </li>
+                <li><a href="spec.html#logical-operators">Logical Operators</a></li>
+                <li><a href="spec.html#comparison-operators">Comparison Operators</a></li>
+                <li><a href="spec.html#unary-operators">Unary Operators</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#precedence">Precedence</a></li>
+            <li><a href="spec.html#statements">Statements</a></li>
+            <li>
+              <a href="spec.html#whitespace">Whitespace</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="spec.html#vertical-whitespace">Vertical Whitespace</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#horizontal-whitespace">Horizontal Whitespace</a></li>
+            <li>
+              <a href="spec.html#functions">Functions</a>
+              <div class="expander"></div>
+              <ul>
+                <li><a href="spec.html#bare-returns">Bare Returns</a></li>
+                <li><a href="spec.html#function-names">Function Names</a></li>
+                <li><a href="spec.html#anonymous-parameters">Anonymous Parameters</a></li>
+                <li><a href="spec.html#variadic-functions">Variadic Functions</a></li>
+              </ul>
+            </li>
+            <li><a href="spec.html#break-and-return">Break and Return</a></li>
+            <li><a href="spec.html#typeof">Typeof</a></li>
+            <li><a href="spec.html#type-assertion">Type Assertion</a></li>
+            <li>
+              <a href="spec.html#assignability">Assignability</a>
+              <div class="expander"></div>
+              <ul>
                 <li>
-                  <a href="syntax_by_example.html#for-range-number"
-                    ><code>for</code> … <code>range</code> number</a
+                  <a href="spec.html#assignability-of-variable-values"
+                    >Assignability of variable values</a
                   >
                 </li>
                 <li>
-                  <a href="syntax_by_example.html#for-range-array"
-                    ><code>for</code> … <code>range</code> array</a
+                  <a href="spec.html#assignability-of-constant-values"
+                    >Assignability of constant values</a
                   >
                 </li>
                 <li>
-                  <a href="syntax_by_example.html#for-range-map"
-                    ><code>for</code> … <code>range</code> map</a
-                  >
-                </li>
-                <li>
-                  <a href="syntax_by_example.html#break"><code>break</code></a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="syntax_by_example.html#function-definition">Function definition</a>
-              <div class="expander"></div>
-              <ul>
-                <li><a href="syntax_by_example.html#no-return-type">No return type</a></li>
-                <li><a href="syntax_by_example.html#variadic">Variadic</a></li>
-                <li><a href="syntax_by_example.html#function-calls">Function calls</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="syntax_by_example.html#array">Array</a>
-              <div class="expander"></div>
-              <ul>
-                <li>
-                  <a href="syntax_by_example.html#array-element-access">Array element access</a>
-                </li>
-                <li><a href="syntax_by_example.html#concatenation">Concatenation</a></li>
-                <li><a href="syntax_by_example.html#slicing">Slicing</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="syntax_by_example.html#map">Map</a>
-              <div class="expander"></div>
-              <ul>
-                <li><a href="syntax_by_example.html#map-value-access">Map value access</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="syntax_by_example.html#any"><code>any</code></a>
-            </li>
-            <li><a href="syntax_by_example.html#type-assertion">Type assertion</a></li>
-            <li><a href="syntax_by_example.html#type-reflection">Type reflection</a></li>
-            <li>
-              <a href="syntax_by_example.html#event-handling">Event handling</a>
-              <div class="expander"></div>
-              <ul>
-                <li>
-                  <a href="syntax_by_example.html#event-handlers-with-parameters"
-                    >Event handlers with parameters</a
+                  <a href="spec.html#assignability-of-empty-composite-literals"
+                    >Assignability of empty composite literals</a
                   >
                 </li>
               </ul>
             </li>
+            <li>
+              <a href="spec.html#run-time-panics-and-recoverable-errors"
+                >Run-time Panics and Recoverable Errors</a
+              >
+            </li>
+            <li>
+              <a href="spec.html#execution-model-and-event-handlers"
+                >Execution Model and Event Handlers</a
+              >
+            </li>
+            <li><a href="spec.html#runtimes">Runtimes</a></li>
           </ul>
         </li>
         <li>
@@ -523,6 +511,18 @@
         <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
         <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
         <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
+        <li>
+          <label class="theme switch">
+            <input type="checkbox" id="dark-theme" checked />
+            <span class="slider"></span>
+            <script>
+              // Inline JS to avoid flash of other theme.
+              if (window.localStorage.getItem("theme") === "light") {
+                document.querySelector("#dark-theme").checked = false
+              }
+            </script>
+          </label>
+        </li>
       </ul>
     </nav>
 

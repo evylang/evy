@@ -38,18 +38,6 @@
       <div class="right">
         <nav class="docs-nav">
           <button id="show-dialog-about">About</button>
-          <label class="theme switch">
-            <input type="checkbox" id="dark-theme" />
-            <span class="slider"></span>
-            <script>
-              // Inline JS to avoid flash of other theme.
-              const theme = window.localStorage.getItem("theme")
-              const systemDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-              if (theme === "dark" || (!theme && systemDarkTheme)) {
-                document.querySelector("#dark-theme").checked = true
-              }
-            </script>
-          </label>
         </nav>
         <a href="/" class="mobile logo-small"></a>
       </div>

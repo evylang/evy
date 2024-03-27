@@ -226,6 +226,8 @@ func (w *walker) walk(n node) {
 		updateLink(n)
 	case *markdown.Heading:
 		w.updateHeading(n)
+	case *markdown.CodeBlock:
+		updateLanguageInfo(n)
 	}
 }
 
@@ -265,6 +267,10 @@ func updateLink(mdl *markdown.Link) {
 	// relative path, fix *.md filenames
 	u.Path = htmlFilename(u.Path)
 	mdl.URL = u.String()
+}
+
+func updateLanguageInfo(codblock *markdown.CodeBlock) {
+	codblock.Info = strings.ReplaceAll(codblock.Info, ":", "-")
 }
 
 // updateHeading inserts a [markdown.Inline] element at the start of a

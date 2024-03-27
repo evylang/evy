@@ -1,5 +1,7 @@
+import hightlightEvy from "./module/highlight.js"
 import initThemeToggle from "./module/theme.js"
 
+// --- ThemeToggle ----------------------------------------------------
 initThemeToggle("#dark-theme", "theme")
 
 const aboutDialog = document.querySelector("#dialog-about")
@@ -8,6 +10,12 @@ showAboutDialog.addEventListener("click", () => {
   aboutDialog.showModal()
 })
 
+// --- Syntax coloring -----------------------------------------------
+document.querySelectorAll(".language-evy").forEach((el) => {
+  el.innerHTML = hightlightEvy(el.textContent)
+})
+
+// --- Sidebar -------------------------------------------------------
 // Open and close sidebar on mobile on hamburger click.
 const sidebar = document.querySelector("#sidebar")
 document.querySelector("#hamburger").onclick = showSidebar

@@ -155,7 +155,10 @@ table {
   white-space: nowrap;
 }
 tr {
-  border-bottom: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+}
+thead > tr {
+  border-top: none;
 }
 th,
 td {

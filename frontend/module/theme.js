@@ -15,7 +15,5 @@ export default function initThemeToggle(selector, storageKey) {
   const toggle = document.querySelector(selector)
   toggle.addEventListener("click", (e) => updateTheme(e.target.checked))
 
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-  mediaQuery.addListener(() => updateTheme(mediaQuery.matches))
   return updateTheme
 }

@@ -1,7 +1,8 @@
 {
   "projects": {
-    "default": "evy-lang-stage",
+    "default": "evy-lang-test",
     "stage": "evy-lang-stage",
+    "test": "evy-lang-test",
     "prod": "evy-lang"
   },
   "targets": {
@@ -21,6 +22,25 @@
         ],
         "play": [
           "evy-lang-stage-play"
+        ]
+      }
+    },
+    "evy-lang-test": {
+      "hosting": {
+        "apex": [
+          "evy-lang-test"
+        ],
+        "discord": [
+          "evy-lang-test-discord"
+        ],
+        "docs": [
+          "evy-lang-test-docs"
+        ],
+        "learn": [
+          "evy-lang-test-learn"
+        ],
+        "play": [
+          "evy-lang-test-play"
         ]
       }
     },

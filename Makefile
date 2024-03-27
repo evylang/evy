@@ -266,12 +266,17 @@ deploy-prod: build-tiny
 deploy-stage: build-tiny
 	./build-tools/firebase-deploy stage live
 
-## Deploy to dev (or other) channel on firebase stage.
+## Deploy to live channel on firebase test.
+## `firebase login` for first time local usage
+deploy-test: build-tiny
+	./build-tools/firebase-deploy test live
+
+## Deploy to dev (or other) channel on firebase test.
 ## `firebase login` for first time local usage
 deploy: build-tiny
-	./build-tools/firebase-deploy stage
+	./build-tools/firebase-deploy test
 
-.PHONY: deploy deploy-prod deploy-stage
+.PHONY: deploy deploy-prod deploy-stage deploy-test
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = build-tools/firebase-deploy .github/scripts/app_token

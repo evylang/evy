@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="./css/switch.css" type="text/css" />
     <link rel="stylesheet" href="./css/dialog.css" type="text/css" />
     <link rel="stylesheet" href="./css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="./css/syntax.css" type="text/css" />
     <link rel="stylesheet" href="./css/index.css" type="text/css" />
     <link rel="stylesheet" href="./css/fonts.css" type="text/css" />
     <script type="importmap">
       {
         "imports": {
+          "./module/highlight.js": "./module/highlight.js",
           "./module/theme.js": "./module/theme.js"
         }
       }
@@ -557,7 +559,7 @@ print &quot;array:&quot; [1 2 3]
 print &quot;map:&quot; {name:&quot;Scholl&quot; age:21}
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">Hello
+        <pre><code class="language-evy-output">Hello
 2 true blue
 array: [1 2 3]
 map: {name:Scholl age:21}
@@ -580,7 +582,7 @@ map: {name:Scholl age:21}
         <pre><code class="language-evy">print &quot;Here's a tab: 👉\t👈\nShe said: \&quot;Thank you!\&quot;&quot;
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">Here's a tab: 👉	👈
+        <pre><code class="language-evy-output">Here's a tab: 👉	👈
 She said: &quot;Thank you!&quot;
 </code></pre>
         <p>
@@ -597,10 +599,10 @@ She said: &quot;Thank you!&quot;
 print &quot;Hello, &quot;+name+&quot;!&quot;
 </code></pre>
         <p>Input</p>
-        <pre><code class="language-evy:input">Mary Jackson
+        <pre><code class="language-evy-input">Mary Jackson
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">Hello, Mary Jackson!
+        <pre><code class="language-evy-output">Hello, Mary Jackson!
 </code></pre>
         <h4>Reference</h4>
         <pre><code>read:string
@@ -624,7 +626,7 @@ cls
 print &quot;Bye&quot;
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">Bye
+        <pre><code class="language-evy-output">Bye
 </code></pre>
         <h4>Reference</h4>
         <pre><code>cls
@@ -684,7 +686,7 @@ printf &quot;Array: %v\n&quot; [1 2 3]
 printf &quot;Map: %v\n&quot; {a:1 b:2}
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">The tank is 100% full.
+        <pre><code class="language-evy-output">The tank is 100% full.
 
 It is rainy today.
 There will be 10mm of rainfall.
@@ -813,7 +815,7 @@ printf &quot;left:   |%-7.2v|\n&quot; &quot;abcd&quot;
 printf &quot;zeropad:|%07.2f|\n&quot; 1.2345
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">right:  |   1.00|
+        <pre><code class="language-evy-output">right:  |   1.00|
 left:   |ab     |
 zeropad:|0001.23|
 </code></pre>
@@ -834,7 +836,7 @@ l = len {a:3 b:4 c:5}
 print &quot;len {a:3 b:4 c:5}:&quot; l
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">len &quot;abcd&quot;: 4
+        <pre><code class="language-evy-output">len &quot;abcd&quot;: 4
 len [1 2]: 2
 len {a:3 b:4 c:5}: 3
 </code></pre>
@@ -868,7 +870,7 @@ print &quot;typeof [1 2 true]:&quot; t
 print &quot;typeof []:&quot; (typeof [])
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">typeof &quot;abcd&quot;: string
+        <pre><code class="language-evy-output">typeof &quot;abcd&quot;: string
 typeof {kind:true strong:true}: {}bool
 typeof [[1 2] [3 4]]: [][]num
 typeof [1 2 true]: []any
@@ -896,7 +898,7 @@ printf &quot;has %v %q: %t\n&quot; map &quot;a&quot; (has map &quot;a&quot;)
 printf &quot;has %v %q: %t\n&quot; map &quot;X&quot; (has map &quot;X&quot;)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">has {a:1} &quot;a&quot;: true
+        <pre><code class="language-evy-output">has {a:1} &quot;a&quot;: true
 has {a:1} &quot;X&quot;: false
 </code></pre>
         <h4>Reference</h4>
@@ -915,7 +917,7 @@ del map &quot;b&quot;
 print map
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">{a:1}
+        <pre><code class="language-evy-output">{a:1}
 </code></pre>
         <h4>Reference</h4>
         <pre><code>del map:{} key:string
@@ -940,7 +942,7 @@ sleep 1
 print &quot;1&quot;
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">2
+        <pre><code class="language-evy-output">2
 1
 </code></pre>
         <h4>Reference</h4>
@@ -954,7 +956,7 @@ print &quot;1&quot;
         <h3><a id="exit" href="#exit" class="anchor">#</a><code>exit</code></h3>
         <p><code>exit</code> terminates the program with the given status code.</p>
         <h4>Example</h4>
-        <pre><code class="language-evy:err">input := &quot;not a number&quot;
+        <pre><code class="language-evy-err">input := &quot;not a number&quot;
 n := str2num input
 
 if err
@@ -965,7 +967,7 @@ end
 print n
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">str2num: cannot parse &quot;not a number&quot;
+        <pre><code class="language-evy-output">str2num: cannot parse &quot;not a number&quot;
 </code></pre>
         <h3><a id="panic" href="#panic" class="anchor">#</a><code>panic</code></h3>
         <p>
@@ -973,14 +975,14 @@ print n
           It is used to report unrecoverable errors.
         </p>
         <h4>Example</h4>
-        <pre><code class="language-evy:err">scale := -5
+        <pre><code class="language-evy-err">scale := -5
 
 if (scale) &lt;= 0
     panic &quot;scale must be positive&quot;
 end
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">line 4 column 5: scale must be positive
+        <pre><code class="language-evy-output">line 4 column 5: scale must be positive
 </code></pre>
         <h4>Reference</h4>
         <pre><code>panic msg:string
@@ -1004,7 +1006,7 @@ n = str2num &quot;NOT-A-NUMBER&quot;
 print &quot;n:&quot; n &quot;err:&quot; err
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">n: 1 err: false
+        <pre><code class="language-evy-output">n: 1 err: false
 n: 0 err: true
 </code></pre>
         <h4>Reference</h4>
@@ -1031,7 +1033,7 @@ b = str2bool &quot;NOT-A-BOOL&quot;
 print &quot;b:&quot; b &quot;err:&quot; err
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">b: true err: false
+        <pre><code class="language-evy-output">b: true err: false
 b: false err: true
 </code></pre>
         <h4>Reference</h4>
@@ -1160,7 +1162,7 @@ print &quot;err:&quot; err
 print &quot;errmsg:&quot; errmsg
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">num: 0
+        <pre><code class="language-evy-output">num: 0
 err: true
 errmsg: str2num: cannot parse &quot;NOT A NUM&quot;
 </code></pre>
@@ -1183,7 +1185,7 @@ printf &quot;%q\n&quot; s
 printf &quot;%q\n&quot; (sprint)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">&quot;a [true] {a:1 b:2}&quot;
+        <pre><code class="language-evy-output">&quot;a [true] {a:1 b:2}&quot;
 &quot;&quot;
 </code></pre>
         <h4>Reference</h4>
@@ -1208,7 +1210,7 @@ printf &quot;%q\n&quot; (sprint)
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">     &quot;val&quot;: 123
+        <pre><code class="language-evy-output">     &quot;val&quot;: 123
 </code></pre>
         <h4>Reference</h4>
         <pre><code>sprintf:string format:string a:any...
@@ -1231,7 +1233,7 @@ print s
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">a, b, c
+        <pre><code class="language-evy-output">a, b, c
 </code></pre>
         <h4>Reference</h4>
         <pre><code>join:string elems:[]string sep:string
@@ -1256,7 +1258,7 @@ print (split &quot;a,b,c&quot; &quot;.&quot;)
 print (split &quot;a,b,c&quot; &quot;&quot;)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">[a b c]
+        <pre><code class="language-evy-output">[a b c]
 [a,b,c]
 [a , b , c]
 </code></pre>
@@ -1294,7 +1296,7 @@ print (split &quot;a,b,c&quot; &quot;&quot;)
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">ABC D E Ü
+        <pre><code class="language-evy-output">ABC D E Ü
 </code></pre>
         <h4>Reference</h4>
         <pre><code>upper:string s:string
@@ -1317,7 +1319,7 @@ print s
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">abc d e ü
+        <pre><code class="language-evy-output">abc d e ü
 </code></pre>
         <h4>Reference</h4>
         <pre><code>lower:string s:string
@@ -1341,7 +1343,7 @@ print s
 print n
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">3
+        <pre><code class="language-evy-output">3
 </code></pre>
         <h4>Reference</h4>
         <pre><code>index:num s:string sub:string
@@ -1358,7 +1360,7 @@ print n
 print b
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">true
+        <pre><code class="language-evy-output">true
 </code></pre>
         <h4>Reference</h4>
         <pre><code>startswith:bool s:string prefix:string
@@ -1375,7 +1377,7 @@ print b
 print b
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">false
+        <pre><code class="language-evy-output">false
 </code></pre>
         <h4>Reference</h4>
         <pre><code>endswith:bool s:string suffix:string
@@ -1392,7 +1394,7 @@ print b
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">abc.de
+        <pre><code class="language-evy-output">abc.de
 </code></pre>
         <h4>Reference</h4>
         <pre><code>trim:string s:string cutset:string
@@ -1411,7 +1413,7 @@ print s
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">ABC123xyzABC ABC
+        <pre><code class="language-evy-output">ABC123xyzABC ABC
 </code></pre>
         <h4>Reference</h4>
         <pre><code>replace:string s:string old:string new:string
@@ -1462,7 +1464,7 @@ print (rand1)
         <pre><code class="language-evy">print (min 3 1)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">1
+        <pre><code class="language-evy-output">1
 </code></pre>
         <h4>Reference</h4>
         <pre><code>min:num n1:num n2:num
@@ -1474,7 +1476,7 @@ print (rand1)
         <pre><code class="language-evy">print (min 3 1)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">1
+        <pre><code class="language-evy-output">1
 </code></pre>
         <h4>Reference</h4>
         <pre><code>max:num n1:num n2:num
@@ -1490,7 +1492,7 @@ print (rand1)
 print (floor 3)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">2
+        <pre><code class="language-evy-output">2
 3
 </code></pre>
         <h4>Reference</h4>
@@ -1548,7 +1550,7 @@ print (round 2.5)
         <pre><code class="language-evy">print (pow 2 3)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">8
+        <pre><code class="language-evy-output">8
 </code></pre>
         <h4>Reference</h4>
         <pre><code>pow:num b:num exp:num
@@ -1565,7 +1567,7 @@ print (round 2.5)
 printf &quot;%.2f\n&quot; (log 2.7183) // e
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">0.00
+        <pre><code class="language-evy-output">0.00
 1.00
 </code></pre>
         <h4>Reference</h4>
@@ -1581,7 +1583,7 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
         <pre><code class="language-evy">print (sqrt 9)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">3
+        <pre><code class="language-evy-output">3
 </code></pre>
         <h4>Reference</h4>
         <pre><code>sqrt:num n:num
@@ -1597,7 +1599,7 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
 print (sin 0.5*pi)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">1
+        <pre><code class="language-evy-output">1
 </code></pre>
         <h4>Reference</h4>
         <pre><code>sin:num n:num
@@ -1613,7 +1615,7 @@ print (sin 0.5*pi)
 print (cos pi)
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">-1
+        <pre><code class="language-evy-output">-1
 </code></pre>
         <h4>Reference</h4>
         <pre><code>cos:num n:num
@@ -1634,7 +1636,7 @@ degrees := rad * 180 / pi
 printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy:output">rad: 0.79 degrees: 45.00
+        <pre><code class="language-evy-output">rad: 0.79 degrees: 45.00
 </code></pre>
         <h4>Reference</h4>
         <pre><code>atan2:num y:num x:num

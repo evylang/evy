@@ -1,0 +1,30 @@
+.language-evy .num,
+.language-evy .bool {
+  color: var(--syntax-num);
+}
+
+.language-evy .str {
+  color: var(--syntax-string);
+}
+
+.language-evy .func {
+  color: var(--syntax-func);
+}
+
+.language-evy .builtin {
+  color: var(--syntax-builtin);
+}
+
+.language-evy .keyword {
+  color: var(--syntax-keyword);
+}
+
+.language-evy .op {
+  color: var(--syntax-keyword);
+}
+
+.language-evy .comment {
+  color: var(--syntax-comment);
+  font-style: italic;
+  font-weight: 300;
+}

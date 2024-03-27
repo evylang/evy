@@ -1,5 +1,6 @@
 "use strict"
 import Editor from "./module/editor.js"
+import highlightEvy from "./module/highlight.js"
 import showConfetti from "./module/confetti.js"
 
 // --- Globals ---------------------------------------------------------
@@ -773,7 +774,7 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  editor = new Editor(".editor", { sessionKey: "evy-editor" })
+  editor = new Editor(".editor", { sessionKey: "evy-editor", highlighter: highlightEvy })
   document.querySelector(".editor-wrap").classList.remove("noscrollbar")
 }
 

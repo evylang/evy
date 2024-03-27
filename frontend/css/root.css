@@ -28,6 +28,12 @@
   --border-color: hsl(0deg 0% 100% / 20%);
   --border-color-strong: hsl(0deg 0% 100% / 40%);
   --border-color-dialog: hsl(0deg 0% 100% / 15%);
+  --syntax-num: hsl(204deg 100% 75%);
+  --syntax-string: hsl(203deg 100% 86%);
+  --syntax-func: hsl(266deg 100% 86%);
+  --syntax-builtin: hsl(27deg 100% 74%);
+  --syntax-keyword: hsl(359deg 100% 75%);
+  --syntax-comment: hsl(210deg 13% 72%);
 
   color-scheme: dark;
 
@@ -55,6 +61,14 @@
   --border-color: hsl(0deg 0% 0% / 20%);
   --border-color-strong: hsl(0deg 0% 0% / 30%);
   --border-color-dialog: hsl(0deg 0% 100% / 15%);
+  --syntax-num: hsl(213deg 94% 35%);
+  --syntax-string: hsl(212deg 92% 45%);
+  --syntax-func: hsl(261deg 70% 60%);
+  --syntax-builtin: hsl(24deg 74% 51%);
+  --syntax-keyword: hsl(356deg 72% 47%);
+  --syntax-comment: rgb(110 119 129);
+  --syntax-error-line-background: hsl(210deg 7% 20%);
+  --syntax-error-background: hsl(209deg 100% 33%);
 
   color-scheme: light;
 

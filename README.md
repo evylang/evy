@@ -91,7 +91,7 @@ frontend locally with
 
     make help
     make ci
-    make frontend-serve
+    make serve
 
 <details>
   <summary>Hermit automatically installs tools.</summary>

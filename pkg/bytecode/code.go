@@ -69,6 +69,12 @@ const (
 	// OpStringConcatenate represents a + operator used to concatenate two
 	// strings.
 	OpStringConcatenate
+	// OpArray represents an array literal, the operand N is the length of
+	// the array, and instructs the vm to pop N elements from the stack.
+	OpArray
+	// OpArrayConcatenate represents a + operator used to concatenate two
+	// arrays.
+	OpArrayConcatenate
 )
 
 var (
@@ -114,6 +120,9 @@ var definitions = map[Opcode]*OpDefinition{
 	OpStringGreaterThan:      {"OpStringGreaterThan", nil},
 	OpStringGreaterThanEqual: {"OpStringGreaterThanEqual", nil},
 	OpStringConcatenate:      {"OpStringConcatenate", nil},
+	// This operand width only allows arrays up to 65535 elements in length.
+	OpArray:            {"OpArray", []int{2}},
+	OpArrayConcatenate: {"OpArrayConcatenate", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

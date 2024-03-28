@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"strconv"
+	"strings"
 
 	"evylang.dev/evy/pkg/parser"
 )
@@ -58,4 +59,39 @@ func (s stringVal) Equals(v value) bool {
 		panic("internal error: String.Equals called with non-String value")
 	}
 	return s == s2
+}
+
+type arrayVal struct {
+	Elements []value
+}
+
+func (a arrayVal) Type() *parser.Type {
+	// Revisit this when adding the typeof builtin: https://github.com/evylang/evy/pull/305#discussion_r1531149977
+	return parser.GENERIC_ARRAY
+}
+
+func (a arrayVal) String() string {
+	elements := make([]string, len(a.Elements))
+	for i, e := range a.Elements {
+		elements[i] = e.String()
+	}
+	return "[" + strings.Join(elements, " ") + "]"
+}
+
+func (a arrayVal) Equals(v value) bool {
+	a2, ok := v.(arrayVal)
+	if !ok {
+		panic("internal error: Array.Equals called with non-Array value")
+	}
+	if len(a.Elements) != len(a2.Elements) {
+		return false
+	}
+	elements2 := a2.Elements
+	for i, e := range a.Elements {
+		e2 := elements2[i]
+		if !e.Equals(e2) {
+			return false
+		}
+	}
+	return true
 }

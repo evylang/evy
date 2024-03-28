@@ -22,7 +22,7 @@ type testCase struct {
 func TestVMGlobals(t *testing.T) {
 	tests := []testCase{
 		{
-			name:         "global assignment",
+			name:         "inferred declaration",
 			input:        "x := 1",
 			wantStackTop: makeValue(t, 1),
 			wantBytecode: &Bytecode{
@@ -30,6 +30,29 @@ func TestVMGlobals(t *testing.T) {
 				Instructions: makeInstructions(
 					mustMake(t, OpConstant, 0),
 					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "assignment",
+			input: `x := 1
+			y := x
+			y = x + 1
+			y = y`,
+			wantStackTop: makeValue(t, 2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpSetGlobal, 1),
 				),
 			},
 		},
@@ -461,6 +484,94 @@ func TestStringExpressions(t *testing.T) {
 	}
 }
 
+func TestArrays(t *testing.T) {
+	tests := []testCase{
+		{
+			name:         "empty assignment",
+			input:        "x := []",
+			wantStackTop: makeValue(t, []any{}),
+			wantBytecode: &Bytecode{
+				Constants: nil,
+				Instructions: makeInstructions(
+					mustMake(t, OpArray, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "assignment",
+			input:        "x := [1 2 3]",
+			wantStackTop: makeValue(t, []any{1, 2, 3}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "concatenate",
+			input:        "x := [1 2] + [3 4]",
+			wantStackTop: makeValue(t, []any{1, 2, 3, 4}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpArrayConcatenate),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "concatenate preserve original",
+			input: `x := [1 2]
+			y := [3 4]
+			y = x + y
+			x = x`,
+			wantStackTop: makeValue(t, []any{1, 2}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpArrayConcatenate),
+					mustMake(t, OpSetGlobal, 1),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
@@ -479,6 +590,8 @@ func compileBytecode(t *testing.T, input string) *Bytecode {
 func makeValue(t *testing.T, a any) value {
 	t.Helper()
 	switch v := a.(type) {
+	case []any:
+		return arrayVal{Elements: makeValues(t, v...)}
 	case string:
 		return stringVal(v)
 	case int:

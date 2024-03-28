@@ -8,10 +8,24 @@ import (
 	"evylang.dev/evy/pkg/parser"
 )
 
+var (
+	// ErrBounds reports an index out of bounds in an array or string.
+	ErrBounds = fmt.Errorf("%w: index out of bounds", ErrPanic)
+	// ErrMapKey reports that no value was found for a specific key
+	// used in a map index.
+	ErrMapKey = fmt.Errorf("%w: no value for map key", ErrPanic)
+)
+
 type value interface {
 	Type() *parser.Type
 	Equals(value) bool
 	String() string
+}
+
+type indexable interface {
+	// Index returns the value at the specified key. A user error will
+	// be returned if the key is not found inside the structure.
+	Index(key value) (value, error)
 }
 
 type numVal float64
@@ -62,6 +76,17 @@ func (s stringVal) Equals(v value) bool {
 	return s == s2
 }
 
+func (s stringVal) Index(idx value) (value, error) {
+	index := int(idx.(numVal))
+	if index >= len(s) || index < -len(s) {
+		return nil, fmt.Errorf("%w: %d", ErrBounds, index)
+	}
+	if index < 0 {
+		index += len(s)
+	}
+	return s[index : index+1], nil
+}
+
 type arrayVal struct {
 	Elements []value
 }
@@ -97,6 +122,33 @@ func (a arrayVal) Equals(v value) bool {
 	return true
 }
 
+func (a arrayVal) Index(idx value) (value, error) {
+	index := int(idx.(numVal))
+	length := len(a.Elements)
+	if index >= length || index < -length {
+		return nil, fmt.Errorf("%w: %d", ErrBounds, index)
+	}
+	if index < 0 {
+		index += length
+	}
+	return a.Elements[index], nil
+}
+
+// Set checks that idx is in bounds and then sets
+// the value of the element at idx to val.
+func (a arrayVal) Set(idx, val value) error {
+	index := int(idx.(numVal))
+	length := len(a.Elements)
+	if index >= length || index < -length {
+		return fmt.Errorf("%w: %d", ErrBounds, index)
+	}
+	if index < 0 {
+		index += length
+	}
+	a.Elements[index] = val
+	return nil
+}
+
 type mapVal map[string]value
 
 func (m mapVal) Type() *parser.Type {
@@ -126,4 +178,14 @@ func (m mapVal) Equals(v value) bool {
 		}
 	}
 	return true
+}
+
+func (m mapVal) Index(idx value) (value, error) {
+	k := idx.(stringVal)
+	key := string(k)
+	val, ok := m[key]
+	if !ok {
+		return nil, fmt.Errorf("%w %q", ErrMapKey, key)
+	}
+	return val, nil
 }

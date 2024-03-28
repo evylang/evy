@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"errors"
 	"math"
 	"testing"
 
@@ -43,16 +44,91 @@ func TestVMGlobals(t *testing.T) {
 			wantBytecode: &Bytecode{
 				Constants: makeValues(t, 1, 1),
 				Instructions: makeInstructions(
+					// x := 1
 					mustMake(t, OpConstant, 0),
 					mustMake(t, OpSetGlobal, 0),
+					// y := x
 					mustMake(t, OpGetGlobal, 0),
 					mustMake(t, OpSetGlobal, 1),
+					// y = x + 1
 					mustMake(t, OpGetGlobal, 0),
 					mustMake(t, OpConstant, 1),
 					mustMake(t, OpAdd),
 					mustMake(t, OpSetGlobal, 1),
+					// y = y
 					mustMake(t, OpGetGlobal, 1),
 					mustMake(t, OpSetGlobal, 1),
+				),
+			},
+		},
+		{
+			name: "index assignment",
+			input: `x := [1 2 3]
+			x[0] = x[2]
+			x[2] = 1
+			x = x`,
+			wantStackTop: makeValue(t, []any{3, 2, 1}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 2, 0, 1, 2),
+				Instructions: makeInstructions(
+					// x := [1 2 3]
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpSetGlobal, 0),
+					// x[2]
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpIndex),
+					// x[0]
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpSetIndex),
+					// 1
+					mustMake(t, OpConstant, 5),
+					// x[2]
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 6),
+					mustMake(t, OpSetIndex),
+					// x = x
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "nested index assignment",
+			input: `x := [[1 2] [3 4]]
+			x[0][0] = x[0][1]
+			x = x`,
+			wantStackTop: makeValue(t, []any{[]any{2, 2}, []any{3, 4}}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 4, 0, 1, 0, 0),
+				Instructions: makeInstructions(
+					// x := [[1 2] [3 4]]
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpSetGlobal, 0),
+					// x[0][0] = x[0][1]
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpIndex),
+					mustMake(t, OpConstant, 5),
+					mustMake(t, OpIndex),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 6),
+					mustMake(t, OpIndex),
+					mustMake(t, OpConstant, 7),
+					mustMake(t, OpSetIndex),
+					// x = x
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
 				),
 			},
 		},
@@ -470,6 +546,35 @@ func TestStringExpressions(t *testing.T) {
 				),
 			},
 		},
+		{
+			name:         "index",
+			input:        `x := "abc"[0]`,
+			wantStackTop: makeValue(t, "a"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 0),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "negative index",
+			input:        `x := "abc"[-1]`,
+			wantStackTop: makeValue(t, "c"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpMinus),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -558,6 +663,41 @@ func TestArrays(t *testing.T) {
 				),
 			},
 		},
+		{
+			name:         "index",
+			input:        `x := [1 2 3][0]`,
+			wantStackTop: makeValue(t, 1),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 0),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "negative index",
+			input:        `x := [1 2 3][-1]`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMinus),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -568,6 +708,39 @@ func TestArrays(t *testing.T) {
 			assert.NoError(t, err, "runtime error")
 			got := vm.lastPoppedStackElem()
 			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestErrBounds(t *testing.T) {
+	type boundsTest struct {
+		name  string
+		input string
+	}
+	tests := []boundsTest{
+		{
+			name:  "string index out of bounds",
+			input: `x := "abc"[3]`,
+		},
+		{
+			name:  "string negative index out of bounds",
+			input: `x := "abc"[-4]`,
+		},
+		{
+			name:  "array index out of bounds",
+			input: `x := [1 2 3][3]`,
+		},
+		{
+			name:  "array negative index out of bounds",
+			input: `x := [1 2 3][-4]`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.Equal(t, true, errors.Is(err, ErrBounds))
 		})
 	}
 }
@@ -602,6 +775,24 @@ func TestMap(t *testing.T) {
 				),
 			},
 		},
+		{
+			name:         "index",
+			input:        `x := {a: 1 b: 2}["b"]`,
+			wantStackTop: makeValue(t, 2),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "a", 1, "b", 2, "b"),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMap, 4),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -614,6 +805,14 @@ func TestMap(t *testing.T) {
 			assert.Equal(t, tt.wantStackTop, got)
 		})
 	}
+}
+
+func TestErrMapKey(t *testing.T) {
+	input := `x := {a: 1}["b"]`
+	bytecode := compileBytecode(t, input)
+	vm := NewVM(bytecode)
+	err := vm.Run()
+	assert.Equal(t, true, errors.Is(err, ErrMapKey))
 }
 
 func compileBytecode(t *testing.T, input string) *Bytecode {

@@ -43,6 +43,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 	switch node := node.(type) {
 	case *parser.Program:
 		return c.compileProgram(node)
+	case *parser.IndexExpression:
+		return c.compileIndexExpression(node)
 	case *parser.InferredDeclStmt:
 		return c.compileDecl(node.Decl)
 	case *parser.AssignmentStmt:
@@ -235,8 +237,23 @@ func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
 	if err := c.Compile(stmt.Value); err != nil {
 		return err
 	}
-	symbol := c.globals.Define(stmt.Target.String())
-	return c.emit(OpSetGlobal, symbol.Index)
+	switch target := stmt.Target.(type) {
+	case *parser.Var:
+		symbol, ok := c.globals.Resolve(target.Name)
+		if !ok {
+			return fmt.Errorf("%w %s", ErrUndefinedVar, target.Name)
+		}
+		return c.emit(OpSetGlobal, symbol.Index)
+	case *parser.IndexExpression:
+		if err := c.Compile(target.Left); err != nil {
+			return err
+		}
+		if err := c.Compile(target.Index); err != nil {
+			return err
+		}
+		return c.emit(OpSetIndex)
+	}
+	return c.Compile(stmt.Target)
 }
 
 func (c *Compiler) compileVar(variable *parser.Var) error {
@@ -245,4 +262,17 @@ func (c *Compiler) compileVar(variable *parser.Var) error {
 		return fmt.Errorf("%w %s", ErrUndefinedVar, variable.Name)
 	}
 	return c.emit(OpGetGlobal, symbol.Index)
+}
+
+func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
+	if err := c.Compile(expr.Left); err != nil {
+		return err
+	}
+	if err := c.Compile(expr.Index); err != nil {
+		return err
+	}
+	if err := c.emit(OpIndex); err != nil {
+		return err
+	}
+	return nil
 }

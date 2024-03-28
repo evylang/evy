@@ -36,7 +36,6 @@
 package main
 
 import (
-	"bufio"
 	"embed"
 	"errors"
 	"fmt"
@@ -45,12 +44,11 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"time"
 
+	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
 	"evylang.dev/evy/pkg/lexer"
 	"evylang.dev/evy/pkg/parser"
@@ -66,55 +64,6 @@ var (
 
 //go:embed out/embed
 var content embed.FS
-
-// cliRuntime implements evaluator.Runtime.
-type cliRuntime struct {
-	evaluator.UnimplementedRuntime
-	reader    *bufio.Reader
-	skipSleep bool
-}
-
-func newCLIRuntime() *cliRuntime {
-	return &cliRuntime{reader: bufio.NewReader(os.Stdin)}
-}
-
-// Print prints s to stdout.
-func (*cliRuntime) Print(s string) {
-	fmt.Print(s)
-}
-
-// Cls clears the screen.
-func (*cliRuntime) Cls() {
-	cmd := exec.Command("clear")
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/c", "cls")
-	}
-	cmd.Stdout = os.Stdout
-	if err := cmd.Run(); err != nil {
-		fmt.Println("cannot clear screen", err)
-	}
-}
-
-// Read reads a line of input from stdin and strips trailing newline.
-func (rt *cliRuntime) Read() string {
-	s, err := rt.reader.ReadString('\n')
-	if err != nil {
-		panic(err)
-	}
-	return s[:len(s)-1] // strip trailing newline
-}
-
-// Sleep sleeps for dur. If the --skip-sleep flag is used, it does nothing.
-func (rt *cliRuntime) Sleep(dur time.Duration) {
-	if !rt.skipSleep {
-		time.Sleep(dur)
-	}
-}
-
-// Yielder returns a no-op yielder for CLI evy as it is not needed. By
-// contrast, browser Evy needs to explicitly hand over control to JS
-// host with Yielder.
-func (*cliRuntime) Yielder() evaluator.Yielder { return nil }
 
 const description = `
 evy is a tool for managing evy source code.
@@ -181,8 +130,8 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	rt := newCLIRuntime()
-	rt.skipSleep = c.SkipSleep
+	rt := cli.NewRuntime()
+	rt.SkipSleep = c.SkipSleep
 	eval := evaluator.NewEvaluator(rt)
 	err = eval.Run(string(b))
 	handlEvyErr(err)

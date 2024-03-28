@@ -6,6 +6,7 @@
   background: var(--background-dimmed);
   color: var(--color);
   padding: 0 18px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .topnav > * {
@@ -37,7 +38,7 @@
 }
 
 .topnav button:hover {
-  color: var(--color-hover);
+  color: var(--color-accent);
   cursor: pointer;
 }
 
@@ -47,7 +48,7 @@
 }
 
 .topnav a:hover {
-  color: var(--color-hover);
+  color: var(--color-accent);
 }
 
 .topnav .logo {

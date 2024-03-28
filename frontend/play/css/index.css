@@ -1,16 +1,12 @@
 :root {
-  /* theme */
   --output-color: hsl(0deg 0% 0% / 80%);
+  --output-background: hsl(0deg 0% 100%);
   --output-border-dark: hsl(0deg 0% 80%);
   --output-border-mid: hsl(0deg 0% 85%);
   --output-border-light: hsl(0deg 0% 92%);
   --line-num-color: hsl(212deg 8% 47%);
   --run-button-color-active: hsl(0deg 0% 100%);
-  --modal-background: hsl(210deg 5% 15% / 95%);
   --modal-circle-color: hsl(0deg 0% 35%);
-  --modal-circle-background: hsl(0deg 0% 13%);
-  --syntax-error-line-background: hsl(210deg 7% 20%);
-  --syntax-error-background: hsl(209deg 100% 33%);
   --main-width: 100%;
   --main-translate: none;
   --editor-width: auto;
@@ -146,7 +142,7 @@ button.share > div {
 #sidebar a,
 #sidebar button {
   font-family: var(--font-family);
-  color: white;
+  color: var(--color-hover);
   text-decoration: none;
   background: none;
   border: none;
@@ -160,7 +156,7 @@ button.share > div {
 
 #sidebar a:hover,
 #sidebar button:hover {
-  color: var(--color-hover);
+  color: var(--color-accent);
 }
 
 #sidebar ul {
@@ -180,12 +176,20 @@ button.share > div {
 }
 
 #sidebar ul.icons a {
+  color: var(--color);
   display: inline-block;
-}
-
-#sidebar :is(.icon-discord, .icon-github, .icon-email, .icon-share) {
   width: 28px;
   height: 28px;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar ul.icons a:hover {
+  color: var(--color-accent);
+}
+
+#sidebar ul.icons li:last-child {
+  margin-left: auto;
 }
 /* --- Main ---------------------------------------------------------- */
 .main {
@@ -356,13 +360,14 @@ dialog .err,
 }
 
 .editor .lines .err.num::after {
-  /* see: /img/icons/err-line.svg */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H2 L10 12 L2 24 H0V0 Z' fill='%230057A8'/%3E%3C/svg%3E%0A");
-  background-repeat: no-repeat;
+  background-color: var(--syntax-error-background);
+  mask: url("data:image/svg+xml,%3Csvg fill='currentColor' stroke='none' viewBox='0 0 10 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 H2 L10 12 L2 24 H0V0 Z' /%3E%3C/svg%3E%0A");
+  mask-size: 100% 100%;
   content: "";
+  mask-repeat: no-repeat;
   width: 0.8rem;
   position: absolute;
-  right: -0.8rem;
+  right: -0.7rem;
   top: 0;
   bottom: 0;
 }
@@ -381,8 +386,9 @@ dialog .err,
 }
 
 .output .canvas {
+  margin-left: auto;
   margin-right: auto;
-  background: var(--color);
+  background: var(--output-background);
   width: var(--canvas-size);
   height: var(--canvas-size);
   border-top: 1px solid var(--output-border-dark);
@@ -412,7 +418,7 @@ dialog .err,
 .output .read,
 .output .input {
   padding: 16px;
-  background: var(--color);
+  background: var(--output-background);
   color: var(--output-color);
   font-family: var(--font-family-code);
   font-variant-ligatures: none;
@@ -460,7 +466,7 @@ dialog .err,
 
 .run.desktop {
   border-top: 1px solid var(--output-border-dark);
-  background: var(--color);
+  background: var(--output-background);
 }
 
 button#run,
@@ -570,7 +576,7 @@ button.running#run-mobile:active {
 /* stylelint-enable no-descending-specificity */
 
 #modal ul li a:hover {
-  color: var(--color);
+  color: var(--color-accent);
 }
 
 #modal ul li a::before {
@@ -613,7 +619,7 @@ dialog .icon-copy {
 }
 
 dialog .icon-copy:hover {
-  color: var(--color);
+  color: var(--color-accent);
 }
 
 dialog .copy input {

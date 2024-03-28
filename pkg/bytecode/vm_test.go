@@ -1,7 +1,6 @@
 package bytecode
 
 import (
-	"errors"
 	"math"
 	"testing"
 
@@ -740,7 +739,7 @@ func TestErrBounds(t *testing.T) {
 			bytecode := compileBytecode(t, tt.input)
 			vm := NewVM(bytecode)
 			err := vm.Run()
-			assert.Equal(t, true, errors.Is(err, ErrBounds))
+			assert.Error(t, ErrBounds, err)
 		})
 	}
 }
@@ -812,7 +811,7 @@ func TestErrMapKey(t *testing.T) {
 	bytecode := compileBytecode(t, input)
 	vm := NewVM(bytecode)
 	err := vm.Run()
-	assert.Equal(t, true, errors.Is(err, ErrMapKey))
+	assert.Error(t, ErrMapKey, err)
 }
 
 func compileBytecode(t *testing.T, input string) *Bytecode {

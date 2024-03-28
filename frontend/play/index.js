@@ -1,6 +1,7 @@
 "use strict"
 import Editor from "./module/editor.js"
 import highlightEvy from "./module/highlight.js"
+import initThemeToggle from "./module/theme.js"
 import showConfetti from "./module/confetti.js"
 
 // --- Globals ---------------------------------------------------------
@@ -22,6 +23,7 @@ let errors = false
 await initWasm()
 initUI()
 initCanvas()
+initThemeToggle("#dark-theme", "theme")
 
 // --- Wasm ------------------------------------------------------------
 

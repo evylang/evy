@@ -43,6 +43,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 	switch node := node.(type) {
 	case *parser.Program:
 		return c.compileProgram(node)
+	case *parser.IndexExpression:
+		return c.compileIndexExpression(node)
 	case *parser.InferredDeclStmt:
 		return c.compileDecl(node.Decl)
 	case *parser.AssignmentStmt:
@@ -245,4 +247,17 @@ func (c *Compiler) compileVar(variable *parser.Var) error {
 		return fmt.Errorf("%w %s", ErrUndefinedVar, variable.Name)
 	}
 	return c.emit(OpGetGlobal, symbol.Index)
+}
+
+func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
+	if err := c.Compile(expr.Left); err != nil {
+		return err
+	}
+	if err := c.Compile(expr.Index); err != nil {
+		return err
+	}
+	if err := c.emit(OpIndex); err != nil {
+		return err
+	}
+	return nil
 }

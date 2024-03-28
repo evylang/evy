@@ -163,6 +163,17 @@ func (vm *VM) Run() error {
 			if err := vm.push(m); err != nil {
 				return err
 			}
+		case OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+			indexed := left.(indexable)
+			val, err := indexed.Index(index)
+			if err != nil {
+				return err
+			}
+			if err := vm.push(val); err != nil {
+				return err
+			}
 		}
 		if err != nil {
 			return err

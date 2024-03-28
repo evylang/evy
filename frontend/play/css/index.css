@@ -5,18 +5,12 @@
   --output-border-mid: hsl(0deg 0% 85%);
   --output-border-light: hsl(0deg 0% 92%);
   --line-num-color: hsl(212deg 8% 47%);
-  --syntax-num: hsl(204deg 100% 75%);
-  --syntax-string: hsl(203deg 100% 86%);
-  --syntax-func: hsl(266deg 100% 86%);
-  --syntax-builtin: hsl(27deg 100% 74%);
-  --syntax-keyword: hsl(359deg 100% 75%);
-  --syntax-comment: hsl(210deg 13% 72%);
-  --syntax-error-line-background: hsl(210deg 7% 20%);
-  --syntax-error-background: hsl(209deg 100% 33%);
   --run-button-color-active: hsl(0deg 0% 100%);
   --modal-background: hsl(210deg 5% 15% / 95%);
   --modal-circle-color: hsl(0deg 0% 35%);
   --modal-circle-background: hsl(0deg 0% 13%);
+  --syntax-error-line-background: hsl(210deg 7% 20%);
+  --syntax-error-background: hsl(209deg 100% 33%);
   --main-width: 100%;
   --main-translate: none;
   --editor-width: auto;
@@ -330,41 +324,10 @@ dialog .err,
   border-radius: 6px;
 }
 
-.editor .num,
-.editor .bool {
-  color: var(--syntax-num);
-}
-
-.editor .str {
-  color: var(--syntax-string);
-}
-
-.editor .func {
-  color: var(--syntax-func);
-}
-
-.editor .builtin {
-  color: var(--syntax-builtin);
-}
-
-.editor .keyword {
-  color: var(--syntax-keyword);
-}
-
 .editor .error {
   background: var(--syntax-error-background);
   color: var(--color);
   font-style: italic;
-}
-
-.editor .op {
-  color: var(--syntax-keyword);
-}
-
-.editor .comment {
-  color: var(--syntax-comment);
-  font-style: italic;
-  font-weight: 300;
 }
 
 .editor .lines .num {

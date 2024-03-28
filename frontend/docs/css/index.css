@@ -15,7 +15,6 @@ body {
 
 header.topnav {
   grid-area: header;
-  border-bottom: 1px solid var(--border-color);
 }
 
 header.topnav .center.mobile span {
@@ -320,6 +319,10 @@ th {
   height: 28px;
   margin: 0;
   padding: 0;
+}
+
+#sidebar ul.icons a:hover {
+  color: var(--color-accent);
 }
 
 #sidebar ul.icons li:last-child {

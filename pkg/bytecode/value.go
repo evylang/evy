@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -90,6 +91,37 @@ func (a arrayVal) Equals(v value) bool {
 	for i, e := range a.Elements {
 		e2 := elements2[i]
 		if !e.Equals(e2) {
+			return false
+		}
+	}
+	return true
+}
+
+type mapVal map[string]value
+
+func (m mapVal) Type() *parser.Type {
+	return parser.GENERIC_MAP
+}
+
+func (m mapVal) String() string {
+	pairs := []string{}
+	for k, v := range m {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v.String()))
+	}
+	return "{" + strings.Join(pairs, ", ") + "}"
+}
+
+func (m mapVal) Equals(v value) bool {
+	m2, ok := v.(mapVal)
+	if !ok {
+		panic("internal error: Map.Equals called with non-Map value")
+	}
+	if len(m) != len(m2) {
+		return false
+	}
+	for key, val := range m {
+		val2 := m2[key]
+		if val2 == nil || !val.Equals(val2) {
 			return false
 		}
 	}

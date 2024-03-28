@@ -255,28 +255,16 @@ $(NODELIB):
 .PHONY: check-prettier e2e prettier serve
 
 # --- deploy -----------------------------------------------------------------
+CHANNEL = live
+ENV = test
 
-## Deploy to live channel on firebase prod, use with care!
-## `firebase login` for first time local usage
-deploy-prod: build-tiny
-	./build-tools/firebase-deploy prod live
-
-## Deploy to live channel on firebase stage.
-## `firebase login` for first time local usage
-deploy-stage: build-tiny
-	./build-tools/firebase-deploy stage live
-
-## Deploy to live channel on firebase test.
-## `firebase login` for first time local usage
-deploy-test: build-tiny
-	./build-tools/firebase-deploy test live
-
-## Deploy to dev (or other) channel on firebase test.
-## `firebase login` for first time local usage
+## Deploy to firebase ENV on CHANNEL. ENV: test (default), stage, prod. CHANNEL live (default), ...
 deploy: build-tiny
-	./build-tools/firebase-deploy test
+	# Empty channel becomes to "dev" locally.
+	# Empty channel becomes PR-NUM or "live" on CI.
+	./build-tools/firebase-deploy $(ENV) $(CHANNEL)
 
-.PHONY: deploy deploy-prod deploy-stage deploy-test
+.PHONY: deploy
 
 # --- scripts ------------------------------------------------------------------
 SCRIPTS = build-tools/firebase-deploy .github/scripts/app_token

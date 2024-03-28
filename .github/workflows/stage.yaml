@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make deploy-stage
+      - run: ./bin/make deploy ENV=stage CHANNEL= # empty channel becomes PR-NUM or "live"
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

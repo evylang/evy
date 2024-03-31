@@ -82,6 +82,19 @@ func (c *Compiler) Compile(node parser.Node) error {
 		if err := c.emit(OpArray, len(node.Elements)); err != nil {
 			return err
 		}
+	case *parser.MapLiteral:
+		for _, k := range node.Order {
+			str := stringVal(k)
+			if err := c.emit(OpConstant, c.addConstant(str)); err != nil {
+				return err
+			}
+			if err := c.Compile(node.Pairs[k]); err != nil {
+				return err
+			}
+		}
+		if err := c.emit(OpMap, len(node.Pairs)*2); err != nil {
+			return err
+		}
 	}
 	return nil
 }

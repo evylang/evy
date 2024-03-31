@@ -150,6 +150,19 @@ func (vm *VM) Run() error {
 			concatenated.Elements = append(concatenated.Elements, left.Elements...)
 			concatenated.Elements = append(concatenated.Elements, right.Elements...)
 			err = vm.push(concatenated)
+		case OpMap:
+			mapLen := int(ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			m := make(mapVal, 0)
+			for i := 0; i < mapLen; i += 2 {
+				val := vm.pop()
+				key := vm.popStringVal()
+				m[string(key)] = val
+			}
+			if err := vm.push(m); err != nil {
+				return err
+			}
 		}
 		if err != nil {
 			return err

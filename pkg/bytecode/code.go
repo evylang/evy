@@ -75,6 +75,11 @@ const (
 	// OpArrayConcatenate represents a + operator used to concatenate two
 	// arrays.
 	OpArrayConcatenate
+	// OpMap represents a map literal, the operand N is the length of
+	// the map multiplied by 2. This length N represents the total length
+	// of the flattened map in the stack, where keys and values have been
+	// pushed sequentially (k1, v1, k2, v2...).
+	OpMap
 )
 
 var (
@@ -123,6 +128,9 @@ var definitions = map[Opcode]*OpDefinition{
 	// This operand width only allows arrays up to 65535 elements in length.
 	OpArray:            {"OpArray", []int{2}},
 	OpArrayConcatenate: {"OpArrayConcatenate", nil},
+	// This operand width only allows maps of up to 32767 pairs, as the map doubles in length
+	// to 65535 when it is flattened onto the stack.
+	OpMap: {"OpMap", []int{2}},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

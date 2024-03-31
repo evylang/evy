@@ -51,6 +51,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileAssignment(node)
 	case *parser.BinaryExpression:
 		return c.compileBinaryExpression(node)
+	case *parser.SliceExpression:
+		return c.compileSliceExpression(node)
 	case *parser.UnaryExpression:
 		return c.compileUnaryExpression(node)
 	case *parser.GroupExpression:
@@ -201,6 +203,29 @@ func (c *Compiler) compileStringBinaryExpression(expr *parser.BinaryExpression) 
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}
+}
+
+func (c *Compiler) compileSliceExpression(expr *parser.SliceExpression) error {
+	var err error
+	if err = c.Compile(expr.Left); err != nil {
+		return err
+	}
+	if err = c.compileOrEmitNone(expr.Start); err != nil {
+		return err
+	}
+	if err = c.compileOrEmitNone(expr.End); err != nil {
+		return err
+	}
+	return c.emit(OpSlice)
+}
+
+// compilerOrEmitNone will emit OpNone if the provided parser node is
+// nil. If the node is not nil then it will be compiled as normal.
+func (c *Compiler) compileOrEmitNone(node parser.Node) error {
+	if node != nil {
+		return c.Compile(node)
+	}
+	return c.emit(OpNone)
 }
 
 func (c *Compiler) compileUnaryExpression(expr *parser.UnaryExpression) error {

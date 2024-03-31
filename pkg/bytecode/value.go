@@ -14,6 +14,8 @@ var (
 	// ErrMapKey reports that no value was found for a specific key
 	// used in a map index.
 	ErrMapKey = fmt.Errorf("%w: no value for map key", ErrPanic)
+	// ErrSlice reports an invalid slice where start index > end index.
+	ErrSlice = fmt.Errorf("%w: invalid slice", ErrPanic)
 )
 
 type value interface {
@@ -26,6 +28,13 @@ type indexable interface {
 	// Index returns the value at the specified key. A user error will
 	// be returned if the key is not found inside the structure.
 	Index(key value) (value, error)
+}
+
+type sliceable interface {
+	// Slice returns a subset of elements between the start (inclusive)
+	// and end (exclusive) index. A user error will be returned if start
+	// or end index are outside the bounds of the structure.
+	Slice(start, end value) (value, error)
 }
 
 type numVal float64
@@ -85,6 +94,14 @@ func (s stringVal) Index(idx value) (value, error) {
 		index += len(s)
 	}
 	return s[index : index+1], nil
+}
+
+func (s stringVal) Slice(start, end value) (value, error) {
+	startIdx, endIdx, err := normalizeSliceIndices(start, end, len(s))
+	if err != nil {
+		return nil, err
+	}
+	return s[startIdx:endIdx], nil
 }
 
 type arrayVal struct {
@@ -149,6 +166,16 @@ func (a arrayVal) Set(idx, val value) error {
 	return nil
 }
 
+func (a arrayVal) Slice(start, end value) (value, error) {
+	startIdx, endIdx, err := normalizeSliceIndices(start, end, len(a.Elements))
+	if err != nil {
+		return nil, err
+	}
+	elements := make([]value, endIdx-startIdx)
+	copy(elements, a.Elements[startIdx:endIdx])
+	return arrayVal{Elements: elements}, nil
+}
+
 type mapVal map[string]value
 
 func (m mapVal) Type() *parser.Type {
@@ -188,4 +215,46 @@ func (m mapVal) Index(idx value) (value, error) {
 		return nil, fmt.Errorf("%w %q", ErrMapKey, key)
 	}
 	return val, nil
+}
+
+type noneVal struct{}
+
+func (noneVal) Type() *parser.Type {
+	return parser.NONE_TYPE
+}
+
+func (noneVal) String() string {
+	return ""
+}
+
+func (noneVal) Equals(_ value) bool {
+	return false
+}
+
+func normalizeSliceIndices(start, end value, length int) (int, int, error) {
+	startIdx := 0
+	if _, ok := start.(numVal); ok {
+		startIdx = int(start.(numVal))
+	}
+	if startIdx > length || startIdx < -length {
+		return 0, 0, fmt.Errorf("%w: %d", ErrBounds, start)
+	}
+	if startIdx < 0 {
+		startIdx += length
+	}
+	endIdx := length
+	if _, ok := end.(numVal); ok {
+		endIdx = int(end.(numVal))
+	}
+	if endIdx > length || endIdx < -length {
+		return 0, 0, fmt.Errorf("%w: %d", ErrBounds, end)
+	}
+	if endIdx < 0 {
+		endIdx += length
+	}
+	if startIdx > endIdx {
+		return 0, 0, fmt.Errorf("%w: start (%d) > end (%d)", ErrSlice,
+			startIdx, endIdx)
+	}
+	return startIdx, endIdx, nil
 }

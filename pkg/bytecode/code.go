@@ -86,6 +86,15 @@ const (
 	// OpSetIndex represents an index operator on the left hand side of
 	// an assignment.
 	OpSetIndex
+	// OpSlice represents a slice operator used on an array or string. The top
+	// three elements are read from the stack and are the end index, start index
+	// and the data structure being operated on. OpNone is used as a default
+	// when the start or end are not specified by the user program.
+	OpSlice
+	// OpNone represents an unspecified value used where values are
+	// optional and unspecified such as the start and end value of a
+	// slice index, or the values in a step range.
+	OpNone
 )
 
 var (
@@ -139,6 +148,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpMap:      {"OpMap", []int{2}},
 	OpIndex:    {"OpIndex", nil},
 	OpSetIndex: {"OpSetIndex", nil},
+	OpSlice:    {"OpSlice", nil},
+	OpNone:     {"OpNone", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

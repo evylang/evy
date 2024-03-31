@@ -574,6 +574,83 @@ func TestStringExpressions(t *testing.T) {
 				),
 			},
 		},
+		{
+			name:         "slice",
+			input:        `x := "abc"[1:3]`,
+			wantStackTop: makeValue(t, "bc"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 1, 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "negative slice",
+			input:        `x := "abc"[-3:-1]`,
+			wantStackTop: makeValue(t, "ab"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 3, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpMinus),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpMinus),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice default start",
+			input:        `x := "abc"[:1]`,
+			wantStackTop: makeValue(t, "a"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpNone),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice default end",
+			input:        `x := "abc"[1:]`,
+			wantStackTop: makeValue(t, "bc"),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNone),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice start equals length",
+			input:        `x := "abc"[3:]`,
+			wantStackTop: makeValue(t, ""),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, "abc", 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNone),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -697,6 +774,131 @@ func TestArrays(t *testing.T) {
 				),
 			},
 		},
+		{
+			name:         "slice",
+			input:        `x := [1 2 3][1:3]`,
+			wantStackTop: makeValue(t, []any{2, 3}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 1, 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "negative slice",
+			input:        `x := [1 2 3][-3:-1]`,
+			wantStackTop: makeValue(t, []any{1, 2}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 3, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpMinus),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpMinus),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice default start",
+			input:        `x := [1 2 3][:1]`,
+			wantStackTop: makeValue(t, []any{1}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpNone),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice default end",
+			input:        `x := [1 2 3][1:]`,
+			wantStackTop: makeValue(t, []any{2, 3}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpNone),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "slice start equals length",
+			input:        `x := [1 2 3][3:]`,
+			wantStackTop: makeValue(t, []any{}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpNone),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "slice preserve original",
+			input: `x := [1 2 3]
+			y := x[1:]
+			y[0] = 8
+			x = x`,
+			wantStackTop: makeValue(t, []any{1, 2, 3}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3, 1, 8, 0),
+				Instructions: makeInstructions(
+					// x := [1 2 3]
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArray, 3),
+					mustMake(t, OpSetGlobal, 0),
+					// y := x[1:]
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpNone),
+					mustMake(t, OpSlice),
+					mustMake(t, OpSetGlobal, 1),
+					// y[0] = 8
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpConstant, 5),
+					mustMake(t, OpSetIndex),
+					// x = x
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -740,6 +942,31 @@ func TestErrBounds(t *testing.T) {
 			vm := NewVM(bytecode)
 			err := vm.Run()
 			assert.Error(t, ErrBounds, err)
+		})
+	}
+}
+
+func TestErrSlice(t *testing.T) {
+	type boundsTest struct {
+		name  string
+		input string
+	}
+	tests := []boundsTest{
+		{
+			name:  "string invalid slice",
+			input: `x := "abc"[2:1]`,
+		},
+		{
+			name:  "array invalid slice",
+			input: `x := [1 2 3][2:1]`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.Error(t, ErrSlice, err)
 		})
 	}
 }

@@ -80,6 +80,12 @@ const (
 	// of the flattened map in the stack, where keys and values have been
 	// pushed sequentially (k1, v1, k2, v2...).
 	OpMap
+	// OpIndex represents an index operator used on an array, map or
+	// string variable.
+	OpIndex
+	// OpSetIndex represents an index operator on the left hand side of
+	// an assignment.
+	OpSetIndex
 )
 
 var (
@@ -130,7 +136,9 @@ var definitions = map[Opcode]*OpDefinition{
 	OpArrayConcatenate: {"OpArrayConcatenate", nil},
 	// This operand width only allows maps of up to 32767 pairs, as the map doubles in length
 	// to 65535 when it is flattened onto the stack.
-	OpMap: {"OpMap", []int{2}},
+	OpMap:      {"OpMap", []int{2}},
+	OpIndex:    {"OpIndex", nil},
+	OpSetIndex: {"OpSetIndex", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

@@ -163,6 +163,27 @@ func (vm *VM) Run() error {
 			if err := vm.push(m); err != nil {
 				return err
 			}
+		case OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+			indexed := left.(indexable)
+			val, err := indexed.Index(index)
+			if err != nil {
+				return err
+			}
+			if err := vm.push(val); err != nil {
+				return err
+			}
+		case OpSetIndex:
+			index := vm.pop()
+			left := vm.pop()
+			val := vm.pop()
+			switch left := left.(type) {
+			case mapVal:
+				left[string(index.(stringVal))] = val
+			case arrayVal:
+				err = left.Set(index, val)
+			}
 		}
 		if err != nil {
 			return err

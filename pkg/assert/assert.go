@@ -3,10 +3,21 @@
 package assert
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 )
+
+// Error immediately fails a test function if err does not contain
+// the target error in its tree.
+func Error(t *testing.T, want, got error) {
+	t.Helper()
+	if errors.Is(got, want) {
+		return
+	}
+	t.Fatalf("want != got\n%v\n%v", want, got)
+}
 
 // NoError immediately fails a test function if err is not nil. It
 // prints an optional formatted message with arguments.

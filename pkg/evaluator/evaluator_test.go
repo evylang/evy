@@ -48,7 +48,6 @@ func TestParseDecl(t *testing.T) {
 		`a:= len "abc"`: "3",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
 			got := run(in)
@@ -390,7 +389,6 @@ func TestExpr(t *testing.T) {
 		`a := -3 +5`:                        "2",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
 			got := run(in)
@@ -418,7 +416,7 @@ func side_effect:bool v:bool
 	return v
 end`
 	for in, want := range tests {
-		in, want := preamble+"\n"+in+"\n print a", want
+		in = preamble + "\n" + in + "\n print a"
 		t.Run(in, func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want+"\n", got)
@@ -442,7 +440,6 @@ end
 a := [1 1+1 (three)]`: "[1 2 3]",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
 			got := run(in)
@@ -470,7 +467,6 @@ func TestIndex(t *testing.T) {
 		`: "bingo",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
 			input := decl + "\n" + in
 			t.Run(input, func(t *testing.T) {
@@ -506,7 +502,6 @@ func TestIndexErr(t *testing.T) {
 		print m[x[1]]`: `line 3 column 10: panic: no value for map key: "b"`,
 	}
 	for in, want := range tests {
-		in, want := in, want
 		for _, decl := range []string{`x := ["a" "b" "c"]`, `x := "abc"`} {
 			input := decl + "\n" + in
 			t.Run(input, func(t *testing.T) {
@@ -534,7 +529,6 @@ end
 a := {name:"fox" age:39+(three)}`: "{name:fox age:42}",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print a"
 			got := run(in)
@@ -556,7 +550,6 @@ func TestDot(t *testing.T) {
 		print m[s]`: "FFF",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		input := `m := {name: "Greta" for: "FFF"}` + "\n" + in
 		t.Run(input, func(t *testing.T) {
 			got := run(input)
@@ -1129,7 +1122,6 @@ func TestTypeof(t *testing.T) {
 		"a := [] + [true]":         "[]bool",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print (typeof a)"
 			got := run(in)
@@ -1142,7 +1134,6 @@ func TestTypeof(t *testing.T) {
 		`a := [ 1 "abc" ]`: "num",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print (typeof a[0])"
 			got := run(in)
@@ -1164,7 +1155,6 @@ func TestTypeof(t *testing.T) {
 		`print (typeof [[2]]+[])`:  "[][]num",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want+"\n", got)
@@ -1225,7 +1215,6 @@ fn []
 `: "[][]num\n[][]num",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want+"\n", got)
@@ -1294,7 +1283,6 @@ print 2 (typeof baz) //  [][]bool
 `,
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in[:4], func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want, got)
@@ -1427,7 +1415,6 @@ print a.([]num) [1]
 `: "2\n[1 2] [1]",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			got := run(in)
 			assert.Equal(t, want+"\n", got)
@@ -1846,7 +1833,6 @@ func TestNestedTypeof(t *testing.T) {
 		"a := [[]]":              "[][]any",
 	}
 	for in, want := range tests {
-		in, want := in, want
 		t.Run(in, func(t *testing.T) {
 			in += "\n print (typeof a)"
 			var got string

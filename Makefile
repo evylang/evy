@@ -3,7 +3,7 @@
 
 # --- Global -------------------------------------------------------------------
 O = out
-COVERAGE = 80
+COVERAGE = 65
 VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 

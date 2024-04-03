@@ -152,7 +152,7 @@ var readDecl = &parser.FuncDefStmt{
 }
 
 func readFunc(readFn func() string) builtinFunc {
-	return func(_ *scope, args []value) (value, error) {
+	return func(_ *scope, _ []value) (value, error) {
 		s := readFn()
 		return &stringVal{V: s}, nil
 	}
@@ -583,7 +583,7 @@ func gridnFunc(gridnFn func(float64, string)) builtinFunc {
 }
 
 func gridFunc(gridnFn func(float64, string)) builtinFunc {
-	return func(_ *scope, args []value) (value, error) {
+	return func(_ *scope, _ []value) (value, error) {
 		gridnFn(10, "hsl(0deg 100% 0% / 50%)")
 		return nil, nil
 	}

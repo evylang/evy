@@ -13,7 +13,6 @@ func TestFuncCallStmtFormat(t *testing.T) {
 		"print  1   // a comment": "print 1 // a comment\n",
 	}
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -42,7 +41,6 @@ end // end comment
 `[1:],
 	}
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -139,7 +137,6 @@ end // end comment
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -184,7 +181,6 @@ end // end comment
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -225,7 +221,6 @@ print i
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -256,7 +251,6 @@ end // end
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -285,7 +279,6 @@ end // end
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -302,7 +295,6 @@ func TestPrintExpressionFormat(t *testing.T) {
 		"print   [1 2 3][0]":         "print [1 2 3][0]\n",
 	}
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -378,7 +370,6 @@ end
 `,
 	}
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -468,7 +459,6 @@ print x
 	}
 
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)
@@ -833,7 +823,6 @@ end
 `,
 	}
 	for input, want := range tests {
-		input, want := input, want
 		t.Run(input, func(t *testing.T) {
 			got := testFormat(t, input)
 			assert.Equal(t, want, got)

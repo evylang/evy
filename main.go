@@ -374,7 +374,7 @@ func listenAddrURL(address net.Addr) string {
 	if addr.IP.IsUnspecified() {
 		if h, err := os.Hostname(); err == nil {
 			hostPort := net.JoinHostPort(h, strconv.Itoa(addr.Port))
-			return fmt.Sprintf("http://%s", hostPort)
+			return "http://" + hostPort
 		}
 	}
 	return "http://" + addr.String()

@@ -55,7 +55,6 @@ func TestSingleToken(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
 			l := New(tt.in)
 			got := l.Next()
@@ -116,7 +115,6 @@ func TestSingleTokenWithLiteral(t *testing.T) {
 	}
 
 	for name, tt := range tests {
-		tt := tt
 		t.Run(name, func(t *testing.T) {
 			l := New(tt.in)
 			got := l.Next()
@@ -282,11 +280,11 @@ func TestIllegal(t *testing.T) {
 		{in: `"bad escape: \X"`, want: Token{Offset: 0, Literal: "invalid string", Line: 1, Col: 1}},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
 			l := New(tt.in)
 			got := l.Next()
-			assert.Equal(t, &tt.want, got)
+			want := tt.want
+			assert.Equal(t, &want, got)
 		})
 	}
 }
@@ -305,7 +303,6 @@ func TestRun(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
 			got := run(tt.in)
 			want := tt.want + "EOF\n"
@@ -325,7 +322,6 @@ func TestRunWS(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
 			got := run(tt.in)
 			want := tt.want + "WS\nEOF\n"
@@ -346,7 +342,6 @@ func TestString(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.in, func(t *testing.T) {
 			got := run(tt.in)
 			want := tt.want + "\nWS\nEOF\n"

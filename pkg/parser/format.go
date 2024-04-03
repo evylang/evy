@@ -384,7 +384,7 @@ func (f *formatting) writeDecl(n *Var) {
 const indentStr = "    "
 
 func (f *formatting) indent() {
-	for i := 0; i < f.indentLevel; i++ {
+	for range f.indentLevel {
 		f.write(indentStr)
 	}
 }

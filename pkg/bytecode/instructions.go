@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 )
 
@@ -38,4 +39,11 @@ func fmtInstruction(def *OpDefinition, operands []int) string {
 	default:
 		return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
 	}
+}
+
+// changeOperand overwrites the first operand of a single-operand
+// instruction at opPosition with the given operand.
+// The width of the operand must be 2.
+func (ins Instructions) changeOperand(opPosition int, operand int) {
+	binary.BigEndian.PutUint16(ins[opPosition+1:], uint16(operand))
 }

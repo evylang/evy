@@ -95,6 +95,13 @@ const (
 	// optional and unspecified such as the start and end value of a
 	// slice index, or the values in a step range.
 	OpNone
+	// OpJump will force the virtual machine to jump to the instruction
+	// address within its operand.
+	OpJump
+	// OpJumpOnFalse will pop the top element of the stack as a
+	// boolean and evaluate it. It will jump to the instruction address
+	// in its operand if the condition evaluates to false.
+	OpJumpOnFalse
 )
 
 var (
@@ -145,11 +152,13 @@ var definitions = map[Opcode]*OpDefinition{
 	OpArrayConcatenate: {"OpArrayConcatenate", nil},
 	// This operand width only allows maps of up to 32767 pairs, as the map doubles in length
 	// to 65535 when it is flattened onto the stack.
-	OpMap:      {"OpMap", []int{2}},
-	OpIndex:    {"OpIndex", nil},
-	OpSetIndex: {"OpSetIndex", nil},
-	OpSlice:    {"OpSlice", nil},
-	OpNone:     {"OpNone", nil},
+	OpMap:         {"OpMap", []int{2}},
+	OpIndex:       {"OpIndex", nil},
+	OpSetIndex:    {"OpSetIndex", nil},
+	OpSlice:       {"OpSlice", nil},
+	OpNone:        {"OpNone", nil},
+	OpJump:        {"OpJump", []int{2}},
+	OpJumpOnFalse: {"OpJumpOnFalse", []int{2}},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

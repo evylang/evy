@@ -6,6 +6,12 @@ import (
 	"evylang.dev/evy/pkg/parser"
 )
 
+const (
+	// JumpPlaceholder is used as a placeholder operand value in OpJump
+	// and OpJumpOnFalse.
+	JumpPlaceholder = 9999
+)
+
 var (
 	// ErrUndefinedVar is returned when a variable name cannot
 	// be resolved in the symbol table.
@@ -51,6 +57,10 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileAssignment(node)
 	case *parser.BinaryExpression:
 		return c.compileBinaryExpression(node)
+	case *parser.BlockStatement:
+		return c.compileBlockStatement(node)
+	case *parser.IfStmt:
+		return c.compileIfStatement(node)
 	case *parser.SliceExpression:
 		return c.compileSliceExpression(node)
 	case *parser.UnaryExpression:
@@ -120,19 +130,27 @@ func (c *Compiler) addConstant(obj value) int {
 
 // addInstruction appends bytes to the instruction set and returns the
 // position of the instruction.
-func (c *Compiler) addInstruction(ins []byte) {
+func (c *Compiler) addInstruction(ins []byte) int {
+	posNewInstruction := len(c.instructions)
 	c.instructions = append(c.instructions, ins...)
+	return posNewInstruction
 }
 
-// emit makes and writes an instruction to the bytecode and returns the
-// position of the instruction.
+// emit makes and writes an instruction to the bytecode.
 func (c *Compiler) emit(op Opcode, operands ...int) error {
+	_, err := c.emitPos(op, operands...)
+	return err
+}
+
+// emitPos makes and writes an instruction to the bytecode and returns the
+// position of the instruction.
+func (c *Compiler) emitPos(op Opcode, operands ...int) (int, error) {
 	ins, err := Make(op, operands...)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	c.addInstruction(ins)
-	return nil
+	newPos := c.addInstruction(ins)
+	return newPos, nil
 }
 
 func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error {
@@ -203,6 +221,69 @@ func (c *Compiler) compileStringBinaryExpression(expr *parser.BinaryExpression) 
 	default:
 		return fmt.Errorf("%w %s", ErrUnknownOperator, expr.Op)
 	}
+}
+
+func (c *Compiler) compileBlockStatement(block *parser.BlockStatement) error {
+	for _, stmt := range block.Statements {
+		if err := c.Compile(stmt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Compiler) compileIfStatement(stmt *parser.IfStmt) error {
+	firstJumpPos, err := c.compileConditionalBlock(stmt.IfBlock)
+	if err != nil {
+		return err
+	}
+	jumpPositions := []int{firstJumpPos}
+	for _, elseif := range stmt.ElseIfBlocks {
+		opJumpPos, err := c.compileConditionalBlock(elseif)
+		if err != nil {
+			return err
+		}
+		jumpPositions = append(jumpPositions, opJumpPos)
+	}
+	if stmt.Else != nil {
+		if err := c.Compile(stmt.Else); err != nil {
+			return err
+		}
+	}
+	// rewrite all OpJump to jump to the end of the entire if statement,
+	// optimisation: if the else block is empty then the last jump will
+	// "jump" to the next instruction
+	stmtEndPos := len(c.instructions)
+	for _, jumpPos := range jumpPositions {
+		c.instructions.changeOperand(jumpPos, stmtEndPos)
+	}
+	return nil
+}
+
+// compileConditionalBlock will compile the condition and block of a ConditionalBlock, emitting
+// an OpJumpOnFalse after the condition and an OpJump after the block. The position of the
+// OpJump is returned so that it can be rewritten in the event that this statement is part
+// of a larger IfStmt.
+func (c *Compiler) compileConditionalBlock(block *parser.ConditionalBlock) (int, error) {
+	if err := c.Compile(block.Condition); err != nil {
+		return 0, err
+	}
+	jumpOnFalsePos, err := c.emitPos(OpJumpOnFalse, JumpPlaceholder)
+	if err != nil {
+		return 0, err
+	}
+	if err := c.Compile(block.Block); err != nil {
+		return 0, err
+	}
+	jumpPos, err := c.emitPos(OpJump, JumpPlaceholder)
+	if err != nil {
+		return 0, err
+	}
+	// rewrite the JumpPlaceholder in the OpJumpOnFalse so that it will jump to the end
+	// of the statement when the condition is not truthy anymore
+	afterBlockPos := len(c.instructions)
+	c.instructions.changeOperand(jumpOnFalsePos, afterBlockPos)
+	return jumpPos, nil
 }
 
 func (c *Compiler) compileSliceExpression(expr *parser.SliceExpression) error {

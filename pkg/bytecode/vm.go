@@ -46,6 +46,8 @@ func NewVM(bytecode *Bytecode) *VM {
 
 // Run executes the provided bytecode instructions in order, any error
 // will stop the execution.
+//
+//nolint:maintidx // Run is special in that it is written to be optimal
 func (vm *VM) Run() error {
 	var err error
 	for ip := 0; ip < len(vm.instructions); ip++ {
@@ -165,13 +167,12 @@ func (vm *VM) Run() error {
 			index := vm.pop()
 			left := vm.pop()
 			indexed := left.(indexable)
-			val, err := indexed.Index(index)
+			var val value
+			val, err = indexed.Index(index)
 			if err != nil {
 				return err
 			}
-			if err := vm.push(val); err != nil {
-				return err
-			}
+			err = vm.push(val)
 		case OpSetIndex:
 			index := vm.pop()
 			left := vm.pop()
@@ -195,6 +196,23 @@ func (vm *VM) Run() error {
 			err = vm.push(val)
 		case OpNone:
 			err = vm.push(noneVal{})
+		case OpJump:
+			pos := int(ReadUint16(vm.instructions[ip+1:]))
+			// jump the instruction pointer to pos - 1 because the run
+			// loop will increment it on the next iteration
+			ip = pos - 1
+		case OpJumpOnFalse:
+			condition := vm.popBoolVal()
+			if !condition {
+				pos := int(ReadUint16(vm.instructions[ip+1:]))
+				// jump the instruction pointer to pos - 1 because
+				// the run loop will increment it on the next iteration
+				ip = pos - 1
+			} else {
+				// no jump, so advance the instruction pointer over the
+				// unread operand
+				ip += 2
+			}
 		}
 		if err != nil {
 			return err

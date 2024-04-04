@@ -160,9 +160,7 @@ func (vm *VM) Run() error {
 				key := vm.popStringVal()
 				m[string(key)] = val
 			}
-			if err := vm.push(m); err != nil {
-				return err
-			}
+			err = vm.push(m)
 		case OpIndex:
 			index := vm.pop()
 			left := vm.pop()
@@ -184,6 +182,19 @@ func (vm *VM) Run() error {
 			case arrayVal:
 				err = left.Set(index, val)
 			}
+		case OpSlice:
+			end := vm.pop()
+			start := vm.pop()
+			left := vm.pop()
+			sliced := left.(sliceable)
+			var val value
+			val, err = sliced.Slice(start, end)
+			if err != nil {
+				return err
+			}
+			err = vm.push(val)
+		case OpNone:
+			err = vm.push(noneVal{})
 		}
 		if err != nil {
 			return err

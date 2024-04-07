@@ -1,2 +1,4 @@
 /frontend/wasm_exec.js
 resets.css
+/pkg/cli/testdata/*.svg
+/pkg/cli/svg/testdata/*.svg

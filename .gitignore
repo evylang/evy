@@ -7,5 +7,6 @@
 /frontend/module/wasm_exec.js
 /frontend/version.json
 /out/
+/test.evy
 
 node_modules/

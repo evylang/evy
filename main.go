@@ -91,6 +91,8 @@ func main() {
 type runCmd struct {
 	Source    string `arg:"" help:"Source file. Default stdin" default:"-"`
 	SkipSleep bool   `help:"skip evy sleep command" env:"EVY_SKIP_SLEEP"`
+	SVGOut    string `help:"output drawing to SVG file. Stdout: -." placeholder:"FILE"`
+	SVGStyle  string `help:"style of top-level SVG element." placeholder:"STYLE"`
 }
 
 type fmtCmd struct {
@@ -130,12 +132,43 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	rt := cli.NewRuntime()
-	rt.SkipSleep = c.SkipSleep
+
+	rt := cli.NewRuntime(c.runtimeOptions()...)
+
 	eval := evaluator.NewEvaluator(rt)
-	err = eval.Run(string(b))
-	handlEvyErr(err)
+	evyErr := eval.Run(string(b))
+	if err := c.writeSVG(rt); err != nil {
+		return err
+	}
+
+	handlEvyErr(evyErr) // may exit
 	return nil
+}
+
+func (c *runCmd) runtimeOptions() []cli.Option {
+	opts := []cli.Option{cli.WithSkipSleep(c.SkipSleep)}
+	if c.SVGOut != "" {
+		opts = append(opts, cli.WithSVG(c.SVGStyle))
+	}
+	return opts
+}
+
+func (c *runCmd) writeSVG(rt *cli.Runtime) error {
+	if c.SVGOut == "" {
+		return nil
+	}
+	var w io.Writer
+	if c.SVGOut == "-" {
+		w = os.Stdout
+	} else {
+		f, err := os.Create(c.SVGOut)
+		if err != nil {
+			return fmt.Errorf("cannot create SVG output file: %w", err)
+		}
+		w = f
+		defer f.Close() //nolint:errcheck
+	}
+	return rt.WriteSVG(w)
 }
 
 func handlEvyErr(err error) {

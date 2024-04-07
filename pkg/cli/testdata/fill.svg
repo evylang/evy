@@ -1,0 +1,28 @@
+<svg stroke="black" stroke-linecap="round" font-size="60" viewBox="0 0 1000 1000" style="border: 1px solid red; width: 400px; height: 400px" xmlns="http://www.w3.org/2000/svg">
+  <rect fill="white" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+  <g fill="red" stroke="red" stroke-width="20">
+    <circle cx="100" cy="350" r="70"></circle>
+    <rect x="30" y="460" width="140" height="140"></rect>
+    <line x1="30" y1="650" x2="170" y2="650"></line>
+  </g>
+  <g fill="red" stroke="blue" stroke-width="20">
+    <circle cx="300" cy="350" r="70"></circle>
+    <rect x="230" y="460" width="140" height="140"></rect>
+    <line x1="230" y1="650" x2="370" y2="650"></line>
+  </g>
+  <g fill="orange" stroke="green" stroke-width="20">
+    <circle cx="500" cy="350" r="70"></circle>
+    <rect x="430" y="460" width="140" height="140"></rect>
+    <line x1="430" y1="650" x2="570" y2="650"></line>
+  </g>
+  <g fill="cyan" stroke="deeppink" stroke-width="20">
+    <circle cx="700" cy="350" r="70"></circle>
+    <rect x="630" y="460" width="140" height="140"></rect>
+    <line x1="630" y1="650" x2="770" y2="650"></line>
+  </g>
+  <g fill="none" stroke="violet" stroke-width="20">
+    <circle cx="900" cy="350" r="70"></circle>
+    <rect x="830" y="460" width="140" height="140"></rect>
+    <line x1="830" y1="650" x2="970" y2="650"></line>
+  </g>
+</svg>

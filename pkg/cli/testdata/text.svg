@@ -1,0 +1,34 @@
+<svg stroke="black" stroke-linecap="round" font-size="60" viewBox="0 0 1000 1000" style="border: 1px solid red; width: 400px; height: 400px" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <rect fill="white" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+    <text x="100" y="150">“Time is an illusion.</text>
+    <text x="100" y="220">Lunchtime doubly so.”</text>
+  </g>
+  <text fill="dodgerblue" stroke="dodgerblue" text-anchor="middle" dominant-baseline="middle" font-size="40" font-weight="700" font-style="italic" font-family="Tahomana, sans-serif" letter-spacing="-0.1" x="600" y="280">― Douglas Adams</text>
+  <line fill="none" x1="100" y1="500" x2="450" y2="500"></line>
+  <g fill="none" dominant-baseline="bottom" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="100" y="500">bottom</text>
+    <line x1="100" y1="650" x2="450" y2="650"></line>
+  </g>
+  <g fill="none" dominant-baseline="top" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="100" y="650">top</text>
+    <line x1="100" y1="800" x2="450" y2="800"></line>
+  </g>
+  <g fill="none" dominant-baseline="middle" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="100" y="800">middle</text>
+    <line x1="100" y1="950" x2="450" y2="950"></line>
+  </g>
+  <g fill="none" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="100" y="950">alphabetic</text>
+    <line x1="700" y1="520" x2="700" y2="440"></line>
+  </g>
+  <g fill="none" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="700" y="500">left</text>
+    <line x1="700" y1="670" x2="700" y2="590"></line>
+  </g>
+  <g fill="none" text-anchor="end" font-weight="700" font-family="Fira Code, monospace">
+    <text fill="black" x="700" y="650">right</text>
+    <line x1="700" y1="820" x2="700" y2="740"></line>
+  </g>
+  <text text-anchor="middle" font-weight="700" font-family="Fira Code, monospace" x="700" y="800">center</text>
+</svg>

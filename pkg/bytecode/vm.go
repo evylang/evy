@@ -30,6 +30,7 @@ type VM struct {
 	constants    []value
 	globals      []value
 	instructions Instructions
+	iterStack    []iterator
 	stack        []value
 	// sp is the stack pointer and always points to
 	// the next value in the stack. The top of the stack is stack[sp-1].
@@ -42,6 +43,7 @@ func NewVM(bytecode *Bytecode) *VM {
 		constants:    bytecode.Constants,
 		globals:      make([]value, GlobalsSize),
 		instructions: bytecode.Instructions,
+		iterStack:    make([]iterator, 0),
 		stack:        make([]value, StackSize),
 		sp:           0,
 	}
@@ -231,6 +233,26 @@ func (vm *VM) Run() error {
 				// unread operand
 				ip += 2
 			}
+		case OpStepRange:
+			stop := vm.popNumVal()
+			step := vm.popNumVal()
+			curr := vm.popNumVal()
+			if step > 0 {
+				err = vm.push(boolVal(curr < stop))
+			} else {
+				err = vm.push(boolVal(curr > stop))
+			}
+			if err != nil {
+				return err
+			}
+		case OpArrayRange:
+			arr := vm.popArrayVal()
+			curr := vm.popNumVal()
+			err = vm.push(boolVal(int(curr) < len(arr.Elements)))
+		case OpMapRange:
+			m := vm.popMapVal()
+			curr := vm.popNumVal()
+			err = vm.push(boolVal(int(curr) < len(m)))
 		}
 		if err != nil {
 			return err
@@ -326,6 +348,18 @@ func (vm *VM) popStringVal() stringVal {
 func (vm *VM) popArrayVal() arrayVal {
 	elem := vm.pop()
 	val, ok := elem.(arrayVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop arrayVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
+}
+
+// popMapVal pops an element from the stack and casts it to a mapVal
+// before returning the value. If elem is not an mapVal then it will error.
+func (vm *VM) popMapVal() mapVal {
+	elem := vm.pop()
+	val, ok := elem.(mapVal)
 	if !ok {
 		panic(fmt.Errorf("%w: expected to pop arrayVal but got %s",
 			ErrInternal, elem.Type()))

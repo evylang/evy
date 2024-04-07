@@ -105,6 +105,12 @@ const (
 	// boolean and evaluate it. It will jump to the instruction address
 	// in its operand if the condition evaluates to false.
 	OpJumpOnFalse
+	// OpStepRange represents a range keyword in a for loop.
+	OpStepRange
+	// OpArrayRange represents a range keyword used with an array.
+	OpArrayRange
+	// OpMapRange represents a range keyword used with a map.
+	OpMapRange
 )
 
 var (
@@ -163,6 +169,9 @@ var definitions = map[Opcode]*OpDefinition{
 	OpNone:        {"OpNone", nil},
 	OpJump:        {"OpJump", []int{2}},
 	OpJumpOnFalse: {"OpJumpOnFalse", []int{2}},
+	OpStepRange:   {"OpStepRange", nil},
+	OpArrayRange:  {"OpArrayRange", nil},
+	OpMapRange:    {"OpMapRange", nil},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

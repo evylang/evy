@@ -39,6 +39,12 @@ type indexable interface {
 	Index(key value) (value, error)
 }
 
+type iterator interface {
+	// Next increments the iterator, changing the value of  and returns
+	// true. It returns false when the iterator has no more elements.
+	Next() (bool, error)
+}
+
 type sliceable interface {
 	// Slice returns a subset of elements between the start (inclusive)
 	// and end (exclusive) index. A user error will be returned if start
@@ -217,6 +223,24 @@ func (m mapVal) Index(idx value) (value, error) {
 		return nil, fmt.Errorf("%w %q", ErrMapKey, key)
 	}
 	return val, nil
+}
+
+type mapRange struct {
+	mapVal
+	// order is an ordered list of keys that is used
+	// when ranging over a map.
+	order []string
+}
+
+func newMapRange(m mapVal) mapRange {
+	order := make([]string, 0, len(m))
+	for k := range m {
+		order = append(order, k)
+	}
+	return mapRange{
+		mapVal: m,
+		order:  order,
+	}
 }
 
 type noneVal struct{}

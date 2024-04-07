@@ -1466,6 +1466,282 @@ func TestWhile(t *testing.T) {
 	}
 }
 
+func TestStepRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "for range default start and step",
+			input: `x := 0
+			for range 10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 10),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for range default step",
+			input: `x := 0
+			for range 2 10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 8),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for range var",
+			input: `x := 0
+			for i := range 10
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 9),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for range step",
+			input: `x := 0
+			for i := range 0 10 4
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 8),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for range negative step",
+			input: `x := 0
+			for i := range 10 0 -1
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for range invalid stop",
+			input: `x := 0
+			for range -10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 0),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+		{
+			name: "for break",
+			input: `x := 0
+			for x := range 5
+				if x == 3 
+                    break
+                end
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants:    makeValues(t),
+				Instructions: makeInstructions(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			t.Log(bytecode.Constants)
+			t.Log(bytecode.Instructions)
+			// assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestArrayRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "for range array",
+			input: `x := 0
+			for e := range [1 2 3]
+				x = e
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 0, 1, 2, 3),
+				Instructions: makeInstructions(
+					// x := 0
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					// i := 0 // i is the hidden index variable
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpSetGlobal, 1),
+					// [1 2 3]
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 2),
+					// [1 2 3]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpGetGlobal, 2),
+				),
+			},
+		},
+		{
+			name: "for range array no loopvar",
+			input: `x := 0
+			for range [1 2 3]
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 0, 1, 2, 3),
+				Instructions: makeInstructions(
+					// x := 0
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					// i := 0
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpSetGlobal, 1),
+					// [1 2 3]
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 2),
+					// [1 2 3]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpGetGlobal, 2),
+				),
+			},
+		},
+		{
+			name: "for range array variable",
+			input: `x := 0
+			y := [1 2 3]
+			for e := range y
+				x = e
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 0, 1, 2, 3),
+				Instructions: makeInstructions(
+					// x := 0
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					// i := 0
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpSetGlobal, 1),
+					// [1 2 3]
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpSetGlobal, 2),
+					// [1 2 3]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpConstant, 4),
+					mustMake(t, OpArray, 3),
+					// e := arr[i]
+					mustMake(t, OpGetGlobal, 1),
+					mustMake(t, OpIndex),
+					mustMake(t, OpGetGlobal, 2),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			t.Log(bytecode.Constants)
+			t.Log(bytecode.Instructions)
+			// assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestMapRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "map range",
+			input: `x := ""
+			for e := range {a:1 b:2}
+				x = e
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "b"),
+			wantBytecode: &Bytecode{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			t.Log(bytecode.Constants)
+			t.Log(bytecode.Instructions)
+			// assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly

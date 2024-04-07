@@ -1221,6 +1221,164 @@ func TestIf(t *testing.T) {
 	}
 }
 
+func TestWhile(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "enter loop",
+			input: `x := 0
+			while x < 5
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 5),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 5, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumLessThan),
+					mustMake(t, OpJumpOnFalse, 29),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpJump, 6),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "skip loop",
+			input: `x := 0
+			while x > 5
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 0),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 5, 1),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumGreaterThan),
+					mustMake(t, OpJumpOnFalse, 29),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 0),
+					mustMake(t, OpJump, 6),
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "break loop",
+			input: `x := 0
+			while x < 5
+				x = x + 1
+				if x == 3 
+					break
+				end
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 5, 1, 3),
+				Instructions: makeInstructions(
+					// x := 0
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					// while x < 5
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpNumLessThan),
+					mustMake(t, OpJumpOnFalse, 45),
+					// 		x = x + 1
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 0),
+					// 		if x == 3
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 3),
+					mustMake(t, OpEqual),
+					mustMake(t, OpJumpOnFalse, 42),
+					// 			break
+					mustMake(t, OpJump, 45),
+					// 		end
+					mustMake(t, OpJump, 42),
+					// end
+					mustMake(t, OpJump, 6),
+					// x = x
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name: "nested loops and breaks",
+			input: `
+			x := 0
+			while true
+				while true
+					break
+				end
+				x = x + 1
+				break
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 0, 1),
+				Instructions: makeInstructions(
+					// x := 0
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpSetGlobal, 0),
+					// while true
+					mustMake(t, OpTrue),
+					mustMake(t, OpJumpOnFalse, 36),
+					// 		while true
+					mustMake(t, OpTrue),
+					mustMake(t, OpJumpOnFalse, 20),
+					// 			break
+					mustMake(t, OpJump, 20),
+					// 		end
+					mustMake(t, OpJump, 10),
+					// 		x = x + 1
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpAdd),
+					mustMake(t, OpSetGlobal, 0),
+					// 		break
+					mustMake(t, OpJump, 36),
+					// end
+					mustMake(t, OpJump, 6),
+					// x = x
+					mustMake(t, OpGetGlobal, 0),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			assertBytecode(t, tt.wantBytecode, bytecode)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly

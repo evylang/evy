@@ -31,6 +31,8 @@ type Compiler struct {
 	constants    []value
 	instructions Instructions
 	globals      *SymbolTable
+	// breaks tracks the positions of break statements in the inner-most loop.
+	breaks []int
 }
 
 // Bytecode represents raw evy bytecode.
@@ -57,10 +59,14 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileAssignment(node)
 	case *parser.BinaryExpression:
 		return c.compileBinaryExpression(node)
+	case *parser.BreakStmt:
+		return c.compileBreakStatement(node)
 	case *parser.BlockStatement:
 		return c.compileBlockStatement(node)
 	case *parser.IfStmt:
 		return c.compileIfStatement(node)
+	case *parser.WhileStmt:
+		return c.compileWhileStatement(node)
 	case *parser.SliceExpression:
 		return c.compileSliceExpression(node)
 	case *parser.UnaryExpression:
@@ -284,6 +290,50 @@ func (c *Compiler) compileConditionalBlock(block *parser.ConditionalBlock) (int,
 	afterBlockPos := len(c.instructions)
 	c.instructions.changeOperand(jumpOnFalsePos, afterBlockPos)
 	return jumpPos, nil
+}
+
+func (c *Compiler) compileWhileStatement(stmt *parser.WhileStmt) error {
+	startPos := len(c.instructions)
+	if err := c.Compile(stmt.Condition); err != nil {
+		return err
+	}
+	// Prepare end position of while block, jump to end if condition is false
+	jumpOnFalsePos, err := c.emitPos(OpJumpOnFalse, JumpPlaceholder)
+	if err != nil {
+		return err
+	}
+	// take a snapshot of the break list before compiling the body of the loop
+	outOfScopeBreaks := c.breaks
+	c.breaks = []int{}
+	if err := c.Compile(stmt.Block); err != nil {
+		return err
+	}
+	// Jump back to start of while condition
+	if err := c.emit(OpJump, startPos); err != nil {
+		return err
+	}
+	// rewrite the JumpPlaceholder in the OpJumpOnFalse so that it will
+	// jump to the end of the statement when the condition is false
+	afterBlockPos := len(c.instructions)
+	c.instructions.changeOperand(jumpOnFalsePos, afterBlockPos)
+	// rewrite the JumpPlaceholder in the break statements to jump
+	// to the end of the loop
+	for _, breakPos := range c.breaks {
+		c.instructions.changeOperand(breakPos, afterBlockPos)
+	}
+	// reset the break list
+	c.breaks = outOfScopeBreaks
+	return nil
+}
+
+func (c *Compiler) compileBreakStatement(_ *parser.BreakStmt) error {
+	// JumpPlaceholder will be rewritten by the parent loop
+	pos, err := c.emitPos(OpJump, JumpPlaceholder)
+	if err != nil {
+		return err
+	}
+	c.breaks = append(c.breaks, pos)
+	return nil
 }
 
 func (c *Compiler) compileSliceExpression(expr *parser.SliceExpression) error {

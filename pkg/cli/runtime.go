@@ -1,32 +1,66 @@
-// Package cli provides a runtime to for Evy CLI execution in terminal.
+//go:build !tinygo
+
+// Package cli provides an Evy runtime to for Evy CLI execution in terminal.
 package cli
 
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
 	"time"
 
+	"evylang.dev/evy/pkg/cli/svg"
 	"evylang.dev/evy/pkg/evaluator"
 )
 
 // Runtime implements evaluator.Runtime.
 type Runtime struct {
-	evaluator.UnimplementedRuntime
+	evaluator.GraphicsRuntime
 	reader    *bufio.Reader
+	writer    io.Writer
 	SkipSleep bool
 }
 
+// Option is used on Runtime creation to set optional parameters.
+type Option func(*Runtime)
+
+// WithSkipSleep sets the SkipSleep field Runtime and is intended to be used
+// with NewRuntime.
+func WithSkipSleep(skipSleep bool) Option {
+	return func(rt *Runtime) {
+		rt.SkipSleep = skipSleep
+	}
+}
+
+// WithSVG sets up an SVG graphics runtime and writes its output to the
+// given writer.
+func WithSVG(svgStyle string) Option {
+	return func(rt *Runtime) {
+		svgRT := svg.NewGraphicsRuntime()
+		svgRT.SVG.Style = svgStyle
+		rt.GraphicsRuntime = svgRT
+	}
+}
+
 // NewRuntime returns an initialized cli runtime.
-func NewRuntime() *Runtime {
-	return &Runtime{reader: bufio.NewReader(os.Stdin)}
+func NewRuntime(options ...Option) *Runtime {
+	rt := &Runtime{
+		reader:          bufio.NewReader(os.Stdin),
+		writer:          os.Stdout,
+		GraphicsRuntime: &evaluator.UnimplementedRuntime{},
+	}
+	for _, opt := range options {
+		opt(rt)
+	}
+	return rt
 }
 
 // Print prints s to stdout.
-func (*Runtime) Print(s string) {
-	fmt.Print(s)
+func (rt *Runtime) Print(s string) {
+	fmt.Fprint(rt.writer, s)
 }
 
 // Cls clears the screen.
@@ -61,3 +95,10 @@ func (rt *Runtime) Sleep(dur time.Duration) {
 // contrast, browser Evy needs to explicitly hand over control to JS
 // host with Yielder.
 func (*Runtime) Yielder() evaluator.Yielder { return nil }
+
+// WriteSVG writes the graphics output in SVG format to the writer set with
+// option WithSVGWriter.
+func (rt *Runtime) WriteSVG(w io.Writer) error {
+	graphicsRT := rt.GraphicsRuntime.(*svg.GraphicsRuntime)
+	return graphicsRT.WriteSVG(w)
+}

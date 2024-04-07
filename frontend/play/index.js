@@ -498,7 +498,7 @@ function resetCanvas() {
   canvas.stroke = true
   ctx.lineCap = "round"
   ctx.setLineDash([])
-  ctx.font = `${(ctx.canvas.width / 100) * 6}px regular`
+  ctx.font = `${(ctx.canvas.width / 100) * 6}px "Fira Code", monospace`
   ctx.textAlign = "left"
   ctx.textBaseline = "alphabetic"
   ctx.letterSpacing = "0px"

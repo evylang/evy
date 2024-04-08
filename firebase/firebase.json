@@ -43,7 +43,21 @@
     },
     {
       "target": "learn",
-      "public": "public/learn"
+      "public": "public/learn",
+      "rewrites": [
+        {
+          "source": "/version",
+          "destination": "/version.json"
+        },
+        {
+          "source": "/api",
+          "run": {
+            "serviceId": "learnapi",
+            "region": "australia-southeast1",
+            "pinTag": false
+          }
+        }
+      ]
     },
     {
       "target": "play",

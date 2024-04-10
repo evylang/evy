@@ -240,7 +240,7 @@ func (t *Token) setLiteral(literal string) *Token {
 func (t *Token) String() string {
 	switch t.Type {
 	case COMMENT, IDENT, NUM_LIT, STRING_LIT:
-		return fmt.Sprintf("%s %q", t.Type.String(), t.Literal)
+		return fmt.Sprintf("%s %q", t.Type, t.Literal)
 	case ILLEGAL:
 		return fmt.Sprintf("ILLEGAL 💥 %q at %s", t.Literal, t.Location())
 	}

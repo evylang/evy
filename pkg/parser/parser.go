@@ -385,7 +385,7 @@ func (p *parser) parseAssignmentStatement() Node {
 		return nil
 	}
 	if !target.Type().accepts(value.Type()) {
-		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target.String(), target.Type().String(), value.Type().String())
+		msg := fmt.Sprintf("%q accepts values of type %s, found %s", target, target.Type(), value.Type())
 		p.appendErrorForToken(msg, tok)
 	} else {
 		value = wrapAny(value, target.Type())
@@ -579,7 +579,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		for i, arg := range args {
 			argType := arg.Type()
 			if !paramType.accepts(argType) {
-				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType.String(), argType.String())
+				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType, argType)
 				p.appendErrorForToken(msg, arg.Token())
 			} else {
 				args[i] = wrapAny(arg, paramType)
@@ -600,7 +600,7 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		paramType := decl.Params[i].Type()
 		argType := arg.Type()
 		if !paramType.accepts(argType) {
-			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType.String(), argType.String())
+			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType, argType)
 			p.appendErrorForToken(msg, arg.Token())
 		} else {
 			args[i] = wrapAny(arg, paramType)

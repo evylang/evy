@@ -127,7 +127,7 @@ func (p *parser) parseUnaryExpr() Node {
 	unaryExp := &UnaryExpression{token: tok, Op: op(tok)}
 	p.advance() // advance past operator
 	if p.lookAt(p.pos-1).Type == lexer.WS {
-		msg := fmt.Sprintf("unexpected whitespace after %q", unaryExp.Op.String())
+		msg := fmt.Sprintf("unexpected whitespace after %q", unaryExp.Op)
 		p.appendErrorForToken(msg, tok)
 	}
 	unaryExp.Right = p.parseExpr(unaryPrec)
@@ -301,7 +301,7 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 	t := p.parseType()
 	switch t {
 	case nil:
-		msg := fmt.Sprintf("invalid type in type assertion of %q", left.String())
+		msg := fmt.Sprintf("invalid type in type assertion of %q", left)
 		p.appendErrorForToken(msg, tok)
 	case ANY_TYPE:
 		p.appendErrorForToken("cannot type assert to type any", tok)
@@ -351,7 +351,7 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
 	if !leftType.matches(rightType) {
-		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op.String(), leftType.String(), rightType.String())
+		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op, leftType, rightType)
 		p.appendErrorForToken(msg, tok)
 		return
 	}
@@ -363,17 +363,17 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 		}
 	case OP_MINUS, OP_SLASH, OP_ASTERISK, OP_PERCENT:
 		if leftType != NUM_TYPE {
-			msg := fmt.Sprintf("%q takes num type, found %s", op.String(), leftType.String())
+			msg := fmt.Sprintf("%q takes num type, found %s", op, leftType)
 			p.appendErrorForToken(msg, tok)
 		}
 	case OP_LT, OP_GT, OP_LTEQ, OP_GTEQ:
 		if leftType != NUM_TYPE && leftType != STRING_TYPE {
-			msg := fmt.Sprintf("%q takes num or string type, found %s", op.String(), leftType.String())
+			msg := fmt.Sprintf("%q takes num or string type, found %s", op, leftType)
 			p.appendErrorForToken(msg, tok)
 		}
 	case OP_AND, OP_OR:
 		if leftType != BOOL_TYPE {
-			msg := fmt.Sprintf("%q takes bool type, found %s", op.String(), leftType.String())
+			msg := fmt.Sprintf("%q takes bool type, found %s", op, leftType)
 			p.appendErrorForToken(msg, tok)
 		}
 	}

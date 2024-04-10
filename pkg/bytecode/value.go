@@ -185,7 +185,7 @@ func (m mapVal) Type() *parser.Type {
 func (m mapVal) String() string {
 	pairs := []string{}
 	for k, v := range m {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v.String()))
+		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v))
 	}
 	return "{" + strings.Join(pairs, ", ") + "}"
 }

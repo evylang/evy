@@ -350,7 +350,7 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 
 	leftType := binaryExp.Left.Type()
 	rightType := binaryExp.Right.Type()
-	if !leftType.matches(rightType) {
+	if !(leftType.matches(rightType) || (leftType.Name == ARRAY && op == OP_ASTERISK)) {
 		msg := fmt.Sprintf("mismatched type for %s: %s, %s", op, leftType, rightType)
 		p.appendErrorForToken(msg, tok)
 		return
@@ -361,7 +361,15 @@ func (p *parser) validateBinaryType(binaryExp *BinaryExpression) {
 		if leftType != NUM_TYPE && leftType != STRING_TYPE && leftType.Name != ARRAY {
 			p.appendErrorForToken(`"+" takes num, string or array type, found `+leftType.String(), tok)
 		}
-	case OP_MINUS, OP_SLASH, OP_ASTERISK, OP_PERCENT:
+	case OP_ASTERISK:
+		if leftType != NUM_TYPE && leftType.Name != ARRAY {
+			msg := fmt.Sprintf(`"*" takes num or array type, found %s`, leftType)
+			p.appendErrorForToken(msg, tok)
+		} else if leftType.Name == ARRAY && rightType != NUM_TYPE {
+			msg := fmt.Sprintf(`array repetition ("*") takes num on right, found %s`, rightType)
+			p.appendErrorForToken(msg, tok)
+		}
+	case OP_MINUS, OP_SLASH, OP_PERCENT:
 		if leftType != NUM_TYPE {
 			msg := fmt.Sprintf("%q takes num type, found %s", op, leftType)
 			p.appendErrorForToken(msg, tok)

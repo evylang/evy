@@ -116,6 +116,7 @@
                   <a href="syntax_by_example.html#array-element-access">Array element access</a>
                 </li>
                 <li><a href="syntax_by_example.html#concatenation">Concatenation</a></li>
+                <li><a href="syntax_by_example.html#repetition">Repetition</a></li>
                 <li><a href="syntax_by_example.html#slicing">Slicing</a></li>
               </ul>
             </li>
@@ -429,8 +430,8 @@
               <div class="expander"></div>
               <ul>
                 <li>
-                  <a href="spec.html#arithmetic-and-concatenation-operators"
-                    >Arithmetic and Concatenation Operators</a
+                  <a href="spec.html#arithmetic-concatenation-and-repetition-operators"
+                    >Arithmetic, Concatenation and Repetition Operators</a
                   >
                 </li>
                 <li><a href="spec.html#logical-operators">Logical Operators</a></li>
@@ -1082,6 +1083,15 @@ print &quot;Type of arr:&quot; (typeof arr)
           <code>arr := [1 2 &quot;a&quot; &quot;b&quot;]</code> instead.
         </p>
         <p>
+          Arrays can be repeated with the <code>*</code> operator, for example
+          <code>[0] * 5</code> results in <code>[0 0 0 0 0]</code>.
+          <code>[&quot;hello&quot; &quot;world&quot;] * 2</code> results in
+          <code>[&quot;hello&quot; &quot;world&quot; &quot;hello&quot; &quot;world&quot;]</code>. An
+          array repeated zero times results in an empty array of the same type as the array. The
+          number on the right hand side of the <code>*</code> operator must be an non-negative
+          integer value. Using a non-integer or negative value will result in an error.
+        </p>
+        <p>
           The elements of an array can be accessed via index starting at <code>0</code>. In the
           example <code>arr := [&quot;abc&quot; 123]</code> the first element in the array
           <code>arr[0]</code> is <code>&quot;abc&quot;</code>.
@@ -1294,6 +1304,12 @@ print 5 s[:-1]
               <td>concatenation</td>
             </tr>
             <tr>
+              <td><code>*</code></td>
+              <td>array <code>*</code> <code>num</code></td>
+              <td>array</td>
+              <td>repetition</td>
+            </tr>
+            <tr>
               <td><code>and</code> <code>or</code></td>
               <td><code>bool</code></td>
               <td><code>bool</code></td>
@@ -1321,18 +1337,19 @@ print 5 s[:-1]
         </table>
         <h3>
           <a
-            id="arithmetic-and-concatenation-operators"
-            href="#arithmetic-and-concatenation-operators"
+            id="arithmetic-concatenation-and-repetition-operators"
+            href="#arithmetic-concatenation-and-repetition-operators"
             class="anchor"
             >#</a
-          >Arithmetic and Concatenation Operators
+          >Arithmetic, Concatenation and Repetition Operators
         </h3>
         <p>
           The <strong>arithmetic operators</strong> <code>+</code>, <code>-</code>, <code>*</code>,
           <code>/</code>, and <code>%</code> stand for addition, subtraction, multiplication,
           division, and the
           <a href="https://en.wikipedia.org/wiki/Modulo_operation">modulo operator</a>. The symbol
-          <code>+</code> can also be used to concatenate strings and arrays.
+          <code>+</code> can also be used to concatenate strings and arrays. The
+          <code>*</code> symbol can be used to repeat an array a number of times.
         </p>
         <p>
           The <strong>modulo operator</strong> <code>%</code>, also known as the remainder operator,
@@ -1345,6 +1362,11 @@ print 5 s[:-1]
           arrays together. For example, <code>&quot;fire&quot;</code> +
           <code>&quot;engine&quot;</code> combines into the string
           <code>&quot;fireengine&quot;</code>.
+        </p>
+        <p>
+          The <strong>repetition operator</strong> <code>*</code>, repeats an array a number of
+          times. The number must be a non-negative integer value. An array repeated zero times is an
+          empty array.
         </p>
         <h3>
           <a id="logical-operators" href="#logical-operators" class="anchor">#</a>Logical Operators

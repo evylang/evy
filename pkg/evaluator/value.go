@@ -148,11 +148,11 @@ func (a *anyVal) Equals(v value) bool {
 }
 
 func (a *anyVal) Set(v value) {
-	if a2, ok := v.(*anyVal); ok {
-		a.V = copyOrRef(a2.V)
-	} else {
-		a.V = copyOrRef(v)
+	a2, ok := v.(*anyVal)
+	if !ok {
+		panic("internal error: Any.Set called with non-Any value")
 	}
+	a.V = copyOrRef(a2.V)
 }
 
 func (n *noneVal) Type() *parser.Type  { return parser.NONE_TYPE }

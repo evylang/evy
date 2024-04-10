@@ -268,7 +268,7 @@ func splitFunc(_ *scope, args []value) (value, error) {
 	for i, s := range slice {
 		elements[i] = &stringVal{V: s}
 	}
-	return &arrayVal{Elements: &elements, T: stringArrayType}, nil
+	return &arrayVal{Elements: &elements}, nil
 }
 
 var upperDecl = &parser.FuncDefStmt{
@@ -436,10 +436,7 @@ var typeofDecl = &parser.FuncDefStmt{
 }
 
 func typeofFunc(_ *scope, args []value) (value, error) {
-	t := args[0].Type()
-	if a, ok := args[0].(*anyVal); ok {
-		t = a.V.Type()
-	}
+	t := args[0].(*anyVal).T
 	return &stringVal{V: t.String()}, nil
 }
 
@@ -458,7 +455,7 @@ func lenFunc(_ *scope, args []value) (value, error) {
 	case *stringVal:
 		return &numVal{V: float64(len(arg.runes()))}, nil
 	}
-	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].Type())
+	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].(*anyVal).T)
 }
 
 var hasDecl = &parser.FuncDefStmt{
@@ -671,7 +668,7 @@ func dashFunc(dashFn func([]float64)) builtinFunc {
 
 var fontDecl = &parser.FuncDefStmt{
 	Name:       "font",
-	Params:     []*parser.Var{{Name: "properties", T: parser.GENERIC_MAP}},
+	Params:     []*parser.Var{{Name: "properties", T: &parser.Type{Name: parser.MAP, Sub: parser.ANY_TYPE}}},
 	ReturnType: parser.NONE_TYPE,
 }
 
@@ -691,10 +688,7 @@ func parseFontProps(arg *mapVal) (map[string]any, error) {
 		if !ok {
 			return nil, fmt.Errorf("%w: unknown property %q", ErrBadArguments, key)
 		}
-		if a, ok := val.(*anyVal); ok {
-			val = a.V
-		}
-		switch v := val.(type) {
+		switch v := val.(*anyVal).V.(type) {
 		case *stringVal:
 			if propType != "string" {
 				return nil, fmt.Errorf("%w: expected property %q of type %s, found string", ErrBadArguments, key, propType)
@@ -715,7 +709,7 @@ func parseFontProps(arg *mapVal) (map[string]any, error) {
 			}
 			props[key] = v.V
 		default:
-			return nil, fmt.Errorf("%w: expected property %q of type %s, found %s", ErrBadArguments, key, propType, v.Type().String())
+			return nil, fmt.Errorf("%w: expected property %q of type %s, found %s", ErrBadArguments, key, propType, val.(*anyVal).T)
 		}
 	}
 	return props, nil

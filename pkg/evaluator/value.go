@@ -30,6 +30,7 @@ type stringVal struct {
 
 type anyVal struct {
 	V value
+	T *parser.Type
 }
 
 type arrayVal struct {
@@ -144,7 +145,7 @@ func (a *anyVal) Equals(v value) bool {
 	if !ok {
 		panic("internal error: Any.Equals called with non-Any value")
 	}
-	return a.V.Type().Equals(a2.V.Type()) && a.V.Equals(a2.V)
+	return a.T.Equals(a2.T) && a.V.Equals(a2.V)
 }
 
 func (a *anyVal) Set(v value) {
@@ -153,6 +154,7 @@ func (a *anyVal) Set(v value) {
 		panic("internal error: Any.Set called with non-Any value")
 	}
 	a.V = copyOrRef(a2.V)
+	a.T = a2.T
 }
 
 func (n *noneVal) Type() *parser.Type  { return parser.NONE_TYPE }
@@ -248,7 +250,7 @@ func copyOrRef(val value) value {
 	case *boolVal:
 		return &boolVal{V: v.V}
 	case *anyVal:
-		return &anyVal{V: copyOrRef(v.V)}
+		return &anyVal{V: copyOrRef(v.V), T: v.T}
 	case *arrayVal:
 		return v
 	case *mapVal:
@@ -367,10 +369,7 @@ func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
 		limit++ // slice expression indices can index one past the end
 	}
 
-	index, ok := idx.(*numVal)
-	if !ok {
-		return 0, fmt.Errorf("%w: expected num, found %v", ErrType, idx.Type())
-	}
+	index := idx.(*numVal)
 	i := int(index.V)
 	if i < -length || i > limit {
 		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
@@ -390,7 +389,7 @@ func zero(t *parser.Type) value {
 	case t == parser.BOOL_TYPE:
 		return &boolVal{}
 	case t == parser.ANY_TYPE:
-		return &anyVal{V: &boolVal{}}
+		return &anyVal{V: &boolVal{}, T: parser.BOOL_TYPE}
 	case t.Name == parser.ARRAY:
 		elements := []value{}
 		return &arrayVal{Elements: &elements, T: t}

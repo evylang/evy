@@ -332,7 +332,7 @@ func (e *Evaluator) evalAny(a *parser.Any) (value, error) {
 	if _, ok := val.(*anyVal); ok {
 		panic("nested any value " + a.String())
 	}
-	return &anyVal{V: val}, nil
+	return &anyVal{V: val, T: a.Value.Type()}, nil
 }
 
 func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
@@ -767,7 +767,7 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 		}
 		val, err = l.Get(strIndex.V)
 	default:
-		err = fmt.Errorf("%w: expected array, string or map with index, found %v", ErrType, left.Type())
+		err = fmt.Errorf("%w: expected array, string or map with index, found %v", ErrType, expr.Left.Type())
 	}
 	if err != nil {
 		return nil, newErr(expr, err)
@@ -837,8 +837,8 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 	if !ok {
 		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
 	}
-	if !a.V.Type().Equals(ta.T) {
-		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.V.Type()))
+	if !a.T.Equals(ta.T) {
+		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.T))
 	}
 	return a.V, nil
 }

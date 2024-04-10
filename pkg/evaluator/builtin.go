@@ -436,7 +436,7 @@ var typeofDecl = &parser.FuncDefStmt{
 }
 
 func typeofFunc(_ *scope, args []value) (value, error) {
-	t := args[0].(*anyVal).V.Type()
+	t := args[0].(*anyVal).T
 	return &stringVal{V: t.String()}, nil
 }
 
@@ -455,7 +455,7 @@ func lenFunc(_ *scope, args []value) (value, error) {
 	case *stringVal:
 		return &numVal{V: float64(len(arg.runes()))}, nil
 	}
-	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].(*anyVal).V.Type())
+	return nil, fmt.Errorf(`%w: "len" takes 1 argument of type "string", array "[]" or map "{}" not %s`, ErrBadArguments, args[0].(*anyVal).T)
 }
 
 var hasDecl = &parser.FuncDefStmt{
@@ -709,7 +709,7 @@ func parseFontProps(arg *mapVal) (map[string]any, error) {
 			}
 			props[key] = v.V
 		default:
-			return nil, fmt.Errorf("%w: expected property %q of type %s, found %s", ErrBadArguments, key, propType, val.(*anyVal).V.Type())
+			return nil, fmt.Errorf("%w: expected property %q of type %s, found %s", ErrBadArguments, key, propType, val.(*anyVal).T)
 		}
 	}
 	return props, nil

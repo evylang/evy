@@ -340,7 +340,7 @@ func (e *Evaluator) evalArrayLiteral(arr *parser.ArrayLiteral) (value, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &arrayVal{Elements: &elements, T: arr.T}, nil
+	return &arrayVal{Elements: &elements}, nil
 }
 
 func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
@@ -354,7 +354,7 @@ func (e *Evaluator) evalMapLiteral(m *parser.MapLiteral) (value, error) {
 	}
 	order := make([]string, len(m.Order))
 	copy(order, m.Order)
-	return &mapVal{Pairs: pairs, Order: &order, T: m.T}, nil
+	return &mapVal{Pairs: pairs, Order: &order}, nil
 }
 
 func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
@@ -379,7 +379,7 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 		e.scope.set(param.Name, args[i])
 	}
 	if fd.VariadicParam != nil {
-		varArg := &arrayVal{Elements: &args, T: fd.VariadicParamType}
+		varArg := &arrayVal{Elements: &args}
 		e.scope.set(fd.VariadicParam.Name, varArg)
 	}
 
@@ -644,7 +644,7 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (value, error)
 	case *boolVal:
 		val, err = evalBinaryBoolExpr(op, l, right.(*boolVal))
 	case *arrayVal:
-		val, err = evalBinaryArrayExpr(op, l, right.(*arrayVal), expr.Type())
+		val, err = evalBinaryArrayExpr(op, l, right.(*arrayVal))
 	default:
 		err = fmt.Errorf("%w (binary): %v", ErrOperation, expr)
 	}
@@ -718,12 +718,11 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *boolVal) (value, error)
 	return nil, fmt.Errorf("%w (bool): %v", ErrOperation, op.String())
 }
 
-func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal, t *parser.Type) (value, error) {
+func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal) (value, error) {
 	if op != parser.OP_PLUS {
 		return nil, fmt.Errorf("%w (array): %v", ErrOperation, op.String())
 	}
 	result := left.Copy()
-	result.T = t
 	rightElemnts := *right.Copy().Elements
 	*result.Elements = append(*result.Elements, rightElemnts...)
 	return result, nil

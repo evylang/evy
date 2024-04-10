@@ -9,7 +9,6 @@ import (
 )
 
 type value interface {
-	Type() *parser.Type
 	Equals(value) bool
 	String() string
 	Set(value)
@@ -35,13 +34,11 @@ type anyVal struct {
 
 type arrayVal struct {
 	Elements *[]value
-	T        *parser.Type
 }
 
 type mapVal struct {
 	Pairs map[string]value
 	Order *[]string
-	T     *parser.Type
 }
 
 type returnVal struct {
@@ -52,8 +49,7 @@ type breakVal struct{}
 
 type noneVal struct{}
 
-func (n *numVal) Type() *parser.Type { return parser.NUM_TYPE }
-func (n *numVal) String() string     { return strconv.FormatFloat(n.V, 'f', -1, 64) }
+func (n *numVal) String() string { return strconv.FormatFloat(n.V, 'f', -1, 64) }
 func (n *numVal) Equals(v value) bool {
 	n2, ok := v.(*numVal)
 	if !ok {
@@ -70,8 +66,7 @@ func (n *numVal) Set(v value) {
 	*n = *n2
 }
 
-func (s *stringVal) Type() *parser.Type { return parser.STRING_TYPE }
-func (s *stringVal) String() string     { return s.V }
+func (s *stringVal) String() string { return s.V }
 func (s *stringVal) Equals(v value) bool {
 	s2, ok := v.(*stringVal)
 	if !ok {
@@ -114,7 +109,6 @@ func (s *stringVal) Slice(start, end value) (value, error) {
 	return &stringVal{V: string(runes[startIdx:endIdx])}, nil
 }
 
-func (*boolVal) Type() *parser.Type { return parser.BOOL_TYPE }
 func (b *boolVal) String() string {
 	return strconv.FormatBool(b.V)
 }
@@ -135,7 +129,6 @@ func (b *boolVal) Set(v value) {
 	*b = *b2
 }
 
-func (*anyVal) Type() *parser.Type { return parser.ANY_TYPE }
 func (a *anyVal) String() string {
 	return a.V.String()
 }
@@ -157,22 +150,18 @@ func (a *anyVal) Set(v value) {
 	a.T = a2.T
 }
 
-func (n *noneVal) Type() *parser.Type  { return parser.NONE_TYPE }
 func (n *noneVal) String() string      { return "" }
 func (n *noneVal) Equals(_ value) bool { return false }
 func (n *noneVal) Set(_ value)         { panic("internal error: None.Set called") }
 
-func (r *returnVal) Type() *parser.Type  { return r.V.Type() }
 func (r *returnVal) String() string      { return r.V.String() }
 func (r *returnVal) Equals(v value) bool { return r.V.Equals(v) }
 func (r *returnVal) Set(v value)         { r.V.Set(v) }
 
-func (r *breakVal) Type() *parser.Type  { return parser.NONE_TYPE }
 func (r *breakVal) String() string      { return "" }
 func (r *breakVal) Equals(_ value) bool { return false }
 func (r *breakVal) Set(_ value)         {}
 
-func (a *arrayVal) Type() *parser.Type { return a.T }
 func (a *arrayVal) String() string {
 	elements := make([]string, len(*a.Elements))
 	for i, e := range *a.Elements {
@@ -221,7 +210,7 @@ func (a *arrayVal) Copy() *arrayVal {
 	for i, v := range *a.Elements {
 		elements[i] = copyOrRef(v)
 	}
-	return &arrayVal{Elements: &elements, T: a.T}
+	return &arrayVal{Elements: &elements}
 }
 
 func (a *arrayVal) Slice(start, end value) (value, error) {
@@ -236,7 +225,7 @@ func (a *arrayVal) Slice(start, end value) (value, error) {
 		v := (*a.Elements)[i]
 		elements[i-startIdx] = copyOrRef(v)
 	}
-	return &arrayVal{Elements: &elements, T: a.T}, nil
+	return &arrayVal{Elements: &elements}, nil
 }
 
 // copyOrRef is a copy of the input value for basic types and a
@@ -259,7 +248,6 @@ func copyOrRef(val value) value {
 	panic("internal error: copyOrRef called with with invalid value")
 }
 
-func (m *mapVal) Type() *parser.Type { return m.T }
 func (m *mapVal) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
 	for _, key := range *m.Order {
@@ -392,10 +380,10 @@ func zero(t *parser.Type) value {
 		return &anyVal{V: &boolVal{}, T: parser.BOOL_TYPE}
 	case t.Name == parser.ARRAY:
 		elements := []value{}
-		return &arrayVal{Elements: &elements, T: t}
+		return &arrayVal{Elements: &elements}
 	case t.Name == parser.MAP:
 		order := []string{}
-		return &mapVal{Pairs: map[string]value{}, Order: &order, T: t}
+		return &mapVal{Pairs: map[string]value{}, Order: &order}
 	}
 	panic("cannot create zero value for type " + t.String())
 }

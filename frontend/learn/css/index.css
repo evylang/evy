@@ -1,0 +1,27 @@
+fieldset {
+  padding: 1rem;
+  max-width: 600px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+pre {
+  margin-left: 32px;
+}
+
+button {
+  padding: 4px 16px;
+}
+
+body {
+  width: 100%;
+}
+form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+h1 {
+  margin: 32px 0 16px;
+}

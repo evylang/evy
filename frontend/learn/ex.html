@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy · Exercise 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="css/root.css" type="text/css" />
+    <link rel="stylesheet" href="css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="css/index.css" type="text/css" />
+    <link rel="stylesheet" href="css/fonts.css" type="text/css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "./module/highlight.js": "./module/highlight.js"
+        }
+      }
+    </script>
+    <script src="./index.js" type="module"></script>
+  </head>
+
+  <body>
+    <!-- Evy header demo -->
+    <header class="topnav" style="margin-top: 64px">
+      <div class="left">
+        <button class="icon hamburger"></button>
+        <a href="/" class="desktop">
+          <img src="../img/logo.v1.svg" alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="center">Middle</div>
+      <div class="right">
+        <span class="desktop">About</span>
+        <a href="/" class="mobile logo-small"></a>
+      </div>
+    </header>
+
+    <form>
+      <h1>Exercise: print output</h1>
+      <p>What does this program output?</p>
+      <pre><code  class="language-evy">
+print "hello"
+    </code></pre>
+      <fieldset>
+        <legend>Choose one correct answer</legend>
+        <div>
+          <input type="radio" id="a" name="answer" />
+          <label for="a">a</label>
+          <pre><code>hello</code></pre>
+        </div>
+        <div>
+          <input type="radio" id="b" name="answer" />
+          <label for="b">b</label>
+          <pre><code>"hello"</code></pre>
+        </div>
+        <div>
+          <input type="radio" id="c" name="answer" />
+          <label for="c">c</label>
+          <pre><code>print hello</code></pre>
+        </div>
+        <div>
+          <input type="radio" id="d" name="answer" />
+          <label for="d">d</label>
+          <pre><code>print "hello"</code></pre>
+        </div>
+      </fieldset>
+      <button type="submit">Check</button>
+    </form>
+  </body>
+</html>

@@ -614,6 +614,62 @@ print "2 arr5" arr5
 	}
 }
 
+func TestArrayRepetition(t *testing.T) {
+	prog := `
+arr1 := [0] * 3
+arr2 := [1 "b" true] * 2
+arr3 := [4 5 6] * 0
+arr4 := [1 2] * 2 + [3] * 3 + [4 5] * 1
+n := 2
+arr5 := arr1 * n
+print "arr1" arr1
+print "arr2" arr2
+print "arr3" arr3
+print "arr4" arr4
+print "arr5" arr5
+`
+	out := run(prog)
+	want := []string{
+		"arr1 [0 0 0]",
+		"arr2 [1 b true 1 b true]",
+		"arr3 []",
+		"arr4 [1 2 1 2 3 3 3 4 5]",
+		"arr5 [0 0 0 0 0 0]",
+		"",
+	}
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), out)
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
+func TestArrayRepetitionErr(t *testing.T) {
+	tests := []struct {
+		name string
+		prog string
+		want string
+	}{
+		{
+			name: "non-integer",
+			prog: `a := [1 2 3] * 4.5`,
+			want: `line 1 column 14: panic: bad repetition count: not an integer: 4.5`,
+		},
+		{
+			name: "negative",
+			prog: `a := [1 2 3] * -1`,
+			want: `line 1 column 14: panic: bad repetition count: negative count: -1`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := run(tt.prog + "\nprint a")
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestArraySlice(t *testing.T) {
 	prog := `
 arr := [1 2 3]

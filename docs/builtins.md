@@ -764,33 +764,35 @@ the `printf` function, and the formatting syntax is the same, see
 
 ### `join`
 
-`join` concatenates the elements of an array of strings into a single
-string, with the given separator string placed between elements.
+`join` concatenates the elements of an array of values into a single
+string, with the given separator string placed between elements. Any
+elements of the array that are not strings are formatted as strings.
 
 #### Example
 
 ```evy
-s := join ["a" "b" "c"] ", "
+s := join ["a" "b" "c" 1 3.141592654 true] ", "
 print s
 ```
 
 Output
 
 ```evy:output
-a, b, c
+a, b, c, 1, 3.141592654, true
 ```
 
 #### Reference
 
-    join:string elems:[]string sep:string
+    join:string elems:[]any sep:string
 
-The `join` function takes two arguments: an array of strings and a
-separator string. The array of strings is the list of elements to be
-concatenated. The separator string is the string that will be placed
-between elements in the resulting string.
+The `join` function takes two arguments: an array of any and a separator
+string. The array of any is the list of elements to be concatenated. The
+separator string is the string that will be placed between elements in
+the resulting string. Values of the array that are not strings are
+formatted as strings.
 
 The `join` function returns a single string that is the concatenation of
-the elements in the list of strings, with the separator string placed
+the elements in the list of any, with the separator string placed
 between elements.
 
 ### `split`

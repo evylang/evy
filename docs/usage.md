@@ -60,10 +60,12 @@ You can also get help for each subcommand by running it with the
       [<source>]    Source file. Default stdin
 
     Flags:
-      -h, --help          Show context-sensitive help.
-      -V, --version       Print version information
+      -h, --help               Show context-sensitive help.
+      -V, --version            Print version information
 
-          --skip-sleep    skip evy sleep command ($EVY_SKIP_SLEEP)
+          --skip-sleep         skip evy sleep command ($EVY_SKIP_SLEEP)
+          --svg-out=FILE       output drawing to SVG file. Stdout: -.
+          --svg-style=STYLE    style of top-level SVG element.
 
 <!-- genend -->
 

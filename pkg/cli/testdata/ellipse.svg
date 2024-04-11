@@ -1,0 +1,7 @@
+<svg stroke="black" stroke-linecap="round" font-size="60" viewBox="0 0 1000 1000" style="border: 1px solid red; width: 400px; height: 400px" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <rect fill="white" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+    <ellipse cx="500" cy="850" rx="300" ry="100"></ellipse>
+    <ellipse cx="500" cy="550" rx="300" ry="100" transform="rotate(30.000000 500.000000 550.000000)"></ellipse>
+  </g>
+</svg>

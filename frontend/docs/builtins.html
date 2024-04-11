@@ -1225,27 +1225,29 @@ print s
         </p>
         <h3><a id="join" href="#join" class="anchor">#</a><code>join</code></h3>
         <p>
-          <code>join</code> concatenates the elements of an array of strings into a single string,
-          with the given separator string placed between elements.
+          <code>join</code> concatenates the elements of an array of values into a single string,
+          with the given separator string placed between elements. Any elements of the array that
+          are not strings are formatted as strings.
         </p>
         <h4>Example</h4>
-        <pre><code class="language-evy">s := join [&quot;a&quot; &quot;b&quot; &quot;c&quot;] &quot;, &quot;
+        <pre><code class="language-evy">s := join [&quot;a&quot; &quot;b&quot; &quot;c&quot; 1 3.141592654 true] &quot;, &quot;
 print s
 </code></pre>
         <p>Output</p>
-        <pre><code class="language-evy-output">a, b, c
+        <pre><code class="language-evy-output">a, b, c, 1, 3.141592654, true
 </code></pre>
         <h4>Reference</h4>
-        <pre><code>join:string elems:[]string sep:string
+        <pre><code>join:string elems:[]any sep:string
 </code></pre>
         <p>
-          The <code>join</code> function takes two arguments: an array of strings and a separator
-          string. The array of strings is the list of elements to be concatenated. The separator
-          string is the string that will be placed between elements in the resulting string.
+          The <code>join</code> function takes two arguments: an array of any and a separator
+          string. The array of any is the list of elements to be concatenated. The separator string
+          is the string that will be placed between elements in the resulting string. Values of the
+          array that are not strings are formatted as strings.
         </p>
         <p>
           The <code>join</code> function returns a single string that is the concatenation of the
-          elements in the list of strings, with the separator string placed between elements.
+          elements in the list of any, with the separator string placed between elements.
         </p>
         <h3><a id="split" href="#split" class="anchor">#</a><code>split</code></h3>
         <p>

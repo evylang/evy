@@ -665,6 +665,7 @@ func TestStringExpressions(t *testing.T) {
 	}
 }
 
+//nolint:maintidx // This function is not complex by any measure.
 func TestArrays(t *testing.T) {
 	tests := []testCase{
 		{
@@ -708,6 +709,38 @@ func TestArrays(t *testing.T) {
 					mustMake(t, OpConstant, 3),
 					mustMake(t, OpArray, 2),
 					mustMake(t, OpArrayConcatenate),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "repetition",
+			input:        `x := [1 2] * 3`,
+			wantStackTop: makeValue(t, []any{1, 2, 1, 2, 1, 2}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 3),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArrayRepeat),
+					mustMake(t, OpSetGlobal, 0),
+				),
+			},
+		},
+		{
+			name:         "zero repetition",
+			input:        `x := [1 2] * 0`,
+			wantStackTop: makeValue(t, []any{}),
+			wantBytecode: &Bytecode{
+				Constants: makeValues(t, 1, 2, 0),
+				Instructions: makeInstructions(
+					mustMake(t, OpConstant, 0),
+					mustMake(t, OpConstant, 1),
+					mustMake(t, OpArray, 2),
+					mustMake(t, OpConstant, 2),
+					mustMake(t, OpArrayRepeat),
 					mustMake(t, OpSetGlobal, 0),
 				),
 			},
@@ -909,6 +942,31 @@ func TestArrays(t *testing.T) {
 			assert.NoError(t, err, "runtime error")
 			got := vm.lastPoppedStackElem()
 			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestErrArrayRepetition(t *testing.T) {
+	type repeatTest struct {
+		name  string
+		input string
+	}
+	tests := []repeatTest{
+		{
+			name:  "non-integer repetition",
+			input: `x := [1 2 3] * 4.5`,
+		},
+		{
+			name:  "negative repetition",
+			input: `x := [1 2 3] * -1`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.Error(t, ErrBadRepetition, err)
 		})
 	}
 }

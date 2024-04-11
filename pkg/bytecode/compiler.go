@@ -183,6 +183,9 @@ func (c *Compiler) compileBinaryExpression(expr *parser.BinaryExpression) error 
 	if expr.Left.Type().Name == parser.ARRAY && expr.Right.Type().Name == parser.ARRAY && expr.Op == parser.OP_PLUS {
 		return c.emit(OpArrayConcatenate)
 	}
+	if expr.Left.Type().Name == parser.ARRAY && expr.Right.Type() == parser.NUM_TYPE && expr.Op == parser.OP_ASTERISK {
+		return c.emit(OpArrayRepeat)
+	}
 	return fmt.Errorf("%w: %s with types %s %s", ErrUnsupportedExpression,
 		expr, expr.Left.Type(), expr.Right.Type())
 }

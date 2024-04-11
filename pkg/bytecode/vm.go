@@ -20,6 +20,9 @@ var (
 	// produce an invalid result. In Golang, floating point division
 	// by zero produces +Inf, and modulo by zero produces NaN.
 	ErrDivideByZero = fmt.Errorf("%w: division by zero", ErrPanic)
+	// ErrBadRepetition is returned when the right-hand side of the array
+	// repetition operator is invalid; i.e. negative or not an integer.
+	ErrBadRepetition = fmt.Errorf("%w: bad repetition count", ErrPanic)
 )
 
 // VM is responsible for executing evy programs from bytecode.
@@ -47,7 +50,7 @@ func NewVM(bytecode *Bytecode) *VM {
 // Run executes the provided bytecode instructions in order, any error
 // will stop the execution.
 //
-//nolint:maintidx // Run is special in that it is written to be optimal
+//nolint:maintidx,gocognit // Run is special in that it is written to be optimal
 func (vm *VM) Run() error {
 	var err error
 	for ip := 0; ip < len(vm.instructions); ip++ {
@@ -152,6 +155,21 @@ func (vm *VM) Run() error {
 			concatenated.Elements = append(concatenated.Elements, left.Elements...)
 			concatenated.Elements = append(concatenated.Elements, right.Elements...)
 			err = vm.push(concatenated)
+		case OpArrayRepeat:
+			right := vm.popNumVal()
+			left := vm.popArrayVal()
+			repetitions := int(right)
+			if float64(repetitions) != float64(right) {
+				return fmt.Errorf("%w: not an integer: %s", ErrBadRepetition, right)
+			}
+			if repetitions < 0 {
+				return fmt.Errorf("%w: negative count: %s", ErrBadRepetition, right)
+			}
+			elements := make([]value, 0, len(left.Elements)*repetitions)
+			for range repetitions {
+				elements = append(elements, left.Elements...)
+			}
+			err = vm.push(arrayVal{Elements: elements})
 		case OpMap:
 			mapLen := int(ReadUint16(vm.instructions[ip+1:]))
 			ip += 2

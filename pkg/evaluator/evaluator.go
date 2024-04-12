@@ -22,6 +22,7 @@ var (
 	ErrMapKey        = fmt.Errorf("%w: no value for map key", ErrPanic)
 	ErrSlice         = fmt.Errorf("%w: bad slice", ErrPanic)
 	ErrBadArguments  = fmt.Errorf("%w: bad arguments", ErrPanic)
+	ErrBadRepetition = fmt.Errorf("%w: bad repetition count", ErrPanic)
 	ErrAnyConversion = fmt.Errorf("%w: error converting any to type", ErrPanic)
 	ErrVarNotSet     = fmt.Errorf("%w: variable has not been set yet", ErrPanic)
 
@@ -644,7 +645,7 @@ func (e *Evaluator) evalBinaryExpr(expr *parser.BinaryExpression) (value, error)
 	case *boolVal:
 		val, err = evalBinaryBoolExpr(op, l, right.(*boolVal))
 	case *arrayVal:
-		val, err = evalBinaryArrayExpr(op, l, right.(*arrayVal))
+		val, err = evalBinaryArrayExpr(op, l, right)
 	default:
 		err = fmt.Errorf("%w (binary): %v", ErrOperation, expr)
 	}
@@ -718,14 +719,32 @@ func evalBinaryBoolExpr(op parser.Operator, left, right *boolVal) (value, error)
 	return nil, fmt.Errorf("%w (bool): %v", ErrOperation, op.String())
 }
 
-func evalBinaryArrayExpr(op parser.Operator, left, right *arrayVal) (value, error) {
-	if op != parser.OP_PLUS {
+func evalBinaryArrayExpr(op parser.Operator, left *arrayVal, right value) (value, error) {
+	switch op {
+	case parser.OP_PLUS:
+		rightArray := right.(*arrayVal)
+		result := left.Copy()
+		rightElements := *rightArray.Copy().Elements
+		*result.Elements = append(*result.Elements, rightElements...)
+		return result, nil
+	case parser.OP_ASTERISK:
+		rightNum := right.(*numVal)
+		repetitions := int(rightNum.V)
+		if float64(repetitions) != float64(rightNum.V) {
+			return nil, fmt.Errorf("%w: not an integer: %s", ErrBadRepetition, right)
+		}
+		if repetitions < 0 {
+			return nil, fmt.Errorf("%w: negative count: %s", ErrBadRepetition, right)
+		}
+		newElements := make([]value, 0, len(*left.Elements)*repetitions)
+		for range repetitions {
+			newElements = append(newElements, *(left.Copy().Elements)...)
+		}
+		result := &arrayVal{Elements: &newElements}
+		return result, nil
+	default:
 		return nil, fmt.Errorf("%w (array): %v", ErrOperation, op.String())
 	}
-	result := left.Copy()
-	rightElemnts := *right.Copy().Elements
-	*result.Elements = append(*result.Elements, rightElemnts...)
-	return result, nil
 }
 
 func (e *Evaluator) evalTarget(node parser.Node) (value, error) {

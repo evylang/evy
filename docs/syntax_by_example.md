@@ -255,6 +255,16 @@ a = a + [100] // [1 2 3 4 100]; optional extra whitespace
 a = [0] + a + [101 102] // [0 1 2 3 4 100 101 102]
 ```
 
+### Repetition
+
+```evy
+a := [0] * 5 // [0 0 0 0 0]
+a = [1 2] * 2 + a + [3] * 3 // [1 2 1 2 0 0 0 0 0 3 3 3]
+n := 3
+b := ["hello"] * n
+print b // ["hello" "hello" "hello"]
+```
+
 ### Slicing
 
 ```evy

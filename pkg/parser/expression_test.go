@@ -152,6 +152,13 @@ func TestParseTopLevelExpression(t *testing.T) {
 		"[[1]]+[[]]":           "([[1]]+[[]])",
 		"[[]]+[[1]]":           "([[]]+[[1]])",
 
+		// Array repetition
+		"[1] * 2":  "([1]*2)",
+		"[] * 0":   "([]*0)",
+		"[1] * n1": "([1]*n1)",
+		"arr * 2":  "(arr*2)",
+		"arr * n1": "(arr*n1)",
+
 		// Slices
 		"arr[1:2]": "(arr[1:2])",
 		"arr[1:]":  "(arr[1:])",
@@ -229,6 +236,7 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		"1 and 2":      `line 1 column 3: "and" takes bool type, found num`,
 		"1 + false":    `line 1 column 3: mismatched type for +: num, bool`,
 		"false + 1":    `line 1 column 7: mismatched type for +: bool, num`,
+		"[1] * true":   `line 1 column 5: array repetition ("*") takes num on right, found bool`,
 		"(1+2":         `line 1 column 5: expected ")", got end of input`,
 		"(1+2\n)":      `line 1 column 5: expected ")", got end of line`,
 		"(1+)2":        `line 1 column 4: unexpected ")"`,

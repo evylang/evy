@@ -116,6 +116,7 @@
                   <a href="syntax_by_example.html#array-element-access">Array element access</a>
                 </li>
                 <li><a href="syntax_by_example.html#concatenation">Concatenation</a></li>
+                <li><a href="syntax_by_example.html#repetition">Repetition</a></li>
                 <li><a href="syntax_by_example.html#slicing">Slicing</a></li>
               </ul>
             </li>
@@ -429,8 +430,8 @@
               <div class="expander"></div>
               <ul>
                 <li>
-                  <a href="spec.html#arithmetic-and-concatenation-operators"
-                    >Arithmetic and Concatenation Operators</a
+                  <a href="spec.html#arithmetic-concatenation-and-repetition-operators"
+                    >Arithmetic, Concatenation and Repetition Operators</a
                   >
                 </li>
                 <li><a href="spec.html#logical-operators">Logical Operators</a></li>
@@ -729,6 +730,13 @@ print a1[-1] // 4
         <pre><code class="language-evy">a := [1 2 3 4]
 a = a + [100] // [1 2 3 4 100]; optional extra whitespace
 a = [0] + a + [101 102] // [0 1 2 3 4 100 101 102]
+</code></pre>
+        <h3><a id="repetition" href="#repetition" class="anchor">#</a>Repetition</h3>
+        <pre><code class="language-evy">a := [0] * 5 // [0 0 0 0 0]
+a = [1 2] * 2 + a + [3] * 3 // [1 2 1 2 0 0 0 0 0 3 3 3]
+n := 3
+b := [&quot;hello&quot;] * n
+print b // [&quot;hello&quot; &quot;hello&quot; &quot;hello&quot;]
 </code></pre>
         <h3><a id="slicing" href="#slicing" class="anchor">#</a>Slicing</h3>
         <pre><code class="language-evy">a := [1 2 3]

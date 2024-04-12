@@ -33,7 +33,7 @@ To get an intuitive understanding of Evy, you can either look at its
 12. [**Maps**](#maps)
 13. [**Index and Slice**](#index-and-slice)
 14. [**Operators and Expressions**](#operators-and-expressions)  
-    [Arithmetic and Concatenation Operators](#arithmetic-and-concatenation-operators), [Logical Operators](#logical-operators), [Comparison Operators](#comparison-operators), [Unary Operators](#unary-operators)
+    [Arithmetic, Concatenation and Repetition Operators](#arithmetic,-concatenation-and-repetition-operators), [Logical Operators](#logical-operators), [Comparison Operators](#comparison-operators), [Unary Operators](#unary-operators)
 15. [**Precedence**](#precedence)
 16. [**Statements**](#statements)
 17. [**Whitespace**](#whitespace)  
@@ -588,6 +588,13 @@ If you try to concatenate two literals of different types such as
 `arr := [1 2] + ["a" "b"]`, you will get a parse error. Use
 `arr := [1 2 "a" "b"]` instead.
 
+Arrays can be repeated with the `*` operator, for example `[0] * 5`
+results in `[0 0 0 0 0]`. `["hello" "world"] * 2` results in `["hello"
+"world" "hello" "world"]`. An array repeated zero times results in an
+empty array of the same type as the array. The number on the right hand
+side of the `*` operator must be an non-negative integer value. Using a
+non-integer or negative value will result in an error.
+
 The elements of an array can be accessed via index starting at `0`. In
 the example `arr := ["abc" 123]` the first element in the array
 `arr[0]` is `"abc"`.
@@ -787,21 +794,23 @@ no automated type conversion of operands.
 There are a variety of binary operators: arithmetic, concatenation,
 logical, and comparison operators.
 
-| Operator            | Operands  | Result   | Description   |
-| ------------------- | --------- | -------- | ------------- |
-| `+` `-` `*` `/` `%` | `num`     | `num`    | arithmetic    |
-| `+`                 | `string`  | `string` | concatenation |
-| `+`                 | array     | array    | concatenation |
-| `and` `or`          | `bool`    | `bool`   | logical       |
-| `<` `<=` `>` `>=`   | `num`     | `bool`   | comparison    |
-| `<` `<=` `>` `>=`   | `string`  | `bool`   | comparison    |
-| `==` `!=`           | all types | `bool`   | comparison    |
+| Operator            | Operands        | Result   | Description   |
+| ------------------- | --------------- | -------- | ------------- |
+| `+` `-` `*` `/` `%` | `num`           | `num`    | arithmetic    |
+| `+`                 | `string`        | `string` | concatenation |
+| `+`                 | array           | array    | concatenation |
+| `*`                 | array `*` `num` | array    | repetition    |
+| `and` `or`          | `bool`          | `bool`   | logical       |
+| `<` `<=` `>` `>=`   | `num`           | `bool`   | comparison    |
+| `<` `<=` `>` `>=`   | `string`        | `bool`   | comparison    |
+| `==` `!=`           | all types       | `bool`   | comparison    |
 
-### Arithmetic and Concatenation Operators
+### Arithmetic, Concatenation and Repetition Operators
 
 The **arithmetic operators** `+`, `-`, `*`, `/`, and `%` stand for addition,
 subtraction, multiplication, division, and the [modulo operator]. The
-symbol `+` can also be used to concatenate strings and arrays.
+symbol `+` can also be used to concatenate strings and arrays. The `*` symbol
+can be used to repeat an array a number of times.
 
 The **modulo operator** `%`, also known as the remainder operator, returns the
 remainder of a division operation. For example, `10 % 3` results in
@@ -810,6 +819,10 @@ remainder of a division operation. For example, `10 % 3` results in
 The **concatenation operator** `+`, combines two strings or two arrays
 together. For example, `"fire"` + `"engine"` combines into the string
 `"fireengine"`.
+
+The **repetition operator** `*`, repeats an array a number of times. The number
+must be a non-negative integer value. An array repeated zero times is an empty
+array.
 
 [modulo operator]: https://en.wikipedia.org/wiki/Modulo_operation
 

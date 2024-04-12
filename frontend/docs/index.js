@@ -30,6 +30,8 @@ expanders.map((el) => (el.onclick = expanderClick))
 highlightCurrent()
 window.addEventListener("hashchange", highlightCurrent)
 
+preventReloadOnSelfLink()
+
 // Utilities
 function showSidebar() {
   sidebar.classList.add("show")
@@ -102,4 +104,18 @@ function getShowing(item) {
     n = n.parentElement
   }
   return parents
+}
+
+function preventReloadOnSelfLink() {
+  let href = normalizedHref()
+  const last = href.split("/").pop()
+  const nodes = document.querySelectorAll(`#sidebar a[href$="${last}"]`)
+  const selfLink = [...nodes].find((n) => n.href === href)
+  if (selfLink) {
+    selfLink.onclick = (e) => {
+      e.preventDefault()
+      document.querySelector("body>main").scrollTo(0, 0)
+      window.history.pushState("", "", window.location.pathname)
+    }
+  }
 }

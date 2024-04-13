@@ -18,6 +18,13 @@ var (
 	ErrSlice = fmt.Errorf("%w: invalid slice", ErrPanic)
 )
 
+type indexType int
+
+const (
+	indexExpression indexType = iota
+	sliceExpression
+)
+
 type value interface {
 	Type() *parser.Type
 	Equals(value) bool
@@ -86,12 +93,9 @@ func (s stringVal) Equals(v value) bool {
 }
 
 func (s stringVal) Index(idx value) (value, error) {
-	index := int(idx.(numVal))
-	if index >= len(s) || index < -len(s) {
-		return nil, fmt.Errorf("%w: %d", ErrBounds, index)
-	}
-	if index < 0 {
-		index += len(s)
+	index, err := normalizeIndex(idx, len(s), indexExpression)
+	if err != nil {
+		return nil, err
 	}
 	return s[index : index+1], nil
 }
@@ -140,13 +144,9 @@ func (a arrayVal) Equals(v value) bool {
 }
 
 func (a arrayVal) Index(idx value) (value, error) {
-	index := int(idx.(numVal))
-	length := len(a.Elements)
-	if index >= length || index < -length {
-		return nil, fmt.Errorf("%w: %d", ErrBounds, index)
-	}
-	if index < 0 {
-		index += length
+	index, err := normalizeIndex(idx, len(a.Elements), indexExpression)
+	if err != nil {
+		return nil, err
 	}
 	return a.Elements[index], nil
 }
@@ -231,30 +231,43 @@ func (noneVal) Equals(_ value) bool {
 	return false
 }
 
+func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
+	limit := length - 1
+	if indexType == sliceExpression {
+		limit++ // slice expression indices can index one past the end
+	}
+
+	index := idx.(numVal)
+	i := int(index)
+
+	if i < -length || i > limit {
+		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
+	}
+	if i < 0 {
+		return length + i, nil // -1 references len-1 i.e. last element
+	}
+	return i, nil
+}
+
 func normalizeSliceIndices(start, end value, length int) (int, int, error) {
 	startIdx := 0
-	if _, ok := start.(numVal); ok {
-		startIdx = int(start.(numVal))
-	}
-	if startIdx > length || startIdx < -length {
-		return 0, 0, fmt.Errorf("%w: %d", ErrBounds, start)
-	}
-	if startIdx < 0 {
-		startIdx += length
+	var err error
+	if _, ok := start.(noneVal); !ok {
+		startIdx, err = normalizeIndex(start, length, sliceExpression)
+		if err != nil {
+			return 0, 0, err
+		}
 	}
 	endIdx := length
-	if _, ok := end.(numVal); ok {
-		endIdx = int(end.(numVal))
+	if _, ok := end.(noneVal); !ok {
+		endIdx, err = normalizeIndex(end, length, sliceExpression)
+		if err != nil {
+			return 0, 0, err
+		}
 	}
-	if endIdx > length || endIdx < -length {
-		return 0, 0, fmt.Errorf("%w: %d", ErrBounds, end)
-	}
-	if endIdx < 0 {
-		endIdx += length
-	}
+
 	if startIdx > endIdx {
-		return 0, 0, fmt.Errorf("%w: start (%d) > end (%d)", ErrSlice,
-			startIdx, endIdx)
+		return 0, 0, fmt.Errorf("%w: %d > %d", ErrSlice, startIdx, endIdx)
 	}
 	return startIdx, endIdx, nil
 }

@@ -17,6 +17,7 @@ var (
 	ErrStopped = errors.New("stopped")
 
 	ErrPanic         = errors.New("panic")
+	ErrIndexValue    = fmt.Errorf("%w: index not an integer", ErrPanic)
 	ErrBounds        = fmt.Errorf("%w: index out of bounds", ErrPanic)
 	ErrRangevalue    = fmt.Errorf("%w: bad range value", ErrPanic)
 	ErrMapKey        = fmt.Errorf("%w: no value for map key", ErrPanic)

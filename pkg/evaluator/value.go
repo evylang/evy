@@ -359,6 +359,10 @@ func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
 
 	index := idx.(*numVal)
 	i := int(index.V)
+
+	if index.V != float64(i) {
+		return 0, fmt.Errorf("%w: %v", ErrIndexValue, index.V)
+	}
 	if i < -length || i > limit {
 		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}

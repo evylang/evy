@@ -11,6 +11,8 @@ import (
 var (
 	// ErrBounds reports an index out of bounds in an array or string.
 	ErrBounds = fmt.Errorf("%w: index out of bounds", ErrPanic)
+	// ErrIndexValue reports an index value error if the index is not an integer, e.g. 1.1.
+	ErrIndexValue = fmt.Errorf("%w: index not an integer", ErrPanic)
 	// ErrMapKey reports that no value was found for a specific key
 	// used in a map index.
 	ErrMapKey = fmt.Errorf("%w: no value for map key", ErrPanic)
@@ -240,6 +242,9 @@ func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
 	index := idx.(numVal)
 	i := int(index)
 
+	if float64(index) != float64(i) {
+		return 0, fmt.Errorf("%w: %v", ErrIndexValue, index)
+	}
 	if i < -length || i > limit {
 		return 0, fmt.Errorf("%w: %d", ErrBounds, i)
 	}

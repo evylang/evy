@@ -1004,6 +1004,35 @@ func TestErrBounds(t *testing.T) {
 	}
 }
 
+func TestErrIndex(t *testing.T) {
+	type boundsTest struct {
+		name  string
+		input string
+	}
+	tests := []boundsTest{
+		{
+			name:  "string index not an integer",
+			input: `x := "abc"[1.1]`,
+		},
+		{
+			name:  "array index not an integer",
+			input: `x := [1 2 3][1.1]`,
+		},
+		{
+			name:  "array invalid slice type",
+			input: `x := [1 2 3][1.1:2.1]`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.Error(t, ErrIndexValue, err)
+		})
+	}
+}
+
 func TestErrSlice(t *testing.T) {
 	type boundsTest struct {
 		name  string

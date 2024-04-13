@@ -496,8 +496,9 @@ func TestDoubleIndex(t *testing.T) {
 func TestIndexErr(t *testing.T) {
 	tests := map[string]string{
 		// x := ["a","b","c"]; x = "abc"
-		"print x[3]":  "line 2 column 8: panic: index out of bounds: 3",
-		"print x[-4]": "line 2 column 8: panic: index out of bounds: -4",
+		"print x[3]":   "line 2 column 8: panic: index out of bounds: 3",
+		"print x[-4]":  "line 2 column 8: panic: index out of bounds: -4",
+		"print x[1.1]": "line 2 column 8: panic: index not an integer: 1.1",
 		`m := {}
 		print m[x[1]]`: `line 3 column 10: panic: no value for map key: "b"`,
 	}

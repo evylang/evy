@@ -1718,12 +1718,12 @@ func TestMapRange(t *testing.T) {
 		{
 			name: "map range",
 			input: `x := ""
-			for e := range {a:1 b:2}
+			for e := range {a:22 b:2}
 				x = e
 			end
 			x = x
 			`,
-			wantStackTop: makeValue(t, "b"),
+			wantStackTop: makeValue(t, 2),
 			wantBytecode: &Bytecode{},
 		},
 	}
@@ -1763,9 +1763,13 @@ func makeValue(t *testing.T, a any) value {
 	case []any:
 		return arrayVal{Elements: makeValues(t, v...)}
 	case map[string]any:
-		m := mapVal{}
+		m := mapVal{
+			order: make([]stringVal, 0),
+			m:     make(map[stringVal]value),
+		}
 		for key, val := range v {
-			m[key] = makeValue(t, val)
+			m.m[stringVal(key)] = makeValue(t, val)
+			m.order = append(m.order, stringVal(key))
 		}
 		return m
 	case string:

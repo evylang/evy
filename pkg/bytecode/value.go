@@ -184,7 +184,10 @@ func (a arrayVal) Slice(start, end value) (value, error) {
 	return arrayVal{Elements: elements}, nil
 }
 
-type mapVal map[string]value
+type mapVal struct {
+	order []stringVal
+	m     map[stringVal]value
+}
 
 func (m mapVal) Type() *parser.Type {
 	return parser.GENERIC_MAP
@@ -192,8 +195,8 @@ func (m mapVal) Type() *parser.Type {
 
 func (m mapVal) String() string {
 	pairs := []string{}
-	for k, v := range m {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v))
+	for _, v := range m.order {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", m.m[v], v))
 	}
 	return "{" + strings.Join(pairs, ", ") + "}"
 }
@@ -203,12 +206,12 @@ func (m mapVal) Equals(v value) bool {
 	if !ok {
 		panic("internal error: Map.Equals called with non-Map value")
 	}
-	if len(m) != len(m2) {
+	if len(m.m) != len(m.m) {
 		return false
 	}
-	for key, val := range m {
-		val2 := m2[key]
-		if val2 == nil || !val.Equals(val2) {
+	for key, val := range m.m {
+		val2, ok := m2.m[key]
+		if !ok || val2 == nil || !val.Equals(val2) {
 			return false
 		}
 	}
@@ -216,30 +219,42 @@ func (m mapVal) Equals(v value) bool {
 }
 
 func (m mapVal) Index(idx value) (value, error) {
-	k := idx.(stringVal)
-	key := string(k)
-	val, ok := m[key]
-	if !ok {
-		return nil, fmt.Errorf("%w %q", ErrMapKey, key)
+	switch idx := idx.(type) {
+	case stringVal:
+		val, ok := m.m[idx]
+		if !ok {
+			return nil, fmt.Errorf("%w %q", ErrMapKey, idx)
+		}
+		return val, nil
+	case numVal:
+		key := m.order[int(idx)]
+		val, ok := m.m[key]
+		if !ok {
+			return nil, fmt.Errorf("%w %q", ErrMapKey, key)
+		}
+		return val, nil
 	}
-	return val, nil
+	return nil, nil
+}
+
+func (m mapVal) Set(idx value, val value) error {
+	switch idx := idx.(type) {
+	case stringVal:
+		m.m[idx] = val
+	case numVal:
+		key := m.order[int(idx)]
+		m.m[key] = val
+	}
+	return nil
 }
 
 type mapRange struct {
 	mapVal
-	// order is an ordered list of keys that is used
-	// when ranging over a map.
-	order []string
 }
 
 func newMapRange(m mapVal) mapRange {
-	order := make([]string, 0, len(m))
-	for k := range m {
-		order = append(order, k)
-	}
 	return mapRange{
 		mapVal: m,
-		order:  order,
 	}
 }
 

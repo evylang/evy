@@ -79,9 +79,8 @@ const (
 	// number of times.
 	OpArrayRepeat
 	// OpMap represents a map literal, the operand N is the length of
-	// the map multiplied by 2. This length N represents the total length
-	// of the flattened map in the stack, where keys and values have been
-	// pushed sequentially (k1, v1, k2, v2...).
+	// the map. The keys and values are read sequentially from the
+	// stack (e.g. k1, v1, k2, v2...).
 	OpMap
 	// OpIndex represents an index operator used on an array, map or
 	// string variable.
@@ -154,8 +153,7 @@ var definitions = map[Opcode]*OpDefinition{
 	OpArray:            {"OpArray", []int{2}},
 	OpArrayConcatenate: {"OpArrayConcatenate", nil},
 	OpArrayRepeat:      {"OpArrayRepeat", nil},
-	// This operand width only allows maps of up to 32767 pairs, as the map doubles in length
-	// to 65535 when it is flattened onto the stack.
+	// This operand width only allows maps up to 65535 elements in length.
 	OpMap:         {"OpMap", []int{2}},
 	OpIndex:       {"OpIndex", nil},
 	OpSetIndex:    {"OpSetIndex", nil},

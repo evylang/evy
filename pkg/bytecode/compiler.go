@@ -112,7 +112,7 @@ func (c *Compiler) Compile(node parser.Node) error {
 				return err
 			}
 		}
-		if err := c.emit(OpMap, len(node.Pairs)*2); err != nil {
+		if err := c.emit(OpMap, len(node.Pairs)); err != nil {
 			return err
 		}
 	}

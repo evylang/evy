@@ -497,17 +497,23 @@ func TestMap(t *testing.T) {
 		{
 			name:         "empty",
 			input:        "x := {}",
-			wantStackTop: makeValue(t, map[string]any{}),
+			wantStackTop: makeValue(t, []pair{}),
 		},
 		{
 			name:         "assignment",
 			input:        "x := {a: 1 b: 2}",
-			wantStackTop: makeValue(t, map[string]any{"a": 1, "b": 2}),
+			wantStackTop: makeValue(t, []pair{{"a", 1}, {"b", 2}}),
 		},
 		{
 			name:         "index",
 			input:        `x := {a: 1 b: 2}["b"]`,
 			wantStackTop: makeValue(t, 2),
+		},
+		{
+			name: "nested assignment",
+			input: `y := {a: {c: 1} b: {d: 2}}
+			x := y["b"]`,
+			wantStackTop: makeValue(t, []pair{{"d", 2}}),
 		},
 	}
 	for _, tt := range tests {
@@ -661,6 +667,11 @@ func TestWhile(t *testing.T) {
 	}
 }
 
+type pair struct {
+	k string
+	v any
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
@@ -681,10 +692,14 @@ func makeValue(t *testing.T, a any) value {
 	switch v := a.(type) {
 	case []any:
 		return arrayVal{Elements: makeValues(t, v...)}
-	case map[string]any:
-		m := mapVal{}
-		for key, val := range v {
-			m[key] = makeValue(t, val)
+	case []pair:
+		m := mapVal{
+			order: make([]stringVal, 0),
+			m:     make(map[stringVal]value),
+		}
+		for _, pair := range v {
+			m.m[stringVal(pair.k)] = makeValue(t, pair.v)
+			m.order = append(m.order, stringVal(pair.k))
 		}
 		return m
 	case string:

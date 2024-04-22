@@ -173,12 +173,15 @@ func (vm *VM) Run() error {
 		case OpMap:
 			mapLen := int(ReadUint16(vm.instructions[ip+1:]))
 			ip += 2
-
-			m := make(mapVal, 0)
-			for i := 0; i < mapLen; i += 2 {
+			m := mapVal{
+				order: make([]stringVal, mapLen),
+				m:     make(map[stringVal]value, mapLen),
+			}
+			for i := mapLen - 1; i >= 0; i-- {
 				val := vm.pop()
 				key := vm.popStringVal()
-				m[string(key)] = val
+				m.m[key] = val
+				m.order[i] = key
 			}
 			err = vm.push(m)
 		case OpIndex:
@@ -197,7 +200,9 @@ func (vm *VM) Run() error {
 			val := vm.pop()
 			switch left := left.(type) {
 			case mapVal:
-				left[string(index.(stringVal))] = val
+				key := index.(stringVal)
+				left.m[key] = val
+				left.order = append(left.order, key)
 			case arrayVal:
 				err = left.Set(index, val)
 			}

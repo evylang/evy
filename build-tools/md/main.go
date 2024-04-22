@@ -18,6 +18,7 @@ import (
 	"strings"
 	"text/template"
 
+	"evylang.dev/evy/pkg/md"
 	"github.com/alecthomas/kong"
 	"rsc.io/markdown"
 )
@@ -132,7 +133,7 @@ func updateASTs(asts map[string]*markdown.Document) {
 			continue
 		}
 		w := &walker{anchorIDs: map[string]bool{}}
-		walk(ast, w.walk)
+		md.Walk(ast, w.walk)
 		headings[mdf] = w.headings
 	}
 	for _, sbf := range sidebarFiles {
@@ -141,7 +142,7 @@ func updateASTs(asts map[string]*markdown.Document) {
 		// we need to walk sidebars _after_ sidebar update with heading
 		// insertion because we look up the inserted headings by markdown and
 		// not html filename.
-		walk(asts[sbf], w.walk)
+		md.Walk(asts[sbf], w.walk)
 	}
 }
 
@@ -218,7 +219,7 @@ type heading struct {
 	heading  *markdown.Heading
 }
 
-func (w *walker) walk(n node) {
+func (w *walker) walk(n md.Node) {
 	switch n := n.(type) {
 	case *markdown.Document:
 		removeTOC(n)

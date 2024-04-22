@@ -1,0 +1,146 @@
+{
+  "id": "op",
+  "unit": 1,
+  "name": "Operators",
+  "description": "Imagine you're following a recipe to make slime.  In computer programming, things work kind of like that!  opuential execution means the computer follows the instructions in your code one by one, just like you follow the steps in the recipe.  It reads the first instruction, does what it says, then moves on to the next one, and the next, until it finishes the whole recipe (or program).  This way, the computer can make sure each step happens in the right order, like adding the glue before the glitter in your slime!",
+  "exercises": [
+    {
+      "id": "op-print",
+      "name": "Printing in Order",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "op-shape",
+      "name": "Drawing shapes in order: move, circle, rect, color",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "op-lines",
+      "name": "Drawing lines in order: move, line, width, color",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "op-text",
+      "name": "Drawing shapes in order",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "op-style",
+      "name": "Drawing shapes in style",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "op-cls",
+      "name": "Print, draw and clear",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    }
+  ]
+}

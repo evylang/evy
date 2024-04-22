@@ -1,0 +1,140 @@
+{
+  "exercises": [
+    {
+      "id": "seq-print",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "seq-shape",
+      "name": "Drawing shapes in order: move, circle, rect, color",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "seq-line",
+      "name": "Drawing lines in order: move, line, width, color",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "seq-text",
+      "name": "Drawing shapes in order",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "seq-style",
+      "name": "Drawing shapes in style",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    },
+    {
+      "id": "seq-cls",
+      "name": "Print, draw and clear",
+      "type": "questions",
+      "count": 4,
+      "composition": { "easy": 2, "medium": 2 },
+      "questions": {
+        "easy": {
+          "1": { "variants": 2, "type": "single" },
+          "2": { "variants": 2, "type": "single" },
+          "3": { "variants": 2, "type": "program" },
+          "4": { "variants": 2, "type": "text" },
+          "5": { "variants": 3, "type": "text" }
+        },
+        "medium": {
+          "1": { "variants": 4, "type": "text" },
+          "2": { "variants": 2, "type": "text" },
+          "3": { "variants": 5, "type": "multi" },
+          "4": { "variants": 2, "type": "multi" },
+          "5": { "variants": 3, "type": "text" }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "progress-summary": {
+    "fundamentals": { "points": 2350, "max-points": 10030, "percentage": 20 },
+    "abstraction": { "points": 2350, "max-points": 10030, "percentage": 20 }
+  },
+  "course-progress-subcollection": {
+    "fundamentals": {
+      "points": 2350,
+      "max-points": 10030,
+      "percentage": 20,
+      "up-next": "seq-text",
+      "units": {
+        "seq": {
+          "points": 230,
+          "max-points": 600,
+          "percentage": 38,
+          "exercises": {
+            "seq-print": 0,
+            "seq-shape": 2,
+            "seq-line": 3,
+            "seq-text": 4,
+            "seq-style": 1,
+            "seq-cls": 0
+          }
+        },
+        "type": {
+          "points": 230,
+          "max-points": 600,
+          "percentage": 38,
+          "exercises": {
+            "type-print": 0,
+            "type-shape": 2,
+            "type-line": 3,
+            "type-text": 4,
+            "type-style": 1,
+            "type-cls": 0,
+            "type-line2": 3,
+            "type-text2": 4,
+            "type-style2": 1,
+            "type-cls2": 0
+          },
+          "flow": {
+            "points": 230,
+            "max-points": 600,
+            "percentage": 38,
+            "exercises": {
+              "flow-print": 0,
+              "flow-shape": 2,
+              "flow-line": 3,
+              "flow-text": 4,
+              "flow-style": 1,
+              "flow-cls": 0,
+              "flow-style2": 1,
+              "flow-cls2": 0
+            }
+          },
+          "op": {
+            "points": 230,
+            "max-points": 600,
+            "percentage": 38,
+            "exercises": {
+              "op-print": 0,
+              "op-shape": 2,
+              "op-line": 3,
+              "op-text": 4,
+              "op-style": 1,
+              "op-cls": 0,
+              "op-line2": 3,
+              "op-text2": 4,
+              "op-style2": 1,
+              "op-cls2": 0,
+              "op-cls4": 0,
+              "op-line3": 3,
+              "op-text3": 4,
+              "op-style3": 1,
+              "op-cls3": 0
+            }
+          },
+          "string": {
+            "points": 230,
+            "max-points": 600,
+            "percentage": 38,
+            "exercises": {
+              "string-print": 0,
+              "string-shape": 2,
+              "string-line": 3,
+              "string-text": 4,
+              "string-style": 1,
+              "string-cls": 0,
+              "string-line2": 3,
+              "string-text2": 4,
+              "string-style2": 1,
+              "string-cls2": 0
+            },
+            "bool": {
+              "points": 230,
+              "max-points": 600,
+              "percentage": 38,
+              "exercises": {
+                "bool-print": 0,
+                "bool-shape": 2,
+                "bool-line": 3,
+                "bool-text": 4,
+                "bool-style": 1,
+                "bool-cls": 0,
+                "bool-style2": 1,
+                "bool-cls2": 0
+              }
+            },
+            "for": {
+              "points": 230,
+              "max-points": 600,
+              "percentage": 38,
+              "exercises": {
+                "for-print": 0,
+                "for-shape": 2,
+                "for-line": 3,
+                "for-text": 4,
+                "for-style": 1,
+                "for-cls": 0,
+                "for-line2": 3,
+                "for-text2": 4,
+                "for-style2": 1,
+                "for-cls2": 0,
+                "for-cls4": 0,
+                "for-line3": 3,
+                "for-text3": 4,
+                "for-style3": 1,
+                "for-cls3": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

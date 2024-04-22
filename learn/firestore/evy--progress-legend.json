@@ -1,0 +1,37 @@
+{
+  "not-started": {
+    "id": 0,
+    "name": "Not started",
+    "description": "This is where you’ll start. Watch videos and practice skills if you’re new to the material or jump to a quiz or unit test if you feel more confident.",
+    "points": 0,
+    "max-percentage": 0
+  },
+  "attempted": {
+    "id": 1,
+    "name": "Attempted",
+    "description": "If you get less than 70% correct when practicing a skill or if you get questions related to this skill incorrect on a quiz or unit test you’ll be here.",
+    "points": 0,
+    "max-percentage": 70
+  },
+  "familiar": {
+    "id": 2,
+    "name": "Familiar",
+    "description": "Get 70% or more correct when practicing a skill. Or, correctly answer a question related to a skill on a quiz or unit test.",
+    "points": 50,
+    "max-percentage": 80
+  },
+  "proficient": {
+    "id": 3,
+    "name": "Proficient",
+    "description": "Answer 100% of the questions correct when practicing a skill or get a Familiar skill correct during a quiz or unit test.",
+    "points": 80,
+    "max-percentage": 70
+  },
+  "mastered": {
+    "id": 4,
+    "name": "Mastered",
+    "description": "Get a Proficient skill correct on the unit test.",
+    "points": 100,
+    "max-percentage": 80
+  }
+}

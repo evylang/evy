@@ -1,49 +1,44 @@
+---
+type: course
+---
+
 # Course: Fundamentals
 
-## Exercises
+`{{course-overview-widget:fundamentals}}`
 
-- Unit 1: Sequential Execution
+## [Unit 1: Sequential Execution](seq/README.md)
 
-  - [Exercise: Print](sequential-execution/print/README.md)
-  - [Exercise: Draw Shapes](sequential-execution/draw-shapes/README.md)
-  - [Exercise: Draw Lines](sequential-execution/draw-lines/README.md)
-  - [Exercise: Draw Text](sequential-execution/draw-text/README.md)
+In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
 
-- Unit 2: Types and Variables
+## [Unit 2: Types and Variables](type/README.md)
 
-- Unit 2:
+Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
 
-## Learn and Exercise
+## [Unit 3: Introduction to flow control](flow/README.md)
 
-### Unit 1: Sequential Execution
+Ifs and loops. Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
 
-- [Learn](sequential-execution/sequence.md)
-- [Exercise: Print](sequential-execution/print/README.md)
-- [Learn](sequential-execution/draw-commands.md)
-- [Exercise: Draw Shapes](sequential-execution/draw-shapes/README.md)
-- [Exercise: Draw Lines](sequential-execution/draw-lines/README.md)
-- [Exercise: Draw Text](sequential-execution/draw-text/README.md)
+## [Unit 4: Operators](op/README.md)
 
-Directory layout:
-learn
-└── courses
-└── fundamentals
-├── README.md
-├── sequential-execution
-│ ├── draw-lines
-│ ├── draw-shapes
-│ ├── draw-text
-│ └── print
-│ └── hello.md
-├── strings
-│ ├── concat
-│ ├── escape-quotes
-│ ├── funcs
-│ ├── printf
-│ ├── slice
-│ └── tab-nl
-└── types-variables
-├── basic-types
-├── read
-├── variables
-└── variables-self-assign
+Operators. Equality, comparison, arithmetic, concatenation.
+Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
+
+## [Unit 5: Strings and number in detail](string/README.md)
+
+Operators. Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
+
+## [Unit 6: bool and if](bool/README.md)
+
+Not, and, or Operators. Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
+
+## [Unit 7: arrays and for-loops](for/README.md)
+
+Operators (+,\*). Variables and Types. In coding, your instructions are like a recipe - the computer follows them one by one, making sure each step happens in the right order.
+
+Sequential Execution](seq/README.md)
+Types and Variables](type/README.md)
+Introduction to flow control](flow/README.md)
+Operators](op/README.md)
+Strings and number in detail](string/README.md)
+bool and if](bool/README.md)
+arrays and for-loops](loops/README.md)

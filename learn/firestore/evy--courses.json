@@ -1,0 +1,38 @@
+{
+  "fundamentals": {
+    "max-points": 10030,
+    "units": [
+      {
+        "id": "seq",
+        "exercises": [
+          {
+            "id": "seq-print",
+            "composition": { "easy": 2, "medium": 2 },
+            "questions": {
+              "easy": {
+                "1": { "variants": 2, "type": "single" },
+                "2": { "variants": 2, "type": "single" },
+                "3": { "variants": 2, "type": "program" },
+                "4": { "variants": 2, "type": "text" },
+                "5": { "variants": 3, "type": "text" }
+              },
+              "medium": {
+                "1": { "variants": 4, "type": "text" },
+                "2": { "variants": 2, "type": "text" },
+                "3": { "variants": 5, "type": "multi" },
+                "4": { "variants": 2, "type": "multi" },
+                "5": { "variants": 3, "type": "text" }
+              }
+            }
+          }
+        ]
+      },
+      { "id": "type", "exercises": [] },
+      { "id": "flow", "exercises": [] },
+      { "id": "op", "exercises": [] },
+      { "id": "string", "exercises": [] },
+      { "id": "bool", "exercises": [] },
+      { "id": "for", "exercises": [] }
+    ]
+  }
+}

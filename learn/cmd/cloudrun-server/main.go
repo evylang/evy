@@ -29,6 +29,20 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
+
+	// doc, err := client.Doc("answerkey/v1/courses/fundamentals").Get(ctx)
+	// checkError(err)
+	// answerkey := Answerkey{}
+	// doc.DataTo(&answerkey)
+	// b, err := json.MarshalIndent(answerkey, "", "  ")
+	// checkError(err)
+	// fmt.Println("answerkey/v0/courses/fundamentals size:", len(b))
+	// answerkey, err = generateLargeAnswerKey(c.JSONFiles)
+	// checkError(err)
+	// b, err = json.MarshalIndent(answerkey, "", "  ")
+	// checkError(err)
+	// fmt.Println("answerkey/v0/courses/fundamentals:", len(b))
+	// os.WriteFile("answerkey-large.json", b, 0644)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

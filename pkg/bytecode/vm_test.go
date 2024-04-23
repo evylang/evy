@@ -985,6 +985,8 @@ func compileBytecode(t *testing.T, input string) *Bytecode {
 func makeValue(t *testing.T, a any) value {
 	t.Helper()
 	switch v := a.(type) {
+	case Instructions:
+		return funcVal{Instructions: v}
 	case []any:
 		return arrayVal{Elements: makeValues(t, v...)}
 	case []pair:

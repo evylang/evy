@@ -65,6 +65,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileBlockStatement(node)
 	case *parser.ForStmt:
 		return c.compileForStatement(node)
+	case *parser.FuncCallStmt:
+		return c.compileFunction(node.FuncCall)
 	case *parser.IfStmt:
 		return c.compileIfStatement(node)
 	case *parser.WhileStmt:
@@ -533,4 +535,12 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Compiler) compileFunction(call *parser.FuncCall) error {
+	// TODO arguments
+	if err := c.Compile(call.FuncDef.Body); err != nil {
+		return err
+	}
+	return c.emit(OpCall)
 }

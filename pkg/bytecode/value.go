@@ -235,6 +235,36 @@ func (noneVal) Equals(_ value) bool {
 	return false
 }
 
+type funcVal struct {
+	Instructions Instructions
+}
+
+func (funcVal) Type() *parser.Type {
+	return parser.NONE_TYPE
+}
+
+func (f funcVal) String() string {
+	return fmt.Sprintf("func[%v]", f.Instructions)
+}
+
+func (f funcVal) Equals(v value) bool {
+	f2, ok := v.(funcVal)
+	if !ok {
+		panic("internal error: function.Equals called with non-function value")
+	}
+	ins2 := f2.Instructions
+	if len(f.Instructions) != len(ins2) {
+		return false
+	}
+	for i, b := range f.Instructions {
+		b2 := ins2[i]
+		if b != b2 {
+			return false
+		}
+	}
+	return true
+}
+
 func normalizeIndex(idx value, length int, indexType indexType) (int, error) {
 	limit := length - 1
 	if indexType == sliceExpression {

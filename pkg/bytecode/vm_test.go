@@ -595,6 +595,22 @@ func TestIf(t *testing.T) {
 			x = x`,
 			wantStackTop: makeValue(t, 1),
 		},
+		{
+			name: "local scope",
+			input: `x := 1
+			if false
+				x := 2
+				x = x + 1
+			else if false
+				x := 3
+				x = x + 1
+			else if false
+				x := 4
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -650,6 +666,19 @@ func TestWhile(t *testing.T) {
 				end
 				x = x + 1
 				break
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local scope",
+			input: `
+			x := 1
+			while true
+				x := 5
+				if x == 5
+					break
+				end
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 1),
@@ -759,6 +788,16 @@ func TestStepRange(t *testing.T) {
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 15),
+		},
+		{
+			name: "local scope",
+			input: `x := 1
+			for i := range 5
+				x := i
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
 		},
 	}
 	for _, tt := range tests {
@@ -948,6 +987,54 @@ func TestStringRange(t *testing.T) {
 			// iterated, which is the first thing pushed when compiling
 			// the for string range bytecode.
 			wantStackTop: makeValue(t, "hello world"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestScope(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "define local",
+			input: `x := 5
+			if true
+				x := 1
+				x = x + 1
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 5),
+		},
+		{
+			name: "define and resolve local",
+			input: `x := 0
+			if true
+				y := 1
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "resolve global in local scope",
+			input: `x := 0
+			if true
+				y := 2
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 2),
 		},
 	}
 	for _, tt := range tests {

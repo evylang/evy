@@ -962,6 +962,55 @@ func TestStringRange(t *testing.T) {
 	}
 }
 
+func TestScope(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "shadow outer variable",
+			input: `x := "global"
+			if x == "global"
+				x := 1
+				x = x + 1
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "global"),
+		},
+		{
+			name: "define and resolve local",
+			input: `x := 0
+			if true
+				y := x
+				y = y + 1
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "resolve global in local scope",
+			input: `x := 0
+			if x == 0
+				y := 2
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 func TestFunctions(t *testing.T) {
 	tests := []testCase{
 		{

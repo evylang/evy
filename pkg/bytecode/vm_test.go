@@ -962,6 +962,30 @@ func TestStringRange(t *testing.T) {
 	}
 }
 
+func TestFunctions(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "simple",
+			input: `
+			func add:num
+				return 1 + 2
+			end
+			x := add`,
+			wantStackTop: makeValue(t, 3),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
 type pair struct {
 	k string
 	v any

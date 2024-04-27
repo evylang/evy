@@ -65,8 +65,10 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileBlockStatement(node)
 	case *parser.ForStmt:
 		return c.compileForStatement(node)
-	case *parser.FuncCallStmt:
-		return c.compileFunction(node.FuncCall)
+	case *parser.FuncCall:
+		return c.compileFuncCall(node)
+	case *parser.ReturnStmt:
+		return c.compileReturn(node)
 	case *parser.IfStmt:
 		return c.compileIfStatement(node)
 	case *parser.WhileStmt:
@@ -537,10 +539,26 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 	return nil
 }
 
-func (c *Compiler) compileFunction(call *parser.FuncCall) error {
-	// TODO arguments
+func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
+	c.enterScope()
+	start := len(c.instructions)
 	if err := c.Compile(call.FuncDef.Body); err != nil {
 		return err
 	}
+	c.leaveScope()
+	// reset the bytecode
+	compiledFn := funcVal{Instructions: make(Instructions, len(c.instructions)-start)}
+	copy(compiledFn.Instructions, c.instructions[start:])
+	c.instructions = c.instructions[:start]
+	if err := c.emit(OpConstant, c.addConstant(compiledFn)); err != nil {
+		return err
+	}
 	return c.emit(OpCall)
+}
+
+func (c *Compiler) compileReturn(stmt *parser.ReturnStmt) error {
+	if err := c.Compile(stmt.Value); err != nil {
+		return err
+	}
+	return c.emit(OpReturn)
 }

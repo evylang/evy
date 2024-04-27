@@ -11,6 +11,8 @@ const (
 	// GlobalsSize is the total number of globals that can be specified
 	// in an evy program.
 	GlobalsSize = 65536
+	// MaxFrames is the total call depth that an evy program can go to.
+	MaxFrames = 1024
 )
 
 var (
@@ -27,10 +29,11 @@ var (
 
 // VM is responsible for executing evy programs from bytecode.
 type VM struct {
-	constants    []value
-	globals      []value
-	instructions Instructions
-	stack        []value
+	constants   []value
+	frames      []*frame
+	framesIndex int
+	globals     []value
+	stack       []value
 	// sp is the stack pointer and always points to
 	// the next value in the stack. The top of the stack is stack[sp-1].
 	sp int
@@ -38,12 +41,17 @@ type VM struct {
 
 // NewVM returns a new VM.
 func NewVM(bytecode *Bytecode) *VM {
+	mainFn := funcVal{Instructions: bytecode.Instructions}
+	mainFrame := newFrame(mainFn)
+	frames := make([]*frame, MaxFrames)
+	frames[0] = mainFrame
 	return &VM{
-		constants:    bytecode.Constants,
-		globals:      make([]value, GlobalsSize),
-		instructions: bytecode.Instructions,
-		stack:        make([]value, StackSize),
-		sp:           0,
+		constants:   bytecode.Constants,
+		globals:     make([]value, GlobalsSize),
+		frames:      frames,
+		framesIndex: 1,
+		stack:       make([]value, StackSize),
+		sp:          0,
 	}
 }
 
@@ -53,27 +61,37 @@ func NewVM(bytecode *Bytecode) *VM {
 //nolint:maintidx,gocognit // Run is special in that it is written to be optimal
 func (vm *VM) Run() error {
 	var err error
-	for ip := 0; ip < len(vm.instructions); ip++ {
+	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
+		vm.currentFrame().ip++
+		ip := vm.currentFrame().ip
+		ins := vm.currentFrame().Instructions()
 		// This loop is the hot path of the vm, avoid unnecessary
 		// lookups or memory movement.
-		op := Opcode(vm.instructions[ip])
-		switch op {
+		switch Opcode(ins[ip]) {
 		case OpConstant:
-			constIndex := ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			constIndex := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 			err = vm.push(vm.constants[constIndex])
 		case OpGetGlobal:
-			globalIndex := ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			globalIndex := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 			err = vm.push(vm.globals[globalIndex])
+		case OpGetLocal:
+			idx := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
+			err = vm.push(vm.stack[idx])
 		case OpSetGlobal:
-			globalIndex := ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			globalIndex := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 			vm.globals[globalIndex] = vm.pop()
 		case OpDrop:
-			n := ReadUint16(vm.instructions[ip+1:])
-			ip += 2
+			n := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
 			vm.drop(int(n))
+		case OpSetLocal:
+			idx := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
+			vm.stack[idx] = vm.peek()
 		case OpAdd:
 			right, left := vm.popBinaryNums()
 			err = vm.push(numVal(left + right))
@@ -142,8 +160,8 @@ func (vm *VM) Run() error {
 			right, left := vm.popBinaryStrings()
 			err = vm.push(stringVal(left + right))
 		case OpArray:
-			arrLen := int(ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+			arrLen := int(ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
 
 			arr := arrayVal{Elements: make([]value, arrLen)}
 			// fill the array in reverse because elements were
@@ -175,8 +193,8 @@ func (vm *VM) Run() error {
 			}
 			err = vm.push(arrayVal{Elements: elements})
 		case OpMap:
-			mapLen := int(ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+			mapLen := int(ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
 			m := mapVal{
 				order: make([]stringVal, mapLen),
 				m:     make(map[stringVal]value, mapLen),
@@ -224,21 +242,21 @@ func (vm *VM) Run() error {
 		case OpNone:
 			err = vm.push(noneVal{})
 		case OpJump:
-			pos := int(ReadUint16(vm.instructions[ip+1:]))
+			pos := int(ReadUint16(ins[ip+1:]))
 			// jump the instruction pointer to pos - 1 because the run
 			// loop will increment it on the next iteration
-			ip = pos - 1
+			vm.currentFrame().ip = pos - 1
 		case OpJumpOnFalse:
 			condition := vm.popBoolVal()
 			if !condition {
-				pos := int(ReadUint16(vm.instructions[ip+1:]))
+				pos := int(ReadUint16(ins[ip+1:]))
 				// jump the instruction pointer to pos - 1 because
 				// the run loop will increment it on the next iteration
-				ip = pos - 1
+				vm.currentFrame().ip = pos - 1
 			} else {
 				// no jump, so advance the instruction pointer over the
 				// unread operand
-				ip += 2
+				vm.currentFrame().ip += 2
 			}
 		case OpStepRange:
 			// OpStepRange works by popping the step range state from the stack,
@@ -247,8 +265,8 @@ func (vm *VM) Run() error {
 			// whether there is a loop var or not, and if so, before pushing
 			// the bool, we push the index so the bytecode can assign the value
 			// to the loop var.
-			hasLoopVar := int(ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+			hasLoopVar := int(ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
 			index := vm.popNumVal()
 			step := vm.popNumVal()
 			stop := vm.popNumVal()
@@ -269,8 +287,8 @@ func (vm *VM) Run() error {
 			// whether there is a loop var or not, and if so, before pushing
 			// the bool, we push the value of the iterable at the index so
 			// the bytecode can assign the value to the loop var.
-			hasLoopVar := int(ReadUint16(vm.instructions[ip+1:]))
-			ip += 2
+			hasLoopVar := int(ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
 			index := int(vm.popNumVal())
 			iter := vm.pop()
 			// stack overflow wont happen because we just popped these values
@@ -291,6 +309,13 @@ func (vm *VM) Run() error {
 				_ = vm.push(val)
 			}
 			err = vm.push(boolVal(val != nil))
+		case OpCall:
+			fn := vm.peekFuncVal()
+			vm.pushFrame(newFrame(fn))
+		case OpReturn:
+			retVal := vm.pop()
+			vm.popFrame()
+			err = vm.push(retVal)
 		}
 		if err != nil {
 			return err
@@ -313,6 +338,22 @@ func (vm *VM) push(o value) error {
 	vm.stack[vm.sp] = o
 	vm.sp++
 	return nil
+}
+
+func (vm *VM) peek() value {
+	return vm.stack[vm.sp-1]
+}
+
+// peekFuncVal pops an element from the stack and casts it to an funcVal
+// before returning the value. If elem is not a funcVal then it will error.
+func (vm *VM) peekFuncVal() funcVal {
+	elem := vm.peek()
+	val, ok := elem.(funcVal)
+	if !ok {
+		panic(fmt.Errorf("%w: expected to pop funcVal but got %s",
+			ErrInternal, elem.Type()))
+	}
+	return val
 }
 
 func (vm *VM) pop() value {
@@ -395,4 +436,18 @@ func (vm *VM) popArrayVal() arrayVal {
 			ErrInternal, elem.Type()))
 	}
 	return val
+}
+
+func (vm *VM) currentFrame() *frame {
+	return vm.frames[vm.framesIndex-1]
+}
+
+func (vm *VM) pushFrame(f *frame) {
+	vm.frames[vm.framesIndex] = f
+	vm.framesIndex++
+}
+
+func (vm *VM) popFrame() *frame {
+	vm.framesIndex--
+	return vm.frames[vm.framesIndex]
 }

@@ -18,10 +18,10 @@ type arrayRange struct {
 }
 
 type mapRange struct {
-	loopVar  value
-	cur      int // index of Map.Order slice of keys
-	mapValal *mapVal
-	order    []string // copy of order in case map entry gets deleted during iteration
+	loopVar value
+	cur     int // index of Map.Order slice of keys
+	mapVal  *mapVal
+	order   []string // copy of order in case map entry gets deleted during iteration
 }
 
 type stringRange struct {
@@ -62,7 +62,7 @@ func (m *mapRange) next() bool {
 	for m.cur < len(m.order) {
 		key := m.order[m.cur]
 		m.cur++
-		if _, ok := m.mapValal.Pairs[key]; ok { // ensure value hasn't been deleted
+		if _, ok := m.mapVal.Pairs[key]; ok { // ensure value hasn't been deleted
 			if m.loopVar != nil {
 				m.loopVar.(*stringVal).V = key
 			}

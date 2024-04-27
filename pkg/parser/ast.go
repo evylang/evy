@@ -883,6 +883,31 @@ func (s *StepRange) Type() *Type {
 	return NUM_TYPE
 }
 
+// GetStart returns the start value of the step range, returning the default 0
+// if s.Start == nil.
+func (s *StepRange) GetStart() Node {
+	if s.Start == nil {
+		return &NumLiteral{Value: 0}
+	}
+	return s.Start
+}
+
+// GetStop returns the stop value of the step range. This is always s.Stop as
+// there is no default for this as there is for start and step, but we have
+// this method for symmetry.
+func (s *StepRange) GetStop() Node {
+	return s.Stop
+}
+
+// GetStep returns the step value of the step range, returning the default 1
+// if s.Step == nil.
+func (s *StepRange) GetStep() Node {
+	if s.Step == nil {
+		return &NumLiteral{Value: 1}
+	}
+	return s.Step
+}
+
 // Var is an AST node that represents a variable, its name and type but
 // not its value.
 //

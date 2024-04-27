@@ -503,15 +503,15 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 }
 
 func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (ranger, error) {
-	start, err := e.numValWithDefault(r.Start, 0.0)
+	start, err := e.evalNum(r.GetStart())
 	if err != nil {
 		return nil, err
 	}
-	stop, err := e.numVal(r.Stop)
+	stop, err := e.evalNum(r.GetStop())
 	if err != nil {
 		return nil, err
 	}
-	step, err := e.numValWithDefault(r.Step, 1.0)
+	step, err := e.evalNum(r.GetStep())
 	if err != nil {
 		return nil, err
 	}
@@ -532,7 +532,7 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 	return sRange, nil
 }
 
-func (e *Evaluator) numVal(n parser.Node) (float64, error) {
+func (e *Evaluator) evalNum(n parser.Node) (float64, error) {
 	v, err := e.eval(n)
 	if err != nil {
 		return 0, err
@@ -542,13 +542,6 @@ func (e *Evaluator) numVal(n parser.Node) (float64, error) {
 		return 0, newErr(n, fmt.Errorf("%w: expected number, found %v", ErrType, v))
 	}
 	return numVal.V, nil
-}
-
-func (e *Evaluator) numValWithDefault(n parser.Node, defaultVal float64) (float64, error) {
-	if n == nil {
-		return defaultVal, nil
-	}
-	return e.numVal(n)
 }
 
 func (e *Evaluator) evalConditionalBlock(condBlock *parser.ConditionalBlock) (value, bool, error) {

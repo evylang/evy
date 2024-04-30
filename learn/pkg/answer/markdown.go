@@ -10,11 +10,7 @@ import (
 	"rsc.io/markdown"
 )
 
-var ErrBadOutput = fmt.Errorf("bad output type")
-var ErrBadCodeBlock = fmt.Errorf("invalid code block info and output type combination")
-var ErrUnimplemented = fmt.Errorf("not yet implemented")                   // todo: remove when done
-var ErrChoiceNotCorrect = fmt.Errorf("expected correct answer choice")     // todo: remove when done
-var ErrChoiceNotIncorrect = fmt.Errorf("expected incorrect answer choice") // todo: remove when done
+var ErrUnimplemented = fmt.Errorf("not yet implemented") // todo: remove when done
 
 // QuestionMarkdown is a markdown file with question frontmatter.
 type QuestionMarkdown struct {
@@ -26,11 +22,11 @@ type QuestionMarkdown struct {
 func NewQuestionMarkdown(filename string) (*QuestionMarkdown, error) {
 	frontmatterString, mdString, err := readSplitMDFile(filename)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, filename)
 	}
 	fm, err := parseQuestionFrontmatter(frontmatterString)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, filename)
 	}
 	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
 	doc := parser.Parse(mdString)
@@ -39,11 +35,17 @@ func NewQuestionMarkdown(filename string) (*QuestionMarkdown, error) {
 }
 
 func (md *QuestionMarkdown) Seal(publicKey string) error {
-	return md.Frontmatter.Seal(publicKey)
+	if err := md.Frontmatter.Seal(publicKey); err != nil {
+		fmt.Errorf("%w (%s)", err, md.Filename)
+	}
+	return nil
 }
 
 func (md *QuestionMarkdown) Unseal(privateKey string) error {
-	return md.Frontmatter.Unseal(privateKey)
+	if err := md.Frontmatter.Unseal(privateKey); err != nil {
+		fmt.Errorf("%w (%s)", err, md.Filename)
+	}
+	return nil
 }
 
 func (md *QuestionMarkdown) Format() (string, error) {
@@ -53,7 +55,7 @@ func (md *QuestionMarkdown) Format() (string, error) {
 func (md *QuestionMarkdown) Verify(key string) error {
 	answer, err := md.Frontmatter.GetAnswer(key)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w (%s)", err, md.Filename)
 	}
 	return md.verifyAnswer(answer)
 }
@@ -61,23 +63,23 @@ func (md *QuestionMarkdown) Verify(key string) error {
 func (md *QuestionMarkdown) ExportAnswerkey(key string) (Answerkey, error) {
 	answer, err := md.Frontmatter.GetAnswer(key)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, md.Filename)
 	}
 	if err := md.verifyAnswer(answer); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, md.Filename)
 	}
 	return NewAnswerkey(md.Filename, answer)
 }
 
 func (md *QuestionMarkdown) verifyAnswer(answer Answer) error {
-	if md.Frontmatter.AnswerType != "single-choice" && md.Frontmatter.AnswerType != "multiple-choice" {
-		return fmt.Errorf("%w: unsupported answerType", ErrUnimplemented, md.Frontmatter.AnswerType)
-	}
-	model, err := NewModel(md.Doc)
+	model, err := NewModel(md, md.Frontmatter.AnswerType)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w (%s)", err, md.Filename)
 	}
-	return model.VerifyAnswer(answer)
+	if err := model.Verify(answer); err != nil {
+		return fmt.Errorf("%w (%s)", err, md.Filename)
+	}
+	return nil
 }
 
 func readSplitMDFile(filename string) (frontmatter string, md string, err error) {

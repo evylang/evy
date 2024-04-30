@@ -2,26 +2,16 @@
 type: question
 diffiulty: easy # "easy", "medium", "hard", "retriable"
 answer-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program, map
-answer: a
+answer: b
 ---
 
-Which program generates the following output?
+What does this program output?
 
-```
-hi
-```
+[evy:source](img/dot2.evy "evy:source")
 
 Choose one correct answer:
 
-- ```evy
-  print "hi"
-  ```
-- ```evy
-  print hi
-  ```
-- ```evy
-  hi
-  ```
-- ```evy
-  "hi"
-  ```
+- ![dot](img/dot1.evy.svg)
+- ![dot](img/dot2.evy.svg)
+- ![dot](img/dot3.evy.svg)
+- ![dot](img/dot4.evy.svg)

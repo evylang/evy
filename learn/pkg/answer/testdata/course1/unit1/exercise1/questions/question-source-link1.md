@@ -7,15 +7,11 @@ answer: c
 
 Which program generates the following output?
 
-- ```evy
-  move 50 50
-  color "red"
-  circle 20
-  ```
+![dot](img/dot3.evy.svg)
 
 Choose one correct answer:
 
-- ![answer a](img/dot-sm.evy.svg)
-- ![answer b](img/dot-bg.evy.svg)
-- ![answer c](img/dot-sm-right.evy.svg)
-- ![answer d](img/dot-bg-right.evy.svg)
+- [1](img/dot1.evy "evy:source")
+- [2](img/dot2.evy "evy:source")
+- [3](img/dot3.evy "evy:source")
+- [4](img/dot4.evy "evy:source")

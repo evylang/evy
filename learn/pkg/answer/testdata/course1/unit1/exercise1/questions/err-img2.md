@@ -2,26 +2,32 @@
 type: question
 diffiulty: easy # "easy", "medium", "hard", "retriable"
 answer-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program, map
-answer: a
+answer: d
 ---
 
 Which program generates the following output?
 
-```
-hi
-```
+![dot](img/dot1.evy.svg)
 
 Choose one correct answer:
 
 - ```evy
-  print "hi"
+  move 50 50
+  color "red"
+  circle 10
   ```
 - ```evy
-  print hi
+  move 50 50
+  color "red"
+  circle 20
   ```
 - ```evy
-  hi
+  move 40 40
+  color "red"
+  circle 20
   ```
 - ```evy
-  "hi"
+  move 60 60
+  color "red"
+  circle 10
   ```

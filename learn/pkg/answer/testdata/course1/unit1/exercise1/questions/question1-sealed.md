@@ -6,9 +6,9 @@ sealed-answer: AQEAe55io6AupjBOj+rdoHoNr2FXBZbqaVO3VwWYei1h0RuHRVGad9fYq+eEngjhP
 
 What does this program output?
 
-- ```
-  print "hi"
-  ```
+```evy
+print "hi"
+```
 
 Choose one correct answer:
 

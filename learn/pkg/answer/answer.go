@@ -134,8 +134,24 @@ func (a Answer) correctAnswerIndices() map[int]bool {
 	return m
 }
 
+func (a Answer) correctAnswers() string {
+	switch {
+	case a.Single != "":
+		return a.Single
+	case len(a.Multi) > 0:
+		return strings.Join(a.Multi, ", ")
+	case a.Text != "":
+		return a.Text
+	case len(a.Texts) > 0:
+		return strings.Join(a.Texts, ", ")
+	case a.Program != "":
+		return a.Program
+	}
+	return "UNKOWN ANSWER"
+}
+
 func indexToLetter(i int) string {
-	return string('a' + i)
+	return string(rune('a' + i))
 }
 
 func newAnswerPath(filename string) (answerPath, error) {

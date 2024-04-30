@@ -2,26 +2,26 @@
 type: question
 diffiulty: easy # "easy", "medium", "hard", "retriable"
 answer-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program, map
-answer: a
+answer: b
 ---
 
-Which program generates the following output?
+What does this program output?
 
-```
-hi
+```evy
+print "hi"
 ```
 
 Choose one correct answer:
 
-- ```evy
-  print "hi"
+- ```evy-out
+  "hey"
   ```
-- ```evy
-  print hi
+- ```evy-out
+  ho
   ```
-- ```evy
+- ```evy-out
   hi
   ```
-- ```evy
+- ```evy-out
   "hi"
   ```

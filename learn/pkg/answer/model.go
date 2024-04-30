@@ -1,124 +1,158 @@
 package answer
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"evylang.dev/evy/pkg/cli"
+	"evylang.dev/evy/pkg/evaluator"
 	"rsc.io/markdown"
 )
 
 var (
 	ErrBadMarkdownStructure = fmt.Errorf("bad Markdown structure")
+	ErrInconsistentMdoel    = fmt.Errorf("inconsistency")
+	ErrInvalidAnswer        = fmt.Errorf("invalid answer")
 )
 
 type Model struct {
 	Question      outputGenerator
 	AnswerChoices []outputGenerator
 	OutputType    OutputType
+	Filename      string
 }
 
-func NewModel(doc *markdown.Document, answerType AnswerType) (*Model, error) {
+func NewModel(qmd *QuestionMarkdown, answerType AnswerType) (*Model, error) {
 	if answerType != "single-choice" && answerType != "multiple-choice" {
 		return nil, fmt.Errorf("%w: unsupported answerType %q", ErrUnimplemented, answerType)
 	}
-	return newFromChoice(doc)
+	return newModelFromChoice(qmd)
 }
 
-// newFromChoice operates on single-choice, multiple-choice question documents
+// newModelFromChoice operates on single-choice, multiple-choice question documents
 // and expects the following structure:
 //
 // - question: top level codeblock or top level paragraph with image ending in .evy.svg.
 // answers: list of codeblocks or paragraphs with images
-func newFromChoice(doc *markdown.Document) (*Model, error) {
-	var question outputGenerator
-	var answers []outputGenerator
+func newModelFromChoice(qmd *QuestionMarkdown) (*Model, error) {
 	var err error
-	for _, b := range doc.Blocks {
-		question, answers, err = toModelFields(question, answers, b)
-		if err != nil {
+	model := &Model{Filename: qmd.Filename}
+	for _, b := range qmd.Doc.Blocks {
+		if err = model.buildFields(b); err != nil {
 			return nil, err
 		}
 	}
-	if question == nil {
+	if model.Question == nil {
 		return nil, fmt.Errorf("%w: found no question", ErrBadMarkdownStructure)
 	}
-	if len(answers) < 2 {
-		return nil, fmt.Errorf("%w: found %d questions, expected 1.", ErrBadMarkdownStructure, len(answers))
+	if len(model.AnswerChoices) < 2 {
+		return nil, fmt.Errorf("%w: found %d answer, expected 2 or more", ErrBadMarkdownStructure, len(model.AnswerChoices))
 	}
-	outputType, err := getOutputType(append([]outputGenerator{question}, answers...))
-	if err != nil {
+	if err := model.inferOutputType(); err != nil {
 		return nil, err
 	}
-	return &Model{
-		Question:      question,
-		AnswerChoices: answers,
-		OutputType:    outputType,
-	}, nil
+	return model, nil
 }
 
-func toModelFields(question outputGenerator, answers []outputGenerator, b markdown.Block) (outputGenerator, []outputGenerator, error) {
-	outputGenerator, err := toOutputGenerator(b)
-	if err != nil {
-		return nil, nil, err
+func (m *Model) buildFields(b markdown.Block) error {
+	if err := m.buildQuestion(b); err != nil {
+		return err
 	}
-	if outputGenerator != nil {
-		if question != nil {
-			return nil, nil, fmt.Errorf("%w: found second question", ErrBadMarkdownStructure)
-		}
-		if answers != nil {
-			return nil, nil, fmt.Errorf("%w: found question after answers", ErrBadMarkdownStructure)
-		}
-		return outputGenerator, nil, nil
+	if m.Question != nil {
+		return m.buildAnswerChoices(b)
 	}
-	outputGeneratorList, err := toOutputGeneratorList(b)
-	if err != nil {
-		return nil, nil, err
-	}
-	if outputGeneratorList != nil {
-		if question == nil {
-			return nil, nil, fmt.Errorf("%w: found answers before question", ErrBadMarkdownStructure)
-		}
-		if answers != nil {
-			return nil, nil, fmt.Errorf("%w: found a second set of answers", ErrBadMarkdownStructure)
-		}
-		return question, outputGeneratorList, nil
-	}
-	return nil, nil, nil
+	return nil
 }
 
-// toOutputGenerator converts a markdown block into an outputGenerator if the
+func (m *Model) buildQuestion(b markdown.Block) error {
+	if m.Question != nil {
+		return nil
+	}
+	var err error
+	m.Question, err = newOutputGeneratorFromBlock(b, m.Filename)
+	return err
+}
+
+func (m *Model) buildAnswerChoices(b markdown.Block) error {
+	if m.AnswerChoices != nil {
+		return nil
+	}
+	var err error
+	m.AnswerChoices, err = newOutputGeneratorsFromList(b, m.Filename)
+	return err
+}
+
+func (m *Model) setAnswerChoices(answerChoices []outputGenerator) error {
+	if m.Question == nil {
+		return fmt.Errorf("%w: found answers before question", ErrBadMarkdownStructure)
+	}
+	if m.AnswerChoices != nil {
+		return fmt.Errorf("%w: found a second set of answers", ErrBadMarkdownStructure)
+	}
+	m.AnswerChoices = answerChoices
+	return nil
+}
+
+// newOutputGeneratorFromBlock converts a markdown block into an outputGenerator if the
 // block is a code block with an `evy` or `evy-out` info tag. It also turn a
 // markdown image with a URL ending in ".evy.svg" into an outputGnerator.
 //
-// toOutputGenerator only considers top-level code blocks and images inside
+// newOutputGeneratorFromBlock only considers top-level code blocks and images inside
 // paragraphs. The first matching is returned, all following are ignored.
-func toOutputGenerator(b markdown.Block) (outputGenerator, error) {
+func newOutputGeneratorFromBlock(b markdown.Block, filename string) (outputGenerator, error) {
 	if cb, ok := b.(*markdown.CodeBlock); ok {
-		if cb.Info == "evy" || cb.Info == "evy-out" {
-			return &codeBlock{cb}, nil
+		if cb.Info == "evy" || cb.Info == "evy-out" || cb.Info == "" {
+			return newCodeBlock(cb), nil
 		}
 	}
-	var img outputGenerator
-	if p, ok := b.(*markdown.Paragraph); ok {
-		for _, inline := range p.Text.Inline {
-			if mdImg, ok := inline.(*markdown.Image); ok {
-				if strings.HasSuffix(mdImg.URL, ".evy.svg") {
-					if img != nil {
-						return nil, fmt.Errorf("%w: found second image", ErrBadMarkdownStructure)
-					}
-					img = image(mdImg.URL)
-				}
-			}
+	text := toText(b)
+	if text == nil {
+		return nil, nil
+	}
+	for _, inline := range text.Inline {
+		mdImg, ok := inline.(*markdown.Image)
+		if ok && strings.HasSuffix(mdImg.URL, ".evy.svg") {
+			return newImageFromFile(filepath.Join(filepath.Dir(filename), mdImg.URL))
+		}
+		link, ok := inline.(*markdown.Link)
+		if ok && isRelativeEvySourceURL(link) {
+			return newCodeBlockFromFile(filepath.Join(filepath.Dir(filename), link.URL))
 		}
 	}
-	return img, nil
+	return nil, nil
 }
 
-// toOutputGeneratorList converts a markdown block into a list of
+func isRelativeEvySourceURL(link *markdown.Link) bool {
+	u := link.URL
+	if strings.HasPrefix(u, "https://") || strings.HasPrefix(u, "http://") {
+		return false // not a relative URL
+	}
+	if !strings.HasSuffix(u, ".evy") {
+		return false
+	}
+	return link.Title == "evy:source"
+}
+
+func toText(b markdown.Block) *markdown.Text {
+	if t, ok := b.(*markdown.Text); ok {
+		return t
+	}
+	if p, ok := b.(*markdown.Paragraph); ok {
+		return p.Text
+	}
+	return nil
+
+}
+
+// newOutputGeneratorsFromList converts a markdown block into a list of
 // outputGenerators if the block is markdown list and all list items
 // can be converted to outputGenerators.
-func toOutputGeneratorList(b markdown.Block) ([]outputGenerator, error) {
+func newOutputGeneratorsFromList(b markdown.Block, filename string) ([]outputGenerator, error) {
 	list, ok := b.(*markdown.List)
 	if !ok {
 		return nil, nil
@@ -127,7 +161,7 @@ func toOutputGeneratorList(b markdown.Block) ([]outputGenerator, error) {
 	for _, item := range list.Items {
 		foundGeneratorInItem := false
 		for _, block := range item.(*markdown.Item).Blocks {
-			outputGenerator, err := toOutputGenerator(block)
+			outputGenerator, err := newOutputGeneratorFromBlock(block, filename)
 			if err != nil {
 				return nil, err
 			}
@@ -154,20 +188,14 @@ func (m *Model) Verify(answer Answer) error {
 		return fmt.Errorf("%w: unsupported answerType %q", ErrUnimplemented, answer.Type)
 	}
 	correctByIndex := answer.correctAnswerIndices()
-	generated, err := m.Question.genOutput(m.OutputType)
-	if err != nil {
-		return err
-	}
+	generated := m.Question.genOutput(m.OutputType)
 	for i, choice := range m.AnswerChoices {
-		choiceGen, err := choice.genOutput(m.OutputType)
-		if err != nil {
-			return err
-		}
+		choiceGen := choice.genOutput(m.OutputType)
 		if correctByIndex[i] && generated != choiceGen {
-			return fmt.Errorf("%w: %q: %q != %q", ErrChoiceNotCorrect, indexToLetter(i), generated, choiceGen)
+			return fmt.Errorf("%w: expected answers %q: answer %q does not match question: %q != %q", ErrInvalidAnswer, answer.correctAnswers(), indexToLetter(i), choiceGen, generated)
 		}
 		if !correctByIndex[i] && generated == choiceGen {
-			return fmt.Errorf("%w: %q: %q == %q", ErrChoiceNotIncorrect, indexToLetter(i), generated, choiceGen)
+			return fmt.Errorf("%w: expected answer %q: answer %q matches question: %q == %q", ErrInvalidAnswer, answer.correctAnswers(), indexToLetter(i), choiceGen, generated)
 		}
 	}
 	return nil
@@ -188,58 +216,111 @@ var OutputTypeToString = map[OutputType]string{
 }
 
 type outputGenerator interface {
-	genOutput(OutputType) (string, error) // OutputType needed for generic evy programs that can have text _and_ image output
+	genOutput(OutputType) string // OutputType needed for generic evy programs that can have text _and_ image output
 	outputType() OutputType
 }
 
 type image string
 
-func (img image) genOutput(t OutputType) (string, error) {
-	if t != imgOutput {
-		return "", fmt.Errorf("%w: expected image output type, got %q", ErrBadOutput, OutputTypeToString[t])
+func newImageFromFile(filename string) (image, error) {
+	b, err := os.ReadFile(filename)
+	if err == nil {
+		return image(b), nil
 	}
-	b, err := os.ReadFile(string(img))
-	if err != nil {
+	if !errors.Is(err, fs.ErrNotExist) {
 		return "", err
 	}
-	return string(b), nil
+	evySourcePath := strings.TrimSuffix(filename, ".svg")
+	b, err2 := os.ReadFile(string(evySourcePath))
+	if err2 != nil {
+		return "", fmt.Errorf("error reading evy source for image: %w: %w (%s)", err, err2, filename)
+	}
+	svgData := runEvy(string(b), imgOutput)
+	if err2 := os.WriteFile(filename, []byte(svgData), 0666); err2 != nil {
+		return "", fmt.Errorf("error writing svg output for evy source: %w: %w (%s)", err, err2, filename)
+	}
+	return image(svgData), nil
+}
+
+func (img image) genOutput(t OutputType) string {
+	return string(img)
 }
 
 func (img image) outputType() OutputType { return imgOutput }
 
 type codeBlock struct {
-	*markdown.CodeBlock
+	outType OutputType
+	text    string
 }
 
-func (b *codeBlock) genOutput(t OutputType) (string, error) {
-	switch {
-	case b.Info == "evy" && t == textOutput:
-	case b.Info == "evy" && t == imgOutput: // TODO
-	case b.Info == "evy-out" && t == textOutput:
-		return strings.Join(b.Text, "\n"), nil
+func newCodeBlock(cb *markdown.CodeBlock) *codeBlock {
+	outType := unknownOutput
+	if cb.Info == "evy-out" || cb.Info == "" {
+		outType = textOutput
 	}
-	return "", fmt.Errorf("%w: info: %q, %q", ErrBadCodeBlock, b.Info, OutputTypeToString[t])
+	text := strings.Join(cb.Text, "\n") + "\n"
+	return &codeBlock{outType: outType, text: text}
+}
+
+func newCodeBlockFromFile(filename string) (*codeBlock, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &codeBlock{outType: unknownOutput, text: string(b)}, nil
+}
+
+func (b *codeBlock) genOutput(t OutputType) string {
+	switch {
+	case b.outType == unknownOutput:
+		return runEvy(b.text, t)
+	case b.outType == textOutput && t == textOutput:
+		return b.text
+	}
+	panic("invalid codeBlock")
 }
 
 func (b *codeBlock) outputType() OutputType {
-	if b.Info == "evy-out" {
-		return textOutput
-	}
-	return unknownOutput
+	return b.outType
 }
 
-func getOutputType(generators []outputGenerator) (OutputType, error) {
+func (m *Model) inferOutputType() error {
 	outputType := unknownOutput
+	generators := append([]outputGenerator{m.Question}, m.AnswerChoices...)
 	for _, g := range generators {
 		t := g.outputType()
 		if outputType == unknownOutput {
 			outputType = t
-		} else if outputType != t {
-			return unknownOutput, fmt.Errorf("%w: found text and image output, expected only one", ErrBadOutput)
+		} else if outputType != t && t != unknownOutput {
+			return fmt.Errorf("%w: found text and image output, expected only one", ErrInconsistentMdoel)
 		}
 	}
 	if outputType == unknownOutput {
-		return unknownOutput, fmt.Errorf("%w: found neither text nor image output", ErrBadOutput)
+		return fmt.Errorf("%w: found neither text nor image output", ErrInconsistentMdoel)
 	}
-	return outputType, nil
+	m.OutputType = outputType
+	return nil
+}
+
+func runEvy(source string, t OutputType) string {
+	textWriter := &bytes.Buffer{}
+	opts := []cli.Option{
+		cli.WithSkipSleep(true),
+		cli.WithOutputWriter(textWriter),
+	}
+	if t == imgOutput {
+		opts = append(opts, cli.WithSVG("" /* root style */))
+	}
+	rt := cli.NewRuntime(opts...)
+	eval := evaluator.NewEvaluator(rt)
+	err := eval.Run(source)
+	if err != nil {
+		return "**ERROR**"
+	}
+	if t == imgOutput {
+		imgWriter := &bytes.Buffer{}
+		rt.WriteSVG(imgWriter)
+		return imgWriter.String()
+	}
+	return textWriter.String()
 }

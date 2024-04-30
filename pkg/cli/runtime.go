@@ -45,6 +45,13 @@ func WithSVG(svgStyle string) Option {
 	}
 }
 
+// WithOutputWriter sets the text output writer, which defaults to os.Stdout.
+func WithOutputWriter(w io.Writer) Option {
+	return func(rt *Runtime) {
+		rt.writer = w
+	}
+}
+
 // NewRuntime returns an initialized cli runtime.
 func NewRuntime(options ...Option) *Runtime {
 	rt := &Runtime{

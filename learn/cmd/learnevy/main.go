@@ -21,7 +21,7 @@ type app struct {
 	Verify verifyCmd `cmd:"" help:"Verify encryptedAnsers in markdown file. Ensure no plaintext answers."`
 	Serve  serveCmd  `cmd:"" help:"Start HTTP server with contents."`
 
-	Crypto cryptoCmd `cmd:"" help:"Encryption utilities."`
+	Crypto cryptoCmd `cmd:"" help:"Encryption utilities." hidden:""`
 }
 
 type cryptoCmd struct {
@@ -82,7 +82,8 @@ type exportCmd struct {
 }
 
 type sealCmd struct {
-	MDFile string `arg:"" type:"markdownfile" help:"Markdown file with course, unit, exercise, or question." placeholder:"ANSWERFILE"`
+	MDFile    string `arg:"" type:"markdownfile" help:"Markdown file with course, unit, exercise, or question." placeholder:"ANSWERFILE"`
+	PublicKey string `short:"k" help:"public key to seal answers, default provided"`
 }
 
 type unsealCmd struct {
@@ -114,7 +115,7 @@ func (c *exportCmd) Run() error {
 	defer f.Close() //nolint
 
 	fmt.Println("creating answerkey file", c.AnswerkeyFile)
-	answerkey, err := md.ExportAnswerKey(c.PrivateKey)
+	answerkey, err := md.ExportAnswerkey(c.PrivateKey)
 	if err != nil {
 		return err
 	}
@@ -123,14 +124,48 @@ func (c *exportCmd) Run() error {
 	return enc.Encode(answerkey)
 }
 
+func (c *sealCmd) Run() error {
+	md, err := answer.NewQuestionMarkdown(c.MDFile)
+	if err != nil {
+		return err
+	}
+	publicKey := c.PublicKey
+	if publicKey == "" {
+		publicKey = answer.PublicKey
+	}
+	if err := md.Seal(publicKey); err != nil {
+		return err
+	}
+	formatted, err := md.Format()
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(c.MDFile, []byte(formatted), 0666)
+}
+
 func (c *unsealCmd) Run() error {
-	fmt.Println("unseal command not yet implemented")
-	return nil
+	md, err := answer.NewQuestionMarkdown(c.MDFile)
+	if err != nil {
+		return err
+	}
+	if err := md.Unseal(c.PrivateKey); err != nil {
+		return err
+	}
+	formatted, err := md.Format()
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(c.MDFile, []byte(formatted), 0666)
 }
+
 func (c *verifyCmd) Run() error {
-	fmt.Println("verify command not yet implemented")
-	return nil
+	md, err := answer.NewQuestionMarkdown(c.MDFile)
+	if err != nil {
+		return err
+	}
+	return md.Verify(c.PrivateKey)
 }
+
 func (c *serveCmd) Run() error {
 	fmt.Println("serve command not yet implemented")
 	return nil

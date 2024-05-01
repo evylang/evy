@@ -1,7 +1,7 @@
 ---
 type: question
 sub-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program, map
-diffiulty: easy
+difficulty: easy
 substitutions:
   - TEXT: Hello
   - TEXT: Nǐ hǎo

@@ -1,7 +1,7 @@
 ---
 type: question
 sub-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program
-diffiulty: easy
+difficulty: easy
 answer: d
 sealedAnswer: nvlIDT0P239TLA;KSDMF;OAIERUGP9Q8U34T;LJK;AREJKG
 ---

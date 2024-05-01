@@ -96,29 +96,33 @@ func splitTrim(str string) []string {
 }
 
 func (a Answer) Equals(other Answer) bool {
-	if a.Single != other.Single {
+	if a.Type != other.Type {
 		return false
 	}
-	if len(a.Multi) != len(other.Multi) {
-		return false
-	}
-	for i, v := range a.Multi {
-		if v != other.Multi[i] {
-			return false
+	switch a.Type {
+	case "single-choice":
+		return a.Single == other.Single
+	case "text":
+		return a.Text == other.Text
+	case "program":
+		return a.Program == other.Program // not quite correct!
+	case "multiple-choice":
+		for i, v := range a.Multi {
+			if v != other.Multi[i] {
+				return false
+			}
 		}
-	}
-	if len(a.Texts) != len(other.Texts) {
-		return false
-	}
-	for i, v := range a.Texts {
-		if v != other.Texts[i] {
-			return false
+		return true
+	case "texts":
+		for i, v := range a.Texts {
+			if v != other.Texts[i] {
+				return false
+			}
 		}
+		return true
 	}
-	if a.Text != other.Text {
-		return false
-	}
-	return a.Program == other.Program
+	return false
+
 }
 
 func (a Answer) correctAnswerIndices() map[int]bool {

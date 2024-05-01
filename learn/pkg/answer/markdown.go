@@ -72,7 +72,7 @@ func (md *QuestionMarkdown) ExportAnswerkey(key string) (Answerkey, error) {
 }
 
 func (md *QuestionMarkdown) verifyAnswer(answer Answer) error {
-	model, err := NewModel(md, md.Frontmatter.AnswerType)
+	model, err := NewModel(md)
 	if err != nil {
 		return fmt.Errorf("%w (%s)", err, md.Filename)
 	}

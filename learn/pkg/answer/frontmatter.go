@@ -121,7 +121,7 @@ func (s Difficulty) MarshalText() ([]byte, error) {
 }
 
 func (s *Difficulty) UnmarshalText(text []byte) error {
-	return unmarshalText("frontmatter 'difficulty'", validFrontmatterTypes, text, (*string)(s))
+	return unmarshalText("frontmatter 'difficulty'", validDifficultys, text, (*string)(s))
 }
 
 func marshalText(fieldName, str string, validStrings []string) ([]byte, error) {

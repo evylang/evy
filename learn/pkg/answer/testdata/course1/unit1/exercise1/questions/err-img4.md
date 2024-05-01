@@ -7,15 +7,10 @@ answer: d
 
 Which program generates the following output?
 
-![question](dot/dot.a.evy.svg)
+![INVALID-TEXT](dot/dot.a.evy.svg)
 
 Choose one correct answer:
 
-- ```evy
-  move 50 50
-  color "red"
-  circle 10
-  ```
 - ```evy
   move 50 50
   color "red"
@@ -28,6 +23,11 @@ Choose one correct answer:
   ```
 - ```evy
   move 60 60
+  color "red"
+  circle 10
+  ```
+- ```evy
+  move 50 50
   color "red"
   circle 10
   ```

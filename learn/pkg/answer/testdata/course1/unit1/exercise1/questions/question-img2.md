@@ -1,13 +1,13 @@
 ---
 type: question
-diffiulty: easy # "easy", "medium", "hard", "retriable"
+difficulty: easy # "easy", "medium", "hard", "retriable"
 answer-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program, map
 answer: d
 ---
 
 Which program generates the following output?
 
-![dot](img/dot1.evy.svg)
+![question](dot/dot.a.evy.svg)
 
 Choose one correct answer:
 

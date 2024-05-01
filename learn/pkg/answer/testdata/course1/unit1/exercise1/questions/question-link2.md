@@ -7,13 +7,11 @@ answer: c
 
 What does this program output?
 
-```evy
-print "hi"
-```
+[question](dot/dot.c.evy "evy:source")
 
 Choose one correct answer:
 
-- `"hey"`
-- `ho`
-- `hi`
-- `"hi"`
+- [answer](dot/dot.a.evy "evy:svg")
+- [answer](dot/dot.b.evy "evy:svg")
+- [answer](dot/dot.c.evy "evy:svg")
+- [answer](dot/dot.d.evy "evy:svg")

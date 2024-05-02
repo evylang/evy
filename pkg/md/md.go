@@ -1,4 +1,6 @@
-package main
+// Package md provides common markdown utilities, used by build-tools and learn
+// platform.
+package md
 
 import (
 	"bytes"
@@ -6,12 +8,14 @@ import (
 	"rsc.io/markdown"
 )
 
-// node is a subset of markdown.Block and markdown.Inline interfaces.
-type node interface {
+// Node is a subset of markdown.Block and markdown.Inline interfaces.
+type Node interface {
 	PrintHTML(*bytes.Buffer)
 }
 
-func walk(node node, f func(node)) {
+// Walk visits a markdown AST node, executes function f on it and recursively
+// visits all children.
+func Walk(node Node, f func(Node)) {
 	f(node)
 	switch n := node.(type) {
 	case *markdown.Del:
@@ -21,7 +25,7 @@ func walk(node node, f func(node)) {
 	case *markdown.Emph:
 		walkNodes(n.Inner, f)
 	case *markdown.Heading:
-		walk(n.Text, f)
+		Walk(n.Text, f)
 	case *markdown.Image:
 		walkNodes(n.Inner, f)
 	case *markdown.Item:
@@ -31,7 +35,7 @@ func walk(node node, f func(node)) {
 	case *markdown.List:
 		walkNodes(n.Items, f)
 	case *markdown.Paragraph:
-		walk(n.Text, f)
+		Walk(n.Text, f)
 	case *markdown.Quote:
 		walkNodes(n.Blocks, f)
 	case *markdown.Strong:
@@ -46,8 +50,8 @@ func walk(node node, f func(node)) {
 	}
 }
 
-func walkNodes[T node](nodes []T, f func(node)) {
+func walkNodes[T Node](nodes []T, f func(Node)) {
 	for _, n := range nodes {
-		walk(n, f)
+		Walk(n, f)
 	}
 }

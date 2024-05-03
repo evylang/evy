@@ -5,7 +5,7 @@ $0 ~ "//\tUsage:" {
 }
 $0 ~ "^(package |// [[])" && in_usage {
         system(cmd " --help | sed -e '/./s|^|//\t|' -e 's|^$|//|'")
-        printf "//\n"
+        if ($1 == "//") printf "//\n"
         in_usage = 0
 }
 

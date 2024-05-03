@@ -31,6 +31,7 @@ clean::
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)
 CMDS = .
+LEARN_CMDS = ./cmd/levy
 
 ## Build full evy binaries
 build-full: embed | $(O)
@@ -39,14 +40,17 @@ build-full: embed | $(O)
 ## Build evy binaries without web content embedded
 build-go: $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
+	cd learn; go build -o ../$(O) -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries in $GOBIN
 install-full: embed
 	go install -tags full -ldflags='$(GO_LDFLAGS)' $(CMDS)
+	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries without embedded frontend in $GOBIN
 install:
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
+	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 # Use `go version` to ensure the right go version is installed when using tinygo.
 go-version:
@@ -82,11 +86,13 @@ clean::
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
+LEARNCOVERFILE = $(O)/learn-coverage.txt
 EXPORTDIR = $(O)/export-test
 
 ## Run non-tinygo tests and generate a coverage file
 test-go: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
+	cd learn; go test -coverprofile=../$(LEARNCOVERFILE) ./...
 
 ## Test evy CLI
 test-cli: build-full
@@ -103,6 +109,7 @@ test-tiny: go-version | $(O)
 ## Check that test coverage meets the required level
 check-coverage: test-go
 	@go tool cover -func=$(COVERFILE) | $(CHECK_COVERAGE) || $(FAIL_COVERAGE)
+	@go tool cover -func=$(LEARNCOVERFILE) | $(CHECK_COVERAGE) || $(FAIL_COVERAGE)
 
 ## Show test coverage in your browser
 cover: test-go
@@ -119,6 +126,7 @@ EVY_FILES = $(shell find frontend/play/samples -name '*.evy')
 ## Lint go source code
 lint-go:
 	golangci-lint run
+	cd learn; golangci-lint run
 
 ## Format evy sample code
 fmt-evy:
@@ -148,7 +156,7 @@ usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
 GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
-GODOCFILES = main.go
+GODOCFILES = main.go learn/cmd/levy/main.go
 godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 

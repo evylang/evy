@@ -998,6 +998,35 @@ func TestScope(t *testing.T) {
 			`,
 			wantStackTop: makeValue(t, 2),
 		},
+		{
+			name: "return scope",
+			input: `x := 1
+			func a:string
+				x := "a"
+				return x
+			end
+			func b:string
+				return a
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local scope",
+			input: `x := ""
+			func a:string
+				x := "a"
+				return x
+			end
+			func b:string
+				y := a
+				return y
+			end
+			x = b
+			`,
+			wantStackTop: makeValue(t, "a"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1014,13 +1043,27 @@ func TestScope(t *testing.T) {
 func TestFunctions(t *testing.T) {
 	tests := []testCase{
 		{
-			name: "simple",
+			name: "no args",
 			input: `
 			func add:num
 				return 1 + 2
 			end
 			x := add`,
 			wantStackTop: makeValue(t, 3),
+		},
+		{
+			name: "with args",
+			input: `
+			func sub:num a:num b:num
+    			return a - b
+			end
+			func add:num a:num b:num
+    			return a + b
+			end
+			x := add 1 2
+			x = sub x 2
+			`,
+			wantStackTop: makeValue(t, 1),
 		},
 	}
 	for _, tt := range tests {

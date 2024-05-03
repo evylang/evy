@@ -65,3 +65,7 @@ func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	}
 	return obj, ok
 }
+
+func (s *SymbolTable) numLocals() int {
+	return len(s.store)
+}

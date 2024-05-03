@@ -122,7 +122,8 @@ const (
 	// array or map). It has one operand that specifies if the loop range
 	// assigns to a loop variable.
 	OpIterRange
-	// OpCall represents a function call.
+	// OpCall represents a function call, the operand is the number of
+	// arguments passed to the function.
 	OpCall
 	// OpReturn reprents a return keyword.
 	OpReturn
@@ -188,7 +189,7 @@ var definitions = map[Opcode]*OpDefinition{
 	OpJumpOnFalse: {"OpJumpOnFalse", []int{2}},
 	OpStepRange:   {"OpStepRange", []int{2}}, // operand: hasLoopVar
 	OpIterRange:   {"OpIterRange", []int{2}}, // operand: hasLoopVar
-	OpCall:        {"OpCall", nil},
+	OpCall:        {"OpCall", []int{2}},
 	OpReturn:      {"OpReturn", nil},
 }
 

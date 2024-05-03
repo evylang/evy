@@ -42,7 +42,7 @@ type VM struct {
 // NewVM returns a new VM.
 func NewVM(bytecode *Bytecode) *VM {
 	mainFn := funcVal{Instructions: bytecode.Instructions}
-	mainFrame := newFrame(mainFn)
+	mainFrame := newFrame(mainFn, 0)
 	frames := make([]*frame, MaxFrames)
 	frames[0] = mainFrame
 	return &VM{
@@ -61,10 +61,10 @@ func NewVM(bytecode *Bytecode) *VM {
 //nolint:maintidx,gocognit // Run is special in that it is written to be optimal
 func (vm *VM) Run() error {
 	var err error
-	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
+	for vm.currentFrame().ip < len(vm.currentFrame().instructions())-1 {
 		vm.currentFrame().ip++
 		ip := vm.currentFrame().ip
-		ins := vm.currentFrame().Instructions()
+		ins := vm.currentFrame().instructions()
 		// This loop is the hot path of the vm, avoid unnecessary
 		// lookups or memory movement.
 		switch Opcode(ins[ip]) {
@@ -79,7 +79,9 @@ func (vm *VM) Run() error {
 		case OpGetLocal:
 			idx := ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
-			err = vm.push(vm.stack[idx])
+			frame := vm.currentFrame()
+
+			err = vm.push(vm.stack[frame.base+int(idx)])
 		case OpSetGlobal:
 			globalIndex := ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
@@ -90,8 +92,9 @@ func (vm *VM) Run() error {
 			vm.drop(int(n))
 		case OpSetLocal:
 			idx := ReadUint16(ins[ip+1:])
+			frame := vm.currentFrame()
 			vm.currentFrame().ip += 2
-			vm.stack[idx] = vm.peek()
+			vm.stack[frame.base+int(idx)] = vm.peek(0)
 		case OpAdd:
 			right, left := vm.popBinaryNums()
 			err = vm.push(numVal(left + right))
@@ -310,11 +313,19 @@ func (vm *VM) Run() error {
 			}
 			err = vm.push(boolVal(val != nil))
 		case OpCall:
-			fn := vm.peekFuncVal()
-			vm.pushFrame(newFrame(fn))
+			numArgs := int(ReadUint16(ins[ip+1:]))
+			vm.currentFrame().ip += 2
+			fn := vm.peekFuncVal(numArgs)
+			frame := newFrame(fn, vm.sp-numArgs)
+			vm.pushFrame(frame)
+			// create a hole on the stack for the local args of the fn
+			// to be stored in
+			vm.sp = frame.base + fn.NumLocals
 		case OpReturn:
+			// TODO: empty returns
 			retVal := vm.pop()
-			vm.popFrame()
+			frame := vm.popFrame()
+			vm.sp = frame.base - 1
 			err = vm.push(retVal)
 		}
 		if err != nil {
@@ -340,17 +351,17 @@ func (vm *VM) push(o value) error {
 	return nil
 }
 
-func (vm *VM) peek() value {
-	return vm.stack[vm.sp-1]
+func (vm *VM) peek(offset int) value {
+	return vm.stack[vm.sp-1-offset]
 }
 
-// peekFuncVal pops an element from the stack and casts it to an funcVal
+// peekFuncVal peeks an element from the stack and casts it to an funcVal
 // before returning the value. If elem is not a funcVal then it will error.
-func (vm *VM) peekFuncVal() funcVal {
-	elem := vm.peek()
+func (vm *VM) peekFuncVal(offset int) funcVal {
+	elem := vm.peek(offset)
 	val, ok := elem.(funcVal)
 	if !ok {
-		panic(fmt.Errorf("%w: expected to pop funcVal but got %s",
+		panic(fmt.Errorf("%w: expected to peek funcVal but got %s",
 			ErrInternal, elem.Type()))
 	}
 	return val

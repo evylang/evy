@@ -236,7 +236,13 @@ func (noneVal) Equals(_ value) bool {
 }
 
 type funcVal struct {
+	// Instructions are the bytecode instructions that compose this
+	// function.
 	Instructions Instructions
+	// NumLocals is the number of locals declared in this function,
+	// it is used to create a whole in the vm stack when running
+	// the function so that it can use the stack directly for locals.
+	NumLocals int
 }
 
 func (funcVal) Type() *parser.Type {
@@ -244,13 +250,16 @@ func (funcVal) Type() *parser.Type {
 }
 
 func (f funcVal) String() string {
-	return fmt.Sprintf("func[%v]", f.Instructions)
+	return fmt.Sprintf("func %d [%v]", f.NumLocals, f.Instructions)
 }
 
 func (f funcVal) Equals(v value) bool {
 	f2, ok := v.(funcVal)
 	if !ok {
 		panic("internal error: function.Equals called with non-function value")
+	}
+	if f.NumLocals != f2.NumLocals {
+		return false
 	}
 	ins2 := f2.Instructions
 	if len(f.Instructions) != len(ins2) {

@@ -283,7 +283,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		// declare the loop var with a noneVal to start with. The top
 		// of the loop will overwrite this with a value of the correct type
 		// for the loop.
-		symbol := c.globals.Define(stmt.LoopVar.Name)
+		symbol := c.symbolTable.Define(stmt.LoopVar.Name)
 		if err := c.emit(OpNone); err != nil {
 			return err
 		}
@@ -306,7 +306,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 	// Assign the current loop value to the loop var. The rangeOp has left it
 	// on the stack if we told it we have a loop var (hasLoopVar).
 	if stmt.LoopVar != nil {
-		symbol, ok := c.globals.Resolve(stmt.LoopVar.Name)
+		symbol, ok := c.symbolTable.Resolve(stmt.LoopVar.Name)
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
 		}
@@ -556,18 +556,30 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
 	c.enterScope()
 	start := len(c.instructions)
+	for _, param := range call.FuncDef.Params {
+		c.symbolTable.Define(param.Name)
+	}
 	if err := c.Compile(call.FuncDef.Body); err != nil {
 		return err
 	}
+	numLocals := c.symbolTable.numLocals()
 	c.leaveScope()
 	// reset the bytecode
-	compiledFn := funcVal{Instructions: make(Instructions, len(c.instructions)-start)}
+	compiledFn := funcVal{
+		Instructions: make(Instructions, len(c.instructions)-start),
+		NumLocals:    numLocals,
+	}
 	copy(compiledFn.Instructions, c.instructions[start:])
 	c.instructions = c.instructions[:start]
 	if err := c.emit(OpConstant, c.addConstant(compiledFn)); err != nil {
 		return err
 	}
-	return c.emit(OpCall)
+	for _, arg := range call.Arguments {
+		if err := c.Compile(arg); err != nil {
+			return err
+		}
+	}
+	return c.emit(OpCall, len(call.Arguments))
 }
 
 func (c *Compiler) compileReturn(stmt *parser.ReturnStmt) error {

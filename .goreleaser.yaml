@@ -1,3 +1,7 @@
+builds:
+  - tags:
+      - full
+
 brews:
   - repository:
       owner: evylang

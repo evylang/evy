@@ -56,15 +56,23 @@ import (
 	"github.com/alecthomas/kong"
 )
 
+// Globals overridden by linker flags on release build.
 var (
-	version         = "v0.0.0"
+	version = "v0.0.0"
+)
+
+// Errors returned by the Evy tool.
+var (
 	errBadWriteFlag = errors.New("cannot use -w without files")
 	errNotFormatted = errors.New("not formatted")
 	errParse        = errors.New("parse error")
 )
 
-//go:embed out/embed
-var content embed.FS
+var (
+	//go:embed build-tools/default-embed
+	content    embed.FS
+	contentDir = "build-tools/default-embed"
+)
 
 const description = `
 evy is a tool for managing evy source code.
@@ -268,7 +276,7 @@ func (c *startCmd) rootDir() (http.FileSystem, error) {
 		dir := filepath.Join(c.Dir, c.Root)
 		return http.Dir(dir), nil
 	}
-	dir := filepath.Join("out/embed", c.Root)
+	dir := filepath.Join(contentDir, c.Root)
 	root, err := fs.Sub(content, dir)
 	if err != nil {
 		return nil, err
@@ -280,7 +288,7 @@ func (c *exportCmd) Run() error {
 	if err := validateExportDir(c.Force, c.Dir); err != nil {
 		return err
 	}
-	fsys, err := fs.Sub(content, "out/embed")
+	fsys, err := fs.Sub(content, contentDir)
 	if err != nil {
 		return err
 	}

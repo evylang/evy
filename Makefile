@@ -8,7 +8,7 @@ VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
 ## Build, test, check coverage and lint
-all: build-go test lint
+all: build-full test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
 
@@ -32,16 +32,20 @@ clean::
 GO_LDFLAGS = -X main.version=$(VERSION)
 CMDS = .
 
-## Build evy binaries
-build-go: embed | $(O)
+## Build full evy binaries
+build-full: embed | $(O)
+	go build -tags full -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
+
+## Build evy binaries without web content embedded
+build-go: $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 ## Build and install binaries in $GOBIN
-install: embed
-	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
+install-full: embed
+	go install -tags full -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
-## Build and install slim binaries without embedded frontend in $GOBIN
-install-slim: embed-slim
+## Build and install binaries without embedded frontend in $GOBIN
+install:
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
 
 # Use `go version` to ensure the right go version is installed when using tinygo.
@@ -61,12 +65,6 @@ embed: build-tiny | $(O)
 	rm -rf $(O)/embed
 	go run ./build-tools/site-gen frontend $(O)/embed
 
-## Prepare slim frontend assets, with placeholder index.html only, to be embedded into the binary
-embed-slim: | $(O)
-	rm -rf $(O)/embed
-	mkdir $(O)/embed
-	cp build-tools/embed-slim-index.html $(O)/embed/index.html
-
 ## Tidy go modules with "go mod tidy"
 tidy:
 	go mod tidy
@@ -80,18 +78,18 @@ clean::
 	-rm -f frontend/module/wasm_exec.js
 	-rm -f frontend/version.json
 
-.PHONY: build-go build-tiny embed embed-slim go-version install install-slim tidy
+.PHONY: build-full build-go build-tiny embed go-version install install-full tidy
 
 # --- Test ---------------------------------------------------------------------
 COVERFILE = $(O)/coverage.txt
 EXPORTDIR = $(O)/export-test
 
 ## Run non-tinygo tests and generate a coverage file
-test-go: embed-slim | $(O)
+test-go: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
 
 ## Test evy CLI
-test-cli: build-go
+test-cli: build-full
 	rm -rf $(EXPORTDIR)
 	$(O)/evy serve export $(EXPORTDIR)
 	test -f $(EXPORTDIR)/index.html
@@ -119,7 +117,7 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 EVY_FILES = $(shell find frontend/play/samples -name '*.evy')
 
 ## Lint go source code
-lint-go: embed-slim
+lint-go:
 	golangci-lint run
 
 ## Format evy sample code
@@ -136,7 +134,7 @@ doc: doctest godoc toc usage
 
 DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 DOCTESTS = docs/builtins.md docs/spec.md docs/syntax_by_example.md
-doctest: install-slim
+doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
 TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
@@ -146,12 +144,12 @@ toc:
 
 USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
 USAGEFILES = docs/usage.md
-usage: install-slim
+usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
 GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
 GODOCFILES = main.go
-godoc: install-slim
+godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
 DOCS_TARGET_DIR = frontend/docs

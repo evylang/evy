@@ -330,7 +330,7 @@ func syncFS(destDir string, source fs.FS) error {
 		}
 		dest := filepath.Join(destDir, filename)
 		if d.IsDir() {
-			return os.MkdirAll(dest, 0o777) //nolint:gosec
+			return os.MkdirAll(dest, 0o777)
 		}
 		sf, err := source.Open(filename)
 		if err != nil {

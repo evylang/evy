@@ -11,8 +11,8 @@
 //	  -V, --version    Print version information
 //
 //	Commands:
-//	  export <md-file> [<answer-key-file>] [flags]
-//	    Export answer key File.
+//	  export <export-type> <md-file> [<target>] [flags]
+//	    Export answer key and HTML Files.
 //
 //	  verify <md-file> [<type>] [flags]
 //	    Verify answers in markdown file.
@@ -30,6 +30,8 @@ import (
 	"cmp"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"evylang.dev/evy/learn/pkg/question"
 	"github.com/alecthomas/kong"
@@ -42,7 +44,7 @@ levy is a tool that manages learn and practice resources for Evy.
 var version = "v0.0.0"
 
 type app struct {
-	Export exportCmd `cmd:"" help:"Export answer key File."`
+	Export exportCmd `cmd:"" help:"Export answer key and HTML Files."`
 	Verify verifyCmd `cmd:"" help:"Verify answers in markdown file."`
 
 	Seal   sealCmd   `cmd:"" help:"Move 'answer' to 'sealed-answer' in source markdown."`
@@ -63,10 +65,14 @@ func main() {
 }
 
 type exportCmd struct {
-	MDFile        string `arg:"" help:"Question markdown file." placeholder:"MDFILE"`
-	AnswerKeyFile string `arg:"" default:"-" help:"JSON output file for answer key (default: stdout)." placeholder:"JSONFILE"`
-	UnsealedOnly  bool   `short:"u" help:"Only export files with unsealed answers. Suitable if private key not available."`
-	PrivateKey    string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
+	ExportType   string `arg:"" enum:"html,answerkey,all" help:"Export target: one of html, answerkey, all."`
+	MDFile       string `arg:"" help:"Question markdown file." placeholder:"MDFILE"`
+	Target       string `arg:"" default:"-" help:"Output directory or JSON/HTML output file (default: . | stdout)." placeholder:"TARGET"`
+	UnsealedOnly bool   `short:"u" help:"Only export files with unsealed answers. Suitable if private key not available."`
+	PrivateKey   string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
+
+	htmlPath      string
+	answerKeyPath string
 }
 
 type verifyCmd struct {
@@ -94,14 +100,49 @@ func (c *exportCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	answerKeyJSON, err := model.ExportAnswerKeyJSON()
-	if err != nil {
+	if err := c.setPaths(); err != nil {
 		return err
 	}
-	if c.AnswerKeyFile != "-" {
-		return os.WriteFile(c.AnswerKeyFile, []byte(answerKeyJSON), 0o666)
+	if c.ExportType == "answerkey" || c.ExportType == "all" {
+		answerKeyJSON, err := model.ExportAnswerKeyJSON()
+		if err != nil {
+			return err
+		}
+		if err := writeFileOrStdout(c.answerKeyPath, answerKeyJSON); err != nil {
+			return err
+		}
 	}
-	fmt.Println(answerKeyJSON)
+	if c.ExportType == "html" || c.ExportType == "all" {
+		if err := writeFileOrStdout(c.htmlPath, model.ToHTML()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func writeFileOrStdout(filename, content string) error {
+	if filename == "-" {
+		fmt.Println(content)
+		return nil
+	}
+	return os.WriteFile(filename, []byte(content), 0o666)
+}
+
+func (c *exportCmd) setPaths() error {
+	c.htmlPath = c.Target
+	c.answerKeyPath = c.Target
+	if c.ExportType == "all" {
+		if c.Target == "-" { // default
+			c.Target = "."
+		} else {
+			if err := os.MkdirAll(c.Target, 0o755); err != nil {
+				return err
+			}
+		}
+		htmlFile := strings.TrimSuffix(filepath.Base(c.MDFile), filepath.Ext(c.MDFile)) + ".html"
+		c.htmlPath = filepath.Join(c.Target, htmlFile)
+		c.answerKeyPath = filepath.Join(c.Target, "answerkey.json")
+	}
 	return nil
 }
 

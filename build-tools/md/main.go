@@ -71,7 +71,7 @@ func (a *app) copy() ([]string, error) {
 
 		if d.IsDir() {
 			// use MkdirAll in case the directory already exists
-			return os.MkdirAll(destfile, 0o777) //nolint:gosec
+			return os.MkdirAll(destfile, 0o777)
 		}
 
 		if filepath.Ext(filename) == ".md" {

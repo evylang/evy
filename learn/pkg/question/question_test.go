@@ -1,8 +1,10 @@
 package question
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"evylang.dev/evy/pkg/assert"
@@ -203,6 +205,71 @@ func TestErrInconsistency(t *testing.T) {
 			fname := "testdata/course1/unit1/err-exercise1/questions/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrInconsistentMdoel, err)
+		})
+	}
+}
+
+func TestRendererTracking(t *testing.T) {
+	embeds := map[string][]string{
+		"question1":      nil,
+		"question2":      nil,
+		"question-img1":  {"dot-dot-a-evy-svg", "dot-dot-b-evy-svg", "dot-dot-c-evy-svg", "dot-dot-d-evy-svg"},
+		"question-img2":  {"dot-dot-a-evy-svg"},
+		"question-link1": {"dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"},
+		"question-link2": {"dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"},
+		"question-link3": {"print-print-b-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"},
+		"question-link4": {"print-print-d-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"},
+	}
+	for name, want := range embeds {
+		t.Run(name, func(t *testing.T) {
+			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			model, err := NewModel(fname)
+			assert.NoError(t, err)
+			got := model.embeds
+			assert.Equal(t, len(want), len(got))
+			m := map[string]bool{}
+			for _, w := range want {
+				m[w] = true
+			}
+			for _, g := range got {
+				assert.Equal(t, true, m[g.id], "cannot find "+g.id)
+			}
+		})
+	}
+}
+
+func TestPrintHTML(t *testing.T) {
+	for name := range testQuestions {
+		t.Run(name, func(t *testing.T) {
+			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			model, err := NewModel(fname)
+			assert.NoError(t, err)
+			buf := &bytes.Buffer{}
+			model.PrintHTML(buf)
+			got := buf.String()
+
+			goldenFile := filepath.Join("testdata/golden/", "form-"+name+".html")
+			b, err := os.ReadFile(goldenFile)
+			assert.NoError(t, err)
+			want := string(b)
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
+func TestToHTML(t *testing.T) {
+	for name := range testQuestions {
+		t.Run(name, func(t *testing.T) {
+			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			model, err := NewModel(fname)
+			assert.NoError(t, err)
+			got := model.ToHTML()
+
+			goldenFile := filepath.Join("testdata/golden/", name+".html")
+			b, err := os.ReadFile(goldenFile)
+			assert.NoError(t, err)
+			want := string(b)
+			assert.Equal(t, want, got)
 		})
 	}
 }

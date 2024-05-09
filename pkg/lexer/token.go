@@ -143,7 +143,7 @@ var tokenStrings = map[TokenType]tokenString{
 	COMMENT:    {string: "COMMENT", format: ""},
 	IDENT:      {string: "IDENT", format: ""},
 	NUM_LIT:    {string: "NUM_LIT", format: ""},
-	STRING_LIT: {string: "STRING_LIT", format: "string"},
+	STRING_LIT: {string: "STRING_LIT", format: ""},
 	DECLARE:    {string: "DECLARE", format: ":="},
 	ASSIGN:     {string: "ASSIGN", format: "="},
 	PLUS:       {string: "PLUS", format: "+"},

@@ -562,6 +562,14 @@ type FuncCall struct {
 	FuncDef   *FuncDefStmt
 }
 
+func NewFuncCallBuiltin(name string, funcdef *FuncDefStmt) *FuncCall {
+	return &FuncCall{
+		Name:    name,
+		token:   funcdef.Token(),
+		FuncDef: funcdef,
+	}
+}
+
 // String returns a string representation of the FuncCall node.
 func (f *FuncCall) String() string {
 	s := make([]string, len(f.Arguments))

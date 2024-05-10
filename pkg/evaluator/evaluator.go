@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 
 	"evylang.dev/evy/pkg/lexer"
 	"evylang.dev/evy/pkg/parser"
@@ -147,6 +148,30 @@ func (e *Evaluator) Run(input string) error {
 	if err != nil {
 		return err
 	}
+	return e.Eval(prog)
+}
+
+// Test is a convenience function that parses and evaluates a given Evy
+// source code input string and runs the user defined `test` function
+// inside and prints assert failures at the end. See the [Evaluator] type and
+// [Evaluator.Eval] method for details on evaluation and errors.
+func (e *Evaluator) Test(input string) error {
+	builtins := builtinsDeclsFromBuiltins(e.builtins)
+	prog, err := parser.Parse(input, builtins)
+	if err != nil {
+		return err
+	}
+	var tests []parser.Node
+	for _, stmnt := range prog.Statements {
+		if val, ok := stmnt.(*parser.FuncDefStmt); ok && strings.Contains(val.Name, "test") {
+			tests = append(tests,
+				parser.NewFuncCallBuiltin("__starttest__", val),
+				parser.NewFuncCallBuiltin(val.Name, val),
+				parser.NewFuncCallBuiltin("__endtest__", val),
+			)
+		}
+	}
+	prog.Statements = append(prog.Statements, tests...)
 	return e.Eval(prog)
 }
 

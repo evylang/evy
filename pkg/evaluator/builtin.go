@@ -73,13 +73,18 @@ func newBuiltins(rt Runtime) builtins {
 		"has": {Func: builtinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: builtinFunc(delFunc), Decl: delDecl},
 
-		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
-		"exit":  {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
-		"panic": {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"sleep":         {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":          {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic":         {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"assert":        {Func: assertFunc(rt.Print), Decl: assertDecl},
+		"assertEqual":   {Func: assertEqualFunc(rt.Print), Decl: assertEqualDecl},
+		"__starttest__": {Func: starttestFunc, Decl: emptyDecl("__starttest__")},
+		"__endtest__":   {Func: endtestFunc(rt.Print), Decl: emptyDecl("__endtest__")},
 
 		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
 
+		"abs":   numRetBuiltin("abs", math.Abs),
 		"min":   xyRetBuiltin("min", math.Min),
 		"max":   xyRetBuiltin("max", math.Max),
 		"floor": numRetBuiltin("floor", math.Floor),
@@ -135,8 +140,11 @@ func newBuiltins(rt Runtime) builtins {
 		"animate": {Name: "animate", Params: numParam},
 	}
 	globals := map[string]*parser.Var{
-		"err":    {Name: "err", T: parser.BOOL_TYPE},
-		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
+		"err":          {Name: "err", T: parser.BOOL_TYPE},
+		"errmsg":       {Name: "errmsg", T: parser.STRING_TYPE},
+		"__total__":    {Name: "__total__", T: parser.NUM_TYPE},
+		"__passed__":   {Name: "__passed__", T: parser.NUM_TYPE},
+		"__testmode__": {Name: "__testmode__", T: parser.BOOL_TYPE},
 	}
 	return builtins{
 		EventHandlers: eventHandlers,
@@ -429,6 +437,22 @@ func globalErr(scope *scope, isErr bool, msg string) {
 	val.Set(&stringVal{V: msg})
 }
 
+func globalTest(scope *scope, passed bool) {
+	if passed {
+		val, ok := scope.get("__passed__")
+		if !ok {
+			panic("cannot find global __passed__")
+		}
+		val.Set(&numVal{V: val.(*numVal).V + 1})
+	}
+	val, ok := scope.get("__total__")
+	if !ok {
+		panic("cannot find global __total__")
+	}
+	val.Set(&numVal{V: val.(*numVal).V + 1})
+
+}
+
 var typeofDecl = &parser.FuncDefStmt{
 	Name:       "typeof",
 	Params:     []*parser.Var{{Name: "a", T: parser.ANY_TYPE}},
@@ -488,6 +512,100 @@ func delFunc(_ *scope, args []value) (value, error) {
 	keyStr := args[1].(*stringVal)
 	m.Delete(keyStr.V)
 	return &noneVal{}, nil
+}
+
+var assertDecl = &parser.FuncDefStmt{
+	Name:       "assert",
+	Params:     []*parser.Var{{Name: "b", T: parser.BOOL_TYPE}},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func assertFunc(printFn func(string)) builtinFunc {
+	return func(scope *scope, args []value) (value, error) {
+		testVal, ok := scope.get("__testmode__")
+		if !ok {
+			panic("cannot find global __testmode__")
+		}
+		test := testVal.(*boolVal)
+
+		s := args[0].(*boolVal)
+		if test.V {
+			globalTest(scope, s.V)
+		}
+		if !s.V {
+			errStr := fmt.Sprintf("assert failed: %s", s)
+			if test.V {
+				printFn(errStr)
+			} else {
+				return nil, PanicError(errStr)
+			}
+		}
+		return s, nil
+	}
+}
+
+var assertEqualDecl = &parser.FuncDefStmt{
+	Name:       "assertEqual",
+	Params:     []*parser.Var{{Name: "left", T: parser.ANY_TYPE}, {Name: "right", T: parser.ANY_TYPE}},
+	ReturnType: parser.BOOL_TYPE,
+}
+
+func assertEqualFunc(printFn func(string)) builtinFunc {
+	return func(scope *scope, args []value) (value, error) {
+		testVal, ok := scope.get("__testmode__")
+		if !ok {
+			panic("cannot find global __testmode__")
+		}
+		test := testVal.(*boolVal)
+
+		left := args[0]
+		right := args[1]
+		equal := left.Equals(right)
+		if test.V {
+			globalTest(scope, equal)
+		}
+		if !equal {
+			errStr := fmt.Sprintf("assert failed: %s != %s", left, right)
+			if test.V {
+				printFn(errStr)
+				printFn("\n")
+			} else {
+				return nil, PanicError(errStr)
+			}
+		}
+		return &boolVal{V: equal}, nil
+	}
+}
+
+func starttestFunc(scope *scope, _ []value) (value, error) {
+	testmode, ok := scope.get("__testmode__")
+	if !ok {
+		panic("cannot find global __total__")
+	}
+	testmode.Set(&boolVal{V: true})
+	return nil, nil
+}
+
+func endtestFunc(printFn func(string)) builtinFunc {
+	return func(scope *scope, _ []value) (value, error) {
+		totalVal, ok := scope.get("__total__")
+		if !ok {
+			panic("cannot find global __total__")
+		}
+		total := totalVal.(*numVal)
+		defer totalVal.Set(&numVal{V: 0})
+		passedVal, ok := scope.get("__passed__")
+		if !ok {
+			panic("cannot find global __passed__")
+		}
+		passed := passedVal.(*numVal)
+		defer passedVal.Set(&numVal{V: 0})
+		if passed.V != total.V {
+			return nil, PanicError(fmt.Sprintf("%v of %v asserts FAILED\n", total.V-passed.V, total.V))
+		}
+		printFn(fmt.Sprintf("%v of %v asserts passed\n", passed.V, total.V))
+		return nil, nil
+	}
 }
 
 var sleepDecl = &parser.FuncDefStmt{

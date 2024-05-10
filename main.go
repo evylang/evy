@@ -81,6 +81,7 @@ evy is a tool for managing evy source code.
 type app struct {
 	Version kong.VersionFlag `short:"V" help:"Print version information"`
 	Run     runCmd           `cmd:"" help:"Run Evy program."`
+	Test    testCmd          `cmd:"" help:"Test Evy program."`
 	Fmt     fmtCmd           `cmd:"" help:"Format Evy files."`
 	Serve   serveCmd         `cmd:"" help:"Start Evy server."`
 
@@ -102,6 +103,10 @@ type runCmd struct {
 	SkipSleep bool   `help:"skip evy sleep command" env:"EVY_SKIP_SLEEP"`
 	SVGOut    string `help:"output drawing to SVG file. Stdout: -." placeholder:"FILE"`
 	SVGStyle  string `help:"style of top-level SVG element." placeholder:"STYLE"`
+}
+
+type testCmd struct {
+	runCmd
 }
 
 type fmtCmd struct {
@@ -178,6 +183,28 @@ func (c *runCmd) writeSVG(rt *cli.Runtime) error {
 		defer f.Close() //nolint:errcheck
 	}
 	return rt.WriteSVG(w)
+}
+
+// Run implements the `evy run` CLI command, called by the Kong API.
+func (c *testCmd) Run() error {
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return err
+	}
+
+	rt := cli.NewRuntime(c.runtimeOptions()...)
+
+	eval := evaluator.NewEvaluator(rt)
+	evyErr := eval.Test(string(b))
+	if !errors.As(evyErr, &parser.Errors{}) {
+		// even if there was an evaluator error, we want to write as much of the SVG that was produced.
+		err = c.writeSVG(rt)
+	}
+	if evyErr != nil {
+		evyErr = fmt.Errorf("%s:%w", c.Source, evyErr)
+	}
+	handleEvyErr(cmp.Or(evyErr, err))
+	return nil
 }
 
 func handleEvyErr(err error) {

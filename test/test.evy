@@ -1,0 +1,31 @@
+func separate_paren_groups:[]string paren_string:string
+    result:[]string
+        current_string:string
+        current_depth:num
+        current_depth = 0
+
+        for c := range (len paren_string)
+            if paren_string[c] == "("
+                current_depth = current_depth + 1
+                current_string = current_string + paren_string[c]
+            else if paren_string[c] == ")"
+                current_depth = current_depth - 1
+                current_string = current_string + paren_string[c]
+
+                if current_depth == 0
+                    result = result + [current_string]
+                    current_string = ""
+                end
+            end
+        end
+
+        return result
+end
+func test
+    assertEqual ["(()())" "((()))" "()" "((())()())"] (separate_paren_groups "(()()) ((())) () ((())()())")
+    assertEqual ["()" "(())" "((()))" "(((())))"] (separate_paren_groups "() (()) ((())) (((())))")
+    assertEqual ["(()(())((())))"] (separate_paren_groups "(()(())((())))")
+    assertEqual ["()" "(())" "(()())"] (separate_paren_groups "( ) (( )) (( )( ))")
+end
+
+

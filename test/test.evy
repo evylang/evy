@@ -1,31 +1,57 @@
-func separate_paren_groups:[]string paren_string:string
-    result:[]string
-        current_string:string
-        current_depth:num
-        current_depth = 0
-
-        for c := range (len paren_string)
-            if paren_string[c] == "("
-                current_depth = current_depth + 1
-                current_string = current_string + paren_string[c]
-            else if paren_string[c] == ")"
-                current_depth = current_depth - 1
-                current_string = current_string + paren_string[c]
-
-                if current_depth == 0
-                    result = result + [current_string]
-                    current_string = ""
-                end
-            end
-        end
-
-        return result
+func testAnyArrayArray
+    x:[]any
+    x = [[1 2 3] [4 5 6]]
+    print x
+    assertEqual (typeof x) "[]any"
+    assertEqual (typeof x[0]) "[]num"
+    y := x.([][]num)
+    assertEqual (typeof y) "[][]num"
+    assertEqual y[0] [1 2 3]
+    assertEqual (typeof y[0]) "[]num"
+    y[1] = [1 2 3]
 end
-func test
-    assertEqual ["(()())" "((()))" "()" "((())()())"] (separate_paren_groups "(()()) ((())) () ((())()())")
-    assertEqual ["()" "(())" "((()))" "(((())))"] (separate_paren_groups "() (()) ((())) (((())))")
-    assertEqual ["(()(())((())))"] (separate_paren_groups "(()(())((())))")
-    assertEqual ["()" "(())" "(()())"] (separate_paren_groups "( ) (( )) (( )( ))")
+
+func testAnyNumSliceAssignment
+    x:[]any
+    y := [1 2 3 4]
+    x = y.([]any)
+    assertEqual x y.([]any)
+    assertEqual (typeof x[0]) "num"
+
 end
+func testAnyNumArray
+    x:[]any
+    x = [1 2 3 4]
+    x = [1 2 3 4].([]any)
+    assertEqual (typeof x) "[]any"
+    assertEqual (typeof x[0]) "num"
+    assertEqual x[0] 1
+    y := [1 2 3 4]
+    x = y.([]any)
+    assertEqual (typeof x[0]) "num"
+    assertEqual (typeof y) "[]num"
+    assertEqual x y.([]any)
+    x = y.([]any)
+    assertEqual (typeof x[0]) "num"
+    assertEqual x[0] 1
+end
+
+func testAnyStringArray
+    x:[]any
+    x = [1 2 3 "4"]
+    x = [1 2 3 4].([]any)
+    assertEqual (typeof x) "[]any"
+    assertEqual (typeof x[0]) "num"
+    assertEqual (typeof x[-1]) "num"
+    assertEqual x[0] 1
+    y := ["a" "b" "c" "d"]
+    x = y.([]any)
+    assertEqual (typeof x[0]) "string"
+    assertEqual (typeof y) "[]string"
+    x = y.([]any)
+    assertEqual (typeof x[0]) "string"
+    assertEqual x[0] "a"
+end
+
 
 

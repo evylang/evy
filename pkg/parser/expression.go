@@ -309,9 +309,9 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 	if p.assertToken(lexer.RPAREN) {
 		p.advanceWSS() // advance past )
 	}
-	if left.Type() != ANY_TYPE {
-		p.appendErrorForToken("value of type assertion must be of type any, not "+left.Type().String(), tok)
-	}
+	//if left.Type() != ANY_TYPE {
+	//	p.appendErrorForToken("value of type assertion must be of type any, not "+left.Type().String(), tok)
+	//}
 	return &TypeAssertion{T: t, token: tok, Left: left}
 }
 

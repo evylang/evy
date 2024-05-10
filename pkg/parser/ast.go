@@ -562,11 +562,19 @@ type FuncCall struct {
 	FuncDef   *FuncDefStmt
 }
 
-func NewFuncCallBuiltin(name string, funcdef *FuncDefStmt) *FuncCall {
+func NewFuncCallBuiltin(name string, funcdef *FuncDefStmt, argsString ...string) *FuncCall {
+	var args []Node
+	for _, str := range argsString {
+		args = append(args, &StringLiteral{
+			token: nil,
+			Value: str,
+		})
+	}
 	return &FuncCall{
-		Name:    name,
-		token:   funcdef.Token(),
-		FuncDef: funcdef,
+		Name:      name,
+		token:     funcdef.Token(),
+		FuncDef:   funcdef,
+		Arguments: args,
 	}
 }
 

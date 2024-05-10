@@ -78,8 +78,8 @@ func newBuiltins(rt Runtime) builtins {
 		"panic":         {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
 		"assert":        {Func: assertFunc(rt.Print), Decl: assertDecl},
 		"assertEqual":   {Func: assertEqualFunc(rt.Print), Decl: assertEqualDecl},
-		"__starttest__": {Func: starttestFunc, Decl: emptyDecl("__starttest__")},
-		"__endtest__":   {Func: endtestFunc(rt.Print), Decl: emptyDecl("__endtest__")},
+		"__starttest__": {Func: starttestFunc(rt.Print), Decl: stringDecl("__starttest__")},
+		"__endtest__":   {Func: endtestFunc(rt.Print), Decl: stringDecl("__endtest__")},
 
 		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
@@ -577,17 +577,24 @@ func assertEqualFunc(printFn func(string)) builtinFunc {
 	}
 }
 
-func starttestFunc(scope *scope, _ []value) (value, error) {
-	testmode, ok := scope.get("__testmode__")
-	if !ok {
-		panic("cannot find global __total__")
+func starttestFunc(printFn func(string)) builtinFunc {
+	return func(scope *scope, args []value) (value, error) {
+		testName := args[0].(*stringVal)
+		testmode, ok := scope.get("__testmode__")
+		if !ok {
+			panic("cannot find global __total__")
+		}
+		testmode.Set(&boolVal{V: true})
+		printFn(fmt.Sprintf("running test: %s\n", testName))
+		return nil, nil
 	}
-	testmode.Set(&boolVal{V: true})
-	return nil, nil
 }
 
 func endtestFunc(printFn func(string)) builtinFunc {
-	return func(scope *scope, _ []value) (value, error) {
+	return func(scope *scope, args []value) (value, error) {
+		testName := args[0].(*stringVal)
+		printFn(fmt.Sprintf("results for test: %s\n", testName))
+		defer printFn(fmt.Sprintf("finished test: %s\n", testName))
 		totalVal, ok := scope.get("__total__")
 		if !ok {
 			panic("cannot find global __total__")

@@ -165,9 +165,9 @@ func (e *Evaluator) Test(input string) error {
 	for _, stmnt := range prog.Statements {
 		if val, ok := stmnt.(*parser.FuncDefStmt); ok && strings.Contains(val.Name, "test") {
 			tests = append(tests,
-				parser.NewFuncCallBuiltin("__starttest__", val),
+				parser.NewFuncCallBuiltin("__starttest__", val, val.Name),
 				parser.NewFuncCallBuiltin(val.Name, val),
-				parser.NewFuncCallBuiltin("__endtest__", val),
+				parser.NewFuncCallBuiltin("__endtest__", val, val.Name),
 			)
 		}
 	}
@@ -870,15 +870,84 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 	// The parser should have already validated that the type of Left
 	// is `any`, but we check anyway just in case. This may be removed
 	// later.
-	a, ok := left.(*anyVal)
+	//switch ta.T.Name {
+	//case parser.ARRAY:
+	orig, ok := left.(*arrayVal)
 	if !ok {
 		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
 	}
-	if !a.T.Equals(ta.T) {
-		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.T))
+	a := orig.Copy()
+	for i := range *a.Elements {
+		elem := (*a.Elements)[i]
+		typeAssert := func(elem value) value {
+			basev, baset := baseVal(elem), baseType(elem)
+			switch ta.T.Sub.Name {
+			case parser.ANY:
+				return &anyVal{
+					V: basev,
+					T: baset,
+				}
+			case parser.NUM:
+				return basev.(*numVal)
+			case parser.STRING:
+				return basev.(*stringVal)
+			case parser.BOOL:
+				return basev.(*boolVal)
+			case parser.ARRAY:
+				return basev.(*arrayVal)
+			case parser.MAP:
+				return basev.(*mapVal)
+			case parser.NONE:
+				return basev.(*noneVal)
+			}
+			return elem
+		}
+		(*a.Elements)[i] = typeAssert(elem)
+
 	}
-	return a.V, nil
+	return a, nil
+
+	//case parser.ANY:
+	//	a, ok := left.(*anyVal)
+	//	if !ok {
+	//		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
+	//	}
+	//	if !a.T.Equals(ta.T) {
+	//		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.T))
+	//	}
+	//	return a.V, nil
+	//}
+	//panic("")
 }
+
+func baseVal(val value) value {
+	if baseType(val) == parser.ANY_TYPE {
+		return baseVal(val.(*anyVal).V)
+	}
+	return val
+}
+
+func baseType(val value) *parser.Type {
+	switch val.(type) {
+	case *numVal:
+		return parser.NUM_TYPE
+	case *boolVal:
+		return parser.BOOL_TYPE
+	case *stringVal:
+		return parser.STRING_TYPE
+	case *anyVal:
+		return parser.ANY_TYPE
+	case *noneVal:
+		return parser.NONE_TYPE
+	case *arrayVal:
+		return parser.GENERIC_ARRAY
+	case *mapVal:
+		return parser.GENERIC_MAP
+	}
+	panic("")
+}
+
+func foo(...any) {}
 
 func (e *Evaluator) pushScope() {
 	e.scope = newInnerScope(e.scope)

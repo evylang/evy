@@ -264,5 +264,5 @@ func (t *Token) Format() string {
 // Location returns a string representation of a token's start location
 // in the form of: "line <line number> column <column number>".
 func (t *Token) Location() string {
-	return "line " + strconv.Itoa(t.Line) + " column " + strconv.Itoa(t.Col)
+	return strconv.Itoa(t.Line) + ":" + strconv.Itoa(t.Col)
 }

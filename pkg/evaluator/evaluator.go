@@ -163,7 +163,7 @@ func (e *Evaluator) Test(input string) error {
 	}
 	var tests []parser.Node
 	for _, stmnt := range prog.Statements {
-		if val, ok := stmnt.(*parser.FuncDefStmt); ok && strings.Contains(val.Name, "test") {
+		if val, ok := stmnt.(*parser.FuncDefStmt); ok && strings.HasPrefix(val.Name, "test") {
 			tests = append(tests,
 				parser.NewFuncCallBuiltin("__starttest__", val, val.Name),
 				parser.NewFuncCallBuiltin(val.Name, val),

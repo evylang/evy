@@ -100,4 +100,19 @@ func testAnyStringArray
 end
 
 
+func greatest_common_divisor:num a:num b:num
+    while b != 0
+        tmp := a
+        a = b
+        b = tmp % b
+    end
+    return a
+end
+
+func test_greatest_common_divisor
+    assertEqual 1 (greatest_common_divisor 3 7)
+    assertEqual 5 (greatest_common_divisor 10 15)
+    assertEqual 7 (greatest_common_divisor 49 14)
+    assertEqual 12 (greatest_common_divisor 144 60)
+end
 

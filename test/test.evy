@@ -1,9 +1,41 @@
+func testMap
+    x := {a: true b: false}
+    assertEqual (typeof x) "{}bool"
+    assertEqual (typeof x["a"]) "bool"
+    assertEqual (typeof x.({}any)) "{}any"
+    assertEqual (typeof x.({}any)["a"]) "bool"
+    // x = {a: true b: "string"}.({}bool) // This should fail
+
+    y := {a: true b: "false"}
+    assertEqual (typeof y) "{}any"
+    assertEqual (typeof y["a"]) "bool"
+    assertEqual (typeof y["b"]) "string"
+    z := {a: true b: true}.({}any)
+    assertEqual (typeof z) "{}any"
+    assertEqual (typeof z["a"]) "bool"
+    y = z
+    assertEqual (typeof y) "{}any"
+    assertEqual (typeof y) "{}any"
+    x = z.({}bool)
+end
+
+func testLiterals
+    a := 1
+    print (typeof a.(any))
+    assertEqual (typeof a.(any)) "num"
+end
+
 func test
+    print [1 2 3].([]any).([]num).([]any).([]num)
     x:[]any
-    x = [[1 2 3] [4 5 6]]
+    x = [[1 2 3]]
     print x
     assertEqual "[]any" (typeof x)
+    x[0] = [7 8 9]
+    print "x:" x
+    print "x:" x
 end
+
 func testAnyArrayArray
     x:[]any
     x = [[1 2 3] [4 5 6]]
@@ -25,6 +57,13 @@ func testAnyNumSliceAssignment
     assertEqual (typeof x[0]) "num"
 
 end
+
+func testArr
+    //y := [1 2 3 4]
+    //x = y.([]any)
+    //print (typeof x)
+end
+
 func testAnyNumArray
     x:[]any
     x = [1 2 3 4]

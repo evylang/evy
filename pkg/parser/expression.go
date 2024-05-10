@@ -299,19 +299,9 @@ func (p *parser) parseTypeAssertion(left Node) Node {
 	p.advance() // advance past .
 	p.advance() // advance past (
 	t := p.parseType()
-	switch t {
-	case nil:
-		msg := fmt.Sprintf("invalid type in type assertion of %q", left)
-		p.appendErrorForToken(msg, tok)
-	case ANY_TYPE:
-		p.appendErrorForToken("cannot type assert to type any", tok)
-	}
 	if p.assertToken(lexer.RPAREN) {
 		p.advanceWSS() // advance past )
 	}
-	//if left.Type() != ANY_TYPE {
-	//	p.appendErrorForToken("value of type assertion must be of type any, not "+left.Type().String(), tok)
-	//}
 	return &TypeAssertion{T: t, token: tok, Left: left}
 }
 

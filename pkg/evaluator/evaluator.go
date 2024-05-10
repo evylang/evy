@@ -880,7 +880,7 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 		for i, elem := range *newArr.Elements {
 			elem, err := convertTypeAssertion(ta.T.Sub.Name, elem)
 			if err != nil {
-				return nil, err
+				return nil, newErr(ta, err)
 			}
 			(*newArr.Elements)[i] = elem
 		}
@@ -894,14 +894,18 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 		for key, val := range newM.Pairs {
 			elem, err := convertTypeAssertion(ta.T.Sub.Name, val)
 			if err != nil {
-				return nil, err
+				return nil, newErr(ta, err)
 			}
 			newM.Pairs[key] = elem
 		}
 		return newM, nil
 	}
 	name := ta.T.Name
-	return convertTypeAssertion(name, left)
+	val, err := convertTypeAssertion(name, left)
+	if err != nil {
+		return nil, newErr(ta, err)
+	}
+	return val, nil
 }
 
 func convertTypeAssertion(name parser.TypeName, elem value) (value, error) {
@@ -913,7 +917,7 @@ func convertTypeAssertion(name parser.TypeName, elem value) (value, error) {
 		}, nil
 	}
 	if name != baset.Name {
-		return nil, fmt.Errorf("%w: expected %v found: %v", ErrAnyConversion, name, baset)
+		return nil, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, name, baset)
 	}
 	return basev, nil
 }

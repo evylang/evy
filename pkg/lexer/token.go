@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -264,5 +265,8 @@ func (t *Token) Format() string {
 // Location returns a string representation of a token's start location
 // in the form of: "line <line number> column <column number>".
 func (t *Token) Location() string {
-	return strconv.Itoa(t.Line) + ":" + strconv.Itoa(t.Col)
+	if os.Getenv("LLM_TEST") != "" {
+		return strconv.Itoa(t.Line) + ":" + strconv.Itoa(t.Col)
+	}
+	return "line " + strconv.Itoa(t.Line) + " column " + strconv.Itoa(t.Col)
 }

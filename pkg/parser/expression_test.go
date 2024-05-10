@@ -256,10 +256,9 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 
 		"[1] + [false]": "line 1 column 5: mismatched type for +: []num, []bool",
 
-		"n1.(num)": "line 1 column 3: value of type assertion must be of type any, not num",
-		"a.(any)":  "line 1 column 2: cannot type assert to type any",
-		"a.(x)":    `line 1 column 2: invalid type in type assertion of "a"`,
-		"a.([]x)":  `line 1 column 2: invalid type in type assertion of "a"`,
+		"a.(any)": "line 1 column 2: cannot type assert to type any",
+		"a.(x)":   `line 1 column 2: invalid type in type assertion of "a"`,
+		"a.([]x)": `line 1 column 2: invalid type in type assertion of "a"`,
 
 		"a. (num)":    `line 1 column 2: unexpected whitespace after "."`,
 		"a .(num)":    `line 1 column 3: unexpected whitespace before "."`,

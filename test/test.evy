@@ -1,9 +1,15 @@
+func test
+    x:[]any
+    x = [[1 2 3] [4 5 6]]
+    print x
+    assertEqual "[]any" (typeof x)
+end
 func testAnyArrayArray
     x:[]any
     x = [[1 2 3] [4 5 6]]
     print x
-    assertEqual (typeof x) "[]any"
-    assertEqual (typeof x[0]) "[]num"
+    assertEqual "[]any" (typeof x)
+    assertEqual "[]num" (typeof x[0])
     y := x.([][]num)
     assertEqual (typeof y) "[][]num"
     assertEqual y[0] [1 2 3]

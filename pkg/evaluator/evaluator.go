@@ -870,64 +870,63 @@ func (e *Evaluator) evalTypeAssertion(ta *parser.TypeAssertion) (value, error) {
 	// The parser should have already validated that the type of Left
 	// is `any`, but we check anyway just in case. This may be removed
 	// later.
-	//switch ta.T.Name {
-	//case parser.ARRAY:
-	orig, ok := left.(*arrayVal)
-	if !ok {
-		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
-	}
-	a := orig.Copy()
-	for i := range *a.Elements {
-		elem := (*a.Elements)[i]
-		typeAssert := func(elem value) value {
-			basev, baset := baseVal(elem), baseType(elem)
-			switch ta.T.Sub.Name {
-			case parser.ANY:
-				return &anyVal{
-					V: basev,
-					T: baset,
-				}
-			case parser.NUM:
-				return basev.(*numVal)
-			case parser.STRING:
-				return basev.(*stringVal)
-			case parser.BOOL:
-				return basev.(*boolVal)
-			case parser.ARRAY:
-				return basev.(*arrayVal)
-			case parser.MAP:
-				return basev.(*mapVal)
-			case parser.NONE:
-				return basev.(*noneVal)
-			}
-			return elem
+	switch ta.T.Name {
+	case parser.ARRAY:
+		arr, ok := left.(*arrayVal)
+		if !ok {
+			break
 		}
-		(*a.Elements)[i] = typeAssert(elem)
-
+		newArr := arr.Copy()
+		for i, elem := range *newArr.Elements {
+			elem, err := convertTypeAssertion(ta.T.Sub.Name, elem)
+			if err != nil {
+				return nil, err
+			}
+			(*newArr.Elements)[i] = elem
+		}
+		return newArr, nil
+	case parser.MAP:
+		m, ok := left.(*mapVal)
+		if !ok {
+			break
+		}
+		newM := m.Copy()
+		for key, val := range newM.Pairs {
+			elem, err := convertTypeAssertion(ta.T.Sub.Name, val)
+			if err != nil {
+				return nil, err
+			}
+			newM.Pairs[key] = elem
+		}
+		return newM, nil
 	}
-	return a, nil
+	name := ta.T.Name
+	return convertTypeAssertion(name, left)
+}
 
-	//case parser.ANY:
-	//	a, ok := left.(*anyVal)
-	//	if !ok {
-	//		return nil, newErr(ta, fmt.Errorf("%w: not an any", ErrAnyConversion))
-	//	}
-	//	if !a.T.Equals(ta.T) {
-	//		return nil, newErr(ta, fmt.Errorf("%w: expected %v, found %v", ErrAnyConversion, ta.T, a.T))
-	//	}
-	//	return a.V, nil
-	//}
-	//panic("")
+func convertTypeAssertion(name parser.TypeName, elem value) (value, error) {
+	basev, baset := baseVal(elem), baseType(elem)
+	if name == parser.ANY {
+		return &anyVal{
+			V: basev,
+			T: baset,
+		}, nil
+	}
+	if name != baset.Name {
+		return nil, fmt.Errorf("%w: expected %v found: %v", ErrAnyConversion, name, baset)
+	}
+	return basev, nil
 }
 
 func baseVal(val value) value {
-	if baseType(val) == parser.ANY_TYPE {
-		return baseVal(val.(*anyVal).V)
+	if val, ok := (val).(*anyVal); ok {
+		return baseVal(val.V)
 	}
 	return val
 }
 
 func baseType(val value) *parser.Type {
+	val = baseVal(val)
 	switch val.(type) {
 	case *numVal:
 		return parser.NUM_TYPE
@@ -935,8 +934,6 @@ func baseType(val value) *parser.Type {
 		return parser.BOOL_TYPE
 	case *stringVal:
 		return parser.STRING_TYPE
-	case *anyVal:
-		return parser.ANY_TYPE
 	case *noneVal:
 		return parser.NONE_TYPE
 	case *arrayVal:

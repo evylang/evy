@@ -248,6 +248,18 @@ func copyOrRef(val value) value {
 	panic("internal error: copyOrRef called with with invalid value")
 }
 
+func (a *mapVal) Copy() *mapVal {
+	order := make([]string, len(*a.Order))
+	for i, v := range *a.Order {
+		order[i] = v
+	}
+	pairs := make(map[string]value, len(a.Pairs))
+	for key, val := range a.Pairs {
+		pairs[key] = copyOrRef(val)
+	}
+	return &mapVal{Order: &order, Pairs: pairs}
+}
+
 func (m *mapVal) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
 	for _, key := range *m.Order {

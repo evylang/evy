@@ -1473,11 +1473,9 @@ end
 
 func TestMapLitErr(t *testing.T) {
 	inputs := map[string]string{
-		`
-func fnm:{}any
-    return {a:1{b:2}}
-end
-`: `line 3 column 16: expected map key, found "{"`,
+		`print {a:1{b:2}}`:    `line 1 column 11: expected map key, found "{"`,
+		`print {"x": true}`:   `line 1 column 8: expected map key, found "x"`,
+		`print {"end": true}`: `line 1 column 8: expected map key, found "end"`,
 	}
 	for input, wantErr := range inputs {
 		parser := newParser(input, testBuiltins())

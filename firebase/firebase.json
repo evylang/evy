@@ -39,11 +39,13 @@
     },
     {
       "target": "docs",
-      "public": "public/docs"
+      "public": "public/docs",
+      "cleanUrls": true
     },
     {
       "target": "learn",
-      "public": "public/learn"
+      "public": "public/learn",
+      "cleanUrls": true
     },
     {
       "target": "play",

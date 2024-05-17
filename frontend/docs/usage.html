@@ -550,7 +550,7 @@
         </p>
         <h3><a id="evy-help" href="#evy-help" class="anchor">#</a>evy --help</h3>
         <!-- gen:evy --help -->
-        <pre><code>Usage: evy &lt;command&gt;
+        <pre><code>Usage: evy &lt;command&gt; [flags]
 
 evy is a tool for managing evy source code.
 
@@ -559,16 +559,16 @@ Flags:
   -V, --version    Print version information
 
 Commands:
-  run [&lt;source&gt;]
+  run [&lt;source&gt;] [flags]
     Run Evy program.
 
-  fmt [&lt;files&gt; ...]
+  fmt [&lt;files&gt; ...] [flags]
     Format Evy files.
 
-  serve export &lt;dir&gt;
+  serve export &lt;dir&gt; [flags]
     Export embedded content.
 
-  serve start
+  serve start [flags]
     Start web server, default for &quot;evy serve&quot;.
 
 Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
@@ -576,7 +576,7 @@ Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
         <!-- genend -->
         <h3><a id="evy-run-help" href="#evy-run-help" class="anchor">#</a>evy run --help</h3>
         <!-- gen:evy run --help -->
-        <pre><code>Usage: evy run [&lt;source&gt;]
+        <pre><code>Usage: evy run [&lt;source&gt;] [flags]
 
 Run Evy program.
 
@@ -594,7 +594,7 @@ Flags:
         <!-- genend -->
         <h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>
         <!-- gen:evy fmt --help -->
-        <pre><code>Usage: evy fmt [&lt;files&gt; ...]
+        <pre><code>Usage: evy fmt [&lt;files&gt; ...] [flags]
 
 Format Evy files.
 
@@ -614,7 +614,7 @@ Flags:
           [start] --help
         </h3>
         <!-- gen:evy serve start --help -->
-        <pre><code>Usage: evy serve start
+        <pre><code>Usage: evy serve start [flags]
 
 Start web server, default for &quot;evy serve&quot;.
 
@@ -635,7 +635,7 @@ Flags:
           export --help
         </h3>
         <!-- gen:evy serve export --help -->
-        <pre><code>Usage: evy serve export &lt;dir&gt;
+        <pre><code>Usage: evy serve export &lt;dir&gt; [flags]
 
 Export embedded content.
 

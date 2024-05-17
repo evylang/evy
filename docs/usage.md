@@ -23,7 +23,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- gen:evy --help -->
 
-    Usage: evy <command>
+    Usage: evy <command> [flags]
 
     evy is a tool for managing evy source code.
 
@@ -32,16 +32,16 @@ You can also get help for each subcommand by running it with the
       -V, --version    Print version information
 
     Commands:
-      run [<source>]
+      run [<source>] [flags]
         Run Evy program.
 
-      fmt [<files> ...]
+      fmt [<files> ...] [flags]
         Format Evy files.
 
-      serve export <dir>
+      serve export <dir> [flags]
         Export embedded content.
 
-      serve start
+      serve start [flags]
         Start web server, default for "evy serve".
 
     Run "evy <command> --help" for more information on a command.
@@ -52,7 +52,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- gen:evy run --help -->
 
-    Usage: evy run [<source>]
+    Usage: evy run [<source>] [flags]
 
     Run Evy program.
 
@@ -73,7 +73,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- gen:evy fmt --help -->
 
-    Usage: evy fmt [<files> ...]
+    Usage: evy fmt [<files> ...] [flags]
 
     Format Evy files.
 
@@ -93,7 +93,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- gen:evy serve start --help -->
 
-    Usage: evy serve start
+    Usage: evy serve start [flags]
 
     Start web server, default for "evy serve".
 
@@ -114,7 +114,7 @@ You can also get help for each subcommand by running it with the
 
 <!-- gen:evy serve export --help -->
 
-    Usage: evy serve export <dir>
+    Usage: evy serve export <dir> [flags]
 
     Export embedded content.
 

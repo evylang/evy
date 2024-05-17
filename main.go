@@ -8,7 +8,7 @@
 //
 // The Evy toolchain has two subcommands: run and fmt.
 //
-//	Usage: evy <command>
+//	Usage: evy <command> [flags]
 //
 //	evy is a tool for managing evy source code.
 //
@@ -17,16 +17,16 @@
 //	  -V, --version    Print version information
 //
 //	Commands:
-//	  run [<source>]
+//	  run [<source>] [flags]
 //	    Run Evy program.
 //
-//	  fmt [<files> ...]
+//	  fmt [<files> ...] [flags]
 //	    Format Evy files.
 //
-//	  serve export <dir>
+//	  serve export <dir> [flags]
 //	    Export embedded content.
 //
-//	  serve start
+//	  serve start [flags]
 //	    Start web server, default for "evy serve".
 //
 //	Run "evy <command> --help" for more information on a command.

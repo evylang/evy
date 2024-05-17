@@ -94,7 +94,7 @@ func (a *app) copyTree() error {
 
 		switch mode := d.Type() & fs.ModeType; mode {
 		case fs.ModeDir:
-			return os.Mkdir(destfile, 0o777) //nolint:gosec // erroneous linter
+			return os.Mkdir(destfile, 0o777)
 		case fs.ModeSymlink:
 			if err := checkSymlink(srcfile); err != nil {
 				return err

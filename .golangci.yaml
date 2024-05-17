@@ -4,7 +4,10 @@ issues:
     - "^don't use ALL_CAPS"
     - "^ST1003: should not use ALL_CAPS"
     - "^var-naming: don't use ALL_CAPS"
+    - "^G302: Expect file permissions to be 0600 or less"
     - "^G304: Potential file inclusion via variable"
+    - "^G306: Expect WriteFile permissions to be 0600 or less"
+    - "^G301: Expect directory permissions to be 0750 or less"
 
 linters:
   enable-all: true
@@ -26,6 +29,7 @@ linters:
     - godox
     - golint
     - gomnd
+    - gomoddirectives
     - ifshort
     - inamedparam
     - interfacer
@@ -42,6 +46,7 @@ linters:
     - scopelint
     - structcheck
     - tagalign
+    - tagliatelle
     - testpackage
     - varcheck
     - varnamelen

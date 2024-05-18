@@ -1,0 +1,109 @@
+ascii := {A:65 B:66 C:67 D:68 E:69 F:70 G:71 H:72 I:73 J:74 K:75 L:76 M:77 N:78 O:79 P:80 Q:81 R:82 S:83 T:84 U:85 V:86 W:87 X:88 Y:89 Z:90 a:97 b:98 c:99 d:100 e:101 f:102 g:103 h:104 i:105 j:106 k:107 l:108 m:109 n:110 o:111 p:112 q:113 r:114 s:115 t:116 u:117 v:118 w:119 x:120 y:121 z:122}
+ascii[" "] = 32
+ascii["!"] = 33
+ascii["\""] = 34
+ascii["#"] = 35
+ascii["$"] = 36
+ascii["%"] = 37
+ascii["&"] = 38
+ascii["'"] = 39
+ascii["("] = 40
+ascii[")"] = 41
+ascii["*"] = 42
+ascii["+"] = 43
+ascii[","] = 44
+ascii["-"] = 45
+ascii["."] = 46
+ascii["/"] = 47
+ascii["0"] = 48
+ascii["1"] = 49
+ascii["2"] = 50
+ascii["3"] = 51
+ascii["4"] = 52
+ascii["5"] = 53
+ascii["6"] = 54
+ascii["7"] = 55
+ascii["8"] = 56
+ascii["9"] = 57
+ascii[":"] = 58
+ascii[";"] = 59
+ascii["<"] = 60
+ascii["="] = 61
+ascii[">"] = 62
+ascii["?"] = 63
+ascii["@"] = 64
+ascii["["] = 91
+ascii["\\"] = 92
+ascii["]"] = 93
+ascii["^"] = 94
+ascii["_"] = 95
+ascii["`"] = 96
+ascii["{"] = 123
+ascii["|"] = 124
+ascii["}"] = 125
+ascii["~"] = 126
+
+//  Write a function that takes a string and returns an ordered version of it.
+//  Ordered version of string, is a string where all words  separated by space
+//  are replaced by a new word where all the characters arranged in
+//  ascending order based on ascii value.
+//  Note: You should keep the order of words and blank spaces in the sentence.
+//  For example:
+//  antiShuffle "Hi"  returns "Hi"
+//  antiShuffle "hello"  returns "ehllo"
+//  antiShuffle "Hello World!!!"  returns "Hello !!!Wdlor"
+func antiShuffle:string s:string
+    words := split s " "
+    for i := range (len words)
+        words[i] = sort words[i]
+    end
+    return join words " "
+end
+
+func sort:string str:string
+    s := str
+    // bubble sort
+    for endIdx := range (len s)-1 0 -1
+        for i := range endIdx
+            if ascii[s[i]] > ascii[s[i + 1]]
+                s = s[:i] + s[i + 1] + s[i] + s[i + 2:]
+            end
+        end
+    end
+    return s
+end
+
+func test
+    assert "Hi" (antiShuffle "Hi")
+    assert "ehllo" (antiShuffle "hello")
+    assert "bemnru" (antiShuffle "number")
+    assert "abcd" (antiShuffle "abcd")
+    assert "Hello !!!Wdlor" (antiShuffle "Hello World!!!")
+    assert "" (antiShuffle "")
+    assert ".Hi My aemn is Meirst .Rboot How aer ?ouy" (antiShuffle "Hi. My name is Mister Robot. How are you?")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,45 @@
+// Insert a number 'delimiter' between every two consecutive elements of input list `numbers'
+// intersperse [] 4 //
+// intersperse [1 2 3] 4 // [1 4 2 4 3]
+func intersperse:[]num numbers:[]num delimeter:num
+    if (len numbers) == 0
+        return []
+    end
+    result:[]num
+    for number := range numbers[:-1]
+        result = result + [number] + [delimeter]
+    end
+    result = result + [numbers[-1]]
+    return result
+end
+
+func test
+    assert [] (intersperse [] 7)
+    assert [5 8 6 8 3 8 2] (intersperse [5 6 3 2] 8)
+    assert [2 2 2 2 2] (intersperse [2 2 2] 2)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

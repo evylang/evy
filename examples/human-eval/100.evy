@@ -1,0 +1,48 @@
+//  Given a positive integer n, you have to make a pile of n levels of stones.
+//  The first level has n stones.
+//  The number of stones in the next level is:
+//      - the next odd number if n is odd.
+//      - the next even number if n is even.
+//  Return the number of stones in each level in an array, where element at index
+//  i represents the number of stones in the level (i+1).
+//  makePile 3 //  [3 5 7]
+func makePile:[]num n:num
+    arr:[]num
+    for i := range n
+        arr = arr + [n+2*i]
+    end
+    return arr
+end
+
+func test
+    assert [3 5 7] (makePile 3)
+    assert [4 6 8 10] (makePile 4)
+    assert [5 7 9 11 13] (makePile 5)
+    assert [6 8 10 12 14 16] (makePile 6)
+    assert [8 10 12 14 16 18 20 22] (makePile 8)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

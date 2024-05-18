@@ -1,0 +1,54 @@
+// Change numerical base of input number x to base.
+// return string representation after the conversion.
+// base numbers are less than 10.
+// convertBase 8 3 // "22"
+// convertBase 8 2 // "1000"
+// convertBase 7 2 // "111"
+func convertBase:string n:num base:num
+    if n == 0
+        return "0"
+    end
+    result := ""
+    while n > 0
+        result = (sprint n%base) + result
+        n = floor n/base
+    end
+    return result
+end
+
+func test
+    assert "22" (convertBase 8 3)
+    assert "100" (convertBase 9 3)
+    assert "11101010" (convertBase 234 2)
+    assert "10000" (convertBase 16 2)
+    assert "1000" (convertBase 8 2)
+    assert "111" (convertBase 7 2)
+    for x := range 9
+        assert (sprint x) (convertBase x x+1)
+    end
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

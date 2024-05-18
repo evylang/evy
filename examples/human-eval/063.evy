@@ -1,0 +1,53 @@
+// The fib3 number sequence is a sequence similar to the Fibonacci sequence
+// that's defined as follows:
+// (fib3 0) == 0
+// (fib3 1) == 0
+// (fib3 2) == 1
+// (fib3 n) == (fib3 n-1) + (fib3 n-2) + fib3 n-3).
+// Please write a function to efficiently compute the n-th element of the fib3
+// number sequence.
+func fib3:num n:num
+    result := [0 0 1]
+    if n < 3
+        return result[n]
+    end
+    for range n-2
+        result = result + [result[-1]+result[-2]+result[-3]]
+    end
+    return result[-1]
+end
+
+func test
+    assert 1 (fib3 2)
+    assert 0 (fib3 1)
+    assert 4 (fib3 5)
+    assert 24 (fib3 8)
+    assert 81 (fib3 10)
+    assert 274 (fib3 12)
+    assert 927 (fib3 14)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

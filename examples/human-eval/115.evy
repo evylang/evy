@@ -1,0 +1,75 @@
+// You are given a rectangular grid of wells. Each row represents a single well
+// and each 1 in a row represents a single unit of water.
+// Each well has a corresponding bucket that can be used to extract water from it,
+// and all buckets have the same capacity.
+// Your task is to use the buckets to empty the wells.
+// Output the number of times you need to lower the buckets.
+//
+// Example 1:
+//     Input:
+//         grid : [[0 0 1 0] [0 1 0 0] [1 1 1 1]]
+//         bucket_capacity : 1
+//     Output: 6
+//
+// Example 2:
+//     Input:
+//         grid : [[0 0 1 1] [0 0 0 0] [1 1 1 1] [0 1 1 1]]
+//         bucket_capacity : 2
+//     Output: 5
+//
+// Example 3:
+//     Input:
+//         grid : [[0 0 0] [0 0 0]]
+//         bucket_capacity : 5
+//     Output: 0
+//
+// Constraints:
+//     * all wells have the same length
+//     * 1 <= grid.length <= 10^2
+//     * 1 <= grid[1].length <= 10^2
+//     * grid[i][j] -> 0 | 1
+//     * 1 <= capacity <= 10
+func lowerCount:num wells:[][]num capacity:num
+    result := 0
+    for well := range wells
+        size := 0
+        for unit := range well
+            size = size + unit
+        end
+        result = result + (ceil size/capacity)
+    end
+    return result
+end
+
+func test
+    assert 6 (lowerCount [[0 0 1 0] [0 1 0 0] [1 1 1 1]] 1)
+    assert 5 (lowerCount [[0 0 1 1] [0 0 0 0] [1 1 1 1] [0 1 1 1]] 2)
+    assert 0 (lowerCount [[0 0 0] [0 0 0]] 5)
+    assert 4 (lowerCount [[1 1 1 1] [1 1 1 1]] 2)
+    assert 2 (lowerCount [[1 1 1 1] [1 1 1 1]] 9)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,61 @@
+// Input to this function is a string representing musical notes in a special ASCII format.
+// Your task is to parse this string and return list of integers corresponding to how many beats does each
+// not last.
+//
+// Here is a legend:
+//   "o" - whole note, lasts four beats
+//   "o|" - half note, lasts two beats
+//   ".|" - quarter note, lasts one beat
+//
+// parseMusic "o o| .| o| o| .| .| .| .| o o"
+//    // [4 2 1 2 2 1 1 1 1 4 4]
+//
+func parseMusic:[]num music:string
+    if music == ""
+        return []
+    end
+    lookup:{}num
+    lookup["o"] = 4
+    lookup["o|"] = 2
+    lookup[".|"] = 1
+    notes := split music " "
+    beats:[]num
+    for note := range notes
+        beats = beats + [lookup[note]]
+    end
+    return beats
+end
+
+func test
+    assert [] (parseMusic "")
+    assert [4 4 4 4] (parseMusic "o o o o")
+    assert [1 1 1 1] (parseMusic ".| .| .| .|")
+    assert [2 2 1 1 4 4 4 4] (parseMusic "o| o| .| .| o o o o")
+    assert [2 1 2 1 4 2 4 2] (parseMusic "o| .| o| .| o o| o o|")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

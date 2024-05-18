@@ -1,0 +1,65 @@
+// Given a string text, replace all spaces in it with underscores,
+// and if a string has more than 2 consecutive spaces,
+// then replace all consecutive spaces with -
+// replaceSpaces "Example" // "Example"
+// replaceSpaces "Example 1" // "Example_1"
+// replaceSpaces " Example 2" // "_Example_2"
+// replaceSpaces " Example   3" // "_Example-3"
+func replaceSpaces:string s:string
+    result := ""
+    cnt := 0
+    for c := range s
+        if c == " "
+            cnt = cnt + 1
+        else
+            result = result + (spaceString cnt) + c
+            cnt = 0
+        end
+    end
+    result = result + (spaceString cnt)
+    return result
+end
+
+func spaceString:string n:num
+    if n == 0
+        return ""
+    else if n == 1
+        return "_"
+    else if n == 2
+        return "__"
+    end
+    return "-"
+end
+
+func test
+    assert "Example" (replaceSpaces "Example")
+    assert "Mudasir_Hanif_" (replaceSpaces "Mudasir Hanif ")
+    assert "Yellow_Yellow__Dirty__Fellow" (replaceSpaces "Yellow Yellow  Dirty  Fellow")
+    assert "Exa-mple" (replaceSpaces "Exa   mple")
+    assert "-Exa_1_2_2_mple" (replaceSpaces "   Exa 1 2 2 mple")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

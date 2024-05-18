@@ -1,0 +1,48 @@
+// Find how many times a given substring can be found in the original string.
+// Count overlapping cases.
+// findTimes " "" // 0
+// findTimes "aa" "" // 3
+// findTimes "aaa" "a" // 3
+func findTimes:num str:string sub:string
+    times := 0
+    rend := (len str) - (len sub) + 1
+    for i := range rend
+        if str[i:i + (len sub)] == sub
+            times = times + 1
+        end
+    end
+    return times
+end
+
+func test
+    assert 0 (findTimes "" "x")
+    assert 4 (findTimes "xyxyxyx" "x")
+    assert 4 (findTimes "cacacacac" "cac")
+    assert 1 (findTimes "john doe" "john")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

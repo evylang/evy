@@ -1,0 +1,50 @@
+// Given a non-empty array of integers arr and an integer k, return
+// the sum of the elements with at most two digits from the first k elements of arr.
+// Example:
+//     Input: arr = [111 21 3 4000 5 6 7 8 9]  k = 4
+//     Output: 24 # sum of 21 + 3
+// Constraints:
+//     1. 1 <= len(arr) <= 100
+//     2. 1 <= k <= len(arr)
+func solve:num nums:[]num k:num
+    result := 0
+    for i := range k
+        if nums[i] < 100
+            result = result + nums[i]
+        end
+    end
+    return result
+end
+
+func test
+    assert -4 (solve [1 -2 -3 41 57 76 87 88 99] 3)
+    assert 0 (solve [111 121 3 4000 5 6] 2)
+    assert 125 (solve [11 21 3 90 5 6 7 8 9] 4)
+    assert 24 (solve [111 21 3 4000 5 6 7 8 9] 4)
+    assert 1 (solve [1] 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

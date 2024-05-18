@@ -1,0 +1,38 @@
+// Return length of given string
+// strlen "" // 0
+// strlen "abc" // 3
+func strlen:num str:string
+    return len str
+end
+
+func test
+    assert 0 (strlen "")
+    assert 1 (strlen "x")
+    assert 9 (strlen "asdasnakj")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

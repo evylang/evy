@@ -1,0 +1,63 @@
+//  Write a function that takes a string and returns true if the string
+//  length is a prime number or false otherwise
+//  Examples
+//  primeLength "Hello" // true
+//  primeLength "abcdcba" // true
+//  primeLength "kittens" // true
+//  primeLength "orange" // false
+func primeLength:bool s:string
+    length := len s
+    if length <= 1
+        return false
+    end
+    for i := range 2 (sqrt length+1)
+        if length % i == 0
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert true (primeLength "Hello")
+    assert true (primeLength "abcdcba")
+    assert true (primeLength "kittens")
+    assert false (primeLength "orange")
+    assert true (primeLength "wow")
+    assert true (primeLength "world")
+    assert true (primeLength "MadaM")
+    assert true (primeLength "Wow")
+    assert false (primeLength "")
+    assert true (primeLength "HI")
+    assert true (primeLength "go")
+    assert false (primeLength "gogo")
+    assert false (primeLength "aaaaaaaaaaaaaaa")
+    assert true (primeLength "Madam")
+    assert false (primeLength "M")
+    assert false (primeLength "0")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

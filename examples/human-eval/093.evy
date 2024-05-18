@@ -1,0 +1,56 @@
+//  Write a function that takes a message, and encodes in such a way that it
+//  swaps case of all letters, replaces all vowels in the message with the
+//  letter that appears 2 places ahead of that vowel in the English alphabet.
+//  Assume only letters.
+//  Examples:
+//  encode "test" // "TGST"
+//  encode "This is a message" // "tHKS KS C MGSSCGG"
+func encode:string str:string
+    map := {a:"c" e:"g" i:"k" o:"q" u:"w" A:"C" E:"G" I:"K" O:"Q" U:"W"}
+    result:string
+    for i := range (len str)
+        ch := str[i]
+        if has map ch
+            ch = map[ch]
+        end
+        if "a" <= ch
+            result = result + (upper ch)
+        else
+            result = result + (lower ch)
+        end
+    end
+    return result
+end
+
+func test
+    assert "tgst" (encode "TEST")
+    assert "mWDCSKR" (encode "Mudasir")
+    assert "ygs" (encode "YES")
+    assert "tHKS KS C MGSSCGG" (encode "This is a message")
+    assert "k dQnT kNqW wHcT Tq wRkTg" (encode "I DoNt KnOw WhAt tO WrItE")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

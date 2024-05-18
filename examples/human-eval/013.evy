@@ -1,0 +1,43 @@
+// Return a greatest common divisor of two integers a and b
+// gcd 3 5 // 1
+// gcd 25 15 // 5
+func gcd:num a:num b:num
+    while b != 0
+        tmp := a
+        a = b
+        b = tmp % b
+    end
+    return a
+end
+
+func test
+    assert 1 (gcd 3 7)
+    assert 5 (gcd 10 15)
+    assert 7 (gcd 49 14)
+    assert 12 (gcd 144 60)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

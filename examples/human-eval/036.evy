@@ -1,0 +1,57 @@
+// Return the number of times the digit 7 appears in integers less than n
+// which are divisible by 11 or 13.
+// fizzBuzz 50 // 0
+// fizzBuzz 78 // 2
+// fizzBuzz 79 // 3
+func fizzBuzz:num n:num
+    str:string
+    for i := range n
+        if i % 11 == 0 or i % 13 == 0
+            str = str + (sprint i)
+        end
+    end
+    result := 0
+    for ch := range str
+        if ch == "7"
+            result = result + 1
+        end
+    end
+    return result
+end
+
+func test
+    assert 0 (fizzBuzz 50)
+    assert 2 (fizzBuzz 78)
+    assert 3 (fizzBuzz 79)
+    assert 3 (fizzBuzz 100)
+    assert 6 (fizzBuzz 200)
+    assert 192 (fizzBuzz 4000)
+    assert 639 (fizzBuzz 10000)
+    assert 8026 (fizzBuzz 100000)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

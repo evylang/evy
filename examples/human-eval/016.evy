@@ -1,0 +1,44 @@
+//  Given a string, find out how many distinct characters (regardless of case) does it consist of
+//  countDistinctCharacter "xyzXYZ" // 3
+//  countDistinctCharacter "Jerry" // 4
+func countDistinctCharacters:num str:string
+    set := {}
+    for s := range str
+        u := upper s
+        set[u] = true
+    end
+    return len set
+end
+
+func test
+    assert 0 (countDistinctCharacters "")
+    assert 5 (countDistinctCharacters "abcde")
+    assert 5 (countDistinctCharacters "abcde"+"cade"+"CADE")
+    assert 1 (countDistinctCharacters "aaaaAAAAaaaa")
+    assert 5 (countDistinctCharacters "Jerry jERRY JeRRRY")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

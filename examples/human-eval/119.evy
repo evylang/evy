@@ -1,0 +1,74 @@
+// You are given a list of two strings, both strings consist of open
+// parentheses '(' or close parentheses ')' only.
+// Your job is to check if it is possible to concatenate the two strings in
+// some order, that the resulting string will be good.
+// A string S is considered to be good if and only if all parentheses in S
+// are balanced. For example: the string '(())()' is good, while the string
+// '())' is not.
+// Return 'Yes' if there's a way to make a good string, and return 'No' otherwise.
+// Examples:
+// matchParens ["()(", ")"] // "Yes"
+// matchParens [")", ")"] // "No"
+func matchParens:string s:[]string
+    s1 := s[0] + s[1]
+    s2 := s[1] + s[0]
+    if (valid s1) or (valid s2)
+        return "Yes"
+    end
+    return "No"
+end
+
+func valid:bool s:string
+    depth := 0
+    for c := range s
+        if c == "("
+            depth = depth + 1
+        else
+            depth = depth - 1
+        end
+        if depth < 0
+            return false
+        end
+    end
+    return depth == 0
+end
+
+func test
+    assert "Yes" (matchParens ["()(" ")"])
+    assert "No" (matchParens [")" ")"])
+    assert "No" (matchParens ["(()(())" "())())"])
+    assert "Yes" (matchParens [")())" "(()()("])
+    assert "Yes" (matchParens ["(())))" "(()())(("])
+    assert "No" (matchParens ["()" "())"])
+    assert "Yes" (matchParens ["(()(" "()))()"])
+    assert "No" (matchParens ["((((" "((())"])
+    assert "No" (matchParens [")(()" "(()("])
+    assert "No" (matchParens [")(" ")("])
+    assert "Yes" (matchParens ["(" ")"])
+    assert "Yes" (matchParens [")" "("])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

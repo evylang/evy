@@ -1,0 +1,66 @@
+// You are given a word. Your task is to find the closest vowel that stands between
+// two consonants from the right side of the word (case sensitive).
+//
+// Vowels in the beginning and ending don't count. Return empty string if you didn't
+// find any vowel that met the above condition.
+//
+// You may assume that the given string contains English letter only.
+//
+// Example:
+// get_closest_vowel "yogurt" // "u"
+// get_closest_vowel "FULL" // "U"
+// get_closest_vowel "quick" // ""
+// get_closest_vowel "ab" // ""
+func findVowel:string s:string
+    if (len s) < 3
+        return ""
+    end
+    vowels := {a:true e:true i:true o:true u:true A:true E:true O:true U:true I:true}
+    for i := range (len s)-2 0 -1
+        if (has vowels s[i]) and !(has vowels s[i + 1]) and !(has vowels s[i - 1])
+            return s[i]
+        end
+    end
+    return ""
+end
+
+func test
+    assert "u" (findVowel "yogurt")
+    assert "u" (findVowel "full")
+    assert "" (findVowel "easy")
+    assert "" (findVowel "eAsy")
+    assert "" (findVowel "ali")
+    assert "a" (findVowel "bad")
+    assert "o" (findVowel "most")
+    assert "" (findVowel "ab")
+    assert "" (findVowel "ba")
+    assert "" (findVowel "quick")
+    assert "i" (findVowel "anime")
+    assert "" (findVowel "Asia")
+    assert "o" (findVowel "Above")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

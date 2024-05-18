@@ -1,0 +1,56 @@
+// Write a function that takes an array of numbers as input and returns
+// the number of elements in the array that are greater than 10 and both
+// first and last digits of a number are odd (1, 3, 5, 7, 9).
+// For example:
+// specialFilter [15 -73 14 -15] // 1
+// specialFilter [33 -2 -3 45 21 109] // 2
+func filter:num nums:[]num
+    result := 0
+    for n := range nums
+        if n > 10 and (n % 2 == 1)
+            if n < 0
+                n = -n
+            end
+            n1 := str2num (sprint n)[0]
+            if n1 % 2 == 1
+                result = result + 1
+            end
+        end
+    end
+    return result
+end
+
+func test
+    assert 0 (filter [5 -2 1 -5])
+    assert 1 (filter [15 -73 14 -15])
+    assert 2 (filter [33 -2 -3 45 21 109])
+    assert 4 (filter [43 -12 93 125 121 109])
+    assert 3 (filter [71 -2 -33 75 21 19])
+    assert 0 (filter [1])
+    assert 0 (filter [])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

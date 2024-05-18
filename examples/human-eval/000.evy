@@ -1,0 +1,59 @@
+// Test if in then given number array any two numbers are closer to each other
+// than given threshold.
+// hasCloseElements [1 2 3] 0.5 // false
+// hasCloseElements [1 2.8 3 4 5 2] 0.3 // true
+func hasCloseElements:bool numbers:[]num threshold:num
+    for idx := range (len numbers)
+        for idx2 := range (len numbers)
+            if idx != idx2
+                distance := abs (numbers[idx] - numbers[idx2])
+                if distance < threshold
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+func abs:num x:num
+    if x < 0
+        return -x
+    end
+    return x
+end
+
+func test
+    assert true (hasCloseElements [1 2 3.9 4 5 2.2] 0.3)
+    assert false (hasCloseElements [1 2 3.9 4 5 2.2] 0.05)
+    assert true (hasCloseElements [1 2 5.9 4 5] 0.95)
+    assert false (hasCloseElements [1 2 5.9 4 5] 0.8)
+    assert true (hasCloseElements [1 2 3 4 5 2] 0.1)
+    assert true (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 1)
+    assert false (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 0.5)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

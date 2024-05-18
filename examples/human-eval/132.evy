@@ -1,0 +1,72 @@
+// Create a function that takes a string as input which contains only square brackets.
+// The function should return True if and only if there is a valid subsequence of brackets
+// where at least one bracket in the subsequence is nested.
+// isNested "[[]]" // true
+// isNested "[]]]]]]][[[[[]" // false
+// isNested "[][]" // false
+// isNested "[]" // false
+// isNested "[[][]]" // true
+// isNested "[[]][[" // true
+func isNested:bool s:string
+    depth := 0
+    maxDepth := 0
+    for c := range s
+        if c == "["
+            depth = depth + 1
+            if depth > maxDepth
+                maxDepth = depth
+            end
+        else
+            depth = depth - 1
+            if depth < 0
+                depth = 0
+                maxDepth = 0
+            else if maxDepth - depth >= 2
+                return true
+            end
+        end
+    end
+    return false
+end
+
+func test
+    assert true (isNested "[[]]")
+    assert false (isNested "[]]]]]]][[[[[]")
+    assert false (isNested "[][]")
+    assert false (isNested ("[]"))
+    assert true (isNested "[[[[]]]]")
+    assert false (isNested "[]]]]]]]]]]")
+    assert true (isNested "[][][[]]")
+    assert false (isNested "[[]")
+    assert false (isNested "[]]")
+    assert true (isNested "[[]][[")
+    assert true (isNested "[[][]]")
+    assert false (isNested "")
+    assert false (isNested "[[[[[[[[")
+    assert false (isNested "]]]]]]]]")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

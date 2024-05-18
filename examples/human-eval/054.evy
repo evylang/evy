@@ -1,0 +1,53 @@
+// Check if two words have the same characters.
+// sameChars "eabcdzzzz" "dddzzzzzzzddeddabc" // true
+// sameChars "abcd" "dddddddabc" // true
+// sameChars "dddddddabc" "abcd" // true
+// sameChars "eabcd" "dddddddabc" // false
+// sameChars "abcd" "dddddddabce" // false
+// sameChars "eabcdzzzz" "dddzzzzzzzddddabc" // false
+func sameChars:bool s1:string s2:string
+    return (set s1) == (set s2)
+end
+
+func set:{}bool s:string
+    result:{}bool
+    for c := range s
+        result[c] = true
+    end
+    return result
+end
+
+func test
+    assert true (sameChars "eabcdzzzz" "dddzzzzzzzddeddabc")
+    assert true (sameChars "abcd" "dddddddabc")
+    assert true (sameChars "dddddddabc" "abcd")
+    assert false (sameChars "eabcd" "dddddddabc")
+    assert false (sameChars "abcd" "dddddddabcf")
+    assert false (sameChars "eabcdzzzz" "dddzzzzzzzddddabc")
+    assert false (sameChars "aabb" "aaccc")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,73 @@
+// Given a string representing a space separated lowercase letters, return a dictionary
+// of the letters with the most repetition and containing the corresponding count.
+// If several letters have the same occurrence, return all of them.
+// Example:
+// histogram "a b c" // {a: 1, b: 1, c: 1}
+// histogram "a b b a" // {a: 2, b: 2}
+// histogram "a b c a b" // {a: 2, b: 2}
+// histogram "b b b b a" // {b: 4}
+// histogram "" // {}
+func histogram:{}num s:string
+    if s == ""
+        return {}
+    end
+
+    m:{}num
+    arr := split s " "
+    for s := range arr
+        if has m s
+            m[s] = m[s] + 1
+        else
+            m[s] = 1
+        end
+    end
+    lmax := 0
+    for k := range m
+        if m[k] > lmax
+            lmax = m[k]
+        end
+    end
+    result:{}num
+    for k := range m
+        if m[k] == lmax
+            result[k] = lmax
+        end
+    end
+    return result
+end
+
+func test
+    assert {a:2 b:2} (histogram "a b b a")
+    assert {a:2 b:2} (histogram "a b c a b")
+    assert {a:1 b:1 c:1 d:1 g:1} (histogram "a b c d g")
+    assert {r:1 t:1 g:1} (histogram "r t g")
+    assert {b:4} (histogram "b b b b a")
+    assert {r:1 t:1 g:1} (histogram "r t g")
+    assert {} (histogram "")
+    assert {a:1} (histogram "a")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

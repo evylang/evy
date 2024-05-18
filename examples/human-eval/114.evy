@@ -1,0 +1,63 @@
+// Given an array of nums, find the minimum sum of any non-empty sub-array
+// of nums.
+// Example
+// minSum [2 3 4 1 2 4] // 1
+// minSum [-1 -2 -3] // -6
+func minSum:num nums:[]num
+    ms := nums[0]
+    runningSum := ms
+
+    for n := range nums[1:]
+        if n < runningSum + n
+            runningSum = n
+        else
+            runningSum = runningSum + n
+        end
+        if runningSum < ms
+            ms = runningSum
+        end
+    end
+    return ms
+end
+
+func test
+    assert -5 (minSum [2 3 -4 1 -2 4])
+    assert -7 (minSum [2 -1 1 -6 2 3 -4 1 -3 4])
+    assert 1 (minSum [2 3 4 1 2 4])
+    assert -6 (minSum [-1 -2 -3])
+    assert -14 (minSum [-1 -2 -3 2 -10])
+    assert -10000000000000000 (minSum [-10000000000000000])
+    assert 0 (minSum [0 10 20 1000000])
+    assert -6 (minSum [-1 -2 -3 10 -5])
+    assert -6 (minSum [100 -1 -2 -3 10 -5])
+    assert 3 (minSum [10 11 13 8 3 4])
+    assert -33 (minSum [100 -33 32 -1 0 -2])
+    assert -10 (minSum [-10])
+    assert 7 (minSum [7])
+    assert -1 (minSum [1 -1])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

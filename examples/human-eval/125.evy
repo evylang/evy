@@ -1,0 +1,61 @@
+//  Given a string of words, return a list of words split on whitespace, if no whitespaces exists in the text you
+//  should split on commas ',' if no commas exists you should return the number of lower-case letters with odd order in the
+//  alphabet, ord('a') = 0, ord('b') = 1, ... ord('z') = 25
+//  Examples
+//  splitWords "Hello world!" // ["Hello", "world!"]
+//  splitWords "Hello,world!" // ["Hello", "world!"]
+//  splitWords "abcdef" // 3
+func splitWords:any s:string
+    ord := {a:0 b:1 c:2 d:3 e:4 f:5 g:6 h:7 i:8 j:9 k:10 l:11 m:12 n:13 o:14 p:15 q:16 r:17 s:18 t:19 u:20 v:21 w:22 x:23 y:24 z:25}
+    arr := split s " "
+    if (len arr) > 1
+        return arr
+    end
+    arr = split s ","
+    if (len arr) > 1
+        return arr
+    end
+    result := 0
+    for c := range s
+        if (has ord c) and ord[c] % 2 == 1
+            result = result + 1
+        end
+    end
+    return result
+end
+
+func test
+    assert ["Hello" "world!"] (splitWords "Hello world!")
+    assert ["Hello" "world!"] (splitWords "Hello,world!")
+    assert ["Hello" "world,!"] (splitWords "Hello world,!")
+    assert ["Hello,Hello,world" "!"] (splitWords "Hello,Hello,world !")
+    assert 3 (splitWords "abcdef")
+    assert 2 (splitWords "aaabb")
+    assert 1 (splitWords "aaaBb")
+    assert 0 (splitWords "")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,52 @@
+// Create a function that takes 3 numbers.
+// Returns true if one of the numbers is equal to the sum of the other two, and all numbers are integers.
+// Returns false in any other cases.
+// Examples
+// sum 5, 2, 7 // true
+// sum 3, 2, 2 // false
+// sum 3, -2, 1 // true
+// sum 3.6, -2.2, 2 // false
+func sum:bool x:num y:num z:num
+    return ((x + y == z) or (x + z == y) or (y + z == x)) and (int x) and (int y) and (int z)
+end
+
+func int:bool n:num
+    return n == (round n)
+end
+
+func test
+    assert true (sum 2 3 1)
+    assert false (sum 2.5 2 3)
+    assert false (sum 1.5 5 3.5)
+    assert false (sum 2 6 2)
+    assert true (sum 4 2 2)
+    assert false (sum 2.2 2.2 2.2)
+    assert true (sum -4 6 2)
+    assert true (sum 2 1 1)
+    assert true (sum 3 4 7)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,48 @@
+//  Create a function that takes a string value representing a number
+//  and returns the closest integer to it. If the number is equidistant
+//  from two integers, round it away from zero.
+//  closest "10" // 10
+//  closest "15.3" // 15
+//
+//  Note:
+//  Rounding away from zero means that if the given number is equidistant
+//  from two integers, the one you should return is the one that is the
+//  farthest from zero. For example closest "14.5"  should
+//  return 15 and closest "-14.5"  should return -15.
+func closest:num s:string
+    n := str2num s
+    return round n
+end
+
+func test
+    assert 10 (closest "10")
+    assert 15 (closest "14.5")
+    assert -16 (closest "-15.5")
+    assert 15 (closest "15.3")
+    assert 0 (closest "0")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

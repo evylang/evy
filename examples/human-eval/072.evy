@@ -1,0 +1,70 @@
+// Write a function that returns True if the object q will fly, and False
+// otherwise. The object q will fly if it's balanced (it is a palindromic
+// list) and the sum of its elements is less than or equal the maximum
+// possible weight w.
+//
+// Example:
+// willFly [1 2] 5 ➞ False
+// 1+2 is less than the maximum possible weight, but it's unbalanced.
+//
+// willFly [3 2 3] 1 ➞ False
+// # it's balanced, but 3+2+3 is more than the maximum possible weight.
+//
+// willFly [3 2 3] 9 ➞ True
+// # 3+2+3 is less than the maximum possible weight, and it's balanced.
+//
+// willFly [3] 5 ➞ True
+// # 3 is less than the maximum possible weight, and it's balanced.
+func willFly:bool nums:[]num w:num
+    length := len nums
+    if length == 0
+        return false
+    end
+    sum := 0
+    for n := range nums
+        sum = sum + n
+    end
+    if sum > w
+        return false
+    end
+    for i := range (floor length/2)
+        if nums[i] != nums[-i - 1]
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert true (willFly [3 2 3] 9)
+    assert false (willFly [1 2] 5)
+    assert true (willFly [3] 5)
+    assert false (willFly [3 2 3] 1)
+    assert false (willFly [1 2 3] 6)
+    assert true (willFly [5] 5)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

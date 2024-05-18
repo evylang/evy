@@ -1,0 +1,59 @@
+// For a given list of input numbers, calculate Mean Absolute Deviation around
+// the mean of this dataset. Mean Absolute Deviation is the average absolute
+// difference between each element and a centerpoint (mean in this case):
+// MAD = average | x - x_mean |
+// meanAbsoluteDeviation [1 2 3 4] // 1
+func meanAbsoluteDeviation:num numbers:[]num
+    mean := (sum numbers) / (len numbers)
+    stdev := 0
+    for number := range numbers
+        stdev = stdev + (abs (number - mean))
+    end
+    return stdev / (len numbers)
+end
+
+func sum:num numbers:[]num
+    total := 0
+    for number := range numbers
+        total = total + number
+    end
+    return total
+end
+
+func abs:num x:num
+    if x < 0
+        return -x
+    end
+    return x
+end
+
+func test
+    assert true ((abs ((meanAbsoluteDeviation [1 2 3]) - 2 / 3)) < 0.000001)
+    assert true ((abs ((meanAbsoluteDeviation [1 2 3 4]) - 1)) < 0.000001)
+    assert true ((abs ((meanAbsoluteDeviation [1 2 3 4 5]) - 6 / 5)) < 0.000001)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

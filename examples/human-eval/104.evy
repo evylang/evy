@@ -1,0 +1,70 @@
+// Given an array of positive integers x. return a sorted array of all
+// elements that doesn't have any even digits.
+// Note: Returned list should be sorted in increasing order.
+// oddDigits [15 33 1422 1] // [1 15 33]
+// oddDigits [152 323 1422 10] // []
+func oddDigits:[]num nums:[]num
+    result:[]num
+    for n := range nums
+        if hasNoEvenDigits n
+            result = result + [n]
+        end
+    end
+    sort result
+    return result
+end
+
+func hasNoEvenDigits:bool n:num
+    while n > 0
+        if n % 2 == 0
+            return false
+        end
+        n = floor n/10
+    end
+    return true
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 15 33] (oddDigits [15 33 1422 1])
+    assert [] (oddDigits [152 323 1422 10])
+    assert [111 151] (oddDigits [12345 2033 111 151])
+    assert [31 135] (oddDigits [135 103 31])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

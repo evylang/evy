@@ -1,0 +1,50 @@
+// Given a positive integer n, return the total sum of its digits in binary.
+// solve 1000 // "1"
+// solve 150 // "110"
+// solve 147 // "1100"
+func solve:string n:num
+    sum := 0
+    while n > 0
+        sum = sum + n % 10
+        n = floor n/10
+    end
+    result := ""
+    while sum > 0
+        result = (sprint sum%2) + result
+        sum = floor sum/2
+    end
+    return result
+end
+
+func test
+    assert "1" (solve 1000)
+    assert "110" (solve 150)
+    assert "1100" (solve 147)
+    assert "1001" (solve 333)
+    assert "10010" (solve 963)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

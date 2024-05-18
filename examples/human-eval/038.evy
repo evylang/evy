@@ -1,0 +1,70 @@
+//  returns encoded string by cycling groups of three characters.
+func encode:string s:string
+    // split string to groups. Each of length 3.
+    groups := group3 s
+    for i := range (len groups)
+        if (len groups[i]) == 3
+            g := groups[i]
+            groups[i] = g[1:] + g[0]
+        end
+    end
+    return join groups ""
+end
+
+//  takes as input string encoded with encode function. Returns decoded string.
+func decode:string s:string
+    groups := group3 s
+    for i := range (len groups)
+        if (len groups[i]) == 3
+            g := groups[i]
+            groups[i] = g[-1] + g[:-1]
+        end
+    end
+    return join groups ""
+end
+
+func group3:[]string s:string
+    result:[]string
+    for i := range (floor ((len s) + 2)/3)
+        startIdx := 3 * i
+        endIdx := min 3*i+3 (len s)
+        g := s[startIdx:endIdx]
+        result = result + [g]
+    end
+    return result
+end
+
+func test
+    s := "lorem ipsum"
+    assert s (decode (encode s))
+    assert "bca" (encode "abc")
+    assert "abc" (decode "bca")
+    assert "bcad" (encode "abcd")
+    assert "abcd" (decode "bcad")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

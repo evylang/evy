@@ -1,0 +1,52 @@
+// removeVowels is a function that takes string and returns string without vowels.
+// removeVowels "" // ""
+// removeVowels "abcdefghijklm" // "bcdfghjklm"
+// removeVowels "abcdef" // "bcdf"
+// removeVowels "aaaaa" // "
+// removeVowels "aaBAA" // "B"
+// removeVowels "zbcd" // "zbcd"
+func removeVowels:string str:string
+    vowels := {a:true e:true i:true o:true u:true A:true E:true I:true O:true U:true}
+    result := ""
+    for ch := range str
+        if !(has vowels ch)
+            result = result + ch
+        end
+    end
+    return result
+end
+
+func test
+    assert "" (removeVowels "")
+    assert "bcdfghjklm" (removeVowels "abcdefghijklm")
+    assert "fdcb" (removeVowels "fedcba")
+    assert "" (removeVowels "eeeee")
+    assert "cB" (removeVowels "acBAA")
+    assert "cB" (removeVowels "EcBOO")
+    assert "ybcd" (removeVowels "ybcd")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

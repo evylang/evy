@@ -1,0 +1,47 @@
+// Filter given list of any values for num
+// filterInts ["a" 3.14 5] // [5]
+// filterInts [1 2 3 "abc" {} []] // [1 2 3]
+func filterInts:[]num values:[]any
+    result:[]num
+    for a := range values
+        if (typeof a) == "num"
+            n := a.(num)
+            if n == (round n)
+                result = result + [n]
+            end
+        end
+    end
+    return result
+end
+
+func test
+    assert [] (filterInts [])
+    assert [4 9] (filterInts [4 {} [] 23.2 9 "adasd"])
+    assert [3 3 3] (filterInts [3 "c" 3 3 "a" "b"])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

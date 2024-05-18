@@ -1,0 +1,45 @@
+// Return only positive numbers in the list.
+// getPositive [-1 2 -4 5 6] // [2, 5, 6]
+// getPositive [5 3 -5 2 -3 3 9 0 123 1 -10] // [5 3 2 3 9 123 1]
+func getPositive:[]num nums:[]num
+    result:[]num
+    for n := range nums
+        if n > 0
+            result = result + [n]
+        end
+    end
+    return result
+end
+
+func test
+    assert [4 5 6] (getPositive [-1 -2 4 5 6])
+    assert [5 3 2 3 3 9 123 1] (getPositive [5 3 -5 2 3 3 9 0 123 1 -10])
+    assert [] (getPositive [-1 -2])
+    assert [] (getPositive [])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

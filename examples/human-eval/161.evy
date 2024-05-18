@@ -1,0 +1,67 @@
+// You are given a string s. If s[i] is a letter, reverse its case from lower
+// to upper or vise versa, otherwise keep it as it is. If the string contains
+// no letters, reverse the string. The function should return the resulted
+// string.
+// Examples
+// solve "1234" // "4321"
+// solve "ab" // "AB"
+// solve "#a@C" // "#A@c"
+func solve:string s:string
+    hasLetters := false
+    result := ""
+    for c := range s
+        if c >= "a" and c <= "z"
+            hasLetters = true
+            result = result + (upper c)
+        else if c >= "A" and c <= "Z"
+            hasLetters = true
+            result = result + (lower c)
+        else
+            result = result + c
+        end
+    end
+    if hasLetters
+        return result
+    end
+    reversed := ""
+    for c := range result
+        reversed = c + reversed
+    end
+    return reversed
+end
+
+func test
+    assert "aSdF" (solve "AsDf")
+    assert "4321" (solve "1234")
+    assert "AB" (solve "ab")
+    assert "#A@c" (solve "#a@C")
+    assert "#aSDFw^45" (solve "#AsdfW^45")
+    assert "2@6#" (solve "#6@2")
+    assert "#$A^d" (solve "#$a^D")
+    assert "#CCC" (solve "#ccc")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

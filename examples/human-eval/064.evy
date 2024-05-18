@@ -1,0 +1,57 @@
+// Write a function vowelCount which takes a string representing
+// a word as input and returns the number of vowels in the string.
+// Vowels in this case are "a", "e", "i", "o", "u". Here, "y" is also a
+// vowel, but only when it is at the end of the given word.
+// Example:
+// vowelCount "abcde" // 2
+// vowelCount "ACEDY" // 3
+func vowelCount:num str:string
+    vowels := {a:0 e:0 i:0 o:0 u:0}
+    result := 0
+    str = lower str
+    for c := range str
+        if has vowels c
+            result = result + 1
+        end
+    end
+    if (len str) > 0 and str[-1] == "y"
+        result = result + 1
+    end
+    return result
+end
+
+func test
+    assert 0 (vowelCount "")
+    assert 2 (vowelCount "abcde")
+    assert 3 (vowelCount "Alone")
+    assert 2 (vowelCount "key")
+    assert 1 (vowelCount "bye")
+    assert 2 (vowelCount "keY")
+    assert 1 (vowelCount "bYe")
+    assert 3 (vowelCount "ACEDY")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

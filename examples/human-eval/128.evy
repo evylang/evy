@@ -1,0 +1,75 @@
+//  You are given an array arr of integers and you need to return sum of
+//  absolute values of the integers multiplied by product of all signs of
+//  each number in the array, represented by 1, -1 or 0. Note: return false
+//  for empty arr.
+//
+//  Example:
+//  signedAbsSum  [1, 2, 2, -4] // -9
+//  signedAbsSum  [0, 1] // 0
+//  signedAbsSum  [] // false
+func signedAbsSum:any nums:[]num
+    if (len nums) == 0
+        return false
+    end
+    sum := 0
+    s := 1
+
+    for n := range nums
+        sum = sum + (abs n)
+        s = s * (sign n)
+    end
+    return s * sum
+end
+
+func abs:num n:num
+    if n < 0
+        return -n
+    end
+    return n
+end
+
+func sign:num n:num
+    if n < 0
+        return -1
+    end
+    if n > 0
+        return 1
+    end
+    return 0
+end
+
+func test
+    assert -9 (signedAbsSum [1 2 2 -4])
+    assert 0 (signedAbsSum [0 1])
+    assert -10 (signedAbsSum [1 1 1 2 3 -1 1])
+    assert false (signedAbsSum [])
+    assert 20 (signedAbsSum [2 4 1 2 -1 -1 9])
+    assert 4 (signedAbsSum [-1 1 -1 1])
+    assert -4 (signedAbsSum [-1 1 1 1])
+    assert 0 (signedAbsSum [-1 1 1 0])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

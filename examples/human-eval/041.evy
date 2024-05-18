@@ -1,0 +1,45 @@
+//  Imagine a road that's a perfectly straight infinitely long line.
+//  n cars are driving left to right;  simultaneously, a different set of n cars
+//  are driving right to left.   The two sets of cars start out being very far from
+//  each other.  All cars move in the same speed.  Two cars are said to collide
+//  when a car that's moving left to right hits a car that's moving right to left.
+//  However, the cars are infinitely sturdy and strong; as a result, they continue moving
+//  in their trajectory as if they did not collide.
+//
+//  This function outputs the number of such collisions.
+func collisions:num n:num
+    return n * n
+end
+
+func test
+    assert 4 (collisions 2)
+    assert 9 (collisions 3)
+    assert 16 (collisions 4)
+    assert 64 (collisions 8)
+    assert 100 (collisions 10)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

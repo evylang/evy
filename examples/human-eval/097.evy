@@ -1,0 +1,51 @@
+//  Complete the function that takes two integers and returns
+//  the product of their unit digits.
+//  Assume the input is always valid.
+//  Examples:
+//  multiply 148, 412  should return 16.
+//  multiply 19, 28  should return 72.
+//  multiply 2020, 1851  should return 0.
+//  multiply 14,-15  should return 20.
+func multiply:num a:num b:num
+    result := (a % 10) * (b % 10)
+    if result < 0
+        return -result
+    end
+    return result
+end
+
+func test
+    assert 16 (multiply 148 412)
+    assert 72 (multiply 19 28)
+    assert 0 (multiply 2020 1851)
+    assert 20 (multiply 14 -15)
+    assert 42 (multiply 76 67)
+    assert 49 (multiply 17 27)
+    assert 0 (multiply 0 1)
+    assert 0 (multiply 0 0)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

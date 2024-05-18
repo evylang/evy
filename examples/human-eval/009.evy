@@ -1,0 +1,49 @@
+// From a given list of integers, generate an array of rolling maximum element found until given moment
+// in the sequence.
+// rollingMax [1 2 3 2 3 4 2] // [1 2 3 3 3 4 4]
+func rollingMax:[]num numbers:[]num
+    if numbers == []
+        return []
+    end
+    running_max := numbers[0]
+    result:[]num
+    for number := range numbers
+        if number > running_max
+            running_max = number
+        end
+        result = result + [running_max]
+    end
+    return result
+end
+
+func test
+    assert [] (rollingMax [])
+    assert [1 2 3 4] (rollingMax [1 2 3 4])
+    assert [4 4 4 4] (rollingMax [4 3 2 1])
+    assert [3 3 3 100 100] (rollingMax [3 2 3 100 3])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

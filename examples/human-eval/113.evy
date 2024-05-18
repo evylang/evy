@@ -1,0 +1,67 @@
+// Given a list of strings, where each string consists of only digits, return a list.
+// Each element i of the output should be "the number of odd elements in the
+// string i of the input." where all the i's should be replaced by the number
+// of odd digits in the i'th string of the input.
+//
+// solve ["1234567"] // ["the number of odd elements 4n the str4ng 4 of the 4nput."]
+// solve(["3","11111111"])
+// [ "the number of odd elements 1n the str1ng 1 of the 1nput.",
+//  "the number of odd elements 8n the str8ng 8 of the 8nput."]
+func solve:[]string arr:[]string
+    result:[]string
+    for s := range arr
+        n := oddCount s
+        r := sprintf "the number of odd elements %vn the str%vng %v of the %vnput." n n n n
+        result = result + [r]
+    end
+    return result
+end
+
+func oddCount:num s:string
+    result := 0
+    for c := range s
+        n := str2num c
+        if n % 2 == 1
+            result = result + 1
+        end
+    end
+    return result
+end
+
+func test
+    assert (solve ["1234567"]) ["the number of odd elements 4n the str4ng 4 of the 4nput."]
+    assert (solve ["3" "11111111"]) [
+        "the number of odd elements 1n the str1ng 1 of the 1nput."
+        "the number of odd elements 8n the str8ng 8 of the 8nput."
+    ]
+    assert (solve ["271" "137" "314"]) [
+        "the number of odd elements 2n the str2ng 2 of the 2nput."
+        "the number of odd elements 3n the str3ng 3 of the 3nput."
+        "the number of odd elements 2n the str2ng 2 of the 2nput."
+    ]
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

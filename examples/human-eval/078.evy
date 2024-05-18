@@ -1,0 +1,64 @@
+// You have been tasked to write a function that receives
+// a hexadecimal number as a string and counts the number of hexadecimal
+// digits that are primes (prime number, or a prime, is a natural number
+// greater than 1 that is not a product of two smaller natural numbers).
+// Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.
+// Prime numbers are 2, 3, 5, 7, 11, 13, 17,...
+// So you have to determine a number of the following digits: 2, 3, 5, 7,
+// B (=decimal 11), D (=decimal 13).
+// Note: you may assume the input is always correct or empty string,
+// and symbols A,B,C,D,E,F are always uppercase.
+// Examples:
+// hexprimes "AB" // 1
+// hexprimes "1077E" // 2
+// hexprimes "ABED1A33" // 4
+// hexprimes "123456789ABCDEF0" // 6
+// hexprimes "2020" // 2
+func hexprimes:num str:string
+    primes := {}
+    for p := range "2357BD"
+        primes[p] = true
+    end
+    result := 0
+    for ch := range str
+        if (has primes ch)
+            result = result + 1
+        end
+    end
+    return result
+end
+
+func test
+    assert 1 (hexprimes "AB")
+    assert 2 (hexprimes "1077E")
+    assert 4 (hexprimes "ABED1A33")
+    assert 2 (hexprimes "2020")
+    assert 6 (hexprimes "123456789ABCDEF0")
+    assert 12 (hexprimes "112233445566778899AABBCCDDEEFF00")
+    assert 0 (hexprimes "")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

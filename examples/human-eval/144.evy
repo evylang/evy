@@ -1,0 +1,57 @@
+// Your task is to implement a function that will simplify the expression
+// x * n. The function returns true if x * n evaluates to a whole number and False
+// otherwise. Both x and n, are string representation of a fraction, and have the following format,
+// <numerator>/<denominator> where both numerator and denominator are positive whole numbers.
+// You can assume that x, and n are valid fractions, and do not have zero as denominator.
+// simplify "1/5" "5/1" // true
+// simplify "1/6" "2/1" // false
+// simplify "7/10" "10/2" // false
+func simplify:bool a:string b:string
+    partsA := split a "/"
+    partsB := split b "/"
+    numerator := (str2num partsA[0]) * (str2num partsB[0])
+    denominator := (str2num partsA[1]) * (str2num partsB[1])
+    val := numerator / denominator
+    return val == (round val)
+end
+
+func test
+    assert true (simplify "1/5" "5/1")
+    assert false (simplify "1/6" "2/1")
+    assert true (simplify "5/1" "3/1")
+    assert false (simplify "7/10" "10/2")
+    assert true (simplify "2/10" "50/10")
+    assert true (simplify "7/2" "4/2")
+    assert true (simplify "11/6" "6/1")
+    assert false (simplify "2/3" "5/2")
+    assert false (simplify "5/2" "3/5")
+    assert true (simplify "2/4" "8/4")
+    assert true (simplify "2/4" "4/2")
+    assert true (simplify "1/5" "5/1")
+    assert false (simplify "1/5" "1/5")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

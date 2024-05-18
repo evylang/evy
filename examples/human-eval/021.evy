@@ -1,0 +1,53 @@
+// Given list of numbers (of at least two elements), apply a linear transform to that list,
+// such that the smallest number will become 0 and the largest will become 1
+// rescale_to_unit [1 2 3 4 5] // [0 0.25 0.5 0.75 1]
+func rescale_to_unit:[]num numbers:[]num
+    min_number := numbers[0]
+    max_number := numbers[0]
+    for n := range numbers
+        if n < min_number
+            min_number = n
+        end
+        if n > max_number
+            max_number = n
+        end
+    end
+    result:[]num
+    for n := range numbers
+        result = result + [(n - min_number)/(max_number - min_number)]
+    end
+    return result
+end
+
+func test
+    assert [0 1] (rescale_to_unit [2 49.9])
+    assert [1 0] (rescale_to_unit [100 49.9])
+    assert [0 0.25 0.5 0.75 1] (rescale_to_unit [1 2 3 4 5])
+    assert [0.25 0 1 0.5 0.75] (rescale_to_unit [2 1 5 3 4])
+    assert [0.25 0 1 0.5 0.75] (rescale_to_unit [12 11 15 13 14])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

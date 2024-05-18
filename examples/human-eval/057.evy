@@ -1,0 +1,60 @@
+// Return true if list elements are monotonically increasing or decreasing.
+// monotonic [1 2 4 20] // true
+// monotonic [1 20 4 10] // false
+// monotonic [4 1 0 -10] // true
+func monotonic:bool nums:[]num
+    numsInc := nums[:]
+    numsDec := nums[:]
+    sort numsInc true
+    sort numsDec false
+    return nums == numsInc or nums == numsDec
+end
+
+func sort arr:[]num inc:bool
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if (inc and arr[i] > arr[i + 1]) or (!inc and arr[i] < arr[i + 1])
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert true (monotonic [1 2 4 10])
+    assert true (monotonic [1 2 4 20])
+    assert false (monotonic [1 20 4 10])
+    assert true (monotonic [4 1 0 -10])
+    assert true (monotonic [4 1 1 0])
+    assert false (monotonic [1 2 3 2 5 60])
+    assert true (monotonic [1 2 3 4 5 60])
+    assert true (monotonic [9 9 9 9])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

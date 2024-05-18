@@ -1,0 +1,62 @@
+// Return sorted unique elements in an array
+// unique [5 3 5 2 3 3 9 0 123] [0 2 3 5 9 123]
+func unique:[]num nums:[]num
+    if (len nums) < 2
+        return nums
+    end
+
+    nums2 := nums[:]
+    sort nums2
+    result := [nums2[0]]
+
+    for n := range nums2
+        if n != result[-1]
+            result = result + [n]
+        end
+    end
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [0 2 3 5 9 123] (unique [5 3 5 2 3 3 9 0 123])
+    assert [] (unique [])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

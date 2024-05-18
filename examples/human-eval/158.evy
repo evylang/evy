@@ -1,0 +1,83 @@
+// Write a function that accepts a list of strings.
+// The list contains different words. Return the word with maximum number
+// of unique characters. If multiple strings have maximum number of unique
+// characters, return the one which comes first in lexicographical order.
+// find_max ["name" "of" "string"] // "string"
+// find_max ["name" "enam" "game"] // "enam"
+// find_max ["aaaaaaa" "bb" "cc"] // "aaaaaaa"
+func maxUniques:string s:[]string
+    if (len s) == 0
+        return ""
+    end
+    result := s[:]
+    sort result
+    return result[0]
+end
+
+func sort arr:[]string
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if compare arr[i] arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func compare:bool a:string b:string
+    ua := uniques a
+    ub := uniques b
+    if ua == ub
+        return a > b
+    end
+    return ua < ub
+end
+
+func uniques:num s:string
+    m:{}bool
+    for c := range s
+        m[c] = true
+    end
+    return len m
+end
+
+func test
+    assert "string" (maxUniques ["name" "of" "string"])
+    assert "enam" (maxUniques ["name" "enam" "game"])
+    assert "aaaaaaa" (maxUniques ["aaaaaaa" "bb" "cc"])
+    assert "abc" (maxUniques ["abc" "cba"])
+    assert "footbott" (maxUniques ["play" "this" "game" "of" "footbott"])
+    assert "gonna" (maxUniques ["we" "are" "gonna" "rock"])
+    assert "nation" (maxUniques ["we" "are" "a" "mad" "nation"])
+    assert "this" (maxUniques ["this" "is" "a" "prrk"])
+    assert "b" (maxUniques ["b"])
+    assert "play" (maxUniques ["play" "play" "play"])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

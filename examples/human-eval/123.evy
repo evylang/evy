@@ -1,0 +1,81 @@
+//  Given a positive integer n, return a sorted list that has the odd numbers in collatz sequence.
+//
+//  The Collatz conjecture is a conjecture in mathematics that concerns a
+//  sequence defined as follows: start with any positive integer n. Then each
+//  term is obtained from the previous term as follows: if the previous term
+//  is even, the next term is one half of the previous term. If the previous
+//  term is odd, the next term is 3 times the previous term plus 1. The
+//  conjecture is that no matter what value of n, the sequence will always
+//  reach 1.
+//
+//  Note:
+//      1. Collatz(1) is [1].
+//      2. returned list sorted in increasing order.
+//
+//  For example:
+//  oddCollatz(5) returns [1 5]
+//  The collatz sequence for 5 is [5 16 8 4 2 1], so the odd numbers are only 1, and 5.
+func oddCollatz:[]num n:num
+    collatz := [n]
+    while n > 1
+        if n % 2 == 0
+            n = n / 2
+        else
+            n = n * 3 + 1
+        end
+        collatz = collatz + [n]
+    end
+    result:[]num
+    for n := range collatz
+        if n % 2 == 1
+            result = result + [n]
+        end
+    end
+    sort result
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 5 7 11 13 17] (oddCollatz 14)
+    assert [1 5] (oddCollatz 5)
+    assert [1 3 5] (oddCollatz 12)
+    assert [1] (oddCollatz 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

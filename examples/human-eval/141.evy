@@ -1,0 +1,87 @@
+// Create a function which takes a string representing a file"s name, and returns
+abc := {a:0 b:1 c:2 d:3 e:4 f:5 g:6 h:7 i:8 j:9 k:10 l:11 m:12 n:13 o:14 p:15 q:16 r:17 s:18 t:19 u:20 v:21 w:22 x:23 y:24 z:25 A:0 B:1 C:2 D:3 E:4 F:5 G:6 H:7 I:8 J:9 K:10 L:11 M:12 N:13 O:14 P:15 Q:16 R:17 S:18 T:19 U:20 V:21 W:22 X:23 Y:24 Z:25}
+
+// "Yes" if the the file"s name is valid, and returns "No" otherwise.
+// A file's name is considered to be valid if and only if all the following conditions
+// are met:
+// - There should not be more than three digits (0-9) in the file's name.
+// - The file"s name contains exactly one dot "."
+// - The substring before the dot should not be empty, and it starts with a letter from
+// the latin alphapet ("a"-"z" and "A"-"Z").
+// - The substring after the dot should be one of these: ["txt", "exe", "dll"]
+// Examples:
+// checkFilename  "example.txt" // "Yes"
+// checkFilename  "1example.dll" // "No" (the name should start with a latin alphapet letter)
+func checkFilename:string filename:string
+    ext := {txt:0 exe:0 dll:0}
+    parts := split filename "."
+    if (len parts) != 2 or !(has ext parts[1]) or (len parts[0]) == 0 or !(has abc parts[0][0])
+        return "No"
+    end
+
+    digitCount := 0
+    for c := range parts[0]
+        str2num c
+        if !err
+            digitCount = digitCount + 1
+        end
+    end
+    if digitCount > 3
+        return "No"
+    end
+    return "Yes"
+end
+
+func test
+    assert "Yes" (checkFilename "example.txt")
+    assert "No" (checkFilename "1example.dll")
+    assert "No" (checkFilename "s1sdf3.asd")
+    assert "Yes" (checkFilename "K.dll")
+    assert "Yes" (checkFilename "MY16FILE3.exe")
+    assert "No" (checkFilename "His12FILE94.exe")
+    assert "No" (checkFilename "_Y.txt")
+    assert "No" (checkFilename "?aREYA.exe")
+    assert "No" (checkFilename "/this_is_valid.dll")
+    assert "No" (checkFilename "this_is_valid.wow")
+    assert "Yes" (checkFilename "this_is_valid.txt")
+    assert "No" (checkFilename "this_is_valid.txtexe")
+    assert "No" (checkFilename "#this2_i4s_5valid.ten")
+    assert "No" (checkFilename "@this1_is6_valid.exe")
+    assert "No" (checkFilename "this_is_12valid.6exe4.txt")
+    assert "No" (checkFilename "all.exe.txt")
+    assert "Yes" (checkFilename "I563_No.exe")
+    assert "Yes" (checkFilename "Is3youfault.txt")
+    assert "Yes" (checkFilename "no_one#knows.dll")
+    assert "No" (checkFilename "1I563_Yes3.exe")
+    assert "No" (checkFilename "I563_Yes3.txtt")
+    assert "No" (checkFilename "final..txt")
+    assert "No" (checkFilename "final132")
+    assert "No" (checkFilename "_f4indsartal132.")
+    assert "No" (checkFilename ".txt")
+    assert "No" (checkFilename "s.")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

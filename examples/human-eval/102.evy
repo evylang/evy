@@ -1,0 +1,53 @@
+// This function takes two positive numbers x and y and returns the
+// biggest even integer number that is in the range [x, y] inclusive. If
+// there's no such number, then the function should return -1.
+// choose 12 15 // 14
+// choose 13 12 // -1
+func choose:num x:num y:num
+    if x > y
+        return -1
+    end
+    if y % 2 == 0
+        return y
+    end
+    if x == y
+        return -1
+    end
+    return y - 1
+end
+
+func test
+    assert 14 (choose 12 15)
+    assert -1 (choose 13 12)
+    assert 12354 (choose 33 12354)
+    assert -1 (choose 5234 5233)
+    assert 28 (choose 6 29)
+    assert -1 (choose 27 10)
+    assert -1 (choose 7 7)
+    assert 546 (choose 546 546)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,53 @@
+// Filter an input list of strings only for ones that contain given substring
+// filter [] "a" // []
+// filter ["abc" "bacd" "cde" "array"] "a"  // ["abc" "bacd" "array"]
+func filter:[]string strings:[]string substring:string
+    ans:[]string
+    for str := range strings
+        if (contains str substring)
+            ans = ans + [str]
+        end
+    end
+    return ans
+end
+
+func contains:bool haystack:string needle:string
+    for i := range ((len haystack) - (len needle) + 1)
+        if haystack[i:i + (len needle)] == needle
+            return true
+        end
+    end
+    return false
+end
+
+func test
+    assert [] (filter [] "john")
+    assert ["xxx" "xxxAAA" "xxx"] (filter ["xxx" "asd" "xxy" "john doe" "xxxAAA" "xxx"] "xxx")
+    assert ["xxx" "aaaxxy" "xxxAAA" "xxx"] (filter ["xxx" "asd" "aaaxxy" "john doe" "xxxAAA" "xxx"] "xx")
+    assert ["grunt" "prune"] (filter ["grunt" "trumpet" "prune" "gruesome"] "run")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

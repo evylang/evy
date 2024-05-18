@@ -1,0 +1,61 @@
+// You are given two positive integers n and m, and your task is to compute the
+// average of the integers from n through m (including n and m).
+// Round the answer to the nearest integer and convert that to binary.
+// If n is greater than m, return -1.
+// Example:
+// avg 1 5 // "0b11"
+// avg 7 5 // -1
+// avg 10 20 // "0b1111"
+// avg 20 33 // "0b11010"
+func avg:any n:num m:num
+    if m < n
+        return -1
+    end
+    a := round (m + n)/2
+    result := ""
+    while a > 0
+        result = (sprint a%2) + result
+        a = floor a/2
+    end
+    return "0b" + result
+end
+
+func test
+    assert "0b11" (avg 1 5)
+    assert "0b1010" (avg 7 13)
+    assert "0b1111001011" (avg 964 977)
+    assert "0b1111100101" (avg 996 997)
+    assert "0b1011000010" (avg 560 851)
+    assert "0b101101110" (avg 185 546)
+    assert "0b110101101" (avg 362 496)
+    assert "0b1001110010" (avg 350 902)
+    assert "0b11010111" (avg 197 233)
+    assert -1 (avg 7 5)
+    assert -1 (avg 5 1)
+    assert "0b101" (avg 5 5)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

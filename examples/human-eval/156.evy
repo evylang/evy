@@ -1,0 +1,65 @@
+// Given a positive integer, obtain its roman numeral equivalent as a string,
+// and return it in lowercase.
+// Restrictions: 1 <= num <= 1000
+// Examples:
+// toRoman 19 // "xix"
+// toRoman 152 // "clii"
+// toRoman 426 // "cdxxvi"
+func toRoman:string n:num
+    nums := [1 4 5 9 10 40 50 90 100 400 500 900 1000]
+    roms := ["i" "iv" "v" "ix" "x" "xl" "l" "xc" "c" "cd" "d" "cm" "m"]
+    i := (len nums) - 1
+    result := ""
+    while n > 0
+        div := floor n/nums[i]
+        n = n % nums[i]
+        while div > 0
+            result = result + roms[i]
+            div = div - 1
+        end
+        i = i - 1
+    end
+    return result
+end
+
+func test
+    assert "xix" (toRoman 19)
+    assert "clii" (toRoman 152)
+    assert "ccli" (toRoman 251)
+    assert "cdxxvi" (toRoman 426)
+    assert "d" (toRoman 500)
+    assert "i" (toRoman 1)
+    assert "iv" (toRoman 4)
+    assert "xliii" (toRoman 43)
+    assert "xc" (toRoman 90)
+    assert "xciv" (toRoman 94)
+    assert "dxxxii" (toRoman 532)
+    assert "cm" (toRoman 900)
+    assert "cmxciv" (toRoman 994)
+    assert "m" (toRoman 1000)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

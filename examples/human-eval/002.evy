@@ -1,0 +1,46 @@
+// Given a positive floating point number, it can be decomposed into
+// and integer part (largest integer smaller than given number) and decimals
+// (leftover part always smaller than 1).
+// Return the decimal part of the number.
+// truncate_number 3.5 // 0.5
+func truncateNumber:num number:num
+    return number % 1
+end
+
+func test
+    assert 0.5 (truncateNumber 3.5)
+    assert true (((abs (truncateNumber (1.33 - 0.33))) < 0.000001))
+    assert true (((abs (truncateNumber (123.456 - 0.456))) < 0.000001))
+end
+
+func abs:num x:num
+    if x < 0
+        return -x
+    end
+    return x
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

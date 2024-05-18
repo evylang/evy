@@ -1,0 +1,54 @@
+// Out of list of strings, return the longest one. Return the first one in
+// case of multiple strings of the same length. Return "" in case the input
+// list is empty.
+// longest [] // ""
+// longest ["a" "b" "c"] // "a"
+// longest ["a" "bb" "ccc"] // "ccc"
+func longest:string strings:[]string
+    if (len strings) == 0
+        return ""
+    end
+    maxlen := 0
+    for s := range strings
+        if (len s) > maxlen
+            maxlen = (len s)
+        end
+    end
+    for s := range strings
+        if (len s) == maxlen
+            return s
+        end
+    end
+    return ""
+end
+
+func test
+    assert "" (longest [])
+    assert "x" (longest ["x" "y" "z"])
+    assert "zzzz" (longest ["x" "yyy" "zzzz" "www" "kkkk" "abc"])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,55 @@
+abc := "abcdefghijklmnopqrstuvwxyz"
+ord := {a:0 b:1 c:2 d:3 e:4 f:5 g:6 h:7 i:8 j:9 k:10 l:11 m:12 n:13 o:14 p:15 q:16 r:17 s:18 t:19 u:20 v:21 w:22 x:23 y:24 z:25}
+
+//  Create a function encrypt that takes a string as an argument and
+//  returns a string encrypted with the alphabet being rotated.
+//  The alphabet should be rotated in a manner such that the letters
+//  shift down by two multiplied to two places.
+//  For example:
+//  encrypt "hi"  returns "lm"
+//  encrypt "asdfghjkl"  returns "ewhjklnop"
+//  encrypt "gf"  returns "kj"
+//  encrypt "et"  returns "ix"
+func encrypt:string s:string
+    result := ""
+    for ch := range s
+        result = result + abc[(ord[ch] + 4) % 26]
+    end
+    return result
+end
+
+func test
+    assert "lm" (encrypt "hi")
+    assert "ewhjklnop" (encrypt "asdfghjkl")
+    assert "kj" (encrypt "gf")
+    assert "ix" (encrypt "et")
+    assert "jeiajeaijeiak" (encrypt "faewfawefaewg")
+    assert "lippsqcjvmirh" (encrypt "hellomyfriend")
+    assert "hbdhpqrmpjylqmpyjlpmlyjrqpmqryjlpmqryjljygyjl" (encrypt "dxzdlmnilfuhmilufhlihufnmlimnufhlimnufhfucufh")
+    assert "e" (encrypt "a")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

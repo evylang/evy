@@ -1,0 +1,63 @@
+// Your task is to write a function that returns true if a number x is a simple
+// power of n and false in other cases.
+// x is a simple power of n if n**int=x
+// For example:
+// isPower 1 4 // true: 4^0 == 1
+// isPower 2 2 // true: 2^1 == 2
+// isPower 8 2 // true: 2^3 == 8
+// isPower 3 2 // false
+// isPower 3 1 // false
+// isPower 5 3 // false
+func isPower:bool x:num n:num
+    for exp := range x
+        x2 := pow n exp
+        if x == x2
+            return true
+        end
+        if x2 > x
+            return false
+        end
+    end
+    return false
+end
+
+func test
+    assert true (isPower 1 1)
+    assert true (isPower 1 12)
+    assert false (isPower 12 1)
+    assert true (isPower 16 2)
+    assert false (isPower 143214 16)
+    assert true (isPower 4 2)
+    assert true (isPower 9 3)
+    assert true (isPower 16 4)
+    assert false (isPower 24 2)
+    assert false (isPower 128 4)
+    assert false (isPower 12 6)
+    assert true (isPower 1 1)
+    assert true (isPower 1 12)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

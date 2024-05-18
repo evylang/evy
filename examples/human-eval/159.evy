@@ -1,0 +1,56 @@
+// You're a hungry rabbit, and you already have eaten a certain number of
+// carrots, but now you need to eat more carrots to complete the day's meals.
+// you should return an array of [ total number of eaten carrots after your
+// meals, the number of carrots left after your meals ] if there are not
+// enough remaining carrots, you will eat all remaining carrots, but will
+// still be hungry.
+// Example:
+// eat 5  6 10 // [11 4]
+// eat 4  8 9 // [12 1]
+// eat 1  10 10 // [11 0]
+// eat 2  11 5 // [7 0]
+// Parameters:
+// done : the number of carrots that you have eaten.
+// need : the number of carrots that you need to eat.
+// stock : the number of remaining carrots that exist in stock
+func eat:[]num done:num need:num stock:num
+    if need <= stock
+        return [done+need stock-need]
+    else
+        return [done+stock 0]
+    end
+end
+
+func test
+    assert [11 4] (eat 5 6 10)
+    assert [12 1] (eat 4 8 9)
+    assert [11 0] (eat 1 10 10)
+    assert [7 0] (eat 2 11 5)
+    assert [9 2] (eat 4 5 7)
+    assert [5 0] (eat 4 5 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

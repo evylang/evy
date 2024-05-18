@@ -1,0 +1,47 @@
+// Given two positive integers a and b, return the even digits between a
+// and b, in ascending order.
+// For example:
+// generate 2 8 // [2 4 6 8]
+// generate 8 2 // [2 4 6 8]
+// generate 10 14 // []
+func generate:[]num a:num b:num
+    l := (max 2 (min a b))
+    u := (min 8 (max a b))
+    result:[]num
+    for i := range l u+1 2
+        result = result + [i]
+    end
+    return result
+end
+
+func test
+    assert [2 4 6 8] (generate 2 10)
+    assert [2 4 6 8] (generate 10 2)
+    assert [2 4 6 8] (generate 132 2)
+    assert [] (generate 17 89)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

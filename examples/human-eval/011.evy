@@ -1,0 +1,45 @@
+// Input are two strings a and b consisting only of 1s and 0s.
+// Perform binary XOR on these inputs and return result also as a string.
+// stringXor "010" "110" //  100
+func stringXor:string a:string b:string
+    res:string
+    for i := range (len a)
+        if a[i] == b[i]
+            res = res + "0"
+        else
+            res = res + "1"
+        end
+    end
+    return res
+end
+
+func test
+    assert "010010" (stringXor "111000" "101010")
+    assert "0" (stringXor "1" "1")
+    assert "0101" (stringXor "0101" "0000")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

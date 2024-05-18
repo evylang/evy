@@ -1,0 +1,49 @@
+//  The special factorial is defined as:
+//  brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!
+//  where n > 0
+//  For example:
+//  specialFact 4 //  288
+//  The function will receive an integer as input and should return the special
+//  factorial of this integer.
+func specialFact:num n:num
+    fact := 1
+    result := 1
+    for i := range 1 n+1
+        fact = fact * i
+        result = result * fact
+    end
+    return result
+end
+
+func test
+    assert 2 (specialFact 2)
+    assert 288 (specialFact 4)
+    assert 34560 (specialFact 5)
+    assert 125411328000 (specialFact 7)
+    assert 1 (specialFact 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,72 @@
+//  You are given two intervals, where each interval is a pair of integers.
+//  For example, interval = [start end] = [1 2]. The given intervals are
+//  closed which means that the interval (start, end) includes both start and
+//  end.
+//  For each given interval, it is assumed that its start is less or equal its end.
+//  Your task is to determine whether the length of intersection of these two
+//  intervals is a prime number.
+//  Example, the intersection of the intervals [1 3], [2 4] is [2 3]
+//  which its length is 1, which not a prime number.
+//  If the length of the intersection is a prime number, return "YES",
+//  otherwise, return "NO".
+//  If the two intervals don't intersect, return "NO".
+//  intersection [1 2] [2 3] // "NO"
+//  intersection [-1 1] [0 4] // "NO"
+//  intersection [-3 -1] [-5 5] // "YES"
+func intersectPrime:string interval1:[]num interval2:[]num
+    left := max interval1[0] interval2[0]
+    right := min interval1[1] interval2[1]
+    length := right - left
+    if isPrime length
+        return "YES"
+    end
+    return "NO"
+end
+
+func isPrime:bool n:num
+    if n < 2
+        return false
+    end
+    for i := range 2 n
+        if n % i == 0
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert "NO" (intersectPrime [1 2] [2 3])
+    assert "NO" (intersectPrime [-1 1] [0 4])
+    assert "YES" (intersectPrime [-3 -1] [-5 5])
+    assert "YES" (intersectPrime [-2 2] [-4 0])
+    assert "NO" (intersectPrime [-11 2] [-1 -1])
+    assert "NO" (intersectPrime [1 2] [3 5])
+    assert "NO" (intersectPrime [1 2] [1 2])
+    assert "NO" (intersectPrime [-2 -2] [-3 -2])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

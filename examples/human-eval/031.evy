@@ -1,0 +1,61 @@
+// Return true if a given number is prime, and false otherwise.
+// isPrime 6 // false
+// isPrime 101 // true
+// isPrime 11 // true
+// isPrime 13441 // true
+// isPrime 61 // true
+// isPrime 4 // false
+// isPrime 1 // false
+func isPrime:bool n:num
+    if n < 2
+        return false
+    end
+    for k := range 2 (sqrt n)+1
+        if n % k == 0
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert false (isPrime 6)
+    assert true (isPrime 101)
+    assert true (isPrime 11)
+    assert true (isPrime 13441)
+    assert true (isPrime 61)
+    assert false (isPrime 4)
+    assert false (isPrime 1)
+    assert true (isPrime 5)
+    assert true (isPrime 11)
+    assert true (isPrime 17)
+    assert false (isPrime 5*17)
+    assert false (isPrime 11*7)
+    assert false (isPrime 13441*19)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

@@ -1,0 +1,46 @@
+// For a given array of number, return an array consisting of a sum and a product of all the integers in the array.
+// Empty sum should be equal to 0 and empty product should be equal to 1.
+// sumProduct [] // [0 1]
+// sumProduct [1 2 3 4] // [10 24]
+func sumProduct:[]num numbers:[]num
+    sum_value := 0
+    prod_value := 1
+    for number := range numbers
+        sum_value = sum_value + number
+        prod_value = prod_value * number
+    end
+    return [sum_value prod_value]
+end
+
+func test
+    assert [0 1] (sumProduct [])
+    assert [3 1] (sumProduct [1 1 1])
+    assert [100 0] (sumProduct [100 0])
+    assert [15 105] (sumProduct [3 5 7])
+    assert [10 10] (sumProduct [10])
+end
+
+func abs:num x:num
+    if x < 0
+        return -x
+    end
+    return x
+end
+
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if (sprintf "%v" want) != (sprintf "%v" got)
+        fails = fails + 1
+        printf "want != got:\n want: %v\n got:  %v\n" want got
+    end
+end
+
+func finished
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+finished

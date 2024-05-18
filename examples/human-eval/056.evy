@@ -1,0 +1,61 @@
+// brackets is a string of "<" and ">". return true if every opening bracket
+// has a corresponding closing bracket.
+// correctBracketing "<" // false
+// correctBracketing "<>" // true
+// correctBracketing "<<><>>" // true
+// correctBracketing "><<>" // false
+func checkBrackets:bool str:string
+    depth := 0
+    for ch := range str
+        if ch == "<"
+            depth = depth + 1
+        else
+            depth = depth - 1
+        end
+        if depth < 0
+            return false
+        end
+    end
+    return depth == 0
+end
+
+func test
+    assert true (checkBrackets "")
+    assert true (checkBrackets "<>")
+    assert true (checkBrackets "<<><>>")
+    assert true (checkBrackets "<><><<><>><>")
+    assert true (checkBrackets "<><><<<><><>><>><<><><<>>>")
+    assert false (checkBrackets "<<<><>>>>")
+    assert false (checkBrackets "><<>")
+    assert false (checkBrackets "<")
+    assert false (checkBrackets "<<<<")
+    assert false (checkBrackets ">")
+    assert false (checkBrackets "<<>")
+    assert false (checkBrackets "<><><<><>><>><<>")
+    assert false (checkBrackets "<><><<><>><>>><>")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

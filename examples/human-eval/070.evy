@@ -1,0 +1,72 @@
+// Given list of integers, return list in strange order.
+// Strange sorting, is when you start with the minimum value,
+// then maximum of the remaining integers, then minimum and so on.
+
+// Examples:
+// strangeSort [1 2 3 4] // [1 4 2 3]
+// strangeSort [5 5 5 5] // [5 5 5 5]
+// strangeSort [] // []
+func strangeSort:[]num nums:[]num
+    nums2 := nums[:]
+    sort nums2
+    result:[]num
+    length := len nums2
+    mid := floor length/2
+    for i := range mid
+        result = result + [nums2[i]] + [nums2[-i - 1]]
+    end
+    if length % 2 == 1
+        result = result + [nums2[mid]]
+    end
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 4 2 3] (strangeSort [1 2 3 4])
+    assert [5 9 6 8 7] (strangeSort [5 6 7 8 9])
+    assert [1 5 2 4 3] (strangeSort [1 2 3 4 5])
+    assert [1 9 5 8 6 7] (strangeSort [5 6 7 8 9 1])
+    assert [5 5 5 5] (strangeSort [5 5 5 5])
+    assert [] (strangeSort [])
+    assert [1 8 2 7 3 6 4 5] (strangeSort [1 2 3 4 5 6 7 8])
+    assert [-5 5 -5 5 0 2 2 2] (strangeSort [0 2 2 2 5 5 -5 -5])
+    assert [111111] (strangeSort [111111])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

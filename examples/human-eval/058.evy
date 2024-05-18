@@ -1,0 +1,83 @@
+// Return sorted unique common elements for two lists.
+// common [1 4 3 34 653 2 5] [5 7 1 5 9 653 121] // [1 5 653]
+// common [5 3 2 8] [3 2] // [2 3]
+func common:[]num nums1:[]num nums2:[]num
+    s1 := set nums1
+    s2 := set nums2
+    s3 := intersection s1 s2
+    result := numArr s3
+    sort result
+    return result
+end
+
+func set:{}bool nums:[]num
+    result:{}bool
+    for n := range nums
+        result[sprint n] = true
+    end
+    return result
+end
+
+func intersection:{}bool s1:{}bool s2:{}bool
+    result:{}bool
+    for k := range s1
+        if has s2 k
+            result[k] = true
+        end
+    end
+    return result
+end
+
+func numArr:[]num s:{}bool
+    result:[]num
+    for k := range s
+        n := str2num k
+        result = result + [n]
+    end
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 5 653] (common [1 4 3 34 653 2 5] [5 7 1 5 9 653 121])
+    assert [2 3] (common [5 3 2 8] [3 2])
+    assert [2 3 4] (common [4 3 2 8] [3 2 4])
+    assert [] (common [4 3 2 8] [])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

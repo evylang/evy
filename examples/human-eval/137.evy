@@ -1,0 +1,64 @@
+// Create a function that takes integers, floats, or strings representing
+// real numbers, and returns the larger variable in its given variable type.
+// Return None if the values are equal.
+// Note: If a real number is represented as a string, the floating point might be . or ,
+// compare 1 2.5 // 2.5
+// compare 1 "23" // "23"
+// compare "5,1" "6" // "6"
+// compare "1" 1 // false
+func compare:any a:any b:any
+    an := toNum a
+    bn := toNum b
+    if an == bn
+        return false
+    else if an > bn
+        return a
+    end
+    return b
+end
+
+func toNum:num a:any
+    aType := typeof a
+    if aType == "num"
+        return a.(num)
+    end
+    sn := a.(string)
+    sn = replace sn "," "."
+    return str2num sn
+end
+
+func test
+    assert 2 (compare 1 2)
+    assert 2.5 (compare 1 2.5)
+    assert 3 (compare 2 3)
+    assert 6 (compare 5 6)
+    assert "2,3" (compare 1 "2,3")
+    assert "6" (compare "5,1" "6")
+    assert "2" (compare "1" "2")
+    assert false (compare "1" 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

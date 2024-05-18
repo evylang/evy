@@ -1,0 +1,57 @@
+// Write a function that accepts two lists of strings and returns the list that has
+// the lower total number of characters of all the strings in the list combined.
+//
+// If the two lists have the same number of chars, return the first list.
+//
+// Examples
+// findShorter [] [] // []
+// findShorter ["hi" "admin"] ["hI" "Hi"] // ["hI" "Hi"]
+// findShorter ["hi" "admin"] ["hi" "hi" "admin" "project"] // ["hi" "admin"]
+// findShorter ["hi" "admin"] ["hI" "hi" "hi"] // ["hI" "hi" "hi"]
+// findShorter ["4"] ["1" "2" "3" "4" "5"] // ["4"]
+func findShorter:[]string arr1:[]string arr2:[]string
+    str1 := join arr1 ""
+    str2 := join arr2 ""
+    if (len str1) <= (len str2)
+        return arr1
+    end
+    return arr2
+end
+
+func test
+    assert [] (findShorter [] [])
+    assert ["hi" "hi"] (findShorter ["hi" "admin"] ["hi" "hi"])
+    assert ["hi" "admin"] (findShorter ["hi" "admin"] ["hi" "hi" "admin" "project"])
+    assert ["4"] (findShorter ["4"] ["1" "2" "3" "4" "5"])
+    assert ["hI" "Hi"] (findShorter ["hi" "admin"] ["hI" "Hi"])
+    assert ["hI" "hi" "hi"] (findShorter ["hi" "admin"] ["hI" "hi" "hi"])
+    assert ["hi" "admin"] (findShorter ["hi" "admin"] ["hI" "hi" "hii"])
+    assert [] (findShorter [] ["this"])
+    assert [] (findShorter ["this"] [])
+
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

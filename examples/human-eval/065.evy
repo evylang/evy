@@ -1,0 +1,53 @@
+// Circular shift the digits of the integer x, shift the digits right by shift
+// and return the result as a string.
+// If shift > number of digits, return digits reversed.
+// shift 12 1 // "21"
+// shift 12 2 // "12"
+func shift:string x:num n:num
+    str := sprint x
+    result := ""
+    if n > (len str)
+        for c := range str
+            result = c + result
+        end
+    else
+        result = str[-n:] + str[:-n]
+    end
+    return result
+end
+
+func test
+    assert "1" (shift 1 1)
+    assert "1" (shift 1 3)
+    assert "0111" (shift 1110 30)
+    assert "001" (shift 100 2)
+    assert "12" (shift 12 2)
+    assert "79" (shift 97 8)
+    assert "21" (shift 12 1)
+    assert "11" (shift 11 101)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

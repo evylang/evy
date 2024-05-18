@@ -1,0 +1,60 @@
+// Return list of prime factors of given integer in the order from smallest to
+// largest. Each of the factors should be listed number of times
+// corresponding to how many times it appears in factorization. Input number
+// should be equal to the product of all factors
+// factorize 8 // [2, 2, 2]
+// factorize 25 // [5, 5]
+// factorize 70 // [2, 5, 7]
+func factorize:[]num n:num
+    result:[]num
+    i := 2
+    while i <= (sqrt n) + 1
+        if n % i == 0
+            result = result + [i]
+            n = n / i
+        else
+            i = i + 1
+        end
+    end
+    if n > 1
+        result = result + [n]
+    end
+    return result
+end
+
+func test
+    assert [2] (factorize 2)
+    assert [2 2] (factorize 4)
+    assert [2 2 2] (factorize 8)
+    assert [3 19] (factorize 3*19)
+    assert [3 3 19 19] (factorize 3*19*3*19)
+    assert [3 3 3 19 19 19] (factorize 3*19*3*19*3*19)
+    assert [3 19 19 19] (factorize 3*19*19*19)
+    assert [2 3 3] (factorize 3*2*3)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

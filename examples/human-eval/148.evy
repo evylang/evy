@@ -1,0 +1,62 @@
+// There are eight planets in our solar system: the closest to the Sun
+// is Mercury, the next one is Venus, then Earth, Mars, Jupiter, Saturn,
+// Uranus, Neptune.
+// Write a function that takes two planet names as strings planet1 and planet2.
+// The function should return a tuple containing all planets whose orbits are
+// located between the orbit of planet1 and the orbit of planet2, sorted by
+// the proximity to the sun.
+// The function should return an empty tuple if planet1 or planet2
+// are not correct planet names.
+// Examples
+// between "Jupiter" "Neptune" // ["Saturn" "Uranus"]
+// between "Earth" "Mercury" // ["Venus"]
+// between "Mercury" "Uranus" // ["Venus" "Earth" "Mars" "Jupiter" "Saturn"]
+func between:[]string p1:string p2:string
+    planets := ["Mercury" "Venus" "Earth" "Mars" "Jupiter" "Saturn" "Uranus" "Neptune"]
+    lookup:{}num
+    for i := range (len planets)
+        lookup[planets[i]] = i
+    end
+    if !(has lookup p1) or !(has lookup p2) or p1 == p2
+        return []
+    end
+    if lookup[p1] > lookup[p2]
+        return planets[lookup[p2] + 1:lookup[p1]]
+    end
+    return planets[lookup[p1] + 1:lookup[p2]]
+end
+
+func test
+    assert ["Saturn" "Uranus"] (between "Jupiter" "Neptune")
+    assert ["Venus"] (between "Earth" "Mercury")
+    assert ["Venus" "Earth" "Mars" "Jupiter" "Saturn"] (between "Mercury" "Uranus")
+    assert ["Earth" "Mars" "Jupiter" "Saturn" "Uranus"] (between "Neptune" "Venus")
+    assert [] (between "Earth" "Earth")
+    assert [] (between "Mars" "Earth")
+    assert [] (between "Jupiter" "Makemake")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

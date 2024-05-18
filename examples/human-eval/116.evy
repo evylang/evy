@@ -1,0 +1,85 @@
+// In this exercise you have to sort an array of non-negative integers according to
+// number of ones in their binary representation in ascending order.
+// For similar number of ones, sort based on decimal value.
+//
+// It must be implemented like this:
+// >>> binSort [1 5 2 3 4] // [1 2 4 3 5]
+// >>> binSort [-2 -3 -4 -5 -6] // [-6 -5 -4 -3 -2]
+// >>> binSort [1 0 2 3 4] // [0 1 2 4 3]
+func binSort:[]num nums:[]num
+    arr := nums[:]
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if moreOnes arr[i] arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+    return arr
+end
+
+func moreOnes:bool n1:num n2:num
+    ones1 := binOnes n1
+    ones2 := binOnes n2
+    if ones1 == ones2
+        return n1 > n2
+    end
+    return ones1 > ones2
+end
+
+func binOnes:num n:num
+    n = abs n
+    result := 0
+    while n > 0
+        if n % 2 == 1
+            result = result + 1
+        end
+        n = floor n/2
+    end
+    return result
+end
+
+func abs:num n:num
+    if n < 0
+        return -n
+    end
+    return n
+end
+
+func test
+    assert [1 2 4 3 5] (binSort [1 5 2 3 4])
+    assert [-4 -2 -6 -5 -3] (binSort [-2 -3 -4 -5 -6])
+    assert [0 1 2 4 3] (binSort [1 0 2 3 4])
+    assert [] (binSort [])
+    assert [2 2 4 4 3 3 5 5 5 7 77] (binSort [2 5 77 4 5 3 5 7 2 3 4])
+    assert [32 3 5 6 12 44] (binSort [3 6 44 12 32 5])
+    assert [2 4 8 16 32] (binSort [2 4 8 16 32])
+    assert [2 4 8 16 32] (binSort [2 4 8 16 32])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

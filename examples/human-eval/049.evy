@@ -1,0 +1,48 @@
+// Return 2^n modulo p. (careful with overflow!)
+// modp 3 5 // 3
+// modp 1101 101 // 2
+// modp 0 101 // 1
+// modp 3 11 // 8
+// modp 100 101 // 1
+func modpn:num n:num p:num
+    result := 1
+    for range n
+        result = (2 * result) % p
+    end
+    return result
+end
+
+func test
+    assert 3 (modpn 3 5)
+    assert 2 (modpn 1101 101)
+    assert 1 (modpn 0 101)
+    assert 8 (modpn 3 11)
+    assert 1 (modpn 100 101)
+    assert 4 (modpn 30 5)
+    assert 3 (modpn 31 5)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,68 @@
+// You are given a array of numbers.
+// Write a function nextSmallest that returns the 2nd smallest element of the list.
+// Return false if there is no such element.
+// nextSmallest [1 2 3 4 5] // 2
+// nextSmallest [5 1 4 3 2] // 2
+// nextSmallest [] // false
+// nextSmallest [1 1] // false
+func nextSmallest:any nums:[]num
+    if (len nums) < 2
+        return false
+    end
+    nums = nums[:] // copy
+    sort nums
+    smallest := nums[0]
+    for i := range 1 (len nums)
+        if nums[i] > smallest
+            return nums[i]
+        end
+    end
+    return false
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert 2 (nextSmallest [1 2 3 4 5])
+    assert 2 (nextSmallest [5 1 4 3 2])
+    assert false (nextSmallest [])
+    assert false (nextSmallest [1 1])
+    assert 1 (nextSmallest [1 1 1 1 0])
+    assert -35 (nextSmallest [-35 34 12 -45])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

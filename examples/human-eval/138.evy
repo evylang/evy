@@ -1,0 +1,44 @@
+//  Evaluate whether the given number n can be written as the sum of exactly 4 positive even numbers
+//  Example
+//  isSum 4 // false
+//  isSum 6 // false
+//  isSum 8 // true
+func isSum:bool n:num
+    return n % 2 == 0 and n >= 8
+end
+
+func test
+    assert false (isSum 4)
+    assert false (isSum 6)
+    assert true (isSum 8)
+    assert true (isSum 10)
+    assert false (isSum 11)
+    assert true (isSum 12)
+    assert false (isSum 13)
+    assert true (isSum 16)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

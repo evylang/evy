@@ -1,0 +1,64 @@
+// Given a string s and a natural number n, you have been tasked to implement
+// a function that returns a list of all words from string s that contain exactly
+// n consonants, in the order in which these words appear in the string s.
+// If the string s is empty then the function should return an empty list.
+// Note: you may assume the input string contains only letters and spaces.
+// Examples:
+// selectWords "Mary had a little lamb" 4 // ["little"]
+// selectWords "Mary had a little lamb" 3 // ["Mary" "lamb"]
+// selectWords "simple white space" 2 // []
+// selectWords "Hello world" 4 // ["world"]
+// selectWords "Uncle sam" 3 // ["Uncle"]
+func selectWords:[]string s:string targetConsonants:num
+    words := split s " "
+    vowels := {a:0 e:0 i:0 o:0 u:0}
+    result:[]string
+    for word := range words
+        consonants := 0
+        lword := lower word
+        for c := range lword
+            if !(has vowels c)
+                consonants = consonants + 1
+            end
+        end
+        if consonants == targetConsonants
+            result = result + [word]
+        end
+    end
+    return result
+end
+
+func test
+    assert ["little"] (selectWords "Mary had a little lamb" 4)
+    assert ["Mary" "lamb"] (selectWords "Mary had a little lamb" 3)
+    assert [] (selectWords "simple white space" 2)
+    assert ["world"] (selectWords "Hello world" 4)
+    assert ["Uncle"] (selectWords "Uncle sam" 3)
+    assert [] (selectWords "" 4)
+    assert ["b" "c" "d" "f"] (selectWords "a b c d e f" 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

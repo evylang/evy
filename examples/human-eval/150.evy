@@ -1,0 +1,54 @@
+// A simple program which should return the value of x if n is
+// a prime number and should return the value of y otherwise.
+// Examples:
+// for xIfPrime 7 34 12 // 34
+// for xIfPrime 15 8 5 // 5
+func xIfPrime:num n:num x:num y:num
+    if n < 2
+        return y
+    end
+    for i := range 2 n
+        if n % i == 0
+            return y
+        end
+    end
+    return x
+end
+
+func test
+    assert 34 (xIfPrime 7 34 12)
+    assert 5 (xIfPrime 15 8 5)
+    assert 33 (xIfPrime 3 33 5212)
+    assert 3 (xIfPrime 1259 3 52)
+    assert -1 (xIfPrime 7919 -1 12)
+    assert 583 (xIfPrime 3609 1245 583)
+    assert 129 (xIfPrime 91 56 129)
+    assert 1234 (xIfPrime 6 34 1234)
+    assert 0 (xIfPrime 1 2 0)
+    assert 2 (xIfPrime 2 2 0)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

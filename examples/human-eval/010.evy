@@ -1,0 +1,65 @@
+// Test if given string is a palindrome
+func isPalindrome:bool str:string
+    return str == (reverse str)
+end
+
+// Find the shortest palindrome that begins with a supplied string.
+// Algorithm idea is simple:
+// - Find the longest postfix of supplied string that is a palindrome.
+// - Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.
+//
+//    makePalindrome("") // ""
+//    makePalindrome("cat") // "catac"
+//    makePalindrome("cata") // "catac"
+func makePalindrome:string str:string
+    if str == ""
+        return ""
+    end
+    beginning_of_suffix := 0
+    while !(isPalindrome str[beginning_of_suffix:])
+        beginning_of_suffix = beginning_of_suffix + 1
+    end
+    return str + (reverse str[:beginning_of_suffix])
+end
+
+func reverse:string str:string
+    reversed := ""
+    for i := range (len str)
+        reversed = str[i] + reversed
+    end
+    return reversed
+end
+
+func test
+    assert "" (makePalindrome "")
+    assert "x" (makePalindrome "x")
+    assert "xyzyx" (makePalindrome "xyz")
+    assert "xyx" (makePalindrome "xyx")
+    assert "catac" (makePalindrome "cata")
+    assert "jerryrrej" (makePalindrome "jerry")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

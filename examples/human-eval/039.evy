@@ -1,0 +1,72 @@
+// primeFib returns n-th number that is a Fibonacci number and it's also
+// prime.
+// primeFib 1 // 2
+// primeFib 2 // 3
+// primeFib 3 // 5
+// primeFib 4 // 13
+// primeFib 5 // 89
+func primeFib:num n:num
+    f := [0 1]
+    while true
+        f = f + [f[-1]+f[-2]]
+        if isPrime f[-1]
+            n = n - 1
+        end
+        if n == 0
+            return f[-1]
+        end
+    end
+    return -1
+end
+
+func isPrime:bool n:num
+    if n < 2
+        return false
+    end
+
+    for k := range 2 (min (ceil (sqrt n))+1 n-1)
+        if n % k == 0
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert 2 (primeFib 1)
+    assert 3 (primeFib 2)
+    assert 5 (primeFib 3)
+    assert 13 (primeFib 4)
+    assert 89 (primeFib 5)
+    assert 233 (primeFib 6)
+    assert 1597 (primeFib 7)
+    assert 28657 (primeFib 8)
+    assert 514229 (primeFib 9)
+    assert 433494437 (primeFib 10)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

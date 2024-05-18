@@ -1,0 +1,43 @@
+//  Given a non-empty list of numbers add the even elements that are at odd indices.
+//  add [4 2 6 7]  // 2
+func add:num nums:[]num
+    result := 0
+    for i := range 1 (len nums) 2
+        if nums[i] % 2 == 0
+            result = result + nums[i]
+        end
+    end
+    return result
+end
+
+func test
+    assert 88 (add [4 88])
+    assert 122 (add [4 5 6 7 2 122])
+    assert 0 (add [4 0 6 7])
+    assert 12 (add [4 4 6 8])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,71 @@
+// You are given a string representing a sentence,
+// the sentence contains some words separated by a space,
+// and you have to return a string that contains the words from the original sentence,
+// whose lengths are prime numbers,
+// the order of the words in the new string should be the same as the original one.
+// Example 1:
+//     Input: sentence = "This is a test"
+//     Output: "is"
+// Example 2:
+//     Input: sentence = "lets go for swimming"
+//     Output: "go for"
+// Constraints:
+//     * 1 <= len(sentence) <= 100
+//     * sentence contains only letters
+func primeWords:string s:string
+    words := split s " "
+    result:[]string
+    for word := range words
+        if (isPrime (len word))
+            result = result + [word]
+        end
+    end
+    return join result " "
+end
+
+func isPrime:bool n:num
+    if n < 2
+        return false
+    end
+    for i := range 2 n
+        if n % i == 0
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert "is" (primeWords "This is a test")
+    assert "go for" (primeWords "lets go for swimming")
+    assert "there is no place" (primeWords "there is no place available here")
+    assert "Hi am Hussein" (primeWords "Hi I am Hussein")
+    assert "go for it" (primeWords "go for it")
+    assert "" (primeWords "here")
+    assert "is" (primeWords "here is")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

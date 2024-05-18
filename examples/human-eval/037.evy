@@ -1,0 +1,68 @@
+// This function takes an array l and returns an array l' such that
+//  l' is identical to l in the odd indices, while its values at the even indices are equal
+//  to the values of the even indices of l, but sorted.
+//
+//  sortEven [1 2 3] // [1 2 3]
+//  sortEven [5 6 3 4] // [3 6 5 4]
+func sortEven:[]num nums:[]num
+    even:[]num
+    for i := range 0 (len nums) 2
+        even = even + [nums[i]]
+    end
+    sort even
+    result := [0] * (len nums)
+
+    for i := range (len nums)
+        if i % 2 == 0
+            result[i] = even[i / 2]
+        else
+            result[i] = nums[i]
+        end
+    end
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 2 3] (sortEven [1 2 3])
+    assert [-10 3 -5 2 -3 3 5 0 9 1 123] (sortEven [5 3 -5 2 -3 3 9 0 123 1 -10])
+    assert [-12 8 3 4 5 2 12 11 23 -10] (sortEven [5 8 -12 4 23 2 3 11 12 -10])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

@@ -1,0 +1,42 @@
+// sum is a function that sums numbers from 1 to n.
+// sum 30 // 465
+// sum 100 // 5050
+// sum 5 // 15
+// sum 10 // 55
+// sum 1 // 1
+func sum:num n:num
+    return n * (n + 1) / 2
+end
+
+func test
+    assert 1 (sum 1)
+    assert 21 (sum 6)
+    assert 66 (sum 11)
+    assert 465 (sum 30)
+    assert 5050 (sum 100)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

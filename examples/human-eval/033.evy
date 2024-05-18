@@ -1,0 +1,72 @@
+// This function takes an array l and returns an array l' such that l' is
+// identical to l in the indices that are not divisible by three, while its
+// values at the indices that are divisible by three are equal to the
+// values of the corresponding indices of l, but sorted.
+// sort_third [1 2 3] // [1 2 3]
+// sort_third [5 6 3 4 8 9 2] // [2 6 3 4 8 9 5]
+func sort_third:[]num nums:[]num
+    div3:[]num
+    for i := range 0 (len nums) 3
+        div3 = div3 + [nums[i]]
+    end
+    sort div3
+    result := [0] * (len nums)
+
+    for i := range (len nums)
+        if i % 3 == 0
+            result[i] = div3[i / 3]
+        else
+            result[i] = nums[i]
+        end
+    end
+    return result
+end
+
+func sort arr:[]num
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if arr[i] > arr[i + 1]
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+end
+
+func test
+    assert [1 2 3] (sort_third [1 2 3])
+    assert [1 3 -5 2 -3 3 5 0 123 9 -10] (sort_third [5 3 -5 2 -3 3 9 0 123 1 -10])
+    assert [-10 8 -12 3 23 2 4 11 12 5] (sort_third [5 8 -12 4 23 2 3 11 12 -10])
+    assert [2 6 3 4 8 9 5] (sort_third [5 6 3 4 8 9 2])
+    assert [2 8 3 4 6 9 5] (sort_third [5 8 3 4 6 9 2])
+    assert [2 6 9 4 8 3 5] (sort_third [5 6 9 4 8 3 2])
+    assert [2 6 3 4 8 9 5 1] (sort_third [5 6 3 4 8 9 2 1])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult
+

@@ -1,0 +1,49 @@
+// Given a string of words separated by commas or spaces. Your task is
+// to split the string into words and return an array of the words.
+// words "Hi, my name is John" // ["Hi" "my" "name" "is" "John"]
+// words "One, two, three, four, five, six" // ["One" "two" "three" "four" "five" "six"]
+func words:[]string s:string
+    wordArr := split s " "
+    result:[]string
+    for word := range wordArr
+        w := trim word ", "
+        if w != ""
+            result = result + [w]
+        end
+    end
+    return result
+end
+
+func test
+    assert ["Hi" "my" "name" "is" "John"] (words "Hi, my name is John")
+    assert ["One" "two" "three" "four" "five" "six"] (words "One, two, three, four, five, six")
+    assert ["Hi" "my" "name"] (words "Hi, my name")
+    assert ["One" "two" "three" "four" "five" "six"] (words "One,, two, three, four, five, six,")
+    assert [] (words "")
+    assert ["ahmed" "gamal"] (words "ahmed     , gamal")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,41 @@
+//  Given a positive integer n, return the count of the numbers of n-digit
+//  positive integers that start or end with 1.
+func count1:num n:num
+    if n == 1
+        return 1
+    end
+    return 18 * (pow 10 n-2)
+end
+
+func test
+    assert 1 (count1 1)
+    assert 18 (count1 2)
+    assert 180 (count1 3)
+    assert 1800 (count1 4)
+    assert 18000 (count1 5)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

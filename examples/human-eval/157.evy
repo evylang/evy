@@ -1,0 +1,52 @@
+// Given the lengths of the three sides of a triangle. Return True if the three
+// sides form a right-angled triangle, False otherwise.
+// A right-angled triangle is a triangle in which one angle is right angle or
+// 90 degree.
+// Example:
+// rightAngle: 3 4 5 // true
+// rightAngle: 1 2 3 // false
+func rightAngle:bool a:num b:num c:num
+    a2 := a * a
+    b2 := b * b
+    c2 := c * c
+    return a2 + b2 == c2 or a2 + c2 == b2 or b2 + c2 == a2
+end
+
+func test
+    assert true (rightAngle 3 4 5)
+    assert false (rightAngle 1 2 3)
+    assert true (rightAngle 10 6 8)
+    assert false (rightAngle 2 2 2)
+    assert true (rightAngle 7 24 25)
+    assert false (rightAngle 10 5 7)
+    assert true (rightAngle 5 12 13)
+    assert true (rightAngle 15 8 17)
+    assert true (rightAngle 48 55 73)
+    assert false (rightAngle 1 1 1)
+    assert false (rightAngle 2 2 10)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

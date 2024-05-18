@@ -1,0 +1,72 @@
+// Write a function which sorts the given list of integers
+// in ascending order according to the sum of their digits.
+// Note: if there are several items with similar sum of their digits,
+// order them based on their index in original list.
+// For example:
+// sort [1 11 -1 -11 -12]  == [-1 -11 1 -12 11]
+// sort [] == []
+func sort:[]num nums:[]num
+    arr := nums[:]
+    // bubble sort
+    for endIdx := range (len arr)-1 0 -1
+        for i := range endIdx
+            if (digitSum arr[i]) > (digitSum arr[i + 1])
+                tmp := arr[i]
+                arr[i] = arr[i + 1]
+                arr[i + 1] = tmp
+            end
+        end
+    end
+    return arr
+end
+
+func digitSum:num n:num
+    sum := 0
+    neg := n < 0
+    if neg
+        n = -n
+    end
+    while n > 0
+        if neg and (floor n/10) == 0
+            sum = sum - n % 10
+        else
+            sum = sum + n % 10
+        end
+        n = floor n/10
+    end
+    return sum
+end
+
+func test
+    assert [-1 -11 1 -12 11] (sort [1 11 -1 -11 -12])
+    assert [0 2 3 6 53 423 423 423 1234 145 37 46 56 463 3457] (sort [1234 423 463 145 2 423 423 53 6 37 3457 3 56 0 46])
+    assert [] (sort [])
+    assert [-3 -32 -98 -11 1 2 43 54] (sort [1 -11 -32 43 54 -98 2 -3])
+    assert [1 10 2 11 3 4 5 6 7 8 9] (sort [1 2 3 4 5 6 7 8 9 10 11])
+    assert [-76 -21 0 4 23 6 6] (sort [0 6 6 -76 -21 23 4])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

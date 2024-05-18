@@ -1,0 +1,54 @@
+// Given the lengths of the three sides of a triangle. Return the area of the
+// triangle rounded to 2 decimal points if the three sides form a valid
+// triangle. Otherwise return -1 Three sides make a valid triangle when the
+// sum of any two sides is greater than the third side.
+// Use Heron's formula.
+//
+// Example:
+// triangleArea 3 4 5 // 6.00
+// triangleArea 1 2 10 // -1
+func triangleArea:num a:num b:num c:num
+    if a + b <= c or a + c <= b or b + c <= a
+        return -1
+    end
+    result := (a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c)
+    result = 0.25 * (pow result 0.5)
+    return (round result*100) / 100 // round to 2 decimals
+end
+
+func test
+    assert 6 (triangleArea 3 4 5)
+    assert -1 (triangleArea 1 2 10)
+    assert 8.18 (triangleArea 4 8 5)
+    assert 1.73 (triangleArea 2 2 2)
+    assert -1 (triangleArea 1 2 3)
+    assert 16.25 (triangleArea 10 5 7)
+    assert -1 (triangleArea 2 6 3)
+    assert 0.43 (triangleArea 1 1 1)
+    assert -1 (triangleArea 2 2 10)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

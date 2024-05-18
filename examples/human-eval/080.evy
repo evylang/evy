@@ -1,0 +1,59 @@
+//  You are given a string s. Your task is to check if the string is happy or
+//  not. A string is happy if its length is at least 3 and every 3
+//  consecutive letters are distinct
+//
+//  For example:
+//  happy "a" // false
+//  happy "aa" // false
+//  happy "abcd" // true
+//  happy "aabb" // false
+//  happy "adb" // true
+//  happy "xyy" // false
+func happy:bool s:string
+    length := len s
+    if length < 3
+        return false
+    end
+    for i := range length-2
+        if s[i] == s[i + 1] or s[i] == s[i + 2] or s[i + 1] == s[i + 2]
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert false (happy "a")
+    assert false (happy "aa")
+    assert true (happy "abcd")
+    assert false (happy "aabb")
+    assert true (happy "adb")
+    assert false (happy "xyy")
+    assert true (happy "iopaxpoi")
+    assert false (happy "iopaxioi")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

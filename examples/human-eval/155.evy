@@ -1,0 +1,60 @@
+// Given an integer. return a tuple that has the number of even and odd digits
+// respectively.
+// Example:
+// count -12 // [1 1]
+// count 123 // [1 2]
+func count:[]num n:num
+    if n == 0
+        return [1 0]
+    end
+    if n < 0
+        n = -n
+    end
+    evens := 0
+    odds := 0
+    while n > 0
+        if n % 2 == 0
+            evens = evens + 1
+        else
+            odds = odds + 1
+        end
+        n = floor n/10
+    end
+    return [evens odds]
+end
+
+func test
+    assert [0 1] (count 7)
+    assert [1 1] (count -78)
+    assert [2 2] (count 3452)
+    assert [3 3] (count 346211)
+    assert [3 3] (count -345821)
+    assert [1 0] (count -2)
+    assert [2 3] (count -45347)
+    assert [1 0] (count 0)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

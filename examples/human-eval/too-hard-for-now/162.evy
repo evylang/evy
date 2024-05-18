@@ -1,0 +1,41 @@
+// Given a string 'text', return its md5 hash equivalent string.
+// If 'text' is an empty string, return false.
+// toMD5 "Hello world" // "3e25960a79dbc69b674cd4ec67a72c62"
+func toMD5:any s:string
+    if s == ""
+        return false
+    end
+    return ""
+end
+
+func test
+    assert "3e25960a79dbc69b674cd4ec67a72c62" (toMD5 "Hello world")
+    assert false (toMD5 "")
+    assert "0ef78513b0cb8cef12743f5aeb35f888" (toMD5 "A B C")
+    assert "5f4dcc3b5aa765d61d8327deb882cf99" (toMD5 "password")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

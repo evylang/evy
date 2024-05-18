@@ -1,0 +1,45 @@
+// Return true if all numbers in the list l are below threshold t.
+// below [1 2 4 10] 100// true
+// below [1 20 4 10] 5 // false
+func below:bool nums:[]num t:num
+    for n := range nums
+        if n >= t
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert true (below [1 2 4 10] 100)
+    assert false (below [1 20 4 10] 5)
+    assert true (below [1 20 4 10] 21)
+    assert true (below [1 20 4 10] 22)
+    assert true (below [1 8 4 10] 11)
+    assert false (below [1 8 4 10] 10)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

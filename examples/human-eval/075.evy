@@ -1,0 +1,79 @@
+// Write a function that returns true if the given number is the
+// multiplication of 3 prime numbers and false otherwise. Knowing that each
+// prime number is less then 100.
+//
+// prime3 30 // true: 30 = 2 * 3 * 5
+func prime3:bool n:num
+    primes := calcPrimes 100
+    length := len primes
+    for i := range length
+        for j := range i length
+            for k := range j length
+                if n == primes[i] * primes[j] * primes[k]
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+func calcPrimes:[]num n:num
+    // Sieve of Eratosthenes
+    // input: an integer n > 1.
+    // output: all prime numbers from 2 through n.
+    sieve := [true] * n
+
+    for i := range 2 (sqrt n+1)
+        if sieve[i]
+            for j := range i*i n i
+                sieve[j] = false
+            end
+        end
+    end
+    result:[]num
+    for i := range 2 n
+        if sieve[i]
+            result = result + [i]
+        end
+    end
+    return result
+end
+
+func test
+    assert false (prime3 5)
+    assert true (prime3 30)
+    assert true (prime3 8)
+    assert false (prime3 10)
+    assert true (prime3 125)
+    assert true (prime3 3*5*7)
+    assert false (prime3 3*6*7)
+    assert false (prime3 9*9*9)
+    assert false (prime3 11*9*9)
+    assert true (prime3 11*13*7)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

@@ -1,0 +1,51 @@
+// In this task, you will be given a string that represents a number of apples and oranges
+// that are distributed in a basket of fruit this basket contains
+// apples, oranges, and mango fruits. Given the string that represents the total number of
+// the oranges and apples and an integer that represent the total number of the fruits
+// in the basket return the number of the mango fruits in the basket.
+// for example:
+// mangoCount "5 apples and 6 oranges" 19 // 19 - 5 - 6 = 8
+// mangoCount "0 apples and 1 oranges"3 //  3 - 0 - 1 = 2
+// mangoCount "2 apples and 3 oranges" 100 //  100 - 2 - 3 = 95
+// mangoCount "100 apples and 1 oranges"120 //  120 - 100 - 1 = 19
+func mangoCount:num str:string total:num
+    words := split str " "
+    apples := str2num words[0]
+    oranges := str2num words[3]
+    return total - apples - oranges
+end
+
+func test
+    assert 8 (mangoCount "5 apples and 6 oranges" 19)
+    assert 10 (mangoCount "5 apples and 6 oranges" 21)
+    assert 2 (mangoCount "0 apples and 1 oranges" 3)
+    assert 2 (mangoCount "1 apples and 0 oranges" 3)
+    assert 95 (mangoCount "2 apples and 3 oranges" 100)
+    assert 0 (mangoCount "2 apples and 3 oranges" 5)
+    assert 19 (mangoCount "1 apples and 100 oranges" 120)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

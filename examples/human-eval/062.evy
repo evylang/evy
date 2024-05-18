@@ -1,0 +1,45 @@
+// xs represent coefficients of a polynomial.
+// xs[0] + xs[1] * x + xs[2] * x^2 + ....
+// Return derivative of this polynomial in the same form.
+// derivative [3 1 2 4 5] // [1 4 12 20]
+// derivative [1 2 3] // [2 6]
+func derivative:[]num xs:[]num
+    result := xs[1:]
+    for i := range 1 (len result)
+        result[i] = result[i] * (i + 1)
+    end
+    return result
+end
+
+func test
+    assert [1 4 12 20] (derivative [3 1 2 4 5])
+    assert [2 6] (derivative [1 2 3])
+    assert [2 2] (derivative [3 2 1])
+    assert [2 2 0 16] (derivative [3 2 1 0 4])
+    assert [] (derivative [1])
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

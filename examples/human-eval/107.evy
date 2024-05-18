@@ -1,0 +1,83 @@
+// Given a positive integer n, return an array that has the number of even and odd
+// integer palindromes that fall within the range(1, n), inclusive.
+//
+// Example 1:
+//
+//     Input: 3
+//     Output: [1, 2]
+//     Explanation:
+//     Integer palindrome are 1, 2, 3. one of them is even, and two of them are odd.
+//
+// Example 2:
+//
+//     Input: 12
+//     Output: [4, 6]
+//     Explanation:
+//     Integer palindrome are 1, 2, 3, 4, 5, 6, 7, 8, 9, 11. four of them are even, and 6 of them are odd.
+//
+// Note:
+//     1. 1 <= n <= 10^3
+//     2. returned tuple has the number of even and odd integer palindromes respectively.
+func palindromeCount:[]num n:num
+    even := 0
+    odd := 0
+    for i := range 1 n+1
+        if (isPalindrome i)
+            if i % 2 == 1
+                odd = odd + 1
+            else
+                even = even + 1
+            end
+        end
+    end
+    return [even odd]
+end
+
+func isPalindrome:bool n:num
+    if n < 10
+        return true
+    end
+    s := sprint n
+    for i := range (len s)/2
+        if s[i] != s[-i - 1]
+            return false
+        end
+    end
+    return true
+end
+
+func test
+    assert [8 13] (palindromeCount 123)
+    assert [4 6] (palindromeCount 12)
+    assert [1 2] (palindromeCount 3)
+    assert [6 8] (palindromeCount 63)
+    assert [5 6] (palindromeCount 25)
+    assert [4 6] (palindromeCount 19)
+    assert [4 5] (palindromeCount 9)
+    assert [0 1] (palindromeCount 1)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

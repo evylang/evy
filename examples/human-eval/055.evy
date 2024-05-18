@@ -1,0 +1,43 @@
+// Return n-th Fibonacci number.
+// fib 10 // 55
+// fib 1 // 1
+// fib 8 // 21
+func fib:num n:num
+    if n < 2
+        return n
+    end
+    return (fib n-1) + (fib n-2)
+end
+
+func test
+    assert 55 (fib 10)
+    assert 1 (fib 1)
+    assert 21 (fib 8)
+    assert 89 (fib 11)
+    assert 144 (fib 12)
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

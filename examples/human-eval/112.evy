@@ -1,0 +1,63 @@
+// We are given two strings s and c, you have to deleted all the characters in
+// s that are equal to any character in c then check if the result string is
+// palindrome. A string is called palindrome if it reads the same backward as
+// forward. You should return a tuple containing the result string and
+// true/false for the check.
+// For s = "abcde", c = "ae", the result should be ('bcd',False)
+// For s = "abcdef", c = "b"  the result should be ('acdef',False)
+// For s = "abcdedcba", c = "ab", the result should be ('cdedc',True)
+func delete:[]any s:string d:string
+    m := {}
+    for c := range d
+        m[c] = true
+    end
+    result := ""
+    for c := range s
+        if !(has m c)
+            result = result + c
+        end
+    end
+    for i := range (len result)/2
+        if result[i] != result[-1 - i]
+            return [result false]
+        end
+    end
+    return [result true]
+end
+
+func test
+    assert ["bcd" false] (delete "abcde" "ae")
+    assert ["acdef" false] (delete "abcdef" "b")
+    assert ["cdedc" true] (delete "abcdedcba" "ab")
+    assert ["dik" false] (delete "dwik" "w")
+    assert ["" true] (delete "a" "a")
+    assert ["abcdedcba" true] (delete "abcdedcba" "")
+    assert ["abcdedcba" true] (delete "abcdedcba" "v")
+    assert ["abba" true] (delete "vabba" "v")
+    assert ["" true] (delete "mamma" "mia")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

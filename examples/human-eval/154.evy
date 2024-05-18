@@ -1,0 +1,52 @@
+// You are given 2 words. You need to return true if the second word or any of
+// its rotations is a substring in the first word
+//
+// contains "abcd" "abd" // false
+// contains "hello" "ell" // true
+// contains "whassup" "psus" // false
+// contains "abab" "baa" // true
+// contains "efef" "eeff" // false
+// contains "himenss" "simen" // true
+func contains:bool s:string sub:string
+    for i := range (len sub)
+        sub1 := sub[i:] + sub[:i]
+        if (index s sub1) != -1
+            return true
+        end
+    end
+    return false
+end
+
+func test
+    assert false (contains "xyzw" "xyw")
+    assert true (contains "yello" "ell")
+    assert false (contains "whattup" "ptut")
+    assert true (contains "efef" "fee")
+    assert false (contains "abab" "aabb")
+    assert true (contains "winemtt" "tinem")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

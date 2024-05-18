@@ -1,0 +1,65 @@
+// You'll be given a string of words, and your task is to count the number
+// of boredoms. A boredom is a sentence that starts with the word "I".
+// Sentences are delimited by '.', '?' or '!'.
+// boredoms "Hello world" // 0
+// boredoms "The sky is blue. The sun is shining. I love this weather" // 1
+func boredoms:num s:string
+    result := 0
+    sentences := splitText s
+    for s := range sentences
+        if (startswith s "I ") or s == "I." or s == "I!" or s == "I?"
+            result = result + 1
+        end
+    end
+    return result
+end
+
+func splitText:[]string s:string
+    result:[]string
+    start := 0
+    for i := range (len s)
+        c := s[i]
+        if c == "." or c == "?" or c == "!"
+            sentence := trim s[start:i + 1] " "
+            result = result + [sentence]
+            start = i + 1
+        end
+    end
+    return result
+end
+
+func test
+    assert 0 (boredoms "Hello world")
+    assert 0 (boredoms "Is the sky blue?")
+    assert 1 (boredoms "I love It !")
+    assert 0 (boredoms "I")
+    assert 1 (boredoms "I.")
+    assert 0 (boredoms "what? I")
+    assert 2 (boredoms "I feel good today. I will be productive. will kill It")
+    assert 0 (boredoms "You and I are going for a walk")
+end
+
+// Test boilerplate
+fails := 0
+total := 0
+
+func assert want:any got:any
+    total = total + 1
+    if want == got
+        return
+    end
+    wantType := (typeof want)[:2]
+    gotType := (typeof got)[:2]
+    if wantType == "[]" or wantType == "{}" and wantType == gotType and (len want) == 0 and (len got) == 0
+        return
+    end
+    fails = fails + 1
+    printf "want != got:\n want: %v\n got:  %v\n" want got
+end
+
+func printResult
+    printf "%2.f of %2.f tests passed\n" (total - fails) total
+end
+
+test
+printResult

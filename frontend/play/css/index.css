@@ -232,7 +232,7 @@ button.share > div {
   margin-right: auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% - var(--topnav-height));
   overflow: clip;
   font-family: var(--font-family-code);
   font-variant-ligatures: none;

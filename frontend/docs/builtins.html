@@ -287,6 +287,9 @@
                   <a href="builtins.html#max"><code>max</code></a>
                 </li>
                 <li>
+                  <a href="builtins.html#abs"><code>abs</code></a>
+                </li>
+                <li>
                   <a href="builtins.html#floor"><code>floor</code></a>
                 </li>
                 <li>
@@ -1485,6 +1488,23 @@ print (rand1)
         <pre><code>max:num n1:num n2:num
 </code></pre>
         <p>The <code>max</code> function returns the greater of the two given number arguments.</p>
+        <h3><a id="abs" href="#abs" class="anchor">#</a><code>abs</code></h3>
+        <p><code>abs</code> returns the absolute value of a number.</p>
+        <h4>Example</h4>
+        <pre><code class="language-evy">print (abs 3)
+print (abs -2.5)
+</code></pre>
+        <p>Output</p>
+        <pre><code class="language-evy-output">3
+2.5
+</code></pre>
+        <h4>Reference</h4>
+        <pre><code>abs:num n:num
+</code></pre>
+        <p>
+          The <code>abs</code> function returns the absolute value of a number, which is its
+          magnitude without regard to its sign.
+        </p>
         <h3><a id="floor" href="#floor" class="anchor">#</a><code>floor</code></h3>
         <p>
           <code>floor</code> returns the greatest integer value less than or equal to the given

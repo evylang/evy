@@ -41,13 +41,6 @@ func binOnes:num n:num
     return result
 end
 
-func abs:num n:num
-    if n < 0
-        return -n
-    end
-    return n
-end
-
 func test
     assert [1 2 4 3 5] (binSort [1 5 2 3 4])
     assert [-4 -2 -6 -5 -3] (binSort [-2 -3 -4 -5 -6])

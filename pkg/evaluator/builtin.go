@@ -82,6 +82,7 @@ func newBuiltins(rt Runtime) builtins {
 
 		"min":   xyRetBuiltin("min", math.Min),
 		"max":   xyRetBuiltin("max", math.Max),
+		"abs":   numRetBuiltin("abs", math.Abs),
 		"floor": numRetBuiltin("floor", math.Floor),
 		"ceil":  numRetBuiltin("ceil", math.Ceil),
 		"round": numRetBuiltin("round", math.Round),

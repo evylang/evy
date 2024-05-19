@@ -16,6 +16,7 @@ function escapeHTML(unsafe) {
 }
 
 const builtins = new Set([
+  "abs",
   "atan2",
   "ceil",
   "circle",

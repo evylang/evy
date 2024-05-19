@@ -21,13 +21,6 @@ func signedAbsSum:any nums:[]num
     return s * sum
 end
 
-func abs:num n:num
-    if n < 0
-        return -n
-    end
-    return n
-end
-
 func sign:num n:num
     if n < 0
         return -1

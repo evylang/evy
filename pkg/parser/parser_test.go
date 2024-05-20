@@ -277,6 +277,23 @@ fox 1 2 3`,
 	}
 }
 
+func TestVariadicFuncDefErr(t *testing.T) {
+	inputs := map[string]string{
+		`
+func fox n:num nums:num...
+  print n nums
+end
+
+fox 1 2 3`: "line 2 column 27: variadic parameter cannot be used with other parameters",
+	}
+	for input, wantErr := range inputs {
+		parser := newParser(input, testBuiltins())
+		assertParseError(t, parser, input)
+		gotErr := parser.errors.Truncate(1)
+		assert.Equal(t, wantErr, gotErr.Error())
+	}
+}
+
 func TestReturn(t *testing.T) {
 	inputs := []string{
 		`

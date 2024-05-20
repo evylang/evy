@@ -53,6 +53,7 @@ function expanderClick(e) {
 }
 
 function highlightCurrent() {
+  scrollToHeading()
   const highlighted = document.querySelectorAll("#sidebar .highlight")
   highlighted.forEach((el) => el.classList.remove("highlight"))
 
@@ -65,6 +66,21 @@ function highlightCurrent() {
   els.forEach((el) => el.classList.add("show"))
   const last = els.pop()
   last && last.previousElementSibling.classList.add("highlight-within")
+}
+
+function scrollToHeading() {
+  // this should be default browser behavior for onhashchange,
+  // but in combination with these CSS rules it does not seem to work.
+  //
+  //    display: grid | flexbox;
+  //    height: 100% | inhert;
+  //    overflow: auto;
+  const hash = window.location.hash
+  if (hash === "" || hash === "#") {
+    document.querySelector("body>main").scrollTo(0, 0)
+    return
+  }
+  document.querySelector(hash).scrollIntoView(true)
 }
 
 function getCurrentItem() {

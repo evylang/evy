@@ -1108,13 +1108,13 @@ arguments.
 #### Example
 
 ```evy
-print (min 3 1)
+print (max 3 1)
 ```
 
 Output
 
 ```evy:output
-1
+3
 ```
 
 #### Reference

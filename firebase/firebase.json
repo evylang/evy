@@ -34,18 +34,15 @@
     },
     {
       "target": "discord",
-      "public": "public/discord",
-      "cleanUrls": true
+      "public": "public/discord"
     },
     {
       "target": "docs",
-      "public": "public/docs",
-      "cleanUrls": true
+      "public": "public/docs"
     },
     {
       "target": "learn",
-      "public": "public/learn",
-      "cleanUrls": true
+      "public": "public/learn"
     },
     {
       "target": "play",

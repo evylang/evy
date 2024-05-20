@@ -99,9 +99,6 @@ function normalizedHref() {
   if (href.endsWith("/")) {
     href = href + "index.html"
   }
-  if (!href.endsWith(".html")) {
-    href = href + ".html"
-  }
   return href + hash
 }
 

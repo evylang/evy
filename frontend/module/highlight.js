@@ -36,6 +36,7 @@ const builtins = new Set([
   "grid",
   "gridn",
   "has",
+  "hsl",
   "index",
   "join",
   "len",

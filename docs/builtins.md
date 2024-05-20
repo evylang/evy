@@ -36,7 +36,7 @@ see [syntax by example](syntax_by_example.md).
 9. [**Math**](#math)  
    [min](#min), [max](#max), [abs](#abs), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [sin](#sin), [cos](#cos), [atan2](#atan2)
 10. [**Graphics**](#graphics)  
-    [move](#move), [line](#line), [rect](#rect), [circle](#circle), [color](#color), [colour](#colour), [width](#width), [clear](#clear), [grid](#grid), [gridn](#gridn), [poly](#poly), [ellipse](#ellipse), [stroke](#stroke), [fill](#fill), [dash](#dash), [linecap](#linecap), [text](#text), [font](#font)
+    [move](#move), [line](#line), [rect](#rect), [circle](#circle), [color](#color), [colour](#colour), [hsl](#hsl), [width](#width), [clear](#clear), [grid](#grid), [gridn](#gridn), [poly](#poly), [ellipse](#ellipse), [stroke](#stroke), [fill](#fill), [dash](#dash), [linecap](#linecap), [text](#text), [font](#font)
 11. [**Event Handlers**](#event-handlers)  
     [key](#key), [down](#down), [up](#up), [move](#move-1), [animate](#animate), [input](#input)
 
@@ -1541,7 +1541,7 @@ The `color` function changes the color of the **stroke** and the **fill** to
 the given CSS color string `c`. Evy supports all [CSS color values],
 including semi-transparent ones. For example, the following code
 changes the color to a shade of red that is 60% opaque:
-`color "hsl (0deg 100% 50% / 60%)"`.
+`color "rgb(100% 0% 0% / 60%)"`.
 
 **Named CSS colors**, such as `"red"`, `"darkmagenta"`, and
 `"springgreen"`, are a simpler way of specifying common colors. For a
@@ -1557,6 +1557,66 @@ does not change. The initial color is `"black"`.
 ### `colour`
 
 `colour` is an alternate spelling of `color`. See [`color`](#color).
+
+### `hsl`
+
+`hsl` changes the color of the pen, similar to [`color`](#color). However, the
+arguments to the `hsl` function are provided as numbers and therefore are
+more suited to mathematical manipulation, e.g. to find the complimentary
+color, create a trail in animations with the alpha value or create color
+gradients.
+
+`hsl` uses the CSS (Cascading Style Sheets) [hsl function] to specify the
+color. In Evy the `hsl` function takes one to four arguments: `hue`,
+`saturation`, `lightness`, and `alpha`.
+
+The `hue` argument is required. It is a number from 0 to 360 that represents
+the color on the [color wheel]:
+
+|                                 | `hue` | color        |
+| ------------------------------- | ----- | ------------ |
+| ![red](img/box/red.svg)         | 0     | "red"        |
+| ![yellow](img/box/yellow.svg)   | 60    | "yellow"     |
+| ![lime](img/box/lime.svg)       | 120   | "lime" green |
+| ![cyan](img/box/cyan.svg)       | 180   | "cyan"       |
+| ![blue](img/box/blue.svg)       | 240   | "blue"       |
+| ![magenta](img/box/magenta.svg) | 300   | "magenta"    |
+
+The `saturation`, `lightness` and `alpha` arguments are optional and must
+range between 0 and 100 percent if given:
+
+- `saturation` is measure for vibrancy with 100 meaning maximum vibrancy and 0 meaning a shade of grey (default: 100)
+- `lightness` is measure for brightness with 100 meaning white and 0 meaning black (default: 50)
+- `alpha` is measure for opacity or transparency with 100 meaning fully opaque and 0 meaning fully transparent (default: 100)
+
+[hsl function]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+[color wheel]: https://www.joshwcomeau.com/css/color-formats/#hsl-4
+
+#### Example
+
+```evy
+for i := range 360
+    hsl i
+    move i/3.6 0
+    rect 1/3.6 100
+end
+```
+
+Output
+
+<img width="300" alt="vertical color gradient from red to aqua to red again" src="img/gradient.png">
+
+#### Reference
+
+    hsl hue:num [saturation:num [lightness:num [alpha:num]]]
+
+The `hsl` function changes the color of the **stroke** and the **fill** to the
+given CSS hsl color. The `hue` value must be between 0 and 360. The
+`saturation`, `lightness` and `alpha` values must be between 0 and 100. See
+the Mozilla Developer documentation on the [CSS hsl function] for more
+details.
+
+[CSS hsl function]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
 
 ### `width`
 

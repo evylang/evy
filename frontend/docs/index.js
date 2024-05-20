@@ -124,6 +124,7 @@ function getShowing(item) {
 
 function preventReloadOnSelfLink() {
   let href = normalizedHref()
+  href = href.replace(window.location.hash, "")
   const last = href.split("/").pop()
   const nodes = document.querySelectorAll(`#sidebar a[href$="${last}"]`)
   const selfLink = [...nodes].find((n) => n.href === href)

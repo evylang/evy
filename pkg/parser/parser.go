@@ -457,7 +457,7 @@ func (p *parser) parseFuncDefSignature() *FuncDefStmt {
 			fd.Params = nil
 			fd.VariadicParamType = &Type{Name: ARRAY, Sub: fd.VariadicParam.Type()}
 		} else {
-			p.appendError("invalid variadic parameter, must be used with single type")
+			p.appendError("variadic parameter cannot be used with other parameters")
 		}
 	}
 	p.assertEOL()

@@ -54,7 +54,8 @@ li::marker {
   padding-bottom: 40px;
 }
 
-:target {
+:target,
+.anchor {
   scroll-margin-top: 20px;
 }
 /* --- Elements -------------------------------------------------------- */

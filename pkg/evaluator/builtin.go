@@ -101,6 +101,7 @@ func newBuiltins(rt Runtime) builtins {
 		"width":  numBuiltin("width", rt.Width),
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
+		"hsl":    {Func: hslFunc(rt.Color), Decl: hslDecl},
 
 		"clear": {Func: clearFunc(rt.Clear), Decl: clearDecl},
 		"grid":  {Func: gridFunc(rt.Gridn), Decl: emptyDecl("grid")},
@@ -540,6 +541,48 @@ var rand1Decl = &parser.FuncDefStmt{
 
 func rand1Func(_ *scope, _ []value) (value, error) {
 	return &numVal{V: randsource.Float64()}, nil
+}
+
+var hslDecl = &parser.FuncDefStmt{
+	Name:          "hsl",
+	VariadicParam: &parser.Var{Name: "n", T: parser.NUM_TYPE},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func hslFunc(colorFn func(string)) builtinFunc {
+	return func(_ *scope, args []value) (value, error) {
+		if len(args) < 1 || len(args) > 4 {
+			return nil, fmt.Errorf(`%w: "hsl" takes 1 to 4 num arguments`, ErrBadArguments)
+		}
+		hue := args[0].(*numVal).V
+		if hue < 0 || hue > 360 {
+			return nil, fmt.Errorf(`%w: the first argument ("hue") of the "hsl" function must be between 0 and 360`, ErrBadArguments)
+		}
+		saturation := 100.0
+		lightness := 50.0
+		alpha := 100.0
+		if len(args) > 1 {
+			saturation = args[1].(*numVal).V
+			if saturation < 0 || saturation > 100 {
+				return nil, fmt.Errorf(`%w: the second argument ("saturation") of the "hsl" function must be between 0 and 100`, ErrBadArguments)
+			}
+		}
+		if len(args) > 2 {
+			lightness = args[2].(*numVal).V
+			if lightness < 0 || lightness > 100 {
+				return nil, fmt.Errorf(`%w: the third argument ("lightness") of the "hsl" function must be between 0 and 100`, ErrBadArguments)
+			}
+		}
+		if len(args) > 3 {
+			alpha = args[3].(*numVal).V
+			if alpha < 0 || alpha > 100 {
+				return nil, fmt.Errorf(`%w: the fourth argument ("alpha") of the "hsl" function must be between 0 and 100`, ErrBadArguments)
+			}
+		}
+		color := fmt.Sprintf("hsl(%vdeg %v%% %v%% / %v%%)", hue, saturation, lightness, alpha)
+		colorFn(color)
+		return &noneVal{}, nil
+	}
 }
 
 var clearDecl = &parser.FuncDefStmt{

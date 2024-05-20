@@ -6,9 +6,10 @@ print "rand 10" (rand 10)
 print
 print "min 3 2:" (min 3 2)
 print "max 3 2:" (max 3 2)
+print "abs -2.5:" (abs -2.5)
 print
 print "floor 2.6:" (floor 2.6)
-print "ceil 2.4:" (floor 2.4)
+print "ceil 2.4:" (ceil 2.4)
 print "round 2.6:" (round 2.6)
 print
 print "pow 2 3:" (pow 2 3)

@@ -34,7 +34,7 @@ see [syntax by example](syntax_by_example.md).
 8. [**Random**](#random)  
    [rand](#rand), [rand1](#rand1)
 9. [**Math**](#math)  
-   [min](#min), [max](#max), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [sin](#sin), [cos](#cos), [atan2](#atan2)
+   [min](#min), [max](#max), [abs](#abs), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [sin](#sin), [cos](#cos), [atan2](#atan2)
 10. [**Graphics**](#graphics)  
     [move](#move), [line](#line), [rect](#rect), [circle](#circle), [color](#color), [colour](#colour), [width](#width), [clear](#clear), [grid](#grid), [gridn](#gridn), [poly](#poly), [ellipse](#ellipse), [stroke](#stroke), [fill](#fill), [dash](#dash), [linecap](#linecap), [text](#text), [font](#font)
 11. [**Event Handlers**](#event-handlers)  
@@ -1123,6 +1123,31 @@ Output
 
 The `max` function returns the greater of the two given number
 arguments.
+
+### `abs`
+
+`abs` returns the absolute value of a number.
+
+#### Example
+
+```evy
+print (abs 3)
+print (abs -2.5)
+```
+
+Output
+
+```evy:output
+3
+2.5
+```
+
+#### Reference
+
+    abs:num n:num
+
+The `abs` function returns the absolute value of a number, which is its
+magnitude without regard to its sign.
 
 ### `floor`
 

@@ -16,13 +16,6 @@ func hasCloseElements:bool numbers:[]num threshold:num
     return false
 end
 
-func abs:num x:num
-    if x < 0
-        return -x
-    end
-    return x
-end
-
 func test
     assert true (hasCloseElements [1 2 3.9 4 5 2.2] 0.3)
     assert false (hasCloseElements [1 2 3.9 4 5 2.2] 0.05)

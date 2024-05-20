@@ -13,13 +13,6 @@ func test
     assert true (((abs (truncateNumber (123.456 - 0.456))) < 0.000001))
 end
 
-func abs:num x:num
-    if x < 0
-        return -x
-    end
-    return x
-end
-
 // Test boilerplate
 fails := 0
 total := 0

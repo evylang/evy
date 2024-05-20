@@ -27,13 +27,6 @@ func findClosest:[]num nums:[]num
     return result
 end
 
-func abs:num n:num
-    if n >= 0
-        return n
-    end
-    return -n
-end
-
 func test
     assert [3.9 4] (findClosest [1 2 3.9 4 5 2.2])
     assert [5 5.9] (findClosest [1 2 5.9 4 5])

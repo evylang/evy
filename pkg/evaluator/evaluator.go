@@ -732,7 +732,7 @@ func evalBinaryArrayExpr(op parser.Operator, left *arrayVal, right value) (value
 		}
 		newElements := make([]value, 0, len(*left.Elements)*repetitions)
 		for range repetitions {
-			newElements = append(newElements, *(left.Copy().Elements)...)
+			newElements = append(newElements, *(deepCopy(left).(*arrayVal).Elements)...)
 		}
 		result := &arrayVal{Elements: &newElements}
 		return result, nil

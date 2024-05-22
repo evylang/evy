@@ -822,7 +822,7 @@ together. For example, `"fire"` + `"engine"` combines into the string
 
 The **repetition operator** `*`, repeats an array a number of times. The number
 must be a non-negative integer value. An array repeated zero times is an empty
-array.
+array. A deep copy is performed on the array elements before each repetition.
 
 [modulo operator]: https://en.wikipedia.org/wiki/Modulo_operation
 

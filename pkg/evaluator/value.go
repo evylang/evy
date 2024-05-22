@@ -248,6 +248,40 @@ func copyOrRef(val value) value {
 	panic("internal error: copyOrRef called with with invalid value")
 }
 
+// deepCopy copies the given value, copying the elements of arrays
+// and maps recursively so as to not reference arrays or maps. It is
+// used by the array repetition operator which is the only place in
+// evy that arrays and map references are "derefenced".
+func deepCopy(val value) value {
+	switch v := val.(type) {
+	case *numVal:
+		return &numVal{V: v.V}
+	case *stringVal:
+		return &stringVal{V: v.V}
+	case *boolVal:
+		return &boolVal{V: v.V}
+	case *anyVal:
+		return &anyVal{V: deepCopy(v.V), T: v.T}
+	case *arrayVal:
+		elements := make([]value, len(*v.Elements))
+		for i, elem := range *v.Elements {
+			elements[i] = deepCopy(elem)
+		}
+		return &arrayVal{Elements: &elements}
+	case *mapVal:
+		newOrder := append([]string{}, (*v.Order)...)
+		mapCopy := mapVal{
+			Pairs: make(map[string]value),
+			Order: &newOrder,
+		}
+		for _, key := range *v.Order {
+			mapCopy.Pairs[key] = deepCopy(v.Pairs[key])
+		}
+		return &mapCopy
+	}
+	panic("internal error: copyOrRef called with with invalid value")
+}
+
 func (m *mapVal) String() string {
 	pairs := make([]string, 0, len(m.Pairs))
 	for _, key := range *m.Order {

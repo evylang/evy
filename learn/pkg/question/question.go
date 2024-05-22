@@ -176,7 +176,7 @@ func (m *Model) WriteFormatted() error {
 
 // PrintHTML prints the question and answer choices as HTML form elements.
 func (m *Model) PrintHTML(buf *bytes.Buffer) {
-	buf.WriteString("<form id=" + baseFilename(m.Filename) + ">\n")
+	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
 			m.printAnswerChoicesHTML(block.(*markdown.List), buf)
@@ -417,6 +417,15 @@ const questionPrefixHTML = `<!doctype html>
         width: 200px;
         height: 200px;
         border: 1px solid silver;
+      }
+      form.difficulty-easy:after {
+        content: "Difficulty: 🌶️";
+      }
+      form.difficulty-medium:after {
+        content: "Difficulty: 🌶️🌶️";
+      }
+      form.difficulty-hard:after {
+        content: "Difficulty: 🌶️🌶️🌶️";
       }
     </style>
   </head>

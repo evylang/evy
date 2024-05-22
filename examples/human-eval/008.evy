@@ -20,20 +20,4 @@ func test
     assert [10 10] (sumProduct [10])
 end
 
-fails := 0
-total := 0
-
-func assert want:any got:any
-    total = total + 1
-    if (sprintf "%v" want) != (sprintf "%v" got)
-        fails = fails + 1
-        printf "want != got:\n want: %v\n got:  %v\n" want got
-    end
-end
-
-func finished
-    printf "%2.f of %2.f tests passed\n" (total - fails) total
-end
-
 test
-finished

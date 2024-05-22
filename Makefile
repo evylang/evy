@@ -14,7 +14,7 @@ all: build-full test lint
 
 test: test-go test-tiny test-cli check-coverage
 
-lint: lint-go lint-sh check-prettier check-style check-fmt-evy
+lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
 
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
@@ -135,7 +135,14 @@ fmt-evy:
 check-fmt-evy:
 	go run . fmt --check $(EVY_FILES)
 
-.PHONY: check-fmt-evy fmt-evy lint-go
+## Conform runs evy over an example suite with asserts.
+conform: install
+	for n in examples/human-eval/*.evy; do \
+	  printf "%s " "$${n##*/}"; \
+	  evy run "$$n"; \
+	done
+
+.PHONY: check-fmt-evy conform fmt-evy lint-go
 
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage

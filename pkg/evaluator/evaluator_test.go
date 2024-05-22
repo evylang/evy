@@ -513,6 +513,172 @@ func TestIndexErr(t *testing.T) {
 	}
 }
 
+func TestAssertion(t *testing.T) {
+	rt := &testRT{}
+	rt.UnimplementedRuntime.print = rt.Print
+	eval := NewEvaluator(rt)
+	prog := `
+assert true
+assert 2 1+1
+assert "abc" "abc" "string comparison"
+assert "abc" "abc" "string comparison %q" "abc"
+	`
+	err := eval.Run(prog)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, eval.AssertInfo.FailCount())
+	assert.Equal(t, 4, eval.AssertInfo.SuccessCount())
+}
+
+func TestCompositeAssertion(t *testing.T) {
+	progs := []string{
+		`
+got:[]num
+assert [] got`,
+		`got:{}[]{}[]num
+assert {} got`,
+		`got:[]any
+got = [1 2 3]
+assert [1 2 3] got`,
+		`got:[]any
+got = [[1] [2 3]]
+assert [[1] [2 3]] got`,
+	}
+	for _, prog := range progs {
+		t.Run(prog, func(t *testing.T) {
+			rt := &testRT{}
+			rt.UnimplementedRuntime.print = rt.Print
+			eval := NewEvaluator(rt)
+			err := eval.Run(prog)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, eval.AssertInfo.FailCount())
+			assert.Equal(t, 1, eval.AssertInfo.SuccessCount())
+		})
+	}
+}
+
+func TestFailedAssertion(t *testing.T) {
+	progs := map[string]string{
+		"assert false": "line 1 column 8: failed assertion: not true",
+		"assert 1 2":   "line 1 column 10: failed assertion: want != got: 1 != 2",
+		`assert "abc" "123" "string comparison"
+		`: "line 1 column 14: failed assertion: want != got: abc != 123 (string comparison)",
+		`answer := 6*9
+		assert 42 answer "the answer is 42, not %v" answer
+		`: `line 2 column 13: failed assertion: want != got: 42 != 54 (the answer is 42, not 54)`,
+	}
+	for prog, want := range progs {
+		t.Run(prog, func(t *testing.T) {
+			rt := &testRT{}
+			rt.UnimplementedRuntime.print = rt.Print
+			eval := NewEvaluator(rt)
+			err := eval.Run(prog)
+			assert.Error(t, ErrAssert, err)
+			assert.Equal(t, want, err.Error())
+			assert.Equal(t, 0, eval.AssertInfo.SuccessCount(), "%#v", eval.AssertInfo)
+			assert.Equal(t, 1, eval.AssertInfo.FailCount())
+		})
+	}
+}
+
+func TestMultipleFailedAssertion(t *testing.T) {
+	prog := `
+assert true
+assert false
+assert 1 2
+assert 1 1
+assert "abc" "123" "custom message"
+	`
+	rt := &testRT{}
+	rt.UnimplementedRuntime.print = rt.Print
+	eval := NewEvaluator(rt)
+	err := eval.Run(prog)
+	assert.Error(t, ErrAssert, err)
+
+	assert.Equal(t, 2, eval.AssertInfo.SuccessCount())
+	assert.Equal(t, 3, eval.AssertInfo.FailCount())
+	assert.Equal(t, 5, eval.AssertInfo.TotalCount())
+
+	assertionErrors := AssertionErrors{}
+	assert.Equal(t, true, errors.As(err, &assertionErrors))
+	assert.Equal(t, 3, len(assertionErrors))
+
+	want := `
+line 3 column 8: failed assertion: not true
+line 4 column 10: failed assertion: want != got: 1 != 2
+line 6 column 14: failed assertion: want != got: abc != 123 (custom message)`[1:]
+	assert.Equal(t, want, assertionErrors.Error())
+
+	eval = NewEvaluator(rt)
+	eval.AssertInfo.FailFast = true
+	err = eval.Run(prog)
+	assert.Error(t, ErrAssert, err)
+
+	assert.Equal(t, 1, eval.AssertInfo.SuccessCount())
+	assert.Equal(t, 1, eval.AssertInfo.FailCount())
+	assert.Equal(t, 2, eval.AssertInfo.TotalCount())
+}
+
+func TestFailedAssertionReporting(t *testing.T) {
+	prog := `
+assert true
+assert false
+assert 1 2
+assert 1 1
+assert "abc" "123" "custom message"
+	`
+	rt := &testRT{}
+	rt.UnimplementedRuntime.print = rt.Print
+	eval := NewEvaluator(rt)
+	eval.AssertInfo.NoAssertionSummary = true
+	err := eval.Run(prog)
+	assert.Error(t, ErrAssert, err)
+	assert.Equal(t, "", rt.b.String())
+
+	rt = &testRT{}
+	eval = NewEvaluator(rt)
+	err = eval.Run(prog)
+	assert.Error(t, ErrAssert, err)
+	want := `
+❌ 3 failed assertions
+✔️ 2 passed assertions
+`[1:]
+	assert.Equal(t, want, rt.b.String())
+
+	rt = &testRT{}
+	eval = NewEvaluator(rt)
+	eval.AssertInfo.FailFast = true
+	err = eval.Run(prog)
+	assert.Error(t, ErrAssert, err)
+	want = `
+❌ 1 failed assertion
+✔️ 1 passed assertion
+`[1:]
+	assert.Equal(t, want, rt.b.String())
+
+	prog = `
+assert true
+assert 1 1`
+	rt = &testRT{}
+	eval = NewEvaluator(rt)
+	err = eval.Run(prog)
+	assert.NoError(t, err)
+	want = `
+✅ 2 passed assertions
+`[1:]
+	assert.Equal(t, want, rt.b.String())
+
+	prog = `
+assert 1 1`
+	rt = &testRT{}
+	eval = NewEvaluator(rt)
+	err = eval.Run(prog)
+	assert.NoError(t, err)
+	want = `
+✅ 1 passed assertion
+`[1:]
+	assert.Equal(t, want, rt.b.String())
+}
+
 func TestMapLit(t *testing.T) {
 	tests := map[string]string{
 		"a := {n:1}":                 "{n:1}",

@@ -73,9 +73,10 @@ func newBuiltins(rt Runtime) builtins {
 		"has": {Func: builtinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: builtinFunc(delFunc), Decl: delDecl},
 
-		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
-		"exit":  {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
-		"panic": {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"sleep":  {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":   {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic":  {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"assert": {Func: assertFunc, Decl: assertDecl},
 
 		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
@@ -514,6 +515,131 @@ func exitFunc(_ *scope, args []value) (value, error) {
 func panicFunc(_ *scope, args []value) (value, error) {
 	s := args[0].(*stringVal).V
 	return nil, PanicError(s)
+}
+
+var assertDecl = &parser.FuncDefStmt{
+	Name:          "assert",
+	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
+	ReturnType:    parser.NONE_TYPE,
+}
+
+func assertFunc(_ *scope, args []value) (value, error) {
+	if err := validateAssertArgs(args); err != nil {
+		return nil, err
+	}
+	if len(args) == 1 {
+		if !args[0].(*anyVal).V.(*boolVal).V {
+			return nil, fmt.Errorf(`%w: not true`, ErrAssert)
+		}
+	} else {
+		want := args[0]
+		got := args[1]
+		if !same(want, got) {
+			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrAssert, want, got, assertMessage(args))
+		}
+	}
+	return nil, nil
+}
+
+func same(want, got value) bool {
+	switch got := got.(type) {
+	case *arrayVal:
+		w, ok := want.(*arrayVal)
+		if !ok {
+			return false
+		}
+		return sameArray(w, got)
+	case *mapVal:
+		w, ok := want.(*mapVal)
+		if !ok {
+			return false
+		}
+		return sameMap(w, got)
+	case *anyVal:
+		w, ok := want.(*anyVal)
+		if !ok {
+			return same(want, got.V)
+		}
+		return same(w.V, got.V)
+	case *numVal:
+		w, ok := want.(*numVal)
+		if !ok {
+			return false
+		}
+		return w.V == got.V
+	case *stringVal:
+		w, ok := want.(*stringVal)
+		if !ok {
+			return false
+		}
+		return w.V == got.V
+	case *boolVal:
+		w, ok := want.(*boolVal)
+		if !ok {
+			return false
+		}
+		return w.V == got.V
+	}
+	return false
+}
+
+func sameArray(want, got *arrayVal) bool {
+	if len(*want.Elements) != len(*got.Elements) {
+		return false
+	}
+	if len(*want.Elements) == 0 {
+		return true
+	}
+	for i, v := range *want.Elements {
+		if !same(v, (*got.Elements)[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func sameMap(want, got *mapVal) bool {
+	if len(want.Pairs) != len(got.Pairs) {
+		return false
+	}
+	if len(want.Pairs) == 0 {
+		return true
+	}
+	for key, v := range want.Pairs {
+		if !same(v, got.Pairs[key]) {
+			return false
+		}
+	}
+	return true
+}
+
+func validateAssertArgs(args []value) error {
+	if len(args) == 0 {
+		return fmt.Errorf(`%w: "assert" expects at least one argument`, ErrBadArguments)
+	}
+	if len(args) == 1 {
+		if _, ok := args[0].(*anyVal).V.(*boolVal); !ok {
+			return fmt.Errorf(`%w: "assert" with one argument expects bool argument`, ErrBadArguments)
+		}
+	}
+	if len(args) > 2 {
+		if _, ok := args[2].(*anyVal).V.(*stringVal); !ok {
+			return fmt.Errorf(`%w: "assert" with three or more argument expects third argument to be string message`, ErrBadArguments)
+		}
+	}
+	return nil
+}
+
+func assertMessage(args []value) string {
+	if len(args) <= 2 {
+		return ""
+	}
+	msg := args[2].(*anyVal).V.(*stringVal).V
+	if len(args) > 3 {
+		msg = sprintf(msg, args[3:])
+	}
+	msg = " (" + msg + ")"
+	return msg
 }
 
 var randDecl = &parser.FuncDefStmt{

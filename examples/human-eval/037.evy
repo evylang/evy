@@ -41,28 +41,4 @@ func test
     assert [-12 8 3 4 5 2 12 11 23 -10] (sortEven [5 8 -12 4 23 2 3 11 12 -10])
 end
 
-// Test boilerplate
-fails := 0
-total := 0
-
-func assert want:any got:any
-    total = total + 1
-    if want == got
-        return
-    end
-    wantType := (typeof want)[:2]
-    gotType := (typeof got)[:2]
-    if (wantType == "[]" or wantType == "{}") and wantType == gotType and (len want) == 0 and (len got) == 0
-        return
-    end
-    fails = fails + 1
-    printf "want != got:\n want: %v\n got:  %v\n" want got
-end
-
-func printResult
-    printf "%2.f of %2.f tests passed\n" (total - fails) total
-end
-
 test
-printResult
-

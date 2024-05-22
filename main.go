@@ -98,16 +98,18 @@ func main() {
 }
 
 type runCmd struct {
-	Source    string `arg:"" help:"Source file. Default stdin" default:"-"`
-	SkipSleep bool   `help:"skip evy sleep command" env:"EVY_SKIP_SLEEP"`
-	SVGOut    string `help:"output drawing to SVG file. Stdout: -." placeholder:"FILE"`
-	SVGStyle  string `help:"style of top-level SVG element." placeholder:"STYLE"`
+	Source             string `arg:"" help:"Source file. Default: stdin." default:"-"`
+	SkipSleep          bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
+	SVGOut             string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
+	SVGStyle           string `help:"Style of top-level SVG element." placeholder:"STYLE"`
+	NoAssertionSummary bool   `short:"s" help:"Do not print assertion summary, only report failed assertion(s)."`
+	FailFast           bool   `help:"Stop execution on first failed assertion."`
 }
 
 type fmtCmd struct {
-	Write bool     `short:"w" help:"update .evy file" xor:"mode"`
-	Check bool     `short:"c" help:"check if already formatted" xor:"mode"`
-	Files []string `arg:"" optional:"" help:"Source files. Default stdin"`
+	Write bool     `short:"w" help:"Update .evy file." xor:"mode"`
+	Check bool     `short:"c" help:"Check if already formatted." xor:"mode"`
+	Files []string `arg:"" optional:"" help:"Source files. Default: stdin."`
 }
 
 type serveCmd struct {
@@ -128,11 +130,11 @@ type startCmd struct {
 }
 
 type tokenizeCmd struct {
-	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+	Source string `arg:"" help:"Source file. Default: stdin" default:"-"`
 }
 
 type parseCmd struct {
-	Source string `arg:"" help:"Source file. Default stdin" default:"-"`
+	Source string `arg:"" help:"Source file. Default: stdin" default:"-"`
 }
 
 // Run implements the `evy run` CLI command, called by the Kong API.
@@ -145,6 +147,8 @@ func (c *runCmd) Run() error {
 	rt := cli.NewRuntime(c.runtimeOptions()...)
 
 	eval := evaluator.NewEvaluator(rt)
+	eval.AssertInfo.NoAssertionSummary = c.NoAssertionSummary
+	eval.AssertInfo.FailFast = c.FailFast
 	evyErr := eval.Run(string(b))
 	if !errors.As(evyErr, &parser.Errors{}) {
 		// even if there was an evaluator error, we want to write as much of the SVG that was produced.

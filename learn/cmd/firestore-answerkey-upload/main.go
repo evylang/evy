@@ -5,13 +5,42 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/alecthomas/kong"
 	"google.golang.org/api/option"
 )
 
+type Answer struct {
+	Timestamp time.Time `firestore:"timestamp,serverTimestamp" json:"timestamp,omitempty"`
+	Created   time.Time `firestore:"created,serverTimestamp"`
+	Single    string    `firestore:"single,omitempty" json:"single,omitempty"`
+	Multi     []string  `firestore:"multi,omitempty" json:"multi,omitempty"`
+	Texts     []string  `firestore:"texts,omitempty" json:"texts,omitempty"`
+	Text      string    `firestore:"text,omitempty" json:"text,omitempty"`
+	Program   string    `firestore:"program,omitempty" json:"program,omitempty"`
+}
+
 func main() {
+
+	// path :=  "/answerkey/fund-seq-print"
+	// path2 := "/users/uid1/progress/fund-seq-print"
+
+	//"/users/uid1/history/{timestamp}"
+	//answerkey, err := loadAnswerKey(c.File)
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, "evy-lang-test", option.WithCredentialsFile(os.Getenv("EVY_FIREBASE_CREDENTIAL_FILE")))
+	checkError(err)
+	fundSeqPrintQuesiton1 := Answer{
+		Single: "33333",
+	}
+	result, err := client.Doc("users/uid1/history/fund-seq-print").Set(ctx, fundSeqPrintQuesiton1)
+	checkError(err)
+	fmt.Printf("successful set %#v\n", result)
+}
+
+func main2() {
 	c := &cli{}
 	kong.Parse(c)
 
@@ -39,14 +68,6 @@ type Answerkey map[string]Answer
 func (a Answerkey) estimateKB() int {
 	b, _ := json.MarshalIndent(a, "", "  ")
 	return len(b) / 1024
-}
-
-type Answer struct {
-	Single  string   `firestore:"single,omitempty" json:"single,omitempty"`
-	Multi   []string `firestore:"multi,omitempty" json:"multi,omitempty"`
-	Texts   []string `firestore:"texts,omitempty" json:"texts,omitempty"`
-	Text    string   `firestore:"text,omitempty" json:"text,omitempty"`
-	Program string   `firestore:"program,omitempty" json:"program,omitempty"`
 }
 
 type cli struct {

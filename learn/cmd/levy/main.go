@@ -28,6 +28,7 @@ package main
 
 import (
 	"cmp"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -70,6 +71,7 @@ type exportCmd struct {
 	Target       string `arg:"" default:"-" help:"Output directory or JSON/HTML output file (default: . | stdout)." placeholder:"TARGET"`
 	UnsealedOnly bool   `short:"u" help:"Only export files with unsealed answers. Suitable if private key not available."`
 	PrivateKey   string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
+	WithMarked   bool   `short:"m" help:"Include marked answers in HTML output. Cannot be used with export target answerkey."`
 
 	htmlPath      string
 	answerKeyPath string
@@ -95,6 +97,9 @@ type unsealCmd struct {
 }
 
 func (c *exportCmd) Run() error {
+	if c.ExportType == "answerkey" && c.WithMarked {
+		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
+	}
 	opts := getOptions(c.UnsealedOnly, c.PrivateKey)
 	model, err := question.NewModel(c.MDFile, opts...)
 	if err != nil {
@@ -113,7 +118,11 @@ func (c *exportCmd) Run() error {
 		}
 	}
 	if c.ExportType == "html" || c.ExportType == "all" {
-		if err := writeFileOrStdout(c.htmlPath, model.ToHTML()); err != nil {
+		html, err := model.ToHTML(c.WithMarked)
+		if err != nil {
+			return err
+		}
+		if err := writeFileOrStdout(c.htmlPath, html); err != nil {
 			return err
 		}
 	}

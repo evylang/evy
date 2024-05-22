@@ -25,7 +25,7 @@ var (
 	ErrInvalidFrontmatter   = errors.New("invalid frontmatter")
 	ErrWrongFrontmatterType = errors.New("wrong frontmatter type")
 	ErrNoFrontmatterAnswer  = errors.New("no answer in frontmatter")
-	ErrSealedAnswerNoKey    = errors.New("sealed answer without key in frontmatter")
+	ErrSealedAnswerNoKey    = errors.New("sealed answer without key")
 	ErrSealedTooShort       = errors.New("sealed data is too short")
 )
 
@@ -175,11 +175,13 @@ func (m *Model) WriteFormatted() error {
 }
 
 // PrintHTML prints the question and answer choices as HTML form elements.
-func (m *Model) PrintHTML(buf *bytes.Buffer) {
+func (m *Model) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
 	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
-			m.printAnswerChoicesHTML(block.(*markdown.List), buf)
+			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withMarked); err != nil {
+				return err
+			}
 			continue
 		}
 		if embed, ok := m.embeds[block]; ok {
@@ -189,32 +191,47 @@ func (m *Model) PrintHTML(buf *bytes.Buffer) {
 		block.PrintHTML(buf)
 	}
 	buf.WriteString("</form>\n")
+	return nil
 }
 
 // ToHTML returns a complete standalone HTML document as string.
-func (m *Model) ToHTML() string {
+func (m *Model) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(questionPrefixHTML)
-	m.PrintHTML(buf)
+	if err := m.PrintHTML(buf, withMarked); err != nil {
+		return "", err
+	}
 	buf.WriteString(questionSuffixHTML)
-	return buf.String()
+	return buf.String(), nil
 }
 
 func baseFilename(filename string) string {
 	return strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
 }
 
-func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer) {
+func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withMarked bool) error {
 	buf.WriteString("<fieldset>\n")
 	inputType := "radio"
 	if m.Frontmatter.AnswerType == "multiple-choice" {
 		inputType = "checkbox"
 	}
+	var correctAnswers map[int]bool
+	if withMarked {
+		answer, err := m.Frontmatter.getAnswer(m.privateKey)
+		if err != nil {
+			return err
+		}
+		correctAnswers = answer.correctAnswerIndices()
+	}
 	for i, item := range list.Items {
+		checked := ""
+		if correctAnswers[i] {
+			checked = "checked "
+		}
 		letter := indexToLetter(i)
 		buf.WriteString("<div>\n")
 		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
-		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" />` + "\n")
+		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" ` + checked + "/>\n")
 		for _, block := range item.(*markdown.Item).Blocks {
 			if embed, ok := m.embeds[block]; ok {
 				embed.renderer.RenderHTML(buf)
@@ -225,6 +242,7 @@ func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer) {
 		buf.WriteString("</div>\n")
 	}
 	buf.WriteString("</fieldset>\n")
+	return nil
 }
 
 func (m *Model) getVerifiedAnswer() (Answer, error) {

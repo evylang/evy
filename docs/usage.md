@@ -57,15 +57,18 @@ You can also get help for each subcommand by running it with the
     Run Evy program.
 
     Arguments:
-      [<source>]    Source file. Default stdin
+      [<source>]    Source file. Default: stdin.
 
     Flags:
-      -h, --help               Show context-sensitive help.
-      -V, --version            Print version information
+      -h, --help                    Show context-sensitive help.
+      -V, --version                 Print version information
 
-          --skip-sleep         skip evy sleep command ($EVY_SKIP_SLEEP)
-          --svg-out=FILE       output drawing to SVG file. Stdout: -.
-          --svg-style=STYLE    style of top-level SVG element.
+          --skip-sleep              Skip evy sleep command ($EVY_SKIP_SLEEP).
+          --svg-out=FILE            Output drawing to SVG file. Stdout: -.
+          --svg-style=STYLE         Style of top-level SVG element.
+      -s, --no-assertion-summary    Do not print assertion summary, only report
+                                    failed assertion(s).
+          --fail-fast               Stop execution on first failed assertion.
 
 <!-- genend -->
 
@@ -78,14 +81,14 @@ You can also get help for each subcommand by running it with the
     Format Evy files.
 
     Arguments:
-      [<files> ...]    Source files. Default stdin
+      [<files> ...]    Source files. Default: stdin.
 
     Flags:
       -h, --help       Show context-sensitive help.
       -V, --version    Print version information
 
-      -w, --write      update .evy file
-      -c, --check      check if already formatted
+      -w, --write      Update .evy file.
+      -c, --check      Check if already formatted.
 
 <!-- genend -->
 

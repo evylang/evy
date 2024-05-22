@@ -206,11 +206,15 @@ func baseFilename(filename string) string {
 
 func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer) {
 	buf.WriteString("<fieldset>\n")
+	inputType := "radio"
+	if m.Frontmatter.AnswerType == "multiple-choice" {
+		inputType = "checkbox"
+	}
 	for i, item := range list.Items {
 		letter := indexToLetter(i)
 		buf.WriteString("<div>\n")
 		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
-		buf.WriteString(`<input type="radio" id="` + letter + `" name="answer" />` + "\n")
+		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" />` + "\n")
 		for _, block := range item.(*markdown.Item).Blocks {
 			if embed, ok := m.embeds[block]; ok {
 				embed.renderer.RenderHTML(buf)

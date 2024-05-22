@@ -1842,19 +1842,20 @@ rect 20 20
         </p>
         <h3><a id="hsl" href="#hsl" class="anchor">#</a><code>hsl</code></h3>
         <p>
-          <code>hsl</code> changes the color of the pen, similar to
-          <a href="#color"><code>color</code></a
-          >. However, the arguments to the <code>hsl</code> function are provided as numbers and
-          therefore are more suited to mathematical manipulation, e.g. to find the complimentary
-          color, create a trail in animations with the alpha value or create color gradients.
+          <code>hsl</code> returns a string to be used with the
+          <a href="#color"><code>color</code></a> and
+          <a href="#clear"><code>clear</code></a> functions. The arguments to the
+          <code>hsl</code> function are numbers and therefore are more suited to mathematical
+          manipulation, e.g. to find the complimentary color, create a trail in animations with the
+          alpha value or create color gradients.
         </p>
         <p>
-          <code>hsl</code> uses the CSS (Cascading Style Sheets)
+          <code>hsl</code> takes one to four arguments - <code>hue</code>, <code>saturation</code>,
+          <code>lightness</code>, and <code>alpha</code> - and returns a
           <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl"
-            >hsl function</a
+            >CSS (Cascading Style Sheets) hsl function</a
           >
-          to specify the color. In Evy the <code>hsl</code> function takes one to four arguments:
-          <code>hue</code>, <code>saturation</code>, <code>lightness</code>, and <code>alpha</code>.
+          string specifying a color.
         </p>
         <p>
           The <code>hue</code> argument is required. It is a number from 0 to 360 that represents
@@ -1922,7 +1923,7 @@ rect 20 20
         </ul>
         <h4>Example</h4>
         <pre><code class="language-evy">for i := range 360
-    hsl i
+    color (hsl i)
     move i/3.6 0
     rect 1/3.6 100
 end
@@ -1934,14 +1935,24 @@ end
           src="img/gradient.png"
         />
         <h4>Reference</h4>
-        <pre><code>hsl hue:num [saturation:num [lightness:num [alpha:num]]]
+        <pre><code>hsl:string hue:num [saturation:num [lightness:num [alpha:num]]]
 </code></pre>
         <p>
-          The <code>hsl</code> function changes the color of the <strong>stroke</strong> and the
-          <strong>fill</strong> to the given CSS hsl color. The <code>hue</code> value must be
-          between 0 and 360. The <code>saturation</code>, <code>lightness</code> and
-          <code>alpha</code> values must be between 0 and 100. See the Mozilla Developer
-          documentation on the
+          <code>hsl</code> returns a string to be used with the
+          <a href="#color"><code>color</code></a> and
+          <a href="#clear"><code>clear</code></a> functions. <code>hsl</code> takes one to four
+          <code>num</code> arguments - <code>hue</code>, <code>saturation</code>,
+          <code>lightness</code>, and <code>alpha</code> - and returns
+          <code>string</code> containing a
+          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl"
+            >CSS hsl function</a
+          >
+          string.
+        </p>
+        <p>
+          The <code>hue</code> value must be between 0 and 360. The <code>saturation</code>,
+          <code>lightness</code> and <code>alpha</code> values must be between 0 and 100. See the
+          Mozilla Developer documentation on the
           <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl"
             >CSS hsl function</a
           >

@@ -1560,15 +1560,15 @@ does not change. The initial color is `"black"`.
 
 ### `hsl`
 
-`hsl` changes the color of the pen, similar to [`color`](#color). However, the
-arguments to the `hsl` function are provided as numbers and therefore are
-more suited to mathematical manipulation, e.g. to find the complimentary
-color, create a trail in animations with the alpha value or create color
-gradients.
+`hsl` returns a string to be used with the [`color`](#color) and
+[`clear`](#clear) functions. The arguments to the `hsl` function are numbers
+and therefore are more suited to mathematical manipulation, e.g. to find the
+complimentary color, create a trail in animations with the alpha value or
+create color gradients.
 
-`hsl` uses the CSS (Cascading Style Sheets) [hsl function] to specify the
-color. In Evy the `hsl` function takes one to four arguments: `hue`,
-`saturation`, `lightness`, and `alpha`.
+`hsl` takes one to four arguments - `hue`, `saturation`, `lightness`, and
+`alpha` - and returns a [CSS (Cascading Style Sheets) hsl function] string
+specifying a color.
 
 The `hue` argument is required. It is a number from 0 to 360 that represents
 the color on the [color wheel]:
@@ -1589,14 +1589,14 @@ range between 0 and 100 percent if given:
 - `lightness` is measure for brightness with 100 meaning white and 0 meaning black (default: 50)
 - `alpha` is measure for opacity or transparency with 100 meaning fully opaque and 0 meaning fully transparent (default: 100)
 
-[hsl function]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+[CSS (Cascading Style Sheets) hsl function]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
 [color wheel]: https://www.joshwcomeau.com/css/color-formats/#hsl-4
 
 #### Example
 
 ```evy
 for i := range 360
-    hsl i
+    color (hsl i)
     move i/3.6 0
     rect 1/3.6 100
 end
@@ -1608,13 +1608,16 @@ Output
 
 #### Reference
 
-    hsl hue:num [saturation:num [lightness:num [alpha:num]]]
+    hsl:string hue:num [saturation:num [lightness:num [alpha:num]]]
 
-The `hsl` function changes the color of the **stroke** and the **fill** to the
-given CSS hsl color. The `hue` value must be between 0 and 360. The
-`saturation`, `lightness` and `alpha` values must be between 0 and 100. See
-the Mozilla Developer documentation on the [CSS hsl function] for more
-details.
+`hsl` returns a string to be used with the [`color`](#color) and
+[`clear`](#clear) functions. `hsl` takes one to four `num` arguments - `hue`,
+`saturation`, `lightness`, and `alpha` - and returns `string` containing a
+[CSS hsl function] string.
+
+The `hue` value must be between 0 and 360. The `saturation`, `lightness` and
+`alpha` values must be between 0 and 100. See the Mozilla Developer
+documentation on the [CSS hsl function] for more details.
 
 [CSS hsl function]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
 

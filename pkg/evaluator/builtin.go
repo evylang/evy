@@ -101,7 +101,7 @@ func newBuiltins(rt Runtime) builtins {
 		"width":  numBuiltin("width", rt.Width),
 		"color":  stringBuiltin("color", rt.Color),
 		"colour": stringBuiltin("colour", rt.Color),
-		"hsl":    {Func: hslFunc(rt.Color), Decl: hslDecl},
+		"hsl":    {Func: hslFunc(), Decl: hslDecl},
 
 		"clear": {Func: clearFunc(rt.Clear), Decl: clearDecl},
 		"grid":  {Func: gridFunc(rt.Gridn), Decl: emptyDecl("grid")},
@@ -546,10 +546,10 @@ func rand1Func(_ *scope, _ []value) (value, error) {
 var hslDecl = &parser.FuncDefStmt{
 	Name:          "hsl",
 	VariadicParam: &parser.Var{Name: "n", T: parser.NUM_TYPE},
-	ReturnType:    parser.NONE_TYPE,
+	ReturnType:    parser.STRING_TYPE,
 }
 
-func hslFunc(colorFn func(string)) builtinFunc {
+func hslFunc() builtinFunc {
 	return func(_ *scope, args []value) (value, error) {
 		if len(args) < 1 || len(args) > 4 {
 			return nil, fmt.Errorf(`%w: "hsl" takes 1 to 4 num arguments`, ErrBadArguments)
@@ -580,8 +580,7 @@ func hslFunc(colorFn func(string)) builtinFunc {
 			}
 		}
 		color := fmt.Sprintf("hsl(%vdeg %v%% %v%% / %v%%)", hue, saturation, lightness, alpha)
-		colorFn(color)
-		return &noneVal{}, nil
+		return &stringVal{V: color}, nil
 	}
 }
 

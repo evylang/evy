@@ -645,6 +645,42 @@ print "arr5" arr5
 	}
 }
 
+func TestArrayRepetitionDeepCopy(t *testing.T) {
+	prog := `
+arr1:= [[0]*2] * 2
+arr1[0][1] = 1
+print "arr1" arr1 // [[0 1] [0 0]]
+
+a := [1] * 2
+arr2:= [a] * 2
+arr2[1][1] = 2
+print "arr2" arr2 // [[1 1] [1 2]]
+
+m := {a:[1]}
+arr3 := [m] * 2
+arr3[0].a[0] = 2
+print "arr3" arr3 // [{a:[2]} {a:[1]}]
+
+a2 := [m] * 2
+arr4:= [a2] * 2
+arr4[1][1].a[0] = 3
+print "arr4" arr4 // [[{a:[1]} {a:[1]}] [{a:[1]} {a:[3]}]]
+`
+	out := run(prog)
+	want := []string{
+		"arr1 [[0 1] [0 0]]",
+		"arr2 [[1 1] [1 2]]",
+		"arr3 [{a:[2]} {a:[1]}]",
+		"arr4 [[{a:[1]} {a:[1]}] [{a:[1]} {a:[3]}]]",
+		"",
+	}
+	got := strings.Split(out, "\n")
+	assert.Equal(t, len(want), len(got), out)
+	for i := range want {
+		assert.Equal(t, want[i], got[i])
+	}
+}
+
 func TestArrayRepetitionErr(t *testing.T) {
 	tests := []struct {
 		name string

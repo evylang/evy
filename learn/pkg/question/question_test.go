@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"evylang.dev/evy/pkg/assert"
@@ -50,7 +49,7 @@ func TestValidateAnswer(t *testing.T) {
 func TestExportAnswer(t *testing.T) {
 	for name, want := range testQuestions {
 		t.Run(name, func(t *testing.T) {
-			b, err := os.ReadFile("testdata/golden/answerkey-" + name + ".json")
+			b, err := os.ReadFile("testdata/golden/answerkey/" + name + ".json")
 			assert.NoError(t, err)
 			wantAnswerKey := AnswerKey{}
 			err = json.Unmarshal(b, &wantAnswerKey)
@@ -113,7 +112,7 @@ func TestExportAnswerKeyFromSeal(t *testing.T) {
 	gotAnswerKey, err := model.ExportAnswerKey()
 	assert.NoError(t, err)
 
-	b, err := os.ReadFile("testdata/golden/answerkey-question1-sealed.json")
+	b, err := os.ReadFile("testdata/golden/answerkey/question1-sealed.json")
 	assert.NoError(t, err)
 	wantAnswerKey := AnswerKey{}
 	err = json.Unmarshal(b, &wantAnswerKey)
@@ -247,8 +246,7 @@ func TestPrintHTML(t *testing.T) {
 			buf := &bytes.Buffer{}
 			model.PrintHTML(buf)
 			got := buf.String()
-
-			goldenFile := filepath.Join("testdata/golden/", "form-"+name+".html")
+			goldenFile := "testdata/golden/form/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)
@@ -265,7 +263,7 @@ func TestToHTML(t *testing.T) {
 			assert.NoError(t, err)
 			got := model.ToHTML()
 
-			goldenFile := filepath.Join("testdata/golden/", name+".html")
+			goldenFile := "testdata/golden/html/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)

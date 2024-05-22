@@ -45,7 +45,7 @@ on input id:string val:string
 end
 
 func dot x:num y:num radius:num hue:num
-    hsl hue 100 50
+    color (hsl hue)
     move x y
     circle radius
 end

@@ -61,7 +61,7 @@ end
 
 on animate
     // 2% opacity leaves trails on movement
-    clear "hsl(0deg 100% 100% / 2%)"
+    clear (hsl 0 0 100 2)
 
     for dot := range dots
         update dot

@@ -87,6 +87,9 @@ const (
 	WHILE  // while
 	BREAK  // break
 	END    // end
+
+	PKG    // package keyword, reserved for later use
+	IMPORT // import keyword, reserved for later use
 )
 
 func lookupKeyword(s string) TokenType {
@@ -117,6 +120,9 @@ var keywords = map[string]TokenType{
 	"while":  WHILE,
 	"break":  BREAK,
 	"end":    END,
+
+	"pkg":    PKG,    // reserved for later use
+	"import": IMPORT, // reserved for later use
 }
 
 // AsIdent returns t as an IDENT token if t is a keyword and valid as an
@@ -187,6 +193,8 @@ var tokenStrings = map[TokenType]tokenString{
 	WHILE:      {string: "WHILE", format: "while"},
 	BREAK:      {string: "BREAK", format: "break"},
 	END:        {string: "END", format: "end"},
+	PKG:        {string: "PKG", format: "pkg"},
+	IMPORT:     {string: "IMPORT", format: "import"},
 }
 
 // String implements the [fmt.Stringer] interface for [TokenType].

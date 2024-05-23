@@ -70,6 +70,10 @@ func (vm *VM) Run() error {
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
 			vm.globals[globalIndex] = vm.pop()
+		case OpDrop:
+			n := ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.drop(int(n))
 		case OpAdd:
 			right, left := vm.popBinaryNums()
 			err = vm.push(numVal(left + right))
@@ -236,6 +240,57 @@ func (vm *VM) Run() error {
 				// unread operand
 				ip += 2
 			}
+		case OpStepRange:
+			// OpStepRange works by popping the step range state from the stack,
+			// pushing it back with an updated index, and pushing a bool that
+			// says whether the range has completed or not. The operand says
+			// whether there is a loop var or not, and if so, before pushing
+			// the bool, we push the index so the bytecode can assign the value
+			// to the loop var.
+			hasLoopVar := int(ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			index := vm.popNumVal()
+			step := vm.popNumVal()
+			stop := vm.popNumVal()
+			// stack overflow wont happen because we just popped these values
+			_ = vm.push(stop)
+			_ = vm.push(step)
+			_ = vm.push(index + step)
+			stillGoing := (step > 0 && index < stop) || (step < 0 && index > stop)
+			if stillGoing && hasLoopVar != 0 {
+				// Ignore stack overflow. Next push will error in that case
+				_ = vm.push(index)
+			}
+			err = vm.push(boolVal(stillGoing))
+		case OpIterRange:
+			// OpIterRange works by popping the range state from the stack,
+			// pushing it back with an updated index, and pushing a bool that
+			// says whether the range has completed or not. The operand says
+			// whether there is a loop var or not, and if so, before pushing
+			// the bool, we push the value of the iterable at the index so
+			// the bytecode can assign the value to the loop var.
+			hasLoopVar := int(ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			index := int(vm.popNumVal())
+			iter := vm.pop()
+			// stack overflow wont happen because we just popped these values
+			_ = vm.push(iter)
+			_ = vm.push(numVal(index + 1))
+
+			var val value
+			if a, ok := iter.(arrayVal); ok && index < len(a.Elements) {
+				val = a.Elements[index]
+			} else if m, ok := iter.(mapVal); ok && index < len(m.order) {
+				val = m.order[index]
+			} else if s, ok := iter.(stringVal); ok && index < len(s) {
+				val = s[index : index+1]
+			}
+			// val != nil means we're still going
+			if val != nil && hasLoopVar != 0 {
+				// Ignore stack overflow. Next push will error in that case
+				_ = vm.push(val)
+			}
+			err = vm.push(boolVal(val != nil))
 		}
 		if err != nil {
 			return err
@@ -268,6 +323,10 @@ func (vm *VM) pop() value {
 	o := vm.stack[vm.sp-1]
 	vm.sp--
 	return o
+}
+
+func (vm *VM) drop(n int) {
+	vm.sp -= n
 }
 
 // popBinaryNums pops the top two elements of the stack (the left

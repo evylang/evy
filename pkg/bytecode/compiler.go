@@ -63,6 +63,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileBreakStatement(node)
 	case *parser.BlockStatement:
 		return c.compileBlockStatement(node)
+	case *parser.ForStmt:
+		return c.compileForStatement(node)
 	case *parser.IfStmt:
 		return c.compileIfStatement(node)
 	case *parser.WhileStmt:
@@ -238,6 +240,103 @@ func (c *Compiler) compileBlockStatement(block *parser.BlockStatement) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
+	var rangeOp Opcode
+	var rangeStateSize int
+	switch t := stmt.Range.Type(); t.Name {
+	case parser.STRING, parser.ARRAY, parser.MAP:
+		rangeOp, rangeStateSize = OpIterRange, 2
+		// Push the iterable and current index (0) on to the stack for OpIterRange
+		if err := c.Compile(stmt.Range); err != nil {
+			return err
+		}
+		if err := c.emit(OpConstant, c.addConstant(numVal(0))); err != nil {
+			return err
+		}
+	case parser.NUM:
+		rangeOp, rangeStateSize = OpStepRange, 3
+		// Push the stop, step and start values onto the stack for OpStepRange
+		sr := stmt.Range.(*parser.StepRange)
+		if err := c.Compile(sr.GetStop()); err != nil {
+			return err
+		}
+		if err := c.Compile(sr.GetStep()); err != nil {
+			return err
+		}
+		if err := c.Compile(sr.GetStart()); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("%w: range over unknown type %T", ErrInternal, t)
+	}
+
+	hasLoopVar := 0
+	if stmt.LoopVar != nil {
+		hasLoopVar = 1
+		// declare the loop var with a noneVal to start with. The top
+		// of the loop will overwrite this with a value of the correct type
+		// for the loop.
+		symbol := c.globals.Define(stmt.LoopVar.Name)
+		if err := c.emit(OpNone); err != nil {
+			return err
+		}
+		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+			return err
+		}
+	}
+
+	// Top of loop
+	topOfLoop := len(c.instructions)
+
+	if err := c.emit(rangeOp, hasLoopVar); err != nil {
+		return err
+	}
+	jumpToEnd, err := c.emitPos(OpJumpOnFalse, JumpPlaceholder)
+	if err != nil {
+		return err
+	}
+
+	// Assign the current loop value to the loop var. The rangeOp has left it
+	// on the stack if we told it we have a loop var (hasLoopVar).
+	if stmt.LoopVar != nil {
+		symbol, ok := c.globals.Resolve(stmt.LoopVar.Name)
+		if !ok {
+			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
+		}
+		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+			return err
+		}
+	}
+
+	// take a snapshot of the break list before compiling the body of the loop
+	outOfScopeBreaks := c.breaks
+	c.breaks = nil
+	if err := c.Compile(stmt.Block); err != nil {
+		return err
+	}
+
+	if err := c.emit(OpJump, topOfLoop); err != nil {
+		return err
+	}
+
+	endOfLoop := len(c.instructions)
+
+	// Drop the range state off the stack
+	if err := c.emit(OpDrop, rangeStateSize); err != nil {
+		return err
+	}
+
+	// Patch the loop condition jump and the break statements to jump here.
+	c.instructions.changeOperand(jumpToEnd, endOfLoop)
+	for _, breakPos := range c.breaks {
+		c.instructions.changeOperand(breakPos, endOfLoop)
+	}
+
+	// reset the break list
+	c.breaks = outOfScopeBreaks
 	return nil
 }
 

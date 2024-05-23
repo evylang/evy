@@ -52,6 +52,8 @@ func TestSingleToken(t *testing.T) {
 		{in: "while", want: WHILE},
 		{in: "break", want: BREAK},
 		{in: "end", want: END},
+		{in: "pkg", want: PKG},
+		{in: "import", want: IMPORT},
 	}
 
 	for _, tt := range tests {

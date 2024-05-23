@@ -12,7 +12,7 @@ print "for your perfect piece."
 draw
 
 func draw
-    clear "hsl(210deg 5% 15%)" // near black
+    clear (hsl 210 5 15) // near black
     drawEllipse
     drawText
     drawHighlight cur
@@ -28,7 +28,7 @@ end
 func drawText
     font {size:2.7 style:"italic" family:"Fira Code, monospace"}
     width 0.2
-    fill "hsl(210deg 13% 72%)" // light grey
+    fill (hsl 210 13 72) // light grey
     move 2 15
     text "// "
     for i := range (len labels)
@@ -36,10 +36,10 @@ func drawText
         text (sprintf "%5s" labels[i])
     end
     font {size:2.7 style:"normal"}
-    fill "hsl(27deg 100% 74%)" // orange
+    fill (hsl 27 100 74) // orange
     move 2 10
     text "ellipse"
-    fill "hsl(204deg 100% 75%)" // ligth  blue
+    fill (hsl 204 100 75) // light blue
     for i := range (len labels)
         move i*w+20 10
         text (sprintf "%5.0f" vals[i])

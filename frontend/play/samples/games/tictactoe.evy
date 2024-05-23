@@ -99,7 +99,7 @@ func drawWinningLine
         return
     end
     l := winningLine w
-    color "hsl(330deg 100% 50% / 80%)"
+    color (hsl 330 100 50 80)
     width 3
     move (getX l.i1) (getY l.i1)
     line (getX l.i2) (getY l.i2)

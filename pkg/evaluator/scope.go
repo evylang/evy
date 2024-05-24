@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 type scope struct {
 	values map[string]value
 	outer  *scope
@@ -28,4 +30,18 @@ func (s *scope) set(name string, val value) {
 		return
 	}
 	s.values[name] = val
+}
+
+func (s *scope) update(name string, val value) {
+	if name == "_" {
+		return
+	}
+	if _, ok := s.values[name]; ok {
+		s.values[name] = val
+		return
+	}
+	if s.outer == nil {
+		panic(fmt.Errorf("%w: update of unknown variable %q", ErrAssignmentTarget, name))
+	}
+	s.outer.update(name, val)
 }

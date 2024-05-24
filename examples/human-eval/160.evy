@@ -18,7 +18,8 @@
 //     Operand is a list of of non-negative integers.
 //     Operator list has at least one operator, and operand list has at least two operands.
 func solve:num ops:[]string nums:[]num
-    return solveExp ops nums 0
+    arr := solveExp ops nums 0 0
+    return arr[0]
 end
 
 precedence:{}num
@@ -28,16 +29,15 @@ precedence["*"] = 2
 precedence["//"] = 2
 precedence["**"] = 3
 
-func solveExp:num ops:[]string nums:[]num prec:num
-    left := nums[0]
-    while (len ops) != 0 and prec < precedence[ops[0]]
-        op := ops[0]
-        ops = ops[1:]
-        nums = nums[1:]
-        right := solveExp ops nums precedence[op]
-        left = solveOp left op right
+func solveExp:[]num ops:[]string nums:[]num idx:num prec:num
+    left := nums[idx]
+    while idx < (len ops) and prec < precedence[ops[idx]]
+        op := ops[idx]
+        result := solveExp ops nums idx+1 precedence[op] // recurse into right sub-tree
+        left = solveOp left op result[0]
+        idx = result[1]
     end
-    return left
+    return [left idx]
 end
 
 func solveOp:num a:num op:string b:num
@@ -57,7 +57,7 @@ func solveOp:num a:num op:string b:num
 end
 
 func test
-    assert 37 (solve ["**" "*" "+"] [2 3 4 5])
+    assert 14 (solve ["+" "*"] [2 3 4])
     assert 9 (solve ["+" "*" "-"] [2 3 4 5])
     assert 8 (solve ["//" "*"] [7 3 4])
     assert 7 (solve ["+" "*"] [1 2 3])

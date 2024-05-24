@@ -1,87 +1,75 @@
 package evaluator
 
 type ranger interface {
-	next() bool
+	next(scope *scope, loopVarName string) bool
 }
 
 type stepRange struct {
-	loopVar *numVal
-	cur     float64
-	stop    float64
-	step    float64
+	cur  float64
+	stop float64
+	step float64
 }
 
 type arrayRange struct {
-	loopVar value
-	cur     int
-	array   *arrayVal
+	cur   int
+	array *arrayVal
 }
 
 type mapRange struct {
-	loopVar value
-	cur     int // index of Map.Order slice of keys
-	mapVal  *mapVal
-	order   []string // copy of order in case map entry gets deleted during iteration
+	cur    int // index of Map.Order slice of keys
+	mapVal *mapVal
+	order  []string // copy of order in case map entry gets deleted during iteration
 }
 
 type stringRange struct {
-	loopVar *stringVal
-	cur     int
-	str     *stringVal
-	runes   []rune
+	cur   int
+	str   *stringVal
+	runes []rune
 }
 
-func (s *stepRange) next() bool {
+func (s *stepRange) next(scope *scope, loopVarName string) bool {
 	if s.step > 0 && s.cur >= s.stop {
 		return false
 	}
 	if s.step < 0 && s.cur <= s.stop {
 		return false
 	}
-	if s.loopVar != nil {
-		s.loopVar.V = s.cur
-	}
+	scope.update(loopVarName, &numVal{V: s.cur})
 	s.cur += s.step
 	return true
 }
 
-func (a *arrayRange) next() bool {
+func (a *arrayRange) next(scope *scope, loopVarName string) bool {
 	elements := *a.array.Elements
 	if a.cur >= len(elements) {
 		return false
 	}
-	if a.loopVar != nil {
-		a.loopVar.Set(elements[a.cur])
-	}
-
+	scope.update(loopVarName, elements[a.cur])
 	a.cur++
 	return true
 }
 
-func (m *mapRange) next() bool {
+func (m *mapRange) next(scope *scope, loopVarName string) bool {
 	for m.cur < len(m.order) {
 		key := m.order[m.cur]
 		m.cur++
 		if _, ok := m.mapVal.Pairs[key]; ok { // ensure value hasn't been deleted
-			if m.loopVar != nil {
-				m.loopVar.(*stringVal).V = key
-			}
+			scope.update(loopVarName, &stringVal{V: key})
 			return true
 		}
 	}
 	return false
 }
 
-func (s *stringRange) next() bool {
+func (s *stringRange) next(scope *scope, loopVarName string) bool {
 	if s.runes == nil {
 		s.runes = s.str.runes()
 	}
 	if s.cur >= len(s.runes) {
 		return false
 	}
-	if s.loopVar != nil {
-		s.loopVar.V = string(s.runes[s.cur])
-	}
+	scope.update(loopVarName, &stringVal{V: string(s.runes[s.cur])})
+
 	s.cur++
 	return true
 }

@@ -205,6 +205,16 @@ func (a *arrayVal) Index(idx value) (value, error) {
 	return elements[i], nil
 }
 
+func (a *arrayVal) SetIndex(idx, val value) error {
+	i, err := normalizeIndex(idx, len(*a.Elements), indexExpression)
+	if err != nil {
+		return err
+	}
+	elements := *a.Elements
+	elements[i] = val
+	return nil
+}
+
 func (a *arrayVal) Copy() *arrayVal {
 	elements := make([]value, len(*a.Elements))
 	for i, v := range *a.Elements {
@@ -251,7 +261,7 @@ func copyOrRef(val value) value {
 // deepCopy copies the given value, copying the elements of arrays
 // and maps recursively so as to not reference arrays or maps. It is
 // used by the array repetition operator which is the only place in
-// evy that arrays and map references are "derefenced".
+// evy that arrays and map references are "dereferenced".
 func deepCopy(val value) value {
 	switch v := val.(type) {
 	case *numVal:
@@ -324,12 +334,11 @@ func (m *mapVal) Get(key string) (value, error) {
 	return val, nil
 }
 
-func (m *mapVal) InsertKey(key string, t *parser.Type) {
-	if _, ok := m.Pairs[key]; ok {
-		return
+func (m *mapVal) SetKey(key string, val value) {
+	if _, ok := m.Pairs[key]; !ok {
+		*m.Order = append(*m.Order, key)
 	}
-	*m.Order = append(*m.Order, key)
-	m.Pairs[key] = zero(t)
+	m.Pairs[key] = val
 }
 
 func (m *mapVal) Delete(key string) {

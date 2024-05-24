@@ -1320,6 +1320,92 @@ print a b
 }
 
 func TestCompositeAssignment(t *testing.T) {
+	tests := map[string]string{
+		`
+n := 1
+a := [n n]
+m := {n: n}
+n = 2
+print n a m
+`: `
+2 [1 1] {n:1}
+`[1:],
+		`
+a := {a: 1}
+b := a
+b = {b: 2}
+print "a" a
+print "b" b
+`: `
+a {a:1}
+b {b:2}
+`[1:],
+		`
+a := [1]
+b := a
+b = [2]
+print "a" a
+print "b" b
+`: `
+a [1]
+b [2]
+`[1:],
+		`
+a := {a:1}
+b := {aa:a}
+c := {aa:a}
+c.aa = {c:2}
+print "a" a
+print "b" b
+print "c" c
+`: `
+a {a:1}
+b {aa:{a:1}}
+c {aa:{c:2}}
+`[1:],
+		`
+a := [1 2]
+b := [a]
+c := [a]
+c[0] = [3 4]
+print "a" a
+print "b" b
+print "c" c
+`: `
+a [1 2]
+b [[1 2]]
+c [[3 4]]
+`[1:],
+		`
+arr := [1 2 3]
+
+func fn a:[]num
+    a[0] = 100
+    a = [6 7 8]
+end
+
+fn arr
+print "arr" arr // [100 2 3]
+`: `
+arr [100 2 3]
+`[1:],
+		`
+a:any
+arr := [1 2 3]
+a = arr
+arr[2] = 222
+arr = [5 6 7]
+print "a" a
+print "arr" arr
+`: `
+a [1 2 222]
+arr [5 6 7]
+`[1:],
+	}
+	for input, want := range tests {
+		got := run(input)
+		assert.Equal(t, want, got, input)
+	}
 	prog := `
 n := 1
 a := [n n]

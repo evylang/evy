@@ -254,11 +254,11 @@ func (e *Evaluator) eval(node parser.Node) (value, error) {
 	case *parser.BinaryExpression:
 		return e.evalBinaryExpr(node)
 	case *parser.IndexExpression:
-		return e.evalIndexExpr(node, false /* forAssign */)
+		return e.evalIndexExpr(node)
 	case *parser.SliceExpression:
 		return e.evalSliceExpr(node)
 	case *parser.DotExpression:
-		return e.evalDotExpr(node, false /* forAssign */)
+		return e.evalDotExpr(node)
 	case *parser.GroupExpression:
 		return e.eval(node.Expr)
 	case *parser.TypeAssertion:
@@ -348,11 +348,48 @@ func (e *Evaluator) evalAssignment(assignment *parser.AssignmentStmt) error {
 	if err != nil {
 		return err
 	}
-	target, err := e.evalTarget(assignment.Target)
+	switch n := assignment.Target.(type) {
+	case *parser.Var:
+		e.scope.update(n.Name, val)
+		return nil
+	case *parser.IndexExpression:
+		return e.evalAssignIndexExpr(n, val)
+	case *parser.DotExpression:
+		return e.evalAssignDotExpr(n, val)
+	}
+	return newErr(assignment.Target, fmt.Errorf("%w: invalid target type %v", ErrAssignmentTarget, assignment.Target.Type()))
+}
+
+func (e *Evaluator) evalAssignIndexExpr(expr *parser.IndexExpression, val value) error {
+	left, err := e.eval(expr.Left)
 	if err != nil {
 		return err
 	}
-	target.Set(val)
+	index, err := e.eval(expr.Index)
+	if err != nil {
+		return err
+	}
+	switch l := left.(type) {
+	case *arrayVal:
+		err = l.SetIndex(index, val)
+	case *mapVal:
+		key := index.(*stringVal).V
+		l.SetKey(key, val)
+	default:
+		err = fmt.Errorf("%w: expected array or map assignment target with index, found %v", ErrType, expr.Left.Type())
+	}
+	if err != nil {
+		return newErr(expr, err)
+	}
+	return nil
+}
+
+func (e *Evaluator) evalAssignDotExpr(expr *parser.DotExpression, val value) error {
+	m, err := e.evalDotLeft(expr)
+	if err != nil {
+		return newErr(expr, err)
+	}
+	m.SetKey(expr.Key, val)
 	return nil
 }
 
@@ -494,7 +531,11 @@ func (e *Evaluator) evalFor(f *parser.ForStmt) (value, error) {
 	if err != nil {
 		return nil, err
 	}
-	for r.next() {
+	loopVarName := "_"
+	if f.LoopVar != nil {
+		loopVarName = f.LoopVar.Name
+	}
+	for r.next(e.scope, loopVarName) {
 		val, err := e.eval(f.Block)
 		if err != nil {
 			return nil, err
@@ -522,15 +563,13 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 	case *arrayVal:
 		aRange := &arrayRange{array: v, cur: 0}
 		if f.LoopVar != nil {
-			aRange.loopVar = zero(f.LoopVar.Type())
-			e.scope.set(f.LoopVar.Name, aRange.loopVar)
+			e.scope.set(f.LoopVar.Name, zero(f.LoopVar.Type()))
 		}
 		return aRange, nil
 	case *stringVal:
 		sRange := &stringRange{str: v, cur: 0}
 		if f.LoopVar != nil {
-			sRange.loopVar = &stringVal{}
-			e.scope.set(f.LoopVar.Name, sRange.loopVar)
+			e.scope.set(f.LoopVar.Name, &stringVal{})
 		}
 		return sRange, nil
 	case *mapVal:
@@ -538,8 +577,7 @@ func (e *Evaluator) newRange(f *parser.ForStmt) (ranger, error) {
 		copy(order, *v.Order)
 		mapRange := &mapRange{mapVal: v, cur: 0, order: order}
 		if f.LoopVar != nil {
-			mapRange.loopVar = &stringVal{}
-			e.scope.set(f.LoopVar.Name, mapRange.loopVar)
+			e.scope.set(f.LoopVar.Name, &stringVal{})
 		}
 		return mapRange, nil
 	}
@@ -569,9 +607,7 @@ func (e *Evaluator) newStepRange(r *parser.StepRange, loopVar *parser.Var) (rang
 		step: step,
 	}
 	if loopVar != nil {
-		loopVarVal := &numVal{}
-		e.scope.set(loopVar.Name, loopVarVal)
-		sRange.loopVar = loopVarVal
+		e.scope.set(loopVar.Name, &numVal{})
 	}
 	return sRange, nil
 }
@@ -785,19 +821,7 @@ func evalBinaryArrayExpr(op parser.Operator, left *arrayVal, right value) (value
 	}
 }
 
-func (e *Evaluator) evalTarget(node parser.Node) (value, error) {
-	switch n := node.(type) {
-	case *parser.Var:
-		return e.evalVar(n)
-	case *parser.IndexExpression:
-		return e.evalIndexExpr(n, true /* forAssign */)
-	case *parser.DotExpression:
-		return e.evalDotExpr(n, true /* forAssign */)
-	}
-	return nil, newErr(node, fmt.Errorf("%w: %v", ErrAssignmentTarget, node))
-}
-
-func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) (value, error) {
+func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression) (value, error) {
 	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
@@ -806,7 +830,6 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 	if err != nil {
 		return nil, err
 	}
-
 	var val value
 	switch l := left.(type) {
 	case *arrayVal:
@@ -818,9 +841,6 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 		if !ok {
 			return nil, newErr(expr.Left, fmt.Errorf("%w: expected string for map index, found %v", ErrType, index))
 		}
-		if forAssign {
-			l.InsertKey(strIndex.V, expr.Type())
-		}
 		val, err = l.Get(strIndex.V)
 	default:
 		err = fmt.Errorf("%w: expected array, string or map with index, found %v", ErrType, expr.Left.Type())
@@ -831,7 +851,19 @@ func (e *Evaluator) evalIndexExpr(expr *parser.IndexExpression, forAssign bool) 
 	return val, nil
 }
 
-func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (value, error) {
+func (e *Evaluator) evalDotExpr(expr *parser.DotExpression) (value, error) {
+	m, err := e.evalDotLeft(expr)
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	val, err := m.Get(expr.Key)
+	if err != nil {
+		return nil, newErr(expr, err)
+	}
+	return val, nil
+}
+
+func (e *Evaluator) evalDotLeft(expr *parser.DotExpression) (*mapVal, error) {
 	left, err := e.eval(expr.Left)
 	if err != nil {
 		return nil, err
@@ -840,14 +872,7 @@ func (e *Evaluator) evalDotExpr(expr *parser.DotExpression, forAssign bool) (val
 	if !ok {
 		return nil, newErr(expr, fmt.Errorf(`%w: expected map before ".", found %v`, ErrType, left))
 	}
-	if forAssign {
-		m.InsertKey(expr.Key, expr.Type())
-	}
-	val, err := m.Get(expr.Key)
-	if err != nil {
-		return nil, newErr(expr, err)
-	}
-	return val, nil
+	return m, nil
 }
 
 func (e *Evaluator) evalSliceExpr(expr *parser.SliceExpression) (value, error) {

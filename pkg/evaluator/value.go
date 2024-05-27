@@ -5,12 +5,14 @@ import (
 	"strconv"
 	"strings"
 
+	"evylang.dev/evy/pkg/lexer"
 	"evylang.dev/evy/pkg/parser"
 )
 
 type value interface {
 	Equals(value) bool
 	String() string
+	Repr() string
 	Set(value)
 }
 
@@ -50,6 +52,7 @@ type breakVal struct{}
 type noneVal struct{}
 
 func (n *numVal) String() string { return strconv.FormatFloat(n.V, 'f', -1, 64) }
+func (n *numVal) Repr() string   { return n.String() }
 func (n *numVal) Equals(v value) bool {
 	n2, ok := v.(*numVal)
 	if !ok {
@@ -67,6 +70,7 @@ func (n *numVal) Set(v value) {
 }
 
 func (s *stringVal) String() string { return s.V }
+func (s *stringVal) Repr() string   { return strconv.Quote(s.V) }
 func (s *stringVal) Equals(v value) bool {
 	s2, ok := v.(*stringVal)
 	if !ok {
@@ -113,6 +117,10 @@ func (b *boolVal) String() string {
 	return strconv.FormatBool(b.V)
 }
 
+func (b *boolVal) Repr() string {
+	return b.String()
+}
+
 func (b *boolVal) Equals(v value) bool {
 	b2, ok := v.(*boolVal)
 	if !ok {
@@ -133,6 +141,10 @@ func (a *anyVal) String() string {
 	return a.V.String()
 }
 
+func (a *anyVal) Repr() string {
+	return a.V.Repr()
+}
+
 func (a *anyVal) Equals(v value) bool {
 	a2, ok := v.(*anyVal)
 	if !ok {
@@ -151,14 +163,17 @@ func (a *anyVal) Set(v value) {
 }
 
 func (n *noneVal) String() string      { return "" }
+func (n *noneVal) Repr() string        { return "" }
 func (n *noneVal) Equals(_ value) bool { return false }
 func (n *noneVal) Set(_ value)         { panic("internal error: None.Set called") }
 
 func (r *returnVal) String() string      { return r.V.String() }
+func (r *returnVal) Repr() string        { return r.V.Repr() }
 func (r *returnVal) Equals(v value) bool { return r.V.Equals(v) }
 func (r *returnVal) Set(v value)         { r.V.Set(v) }
 
 func (r *breakVal) String() string      { return "" }
+func (r *breakVal) Repr() string        { return "" }
 func (r *breakVal) Equals(_ value) bool { return false }
 func (r *breakVal) Set(_ value)         {}
 
@@ -166,6 +181,14 @@ func (a *arrayVal) String() string {
 	elements := make([]string, len(*a.Elements))
 	for i, e := range *a.Elements {
 		elements[i] = e.String()
+	}
+	return "[" + strings.Join(elements, " ") + "]"
+}
+
+func (a *arrayVal) Repr() string {
+	elements := make([]string, len(*a.Elements))
+	for i, e := range *a.Elements {
+		elements[i] = e.Repr()
 	}
 	return "[" + strings.Join(elements, " ") + "]"
 }
@@ -298,6 +321,21 @@ func (m *mapVal) String() string {
 		pairs = append(pairs, key+":"+m.Pairs[key].String())
 	}
 	return "{" + strings.Join(pairs, " ") + "}"
+}
+
+func (m *mapVal) Repr() string {
+	pairs := make([]string, 0, len(m.Pairs))
+	for _, key := range *m.Order {
+		pairs = append(pairs, keyRepr(key)+":"+m.Pairs[key].Repr())
+	}
+	return "{" + strings.Join(pairs, " ") + "}"
+}
+
+func keyRepr(s string) string {
+	if lexer.IsIdent(s) {
+		return s
+	}
+	return strconv.Quote(s)
 }
 
 func (m *mapVal) Equals(v value) bool {

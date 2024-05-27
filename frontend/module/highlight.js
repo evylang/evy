@@ -57,6 +57,7 @@ const builtins = new Set([
   "read",
   "rect",
   "replace",
+  "repr",
   "round",
   "sin",
   "sleep",

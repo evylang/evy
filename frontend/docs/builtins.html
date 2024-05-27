@@ -265,6 +265,9 @@
                 <li>
                   <a href="builtins.html#replace"><code>replace</code></a>
                 </li>
+                <li>
+                  <a href="builtins.html#repr"><code>repr</code></a>
+                </li>
               </ul>
             </li>
             <li>
@@ -1503,6 +1506,66 @@ print s
         <p>
           The <code>replace</code> function replaces all occurrences of the substring
           <code>old</code> in the string <code>s</code> with the substring <code>new</code>.
+        </p>
+        <h3><a id="repr" href="#repr" class="anchor">#</a><code>repr</code></h3>
+        <p>
+          <code>repr</code> returns a string representation of its arguments, typically as valid,
+          formatted Evy code. The notable exception are maps with keys that could not be used in a
+          map literal.
+        </p>
+        <h4>Example</h4>
+        <pre><code class="language-evy">s := repr 1 &quot;abc&quot;
+print s
+</code></pre>
+        <p>Output</p>
+        <pre><code class="language-evy-output">1 &quot;abc&quot;
+</code></pre>
+        <h4>Reference</h4>
+        <pre><code>repr:string a:any...
+</code></pre>
+        <p>
+          The <code>repr</code> function returns a string representation of its arguments, typically
+          as valid, formatted Evy code. The notable exception are maps with keys that could not be
+          used in a map literal.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Representation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>num</code></td>
+              <td>as is</td>
+            </tr>
+            <tr>
+              <td><code>bool</code></td>
+              <td>as is</td>
+            </tr>
+            <tr>
+              <td><code>string</code></td>
+              <td>double-quoted with internal quotes escaped</td>
+            </tr>
+            <tr>
+              <td><code>[]</code>...</td>
+              <td>enclosed in square brackets, details below</td>
+            </tr>
+            <tr>
+              <td><code>{}</code>...</td>
+              <td>enclosed in curly braces, details below</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The elements of an array are printed according to <code>repr</code> and space-separated.
+        </p>
+        <p>
+          The key-value pairs of a map are space-separated, with keys separated from values by
+          <code>:</code>. Keys are printed without quotes if they are valid identifiers or Evy
+          keywords, and surrounded by quotes with escaped internal quotes if not. Values are printed
+          according to <code>repr</code>.
         </p>
         <h2><a id="random" href="#random" class="anchor">#</a>Random</h2>
         <h3><a id="rand" href="#rand" class="anchor">#</a><code>rand</code></h3>

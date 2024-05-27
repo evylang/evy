@@ -219,6 +219,19 @@ func (l *Lexer) readString() (string, error) {
 	return r, nil
 }
 
+// IsIdent returns true if the given string is a valid identifier.
+func IsIdent(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i, r := range s {
+		if !isLetter(r) && (i > 0 && !isDigit(r)) {
+			return false
+		}
+	}
+	return true
+}
+
 func isLetter(r rune) bool {
 	return unicode.IsLetter(r) || r == '_'
 }

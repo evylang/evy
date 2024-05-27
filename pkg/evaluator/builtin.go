@@ -63,6 +63,7 @@ func newBuiltins(rt Runtime) builtins {
 		"endswith":   {Func: endswithFunc, Decl: endswithDecl},
 		"trim":       {Func: trimFunc, Decl: trimDecl},
 		"replace":    {Func: replaceFunc, Decl: replaceDecl},
+		"repr":       {Func: reprFunc, Decl: reprDecl},
 
 		"str2num":  {Func: builtinFunc(str2numFunc), Decl: str2numDecl},
 		"str2bool": {Func: builtinFunc(str2boolFunc), Decl: str2boolDecl},
@@ -377,6 +378,20 @@ func replaceFunc(_ *scope, args []value) (value, error) {
 	return &stringVal{V: strings.ReplaceAll(s, oldStr, newStr)}, nil
 }
 
+var reprDecl = &parser.FuncDefStmt{
+	Name:          "repr",
+	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
+	ReturnType:    parser.STRING_TYPE,
+}
+
+func reprFunc(_ *scope, args []value) (value, error) {
+	str := make([]string, len(args))
+	for i, arg := range args {
+		str[i] = arg.Repr()
+	}
+	return &stringVal{V: strings.Join(str, " ")}, nil
+}
+
 var str2numDecl = &parser.FuncDefStmt{
 	Name:       "str2num",
 	Params:     []*parser.Var{{Name: "s", T: parser.STRING_TYPE}},
@@ -535,7 +550,7 @@ func assertFunc(_ *scope, args []value) (value, error) {
 		want := args[0]
 		got := args[1]
 		if !same(want, got) {
-			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrAssert, want, got, assertMessage(args))
+			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrAssert, want.Repr(), got.Repr(), assertMessage(args))
 		}
 	}
 	return nil, nil

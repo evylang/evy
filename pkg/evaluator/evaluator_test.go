@@ -561,7 +561,7 @@ func TestFailedAssertion(t *testing.T) {
 		"assert false": "line 1 column 8: failed assertion: not true",
 		"assert 1 2":   "line 1 column 10: failed assertion: want != got: 1 != 2",
 		`assert "abc" "123" "string comparison"
-		`: "line 1 column 14: failed assertion: want != got: abc != 123 (string comparison)",
+		`: `line 1 column 14: failed assertion: want != got: "abc" != "123" (string comparison)`,
 		`answer := 6*9
 		assert 42 answer "the answer is 42, not %v" answer
 		`: `line 2 column 13: failed assertion: want != got: 42 != 54 (the answer is 42, not 54)`,
@@ -605,7 +605,7 @@ assert "abc" "123" "custom message"
 	want := `
 line 3 column 8: failed assertion: not true
 line 4 column 10: failed assertion: want != got: 1 != 2
-line 6 column 14: failed assertion: want != got: abc != 123 (custom message)`[1:]
+line 6 column 14: failed assertion: want != got: "abc" != "123" (custom message)`[1:]
 	assert.Equal(t, want, assertionErrors.Error())
 
 	eval = NewEvaluator(rt)

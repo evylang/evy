@@ -963,12 +963,9 @@ function showAbout() {
 
 async function share() {
   hideSidebar()
+  const note = document.querySelector("#dialog-share .note")
   await format()
-
-  if (errors) {
-    document.querySelector("#dialog-error").showModal()
-    return
-  }
+  errors ? note.classList.remove("hidden") : note.classList.add("hidden")
   const baseurl = window.location.origin + window.location.pathname
   const encoded = await encode(editor.value)
   const input = document.querySelector("#dialog-share .copy input")

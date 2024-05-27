@@ -635,13 +635,16 @@ dialog .copy input {
   min-width: 10em;
 }
 
-#dialog-error .err {
+dialog .err {
   font-family: var(--font-family-code);
   color: var(--color);
   margin-left: 8px;
   margin-right: 8px;
 }
 
+dialog .note {
+  margin-bottom: 16px;
+}
 /* --- Utilities ----------------------------------------------------- */
 .hidden {
   display: none;

@@ -16,6 +16,8 @@ const (
 	// OpSetGlobal adds a symbol to the specified index in the symbol
 	// table.
 	OpSetGlobal
+	// OpDrop pops and discards the top N elements of the stack.
+	OpDrop
 	// OpAdd instructs the virtual machine to perform an addition.
 	OpAdd
 	// OpSubtract instructs the virtual machine to perform a subtraction.
@@ -79,9 +81,8 @@ const (
 	// number of times.
 	OpArrayRepeat
 	// OpMap represents a map literal, the operand N is the length of
-	// the map multiplied by 2. This length N represents the total length
-	// of the flattened map in the stack, where keys and values have been
-	// pushed sequentially (k1, v1, k2, v2...).
+	// the map. The keys and values are read sequentially from the
+	// stack (e.g. k1, v1, k2, v2...).
 	OpMap
 	// OpIndex represents an index operator used on an array, map or
 	// string variable.
@@ -105,6 +106,14 @@ const (
 	// boolean and evaluate it. It will jump to the instruction address
 	// in its operand if the condition evaluates to false.
 	OpJumpOnFalse
+	// OpStepRange represents a range over a numeric start, stop and step.
+	// It has one operand that specifies if the loop range assigns to a
+	// loop variable.
+	OpStepRange
+	// OpIterRange represents a range over an iterable structure (a string,
+	// array or map). It has one operand that specifies if the loop range
+	// assigns to a loop variable.
+	OpIterRange
 )
 
 var (
@@ -127,6 +136,7 @@ var definitions = map[Opcode]*OpDefinition{
 	OpConstant:  {"OpConstant", []int{2}},
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
+	OpDrop:      {"OpDrop", []int{2}},
 	// Operations like OpAdd have no operand width because the virtual
 	// machine is expected to pop the values from the stack when reading
 	// this instruction.
@@ -154,8 +164,7 @@ var definitions = map[Opcode]*OpDefinition{
 	OpArray:            {"OpArray", []int{2}},
 	OpArrayConcatenate: {"OpArrayConcatenate", nil},
 	OpArrayRepeat:      {"OpArrayRepeat", nil},
-	// This operand width only allows maps of up to 32767 pairs, as the map doubles in length
-	// to 65535 when it is flattened onto the stack.
+	// This operand width only allows maps up to 65535 elements in length.
 	OpMap:         {"OpMap", []int{2}},
 	OpIndex:       {"OpIndex", nil},
 	OpSetIndex:    {"OpSetIndex", nil},
@@ -163,6 +172,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpNone:        {"OpNone", nil},
 	OpJump:        {"OpJump", []int{2}},
 	OpJumpOnFalse: {"OpJumpOnFalse", []int{2}},
+	OpStepRange:   {"OpStepRange", []int{2}}, // operand: hasLoopVar
+	OpIterRange:   {"OpIterRange", []int{2}}, // operand: hasLoopVar
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

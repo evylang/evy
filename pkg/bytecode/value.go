@@ -178,16 +178,19 @@ func (a arrayVal) Slice(start, end value) (value, error) {
 	return arrayVal{Elements: elements}, nil
 }
 
-type mapVal map[string]value
+type mapVal struct {
+	order []stringVal
+	m     map[stringVal]value
+}
 
 func (m mapVal) Type() *parser.Type {
 	return parser.GENERIC_MAP
 }
 
 func (m mapVal) String() string {
-	pairs := []string{}
-	for k, v := range m {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", k, v))
+	pairs := make([]string, len(m.order))
+	for i, k := range m.order {
+		pairs[i] = fmt.Sprintf("%s: %s", k, m.m[k])
 	}
 	return "{" + strings.Join(pairs, ", ") + "}"
 }
@@ -197,12 +200,12 @@ func (m mapVal) Equals(v value) bool {
 	if !ok {
 		panic("internal error: Map.Equals called with non-Map value")
 	}
-	if len(m) != len(m2) {
+	if len(m.m) != len(m2.m) {
 		return false
 	}
-	for key, val := range m {
-		val2 := m2[key]
-		if val2 == nil || !val.Equals(val2) {
+	for key, val := range m.m {
+		val2, ok := m2.m[key]
+		if !ok || val2 == nil || !val.Equals(val2) {
 			return false
 		}
 	}
@@ -211,10 +214,9 @@ func (m mapVal) Equals(v value) bool {
 
 func (m mapVal) Index(idx value) (value, error) {
 	k := idx.(stringVal)
-	key := string(k)
-	val, ok := m[key]
+	val, ok := m.m[k]
 	if !ok {
-		return nil, fmt.Errorf("%w %q", ErrMapKey, key)
+		return nil, fmt.Errorf("%w %q", ErrMapKey, idx)
 	}
 	return val, nil
 }

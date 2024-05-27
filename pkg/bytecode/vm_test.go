@@ -497,17 +497,23 @@ func TestMap(t *testing.T) {
 		{
 			name:         "empty",
 			input:        "x := {}",
-			wantStackTop: makeValue(t, map[string]any{}),
+			wantStackTop: makeValue(t, []pair{}),
 		},
 		{
 			name:         "assignment",
 			input:        "x := {a: 1 b: 2}",
-			wantStackTop: makeValue(t, map[string]any{"a": 1, "b": 2}),
+			wantStackTop: makeValue(t, []pair{{"a", 1}, {"b", 2}}),
 		},
 		{
 			name:         "index",
 			input:        `x := {a: 1 b: 2}["b"]`,
 			wantStackTop: makeValue(t, 2),
+		},
+		{
+			name: "nested assignment",
+			input: `y := {a: {c: 1} b: {d: 2}}
+			x := y["b"]`,
+			wantStackTop: makeValue(t, []pair{{"d", 2}}),
 		},
 	}
 	for _, tt := range tests {
@@ -661,6 +667,306 @@ func TestWhile(t *testing.T) {
 	}
 }
 
+func TestStepRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "for range default start and step",
+			input: `x := 0
+			for range 10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 10),
+		},
+		{
+			name: "for range default step",
+			input: `x := 0
+			for range 2 10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 8),
+		},
+		{
+			name: "for range var",
+			input: `x := 0
+			for i := range 10
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 9),
+		},
+		{
+			name: "for range step",
+			input: `x := 0
+			for i := range 0 10 4
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 8),
+		},
+		{
+			name: "for range negative step",
+			input: `x := 0
+			for i := range 10 0 -1
+				x = i
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "for range invalid stop",
+			input: `x := 0
+			for range -10
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 0),
+		},
+		{
+			name: "for break",
+			input: `x := 0
+			for range 5
+				x = x + 1
+				if x == 3
+					break
+				end
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+		},
+		{
+			name: "for break stack reset",
+			input: `x := 0
+			for range 5
+				x = x + 1
+				if x == 3
+					break
+				end
+			end`,
+			// The last element popped off the stack should be the stop value
+			// for the step range, which is the first thing pushed when compiling
+			// the for step range bytecode.
+			wantStackTop: makeValue(t, 5),
+		},
+		{
+			name: "nested step range",
+			input: `x := 0
+			for range 5
+				for range 3
+					x = x + 1
+				end
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 15),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestArrayRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "for range array",
+			input: `x := 0
+			for e := range [1 2 3]
+				x = e
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+		},
+		{
+			name: "for range array no loopvar",
+			input: `x := 0
+			for range [1 2 3]
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+		},
+		{
+			name: "for range array variable",
+			input: `x := 0
+			y := [1 2 3]
+			for e := range y
+				x = e
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 3),
+		},
+		{
+			name: "for range array break",
+			input: `x := 0
+			for x := range [1 2 3]
+				if x == 2
+					break
+				end
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 2),
+		},
+		{
+			name: "for break stack reset",
+			input: `x := 0
+			for x := range [1 2 3]
+				if x == 2
+					break
+				end
+			end`,
+			// The last element popped off the stack should be the array being
+			// iterated, which is the first thing pushed when compiling
+			// the for array range bytecode.
+			wantStackTop: makeValue(t, []any{1, 2, 3}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestMapRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "map range",
+			input: `x := ""
+			for e := range {a:22 b:44}
+				x = e
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "b"),
+		},
+		{
+			name: "map range variable",
+			input: `x := ""
+			y := {a:22 b:44}
+			for e := range y
+				x = e
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "b"),
+		},
+		{
+			name: "map range break",
+			input: `x := ""
+			for x := range {a:22 b:44}
+				if x == "a"
+					break
+				end
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "a"),
+		},
+		{
+			name: "for break stack reset",
+			input: `x := ""
+			for x := range {a:22 b:44}
+				if x == "a"
+					break
+				end
+			end`,
+			// The last element popped off the stack should be the map being
+			// iterated, which is the first thing pushed when compiling
+			// the for map range bytecode.
+			wantStackTop: makeValue(t, []pair{{"a", 22}, {"b", 44}}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestStringRange(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "string range",
+			input: `x := ""
+			for e := range "hello world"
+				x = e
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "d"),
+		},
+		{
+			name: "string range variable",
+			input: `x := ""
+			y := "hello world"
+			for e := range y
+				x = e
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "d"),
+		},
+		{
+			name: "string range break",
+			input: `x := ""
+			for x := range "hello world"
+				if x == "o"
+					break
+				end
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, "o"),
+		},
+		{
+			name: "for break stack reset",
+			input: `x := ""
+			for x := range "hello world"
+				if x == "o"
+					break
+				end
+			end`,
+			// The last element popped off the stack should be the string being
+			// iterated, which is the first thing pushed when compiling
+			// the for string range bytecode.
+			wantStackTop: makeValue(t, "hello world"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+type pair struct {
+	k string
+	v any
+}
+
 func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
@@ -681,10 +987,14 @@ func makeValue(t *testing.T, a any) value {
 	switch v := a.(type) {
 	case []any:
 		return arrayVal{Elements: makeValues(t, v...)}
-	case map[string]any:
-		m := mapVal{}
-		for key, val := range v {
-			m[key] = makeValue(t, val)
+	case []pair:
+		m := mapVal{
+			order: make([]stringVal, 0),
+			m:     make(map[stringVal]value),
+		}
+		for _, pair := range v {
+			m.m[stringVal(pair.k)] = makeValue(t, pair.v)
+			m.order = append(m.order, stringVal(pair.k))
 		}
 		return m
 	case string:

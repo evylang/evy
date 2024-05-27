@@ -49,6 +49,7 @@ import (
 	"strconv"
 	"time"
 
+	"evylang.dev/evy/pkg/bytecode"
 	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
 	"evylang.dev/evy/pkg/lexer"
@@ -86,6 +87,7 @@ type app struct {
 
 	Tokenize tokenizeCmd `cmd:"" help:"Tokenize evy program" hidden:""`
 	Parse    parseCmd    `cmd:"" help:"Parse evy program" hidden:""`
+	Compile  compileCmd  `cmd:"" help:"Output compiled bytecode of evy program" hidden:""`
 }
 
 func main() {
@@ -134,6 +136,10 @@ type tokenizeCmd struct {
 }
 
 type parseCmd struct {
+	Source string `arg:"" help:"Source file. Default: stdin" default:"-"`
+}
+
+type compileCmd struct {
 	Source string `arg:"" help:"Source file. Default: stdin" default:"-"`
 }
 
@@ -384,6 +390,32 @@ func (c *parseCmd) Run() error {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
 	fmt.Println(ast.String())
+	return nil
+}
+
+// Run implements the hidden `evy compile` CLI command, called by the
+// Kong API.
+func (c *compileCmd) Run() error {
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return err
+	}
+	ast, err := parser.Parse(string(b), parser.Builtins{})
+	if err != nil {
+		return fmt.Errorf("%w: %w", errParse, truncateError(err))
+	}
+	comp := bytecode.NewCompiler()
+	if err := comp.Compile(ast); err != nil {
+		return err
+	}
+	bc := comp.Bytecode()
+	fmt.Println("Constants:")
+	for i, c := range bc.Constants {
+		fmt.Printf("%d: %v\n", i, c)
+	}
+	fmt.Println("\nBytecode:")
+	fmt.Print(bc.Instructions)
+
 	return nil
 }
 

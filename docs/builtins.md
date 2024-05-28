@@ -30,7 +30,7 @@ see [syntax by example](syntax_by_example.md).
 6. [**Errors**](#errors)  
    [Panic](#panic-1), [Recoverable Errors](#recoverable-errors)
 7. [**String**](#string)  
-   [sprint](#sprint), [sprintf](#sprintf), [join](#join), [split](#split), [upper](#upper), [lower](#lower), [index](#index), [startswith](#startswith), [endswith](#endswith), [trim](#trim), [replace](#replace)
+   [sprint](#sprint), [sprintf](#sprintf), [join](#join), [split](#split), [upper](#upper), [lower](#lower), [index](#index), [startswith](#startswith), [endswith](#endswith), [trim](#trim), [replace](#replace), [repr](#repr)
 8. [**Random**](#random)  
    [rand](#rand), [rand1](#rand1)
 9. [**Math**](#math)  
@@ -1093,6 +1093,48 @@ ABC123xyzABC ABC
 
 The `replace` function replaces all occurrences of the substring `old`
 in the string `s` with the substring `new`.
+
+### `repr`
+
+`repr` returns a string representation of its arguments, typically as valid,
+formatted Evy code. The notable exception are maps with keys that could not be
+used in a map literal.
+
+#### Example
+
+```evy
+s := repr 1 "abc"
+print s
+```
+
+Output
+
+```evy:output
+1 "abc"
+```
+
+#### Reference
+
+    repr:string a:any...
+
+The `repr` function returns a string representation of its arguments,
+typically as valid, formatted Evy code. The notable exception are maps with
+keys that could not be used in a map literal.
+
+| Type     | Representation                             |
+| -------- | ------------------------------------------ |
+| `num`    | as is                                      |
+| `bool`   | as is                                      |
+| `string` | double-quoted with internal quotes escaped |
+| `[]`...  | enclosed in square brackets, details below |
+| `{}`...  | enclosed in curly braces, details below    |
+
+The elements of an array are printed according to `repr` and space-separated.
+
+The key-value pairs of a map are space-separated, with keys separated from
+values by `:`. Keys are printed without quotes if they are valid identifiers
+or Evy keywords, and surrounded by quotes with escaped internal quotes if
+not. Values are printed according to `repr`.
 
 ## Random
 

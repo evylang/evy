@@ -152,6 +152,42 @@ func TestFunccallError(t *testing.T) {
 	}
 }
 
+func TestFuncDefError(t *testing.T) {
+	tests := map[string]string{
+		`
+func f:[]int
+  return 0
+end`: `line 2 column 8: invalid return type`,
+		`
+func f:int s:string
+  print s
+  return 0
+end`: `line 2 column 8: invalid return type`,
+		`
+func f:[]int s:string
+  print s
+  return 0
+end`: `line 2 column 8: invalid return type`,
+		`
+func f:[string s:string
+  print s
+  return 0
+end`: `line 2 column 8: invalid return type`,
+		`
+func f:[]string s:chars
+  print s
+  return 0
+end`: `line 2 column 17: invalid type declaration for "s"`,
+	}
+	for input, err1 := range tests {
+		parser := newParser(input, testBuiltins())
+		_ = parser.parse()
+		assertParseError(t, parser, input)
+		got := parser.errors.Truncate(1)
+		assert.Equal(t, err1, got.Error())
+	}
+}
+
 func TestBlock(t *testing.T) {
 	tests := map[string]string{
 		`

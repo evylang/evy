@@ -797,7 +797,7 @@ function registerEventHandler(ptr, len) {
     c.onpointerup = (e) => exp.onUp(logicalX(e), logicalY(e))
   } else if (s === "move") {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
-    c.onpointerleave = (e) => exp.onMove(...leaveXY(e))
+    c.onmouseleave = (e) => exp.onMove(...leaveXY(e)) // pointer can leave in middle of canvas
   } else if (s === "key") {
     unfocusRunBotton()
     document.addEventListener("keydown", keydownListener)

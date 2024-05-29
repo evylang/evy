@@ -440,9 +440,10 @@ func (p *parser) parseFuncDefSignature() *FuncDefStmt {
 	p.advance() // advance past function name IDENT
 	if p.cur.TokenType() == lexer.COLON {
 		p.advance() // advance past `:` of return type declaration, e.g. in `func rand:num`
+		tok := p.cur
 		fd.ReturnType = p.parseType()
 		if fd.ReturnType == nil {
-			p.appendErrorForToken("invalid return type: "+p.cur.Format(), fd.token)
+			p.appendErrorForToken("invalid return type", tok)
 		}
 	}
 	for !p.isAtEOL() && p.cur.TokenType() != lexer.DOT3 {

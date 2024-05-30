@@ -200,10 +200,16 @@ button.share > div {
   display: flex;
   overflow: clip;
   transition: translate 0.3s ease-in-out;
+  justify-content: center;
 }
 
-.main.view-output {
-  translate: -100vw;
+@media (max-width: 767px) {
+  .main.view-output {
+    translate: -100vw;
+  }
+  .main {
+    justify-content: left;
+  }
 }
 
 @media (prefers-reduced-motion) {

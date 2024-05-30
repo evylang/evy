@@ -17,6 +17,7 @@ let sampleData
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
+let editorHidden = false
 
 // --- Initialize ------------------------------------------------------
 
@@ -234,6 +235,10 @@ async function handleRun() {
 // handleMobRun handles three states for mobile devices:
 // run -> stop -> code
 async function handleMobRun() {
+  if (editorHidden) {
+    handleRun()
+    return
+  }
   if (onCodeScreen()) {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
@@ -399,6 +404,9 @@ async function handleHashChange() {
   clearOutput()
   await format()
   editor.onUpdate(clearHash)
+  editorHidden = opts.editor === "none"
+  const classList = document.querySelector(".editor-wrap").classList
+  editorHidden ? classList.add("hidden") : classList.remove("hidden")
 }
 
 // parseHash parses URL fragment into object e.g.:

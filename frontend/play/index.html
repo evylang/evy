@@ -242,6 +242,9 @@
         document.querySelector(".placeholder").innerText = sessionStorage.getItem("evy-editor")
         document.querySelector(".lines").innerText = ""
       }
+      if (window.location.hash.includes("editor=none")) {
+        document.querySelector(".editor-wrap").classList.add("hidden")
+      }
     </script>
   </body>
 </html>

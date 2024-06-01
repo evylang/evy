@@ -5,6 +5,8 @@ answer-type: single-choice
 answer: a
 ---
 
+## The `print` command
+
 Which program generates the following output?
 
 ```

@@ -5,6 +5,8 @@ answer-type: single-choice # single-choice, multiple-choice, free-text, multiple
 answer: d
 ---
 
+## The `print` command
+
 What does this program output?
 
 [question](print/print.d.evy "evy:source")

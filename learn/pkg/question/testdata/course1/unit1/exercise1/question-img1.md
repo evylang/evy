@@ -5,6 +5,8 @@ answer-type: single-choice # single-choice, multiple-choice, free-text, multiple
 answer: b
 ---
 
+## Understanding sequence: `move`, `color`, `circle` commands
+
 What does this program output?
 
 ```evy

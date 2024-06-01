@@ -431,6 +431,9 @@ const questionPrefixHTML = `<!doctype html>
         background: white;
         border: 1px solid silver
       }
+      form {
+        padding-bottom: 32px;
+      }
       form svg {
         width: 200px;
         height: 200px;
@@ -444,6 +447,17 @@ const questionPrefixHTML = `<!doctype html>
       }
       form.difficulty-hard:after {
         content: "Difficulty: 🌶️🌶️🌶️";
+      }
+      form:not(:first-child) {
+        border-top: 1px solid silver;
+      }
+      table {
+        border-collapse: collapse;
+        margin-bottom: 24px;
+      }
+      td {
+        border: 1px solid silver;
+        padding: 4px 8px;
       }
     </style>
   </head>

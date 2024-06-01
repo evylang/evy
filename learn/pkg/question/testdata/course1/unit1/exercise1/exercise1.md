@@ -5,6 +5,6 @@ composition:
   - medium: 2
 ---
 
-# Exercise 1 - demo and test sample
+# Exercise 1
 
-Exercise 1 tag line goes here. Questions will be rendered below
+Exercise 1 shows how exercises are composed, it's not a _real_ exercise.

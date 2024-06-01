@@ -35,7 +35,7 @@ var allTestQuestions = []string{
 func TestNewModel(t *testing.T) {
 	for name := range testQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			got, err := NewModel(fname)
 			assert.NoError(t, err)
 
@@ -49,7 +49,7 @@ func TestNewModel(t *testing.T) {
 func TestValidateAnswer(t *testing.T) {
 	for name := range testQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			err = model.Verify()
@@ -67,7 +67,7 @@ func TestExportAnswer(t *testing.T) {
 			err = json.Unmarshal(b, &wantAnswerKey)
 			assert.NoError(t, err)
 
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			gotAnswerKey, err := model.ExportAnswerKey()
@@ -90,7 +90,7 @@ func TestExportAnswer(t *testing.T) {
 func TestSealAnswer(t *testing.T) {
 	for name, answer := range testQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 
@@ -106,7 +106,7 @@ func TestSealAnswer(t *testing.T) {
 }
 
 func TestUnsealAnswer(t *testing.T) {
-	fname := "testdata/course1/unit1/exercise1/questions/question1-sealed.md"
+	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewModel(fname, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)
 	assert.Equal(t, "", model.Frontmatter.Answer)
@@ -118,7 +118,7 @@ func TestUnsealAnswer(t *testing.T) {
 }
 
 func TestExportAnswerKeyFromSeal(t *testing.T) {
-	fname := "testdata/course1/unit1/exercise1/questions/question1-sealed.md"
+	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewModel(fname, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)
 	gotAnswerKey, err := model.ExportAnswerKey()
@@ -151,7 +151,7 @@ func TestErrInvalidAnswer(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			err = model.Verify()
@@ -161,13 +161,13 @@ func TestErrInvalidAnswer(t *testing.T) {
 }
 
 func TestErrNoExistMD(t *testing.T) {
-	fname := "testdata/course1/unit1/exercise1/questions/MISSING-FILE.md"
+	fname := "testdata/course1/unit1/exercise1/MISSING-FILE.md"
 	_, err := NewModel(fname)
 	assert.Error(t, os.ErrNotExist, err)
 }
 
 func TestErrNoExistSVG(t *testing.T) {
-	fname := "testdata/course1/unit1/err-exercise1/questions/err-img3.md"
+	fname := "testdata/course1/unit1/err-exercise1/err-img3.md"
 	_, err := NewModel(fname)
 	assert.Error(t, os.ErrNotExist, err)
 }
@@ -181,7 +181,7 @@ func TestErrBadMDImg(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrBadMarkdownStructure, err)
 		})
@@ -199,7 +199,7 @@ func TestErrBadMDLink(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrBadMarkdownStructure, err)
 		})
@@ -213,7 +213,7 @@ func TestErrInconsistency(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrInconsistentMdoel, err)
 		})
@@ -233,7 +233,7 @@ func TestRendererTracking(t *testing.T) {
 	}
 	for name, want := range embeds {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			got := model.embeds
@@ -252,7 +252,7 @@ func TestRendererTracking(t *testing.T) {
 func TestPrintHTML(t *testing.T) {
 	for _, name := range allTestQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			buf := &bytes.Buffer{}
@@ -271,7 +271,7 @@ func TestPrintHTML(t *testing.T) {
 func TestToHTML(t *testing.T) {
 	for _, name := range allTestQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			got, err := model.ToHTML(false /* withMarked */)
@@ -289,7 +289,7 @@ func TestToHTML(t *testing.T) {
 func TestToHTMLWithMarked(t *testing.T) {
 	for name := range testQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/exercise1/questions/" + name + ".md"
+			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			got, err := model.ToHTML(true /* withMarked */)
@@ -305,7 +305,7 @@ func TestToHTMLWithMarked(t *testing.T) {
 }
 
 func TestToHTMLWithMarkedSealErr(t *testing.T) {
-	fname := "testdata/course1/unit1/exercise1/questions/question1-sealed.md"
+	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewModel(fname)
 	assert.NoError(t, err)
 	_, err = model.ToHTML(true /* withMarked */)
@@ -313,7 +313,7 @@ func TestToHTMLWithMarkedSealErr(t *testing.T) {
 }
 
 func TestToHTMLWithMarkedSealed(t *testing.T) {
-	fname := "testdata/course1/unit1/exercise1/questions/question1-sealed.md"
+	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewModel(fname, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)
 	got, err := model.ToHTML(true /* withMarked */)

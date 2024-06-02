@@ -5,7 +5,7 @@ on https://learn.evy.dev. This includes the markdown files, images, Evy code
 samples, but also Firebase and Firestore utilities for answer verification
 and progress tracking. However, frontend code is not included in this directory.
 
-The target structure of Evy learn materials is (inspired by https://khanacademy.org):
+The target structure of Evy learn materials is, inspired by [Khanacademy]:
 
     Course -> Unit -> Exercise -> Question
 
@@ -26,6 +26,8 @@ Questions are encoded in markdown files. Each question has a YAML front matter s
      difficulty: easy # "easy", "medium", "hard", "retriable"
      answer-type: single-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program
      answer: c
+
+[Khanacademy]: https://khanacademy.org
 
 ## `levy`
 

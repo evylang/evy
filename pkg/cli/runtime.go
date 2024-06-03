@@ -67,7 +67,7 @@ func NewRuntime(options ...Option) *Runtime {
 
 // Print prints s to stdout.
 func (rt *Runtime) Print(s string) {
-	fmt.Fprint(rt.writer, s)
+	fmt.Fprint(rt.writer, s) //nolint:errcheck // no need to check for stdout
 }
 
 // Cls clears the screen.

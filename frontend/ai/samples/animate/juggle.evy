@@ -1,0 +1,55 @@
+// increase `s` for highter speed
+// try 5.1 vs 5 to visualize rounding errors
+s := 0.5
+radius := 5
+
+colors := ["red" "orange" "gold" "forestgreen" "blue" "indigo" "purple" "deeppink"]
+dots := [
+    {x:(pos 0) y:(pos 2) dx:s dy:s}
+    {x:(pos 1) y:(pos 3) dx:s dy:s}
+    {x:(pos 2) y:(pos 4) dx:s dy:-s}
+    {x:(pos 3) y:(pos 3) dx:s dy:-s}
+    {x:(pos 4) y:(pos 2) dx:-s dy:-s}
+    {x:(pos 3) y:(pos 1) dx:-s dy:-s}
+    {x:(pos 2) y:(pos 0) dx:-s dy:s}
+    {x:(pos 1) y:(pos 1) dx:-s dy:s}
+]
+
+for i := range (len dots)
+    dots[i].radius = radius
+    dots[i].color = i
+end
+
+func pos:num i:num
+    l := (100 - 2 * radius) / 4
+    return radius + i * l
+end
+
+on animate
+    clear
+
+    for dot := range dots
+        update dot
+        draw dot colors[dot.color]
+    end
+end
+
+func update dot:{}num
+    dot.x = dot.x + dot.dx
+    dot.y = dot.y + dot.dy
+    dot.dx = delta dot.dx dot.x
+    dot.dy = delta dot.dy dot.y
+end
+
+func delta:num d:num n:num
+    if n >= radius and n < 100 - radius
+        return d
+    end
+    return -d
+end
+
+func draw dot:{}num col:string
+    color col
+    move dot.x dot.y
+    circle dot.radius
+end

@@ -1,0 +1,9 @@
+move 20 0
+rect 10 30
+rect 20 5
+
+move 50 50
+color "red"
+circle 10
+
+grid

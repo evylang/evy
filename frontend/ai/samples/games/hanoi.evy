@@ -1,0 +1,87 @@
+// towers of hanoi
+
+colors := ["red" "orange" "gold" "green" "blue" "darkviolet" "violet" "black"]
+towers := [
+    []
+    [8 7 6 5 4 3 2 1]
+    []
+]
+
+selected := -1
+startTower := 1
+numPieces := (len towers[startTower])
+
+// Drawing / positioning
+towerx := [17 50 83]
+w := 5 // line width
+basey := 20
+font {align:"center" baseline:"top"}
+
+width w
+linecap "round"
+
+func drawTowers
+    clear "white"
+    color "black"
+    move 0 basey-(w / 2)
+    line 100 basey-(w / 2)
+    for tower := range 3
+        x := towerx[tower]
+        color "black"
+        move x basey
+        line x basey+42
+        if tower == 2
+            text "✨"
+        end
+        for n := range (len towers[tower])
+            y := n * w + (w / 2) + basey
+            if tower == selected and n == (len towers[tower]) - 1
+                y = y + w
+            end
+            piece := towers[tower][n]
+            pieceWidth := piece * 3 + 5
+            color colors[piece - 1]
+            move x-(pieceWidth / 2) y
+            line x+(pieceWidth / 2) y
+        end
+    end
+end
+
+on down x:num _:num
+    tower := floor x/100*3
+    if selected == -1 and (len towers[tower]) == 0
+        cls
+        print "No pieces on that tower!"
+        return
+    else if selected == -1
+        selected = tower
+    else if selected == tower
+        selected = -1
+    else
+        movePiece selected tower
+        selected = -1
+    end
+    drawTowers
+    checkGameover tower
+end
+
+func movePiece from:num to:num
+    if (len towers[to]) > 0 and towers[from][-1] > towers[to][-1]
+        cls
+        print "Piece too big to move there."
+        return
+    end
+    towers[to] = towers[to] + [towers[from][-1]]
+    towers[from] = towers[from][:-1]
+end
+
+func checkGameover tower:num
+    if tower == 2 and (len towers[tower]) == numPieces
+        cls
+        print "Well done! 🥳"
+        exit 0
+    end
+end
+
+drawTowers
+print "Move all disks to the third pole✨."

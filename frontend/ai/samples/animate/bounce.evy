@@ -1,0 +1,17 @@
+background := hsl 0 0 0 10
+x := 10
+y := 50
+s := 1
+width 1
+fill background
+stroke "red"
+
+on animate
+    clear background
+    move x y
+    circle 10
+    x = x + s
+    if x < 10 or x > 90
+        s = -s
+    end
+end

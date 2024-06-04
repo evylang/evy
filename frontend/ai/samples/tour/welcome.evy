@@ -1,0 +1,11 @@
+move 10 20
+line 50 50
+rect 25 25
+color "red"
+circle 10
+
+x := 12
+print "x:" x
+if x > 10
+    print "🍦 big x"
+end

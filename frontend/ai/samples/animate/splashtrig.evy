@@ -1,0 +1,49 @@
+colors := ["red" "orange" "gold" "forestgreen" "blue" "indigo" "purple" "deeppink"]
+speed := [0.007 0.006 0.005 0.004 0.003]
+// 2% opacity leaves trails on movement, try hsl 0 0 0 2 for black
+background := hsl 0 0 100 2
+
+orbits := len speed // number of moving rings
+dots := len colors // number of dots per ring
+radius := 100 / (orbits * 4 + 2)
+
+pi := 3.141593
+tau := 2 * pi
+
+dot:{}num
+ring := [dot] * dots
+rings := [ring] * orbits
+
+// initialize dots
+for i := range orbits
+    for j := range dots
+        dot := rings[i][j]
+        dot.speed = speed[i]
+        dot.orbit = (i + 1) * radius * 2
+        dot.phase = j / dots
+        dot.radius = radius
+        dot.color = j
+    end
+end
+
+on animate
+    clear background
+    for ring := range rings
+        for dot := range ring
+            update dot
+            draw dot colors[dot.color]
+        end
+    end
+end
+
+func update dot:{}num
+    dot.phase = dot.phase - dot.speed
+end
+
+func draw dot:{}num col:string
+    color col
+    x := 50 + dot.orbit * (cos (tau * dot.phase))
+    y := 50 + dot.orbit * (sin (tau * dot.phase))
+    move x y
+    circle dot.radius
+end

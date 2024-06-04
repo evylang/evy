@@ -1,0 +1,51 @@
+x := 50
+y := 50
+dy := 2
+radius := 5
+stopped := false
+speed := 0.5
+hue := 0
+
+dot x y radius hue
+
+on animate
+    if stopped
+        return
+    end
+    clear
+    y = y + dy * speed
+    dot x y radius hue
+    if y >= 100 - radius or y <= radius
+        dy = dy * -1
+    end
+end
+
+on key k:string
+    print "key" k
+    if k == " "
+        stopped = !stopped
+    else if k == "ArrowUp"
+        hue = hue + 5
+    else if k == "ArrowDown"
+        hue = hue - 5
+    end
+    dot x y radius hue
+end
+
+// update x position with x-slider
+// update speed with y-slider
+on input id:string val:string
+    if id == "sliderx"
+        x = str2num val
+    else
+        s := str2num val
+        speed = s * 0.01
+    end
+    dot x y radius hue
+end
+
+func dot x:num y:num radius:num hue:num
+    color (hsl hue)
+    move x y
+    circle radius
+end

@@ -1,0 +1,5 @@
+print "Write something, press enter and enjoy the echo."
+while true
+    s := read
+    print s s s
+end

@@ -33,6 +33,10 @@
       ]
     },
     {
+      "target": "ai",
+      "public": "public/ai"
+    },
+    {
       "target": "discord",
       "public": "public/discord"
     },

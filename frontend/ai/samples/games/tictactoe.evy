@@ -1,0 +1,374 @@
+// See https://evy.dev#tictactoetext for a simpler, text based version
+// x - bot
+// o - human
+
+board:[]string
+humanScore:num
+botScore:num
+botStrength := 2
+botStart := false
+turn:string
+
+font {family:"Fira Code, monospace"}
+linecap "round"
+
+newGame
+
+func newGame
+    board = newBoard
+    if botStart
+        turn = "x"
+        draw
+        botTurn
+    end
+    turn = "o"
+    draw
+    botStart = !botStart
+end
+
+func newBoard:[]string
+    return [
+        "." "." "."
+        "." "." "."
+        "." "." "."
+    ]
+end
+
+func drawGameover
+    msg := "🎀 Tie."
+    w := winner
+    if w == "o"
+        humanScore = humanScore + 1
+        msg = "🥳 You win!"
+    else if w == "x"
+        botScore = botScore + 1
+        msg = "🤖 wins."
+    end
+    clear "white"
+    drawBoard
+    drawWinningLine
+    drawWinningMsg msg
+    sleep 0.5
+    newGame
+end
+
+// --- graphics ---
+
+func draw
+    clear "white"
+    drawBoard
+    drawScore
+end
+
+func drawBoard
+    // grid
+    vline 37.5 27 98 1 "black"
+    vline 62.5 27 98 1 "black"
+    hline 12.5 87.5 50 1 "black"
+    hline 12.5 87.5 75 1 "black"
+
+    // x and o
+    font {size:20}
+    for i := range 9
+        if board[i] != "."
+            x := (getX i) - 6
+            y := (getY i) - 6
+            move x y
+            text board[i]
+        end
+    end
+end
+
+func drawScore
+    font {size:4}
+    move 13 16
+    text (sprintf "score     🤖:%.0f    you:%.0f" botScore humanScore)
+    move 13 10
+    text "strength  "+(repeatstr "🦾" botStrength)
+    move 13 4
+    if turn == "x"
+        text "turn      🤖 thinking…"
+    else if turn == "o"
+        text "turn      you"
+    end
+end
+
+func drawWinningLine
+    w := winner
+    if w == "."
+        return
+    end
+    l := winningLine w
+    color (hsl 330 100 50 80)
+    width 3
+    move (getX l.i1) (getY l.i1)
+    line (getX l.i2) (getY l.i2)
+end
+
+func winningLine:{}num s:string
+    if board[0] == s and board[1] == s and board[2] == s
+        return {i1:0 i2:2}
+    else if board[3] == s and board[4] == s and board[5] == s
+        return {i1:3 i2:5}
+    else if board[6] == s and board[7] == s and board[8] == s
+        return {i1:6 i2:8}
+    else if board[0] == s and board[3] == s and board[6] == s
+        return {i1:0 i2:6}
+    else if board[1] == s and board[4] == s and board[7] == s
+        return {i1:1 i2:7}
+    else if board[2] == s and board[5] == s and board[8] == s
+        return {i1:2 i2:8}
+    else if board[0] == s and board[4] == s and board[8] == s
+        return {i1:0 i2:8}
+    else if board[2] == s and board[4] == s and board[6] == s
+        return {i1:2 i2:6}
+    end
+    return {}
+end
+
+func drawWinningMsg msg:string
+    move 13 10
+    color "black"
+    font {size:7}
+    text msg
+    sleep 1.5
+end
+
+func getX:num i:num
+    return 24 + (i % 3) * 25
+end
+
+func getY:num i:num
+    return 88 - (floor i/3) * 25
+end
+
+func vline x:num y1:num y2:num w:num c:string
+    line2 x y1 x y2 w c
+end
+
+func hline x1:num x2:num y:num w:num c:string
+    line2 x1 y x2 y w c
+end
+
+func line2 x1:num y1:num x2:num y2:num w:num c:string
+    width w
+    color c
+    move x1 y1
+    line x2 y2
+end
+
+func repeatstr:string s:string cnt:num
+    r:string
+    for range cnt
+        r = r + s
+    end
+    return r
+end
+
+// --- game logic ---
+
+on down x:num y:num
+    if y > 25 and x > 13 and x < 87
+        i := floor (x - 12.5)/25
+        j := floor (100 - y)/25
+        humanBotTurn i+j*3
+        return
+    end
+    if x > 35 and x < 55 and y > 7 and y < 16
+        botStrength = botStrength % 3 + 1
+        draw
+        return
+    end
+end
+
+func humanBotTurn i:num
+    success := humanTurn i
+    if !success
+        return
+    end
+    if (isGameover)
+        drawGameover
+        return
+    end
+
+    turn = "x"
+    draw
+    botTurn
+
+    turn = "o"
+    draw
+    if (isGameover)
+        drawGameover
+    end
+end
+
+func humanTurn:bool i:num
+    if board[i] != "."
+        return false
+    end
+    board[i] = "o"
+    return true
+end
+
+func isGameover:bool
+    return (emptyCnt) == 0 or (winner) != "."
+end
+
+func emptyCnt:num
+    cnt := 0
+    for i := range 9
+        if board[i] == "."
+            cnt = cnt + 1
+        end
+    end
+    return cnt
+end
+
+func winner:string
+    if board[0] != "." and ((board[1] == board[0] and board[2] == board[0]) or (board[4] == board[0] and board[8] == board[0]) or (board[3] == board[0] and board[6] == board[0]))
+        return board[0]
+    end
+    if board[4] != "." and ((board[1] == board[4] and board[7] == board[4]) or (board[3] == board[4] and board[5] == board[4]) or (board[2] == board[4] and board[6] == board[4]))
+        return board[4]
+    end
+    if board[8] != "." and ((board[6] == board[8] and board[7] == board[8]) or (board[2] == board[8] and board[5] == board[8]))
+        return board[8]
+    end
+    return "." // no winner
+end
+
+func botTurn
+    if botStrength == 1
+        bot1Turn
+    else if botStrength == 2
+        bot2Turn
+    else
+        bot3Turn
+    end
+end
+
+func bot1Turn
+    target := rand (emptyCnt)
+    cnt := 0
+    for i := range 9
+        if board[i] == "."
+            if target == cnt
+                board[i] = "x"
+                return
+            end
+            cnt = cnt + 1
+        end
+    end
+end
+
+func bot2Turn
+    // try to win in next move
+    for i := range 9
+        if board[i] == "."
+            board[i] = "x"
+            if (winner) == "x"
+                return
+            end
+            board[i] = "."
+        end
+    end
+    // try to stop "o" from winning in next move
+    for i := range 9
+        if board[i] == "."
+            board[i] = "o"
+            if (winner) == "o"
+                board[i] = "x"
+                return
+            end
+            board[i] = "."
+        end
+    end
+    // random move if no win or block possible
+    bot1Turn
+end
+
+func bot3Turn
+    e := emptyCnt
+    if e == 9
+        bot1Turn
+    else if e == 8 and board[4] == "."
+        board[4] = "x"
+    else if e == 8 // "o" on 4
+        corners := [0 2 6 8]
+        i := corners[rand 4]
+        board[i] = "x"
+    else
+        board[minmax "x" 0] = "x"
+    end
+end
+
+func minmax:num turn:string depth:num
+    if (isGameover)
+        return score depth
+    end
+    scores:[]num
+    moves:[]num
+    nextTurn := next turn
+    nextDepth := depth + 1
+    for i := range 9
+        if board[i] == "."
+            board[i] = turn
+            scores = scores + [(minmax nextTurn nextDepth)]
+            moves = moves + [i]
+            board[i] = "."
+        end
+    end
+
+    idx:num
+    if turn == "x"
+        idx = maxIndex scores
+    else
+        idx = minIndex scores
+    end
+    if depth != 0
+        return scores[idx]
+    else
+        return moves[idx]
+    end
+end
+
+func score:num depth:num
+    w := winner
+    if w == "x"
+        return 10 - depth
+    else if w == "o"
+        return -10 + depth
+    end
+    return 0
+end
+
+func next:string turn:string
+    if turn == "o"
+        return "x"
+    end
+    return "o"
+end
+
+func minIndex:num nums:[]num
+    nmin := nums[0]
+    idx := 0
+    for i := range 1 (len nums)
+        if nums[i] < nmin
+            nmin = nums[i]
+            idx = i
+        end
+    end
+    return idx
+end
+
+func maxIndex:num nums:[]num
+    nmax := nums[0]
+    idx := 0
+    for i := range 1 (len nums)
+        if nums[i] > nmax
+            nmax = nums[i]
+            idx = i
+        end
+    end
+    return idx
+end

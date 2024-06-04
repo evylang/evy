@@ -1,0 +1,21 @@
+pi := 3.14159265
+e := 2.718281828459045
+
+print "rand1" (rand1)
+print "rand 10" (rand 10)
+print
+print "min 3 2:" (min 3 2)
+print "max 3 2:" (max 3 2)
+print "abs -2.5:" (abs -2.5)
+print
+print "floor 2.6:" (floor 2.6)
+print "ceil 2.4:" (ceil 2.4)
+print "round 2.6:" (round 2.6)
+print
+print "pow 2 3:" (pow 2 3)
+print "log e:" (log e)
+print "sqrt 2:" (sqrt 2)
+print
+print "sin pi:" (sin pi)
+print "cos pi:" (cos pi)
+print "atan2 0 0:" (atan2 0 0)

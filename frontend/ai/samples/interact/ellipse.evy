@@ -1,0 +1,120 @@
+labels := ["x" "y" "radX" "radY" "rot°" "start°" "end°"]
+vals := [50 60 30 17 5 0 180]
+cnt := len vals
+cur := 1
+w := 11
+
+print "Watermelon, anyone?"
+print "🍉"
+print "Use arrow keys or drag numbers"
+print "for your perfect piece."
+
+draw
+
+func draw
+    clear (hsl 210 5 15) // near black
+    drawEllipse
+    drawText
+    drawHighlight cur
+end
+
+func drawEllipse
+    width 2
+    fill "red"
+    stroke "darkgreen"
+    ellipse vals[0] vals[1] vals[2] vals[3] vals[4] vals[5] vals[6]
+end
+
+func drawText
+    font {size:2.7 style:"italic" family:"Fira Code, monospace"}
+    width 0.2
+    fill (hsl 210 13 72) // light grey
+    move 2 15
+    text "// "
+    for i := range (len labels)
+        move i*w+20 15
+        text (sprintf "%5s" labels[i])
+    end
+    font {size:2.7 style:"normal"}
+    fill (hsl 27 100 74) // orange
+    move 2 10
+    text "ellipse"
+    fill (hsl 204 100 75) // light blue
+    for i := range (len labels)
+        move i*w+20 10
+        text (sprintf "%5.0f" vals[i])
+    end
+
+end
+
+func drawHighlight i:num
+    fill "none"
+    stroke "white"
+    width 0.4
+    x := i * w + 20
+    move x-1 9
+    rect 10 4
+end
+
+// keyboard interaction
+on key k:string
+    if k == "ArrowLeft"
+        cur = (cur + cnt - 1) % cnt
+    else if k == "ArrowRight"
+        cur = (cur + 1) % cnt
+    else if k == "ArrowUp"
+        vals[cur] = vals[cur] + 1
+    else if k == "ArrowDown"
+        vals[cur] = max 0 vals[cur]-1
+    end
+    draw
+end
+
+// pointer interaction
+
+dragy := -1
+deltay := 0
+
+on down x:num y:num
+    if y < 20 and x > 18
+        cur = min (floor (x - 18)/w) (len labels)-1
+        dragy = y
+        draw
+    end
+end
+
+on up
+    dragy = -1
+    deltay = 0
+end
+
+on move x:num y:num
+    if dragy == -1
+        return
+    end
+    if x == 0 or x == 100 or y == 0 or y == 100
+        // stop animation when we leave the canvas
+        dragy = -1
+        deltay = 0
+        return
+    end
+    deltay = y - dragy
+    if deltay < 0
+        deltay = floor deltay
+    else
+        deltay = ceil deltay
+    end
+end
+
+on animate
+    if deltay == 0
+        return
+    end
+    if cur < 4
+        val := vals[cur] + deltay / 10
+        vals[cur] = max 0 (min 100 val)
+    else
+        vals[cur] = vals[cur] + deltay / 5
+    end
+    draw
+end

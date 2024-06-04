@@ -1,0 +1,240 @@
+// x - bot
+// o - human
+
+playGame "x" (selectStrength)
+
+func selectStrength:num
+    print "Select strength 1-3."
+    while true
+        str := read
+        n := str2num str
+        if !err and n >= 1 and n <= 3
+            return n
+        end
+        printf "💣 %q is not a valid strength (1-3). Try again.\n" str
+    end
+    return -1
+end
+
+func playGame turn:string strength:num
+    board := newBoard
+    printAll strength board
+    while !(isGameover board)
+        if turn == "x"
+            botTurn board strength
+        else
+            humanTurn board
+        end
+        printAll strength board
+        turn = next turn
+    end
+    result := winner board
+    if result == "."
+        print "Tie."
+    else
+        printf "%q wins.\n" result
+    end
+end
+
+func newBoard:[]string
+    return [
+        "." "." "."
+        "." "." "."
+        "." "." "."
+    ]
+end
+
+func isGameover:bool b:[]string
+    return (emptyCnt b) == 0 or (winner b) != "."
+end
+
+func next:string turn:string
+    if turn == "o"
+        return "x"
+    end
+    return "o"
+end
+
+func emptyCnt:num b:[]string
+    cnt := 0
+    for i := range 9
+        if b[i] == "."
+            cnt = cnt + 1
+        end
+    end
+    return cnt
+end
+
+func winner:string b:[]string
+    if b[0] != "." and ((b[1] == b[0] and b[2] == b[0]) or (b[4] == b[0] and b[8] == b[0]) or (b[3] == b[0] and b[6] == b[0]))
+        return b[0]
+    end
+    if b[4] != "." and ((b[1] == b[4] and b[7] == b[4]) or (b[3] == b[4] and b[5] == b[4]) or (b[2] == b[4] and b[6] == b[4]))
+        return b[4]
+    end
+    if b[8] != "." and ((b[6] == b[8] and b[7] == b[8]) or (b[2] == b[8] and b[5] == b[8]))
+        return b[8]
+    end
+    return "." // no winner
+end
+
+func printAll strength:num b:[]string
+    cls
+    printNotes strength
+    printBoard b
+end
+
+func printNotes strength:num
+    printf "Strength %0.f.\n\n" strength
+    print "Enter index for \"o\" move:"
+    print "0 1 2"
+    print "3 4 5"
+    print "6 7 8\n"
+end
+
+func printBoard b:[]string
+    print b[0] b[1] b[2]
+    print b[3] b[4] b[5]
+    print b[6] b[7] b[8]
+    print
+end
+
+func humanTurn b:[]string
+    while true
+        str := read
+        n := str2num str
+        if !err and n <= 8 and n >= 0 and b[n] == "."
+            b[n] = "o"
+            return
+        end
+        printf "💣 %q is not a valid move (0-8, free fields). Try again.\n" str
+    end
+end
+
+func botTurn b:[]string strength:num
+    if strength == 1
+        bot1Turn b
+    else if strength == 2
+        bot2Turn b
+    else
+        bot3Turn b
+    end
+end
+
+func bot1Turn b:[]string
+    target := rand (emptyCnt b)
+    cnt := 0
+    for i := range 9
+        if b[i] == "."
+            if target == cnt
+                b[i] = "x"
+                return
+            end
+            cnt = cnt + 1
+        end
+    end
+end
+
+func bot2Turn b:[]string
+    // try to win in next move
+    for i := range 9
+        if b[i] == "."
+            b[i] = "x"
+            if (winner b) == "x"
+                return
+            end
+            b[i] = "."
+        end
+    end
+    // try to stop "o" from winning in next move
+    for i := range 9
+        if b[i] == "."
+            b[i] = "o"
+            if (winner b) == "o"
+                b[i] = "x"
+                return
+            end
+            b[i] = "."
+        end
+    end
+    // random move if no win or block possible
+    bot1Turn b
+end
+
+func bot3Turn b:[]string
+    e := emptyCnt b
+    if e == 9
+        bot1Turn b
+    else if e == 8 and b[4] == "."
+        b[4] = "x"
+    else if e == 8 // "o" on 4
+        corners := [0 2 6 8]
+        i := corners[rand 4]
+        b[i] = "x"
+    else
+        minmax b "x" 0
+    end
+end
+
+func minmax:num b:[]string turn:string depth:num
+    if (isGameover b)
+        return score b depth
+    end
+    scores:[]num
+    moves:[]num
+    b2 := b[:]
+    turn2 := next turn
+    for i := range 9
+        if b[i] == "."
+            b2[i] = turn
+            scores = scores + [(minmax b2 turn2 depth+1)]
+            moves = moves + [i]
+            b2[i] = "."
+        end
+    end
+
+    idx:num
+    if turn == "x"
+        idx = maxIndex scores
+    else
+        idx = minIndex scores
+    end
+    if depth == 0
+        b[moves[idx]] = turn
+    end
+    return scores[idx]
+end
+
+func score:num b:[]string depth:num
+    w := winner b
+    if w == "x"
+        return 10 - depth
+    else if w == "o"
+        return -10 + depth
+    end
+    return 0
+end
+
+func minIndex:num nums:[]num
+    nmin := nums[0]
+    idx := 0
+    for i := range 1 (len nums)
+        if nums[i] < nmin
+            nmin = nums[i]
+            idx = i
+        end
+    end
+    return idx
+end
+
+func maxIndex:num nums:[]num
+    nmax := nums[0]
+    idx := 0
+    for i := range 1 (len nums)
+        if nums[i] > nmax
+            nmax = nums[i]
+            idx = i
+        end
+    end
+    return idx
+end

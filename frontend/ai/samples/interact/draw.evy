@@ -1,0 +1,17 @@
+down := false
+width 1
+
+on down x:num y:num
+    down = true
+    move x y
+end
+
+on up
+    down = false
+end
+
+on move x:num y:num
+    if down
+        line x y
+    end
+end

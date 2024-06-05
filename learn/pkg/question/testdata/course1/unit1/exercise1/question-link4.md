@@ -5,6 +5,8 @@ answer-type: multiple-choice # single-choice, multiple-choice, free-text, multip
 answer: b, c
 ---
 
+## The `print` command
+
 Which program generates the following text output?
 
 [question](print/print.b.evy "evy:text")

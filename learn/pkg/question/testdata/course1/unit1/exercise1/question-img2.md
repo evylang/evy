@@ -5,6 +5,8 @@ answer-type: single-choice # single-choice, multiple-choice, free-text, multiple
 answer: d
 ---
 
+## Understanding sequence: `move`, `color`, `circle` commands
+
 Which program generates the following output?
 
 ![question](dot/dot.a.evy.svg)

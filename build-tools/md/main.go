@@ -6,10 +6,7 @@ package main
 import (
 	"bytes"
 	"embed"
-	"errors"
 	"fmt"
-	"io"
-	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -37,7 +34,7 @@ func main() {
 }
 
 func (a *app) Run() error {
-	mdFiles, err := a.copy()
+	mdFiles, err := md.Copy(a.SrcDir, a.DestDir)
 	if err != nil {
 		return err
 	}
@@ -48,56 +45,6 @@ func (a *app) Run() error {
 	// Add anchors, fill in sidebar, replace .md with .html in links
 	updateASTs(asts)
 	return a.genHTMLFiles(asts)
-}
-
-// Copy the contents of the `src` directory to the `dest` directory.
-// Skip over *.md files as we will generate *.html files from them.
-func (a *app) copy() ([]string, error) {
-	mdFiles := []string{}
-	srcFS := os.DirFS(a.SrcDir)
-	err := fs.WalkDir(srcFS, ".", func(filename string, d fs.DirEntry, err error) error {
-		if err != nil {
-			// Errors from WalkDir do not include `src` in the path making
-			// the error messages not useful. Add src back in.
-			var pe *fs.PathError
-			if errors.As(err, &pe) {
-				pe.Path = filepath.Join(a.SrcDir, pe.Path)
-				return pe
-			}
-			return err
-		}
-		srcfile := filepath.Join(a.SrcDir, filename)
-		destfile := filepath.Join(a.DestDir, filename)
-
-		if d.IsDir() {
-			// use MkdirAll in case the directory already exists
-			return os.MkdirAll(destfile, 0o777)
-		}
-
-		if filepath.Ext(filename) == ".md" {
-			mdFiles = append(mdFiles, filename)
-			return nil
-		}
-		sf, err := os.Open(srcfile)
-		if err != nil {
-			return err
-		}
-		defer sf.Close() //nolint:errcheck // don't care about close failing on read-only files
-		df, err := os.Create(destfile)
-		if err != nil {
-			df.Close() //nolint:errcheck,gosec // we're returning the more important error
-			return err
-		}
-		if _, err := io.Copy(df, sf); err != nil {
-			df.Close() //nolint:errcheck,gosec // we're returning the more important error
-			return err
-		}
-		return df.Close()
-	})
-	if err != nil {
-		return nil, err
-	}
-	return mdFiles, nil
 }
 
 // makeASTs creates *markdown.Document ASTs from the markdown files in
@@ -153,7 +100,7 @@ func (a *app) genHTMLFiles(asts map[string]*markdown.Document) error {
 		}
 		sidebar := filepath.Join(filepath.Dir(mdf), "_sidebar.md")
 		header := filepath.Join(filepath.Dir(mdf), "_header.md")
-		htmlFile := filepath.Join(a.DestDir, htmlFilename(mdf))
+		htmlFile := filepath.Join(a.DestDir, md.HTMLFilename(mdf))
 		err := genHTMLFile(doc, asts[sidebar], asts[header], htmlFile, mdf)
 		if err != nil {
 			return err
@@ -174,7 +121,7 @@ type tmplData struct {
 
 func genHTMLFile(doc, sidebar, header *markdown.Document, htmlFile, mdf string) error {
 	data := tmplData{
-		Root:    toRoot(mdf),
+		Root:    md.ToRoot(mdf),
 		Title:   extractTitle(doc),
 		Content: docToHTML(doc),
 		Sidebar: docToHTML(sidebar),
@@ -266,7 +213,7 @@ func updateLink(mdl *markdown.Link) {
 		return
 	}
 	// relative path, fix *.md filenames
-	u.Path = htmlFilename(u.Path)
+	u.Path = md.HTMLFilename(u.Path)
 	mdl.URL = u.String()
 }
 
@@ -320,23 +267,6 @@ func inlineText(inlines []markdown.Inline) string {
 		inline.PrintText(buf)
 	}
 	return buf.String()
-}
-
-func htmlFilename(mdf string) string {
-	if filepath.Base(mdf) == "README.md" {
-		return filepath.Join(filepath.Dir(mdf), "index.html")
-	}
-	if filename, found := strings.CutSuffix(mdf, ".md"); found {
-		return filename + ".html"
-	}
-	return mdf
-}
-
-func toRoot(p string) string {
-	if c := strings.Count(p, string(os.PathSeparator)); c > 0 {
-		return strings.Repeat("/..", c)[1:]
-	}
-	return "."
 }
 
 var reHeadingID = regexp.MustCompile(`[^\pL\pN]+`)

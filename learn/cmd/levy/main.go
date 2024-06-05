@@ -181,7 +181,11 @@ func (c *unsealCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	return model.Unseal()
+	if err := model.Unseal(); err != nil {
+		return err
+	}
+	fmt.Println("Unsealed answer:", model.Frontmatter.Answer)
+	return nil
 }
 
 type cryptoCmd struct {

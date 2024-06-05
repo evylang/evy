@@ -34,7 +34,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"evylang.dev/evy/learn/pkg/question"
+	"evylang.dev/evy/learn/pkg/learn"
 	"github.com/alecthomas/kong"
 )
 
@@ -101,7 +101,7 @@ func (c *exportCmd) Run() error {
 		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
 	}
 	opts := getOptions(c.UnsealedOnly, c.PrivateKey)
-	model, err := question.NewModel(c.MDFile, opts...)
+	model, err := learn.NewModel(c.MDFile, opts...)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (c *exportCmd) setPaths() error {
 
 func (c *verifyCmd) Run() error {
 	opts := getOptions(c.UnsealedOnly, c.PrivateKey)
-	model, err := question.NewModel(c.MDFile, opts...)
+	model, err := learn.NewModel(c.MDFile, opts...)
 	if err != nil {
 		return err
 	}
@@ -165,11 +165,11 @@ func (c *verifyCmd) Run() error {
 }
 
 func (c *sealCmd) Run() error {
-	model, err := question.NewModel(c.MDFile)
+	model, err := learn.NewModel(c.MDFile)
 	if err != nil {
 		return err
 	}
-	publicKey := cmp.Or(c.PublicKey, question.PublicKey)
+	publicKey := cmp.Or(c.PublicKey, learn.PublicKey)
 	if err := model.Seal(publicKey); err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (c *sealCmd) Run() error {
 }
 
 func (c *unsealCmd) Run() error {
-	model, err := question.NewModel(c.MDFile, question.WithPrivateKey(c.PrivateKey))
+	model, err := learn.NewModel(c.MDFile, learn.WithPrivateKey(c.PrivateKey))
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ type unsealCryptoCmd struct {
 }
 
 func (c *keygenCryptoCmd) Run() error {
-	keys, err := question.Keygen(c.Length)
+	keys, err := learn.Keygen(c.Length)
 	if err != nil {
 		return err
 	}
@@ -215,7 +215,7 @@ func (c *keygenCryptoCmd) Run() error {
 }
 
 func (c *sealCryptoCmd) Run() error {
-	encrypted, err := question.Encrypt(question.PublicKey, c.Plaintext)
+	encrypted, err := learn.Encrypt(learn.PublicKey, c.Plaintext)
 	if err != nil {
 		return err
 	}
@@ -224,7 +224,7 @@ func (c *sealCryptoCmd) Run() error {
 }
 
 func (c *unsealCryptoCmd) Run() error {
-	plaintext, err := question.Decrypt(c.PrivateKey, c.Ciphertext)
+	plaintext, err := learn.Decrypt(c.PrivateKey, c.Ciphertext)
 	if err != nil {
 		return err
 	}
@@ -232,9 +232,9 @@ func (c *unsealCryptoCmd) Run() error {
 	return nil
 }
 
-func getOptions(unsealedOnly bool, privateKey string) []question.Option {
+func getOptions(unsealedOnly bool, privateKey string) []learn.Option {
 	if unsealedOnly {
 		return nil
 	}
-	return []question.Option{question.WithPrivateKey(privateKey)}
+	return []learn.Option{learn.WithPrivateKey(privateKey)}
 }

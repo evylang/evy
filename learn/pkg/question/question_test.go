@@ -151,7 +151,7 @@ func TestErrInvalidAnswer(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
+			fname := "testdata/err-course/unit1/err-exercise1/" + name + ".md"
 			model, err := NewModel(fname)
 			assert.NoError(t, err)
 			err = model.Verify()
@@ -181,7 +181,7 @@ func TestErrBadMDImg(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
+			fname := "testdata/err-course/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrBadMarkdownStructure, err)
 		})
@@ -199,7 +199,7 @@ func TestErrBadMDLink(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
+			fname := "testdata/err-course/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrBadMarkdownStructure, err)
 		})
@@ -213,7 +213,7 @@ func TestErrInconsistency(t *testing.T) {
 	}
 	for _, name := range errQuestions {
 		t.Run(name, func(t *testing.T) {
-			fname := "testdata/course1/unit1/err-exercise1/" + name + ".md"
+			fname := "testdata/err-course/unit1/err-exercise1/" + name + ".md"
 			_, err := NewModel(fname)
 			assert.Error(t, ErrInconsistentMdoel, err)
 		})

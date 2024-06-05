@@ -69,7 +69,7 @@ type exportCmd struct {
 	ExportType   string `arg:"" enum:"html,answerkey,all" help:"Export target: one of html, answerkey, all."`
 	MDFile       string `arg:"" help:"Question markdown file." placeholder:"MDFILE"`
 	Target       string `arg:"" default:"-" help:"Output directory or JSON/HTML output file (default: . | stdout)." placeholder:"TARGET"`
-	UnsealedOnly bool   `short:"u" help:"Only export files with unsealed answers. Suitable if private key not available."`
+	IgnoreSealed bool   `short:"i" help:"Only export answerkey and add solution to unsealed answers. Suitable if private key not available."`
 	PrivateKey   string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
 	WithMarked   bool   `short:"m" help:"Include marked answers in HTML output. Cannot be used with export target answerkey."`
 
@@ -79,7 +79,7 @@ type exportCmd struct {
 
 type verifyCmd struct {
 	MDFile       string `arg:"" help:"Question markdown file." placeholder:"MDFILE"`
-	UnsealedOnly bool   `short:"u" help:"Only check result for files with unsealed answers. Suitable if private key not available."`
+	IgnoreSealed bool   `short:"i" help:"Only verify result for files with unsealed answers. Suitable if private key not available."`
 	PrivateKey   string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
 
 	// TODO
@@ -100,7 +100,7 @@ func (c *exportCmd) Run() error {
 	if c.ExportType == "answerkey" && c.WithMarked {
 		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
 	}
-	opts := getOptions(c.UnsealedOnly, c.PrivateKey)
+	opts := getOptions(c.IgnoreSealed, c.PrivateKey)
 	model, err := learn.NewQuestionModel(c.MDFile, opts...)
 	if err != nil {
 		return err
@@ -156,7 +156,7 @@ func (c *exportCmd) setPaths() error {
 }
 
 func (c *verifyCmd) Run() error {
-	opts := getOptions(c.UnsealedOnly, c.PrivateKey)
+	opts := getOptions(c.IgnoreSealed, c.PrivateKey)
 	model, err := learn.NewQuestionModel(c.MDFile, opts...)
 	if err != nil {
 		return err
@@ -232,9 +232,13 @@ func (c *unsealCryptoCmd) Run() error {
 	return nil
 }
 
-func getOptions(unsealedOnly bool, privateKey string) []learn.Option {
-	if unsealedOnly {
-		return nil
+func getOptions(ignoreSealed bool, privateKey string) []learn.Option {
+	var options []learn.Option
+	if ignoreSealed {
+		options = append(options, learn.WithIgnoreSealed())
 	}
-	return []learn.Option{learn.WithPrivateKey(privateKey)}
+	if !ignoreSealed && privateKey != "" {
+		options = append(options, learn.WithPrivateKey(privateKey))
+	}
+	return options
 }

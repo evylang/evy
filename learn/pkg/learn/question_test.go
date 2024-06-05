@@ -135,11 +135,16 @@ func TestExportAnswerKeyFromSeal(t *testing.T) {
 	got := gotAnswerKey["course1"]["unit1"]["exercise1"]["question1-sealed"]
 	assert.Equal(t, true, want.Equals(got))
 
-	model, err = NewQuestionModel(fname) // no key
+	model, err = NewQuestionModel(fname, WithIgnoreSealed())
 	assert.NoError(t, err)
 	gotAnswerKey, err = model.ExportAnswerKey()
 	assert.NoError(t, err)
 	assert.Equal(t, AnswerKey{}, gotAnswerKey)
+
+	model, err = NewQuestionModel(fname) // no key for sealed question, expect error
+	assert.NoError(t, err)
+	_, err = model.ExportAnswerKey()
+	assert.Error(t, ErrSealedAnswerNoKey, err)
 }
 
 func TestErrInvalidAnswer(t *testing.T) {
@@ -256,7 +261,7 @@ func TestPrintHTML(t *testing.T) {
 			model, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
 			buf := &bytes.Buffer{}
-			err = model.PrintHTML(buf, false /* withMarked*/)
+			err = model.PrintHTML(buf, false) // without marked answers
 			assert.NoError(t, err)
 			got := buf.String()
 			goldenFile := "testdata/golden/form/" + name + ".html"
@@ -274,7 +279,7 @@ func TestToHTML(t *testing.T) {
 			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
-			got, err := model.ToHTML(false /* withMarked */)
+			got, err := model.ToHTML(false) // without marked
 			assert.NoError(t, err)
 
 			goldenFile := "testdata/golden/html/" + name + ".html"
@@ -292,13 +297,19 @@ func TestToHTMLWithMarked(t *testing.T) {
 			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
 			model, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
-			got, err := model.ToHTML(true /* withMarked */)
+			got, err := model.ToHTML(true) // with marked
 			assert.NoError(t, err)
 
 			goldenFile := "testdata/golden/html-with-marked/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)
+			assert.Equal(t, want, got)
+
+			model, err = NewQuestionModel(fname, WithIgnoreSealed())
+			assert.NoError(t, err)
+			got, err = model.ToHTML(true) // with marked
+			assert.NoError(t, err)
 			assert.Equal(t, want, got)
 		})
 	}
@@ -308,8 +319,19 @@ func TestToHTMLWithMarkedSealErr(t *testing.T) {
 	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewQuestionModel(fname)
 	assert.NoError(t, err)
-	_, err = model.ToHTML(true /* withMarked */)
+	_, err = model.ToHTML(true) // with marked
 	assert.Error(t, ErrSealedAnswerNoKey, err)
+
+	model, err = NewQuestionModel(fname, WithIgnoreSealed())
+	assert.NoError(t, err)
+	got, err := model.ToHTML(true) // with marked
+	assert.NoError(t, err)
+
+	goldenFile := "testdata/golden/html-with-marked/question1-sealed-unsealed-only.html"
+	b, err := os.ReadFile(goldenFile)
+	assert.NoError(t, err)
+	want := string(b)
+	assert.Equal(t, want, got)
 }
 
 func TestToHTMLWithMarkedSealed(t *testing.T) {

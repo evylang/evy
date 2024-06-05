@@ -28,10 +28,10 @@ type QuestionModel struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	withSealed bool
-	privateKey string
-	embeds     map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block           // use to output checkbox or radio buttons for List in HTML
+	ignoreSealed bool
+	privateKey   string
+	embeds       map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList   markdown.Block           // use to output checkbox or radio buttons for List in HTML
 }
 
 type embed struct {
@@ -75,21 +75,6 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 	return model, nil
 }
 
-// Option is used on model creation to set optional parameters.
-type Option func(configurableModel)
-
-type configurableModel interface {
-	setPrivateKey(string)
-}
-
-// WithPrivateKey sets privateKey and all follow-up method invocations attempt
-// to unseal sealed answers.
-func WithPrivateKey(privateKey string) Option {
-	return func(m configurableModel) {
-		m.setPrivateKey(privateKey)
-	}
-}
-
 // Seal seals the unsealed answer in the Frontmatter using the public key.
 // Sealing can only be reverted if the secret private key is available.
 // Answers committed to the public Repo should always be sealed.
@@ -112,7 +97,7 @@ func (m *QuestionModel) Unseal() error {
 // Verify compares the given Frontmatter answer against generated output of
 // questions and answers markdown code blocks and images.
 func (m *QuestionModel) Verify() error {
-	if !m.withSealed && m.Frontmatter.SealedAnswer != "" {
+	if m.ignoreSealed && m.IsSealed() {
 		return nil
 	}
 	_, err := m.getVerifiedAnswer()
@@ -121,7 +106,7 @@ func (m *QuestionModel) Verify() error {
 
 // ExportAnswerKey returns the answerKey for the question Markdown file.
 func (m *QuestionModel) ExportAnswerKey() (AnswerKey, error) {
-	if !m.withSealed && m.Frontmatter.SealedAnswer != "" {
+	if m.ignoreSealed && m.IsSealed() {
 		return AnswerKey{}, nil // ignore
 	}
 
@@ -144,6 +129,11 @@ func (m *QuestionModel) ExportAnswerKeyJSON() (string, error) {
 		return "", err
 	}
 	return string(b) + "\n", nil
+}
+
+// IsSealed returns true if the answer is sealed in the Frontmatter.
+func (m *QuestionModel) IsSealed() bool {
+	return m.Frontmatter.SealedAnswer != ""
 }
 
 // WriteFormatted formats YAML frontmatter, fenced by "---", followed by
@@ -198,7 +188,7 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 		inputType = "checkbox"
 	}
 	var correctAnswers map[int]bool
-	if withMarked {
+	if withMarked && !(m.IsSealed() && m.ignoreSealed) {
 		answer, err := m.Frontmatter.getAnswer(m.privateKey)
 		if err != nil {
 			return err
@@ -367,7 +357,10 @@ func (m *QuestionModel) inferResultType() error {
 
 func (m *QuestionModel) setPrivateKey(privateKey string) {
 	m.privateKey = privateKey
-	m.withSealed = true
+}
+
+func (m *QuestionModel) setIgnoreSealed() {
+	m.ignoreSealed = true
 }
 
 const questionPrefixHTML = `<!doctype html>

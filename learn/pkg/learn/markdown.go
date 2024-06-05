@@ -1,14 +1,3 @@
-// Package learn provides data structures and tools for Evy learn resources.
-// Question, exercises, units and courses are parsed from Markdown files with
-// YAML frontmatter. The frontmatter serves as a small set of structured data
-// associated with the unstructured Markdown file.
-//
-// Question can be verified to have the expected correct answer output match
-// the question output. Questions, can seal (encrypt) their answers in the
-// Frontmatter or unsealed (decrypted) them. We use this to avoid openly
-// publishing the answerKey. Questions can also export their AnswerKeys into
-// single big JSON object as used in Evy's persistent data store(Firestore).
-// See the testdata/ directory for sample question and answers.
 package learn
 
 import (

@@ -3,30 +3,12 @@ package learn
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"rsc.io/markdown"
-)
-
-// Errors for the question package.
-var (
-	ErrBadMarkdownStructure = errors.New("bad Markdown structure")
-	ErrInconsistentMdoel    = errors.New("inconsistency")
-	ErrWrongAnswer          = errors.New("wrong answer")
-
-	ErrSingleChoice          = errors.New("single-choice answer must be a single character a-z")
-	ErrBadDirectoryStructure = errors.New("bad directory structure for course layout")
-
-	ErrNoFrontmatter        = errors.New("no frontmatter found")
-	ErrInvalidFrontmatter   = errors.New("invalid frontmatter")
-	ErrWrongFrontmatterType = errors.New("wrong frontmatter type")
-	ErrNoFrontmatterAnswer  = errors.New("no answer in frontmatter")
-	ErrSealedAnswerNoKey    = errors.New("sealed answer without key")
-	ErrSealedTooShort       = errors.New("sealed data is too short")
 )
 
 // QuestionModel represents a question and its answer choices as parsed and derived

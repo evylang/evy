@@ -1,0 +1,41 @@
+{
+  "course1": {
+    "unit1": {
+      "exercise1": {
+        "question-img1": {
+          "single": "b"
+        },
+        "question-img2": {
+          "single": "d"
+        },
+        "question-img3": {
+          "single": "d"
+        },
+        "question-link1": {
+          "single": "c"
+        },
+        "question-link2": {
+          "single": "c"
+        },
+        "question-link3": {
+          "single": "d"
+        },
+        "question-link4": {
+          "multi": [
+            "b",
+            "c"
+          ]
+        },
+        "question1": {
+          "single": "c"
+        },
+        "question1-sealed": {
+          "single": "c"
+        },
+        "question2": {
+          "single": "a"
+        }
+      }
+    }
+  }
+}

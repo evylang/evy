@@ -2,7 +2,6 @@ package learn
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -28,10 +27,12 @@ type QuestionModel struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	ignoreSealed bool
-	privateKey   string
-	embeds       map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList   markdown.Block           // use to output checkbox or radio buttons for List in HTML
+	ignoreSealed   bool
+	privateKey     string
+	embeds         map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList     markdown.Block           // use to output checkbox or radio buttons for List in HTML
+	rawFrontmatter string
+	rawMD          string
 }
 
 type embed struct {
@@ -50,24 +51,18 @@ var fieldTypeToString = map[fieldType]string{
 	answerField:   "answer",
 }
 
-// NewQuestionModel creates a new QuestionModel from a Markdown file.
+// NewQuestionModel returns a new question model from a question Markdown file
+// or its contents.
 func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
-	frontmatter, doc, err := newFrontmatterMarkdown(filename)
-	if err != nil {
-		return nil, err
-	}
-	answerType := frontmatter.AnswerType
-	if answerType != "single-choice" && answerType != "multiple-choice" {
-		return nil, fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, answerType)
-	}
 	model := &QuestionModel{
-		Filename:    filename,
-		Doc:         doc,
-		Frontmatter: frontmatter,
-		embeds:      map[markdown.Block]embed{},
+		Filename: filename,
+		embeds:   map[markdown.Block]embed{},
 	}
 	for _, opt := range options {
 		opt(model)
+	}
+	if err := model.parseFrontmatterMD(); err != nil {
+		return nil, err
 	}
 	if err := model.buildQuestionModelForChoice(); err != nil {
 		return nil, err
@@ -117,20 +112,6 @@ func (m *QuestionModel) ExportAnswerKey() (AnswerKey, error) {
 	return NewAnswerKey(m.Filename, answer)
 }
 
-// ExportAnswerKeyJSON returns the answerKey for the question Markdown file as
-// JSON string.
-func (m *QuestionModel) ExportAnswerKeyJSON() (string, error) {
-	answerKey, err := m.ExportAnswerKey()
-	if err != nil {
-		return "", err
-	}
-	b, err := json.MarshalIndent(answerKey, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	return string(b) + "\n", nil
-}
-
 // IsSealed returns true if the answer is sealed in the Frontmatter.
 func (m *QuestionModel) IsSealed() bool {
 	return m.Frontmatter.SealedAnswer != ""
@@ -147,11 +128,11 @@ func (m *QuestionModel) WriteFormatted() error {
 }
 
 // PrintHTML prints the question and answer choices as HTML form elements.
-func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
+func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
 	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
-			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withMarked); err != nil {
+			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked); err != nil {
 				return err
 			}
 			continue
@@ -167,10 +148,10 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
 }
 
 // ToHTML returns a complete standalone HTML document as string.
-func (m *QuestionModel) ToHTML(withMarked bool) (string, error) {
+func (m *QuestionModel) ToHTML(withAnswersMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(questionPrefixHTML)
-	if err := m.PrintHTML(buf, withMarked); err != nil {
+	if err := m.PrintHTML(buf, withAnswersMarked); err != nil {
 		return "", err
 	}
 	buf.WriteString(questionSuffixHTML)
@@ -181,14 +162,14 @@ func baseFilename(filename string) string {
 	return strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
 }
 
-func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withMarked bool) error {
+func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withAnswersMarked bool) error {
 	buf.WriteString("<fieldset>\n")
 	inputType := "radio"
 	if m.Frontmatter.AnswerType == "multiple-choice" {
 		inputType = "checkbox"
 	}
 	var correctAnswers map[int]bool
-	if withMarked && !(m.IsSealed() && m.ignoreSealed) {
+	if withAnswersMarked && !(m.IsSealed() && m.ignoreSealed) {
 		answer, err := m.Frontmatter.getAnswer(m.privateKey)
 		if err != nil {
 			return err
@@ -361,6 +342,30 @@ func (m *QuestionModel) setPrivateKey(privateKey string) {
 
 func (m *QuestionModel) setIgnoreSealed() {
 	m.ignoreSealed = true
+}
+
+func (m *QuestionModel) setRawMD(rawFrontmatter string, rawMD string) {
+	m.rawFrontmatter = rawFrontmatter
+	m.rawMD = rawMD
+}
+
+func (m *QuestionModel) parseFrontmatterMD() error {
+	var err error
+	if m.rawFrontmatter == "" && m.rawMD == "" {
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		if err != nil {
+			return fmt.Errorf("%w (%s)", err, m.Filename)
+		}
+	}
+	if m.Frontmatter, err = parseFrontmatter(m.rawFrontmatter); err != nil {
+		return fmt.Errorf("%w (%s)", err, m.Filename)
+	}
+	if m.Frontmatter.AnswerType != "single-choice" && m.Frontmatter.AnswerType != "multiple-choice" {
+		return fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, m.Frontmatter.AnswerType)
+	}
+	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
+	m.Doc = parser.Parse(m.rawMD)
+	return nil
 }
 
 const questionPrefixHTML = `<!doctype html>

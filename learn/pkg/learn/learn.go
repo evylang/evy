@@ -11,7 +11,12 @@
 // See the testdata/ directory for sample question and answers.
 package learn
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+
+	"gopkg.in/yaml.v3"
+)
 
 // Errors for the learn package.
 var (
@@ -28,4 +33,58 @@ var (
 	ErrNoFrontmatterAnswer  = errors.New("no answer in frontmatter")
 	ErrSealedAnswerNoKey    = errors.New("sealed answer without key")
 	ErrSealedTooShort       = errors.New("sealed data is too short")
+
+	ErrInvalidExportOptions = errors.New("invalid export options")
 )
+
+type model interface {
+	ToHTML(withAnswersMarked bool) (string, error)
+	ExportAnswerKey() (AnswerKey, error)
+}
+
+type plainMD string
+
+func (s plainMD) ToHTML(_ bool) (string, error) {
+	return md2HTML(string(s)), nil
+}
+
+func (s plainMD) ExportAnswerKey() (AnswerKey, error) {
+	return nil, nil
+}
+
+func newModel(mdFile string, opts []Option) (model, error) {
+	frontmatterString, mdString, err := readSplitMDFile(mdFile)
+	if err != nil {
+		return nil, err
+	}
+	var model model
+	if frontmatterString == "" {
+		model = plainMD(mdString)
+	} else {
+		model, err = newModelWithFrontmatter(mdFile, frontmatterString, mdString, opts)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return model, nil
+}
+
+func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []Option) (model, error) {
+	opts = append([]Option{WithRawMD(frontmatterString, mdString)}, opts...)
+	fm := &baseFrontmatter{}
+	if err := yaml.Unmarshal([]byte(frontmatterString), fm); err != nil {
+		return nil, fmt.Errorf("%w: cannot process Question Markdown frontmatter: %w", ErrInvalidFrontmatter, err)
+	}
+
+	switch fm.Type { // "course", "unit", "exercise", "question"
+	case "question":
+		return NewQuestionModel(mdFile, opts...)
+	case "exercise":
+		// return NewExerciseModel(mdFile, opts...)
+	}
+	return nil, fmt.Errorf("unsupported frontmatter type %q", string(fm.Type)) //nolint:err113 // dynamic errors in main are fine.
+}
+
+type baseFrontmatter struct {
+	Type frontmatterType `yaml:"type,omitempty"`
+}

@@ -11,25 +11,6 @@ import (
 	"rsc.io/markdown"
 )
 
-// newFrontmatterMarkdown creates a new frontmatter and markdown document for
-// filename. Frontmatter contains the initial, parsed YAML data section  of
-// the file, the markdown document contains the parsed the markdown AST for
-// the remainder.
-func newFrontmatterMarkdown(filename string) (*frontmatter, *markdown.Document, error) {
-	frontmatterString, mdString, err := readSplitMDFile(filename)
-	if err != nil {
-		return nil, nil, fmt.Errorf("%w (%s)", err, filename)
-	}
-	fm, err := parseFrontmatter(frontmatterString)
-	if err != nil {
-		return nil, nil, fmt.Errorf("%w (%s)", err, filename)
-	}
-	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
-	doc := parser.Parse(mdString)
-
-	return fm, doc, nil
-}
-
 // format formats YAML frontmatter, fenced by "---", followed by markdown
 // content.
 func format(frontmatter any, doc *markdown.Document) ([]byte, error) {
@@ -50,12 +31,12 @@ func format(frontmatter any, doc *markdown.Document) ([]byte, error) {
 func readSplitMDFile(filename string) (string, string, error) {
 	b, err := os.ReadFile(filename)
 	if err != nil {
-		return "", "", fmt.Errorf("cannot process Question Markdown file: %w", err)
+		return "", "", fmt.Errorf("cannot process Markdown file: %w", err)
 	}
 	str := trimLeftSpace(string(b))
 
 	if !strings.HasPrefix(str, "---\n") {
-		return "", "", ErrNoFrontmatter
+		return "", str, nil
 	}
 	end := strings.Index(str, "\n---\n")
 	if end == -1 {
@@ -64,6 +45,20 @@ func readSplitMDFile(filename string) (string, string, error) {
 	frontmatter := str[:end+1]
 	md := trimLeftSpace(str[len(frontmatter)+4:])
 	return frontmatter, md, nil
+}
+
+func parseMD(rawMD string) *markdown.Document {
+	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
+	return parser.Parse(rawMD)
+}
+
+func md2HTML(rawMD string) string {
+	doc := parseMD(rawMD)
+	buf := &bytes.Buffer{}
+	buf.WriteString(questionPrefixHTML)
+	doc.PrintHTML(buf)
+	buf.WriteString(questionSuffixHTML)
+	return buf.String()
 }
 
 func trimLeftSpace(str string) string {

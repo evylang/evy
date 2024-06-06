@@ -291,7 +291,7 @@ func TestToHTML(t *testing.T) {
 	}
 }
 
-func TestToHTMLWithMarked(t *testing.T) {
+func TestToHTMLWithAnswersMarked(t *testing.T) {
 	for name := range testQuestions {
 		t.Run(name, func(t *testing.T) {
 			fname := "testdata/course1/unit1/exercise1/" + name + ".md"
@@ -315,7 +315,7 @@ func TestToHTMLWithMarked(t *testing.T) {
 	}
 }
 
-func TestToHTMLWithMarkedSealErr(t *testing.T) {
+func TestToHTMLWithAnswersMarkedSealErr(t *testing.T) {
 	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewQuestionModel(fname)
 	assert.NoError(t, err)
@@ -334,11 +334,11 @@ func TestToHTMLWithMarkedSealErr(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestToHTMLWithMarkedSealed(t *testing.T) {
+func TestToHTMLWithAnswersMarkedSealed(t *testing.T) {
 	fname := "testdata/course1/unit1/exercise1/question1-sealed.md"
 	model, err := NewQuestionModel(fname, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)
-	got, err := model.ToHTML(true /* withMarked */)
+	got, err := model.ToHTML(true) // withAnswersMarked
 	assert.NoError(t, err)
 
 	goldenFile := "testdata/golden/html-with-marked/question1-sealed.html"

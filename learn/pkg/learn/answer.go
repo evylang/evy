@@ -78,6 +78,29 @@ func (key AnswerKey) add(p *answerPath, answer Answer) {
 	key[p.course][p.unit][p.exercise][p.question] = answer
 }
 
+// merge merges the the given AnswerKeys parameter into the answerkey
+// receiver. The parameter is not modified, the receiver is updated.
+func (key AnswerKey) merge(answerKey AnswerKey) {
+	for course, courseKey := range answerKey {
+		if key[course] == nil {
+			key[course] = CourseKey{}
+		}
+		for unit, unitKey := range courseKey {
+			if key[course][unit] == nil {
+				key[course][unit] = UnitKey{}
+			}
+			for exercise, exerciseKey := range unitKey {
+				if key[course][unit][exercise] == nil {
+					key[course][unit][exercise] = ExerciseKey{}
+				}
+				for question, answer := range exerciseKey {
+					key[course][unit][exercise][question] = answer
+				}
+			}
+		}
+	}
+}
+
 // Type returns the type of the answer, one of:
 // - single-choice
 // - multiple-choice

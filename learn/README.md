@@ -41,7 +41,7 @@ It currently supports the following sub-commands:
 Try it with
 
     make install
-    levy export answerkey pkg/question/testdata/course1/unit1/exercise1/question1.md
+    levy export all --unselaed-only pkg/question/testdata/course1/unit1/exercise1 out
     levy seal pkg/question/testdata/course1/unit1/exercise1/question1.md
 
 For sample error messages in case of failed verification, try

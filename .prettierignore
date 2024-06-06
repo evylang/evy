@@ -2,4 +2,4 @@
 resets.css
 /pkg/cli/testdata/*.svg
 /pkg/cli/svg/testdata/*.svg
-/learn/pkg/question/testdata/
+/learn/pkg/learn/testdata/

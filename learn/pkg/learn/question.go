@@ -1,9 +1,8 @@
-package question
+package learn
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,32 +11,15 @@ import (
 	"rsc.io/markdown"
 )
 
-// Errors for the question package.
-var (
-	ErrBadMarkdownStructure = errors.New("bad Markdown structure")
-	ErrInconsistentMdoel    = errors.New("inconsistency")
-	ErrWrongAnswer          = errors.New("wrong answer")
-
-	ErrSingleChoice          = errors.New("single-choice answer must be a single character a-z")
-	ErrBadDirectoryStructure = errors.New("bad directory structure for course layout")
-
-	ErrNoFrontmatter        = errors.New("no frontmatter found")
-	ErrInvalidFrontmatter   = errors.New("invalid frontmatter")
-	ErrWrongFrontmatterType = errors.New("wrong frontmatter type")
-	ErrNoFrontmatterAnswer  = errors.New("no answer in frontmatter")
-	ErrSealedAnswerNoKey    = errors.New("sealed answer without key")
-	ErrSealedTooShort       = errors.New("sealed data is too short")
-)
-
-// Model represents a question and its answer choices as parsed and derived
+// QuestionModel represents a question and its answer choices as parsed and derived
 // from the original Markdown file with frontmatter.
 //
-// In a Model the Question may be Evy source code, text output or image
-// output. The Model AnswerChoices field is a list of Evy source code, text
-// output and image output. In a verified Model, only the correct answer
+// In a QuestionModel the Question may be Evy source code, text output or image
+// output. The QuestionModel AnswerChoices field is a list of Evy source code, text
+// output and image output. In a verified QuestionModel, only the correct answer
 // choice (output) matches the question (output). "Correct" means as
 // specified in the Markdown Frontmatter.
-type Model struct {
+type QuestionModel struct {
 	Filename    string
 	Doc         *markdown.Document
 	Frontmatter *frontmatter
@@ -46,10 +28,10 @@ type Model struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	withSealed bool
-	privateKey string
-	embeds     map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block           // use to output checkbox or radio buttons for List in HTML
+	ignoreSealed bool
+	privateKey   string
+	embeds       map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList   markdown.Block           // use to output checkbox or radio buttons for List in HTML
 }
 
 type embed struct {
@@ -68,8 +50,8 @@ var fieldTypeToString = map[fieldType]string{
 	answerField:   "answer",
 }
 
-// NewModel creates a new Model from a Markdown file.
-func NewModel(filename string, options ...Option) (*Model, error) {
+// NewQuestionModel creates a new QuestionModel from a Markdown file.
+func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
 	frontmatter, doc, err := newFrontmatterMarkdown(filename)
 	if err != nil {
 		return nil, err
@@ -78,7 +60,7 @@ func NewModel(filename string, options ...Option) (*Model, error) {
 	if answerType != "single-choice" && answerType != "multiple-choice" {
 		return nil, fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, answerType)
 	}
-	model := &Model{
+	model := &QuestionModel{
 		Filename:    filename,
 		Doc:         doc,
 		Frontmatter: frontmatter,
@@ -87,31 +69,16 @@ func NewModel(filename string, options ...Option) (*Model, error) {
 	for _, opt := range options {
 		opt(model)
 	}
-	if err := model.buildModelForChoice(); err != nil {
+	if err := model.buildQuestionModelForChoice(); err != nil {
 		return nil, err
 	}
 	return model, nil
 }
 
-// Option is used on Model creation to set optional parameters.
-type Option func(configurableModel)
-
-type configurableModel interface {
-	setPrivateKey(string)
-}
-
-// WithPrivateKey sets privateKey and all follow-up method invocations attempt
-// to unseal sealed answers.
-func WithPrivateKey(privateKey string) Option {
-	return func(m configurableModel) {
-		m.setPrivateKey(privateKey)
-	}
-}
-
 // Seal seals the unsealed answer in the Frontmatter using the public key.
 // Sealing can only be reverted if the secret private key is available.
 // Answers committed to the public Repo should always be sealed.
-func (m *Model) Seal(publicKey string) error {
+func (m *QuestionModel) Seal(publicKey string) error {
 	if err := m.Frontmatter.Seal(publicKey); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
@@ -119,7 +86,7 @@ func (m *Model) Seal(publicKey string) error {
 }
 
 // Unseal unseals the sealed answer in the Frontmatter using the private key.
-func (m *Model) Unseal() error {
+func (m *QuestionModel) Unseal() error {
 	if err := m.Frontmatter.Unseal(m.privateKey); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
@@ -129,8 +96,8 @@ func (m *Model) Unseal() error {
 // Verify checks if the given answer, provided by the frontmatter, is correct.
 // Verify compares the given Frontmatter answer against generated output of
 // questions and answers markdown code blocks and images.
-func (m *Model) Verify() error {
-	if !m.withSealed && m.Frontmatter.SealedAnswer != "" {
+func (m *QuestionModel) Verify() error {
+	if m.ignoreSealed && m.IsSealed() {
 		return nil
 	}
 	_, err := m.getVerifiedAnswer()
@@ -138,8 +105,8 @@ func (m *Model) Verify() error {
 }
 
 // ExportAnswerKey returns the answerKey for the question Markdown file.
-func (m *Model) ExportAnswerKey() (AnswerKey, error) {
-	if !m.withSealed && m.Frontmatter.SealedAnswer != "" {
+func (m *QuestionModel) ExportAnswerKey() (AnswerKey, error) {
+	if m.ignoreSealed && m.IsSealed() {
 		return AnswerKey{}, nil // ignore
 	}
 
@@ -152,7 +119,7 @@ func (m *Model) ExportAnswerKey() (AnswerKey, error) {
 
 // ExportAnswerKeyJSON returns the answerKey for the question Markdown file as
 // JSON string.
-func (m *Model) ExportAnswerKeyJSON() (string, error) {
+func (m *QuestionModel) ExportAnswerKeyJSON() (string, error) {
 	answerKey, err := m.ExportAnswerKey()
 	if err != nil {
 		return "", err
@@ -164,9 +131,14 @@ func (m *Model) ExportAnswerKeyJSON() (string, error) {
 	return string(b) + "\n", nil
 }
 
+// IsSealed returns true if the answer is sealed in the Frontmatter.
+func (m *QuestionModel) IsSealed() bool {
+	return m.Frontmatter.SealedAnswer != ""
+}
+
 // WriteFormatted formats YAML frontmatter, fenced by "---", followed by
 // formatted markdown content and writes it to original File.
-func (m *Model) WriteFormatted() error {
+func (m *QuestionModel) WriteFormatted() error {
 	b, err := format(m.Frontmatter, m.Doc)
 	if err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
@@ -175,7 +147,7 @@ func (m *Model) WriteFormatted() error {
 }
 
 // PrintHTML prints the question and answer choices as HTML form elements.
-func (m *Model) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
+func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
 	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
@@ -195,7 +167,7 @@ func (m *Model) PrintHTML(buf *bytes.Buffer, withMarked bool) error {
 }
 
 // ToHTML returns a complete standalone HTML document as string.
-func (m *Model) ToHTML(withMarked bool) (string, error) {
+func (m *QuestionModel) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(questionPrefixHTML)
 	if err := m.PrintHTML(buf, withMarked); err != nil {
@@ -209,14 +181,14 @@ func baseFilename(filename string) string {
 	return strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
 }
 
-func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withMarked bool) error {
+func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withMarked bool) error {
 	buf.WriteString("<fieldset>\n")
 	inputType := "radio"
 	if m.Frontmatter.AnswerType == "multiple-choice" {
 		inputType = "checkbox"
 	}
 	var correctAnswers map[int]bool
-	if withMarked {
+	if withMarked && !(m.IsSealed() && m.ignoreSealed) {
 		answer, err := m.Frontmatter.getAnswer(m.privateKey)
 		if err != nil {
 			return err
@@ -245,7 +217,7 @@ func (m *Model) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, w
 	return nil
 }
 
-func (m *Model) getVerifiedAnswer() (Answer, error) {
+func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 	answer, err := m.Frontmatter.getAnswer(m.privateKey)
 	if err != nil {
 		return Answer{}, err
@@ -264,12 +236,12 @@ func (m *Model) getVerifiedAnswer() (Answer, error) {
 	return answer, nil
 }
 
-// buildModelForChoice operates on single-choice or multiple-choice question documents
+// buildQuestionModelForChoice operates on single-choice or multiple-choice question documents
 // and expects the following structure:
 //
 // - question: top level evyContent or top level paragraph with image ending in .evy.svg.
 // - answers: list of codeblocks / inline-code, paragraphs with images or links.
-func (m *Model) buildModelForChoice() error {
+func (m *QuestionModel) buildQuestionModelForChoice() error {
 	for _, b := range m.Doc.Blocks {
 		if err := m.buildQuestionField(b); err != nil {
 			return err
@@ -290,7 +262,7 @@ func (m *Model) buildModelForChoice() error {
 	return nil
 }
 
-func (m *Model) buildQuestionField(b markdown.Block) error {
+func (m *QuestionModel) buildQuestionField(b markdown.Block) error {
 	if m.Question != nil {
 		return nil
 	}
@@ -303,7 +275,7 @@ func (m *Model) buildQuestionField(b markdown.Block) error {
 	return nil
 }
 
-func (m *Model) buildAnswerChoicesField(block markdown.Block) error {
+func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	list, ok := block.(*markdown.List)
 	if m.Question == nil || m.AnswerChoices != nil || !ok {
 		return nil
@@ -333,7 +305,7 @@ func (m *Model) buildAnswerChoicesField(block markdown.Block) error {
 	return nil
 }
 
-func (m *Model) trackBlocksToReplace(b markdown.Block, renderer Renderer) {
+func (m *QuestionModel) trackBlocksToReplace(b markdown.Block, renderer Renderer) {
 	text := toText(b)
 	if renderer == nil || text == nil || len(text.Inline) != 1 {
 		return
@@ -360,7 +332,7 @@ func escape(s string) string {
 	return strings.ReplaceAll(s, ".", "-")
 }
 
-func (m *Model) inferResultType() error {
+func (m *QuestionModel) inferResultType() error {
 	resultType := UnknownOutput
 	renderers := append([]Renderer{m.Question}, m.AnswerChoices...)
 	for _, r := range renderers {
@@ -383,9 +355,12 @@ func (m *Model) inferResultType() error {
 	return nil
 }
 
-func (m *Model) setPrivateKey(privateKey string) {
+func (m *QuestionModel) setPrivateKey(privateKey string) {
 	m.privateKey = privateKey
-	m.withSealed = true
+}
+
+func (m *QuestionModel) setIgnoreSealed() {
+	m.ignoreSealed = true
 }
 
 const questionPrefixHTML = `<!doctype html>

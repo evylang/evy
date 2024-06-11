@@ -1,0 +1,5 @@
+move 40 40
+circle 10
+clear
+move 80 80
+circle 20

@@ -1,6 +1,38 @@
 {
   "course1": {
     "unit1": {
+      "cls": {
+        "q-cls1": {
+          "single": "c"
+        },
+        "q-cls2": {
+          "single": "a"
+        },
+        "q-cls3": {
+          "multi": [
+            "a",
+            "b"
+          ]
+        },
+        "q-cls4": {
+          "multi": [
+            "a",
+            "d"
+          ]
+        },
+        "q-draw1": {
+          "single": "c"
+        },
+        "q-draw2": {
+          "single": "b"
+        },
+        "q-draw3": {
+          "single": "a"
+        },
+        "q-draw4": {
+          "single": "d"
+        }
+      },
       "exercise1": {
         "question-img1": {
           "single": "b"
@@ -34,6 +66,58 @@
         },
         "question2": {
           "single": "a"
+        }
+      },
+      "shape": {
+        "q-2circles1": {
+          "single": "c"
+        },
+        "q-2circles2": {
+          "single": "b"
+        },
+        "q-2circles3": {
+          "single": "a"
+        },
+        "q-2circles4": {
+          "single": "d"
+        },
+        "q-circle1": {
+          "single": "c"
+        },
+        "q-circle2": {
+          "single": "b"
+        },
+        "q-circle3": {
+          "single": "d"
+        },
+        "q-circle4": {
+          "single": "d"
+        }
+      },
+      "text": {
+        "q-colored1": {
+          "single": "c"
+        },
+        "q-colored2": {
+          "single": "d"
+        },
+        "q-colored3": {
+          "single": "a"
+        },
+        "q-colored4": {
+          "single": "b"
+        },
+        "q-plain1": {
+          "single": "c"
+        },
+        "q-plain2": {
+          "single": "a"
+        },
+        "q-plain3": {
+          "single": "b"
+        },
+        "q-plain4": {
+          "single": "d"
         }
       }
     }

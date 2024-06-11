@@ -16,6 +16,7 @@ type CourseModel struct {
 	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *courseFrontmatter
+	Name               string // flat markdown heading
 	Units              []*UnitModel
 }
 
@@ -105,5 +106,8 @@ func (m *CourseModel) parseFrontmatterMD() error {
 	}
 
 	m.Doc = parseMD(m.rawMD)
+	if m.Name, err = extractName(m.Doc); err != nil {
+		return fmt.Errorf("%w (%s)", err, m.Filename)
+	}
 	return nil
 }

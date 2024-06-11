@@ -20,6 +20,7 @@ type ExerciseModel struct {
 	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *exerciseFrontmatter
+	Name                  string
 	Questions             []*QuestionModel
 	QuestionsByDifficulty questionsByDifficulty
 }
@@ -107,5 +108,8 @@ func (m *ExerciseModel) parseFrontmatterMD() error {
 	}
 
 	m.Doc = parseMD(m.rawMD)
+	if m.Name, err = extractName(m.Doc); err != nil {
+		return fmt.Errorf("%w (%s)", err, m.Filename)
+	}
 	return nil
 }

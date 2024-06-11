@@ -56,26 +56,26 @@ func NewAnswer(answerType answerType, text string) (Answer, error) {
 // filename is used to generate the composite key of the answer. It is split
 // into course, unit, exercise and answer key and an Answer.
 func NewAnswerKey(filename string, answer Answer) (AnswerKey, error) {
-	answerPath, err := newAnswerPath(filename)
+	AnswerPath, err := NewAnswerPath(filename)
 	if err != nil {
 		return nil, err
 	}
 	answerKey := AnswerKey{}
-	answerKey.add(answerPath, answer)
+	answerKey.add(AnswerPath, answer)
 	return answerKey, nil
 }
 
-func (key AnswerKey) add(p *answerPath, answer Answer) {
-	if key[p.course] == nil {
-		key[p.course] = CourseKey{}
+func (key AnswerKey) add(p AnswerPath, answer Answer) {
+	if key[p.Course] == nil {
+		key[p.Course] = CourseKey{}
 	}
-	if key[p.course][p.unit] == nil {
-		key[p.course][p.unit] = UnitKey{}
+	if key[p.Course][p.Unit] == nil {
+		key[p.Course][p.Unit] = UnitKey{}
 	}
-	if key[p.course][p.unit][p.exercise] == nil {
-		key[p.course][p.unit][p.exercise] = ExerciseKey{}
+	if key[p.Course][p.Unit][p.Exercise] == nil {
+		key[p.Course][p.Unit][p.Exercise] = ExerciseKey{}
 	}
-	key[p.course][p.unit][p.exercise][p.question] = answer
+	key[p.Course][p.Unit][p.Exercise][p.Question] = answer
 }
 
 // merge merges the the given AnswerKeys parameter into the answerkey
@@ -186,29 +186,34 @@ func splitTrim(str string) []string {
 	return ss
 }
 
-type answerPath struct {
-	course   string
-	unit     string
-	exercise string
-	question string
+// AnswerPath is a composite key of a course, unit, exercise and question,
+// which uniquely identifies a question-answer pair.
+type AnswerPath struct {
+	Course   string
+	Unit     string
+	Exercise string
+	Question string
 }
 
-func newAnswerPath(filename string) (*answerPath, error) {
-	// path: /..../COURSE/UNIT/EXERCISE/QUESTION.md
+// NewAnswerPath creates a new AnswerPath from a question markdown filename.
+// The required path structure is
+//
+//	/..../COURSE/UNIT/EXERCISE/QUESTION.md
+func NewAnswerPath(filename string) (AnswerPath, error) {
 	path, err := filepath.Abs(filename)
 	if err != nil {
-		return nil, err
+		return AnswerPath{}, err
 	}
-	segments := split(path)
+	segments := splitPath(path)
 	if len(segments) < 4 {
-		return nil, fmt.Errorf("%w: not enough directories in path: %v, want /..../COURSE/UNIT/EXERCISE/QUESTION.md", ErrBadDirectoryStructure, segments)
+		return AnswerPath{}, fmt.Errorf("%w: not enough directories in path: %v, want /..../COURSE/UNIT/EXERCISE/QUESTION.md", ErrBadDirectoryStructure, segments)
 	}
 	slices.Reverse(segments)
-	return &answerPath{
-		course:   segments[3],
-		unit:     segments[2],
-		exercise: segments[1],
-		question: baseNoExt(segments[0]),
+	return AnswerPath{
+		Course:   segments[3],
+		Unit:     segments[2],
+		Exercise: segments[1],
+		Question: baseNoExt(segments[0]),
 	}, nil
 }
 
@@ -217,10 +222,10 @@ func baseNoExt(filename string) string {
 	return strings.TrimSuffix(filename, filepath.Ext(filename))
 }
 
-func split(path string) []string {
+func splitPath(path string) []string {
 	dir, last := filepath.Split(path)
 	if dir == "" || dir == "/" {
 		return []string{last}
 	}
-	return append(split(filepath.Clean(dir)), last)
+	return append(splitPath(filepath.Clean(dir)), last)
 }

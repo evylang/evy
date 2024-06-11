@@ -14,6 +14,7 @@ package learn
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -35,11 +36,13 @@ var (
 	ErrSealedTooShort       = errors.New("sealed data is too short")
 
 	ErrInvalidExportOptions = errors.New("invalid export options")
+	ErrExercise             = errors.New("exercise error")
+
+	ErrInvalidFileHierarchy = errors.New("invalid file hierarchy")
 )
 
 type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
-	ExportAnswerKey() (AnswerKey, error)
 }
 
 type plainMD string
@@ -48,11 +51,11 @@ func (s plainMD) ToHTML(_ bool) (string, error) {
 	return md2HTML(string(s)), nil
 }
 
-func (s plainMD) ExportAnswerKey() (AnswerKey, error) {
-	return nil, nil
-}
-
-func newModel(mdFile string, opts []Option) (model, error) {
+func newModel(mdFile string, opts []Option, modelCache map[string]model) (model, error) {
+	mdFile = filepath.Clean(mdFile)
+	if m, ok := modelCache[mdFile]; ok {
+		return m, nil
+	}
 	frontmatterString, mdString, err := readSplitMDFile(mdFile)
 	if err != nil {
 		return nil, err
@@ -66,6 +69,7 @@ func newModel(mdFile string, opts []Option) (model, error) {
 			return nil, err
 		}
 	}
+	modelCache[mdFile] = model
 	return model, nil
 }
 
@@ -73,14 +77,22 @@ func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []
 	opts = append([]Option{WithRawMD(frontmatterString, mdString)}, opts...)
 	fm := &baseFrontmatter{}
 	if err := yaml.Unmarshal([]byte(frontmatterString), fm); err != nil {
-		return nil, fmt.Errorf("%w: cannot process Question Markdown frontmatter: %w", ErrInvalidFrontmatter, err)
+		return nil, fmt.Errorf("%w: cannot process Markdown frontmatter: %w", ErrInvalidFrontmatter, err)
 	}
 
 	switch fm.Type { // "course", "unit", "exercise", "question"
 	case "question":
 		return NewQuestionModel(mdFile, opts...)
 	case "exercise":
-		// return NewExerciseModel(mdFile, opts...)
+		return NewExerciseModel(mdFile, opts...)
+		// case "unit":
+		// 	return NewUnitModel(mdFile, opts...)
+		// case "quiz":
+		// 	return NewQuizModel(mdFile, opts...)
+		// case "unittest":
+		// 	return NewUnittestModel(mdFile, opts...)
+		// case "course":
+		// 	return NewCourseModel(mdFile, opts...)
 	}
 	return nil, fmt.Errorf("unsupported frontmatter type %q", string(fm.Type)) //nolint:err113 // dynamic errors in main are fine.
 }

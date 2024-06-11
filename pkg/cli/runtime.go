@@ -21,6 +21,7 @@ type Runtime struct {
 	evaluator.GraphicsRuntime
 	reader    *bufio.Reader
 	writer    io.Writer
+	clsFn     func()
 	SkipSleep bool
 }
 
@@ -52,6 +53,13 @@ func WithOutputWriter(w io.Writer) Option {
 	}
 }
 
+// WithCls sets the action to be done for `cls` command.
+func WithCls(clsFn func()) Option {
+	return func(rt *Runtime) {
+		rt.clsFn = clsFn
+	}
+}
+
 // NewRuntime returns an initialized cli runtime.
 func NewRuntime(options ...Option) *Runtime {
 	rt := &Runtime{
@@ -71,7 +79,11 @@ func (rt *Runtime) Print(s string) {
 }
 
 // Cls clears the screen.
-func (*Runtime) Cls() {
+func (rt *Runtime) Cls() {
+	if rt.clsFn != nil {
+		rt.clsFn()
+		return
+	}
 	cmd := exec.Command("clear")
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "cls")

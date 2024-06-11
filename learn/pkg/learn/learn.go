@@ -85,12 +85,12 @@ func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []
 		return NewQuestionModel(mdFile, opts...)
 	case "exercise":
 		return NewExerciseModel(mdFile, opts...)
-		// case "unit":
-		// 	return NewUnitModel(mdFile, opts...)
-		// case "quiz":
-		// 	return NewQuizModel(mdFile, opts...)
-		// case "unittest":
-		// 	return NewUnittestModel(mdFile, opts...)
+	case "unit":
+		return NewUnitModel(mdFile, opts...)
+	case "quiz":
+		return NewQuizModel(mdFile, opts...)
+	case "unittest":
+		return NewUnittestModel(mdFile, opts...)
 		// case "course":
 		// 	return NewCourseModel(mdFile, opts...)
 	}

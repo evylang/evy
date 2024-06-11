@@ -113,12 +113,12 @@ func newPathsByType(models []model) (pathsByType, error) {
 			byType.questions = append(byType.questions, m.Filename)
 		case *ExerciseModel:
 			byType.questions = append(byType.questions, m.Filename)
-		// case *UnitModel:
-		// 	byType.units = append(byType.units, m.Filename)
-		// case *UnittestModel:
-		// 	byType.quizzes = append(byType.quizzes, m.Filename)
-		// case *QuizModel:
-		// 	byType.quizzes = append(byType.quizzes, m.Filename)
+		case *UnitModel:
+			byType.units = append(byType.units, m.Filename)
+		case *UnittestModel:
+			byType.quizzes = append(byType.quizzes, m.Filename)
+		case *QuizModel:
+			byType.quizzes = append(byType.quizzes, m.Filename)
 		// case *CourseModel:
 		// 	byType.courses = append(byType.courses, m.Filename)
 		case plainMD: // plain markdown files can be anywhere, no-op

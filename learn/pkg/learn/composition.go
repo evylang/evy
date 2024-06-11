@@ -46,6 +46,17 @@ func (d *DifficultyCount) UnmarshalYAML(value *yaml.Node) error {
 
 type questionsByDifficulty map[string][]*QuestionModel
 
+func (m questionsByDifficulty) merge(other questionsByDifficulty) {
+	filenames := m.questionFilenames()
+	for difficulty, questions := range other {
+		for _, question := range questions {
+			if !filenames[question.Filename] {
+				m[difficulty] = append(m[difficulty], question)
+			}
+		}
+	}
+}
+
 func (m questionsByDifficulty) validate(composition []DifficultyCount) error {
 	totalByDifficulty := map[string]int{}
 	for _, c := range composition {
@@ -57,6 +68,16 @@ func (m questionsByDifficulty) validate(composition []DifficultyCount) error {
 		}
 	}
 	return nil
+}
+
+func (m questionsByDifficulty) questionFilenames() map[string]bool {
+	filenames := map[string]bool{}
+	for _, questions := range m {
+		for _, question := range questions {
+			filenames[question.Filename] = true
+		}
+	}
+	return filenames
 }
 
 func (m questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {

@@ -8,6 +8,7 @@ type configurableModel struct {
 	ignoreSealed   bool
 	rawFrontmatter string
 	rawMD          string
+	cache          map[string]model
 }
 
 func (m *configurableModel) setPrivateKey(privateKey string) {
@@ -23,8 +24,12 @@ func (m *configurableModel) setRawMD(rawFrontmatter string, rawMD string) {
 	m.rawMD = rawMD
 }
 
+func (m *configurableModel) setCache(cache map[string]model) {
+	m.cache = cache
+}
+
 func newConfigurableModel(options []Option) *configurableModel {
-	m := &configurableModel{}
+	m := &configurableModel{cache: map[string]model{}}
 	for _, opt := range options {
 		opt(m)
 	}
@@ -52,4 +57,24 @@ func WithRawMD(rawFrontmatter string, rawMD string) Option {
 	return func(m *configurableModel) {
 		m.setRawMD(rawFrontmatter, rawMD)
 	}
+}
+
+func withCache(cache map[string]model) Option {
+	return func(m *configurableModel) {
+		m.setCache(cache)
+	}
+}
+
+func newOptions(ignoreSealed bool, privateKey string, cache map[string]model) []Option {
+	var options []Option
+	if ignoreSealed {
+		options = append(options, WithIgnoreSealed())
+	}
+	if !ignoreSealed && privateKey != "" {
+		options = append(options, WithPrivateKey(privateKey))
+	}
+	if cache != nil {
+		options = append(options, withCache(cache))
+	}
+	return options
 }

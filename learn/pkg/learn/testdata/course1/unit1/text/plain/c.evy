@@ -1,0 +1,4 @@
+move 20 20
+text "Hello"
+move 60 20
+text "World"

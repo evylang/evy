@@ -47,28 +47,46 @@ func (d *DifficultyCount) UnmarshalYAML(value *yaml.Node) error {
 
 type questionsByDifficulty map[string][]*QuestionModel
 
-func (m questionsByDifficulty) validate(composition []DifficultyCount) error {
+func (q questionsByDifficulty) merge(other questionsByDifficulty) {
+	// Add filenames set to ensure we don't accidentally add the same question
+	// twice.
+	filenames := map[string]bool{}
+	for _, questions := range q {
+		for _, question := range questions {
+			filenames[question.Filename] = true
+		}
+	}
+	for difficulty, questions := range other {
+		for _, question := range questions {
+			if !filenames[question.Filename] {
+				q[difficulty] = append(q[difficulty], question)
+			}
+		}
+	}
+}
+
+func (q questionsByDifficulty) validate(composition []DifficultyCount) error {
 	totalByDifficulty := map[string]int{}
 	for _, c := range composition {
 		totalByDifficulty[c.Difficulty] += c.Count
 	}
 	for difficulty, total := range totalByDifficulty {
-		if len(m[difficulty]) < total {
-			return fmt.Errorf("%w: not enough questions of difficulty %q, expected %d, got %d", ErrInconsistentMdoel, difficulty, total, len(m[difficulty]))
+		if len(q[difficulty]) < total {
+			return fmt.Errorf("%w: not enough questions of difficulty %q, expected %d, got %d", ErrInconsistentMdoel, difficulty, total, len(q[difficulty]))
 		}
 	}
 	return nil
 }
 
-func (m questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
+func (q questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
 	buf.WriteString("<h3>Question Pool</h3>\n")
 	buf.WriteString("<table>\n")
 
 	for _, difficulty := range validDifficulties {
-		questions := m[difficulty]
+		questions := q[difficulty]
 		filenames := make([]string, len(questions))
-		for i, q := range questions {
-			filenames[i] = q.Filename
+		for i, question := range questions {
+			filenames[i] = question.Filename
 		}
 		slices.Sort(filenames)
 		for _, filename := range filenames {

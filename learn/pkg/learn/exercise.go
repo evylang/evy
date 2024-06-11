@@ -24,8 +24,7 @@ type ExerciseModel struct {
 	QuestionsByDifficulty questionsByDifficulty
 }
 
-// NewExerciseModel returns a new exercise model from an exercise Markdown file or its
-// contents.
+// NewExerciseModel returns a new exercise model from an exercise Markdown file.
 func NewExerciseModel(filename string, options ...Option) (*ExerciseModel, error) {
 	exercise := &ExerciseModel{
 		Filename:              filename,

@@ -119,8 +119,8 @@ func newPathsByType(models []model) (pathsByType, error) {
 			byType.quizzes = append(byType.quizzes, m.Filename)
 		case *QuizModel:
 			byType.quizzes = append(byType.quizzes, m.Filename)
-		// case *CourseModel:
-		// 	byType.courses = append(byType.courses, m.Filename)
+		case *CourseModel:
+			byType.courses = append(byType.courses, m.Filename)
 		case plainMD: // plain markdown files can be anywhere, no-op
 		default:
 			return byType, fmt.Errorf("%w: unknown model type: %T", ErrInconsistentMdoel, m)

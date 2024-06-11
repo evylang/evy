@@ -91,8 +91,8 @@ func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []
 		return NewQuizModel(mdFile, opts...)
 	case "unittest":
 		return NewUnittestModel(mdFile, opts...)
-		// case "course":
-		// 	return NewCourseModel(mdFile, opts...)
+	case "course":
+		return NewCourseModel(mdFile, opts...)
 	}
 	return nil, fmt.Errorf("unsupported frontmatter type %q", string(fm.Type)) //nolint:err113 // dynamic errors in main are fine.
 }

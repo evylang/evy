@@ -20,6 +20,7 @@ func TestExportAll(t *testing.T) {
 		WriteHTML:         true,
 		WriteAnswerKey:    true,
 		WithAnswersMarked: true,
+		WriteCatalog:      true,
 	}
 	err := Export(srcdir, destdir, opts, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)

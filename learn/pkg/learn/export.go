@@ -14,11 +14,12 @@ type ExportOptions struct {
 	WriteAnswerKey    bool
 	WriteHTML         bool
 	WithAnswersMarked bool
+	WriteCatalog      bool
 }
 
 func (opts ExportOptions) validate() error {
-	if !opts.WriteHTML && !opts.WriteAnswerKey {
-		return fmt.Errorf("%w: at least one of WriteHTML or WriteAnswerKey must be true", ErrInvalidExportOptions)
+	if !opts.WriteHTML && !opts.WriteAnswerKey && !opts.WriteCatalog {
+		return fmt.Errorf("%w: at least one of WriteHTML, WriteAnswerKey or WriteCatalog must be true", ErrInvalidExportOptions)
 	}
 	if !opts.WriteHTML && opts.WithAnswersMarked {
 		return fmt.Errorf("%w: WithAnswersMarked requires WriteHTML", ErrInvalidExportOptions)
@@ -47,7 +48,15 @@ func Export(srcDir, destDir string, exportOpts ExportOptions, modelOpts ...Optio
 	}
 	if exportOpts.WriteAnswerKey {
 		answerKeyFile := filepath.Join(destDir, "answerkey.json")
-		return writeAnswerKeyFile(models, answerKeyFile)
+		if err := writeAnswerKeyFile(models, answerKeyFile); err != nil {
+			return err
+		}
+	}
+	if exportOpts.WriteCatalog {
+		catalogFile := filepath.Join(destDir, "catalog.json")
+		if err := writeCatalogFile(models, catalogFile); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -169,4 +178,25 @@ func writeAnswerKeyFile(models []model, answerKeyFile string) error {
 	}
 	b = append(b, '\n')
 	return os.WriteFile(answerKeyFile, b, 0o666)
+}
+
+func writeCatalogFile(models []model, catalogFile string) error {
+	// use MkdirAll in case the directory already exists
+	if err := os.MkdirAll(filepath.Dir(catalogFile), 0o777); err != nil {
+		return err
+	}
+	catalogs := map[string]Course{}
+	var err error
+	for _, m := range models {
+		if cmodel, ok := m.(*CourseModel); ok {
+			catalog := NewCourseCatalog(cmodel)
+			catalogs[catalog.PartialID] = catalog
+		}
+	}
+	b, err := json.MarshalIndent(catalogs, "", "  ")
+	if err != nil {
+		return err
+	}
+	b = append(b, '\n')
+	return os.WriteFile(catalogFile, b, 0o666)
 }

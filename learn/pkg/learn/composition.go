@@ -21,8 +21,8 @@ import (
 //	  - hard: 3
 //	  - easy: 1
 type DifficultyCount struct {
-	Difficulty string
-	Count      int
+	Difficulty string `firestore:"difficulty,omitempty" json:"difficulty,omitempty"`
+	Count      int    `firestore:"count,omitempty" json:"count,omitempty"`
 }
 
 // UnmarshalYAML unmarshals a DifficultyCount from a YAML node. In the source

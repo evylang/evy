@@ -1,0 +1,154 @@
+{
+  "course1": {
+    "name": "Course 1",
+    "partialID": "course1",
+    "maxScore": 40,
+    "units": {
+      "unit1": {
+        "name": "Unit 1: Demo Unit",
+        "partialID": "unit1",
+        "maxScore": 40,
+        "exercises": {
+          "cls": {
+            "partialID": "cls",
+            "type": "exercise",
+            "maxScore": 10,
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              }
+            ]
+          },
+          "exercise1": {
+            "partialID": "exercise1",
+            "type": "exercise",
+            "maxScore": 10,
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              }
+            ]
+          },
+          "quiz1": {
+            "partialID": "quiz1",
+            "type": "quiz",
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 1
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              },
+              {
+                "difficulty": "hard",
+                "count": 2
+              }
+            ]
+          },
+          "quiz2": {
+            "partialID": "quiz2",
+            "type": "quiz",
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              },
+              {
+                "difficulty": "hard",
+                "count": 2
+              }
+            ]
+          },
+          "shape": {
+            "partialID": "shape",
+            "type": "exercise",
+            "maxScore": 10,
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              }
+            ]
+          },
+          "text": {
+            "partialID": "text",
+            "type": "exercise",
+            "maxScore": 10,
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              }
+            ]
+          },
+          "unittest": {
+            "partialID": "unittest",
+            "type": "unittest",
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 3
+              },
+              {
+                "difficulty": "hard",
+                "count": 1
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              },
+              {
+                "difficulty": "hard",
+                "count": 1
+              },
+              {
+                "difficulty": "easy",
+                "count": 4
+              },
+              {
+                "difficulty": "medium",
+                "count": 2
+              }
+            ]
+          }
+        },
+        "exerciseOrder": [
+          "exercise1",
+          "shape",
+          "quiz1",
+          "text",
+          "cls",
+          "quiz2",
+          "unittest"
+        ]
+      }
+    },
+    "unitOrder": [
+      "unit1"
+    ]
+  }
+}

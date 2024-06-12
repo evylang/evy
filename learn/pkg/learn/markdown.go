@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unicode"
 
+	"evylang.dev/evy/pkg/md"
 	"gopkg.in/yaml.v3"
 	"rsc.io/markdown"
 )
@@ -54,10 +55,11 @@ func parseMD(rawMD string) *markdown.Document {
 
 func md2HTML(rawMD string) string {
 	doc := parseMD(rawMD)
+	md.Walk(doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(questionPrefixHTML)
+	buf.WriteString(prefixHTML)
 	doc.PrintHTML(buf)
-	buf.WriteString(questionSuffixHTML)
+	buf.WriteString(suffixHTML)
 	return buf.String()
 }
 

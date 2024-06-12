@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"evylang.dev/evy/pkg/md"
+	"gopkg.in/yaml.v3"
 	"rsc.io/markdown"
 )
 
@@ -19,20 +21,18 @@ import (
 // choice (output) matches the question (output). "Correct" means as
 // specified in the Markdown Frontmatter.
 type QuestionModel struct {
+	*configurableModel
 	Filename    string
 	Doc         *markdown.Document
-	Frontmatter *frontmatter
+	Frontmatter *questionFrontmatter
+	AnswerPath  AnswerPath
 
 	Question      Renderer
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	ignoreSealed   bool
-	privateKey     string
-	embeds         map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList     markdown.Block           // use to output checkbox or radio buttons for List in HTML
-	rawFrontmatter string
-	rawMD          string
+	embeds     map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList markdown.Block           // use to output checkbox or radio buttons for List in HTML
 }
 
 type embed struct {
@@ -54,20 +54,22 @@ var fieldTypeToString = map[fieldType]string{
 // NewQuestionModel returns a new question model from a question Markdown file
 // or its contents.
 func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
-	model := &QuestionModel{
-		Filename: filename,
-		embeds:   map[markdown.Block]embed{},
+	question := &QuestionModel{
+		Filename:          filename,
+		embeds:            map[markdown.Block]embed{},
+		configurableModel: newConfigurableModel(options),
 	}
-	for _, opt := range options {
-		opt(model)
-	}
-	if err := model.parseFrontmatterMD(); err != nil {
+	var err error
+	if question.AnswerPath, err = NewAnswerPath(filename); err != nil {
 		return nil, err
 	}
-	if err := model.buildQuestionModelForChoice(); err != nil {
+	if err := question.parseFrontmatterMD(); err != nil {
 		return nil, err
 	}
-	return model, nil
+	if err := question.buildQuestionModelForChoice(); err != nil {
+		return nil, err
+	}
+	return question, nil
 }
 
 // Seal seals the unsealed answer in the Frontmatter using the public key.
@@ -129,6 +131,7 @@ func (m *QuestionModel) WriteFormatted() error {
 
 // PrintHTML prints the question and answer choices as HTML form elements.
 func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
+	md.Walk(m.Doc, md.RewriteLink)
 	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
@@ -150,11 +153,11 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 // ToHTML returns a complete standalone HTML document as string.
 func (m *QuestionModel) ToHTML(withAnswersMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
-	buf.WriteString(questionPrefixHTML)
+	buf.WriteString(prefixHTML)
 	if err := m.PrintHTML(buf, withAnswersMarked); err != nil {
 		return "", err
 	}
-	buf.WriteString(questionSuffixHTML)
+	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 
@@ -208,10 +211,10 @@ func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 	for i, choice := range m.AnswerChoices {
 		choiceGen := choice.RenderOutput()
 		if correctByIndex[i] && generated != choiceGen {
-			return Answer{}, fmt.Errorf("%w: answer %q does not match question: %q != %q", ErrWrongAnswer, indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename, indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 		if !correctByIndex[i] && generated == choiceGen {
-			return Answer{}, fmt.Errorf("%w: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename, answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 	}
 	return answer, nil
@@ -336,19 +339,6 @@ func (m *QuestionModel) inferResultType() error {
 	return nil
 }
 
-func (m *QuestionModel) setPrivateKey(privateKey string) {
-	m.privateKey = privateKey
-}
-
-func (m *QuestionModel) setIgnoreSealed() {
-	m.ignoreSealed = true
-}
-
-func (m *QuestionModel) setRawMD(rawFrontmatter string, rawMD string) {
-	m.rawFrontmatter = rawFrontmatter
-	m.rawMD = rawMD
-}
-
 func (m *QuestionModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
@@ -357,7 +347,11 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 			return fmt.Errorf("%w (%s)", err, m.Filename)
 		}
 	}
-	if m.Frontmatter, err = parseFrontmatter(m.rawFrontmatter); err != nil {
+	m.Frontmatter = &questionFrontmatter{}
+	if err := yaml.Unmarshal([]byte(m.rawFrontmatter), m.Frontmatter); err != nil {
+		return fmt.Errorf("%w: cannot process Markdown frontmatter: %w (%s)", ErrInvalidFrontmatter, err, m.Filename)
+	}
+	if err := m.Frontmatter.validate(); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
 	if m.Frontmatter.AnswerType != "single-choice" && m.Frontmatter.AnswerType != "multiple-choice" {
@@ -368,7 +362,7 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 	return nil
 }
 
-const questionPrefixHTML = `<!doctype html>
+const prefixHTML = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -444,6 +438,6 @@ const questionPrefixHTML = `<!doctype html>
   <body>
   `
 
-const questionSuffixHTML = `  </body>
+const suffixHTML = `  </body>
 </html>
 `

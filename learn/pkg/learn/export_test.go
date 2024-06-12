@@ -65,7 +65,7 @@ func findFiles(root string) []string {
 	var files []string
 	rootFS := os.DirFS(root)
 	_ = fs.WalkDir(rootFS, ".", func(filename string, d fs.DirEntry, _ error) error {
-		if !d.IsDir() {
+		if !d.IsDir() && filepath.Ext(filename) != ".DS_Store" {
 			files = append(files, filename)
 		}
 		return nil

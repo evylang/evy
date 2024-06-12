@@ -43,12 +43,17 @@ var (
 
 type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
+	Name() string
 }
 
 type plainMD string
 
 func (s plainMD) ToHTML(_ bool) (string, error) {
 	return md2HTML(string(s)), nil
+}
+
+func (s plainMD) Name() string {
+	return "Plain Markdown"
 }
 
 func newModel(mdFile string, opts []Option, modelCache map[string]model) (model, error) {

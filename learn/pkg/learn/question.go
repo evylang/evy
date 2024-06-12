@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"evylang.dev/evy/pkg/md"
@@ -132,7 +131,7 @@ func (m *QuestionModel) WriteFormatted() error {
 // PrintHTML prints the question and answer choices as HTML form elements.
 func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
 	md.Walk(m.Doc, md.RewriteLink)
-	buf.WriteString("<form id=" + baseFilename(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
+	buf.WriteString("<form id=" + baseNoExt(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
 			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked); err != nil {
@@ -161,8 +160,9 @@ func (m *QuestionModel) ToHTML(withAnswersMarked bool) (string, error) {
 	return buf.String(), nil
 }
 
-func baseFilename(filename string) string {
-	return strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
+// Name returns the name of the question model as the base filename without extension.
+func (m *QuestionModel) Name() string {
+	return baseNoExt(m.Filename)
 }
 
 func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withAnswersMarked bool) error {

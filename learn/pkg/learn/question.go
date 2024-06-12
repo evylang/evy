@@ -30,11 +30,11 @@ type QuestionModel struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	embeds     map[markdown.Block]embed // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block           // use to output checkbox or radio buttons for List in HTML
+	embeds     map[markdown.Block]embedMD // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList markdown.Block             // use to output checkbox or radio buttons for List in HTML
 }
 
-type embed struct {
+type embedMD struct {
 	id       string
 	renderer Renderer
 }
@@ -55,7 +55,7 @@ var fieldTypeToString = map[fieldType]string{
 func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
 	question := &QuestionModel{
 		Filename:          filename,
-		embeds:            map[markdown.Block]embed{},
+		embeds:            map[markdown.Block]embedMD{},
 		configurableModel: newConfigurableModel(options),
 	}
 	var err error
@@ -152,11 +152,9 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 // ToHTML returns a complete standalone HTML document as string.
 func (m *QuestionModel) ToHTML(withAnswersMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	if err := m.PrintHTML(buf, withAnswersMarked); err != nil {
 		return "", err
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 
@@ -298,7 +296,7 @@ func (m *QuestionModel) trackBlocksToReplace(b markdown.Block, renderer Renderer
 	if id == "" {
 		return
 	}
-	m.embeds[b] = embed{id: id, renderer: renderer}
+	m.embeds[b] = embedMD{id: id, renderer: renderer}
 }
 
 func idFromInline(inline markdown.Inline) string {
@@ -361,83 +359,3 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 	m.Doc = parser.Parse(m.rawMD)
 	return nil
 }
-
-const prefixHTML = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>evy · Question</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡️</text></svg>" />
-    <style>
-      body {
-        padding: 8px 32px;
-        margin: 0;
-      }
-      fieldset {
-        display: grid;
-        grid-template: repeat(2, min-content) / repeat(2, min-content);
-        grid-auto-flow: column;
-        column-gap: 32px;
-        row-gap: 8px;
-        border: none;
-      }
-      pre {
-        border: 1px solid silver;
-        padding: 8px 12px;
-        border-radius: 2px;
-        background: whitesmoke;
-        width: fit-content;
-      }
-      fieldset > div {
-        display: flex;
-        align-items: start;
-        gap: 8px;
-        border: 1px solid silver;
-        border-radius: 6px;
-        padding: 8px;
-        background: whitesmoke;
-      }
-      fieldset pre {
-        margin: 0;
-        padding: 4px 12px;
-        align-self: center;
-        background: white;
-        border: 1px solid silver
-      }
-      form {
-        padding-bottom: 32px;
-      }
-      form svg {
-        width: 200px;
-        height: 200px;
-        border: 1px solid silver;
-      }
-      form.difficulty-easy:after {
-        content: "Difficulty: 🌶️";
-      }
-      form.difficulty-medium:after {
-        content: "Difficulty: 🌶️🌶️";
-      }
-      form.difficulty-hard:after {
-        content: "Difficulty: 🌶️🌶️🌶️";
-      }
-      form:not(:first-child) {
-        border-top: 1px solid silver;
-      }
-      table {
-        border-collapse: collapse;
-        margin-bottom: 24px;
-      }
-      td {
-        border: 1px solid silver;
-        padding: 4px 8px;
-      }
-    </style>
-  </head>
-  <body>
-  `
-
-const suffixHTML = `  </body>
-</html>
-`

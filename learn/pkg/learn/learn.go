@@ -12,7 +12,6 @@
 package learn
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -56,13 +55,7 @@ type plainMD struct {
 
 func (p *plainMD) ToHTML(_ bool) (string, error) {
 	md.Walk(p.doc, md.RewriteLink)
-	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
-	p.doc.PrintHTML(buf)
-	buf.WriteString(suffixHTML)
-	return buf.String(), nil
-
-	// TODO: return markdown.ToHTML(p.doc), nil
+	return markdown.ToHTML(p.doc), nil
 }
 
 func (p *plainMD) Name() string {

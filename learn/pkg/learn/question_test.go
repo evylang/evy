@@ -264,7 +264,7 @@ func TestPrintHTML(t *testing.T) {
 			err = model.PrintHTML(buf, false) // without marked answers
 			assert.NoError(t, err)
 			got := buf.String()
-			goldenFile := "testdata/golden/form/" + name + ".html"
+			goldenFile := "testdata/golden/question/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)

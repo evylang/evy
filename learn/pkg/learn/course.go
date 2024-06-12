@@ -63,12 +63,10 @@ func (m *CourseModel) buildUnits() error {
 func (m *CourseModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.PrintHTML(buf)
 	if err := m.printUnitBadgesHTML(buf); err != nil {
 		return "", err
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 

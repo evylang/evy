@@ -53,7 +53,6 @@ type exerciseFrontmatter struct {
 // ToHTML returns a complete standalone HTML document as string.
 func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	md.Walk(m.Doc, md.RewriteLink)
 	m.Doc.PrintHTML(buf)
 	printComposition(buf, m.Frontmatter.Composition)
@@ -64,7 +63,6 @@ func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 			}
 		}
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 

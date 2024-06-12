@@ -78,13 +78,11 @@ func (m *UnittestModel) buildExercises() error {
 func (m *UnittestModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.PrintHTML(buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 

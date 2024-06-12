@@ -210,6 +210,9 @@ func (rt *GraphicsRuntime) Circle(radius float64) {
 // all previous SVG elements as the background color could be
 // semi-transparent overlaying previous elements.
 func (rt *GraphicsRuntime) Clear(color string) {
+	if color == "" {
+		color = "white"
+	}
 	rect := Rect{
 		X:      0,
 		Y:      0,

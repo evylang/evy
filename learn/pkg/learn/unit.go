@@ -59,7 +59,6 @@ func (m *UnitModel) Name() string {
 func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.Blocks[0].PrintHTML(buf)
 	if err := m.printBadgesHTML(buf); err != nil {
 		return "", err
@@ -67,7 +66,6 @@ func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	for _, block := range m.Doc.Blocks[1:] {
 		block.PrintHTML(buf)
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
 }
 

@@ -59,9 +59,7 @@ func md2HTML(rawMD string) string {
 	doc := parseMD(rawMD)
 	md.Walk(doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	doc.PrintHTML(buf)
-	buf.WriteString(suffixHTML)
 	return buf.String()
 }
 

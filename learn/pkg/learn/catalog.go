@@ -40,13 +40,13 @@ const exerciseScore = 10
 // NewCourseCatalog creates a course catalog from a course model.
 func NewCourseCatalog(courseModel *CourseModel) Course {
 	course := Course{
-		Name:      courseModel.Name,
+		Name:      courseModel.Name(),
 		PartialID: filepath.Base(filepath.Dir(courseModel.Filename)),
 		Units:     map[string]Unit{},
 	}
 	for _, unitModel := range courseModel.Units {
 		unit := Unit{
-			Name:      unitModel.Name,
+			Name:      unitModel.Name(),
 			PartialID: filepath.Base(filepath.Dir(unitModel.Filename)),
 			Exercises: map[string]Exercise{},
 		}

@@ -24,8 +24,8 @@ type UnitModel struct {
 	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *unitFrontmatter
-	Name               string
-	OrderedModels      []model // exercises, quizzes, unittests
+	name               string // exercises, quizzes, unittests
+	OrderedModels      []model
 }
 
 // NewUnitModel returns a new unit model from a unit Markdown file or its
@@ -47,6 +47,11 @@ func NewUnitModel(filename string, options ...Option) (*UnitModel, error) {
 
 type unitFrontmatter struct {
 	Type frontmatterType `yaml:"type,omitempty"`
+}
+
+// Name returns the name of the unit model derived from the first heading.
+func (m *UnitModel) Name() string {
+	return m.name
 }
 
 // ToHTML returns a complete standalone HTML document as string.
@@ -105,15 +110,22 @@ func (m *UnitModel) buildModels() error {
 	relPaths := collectMDLinks(m.Doc)
 	dir := filepath.Dir(m.Filename)
 	opts := newOptions(m.ignoreSealed, m.privateKey, m.cache)
-
+	quizCount := 1
 	for _, relPath := range relPaths {
 		fname := filepath.Join(dir, relPath)
 		model, err := newModel(fname, opts, m.cache)
 		if err != nil {
 			return fmt.Errorf("%w: %s", err, fname)
 		}
-		switch model.(type) {
-		case *ExerciseModel, *QuizModel, *UnittestModel:
+		switch model := model.(type) {
+		case *ExerciseModel:
+			m.OrderedModels = append(m.OrderedModels, model)
+		case *QuizModel:
+			model.name = fmt.Sprintf("Quiz %d · %s", quizCount, m.name)
+			m.OrderedModels = append(m.OrderedModels, model)
+			quizCount++
+		case *UnittestModel:
+			model.name = "Unit test · " + m.name
 			m.OrderedModels = append(m.OrderedModels, model)
 		}
 	}
@@ -143,7 +155,7 @@ func (m *UnitModel) parseFrontmatterMD() error {
 	if _, ok := m.Doc.Blocks[0].(*markdown.Heading); !ok {
 		return fmt.Errorf("%w: first markdown element in unit Markdown file must be heading", ErrBadMarkdownStructure)
 	}
-	if m.Name, err = extractName(m.Doc); err != nil {
+	if m.name, err = extractName(m.Doc); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
 	return nil

@@ -12,11 +12,14 @@
 package learn
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"path/filepath"
 
+	"evylang.dev/evy/pkg/md"
 	"gopkg.in/yaml.v3"
+	"rsc.io/markdown"
 )
 
 // Errors for the learn package.
@@ -43,12 +46,36 @@ var (
 
 type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
+	Name() string
 }
 
-type plainMD string
+type plainMD struct {
+	doc  *markdown.Document
+	name string
+}
 
-func (s plainMD) ToHTML(_ bool) (string, error) {
-	return md2HTML(string(s)), nil
+func (p *plainMD) ToHTML(_ bool) (string, error) {
+	md.Walk(p.doc, md.RewriteLink)
+	buf := &bytes.Buffer{}
+	buf.WriteString(prefixHTML)
+	p.doc.PrintHTML(buf)
+	buf.WriteString(suffixHTML)
+	return buf.String(), nil
+
+	// TODO: return markdown.ToHTML(p.doc), nil
+}
+
+func (p *plainMD) Name() string {
+	return p.name
+}
+
+func newPlainMD(mdString string) (*plainMD, error) {
+	doc := parseMD(mdString)
+	name, err := extractName(doc)
+	if err != nil {
+		return nil, err
+	}
+	return &plainMD{doc: doc, name: name}, nil
 }
 
 func newModel(mdFile string, opts []Option, modelCache map[string]model) (model, error) {
@@ -62,12 +89,12 @@ func newModel(mdFile string, opts []Option, modelCache map[string]model) (model,
 	}
 	var model model
 	if frontmatterString == "" {
-		model = plainMD(mdString)
+		model, err = newPlainMD(mdString)
 	} else {
 		model, err = newModelWithFrontmatter(mdFile, frontmatterString, mdString, opts)
-		if err != nil {
-			return nil, err
-		}
+	}
+	if err != nil {
+		return nil, err
 	}
 	modelCache[mdFile] = model
 	return model, nil

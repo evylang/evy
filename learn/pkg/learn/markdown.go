@@ -86,3 +86,18 @@ func collectMDLinks(doc *markdown.Document) []string {
 	})
 	return mdLinks
 }
+
+func extractName(doc *markdown.Document) (string, error) {
+	for _, b := range doc.Blocks {
+		h, ok := b.(*markdown.Heading)
+		if !ok {
+			continue
+		}
+		buf := &bytes.Buffer{}
+		for _, inline := range h.Text.Inline {
+			inline.PrintText(buf)
+		}
+		return buf.String(), nil
+	}
+	return "", fmt.Errorf("%w: no heading found", ErrBadMarkdownStructure)
+}

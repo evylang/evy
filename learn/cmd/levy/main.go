@@ -63,7 +63,7 @@ func main() {
 }
 
 type exportCmd struct {
-	ExportType        string `arg:"" enum:"html,answerkey,all" help:"Export target: one of html, answerkey, all."`
+	ExportType        string `arg:"" enum:"html,answerkey,catalog,all" help:"Export target: one of html, answerkey, catalog, all."`
 	Srcdir            string `arg:"" help:"Source directory containing markdown files." placeholder:"SRCDIR"`
 	Destdir           string `arg:"" default:"." help:"Output directory (default: .)" placeholder:"DESTDIR"`
 	IgnoreSealed      bool   `short:"i" help:"Only export answerkey and add solution to unsealed answers. Suitable if private key not available."`
@@ -91,12 +91,13 @@ type unsealCmd struct {
 }
 
 func (c *exportCmd) Run() error {
-	if c.ExportType == "answerkey" && c.WithAnswersMarked {
+	if c.WithAnswersMarked && c.ExportType != "all" && c.ExportType != "html" {
 		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
 	}
 	exportOptions := learn.ExportOptions{
 		WriteHTML:         c.ExportType == "html" || c.ExportType == "all",
 		WriteAnswerKey:    c.ExportType == "answerkey" || c.ExportType == "all",
+		WriteCatalog:      c.ExportType == "catalog" || c.ExportType == "all",
 		WithAnswersMarked: c.WithAnswersMarked,
 	}
 	modelOptions := getOptions(c.IgnoreSealed, c.PrivateKey)

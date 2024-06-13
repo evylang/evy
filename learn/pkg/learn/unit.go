@@ -24,6 +24,7 @@ type UnitModel struct {
 	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *unitFrontmatter
+	Name               string
 	OrderedModels      []model // exercises, quizzes, unittests
 }
 
@@ -141,6 +142,9 @@ func (m *UnitModel) parseFrontmatterMD() error {
 	}
 	if _, ok := m.Doc.Blocks[0].(*markdown.Heading); !ok {
 		return fmt.Errorf("%w: first markdown element in unit Markdown file must be heading", ErrBadMarkdownStructure)
+	}
+	if m.Name, err = extractName(m.Doc); err != nil {
+		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
 	return nil
 }

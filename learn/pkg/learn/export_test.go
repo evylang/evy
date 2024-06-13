@@ -13,7 +13,7 @@ import (
 
 func TestExportAll(t *testing.T) {
 	destdir := t.TempDir()
-	srcdir := "testdata/course1/unit1/exercise1"
+	srcdir := "testdata/course1"
 	goldendir := "testdata/golden/export/all"
 
 	opts := ExportOptions{
@@ -28,7 +28,7 @@ func TestExportAll(t *testing.T) {
 
 func TestExportHTMLNoPrivateKey(t *testing.T) {
 	destdir := t.TempDir()
-	srcdir := "testdata/course1/unit1/exercise1"
+	srcdir := "testdata/course1"
 	goldendir := "testdata/golden/export/html-no-private-key"
 
 	opts := ExportOptions{

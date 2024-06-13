@@ -1,0 +1,5 @@
+move 20 20
+color "red"
+text "World"
+color "blue"
+text "Hello"

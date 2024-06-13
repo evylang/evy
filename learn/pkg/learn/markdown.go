@@ -3,7 +3,9 @@ package learn
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"unicode"
 
@@ -65,4 +67,22 @@ func md2HTML(rawMD string) string {
 
 func trimLeftSpace(str string) string {
 	return strings.TrimLeftFunc(str, unicode.IsSpace)
+}
+
+func collectMDLinks(doc *markdown.Document) []string {
+	var mdLinks []string
+	md.Walk(doc, func(n md.Node) {
+		mdl, ok := n.(*markdown.Link)
+		if !ok {
+			return
+		}
+		u, err := url.Parse(mdl.URL)
+		if err != nil || u.IsAbs() {
+			return
+		}
+		if filepath.Ext(u.Path) == ".md" {
+			mdLinks = append(mdLinks, u.Path)
+		}
+	})
+	return mdLinks
 }

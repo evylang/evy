@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy · Question</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡️</text></svg>" />
+    <style>
+      body {
+        padding: 8px 32px;
+        margin: 0;
+      }
+      fieldset {
+        display: grid;
+        grid-template: repeat(2, min-content) / repeat(2, min-content);
+        grid-auto-flow: column;
+        column-gap: 32px;
+        row-gap: 8px;
+        border: none;
+      }
+      pre {
+        border: 1px solid silver;
+        padding: 8px 12px;
+        border-radius: 2px;
+        background: whitesmoke;
+        width: fit-content;
+      }
+      fieldset > div {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        border: 1px solid silver;
+        border-radius: 6px;
+        padding: 8px;
+        background: whitesmoke;
+      }
+      fieldset pre {
+        margin: 0;
+        padding: 4px 12px;
+        align-self: center;
+        background: white;
+        border: 1px solid silver
+      }
+      form {
+        padding-bottom: 32px;
+      }
+      form svg {
+        width: 200px;
+        height: 200px;
+        border: 1px solid silver;
+      }
+      form.difficulty-easy:after {
+        content: "Difficulty: 🌶️";
+      }
+      form.difficulty-medium:after {
+        content: "Difficulty: 🌶️🌶️";
+      }
+      form.difficulty-hard:after {
+        content: "Difficulty: 🌶️🌶️🌶️";
+      }
+      form:not(:first-child) {
+        border-top: 1px solid silver;
+      }
+      table {
+        border-collapse: collapse;
+        margin-bottom: 24px;
+      }
+      td {
+        border: 1px solid silver;
+        padding: 4px 8px;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>Unit 1: Demo Unit</h1>
+<a href="exercise1/index.html">🔲</a>
+<a href="shape/index.html">🔲</a>
+<a href="quiz1.html">✨</a>
+<a href="text/index.html">🔲</a>
+<a href="cls/index.html">🔲</a>
+<a href="quiz2.html">✨</a>
+<a href="unittest.html">⭐️</a>
+<pre><code>Legend:
+✳️ Exercise mastered: Proficient skill correct on the unit test (🟩 ☝️).
+🟩 Exercise proficient: 100% correct or familiar skill correct during a quiz or unit test (🟨 ☝️).
+🟨 Exercise familiar: &gt;=70 % correct.
+🟪 Exercise attempted: &lt; 70 % correct or wrong during quiz or unit test.
+🔲 Exercise not started
+✨ Quiz
+⭐️ Unit test
+</code></pre>
+<p>Unit introduction goes here. 1-2 sentences, maybe a paragraph.</p>
+<h2>Getting Started</h2>
+<ul>
+<li><a href="intro.html"><code>print</code> command</a></li>
+<li><a href="exercise1/index.html">Exercise: <code>print</code> 👈</a></li>
+<li><a href="shape/intro.html">Drawing canvas</a></li>
+<li><a href="shape/commands.html">Draw shapes</a></li>
+<li><a href="shape/index.html">Exercise: Shape commands 👈</a></li>
+<li><a href="quiz1.html">Quiz: drawing and print ✨</a></li>
+</ul>
+<h2>Draw with Style</h2>
+<ul>
+<li><a href="text/intro.html">Draw text</a></li>
+<li><a href="text/index.html">Exercise: text and shapes 👈</a></li>
+<li><a href="cls/cls.html">Clear output</a></li>
+<li><a href="cls/clear.html">Clear drawing</a></li>
+<li><a href="cls/index.html">Exercise: styled shapes 👈</a></li>
+<li><a href="quiz2.html">Quiz: Text and style ✨</a></li>
+<li><a href="unittest.html">Unit test: drawing and print ⭐️</a></li>
+</ul>
+  </body>
+</html>

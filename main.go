@@ -55,6 +55,7 @@ import (
 	"evylang.dev/evy/pkg/lexer"
 	"evylang.dev/evy/pkg/parser"
 	"github.com/alecthomas/kong"
+	"golang.org/x/tools/txtar"
 )
 
 // Globals overridden by linker flags on release build.
@@ -106,6 +107,7 @@ type runCmd struct {
 	SVGStyle           string `help:"Style of top-level SVG element." placeholder:"STYLE"`
 	NoAssertionSummary bool   `short:"s" help:"Do not print assertion summary, only report failed assertion(s)."`
 	FailFast           bool   `help:"Stop execution on first failed assertion."`
+	Txtar              string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
 }
 
 type fmtCmd struct {
@@ -145,11 +147,10 @@ type compileCmd struct {
 
 // Run implements the `evy run` CLI command, called by the Kong API.
 func (c *runCmd) Run() error {
-	b, err := fileBytes(c.Source)
+	b, err := c.fileBytes()
 	if err != nil {
 		return err
 	}
-
 	rt := cli.NewRuntime(c.runtimeOptions()...)
 
 	eval := evaluator.NewEvaluator(rt)
@@ -162,6 +163,28 @@ func (c *runCmd) Run() error {
 	}
 	handleEvyErr(cmp.Or(evyErr, err))
 	return nil
+}
+
+func (c *runCmd) fileBytes() ([]byte, error) {
+	if c.Txtar != "" && filepath.Ext(c.Source) != ".txtar" {
+		//nolint:goerr113 // dynamic errors in package main is ok
+		return nil, errors.New("txtar member specified but source file is not a txtar archive")
+	}
+	b, err := fileBytes(c.Source)
+	if err != nil {
+		return nil, err
+	}
+	if c.Txtar != "" {
+		archive := txtar.Parse(b)
+		for _, file := range archive.Files {
+			if file.Name == c.Txtar {
+				return file.Data, nil
+			}
+		}
+		//nolint:goerr113 // dynamic errors in package main is ok
+		return nil, fmt.Errorf("file %q not found in txtar archive", c.Txtar)
+	}
+	return b, nil
 }
 
 func (c *runCmd) runtimeOptions() []cli.Option {
@@ -208,61 +231,106 @@ func (c *fmtCmd) Run() error {
 		if c.Write {
 			return errBadWriteFlag
 		}
-		return format(os.Stdin, os.Stdout, c.Check)
+		return formatStdInOut(c.Check)
 	}
-	var out io.StringWriter = os.Stdout
 	for _, filename := range c.Files {
-		in, err := os.Open(filename)
+		var err error
+		if filepath.Ext(filename) == ".txtar" {
+			err = c.fmtTxtarFile(filename)
+		} else {
+			err = c.fmtEvyFile(filename)
+		}
 		if err != nil {
 			return err
-		}
-		if c.Write {
-			out, err = os.CreateTemp("", "evy")
-			if err != nil {
-				return fmt.Errorf("%s: %w", filename, err)
-			}
-		}
-		if err := format(in, out, c.Check); err != nil {
-			return fmt.Errorf("%s: %w", filename, err)
-		}
-		if err := in.Close(); err != nil {
-			return err
-		}
-		if c.Write {
-			tempFile := out.(*os.File)
-			if err := tempFile.Close(); err != nil {
-				return fmt.Errorf("%s: %w", filename, err)
-			}
-			if err := os.Rename(tempFile.Name(), filename); err != nil {
-				return fmt.Errorf("%s: %w", filename, err)
-			}
 		}
 	}
 	return nil
 }
 
-func format(r io.Reader, w io.StringWriter, checkOnly bool) error {
-	b, err := io.ReadAll(r)
+func formatStdInOut(checkOnly bool) error {
+	b, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return err
 	}
+	formatted, err := format(b, checkOnly)
+	if err != nil {
+		return err
+	}
+	if !checkOnly {
+		fmt.Print(formatted)
+	}
+	return nil
+}
+
+func (c *fmtCmd) fmtEvyFile(filename string) error {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	formatted, err := format(b, c.Check)
+	if err != nil {
+		return fmt.Errorf("%s: %w", filename, err)
+	}
+	if c.Write {
+		return writeAtomically([]byte(formatted), filename)
+	}
+	return nil
+}
+
+func (c *fmtCmd) fmtTxtarFile(filename string) error {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	archive := txtar.Parse(b)
+	for i, file := range archive.Files {
+		if filepath.Ext(file.Name) != ".evy" {
+			continue
+		}
+		out, err := format(file.Data, c.Check)
+		if err != nil {
+			return err
+		}
+		archive.Files[i].Data = []byte(out)
+	}
+	if c.Write {
+		return writeAtomically(txtar.Format(archive), filename)
+	}
+	return nil
+}
+
+func writeAtomically(b []byte, filename string) error {
+	tempFile, err := os.CreateTemp("", "evy")
+	if err != nil {
+		return fmt.Errorf("%s: %w", filename, err)
+	}
+	if _, err := tempFile.Write(b); err != nil {
+		return fmt.Errorf("%s: %w", filename, err)
+	}
+	if err := tempFile.Close(); err != nil {
+		return fmt.Errorf("%s: %w", filename, err)
+	}
+	if err := os.Rename(tempFile.Name(), filename); err != nil {
+		return fmt.Errorf("%s: %w", filename, err)
+	}
+	return nil
+}
+
+func format(b []byte, checkOnly bool) (string, error) {
 	in := string(b)
 	builtins := evaluator.BuiltinDecls()
 	prog, err := parser.Parse(in, builtins)
 	if err != nil {
-		return fmt.Errorf("%w: %w", errParse, truncateError(err))
+		return "", fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
-	out := prog.Format()
-	if checkOnly {
-		if in != out {
-			return errNotFormatted
-		}
-		return nil
+	out, err := prog.Format(), nil
+	if err != nil {
+		return "", err
 	}
-	if _, err := w.WriteString(out); err != nil {
-		return err
+	if checkOnly && in != out {
+		return "", errNotFormatted
 	}
-	return nil
+	return out, nil
 }
 
 func (c *startCmd) Run() error {

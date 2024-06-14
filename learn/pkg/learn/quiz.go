@@ -17,7 +17,6 @@ import (
 // individual exercises.
 type QuizModel struct {
 	*configurableModel    // used by functional options
-	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *quizFrontmatter
 	name                  string
@@ -27,10 +26,9 @@ type QuizModel struct {
 // NewQuizModel returns a new quiz model from a quiz Markdown file.
 func NewQuizModel(filename string, options ...Option) (*QuizModel, error) {
 	quiz := &QuizModel{
-		Filename:              filename,
 		name:                  "Quiz",
 		QuestionsByDifficulty: questionsByDifficulty{},
-		configurableModel:     newConfigurableModel(options),
+		configurableModel:     newConfigurableModel(filename, options),
 	}
 	quiz.cache[filename] = quiz
 	if err := quiz.parseFrontmatterMD(); err != nil {
@@ -49,7 +47,7 @@ type quizFrontmatter struct {
 }
 
 func (m *QuizModel) buildExercises() error {
-	dir := filepath.Dir(m.Filename)
+	dir := filepath.Dir(m.Filename())
 	var mdFiles []string
 	for _, path := range m.Frontmatter.Exercises {
 		files, err := filepath.Glob(filepath.Join(dir, path) + "/*.md")
@@ -93,9 +91,9 @@ func (m *QuizModel) Name() string {
 func (m *QuizModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &quizFrontmatter{}

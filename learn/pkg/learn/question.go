@@ -21,10 +21,8 @@ import (
 // specified in the Markdown Frontmatter.
 type QuestionModel struct {
 	*configurableModel
-	Filename    string
 	Doc         *markdown.Document
 	Frontmatter *questionFrontmatter
-	AnswerPath  AnswerPath
 
 	Question      Renderer
 	AnswerChoices []Renderer
@@ -54,19 +52,14 @@ var fieldTypeToString = map[fieldType]string{
 // or its contents.
 func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
 	question := &QuestionModel{
-		Filename:          filename,
 		embeds:            map[markdown.Block]embedMD{},
-		configurableModel: newConfigurableModel(options),
-	}
-	var err error
-	if question.AnswerPath, err = NewAnswerPath(filename); err != nil {
-		return nil, err
+		configurableModel: newConfigurableModel(filename, options),
 	}
 	if err := question.parseFrontmatterMD(); err != nil {
 		return nil, err
 	}
 	if err := question.buildQuestionModelForChoice(); err != nil {
-		return nil, fmt.Errorf("%w (%s)", err, question.Filename)
+		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
 	}
 	return question, nil
 }
@@ -76,7 +69,7 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 // Answers committed to the public Repo should always be sealed.
 func (m *QuestionModel) Seal(publicKey string) error {
 	if err := m.Frontmatter.Seal(publicKey); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	return nil
 }
@@ -84,7 +77,7 @@ func (m *QuestionModel) Seal(publicKey string) error {
 // Unseal unseals the sealed answer in the Frontmatter using the private key.
 func (m *QuestionModel) Unseal() error {
 	if err := m.Frontmatter.Unseal(m.privateKey); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	return nil
 }
@@ -110,7 +103,7 @@ func (m *QuestionModel) ExportAnswerKey() (AnswerKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewAnswerKey(m.Filename, answer)
+	return NewAnswerKey(m.Filename(), answer)
 }
 
 // IsSealed returns true if the answer is sealed in the Frontmatter.
@@ -123,15 +116,15 @@ func (m *QuestionModel) IsSealed() bool {
 func (m *QuestionModel) WriteFormatted() error {
 	b, err := format(m.Frontmatter, m.Doc)
 	if err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
-	return os.WriteFile(m.Filename, b, 0o666)
+	return os.WriteFile(m.Filename(), b, 0o666)
 }
 
 // PrintHTML prints the question and answer choices as HTML form elements.
 func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
 	md.Walk(m.Doc, md.RewriteLink)
-	buf.WriteString("<form id=" + baseNoExt(m.Filename) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
+	buf.WriteString("<form id=" + baseNoExt(m.Filename()) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
 		if block == m.answerList {
 			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked); err != nil {
@@ -160,7 +153,7 @@ func (m *QuestionModel) ToHTML(withAnswersMarked bool) (string, error) {
 
 // Name returns the name of the question model as the base filename without extension.
 func (m *QuestionModel) Name() string {
-	return baseNoExt(m.Filename)
+	return baseNoExt(m.Filename())
 }
 
 func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withAnswersMarked bool) error {
@@ -209,10 +202,10 @@ func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 	for i, choice := range m.AnswerChoices {
 		choiceGen := choice.RenderOutput()
 		if correctByIndex[i] && generated != choiceGen {
-			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename, indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 		if !correctByIndex[i] && generated == choiceGen {
-			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename, answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 	}
 	return answer, nil
@@ -249,7 +242,7 @@ func (m *QuestionModel) buildQuestionField(b markdown.Block) error {
 		return nil
 	}
 	var err error
-	m.Question, err = NewRenderer(b, questionField, m.Filename)
+	m.Question, err = NewRenderer(b, questionField, m.Filename())
 	if err != nil {
 		return err
 	}
@@ -265,7 +258,7 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	for _, item := range list.Items {
 		found := false
 		for _, b := range item.(*markdown.Item).Blocks {
-			renderer, err := NewRenderer(b, answerField, m.Filename)
+			renderer, err := NewRenderer(b, answerField, m.Filename())
 			if err != nil {
 				return err
 			}
@@ -340,17 +333,17 @@ func (m *QuestionModel) inferResultType() error {
 func (m *QuestionModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &questionFrontmatter{}
 	if err := yaml.Unmarshal([]byte(m.rawFrontmatter), m.Frontmatter); err != nil {
-		return fmt.Errorf("%w: cannot process Markdown frontmatter: %w (%s)", ErrInvalidFrontmatter, err, m.Filename)
+		return fmt.Errorf("%w: cannot process Markdown frontmatter: %w (%s)", ErrInvalidFrontmatter, err, m.Filename())
 	}
 	if err := m.Frontmatter.validate(); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	if m.Frontmatter.AnswerType != "single-choice" && m.Frontmatter.AnswerType != "multiple-choice" {
 		return fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, m.Frontmatter.AnswerType)

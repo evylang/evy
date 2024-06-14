@@ -46,11 +46,13 @@ var (
 type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
 	Name() string
+	Filename() string
 }
 
 type plainMD struct {
-	doc  *markdown.Document
-	name string
+	filename string
+	doc      *markdown.Document
+	name     string
 }
 
 func (p *plainMD) ToHTML(_ bool) (string, error) {
@@ -62,13 +64,17 @@ func (p *plainMD) Name() string {
 	return p.name
 }
 
-func newPlainMD(mdString string) (*plainMD, error) {
+func (p *plainMD) Filename() string {
+	return p.filename
+}
+
+func newPlainMD(mdString, filename string) (*plainMD, error) {
 	doc := parseMD(mdString)
 	name, err := extractName(doc)
 	if err != nil {
 		return nil, err
 	}
-	return &plainMD{doc: doc, name: name}, nil
+	return &plainMD{doc: doc, name: name, filename: filename}, nil
 }
 
 func newModel(mdFile string, opts []Option, modelCache map[string]model) (model, error) {
@@ -82,7 +88,7 @@ func newModel(mdFile string, opts []Option, modelCache map[string]model) (model,
 	}
 	var model model
 	if frontmatterString == "" {
-		model, err = newPlainMD(mdString)
+		model, err = newPlainMD(mdString, mdFile)
 	} else {
 		model, err = newModelWithFrontmatter(mdFile, frontmatterString, mdString, opts)
 	}

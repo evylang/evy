@@ -14,7 +14,6 @@ import (
 // mistakes to "master" a unit.
 type UnittestModel struct {
 	*configurableModel    // used by functional options
-	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *unittestFrontmatter
 	name                  string
@@ -25,9 +24,8 @@ type UnittestModel struct {
 // contents.
 func NewUnittestModel(filename string, options ...Option) (*UnittestModel, error) {
 	unittest := &UnittestModel{
-		Filename:              filename,
 		QuestionsByDifficulty: questionsByDifficulty{},
-		configurableModel:     newConfigurableModel(options),
+		configurableModel:     newConfigurableModel(filename, options),
 		name:                  "Unit test",
 	}
 	unittest.cache[filename] = unittest
@@ -47,14 +45,14 @@ type unittestFrontmatter struct {
 }
 
 func (m *UnittestModel) buildExercises() error {
-	mdFiles, err := filepath.Glob(filepath.Dir(m.Filename) + "/*/*.md")
+	mdFiles, err := filepath.Glob(filepath.Dir(m.Filename()) + "/*/*.md")
 	if err != nil {
 		return fmt.Errorf("%w: cannot glob exercise and question *.md files: %w", ErrExercise, err)
 	}
 	opts := newOptions(m.ignoreSealed, m.privateKey, m.cache)
 	ignoreExercises := map[string]bool{}
 	for _, path := range m.Frontmatter.IgnoreExercises {
-		p := filepath.Clean(filepath.Join(filepath.Dir(m.Filename), path))
+		p := filepath.Clean(filepath.Join(filepath.Dir(m.Filename()), path))
 		ignoreExercises[p] = true
 	}
 	for _, filename := range mdFiles {
@@ -94,9 +92,9 @@ func (m *UnittestModel) Name() string {
 func (m *UnittestModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &unittestFrontmatter{}

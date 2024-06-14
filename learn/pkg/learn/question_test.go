@@ -39,7 +39,7 @@ func TestNewQuestionModel(t *testing.T) {
 			got, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
 
-			assert.Equal(t, fname, got.Filename)
+			assert.Equal(t, fname, got.Filename())
 			want := frontmatterType("question")
 			assert.Equal(t, want, got.Frontmatter.Type)
 		})

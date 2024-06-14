@@ -4,11 +4,16 @@ package learn
 type Option func(*configurableModel)
 
 type configurableModel struct {
+	filename       string
 	privateKey     string
 	ignoreSealed   bool
 	rawFrontmatter string
 	rawMD          string
 	cache          map[string]model
+}
+
+func (m *configurableModel) Filename() string {
+	return m.filename
 }
 
 func (m *configurableModel) setPrivateKey(privateKey string) {
@@ -28,8 +33,11 @@ func (m *configurableModel) setCache(cache map[string]model) {
 	m.cache = cache
 }
 
-func newConfigurableModel(options []Option) *configurableModel {
-	m := &configurableModel{cache: map[string]model{}}
+func newConfigurableModel(filename string, options []Option) *configurableModel {
+	m := &configurableModel{
+		filename: filename,
+		cache:    map[string]model{},
+	}
 	for _, opt := range options {
 		opt(m)
 	}

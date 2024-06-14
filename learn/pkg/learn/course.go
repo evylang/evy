@@ -13,7 +13,6 @@ import (
 // CourseModel represents a  single course composed of multiple units.
 type CourseModel struct {
 	*configurableModel // used by functional options
-	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *courseFrontmatter
 	name               string // flat markdown heading
@@ -23,10 +22,7 @@ type CourseModel struct {
 // NewCourseModel returns a new unit model from a unit Markdown file or its
 // contents.
 func NewCourseModel(filename string, options ...Option) (*CourseModel, error) {
-	course := &CourseModel{
-		Filename:          filename,
-		configurableModel: newConfigurableModel(options),
-	}
+	course := &CourseModel{configurableModel: newConfigurableModel(filename, options)}
 	course.cache[filename] = course
 	if err := course.parseFrontmatterMD(); err != nil {
 		return nil, err
@@ -43,7 +39,7 @@ type courseFrontmatter struct {
 
 func (m *CourseModel) buildUnits() error {
 	relPaths := collectMDLinks(m.Doc)
-	dir := filepath.Dir(m.Filename)
+	dir := filepath.Dir(m.Filename())
 	opts := newOptions(m.ignoreSealed, m.privateKey, m.cache)
 
 	for _, relPath := range relPaths {
@@ -76,12 +72,12 @@ func (m *CourseModel) Name() string {
 }
 
 func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
-	courseDir := filepath.Dir(m.Filename)
+	courseDir := filepath.Dir(m.Filename())
 	for _, unit := range m.Units {
 		buf.WriteString("<h2>")
 		h, ok := unit.Doc.Blocks[0].(*markdown.Heading)
 		if !ok {
-			buf.WriteString("Unit:" + unit.Filename + "\n")
+			buf.WriteString("Unit:" + unit.Filename() + "\n")
 		} else {
 			h.Text.PrintHTML(buf)
 		}
@@ -96,9 +92,9 @@ func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
 func (m *CourseModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &courseFrontmatter{}
@@ -111,7 +107,7 @@ func (m *CourseModel) parseFrontmatterMD() error {
 
 	m.Doc = parseMD(m.rawMD)
 	if m.name, err = extractName(m.Doc); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	return nil
 }

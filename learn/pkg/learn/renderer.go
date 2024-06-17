@@ -11,6 +11,7 @@ import (
 
 	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/parser"
 	"golang.org/x/tools/txtar"
 	"rsc.io/markdown"
 )
@@ -333,4 +334,10 @@ func runEvy(source string, t ResultType) string {
 		return imgWriter.String()
 	}
 	return textWriter.String()
+}
+
+func hasParseError(source string) bool {
+	builtins := evaluator.BuiltinDecls()
+	_, err := parser.Parse(source, builtins)
+	return err != nil
 }

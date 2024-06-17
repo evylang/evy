@@ -11,6 +11,7 @@ type questionFrontmatter struct {
 	GenerateQuestions string          `yaml:"generate-questions,omitempty"`
 	Answer            string          `yaml:"answer,omitempty"`
 	SealedAnswer      string          `yaml:"sealed-answer,omitempty"`
+	Verification      verification    `yaml:"verification,omitempty"`
 }
 
 func (f *questionFrontmatter) validate() error {

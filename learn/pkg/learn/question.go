@@ -146,6 +146,8 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 		switch {
 		case block == m.answerList && m.isSubQuestion():
 			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
+		case block == m.answerList && m.isParserErrorQuestion():
+			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
 		case block == m.answerList && !m.isSubQuestion():
 			err = m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked)
 		case ok: // question block (answers are covered in the cases above)
@@ -209,6 +211,10 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 
 func (m *QuestionModel) printTxtarAnswerChoicesHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
 	buf.WriteString("<fieldset>\n")
+	inputType := "radio"
+	if m.Frontmatter.AnswerType == "multiple-choice" {
+		inputType = "checkbox"
+	}
 	correctAnswers, err := m.correctAnswerIndices(withAnswersMarked)
 	if err != nil {
 		return err
@@ -223,9 +229,15 @@ func (m *QuestionModel) printTxtarAnswerChoicesHTML(buf *bytes.Buffer, withAnswe
 		letter := indexToLetter(i)
 		buf.WriteString("<div>\n")
 		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
-		buf.WriteString(`<input type="radio" value="` + letter + `" name="answer" ` + checked + "/>\n")
-		r := newRendererFromEvyBytes(file.Data, txtarRenderer.ResultType)
-		r.RenderHTML(buf)
+		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" ` + checked + "/>\n")
+		if m.isParserErrorQuestion() {
+			buf.WriteString(`<pre><code class="language-evy">`)
+			buf.Write(file.Data)
+			buf.WriteString("</code></pre>")
+		} else {
+			r := newRendererFromEvyBytes(file.Data, txtarRenderer.ResultType)
+			r.RenderHTML(buf)
+		}
 		buf.WriteString("</div>\n")
 	}
 	buf.WriteString("</fieldset>\n")
@@ -251,21 +263,69 @@ func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 	if err != nil {
 		return Answer{}, err
 	}
-	if m.isSubQuestion() {
+	verification := m.Frontmatter.Verification
+	if m.isSubQuestion() || verification == "none" {
 		return answer, nil
 	}
+	if m.isMatchQuestion() {
+		if err := m.verifyMatch(answer); err != nil {
+			return Answer{}, err
+		}
+	}
+	if verification == "parse-error" {
+		if err := m.verifyParseError(answer); err != nil {
+			return Answer{}, err
+		}
+	}
+	if verification == "no-parse-error" {
+		if err := m.verifyNoParseError(answer); err != nil {
+			return Answer{}, err
+		}
+	}
+	return answer, nil
+}
+
+func (m *QuestionModel) verifyMatch(answer Answer) error {
 	correctByIndex := answer.correctAnswerIndices()
 	generated := m.Question.RenderOutput()
 	outputs := generateAnserOutputs(m.AnswerChoices)
 	for i, output := range outputs {
 		if correctByIndex[i] && generated != output {
-			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 		if !correctByIndex[i] && generated == output {
-			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 	}
-	return answer, nil
+	return nil
+}
+
+func (m *QuestionModel) verifyParseError(answer Answer) error {
+	correctByIndex := answer.correctAnswerIndices()
+	parseErrors := generateParseErrors(m.AnswerChoices[0].(*txtarContent))
+	for i, parseError := range parseErrors {
+		if correctByIndex[i] && !parseError {
+			return fmt.Errorf("%w: %s: answer %s should have parse error", ErrWrongAnswer, m.Filename(), indexToLetter(i))
+		}
+		if !correctByIndex[i] && parseError {
+			return fmt.Errorf("%w: %s: answer %s should not have parse error", ErrWrongAnswer, m.Filename(), indexToLetter(i))
+		}
+	}
+	return nil
+}
+
+func (m *QuestionModel) verifyNoParseError(answer Answer) error {
+	correctByIndex := answer.correctAnswerIndices()
+	parseErrors := generateParseErrors(m.AnswerChoices[0].(*txtarContent))
+	for i, parseError := range parseErrors {
+		if correctByIndex[i] && parseError {
+			return fmt.Errorf("%w: %s: answer %s should not have parse error", ErrWrongAnswer, m.Filename(), indexToLetter(i))
+		}
+		if !correctByIndex[i] && !parseError {
+			return fmt.Errorf("%w: %s: answer %s should have parse error", ErrWrongAnswer, m.Filename(), indexToLetter(i))
+		}
+	}
+	return nil
 }
 
 func generateAnserOutputs(renderers []Renderer) []string {
@@ -289,6 +349,15 @@ func generateAnserOutputs(renderers []Renderer) []string {
 	return outputs
 }
 
+func generateParseErrors(t *txtarContent) []bool {
+	files := t.archive.Files
+	parseErrors := make([]bool, len(files))
+	for i, file := range files {
+		parseErrors[i] = hasParseError(string(file.Data))
+	}
+	return parseErrors
+}
+
 // buildQuestionModelForChoice operates on single-choice or multiple-choice question documents
 // and expects the following structure:
 //
@@ -304,7 +373,9 @@ func (m *QuestionModel) buildQuestionModelForChoice() error {
 		}
 	}
 	if m.Question == nil {
-		return fmt.Errorf("%w: found no question", ErrBadMarkdownStructure)
+		if m.isMatchQuestion() {
+			return fmt.Errorf("%w: found no question", ErrBadMarkdownStructure)
+		}
 	}
 	if len(m.AnswerChoices) == 0 {
 		return fmt.Errorf("%w: found no answers", ErrBadMarkdownStructure)
@@ -314,8 +385,12 @@ func (m *QuestionModel) buildQuestionModelForChoice() error {
 			return fmt.Errorf("%w: found only 1 answer", ErrBadMarkdownStructure)
 		}
 	}
-	if m.Frontmatter.GenerateQuestions != "" && len(m.AnswerChoices) != 1 {
-		return fmt.Errorf("%w: found %d answer, expected exactly 1 for question generation", ErrBadMarkdownStructure, len(m.AnswerChoices))
+	if m.Frontmatter.GenerateQuestions != "" || m.isParserErrorQuestion() {
+		// Single .txtar question required for question generation and
+		// (no) parse error verification.
+		if len(m.AnswerChoices) != 1 {
+			return fmt.Errorf("%w: found %d answer, expected exactly 1", ErrBadMarkdownStructure, len(m.AnswerChoices))
+		}
 	}
 	if err := m.inferResultType(); err != nil {
 		return err
@@ -346,7 +421,10 @@ func (m *QuestionModel) buildQuestionField(b markdown.Block) error {
 
 func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	list, ok := block.(*markdown.List)
-	if m.Question == nil || m.AnswerChoices != nil || !ok {
+	if m.AnswerChoices != nil || !ok {
+		return nil
+	}
+	if m.Question == nil && !m.isParserErrorQuestion() {
 		return nil
 	}
 	for _, item := range list.Items {
@@ -415,7 +493,7 @@ func (m *QuestionModel) inferResultType() error {
 			return fmt.Errorf("%w: found text and image output, expected only one", ErrInconsistentMdoel)
 		}
 	}
-	if resultType == UnknownOutput {
+	if resultType == UnknownOutput && !m.isParserErrorQuestion() {
 		return fmt.Errorf("%w: found neither text nor image output", ErrInconsistentMdoel)
 	}
 	m.ResultType = resultType
@@ -464,4 +542,12 @@ func (m *QuestionModel) isSubQuestion() bool {
 
 func (m *QuestionModel) hasSubQuestions() bool {
 	return len(m.subQuestions) != 0
+}
+
+func (m *QuestionModel) isParserErrorQuestion() bool {
+	return m.Frontmatter.Verification == "parse-error" || m.Frontmatter.Verification == "no-parse-error"
+}
+
+func (m *QuestionModel) isMatchQuestion() bool {
+	return m.Frontmatter.Verification == "match" || m.Frontmatter.Verification == ""
 }

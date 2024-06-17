@@ -9,12 +9,14 @@ type (
 	frontmatterType string
 	answerType      string
 	difficulty      string
+	verification    string
 )
 
 var (
 	validFrontmatterTypes = []string{"course", "unit", "unittest", "quiz", "exercise", "question"}
 	validAnswerTypes      = []string{"single-choice", "multiple-choice", "free-text", "multiple-free-texts", "program"}
 	validDifficulties     = []string{"easy", "medium", "hard", "retriable"}
+	validVerifications    = []string{"match" /* default */, "none", "parse-error", "no-parse-error"}
 )
 
 func (s frontmatterType) MarshalText() ([]byte, error) {
@@ -27,6 +29,10 @@ func (s answerType) MarshalText() ([]byte, error) {
 
 func (s difficulty) MarshalText() ([]byte, error) {
 	return marshalText("difficulty", string(s), validDifficulties)
+}
+
+func (s verification) MarshalText() ([]byte, error) {
+	return marshalText("difficulty", string(s), validVerifications)
 }
 
 func marshalText(fieldName, str string, validStrings []string) ([]byte, error) {
@@ -46,6 +52,10 @@ func (s *answerType) UnmarshalText(text []byte) error {
 
 func (s *difficulty) UnmarshalText(text []byte) error {
 	return unmarshalText("difficulty", validDifficulties, text, (*string)(s))
+}
+
+func (s *verification) UnmarshalText(text []byte) error {
+	return unmarshalText("difficulty", validVerifications, text, (*string)(s))
 }
 
 func unmarshalText(fieldName string, validStrings []string, text []byte, s *string) error {

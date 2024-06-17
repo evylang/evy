@@ -1,0 +1,8 @@
+-- a.evy --
+print "banana"
+-- b.evy --
+print "🍌
+-- c.evy --
+print "print 🍌"
+-- d.evy --
+print "print banana"

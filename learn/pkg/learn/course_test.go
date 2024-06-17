@@ -19,6 +19,7 @@ func TestNewCourseModel(t *testing.T) {
 <h2>Unit 1: Demo Unit</h2>
 <a href="unit1/exercise1/index.html">🔲</a>
 <a href="unit1/exercise-txtar/index.html">🔲</a>
+<a href="unit1/exercise-parse-error/index.html">🔲</a>
 <a href="unit1/shape/index.html">🔲</a>
 <a href="unit1/quiz1.html">✨</a>
 <a href="unit1/text/index.html">🔲</a>

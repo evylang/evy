@@ -158,13 +158,9 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 	if m.Frontmatter.AnswerType == "multiple-choice" {
 		inputType = "checkbox"
 	}
-	var correctAnswers map[int]bool
-	if withAnswersMarked && !(m.IsSealed() && m.ignoreSealed) {
-		answer, err := m.Frontmatter.getAnswer(m.privateKey)
-		if err != nil {
-			return err
-		}
-		correctAnswers = answer.correctAnswerIndices()
+	correctAnswers, err := m.correctAnswerIndices(withAnswersMarked)
+	if err != nil {
+		return err
 	}
 	for i, item := range list.Items {
 		checked := ""
@@ -186,6 +182,20 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 	}
 	buf.WriteString("</fieldset>\n")
 	return nil
+}
+
+func (m *QuestionModel) correctAnswerIndices(withAnswersMarked bool) (map[int]bool, error) {
+	if !withAnswersMarked {
+		return nil, nil
+	}
+	if m.IsSealed() && m.ignoreSealed {
+		return nil, nil
+	}
+	answer, err := m.Frontmatter.getAnswer(m.privateKey)
+	if err != nil {
+		return nil, fmt.Errorf("%w: (%s)", err, m.Filename())
+	}
+	return answer.correctAnswerIndices(), nil
 }
 
 func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {

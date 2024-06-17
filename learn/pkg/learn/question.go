@@ -28,14 +28,10 @@ type QuestionModel struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	embeds     map[markdown.Block]embedMD // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block             // use to output checkbox or radio buttons for List in HTML
+	embeds     map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerList markdown.Block              // use to output checkbox or radio buttons for List in HTML
 }
 
-type embedMD struct {
-	id       string
-	renderer Renderer
-}
 type fieldType uint
 
 const (
@@ -52,7 +48,7 @@ var fieldTypeToString = map[fieldType]string{
 // or its contents.
 func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error) {
 	question := &QuestionModel{
-		embeds:            map[markdown.Block]embedMD{},
+		embeds:            map[markdown.Block]Renderer{},
 		configurableModel: newConfigurableModel(filename, options),
 	}
 	if err := question.parseFrontmatterMD(); err != nil {
@@ -133,7 +129,7 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 			continue
 		}
 		if embed, ok := m.embeds[block]; ok {
-			embed.renderer.RenderHTML(buf)
+			embed.RenderHTML(buf)
 			continue
 		}
 		block.PrintHTML(buf)
@@ -181,7 +177,7 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" ` + checked + "/>\n")
 		for _, block := range item.(*markdown.Item).Blocks {
 			if embed, ok := m.embeds[block]; ok {
-				embed.renderer.RenderHTML(buf)
+				embed.RenderHTML(buf)
 			} else {
 				block.PrintHTML(buf)
 			}
@@ -289,7 +285,7 @@ func (m *QuestionModel) trackBlocksToReplace(b markdown.Block, renderer Renderer
 	if id == "" {
 		return
 	}
-	m.embeds[b] = embedMD{id: id, renderer: renderer}
+	m.embeds[b] = renderer
 }
 
 func idFromInline(inline markdown.Inline) string {

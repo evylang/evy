@@ -3,6 +3,7 @@ package learn
 import (
 	"bytes"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 
@@ -30,6 +31,9 @@ type QuestionModel struct {
 
 	embeds     map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
 	answerList markdown.Block              // use to output checkbox or radio buttons for List in HTML
+
+	subQuestions   []*QuestionModel // Derived questions, generated from txtar question and links.
+	parentQuestion *QuestionModel   // Initial Model from which sub-question was generated.
 }
 
 type fieldType uint
@@ -57,6 +61,11 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 	if err := question.buildQuestionModelForChoice(); err != nil {
 		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
 	}
+	subs, err := newSubQuestions(question)
+	if err != nil {
+		return nil, err
+	}
+	question.subQuestions = subs
 	return question, nil
 }
 
@@ -91,10 +100,20 @@ func (m *QuestionModel) Verify() error {
 
 // ExportAnswerKey returns the answerKey for the question Markdown file.
 func (m *QuestionModel) ExportAnswerKey() (AnswerKey, error) {
+	if m.hasSubQuestions() {
+		answerKey := AnswerKey{}
+		for _, q := range m.subQuestions {
+			ak, err := q.ExportAnswerKey()
+			if err != nil {
+				return AnswerKey{}, err
+			}
+			answerKey.merge(ak)
+		}
+		return answerKey, nil
+	}
 	if m.ignoreSealed && m.IsSealed() {
 		return AnswerKey{}, nil // ignore
 	}
-
 	answer, err := m.getVerifiedAnswer()
 	if err != nil {
 		return nil, err
@@ -122,17 +141,21 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 	md.Walk(m.Doc, md.RewriteLink)
 	buf.WriteString("<form id=" + baseNoExt(m.Filename()) + ` class="difficulty-` + string(m.Frontmatter.Difficulty) + `">` + "\n")
 	for _, block := range m.Doc.Blocks {
-		if block == m.answerList {
-			if err := m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked); err != nil {
-				return err
-			}
-			continue
-		}
-		if embed, ok := m.embeds[block]; ok {
+		embed, ok := m.embeds[block]
+		var err error
+		switch {
+		case block == m.answerList && m.isSubQuestion():
+			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
+		case block == m.answerList && !m.isSubQuestion():
+			err = m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked)
+		case ok: // question block (answers are covered in the cases above)
 			embed.RenderHTML(buf)
-			continue
+		default:
+			block.PrintHTML(buf)
 		}
-		block.PrintHTML(buf)
+		if err != nil {
+			return err
+		}
 	}
 	buf.WriteString("</form>\n")
 	return nil
@@ -184,6 +207,31 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 	return nil
 }
 
+func (m *QuestionModel) printTxtarAnswerChoicesHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
+	buf.WriteString("<fieldset>\n")
+	correctAnswers, err := m.correctAnswerIndices(withAnswersMarked)
+	if err != nil {
+		return err
+	}
+	txtarRenderer := m.AnswerChoices[0].(*txtarContent)
+	files := txtarRenderer.archive.Files
+	for i, file := range files {
+		checked := ""
+		if correctAnswers[i] {
+			checked = "checked "
+		}
+		letter := indexToLetter(i)
+		buf.WriteString("<div>\n")
+		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
+		buf.WriteString(`<input type="radio" value="` + letter + `" name="answer" ` + checked + "/>\n")
+		r := newRendererFromEvyBytes(file.Data, txtarRenderer.ResultType)
+		r.RenderHTML(buf)
+		buf.WriteString("</div>\n")
+	}
+	buf.WriteString("</fieldset>\n")
+	return nil
+}
+
 func (m *QuestionModel) correctAnswerIndices(withAnswersMarked bool) (map[int]bool, error) {
 	if !withAnswersMarked {
 		return nil, nil
@@ -203,18 +251,42 @@ func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 	if err != nil {
 		return Answer{}, err
 	}
+	if m.isSubQuestion() {
+		return answer, nil
+	}
 	correctByIndex := answer.correctAnswerIndices()
 	generated := m.Question.RenderOutput()
-	for i, choice := range m.AnswerChoices {
-		choiceGen := choice.RenderOutput()
-		if correctByIndex[i] && generated != choiceGen {
-			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+	outputs := generateAnserOutputs(m.AnswerChoices)
+	for i, output := range outputs {
+		if correctByIndex[i] && generated != output {
+			return Answer{}, fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
-		if !correctByIndex[i] && generated == choiceGen {
-			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(choiceGen, "\n"), strings.TrimSuffix(generated, "\n"))
+		if !correctByIndex[i] && generated == output {
+			return Answer{}, fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 	}
 	return answer, nil
+}
+
+func generateAnserOutputs(renderers []Renderer) []string {
+	if textar, ok := renderers[0].(*txtarContent); ok {
+		files := textar.archive.Files
+		outputs := make([]string, len(files))
+		for i, file := range files {
+			if !strings.HasSuffix(file.Name, ".evy") {
+				outputs[i] = string(file.Data)
+				continue
+			}
+			r := newRendererFromEvyBytes(file.Data, textar.ResultType)
+			outputs[i] = r.RenderOutput()
+		}
+		return outputs
+	}
+	outputs := make([]string, len(renderers))
+	for i, r := range renderers {
+		outputs[i] = r.RenderOutput()
+	}
+	return outputs
 }
 
 // buildQuestionModelForChoice operates on single-choice or multiple-choice question documents
@@ -234,8 +306,16 @@ func (m *QuestionModel) buildQuestionModelForChoice() error {
 	if m.Question == nil {
 		return fmt.Errorf("%w: found no question", ErrBadMarkdownStructure)
 	}
-	if len(m.AnswerChoices) < 2 {
-		return fmt.Errorf("%w: found %d answer, expected 2 or more", ErrBadMarkdownStructure, len(m.AnswerChoices))
+	if len(m.AnswerChoices) == 0 {
+		return fmt.Errorf("%w: found no answers", ErrBadMarkdownStructure)
+	}
+	if len(m.AnswerChoices) == 1 {
+		if _, ok := m.AnswerChoices[0].(*txtarContent); !ok {
+			return fmt.Errorf("%w: found only 1 answer", ErrBadMarkdownStructure)
+		}
+	}
+	if m.Frontmatter.GenerateQuestions != "" && len(m.AnswerChoices) != 1 {
+		return fmt.Errorf("%w: found %d answer, expected exactly 1 for question generation", ErrBadMarkdownStructure, len(m.AnswerChoices))
 	}
 	if err := m.inferResultType(); err != nil {
 		return err
@@ -251,6 +331,14 @@ func (m *QuestionModel) buildQuestionField(b markdown.Block) error {
 	m.Question, err = NewRenderer(b, questionField, m.Filename())
 	if err != nil {
 		return err
+	}
+	if m.Question == nil {
+		return nil
+	}
+	if m.Frontmatter.GenerateQuestions != "" {
+		if _, ok := m.Question.(*txtarContent); !ok {
+			return fmt.Errorf("%w: expected txtar question link, got %T", ErrBadMarkdownStructure, m.Question)
+		}
 	}
 	m.trackBlocksToReplace(b, m.Question)
 	return nil
@@ -282,6 +370,9 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	}
 	if len(m.AnswerChoices) != 0 && len(m.AnswerChoices) != len(list.Items) {
 		return fmt.Errorf("%w: found %d answers, expected %d (one per list item)", ErrBadMarkdownStructure, len(m.AnswerChoices), len(list.Items))
+	}
+	if m.Frontmatter.GenerateQuestions != "" && len(m.AnswerChoices) != 1 {
+		return fmt.Errorf("%w: expected exactly 1 answer for question generation, got %d", ErrBadMarkdownStructure, len(m.AnswerChoices))
 	}
 	return nil
 }
@@ -357,4 +448,20 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
 	m.Doc = parser.Parse(m.rawMD)
 	return nil
+}
+
+func (m *QuestionModel) pick() *QuestionModel {
+	if !m.hasSubQuestions() {
+		return m
+	}
+	randIdx := rand.Intn(len(m.subQuestions)) //nolint:gosec // we are fine to use "insecure" randomization here.
+	return m.subQuestions[randIdx]
+}
+
+func (m *QuestionModel) isSubQuestion() bool {
+	return m.parentQuestion != nil
+}
+
+func (m *QuestionModel) hasSubQuestions() bool {
+	return len(m.subQuestions) != 0
 }

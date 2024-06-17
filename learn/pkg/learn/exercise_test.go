@@ -3,6 +3,7 @@ package learn
 import (
 	"os"
 	"slices"
+	"strings"
 	"testing"
 
 	"evylang.dev/evy/pkg/assert"
@@ -104,4 +105,23 @@ func TestGenerateQuestionSetForExercise(t *testing.T) {
 	for _, qid := range questions[2:] {
 		assert.Equal(t, true, slices.Contains(medium, qid))
 	}
+}
+
+func TestGenerateQuestionSetForTxtarExercise(t *testing.T) {
+	fname := "testdata/course1/unit1/exercise-txtar/README.md"
+	m, err := NewExerciseModel(fname)
+	assert.NoError(t, err)
+
+	questions := GenerateQuestionSet(m.QuestionsByDifficulty, m.Frontmatter.Composition)
+	assert.Equal(t, 4, len(questions))
+	// Ensure no accidental duplication of generated question variants
+	qFilesNoHash := map[string]bool{}
+	for _, q := range questions {
+		fname := baseNoExt(q.Filename())
+		// ignore generation hash
+		idx := strings.LastIndex(fname, "-")
+		fname = fname[:idx]
+		qFilesNoHash[fname] = true
+	}
+	assert.Equal(t, 4, len(qFilesNoHash))
 }

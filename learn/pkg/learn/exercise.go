@@ -56,8 +56,16 @@ func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 	printComposition(buf, m.Frontmatter.Composition)
 	for _, d := range validDifficulties {
 		for _, question := range m.QuestionsByDifficulty[d] {
-			if err := question.PrintHTML(buf, withMarked); err != nil {
-				return "", err
+			if !question.hasSubQuestions() {
+				if err := question.PrintHTML(buf, withMarked); err != nil {
+					return "", err
+				}
+				continue
+			}
+			for _, subQuestion := range question.subQuestions {
+				if err := subQuestion.PrintHTML(buf, withMarked); err != nil {
+					return "", err
+				}
 			}
 		}
 	}

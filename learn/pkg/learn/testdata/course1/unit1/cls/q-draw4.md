@@ -7,7 +7,7 @@ answer: d
 
 ## Clear drawings
 
-Which program generates the following output?
+What does this program output?
 
 [question](draw/d.evy "evy:source")
 

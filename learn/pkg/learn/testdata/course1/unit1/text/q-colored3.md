@@ -7,7 +7,7 @@ answer: a
 
 ## Draw colored text on canvas
 
-Which program generates the following output?
+What does this program output?
 
 [question](colored/a.evy "evy:source")
 

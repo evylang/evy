@@ -109,6 +109,8 @@ func (q questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
 // The generated question set will eventually be tracked and persisted for returning
 // students on the internet. This means we need to generate the question set before
 // we start the exercise.
+//
+// TODO: Use exercise round robin strategy for question selection for quiz and unittest.
 func GenerateQuestionSet(questionsByDifficulty questionsByDifficulty, composition []DifficultyCount) []*QuestionModel {
 	permByDifficulty := map[string][]int{}
 	for difficulty, quesitons := range questionsByDifficulty {

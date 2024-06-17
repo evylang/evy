@@ -113,7 +113,7 @@ func (m *UnitModel) buildModels() error {
 		fname := filepath.Join(dir, relPath)
 		model, err := newModel(fname, opts, m.cache)
 		if err != nil {
-			return fmt.Errorf("%w: %s", err, fname)
+			return err
 		}
 		switch model := model.(type) {
 		case *ExerciseModel:

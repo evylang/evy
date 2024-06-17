@@ -66,7 +66,7 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 		return nil, err
 	}
 	if err := question.buildQuestionModelForChoice(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, question.Filename)
 	}
 	return question, nil
 }

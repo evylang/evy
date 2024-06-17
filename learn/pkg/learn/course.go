@@ -50,7 +50,7 @@ func (m *CourseModel) buildUnits() error {
 		fname := filepath.Join(dir, relPath)
 		model, err := newModel(fname, opts, m.cache)
 		if err != nil {
-			return fmt.Errorf("%w: %s", err, fname)
+			return err
 		}
 		if unit, ok := model.(*UnitModel); ok {
 			m.Units = append(m.Units, unit)

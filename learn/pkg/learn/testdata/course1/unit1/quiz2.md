@@ -1,6 +1,7 @@
 ---
 type: quiz
 exercises:
+  - shape
   - text
   - cls
 composition:

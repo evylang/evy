@@ -23,13 +23,13 @@ Unit introduction goes here. 1-2 sentences, maybe a paragraph.
 - [Exercise: `print` 👈](exercise1/README.md)
 - [Exercise: txtar demo 👈](exercise-txtar/README.md)
 - [Exercise: parse error demo 👈](exercise-parse-error/README.md)
-- [Drawing canvas](shape/intro.md)
-- [Draw shapes](shape/commands.md)
-- [Exercise: Shape commands 👈](shape/README.md)
 - [Quiz: drawing and print ✨](quiz1.md)
 
 ## Draw with Style
 
+- [Drawing canvas](shape/intro.md)
+- [Draw shapes](shape/commands.md)
+- [Exercise: Shape commands 👈](shape/README.md)
 - [Draw text](text/intro.md)
 - [Exercise: text and shapes 👈](text/README.md)
 - [Clear output](cls/cls.md)

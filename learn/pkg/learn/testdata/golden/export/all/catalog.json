@@ -71,15 +71,15 @@
             "composition": [
               {
                 "difficulty": "easy",
-                "count": 1
+                "count": 2
               },
               {
                 "difficulty": "medium",
                 "count": 2
               },
               {
-                "difficulty": "hard",
-                "count": 2
+                "difficulty": "easy",
+                "count": 1
               }
             ]
           },
@@ -166,8 +166,8 @@
           "exercise1",
           "exercise-txtar",
           "exercise-parse-error",
-          "shape",
           "quiz1",
+          "shape",
           "text",
           "cls",
           "quiz2",

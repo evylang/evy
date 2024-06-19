@@ -33,6 +33,13 @@ fieldset pre {
   background: white;
   border: 1px solid silver;
 }
+textarea {
+  display: block;
+  border: 1px solid silver;
+  border-radius: 2px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
 form {
   padding-bottom: 32px;
 }

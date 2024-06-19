@@ -29,8 +29,8 @@ type QuestionModel struct {
 	AnswerChoices []Renderer
 	ResultType    ResultType
 
-	embeds     map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block              // use to output checkbox or radio buttons for List in HTML
+	embeds      map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerBlock markdown.Block              // use to output checkbox or radio buttons for List in HTML
 
 	subQuestions   []*QuestionModel // Derived questions, generated from txtar question and links.
 	parentQuestion *QuestionModel   // Initial Model from which sub-question was generated.
@@ -56,7 +56,7 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 		configurableModel: newConfigurableModel(filename, options),
 	}
 	if err := question.parseFrontmatterMD(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
 	}
 	if err := question.buildQuestionModelForChoice(); err != nil {
 		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
@@ -144,11 +144,11 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 		embed, ok := m.embeds[block]
 		var err error
 		switch {
-		case block == m.answerList && m.isSubQuestion():
+		case block == m.answerBlock && m.isSubQuestion():
 			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
-		case block == m.answerList && m.isParserErrorQuestion():
+		case block == m.answerBlock && m.isParserErrorQuestion():
 			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
-		case block == m.answerList && !m.isSubQuestion():
+		case block == m.answerBlock && !m.isSubQuestion():
 			err = m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked)
 		case ok: // question block (answers are covered in the cases above)
 			embed.RenderHTML(buf)
@@ -291,10 +291,10 @@ func (m *QuestionModel) verifyMatch(answer Answer) error {
 	outputs := generateAnserOutputs(m.AnswerChoices)
 	for i, output := range outputs {
 		if correctByIndex[i] && generated != output {
-			return fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w (%s): answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 		if !correctByIndex[i] && generated == output {
-			return fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w (%s): expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 	}
 	return nil
@@ -442,7 +442,7 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 			}
 			found = true
 			m.AnswerChoices = append(m.AnswerChoices, renderer)
-			m.answerList = block
+			m.answerBlock = block
 			m.trackBlocksToReplace(b, renderer)
 		}
 	}

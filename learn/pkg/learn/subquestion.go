@@ -55,7 +55,7 @@ func newSubQuestion(m *QuestionModel, question, filename string, txtarEvyFile []
 	model.Doc = m.Doc
 	model.ResultType = m.ResultType
 	model.AnswerChoices = m.AnswerChoices
-	model.answerList = m.answerList
+	model.answerBlock = m.answerBlock
 
 	fm := *m.Frontmatter
 	fm.Answer = question

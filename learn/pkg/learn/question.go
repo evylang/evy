@@ -265,7 +265,7 @@ func (m *QuestionModel) printTextAnswerHTML(buf *bytes.Buffer, withAnswersMarked
 func (m *QuestionModel) answerContent(withAnswersMarked bool) (string, error) {
 	if !withAnswersMarked {
 		if evySrc, ok := m.AnswerText.(*evySource); ok {
-			return evySrc.source, nil
+			return removeCommentTaggedLines(evySrc.source), nil
 		}
 		return m.AnswerText.RenderOutput(), nil
 	}
@@ -273,11 +273,21 @@ func (m *QuestionModel) answerContent(withAnswersMarked bool) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("%w: (%s)", err, m.Filename())
 	}
-	content := answer.Text
+	content := removeCommentTags(answer.Text)
 	if !strings.HasSuffix(content, "\n") {
 		content += "\n"
 	}
 	return content, nil
+}
+
+func removeCommentTaggedLines(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if strings.HasSuffix(line, " //levy:blank") {
+			lines[i] = ""
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func (m *QuestionModel) correctAnswerIndices(withAnswersMarked bool) (map[int]bool, error) {

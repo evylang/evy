@@ -178,8 +178,17 @@ func (s *evySource) RenderOutput() string {
 // RenderHTML prints evy source code.
 func (s *evySource) RenderHTML(buf *bytes.Buffer) {
 	buf.WriteString(`<pre><code class="language-evy">`)
-	buf.WriteString(s.source)
+	buf.WriteString(removeCommentTags(s.source))
 	buf.WriteString("</code></pre>\n")
+}
+
+func removeCommentTags(s string) string {
+	lines := strings.Split(s, "\n")
+	trimmedLines := make([]string, len(lines))
+	for i, line := range lines {
+		trimmedLines[i] = strings.TrimSuffix(line, " //levy:blank")
+	}
+	return strings.Join(trimmedLines, "\n")
 }
 
 func newTxtarContent(filename string, resultType ResultType) (Renderer, error) {

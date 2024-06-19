@@ -24,9 +24,6 @@ func (f *questionFrontmatter) validate() error {
 	if f.Answer != "" && f.SealedAnswer != "" {
 		return fmt.Errorf("%w: sealed and unsealed answer found, only one allowed", ErrInvalidFrontmatter)
 	}
-	if f.GenerateQuestions != "" && f.AnswerType != "single-choice" {
-		return fmt.Errorf("%w: answers can only be generated for single-choice answer-type", ErrInvalidFrontmatter)
-	}
 	if f.GenerateQuestions != "" && f.Answer != "" {
 		return fmt.Errorf("%w: answer field must be empty when generating questions", ErrInvalidFrontmatter)
 	}

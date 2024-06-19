@@ -23,6 +23,7 @@ Unit introduction goes here. 1-2 sentences, maybe a paragraph.
 - [Exercise: `print` 👈](exercise1/README.md)
 - [Exercise: txtar demo 👈](exercise-txtar/README.md)
 - [Exercise: parse error demo 👈](exercise-parse-error/README.md)
+- [Exercise: free text demo 👈](exercise-text/README.md)
 - [Quiz: drawing and print ✨](quiz1.md)
 
 ## Draw with Style

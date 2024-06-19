@@ -45,6 +45,20 @@
           "single": "b"
         }
       },
+      "exercise-text": {
+        "q-print1": {
+          "text": "print \"cookies coding crew\""
+        },
+        "q-print1-inverted": {
+          "text": "peppy pixel parade"
+        },
+        "q-print2": {
+          "text": "print \"1, 2,\"\nprint \"Robots say moo.\"\nprint \"🤖🐄\"\n"
+        },
+        "q-print2-inverted": {
+          "text": "⏰\nWake up\n🍰\nEat breakfast\n⚡️\nWrite code\n"
+        }
+      },
       "exercise-txtar": {
         "q-banana-0e": {
           "single": "a"

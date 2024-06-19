@@ -396,3 +396,25 @@ func TestParseErrorQuestion(t *testing.T) {
 		}
 	}
 }
+
+func TestTextQuestion(t *testing.T) {
+	fname := "testdata/course1/unit1/exercise-text/q-print1.md"
+	model, err := NewQuestionModel(fname)
+	assert.NoError(t, err)
+	assert.Equal(t, TextOutput, model.ResultType)
+	assert.Equal(t, true, model.AnswerText != nil)
+
+	dirs := map[string]bool{
+		"question-text":             false,
+		"question-text-with-marked": true,
+	}
+	for dir, withMarked := range dirs {
+		got, err := model.ToHTML(withMarked)
+		assert.NoError(t, err)
+		goldenFile := "testdata/golden/" + dir + "/" + baseNoExt(fname) + ".html"
+		b, err := os.ReadFile(goldenFile)
+		assert.NoError(t, err)
+		want := string(b)
+		assert.Equal(t, want, got)
+	}
+}

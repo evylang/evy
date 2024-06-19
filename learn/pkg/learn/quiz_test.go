@@ -13,7 +13,7 @@ func TestQuiz1(t *testing.T) {
 	questions := GenerateQuestionSet(quiz.QuestionsByDifficulty, quiz.Frontmatter.Composition)
 	assert.Equal(t, 5, len(questions))
 	questionSet := map[string]bool{}
-	quiz1Exercises := []string{"exercise1", "exercise-txtar", "exercise-parse-error"}
+	quiz1Exercises := []string{"exercise1", "exercise-txtar", "exercise-parse-error", "exercise-text"}
 	for _, q := range questions {
 		questionSet[q.Filename()] = true
 		got := containsAny(q.Filename(), quiz1Exercises)

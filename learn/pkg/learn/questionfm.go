@@ -7,7 +7,7 @@ import (
 type questionFrontmatter struct {
 	Type              frontmatterType `yaml:"type,omitempty"` // question
 	Difficulty        difficulty      `yaml:"difficulty,omitempty"`
-	AnswerType        answerType      `yaml:"answer-type,omitempty"` // single-choice, multiple-choice, free-text, multiple-free-texts, program
+	AnswerType        answerType      `yaml:"answer-type,omitempty"` // single-choice, multiple-choice, text, multiple-texts, program
 	GenerateQuestions string          `yaml:"generate-questions,omitempty"`
 	Answer            string          `yaml:"answer,omitempty"`
 	SealedAnswer      string          `yaml:"sealed-answer,omitempty"`

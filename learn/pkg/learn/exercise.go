@@ -20,7 +20,7 @@ type ExerciseModel struct {
 	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *exerciseFrontmatter
-	Name                  string
+	name                  string
 	Questions             []*QuestionModel
 	QuestionsByDifficulty questionsByDifficulty
 }
@@ -53,7 +53,6 @@ type exerciseFrontmatter struct {
 // ToHTML returns a complete standalone HTML document as string.
 func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	md.Walk(m.Doc, md.RewriteLink)
 	m.Doc.PrintHTML(buf)
 	printComposition(buf, m.Frontmatter.Composition)
@@ -64,8 +63,12 @@ func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 			}
 		}
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
+}
+
+// Name returns the name of the exercise model derived from the first heading.
+func (m *ExerciseModel) Name() string {
+	return m.name
 }
 
 func (m *ExerciseModel) buildQuestions() error {
@@ -107,7 +110,7 @@ func (m *ExerciseModel) parseFrontmatterMD() error {
 	}
 
 	m.Doc = parseMD(m.rawMD)
-	if m.Name, err = extractName(m.Doc); err != nil {
+	if m.name, err = extractName(m.Doc); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
 	return nil

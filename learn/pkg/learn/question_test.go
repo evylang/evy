@@ -264,7 +264,7 @@ func TestPrintHTML(t *testing.T) {
 			err = model.PrintHTML(buf, false) // without marked answers
 			assert.NoError(t, err)
 			got := buf.String()
-			goldenFile := "testdata/golden/form/" + name + ".html"
+			goldenFile := "testdata/golden/question/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)
@@ -282,7 +282,7 @@ func TestToHTML(t *testing.T) {
 			got, err := model.ToHTML(false) // without marked
 			assert.NoError(t, err)
 
-			goldenFile := "testdata/golden/html/" + name + ".html"
+			goldenFile := "testdata/golden/question/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)
@@ -300,7 +300,7 @@ func TestToHTMLWithAnswersMarked(t *testing.T) {
 			got, err := model.ToHTML(true) // with marked
 			assert.NoError(t, err)
 
-			goldenFile := "testdata/golden/html-with-marked/" + name + ".html"
+			goldenFile := "testdata/golden/question-with-marked/" + name + ".html"
 			b, err := os.ReadFile(goldenFile)
 			assert.NoError(t, err)
 			want := string(b)
@@ -327,7 +327,7 @@ func TestToHTMLWithAnswersMarkedSealErr(t *testing.T) {
 	got, err := model.ToHTML(true) // with marked
 	assert.NoError(t, err)
 
-	goldenFile := "testdata/golden/html-with-marked/question1-sealed-unsealed-only.html"
+	goldenFile := "testdata/golden/question-with-marked/question1-sealed-unsealed-only.html"
 	b, err := os.ReadFile(goldenFile)
 	assert.NoError(t, err)
 	want := string(b)
@@ -341,7 +341,7 @@ func TestToHTMLWithAnswersMarkedSealed(t *testing.T) {
 	got, err := model.ToHTML(true) // withAnswersMarked
 	assert.NoError(t, err)
 
-	goldenFile := "testdata/golden/html-with-marked/question1-sealed.html"
+	goldenFile := "testdata/golden/question-with-marked/question1-sealed.html"
 	b, err := os.ReadFile(goldenFile)
 	assert.NoError(t, err)
 	want := string(b)

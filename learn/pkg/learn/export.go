@@ -1,10 +1,13 @@
 package learn
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"text/template"
 
 	"evylang.dev/evy/pkg/md"
 )
@@ -14,6 +17,7 @@ type ExportOptions struct {
 	WriteAnswerKey    bool
 	WriteHTML         bool
 	WithAnswersMarked bool
+	WithHeadLinks     bool /* CSS, JS, Favicon links vs standalone embeds*/
 	WriteCatalog      bool
 }
 
@@ -42,7 +46,7 @@ func Export(srcDir, destDir string, exportOpts ExportOptions, modelOpts ...Optio
 		return err
 	}
 	if exportOpts.WriteHTML {
-		if err := writeHTMLFiles(mdFiles, models, srcDir, destDir, exportOpts.WithAnswersMarked); err != nil {
+		if err := writeHTMLFiles(mdFiles, models, srcDir, destDir, exportOpts); err != nil {
 			return err
 		}
 	}
@@ -130,7 +134,7 @@ func newPathsByType(models []model) (pathsByType, error) {
 			byType.quizzes = append(byType.quizzes, m.Filename)
 		case *CourseModel:
 			byType.courses = append(byType.courses, m.Filename)
-		case plainMD: // plain markdown files can be anywhere, no-op
+		case *plainMD: // plain markdown files can be anywhere, no-op
 		default:
 			return byType, fmt.Errorf("%w: unknown model type: %T", ErrInconsistentMdoel, m)
 		}
@@ -140,21 +144,34 @@ func newPathsByType(models []model) (pathsByType, error) {
 	return byType, nil
 }
 
-func writeHTMLFiles(mdFiles []string, models []model, srcDir, destDir string, withAnswersMarked bool) error {
+func writeHTMLFiles(mdFiles []string, models []model, srcDir, destDir string, opts ExportOptions) error {
 	if _, err := md.Copy(srcDir, destDir); err != nil {
 		return err
 	}
 	for i, mdFile := range mdFiles {
 		htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
-		html, err := models[i].ToHTML(withAnswersMarked)
+		content, err := models[i].ToHTML(opts.WithAnswersMarked)
 		if err != nil {
 			return err
 		}
-		if err := os.WriteFile(htmlFile, []byte(html), 0o666); err != nil {
+		tmplData := newTmplData(mdFile, models[i].Name(), content, opts.WithHeadLinks)
+		if err := writeHTMLFile(htmlFile, tmplData); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func writeHTMLFile(htmlFile string, tmplData tmplData) error {
+	out, err := os.Create(htmlFile)
+	if err != nil {
+		return err
+	}
+	if err := tmpl.Execute(out, tmplData); err != nil {
+		out.Close() //nolint:errcheck,gosec // we're returning the more important error
+		return err
+	}
+	return out.Close()
 }
 
 func writeAnswerKeyFile(models []model, answerKeyFile string) error {
@@ -199,4 +216,47 @@ func writeCatalogFile(models []model, catalogFile string) error {
 	}
 	b = append(b, '\n')
 	return os.WriteFile(catalogFile, b, 0o666)
+}
+
+//go:embed tmpl/*
+var tmplFS embed.FS
+
+var (
+	tmplFuncMap = template.FuncMap{"indent": indent}
+	tmpl        = template.Must(template.New("learn.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/learn.html.tmpl"))
+)
+
+func indent(indentCount int, s string) string {
+	parts := strings.Split(s, "\n")
+	if len(parts) == 0 {
+		return s
+	}
+	if strings.TrimSpace(parts[len(parts)-1]) == "" {
+		parts = parts[:len(parts)-1]
+	}
+	indent := strings.Repeat("  ", indentCount)
+	return strings.Join(parts, "\n"+indent)
+}
+
+type tmplData struct {
+	Root          string
+	Title         string
+	Content       string
+	DefaultCSS    string
+	CSSFiles      []string
+	WithHeadLinks bool
+}
+
+//go:embed tmpl/default.css
+var defaultCSS string
+
+func newTmplData(mdFile, title, content string, withHeadLinks bool) tmplData {
+	return tmplData{
+		Root:          md.ToRoot(mdFile),
+		Title:         title,
+		Content:       content,
+		DefaultCSS:    defaultCSS,
+		CSSFiles:      []string{"index.css"},
+		WithHeadLinks: withHeadLinks,
+	}
 }

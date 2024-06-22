@@ -34,7 +34,7 @@ func TestExerciseToHTML(t *testing.T) {
 	assert.NoError(t, err)
 	got, err := m.ToHTML(false) // without marked
 	assert.NoError(t, err)
-	goldenFile := "testdata/golden/html/exercise1.html"
+	goldenFile := "testdata/golden/exercise/exercise1.html"
 	b, err := os.ReadFile(goldenFile)
 	assert.NoError(t, err)
 	want := string(b)
@@ -48,7 +48,7 @@ func TestExerciseToHTMLWithMarked(t *testing.T) {
 	got, err := m.ToHTML(true) // with marked
 	assert.NoError(t, err)
 
-	goldenFile := "testdata/golden/html-with-marked/exercise1.html"
+	goldenFile := "testdata/golden/exercise-with-marked/exercise1.html"
 	b, err := os.ReadFile(goldenFile)
 	assert.NoError(t, err)
 	want := string(b)

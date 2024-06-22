@@ -17,6 +17,7 @@ type UnittestModel struct {
 	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *unittestFrontmatter
+	name                  string
 	QuestionsByDifficulty questionsByDifficulty
 }
 
@@ -27,6 +28,7 @@ func NewUnittestModel(filename string, options ...Option) (*UnittestModel, error
 		Filename:              filename,
 		QuestionsByDifficulty: questionsByDifficulty{},
 		configurableModel:     newConfigurableModel(options),
+		name:                  "Unit test",
 	}
 	unittest.cache[filename] = unittest
 	if err := unittest.parseFrontmatterMD(); err != nil {
@@ -76,14 +78,17 @@ func (m *UnittestModel) buildExercises() error {
 func (m *UnittestModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.PrintHTML(buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
+}
+
+// Name returns the name of the unit test model: "Unit test <UNIT-NAME>".
+func (m *UnittestModel) Name() string {
+	return m.name
 }
 
 func (m *UnittestModel) parseFrontmatterMD() error {

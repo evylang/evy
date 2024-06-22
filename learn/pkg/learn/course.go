@@ -16,7 +16,7 @@ type CourseModel struct {
 	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *courseFrontmatter
-	Name               string // flat markdown heading
+	name               string // flat markdown heading
 	Units              []*UnitModel
 }
 
@@ -63,13 +63,16 @@ func (m *CourseModel) buildUnits() error {
 func (m *CourseModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.PrintHTML(buf)
 	if err := m.printUnitBadgesHTML(buf); err != nil {
 		return "", err
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
+}
+
+// Name returns the name of the course model derived from the first heading.
+func (m *CourseModel) Name() string {
+	return m.name
 }
 
 func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
@@ -107,7 +110,7 @@ func (m *CourseModel) parseFrontmatterMD() error {
 	}
 
 	m.Doc = parseMD(m.rawMD)
-	if m.Name, err = extractName(m.Doc); err != nil {
+	if m.name, err = extractName(m.Doc); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename)
 	}
 	return nil

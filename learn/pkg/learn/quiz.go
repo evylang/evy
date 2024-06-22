@@ -20,6 +20,7 @@ type QuizModel struct {
 	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *quizFrontmatter
+	name                  string
 	QuestionsByDifficulty questionsByDifficulty
 }
 
@@ -27,6 +28,7 @@ type QuizModel struct {
 func NewQuizModel(filename string, options ...Option) (*QuizModel, error) {
 	quiz := &QuizModel{
 		Filename:              filename,
+		name:                  "Quiz",
 		QuestionsByDifficulty: questionsByDifficulty{},
 		configurableModel:     newConfigurableModel(options),
 	}
@@ -75,14 +77,17 @@ func (m *QuizModel) buildExercises() error {
 func (m *QuizModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	buf.WriteString(prefixHTML)
 	m.Doc.PrintHTML(buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)
 	}
-	buf.WriteString(suffixHTML)
 	return buf.String(), nil
+}
+
+// Name returns the name of the quiz model: "Quiz N <UNIT-NAME>".
+func (m *QuizModel) Name() string {
+	return m.name
 }
 
 func (m *QuizModel) parseFrontmatterMD() error {

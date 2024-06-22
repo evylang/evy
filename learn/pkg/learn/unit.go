@@ -21,7 +21,6 @@ import (
 // summary. The order is captured in the OrderedModels slice.
 type UnitModel struct {
 	*configurableModel // used by functional options
-	Filename           string
 	Doc                *markdown.Document
 	Frontmatter        *unitFrontmatter
 	name               string // exercises, quizzes, unittests
@@ -32,8 +31,7 @@ type UnitModel struct {
 // contents.
 func NewUnitModel(filename string, options ...Option) (*UnitModel, error) {
 	unit := &UnitModel{
-		Filename:          filename,
-		configurableModel: newConfigurableModel(options),
+		configurableModel: newConfigurableModel(filename, options),
 	}
 	unit.cache[filename] = unit
 	if err := unit.parseFrontmatterMD(); err != nil {
@@ -59,7 +57,7 @@ func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
 	m.Doc.Blocks[0].PrintHTML(buf)
-	unitDir := filepath.Dir(m.Filename)
+	unitDir := filepath.Dir(m.Filename())
 	if err := m.printBadgesHTML(buf, unitDir); err != nil {
 		return "", err
 	}
@@ -82,21 +80,18 @@ func (m *UnitModel) printBadgesHTML(buf *bytes.Buffer, baseDir string) error {
 }
 
 func badgeURL(m model, baseDir string) (string, string, error) {
-	var badge, fname string
+	var badge string
 	switch m := m.(type) {
 	case *ExerciseModel:
 		badge = "🔲"
-		fname = m.Filename
 	case *QuizModel:
 		badge = "✨"
-		fname = m.Filename
 	case *UnittestModel:
 		badge = "⭐️"
-		fname = m.Filename
 	default:
 		return "", "", fmt.Errorf("%w: unit link: unknown model type %T", ErrInconsistentMdoel, m)
 	}
-	relPath, err := filepath.Rel(baseDir, fname)
+	relPath, err := filepath.Rel(baseDir, m.Filename())
 	if err != nil {
 		return "", "", fmt.Errorf("%w: cannot create relative path to exercise, quiz or unittest", err)
 	}
@@ -106,14 +101,14 @@ func badgeURL(m model, baseDir string) (string, string, error) {
 
 func (m *UnitModel) buildModels() error {
 	relPaths := collectMDLinks(m.Doc)
-	dir := filepath.Dir(m.Filename)
+	dir := filepath.Dir(m.Filename())
 	opts := newOptions(m.ignoreSealed, m.privateKey, m.cache)
 	quizCount := 1
 	for _, relPath := range relPaths {
 		fname := filepath.Join(dir, relPath)
 		model, err := newModel(fname, opts, m.cache)
 		if err != nil {
-			return fmt.Errorf("%w: %s", err, fname)
+			return err
 		}
 		switch model := model.(type) {
 		case *ExerciseModel:
@@ -133,9 +128,9 @@ func (m *UnitModel) buildModels() error {
 func (m *UnitModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &unitFrontmatter{}
@@ -154,7 +149,7 @@ func (m *UnitModel) parseFrontmatterMD() error {
 		return fmt.Errorf("%w: first markdown element in unit Markdown file must be heading", ErrBadMarkdownStructure)
 	}
 	if m.name, err = extractName(m.Doc); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	return nil
 }

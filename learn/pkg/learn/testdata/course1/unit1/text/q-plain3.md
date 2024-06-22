@@ -7,7 +7,7 @@ answer: b
 
 ## Draw text on canvas
 
-Which program generates the following output?
+What does this program output?
 
 [question](plain/b.evy "evy:source")
 

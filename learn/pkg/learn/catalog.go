@@ -41,13 +41,13 @@ const exerciseScore = 10
 func NewCourseCatalog(courseModel *CourseModel) Course {
 	course := Course{
 		Name:      courseModel.Name(),
-		PartialID: filepath.Base(filepath.Dir(courseModel.Filename)),
+		PartialID: filepath.Base(filepath.Dir(courseModel.Filename())),
 		Units:     map[string]Unit{},
 	}
 	for _, unitModel := range courseModel.Units {
 		unit := Unit{
 			Name:      unitModel.Name(),
-			PartialID: filepath.Base(filepath.Dir(unitModel.Filename)),
+			PartialID: filepath.Base(filepath.Dir(unitModel.Filename())),
 			Exercises: map[string]Exercise{},
 		}
 		for _, model := range unitModel.OrderedModels {
@@ -67,16 +67,16 @@ func newExerciseCatalogEntry(model model) Exercise {
 	exercise := Exercise{}
 	switch m := model.(type) {
 	case *ExerciseModel:
-		exercise.PartialID = filepath.Base(filepath.Dir(m.Filename))
+		exercise.PartialID = filepath.Base(filepath.Dir(m.Filename()))
 		exercise.Composition = m.Frontmatter.Composition
 		exercise.MaxScore = exerciseScore
 		exercise.Type = "exercise"
 	case *QuizModel:
-		exercise.PartialID = baseNoExt(m.Filename)
+		exercise.PartialID = baseNoExt(m.Filename())
 		exercise.Composition = m.Frontmatter.Composition
 		exercise.Type = "quiz"
 	case *UnittestModel:
-		exercise.PartialID = baseNoExt(m.Filename)
+		exercise.PartialID = baseNoExt(m.Filename())
 		exercise.Composition = m.Frontmatter.Composition
 		exercise.Type = "unittest"
 	}

@@ -46,7 +46,7 @@ func Export(srcDir, destDir string, exportOpts ExportOptions, modelOpts ...Optio
 		return err
 	}
 	if exportOpts.WriteHTML {
-		if err := writeHTMLFiles(mdFiles, models, srcDir, destDir, exportOpts); err != nil {
+		if err := writeHTMLFiles(models, srcDir, destDir, exportOpts); err != nil {
 			return err
 		}
 	}
@@ -68,14 +68,14 @@ func Export(srcDir, destDir string, exportOpts ExportOptions, modelOpts ...Optio
 func newModels(srcDir string, mdFiles []string, modelOpts []Option) ([]model, error) {
 	modelCache := map[string]model{}
 	modelOpts = append(modelOpts, withCache(modelCache))
-	models := make([]model, len(mdFiles))
-	var err error
-	for i, mdFile := range mdFiles {
+	models := make([]model, 0, len(mdFiles))
+	for _, mdFile := range mdFiles {
 		mdf := filepath.Join(srcDir, mdFile)
-		models[i], err = newModel(mdf, modelOpts, modelCache)
+		model, err := newModel(mdf, modelOpts, modelCache)
 		if err != nil {
 			return nil, err
 		}
+		models = append(models, model)
 	}
 	if err := validateModelPaths(models); err != nil {
 		return nil, err
@@ -92,7 +92,6 @@ func validateModelPaths(models []model) error {
 		return fmt.Errorf("%w: no question Markdown file found", ErrInvalidFileHierarchy)
 	}
 	courseDepth := len(splitPath(p.questions[0])) - 2 // relative depth from srcDir
-
 	for idx, paths := range [][]string{p.courses, p.unitsWithQuizzes, p.questions} {
 		for _, path := range paths {
 			depth := len(splitPath(path))
@@ -123,17 +122,15 @@ func newPathsByType(models []model) (pathsByType, error) {
 	for _, m := range models {
 		switch m := m.(type) { // "course", "unit", "exercise", "question"
 		case *QuestionModel:
-			byType.questions = append(byType.questions, m.Filename)
+			byType.questions = append(byType.questions, m.Filename())
 		case *ExerciseModel:
-			byType.questions = append(byType.questions, m.Filename)
+			byType.questions = append(byType.questions, m.Filename())
 		case *UnitModel:
-			byType.units = append(byType.units, m.Filename)
-		case *UnittestModel:
-			byType.quizzes = append(byType.quizzes, m.Filename)
-		case *QuizModel:
-			byType.quizzes = append(byType.quizzes, m.Filename)
+			byType.units = append(byType.units, m.Filename())
+		case *UnittestModel, *QuizModel:
+			byType.quizzes = append(byType.quizzes, m.Filename())
 		case *CourseModel:
-			byType.courses = append(byType.courses, m.Filename)
+			byType.courses = append(byType.courses, m.Filename())
 		case *plainMD: // plain markdown files can be anywhere, no-op
 		default:
 			return byType, fmt.Errorf("%w: unknown model type: %T", ErrInconsistentMdoel, m)
@@ -144,17 +141,21 @@ func newPathsByType(models []model) (pathsByType, error) {
 	return byType, nil
 }
 
-func writeHTMLFiles(mdFiles []string, models []model, srcDir, destDir string, opts ExportOptions) error {
+func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) error {
 	if _, err := md.Copy(srcDir, destDir); err != nil {
 		return err
 	}
-	for i, mdFile := range mdFiles {
+	for _, model := range models {
+		mdFile, err := filepath.Rel(srcDir, model.Filename())
+		if err != nil {
+			return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
+		}
 		htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
-		content, err := models[i].ToHTML(opts.WithAnswersMarked)
+		content, err := model.ToHTML(opts.WithAnswersMarked)
 		if err != nil {
 			return err
 		}
-		tmplData := newTmplData(mdFile, models[i].Name(), content, opts.WithHeadLinks)
+		tmplData := newTmplData(mdFile, model.Name(), content, opts.WithHeadLinks)
 		if err := writeHTMLFile(htmlFile, tmplData); err != nil {
 			return err
 		}

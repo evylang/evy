@@ -53,12 +53,12 @@ func (q questionsByDifficulty) merge(other questionsByDifficulty) {
 	filenames := map[string]bool{}
 	for _, questions := range q {
 		for _, question := range questions {
-			filenames[question.Filename] = true
+			filenames[question.Filename()] = true
 		}
 	}
 	for difficulty, questions := range other {
 		for _, question := range questions {
-			if !filenames[question.Filename] {
+			if !filenames[question.Filename()] {
 				q[difficulty] = append(q[difficulty], question)
 			}
 		}
@@ -86,7 +86,7 @@ func (q questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
 		questions := q[difficulty]
 		filenames := make([]string, len(questions))
 		for i, question := range questions {
-			filenames[i] = question.Filename
+			filenames[i] = question.Filename()
 		}
 		slices.Sort(filenames)
 		for _, filename := range filenames {
@@ -109,6 +109,8 @@ func (q questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
 // The generated question set will eventually be tracked and persisted for returning
 // students on the internet. This means we need to generate the question set before
 // we start the exercise.
+//
+// TODO: Use exercise round robin strategy for question selection for quiz and unittest.
 func GenerateQuestionSet(questionsByDifficulty questionsByDifficulty, composition []DifficultyCount) []*QuestionModel {
 	permByDifficulty := map[string][]int{}
 	for difficulty, quesitons := range questionsByDifficulty {

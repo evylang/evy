@@ -1,3 +1,4 @@
+font {size:25 family:"arial"} // set the letter size and style
 move 20 20
 color "red"
 text "World"

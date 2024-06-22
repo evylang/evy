@@ -17,7 +17,6 @@ import (
 // questions are selected.
 type ExerciseModel struct {
 	*configurableModel
-	Filename              string
 	Doc                   *markdown.Document
 	Frontmatter           *exerciseFrontmatter
 	name                  string
@@ -28,9 +27,8 @@ type ExerciseModel struct {
 // NewExerciseModel returns a new exercise model from an exercise Markdown file.
 func NewExerciseModel(filename string, options ...Option) (*ExerciseModel, error) {
 	exercise := &ExerciseModel{
-		Filename:              filename,
 		QuestionsByDifficulty: map[string][]*QuestionModel{},
-		configurableModel:     newConfigurableModel(options),
+		configurableModel:     newConfigurableModel(filename, options),
 	}
 	exercise.cache[filename] = exercise
 	if err := exercise.parseFrontmatterMD(); err != nil {
@@ -40,7 +38,7 @@ func NewExerciseModel(filename string, options ...Option) (*ExerciseModel, error
 		return nil, err
 	}
 	if err := exercise.QuestionsByDifficulty.validate(exercise.Frontmatter.Composition); err != nil {
-		return nil, fmt.Errorf("%w: %w: %s", ErrExercise, err, exercise.Filename)
+		return nil, fmt.Errorf("%w: %w: %s", ErrExercise, err, exercise.Filename())
 	}
 	return exercise, nil
 }
@@ -72,7 +70,7 @@ func (m *ExerciseModel) Name() string {
 }
 
 func (m *ExerciseModel) buildQuestions() error {
-	questionFiles, err := filepath.Glob(filepath.Dir(m.Filename) + "/*.md")
+	questionFiles, err := filepath.Glob(filepath.Dir(m.Filename()) + "/*.md")
 	if err != nil {
 		return fmt.Errorf("%w: cannot glob *.md files: %w", ErrExercise, err)
 	}
@@ -96,9 +94,9 @@ func (m *ExerciseModel) buildQuestions() error {
 func (m *ExerciseModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {
-		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename)
+		m.rawFrontmatter, m.rawMD, err = readSplitMDFile(m.Filename())
 		if err != nil {
-			return fmt.Errorf("%w (%s)", err, m.Filename)
+			return fmt.Errorf("%w (%s)", err, m.Filename())
 		}
 	}
 	m.Frontmatter = &exerciseFrontmatter{}
@@ -111,7 +109,7 @@ func (m *ExerciseModel) parseFrontmatterMD() error {
 
 	m.Doc = parseMD(m.rawMD)
 	if m.name, err = extractName(m.Doc); err != nil {
-		return fmt.Errorf("%w (%s)", err, m.Filename)
+		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
 	return nil
 }

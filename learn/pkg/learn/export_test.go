@@ -45,7 +45,9 @@ func assertSameContents(t *testing.T, wantDir, gotDir string) {
 	wantFiles := findFiles(wantDir)
 	gotFiles := findFiles(gotDir)
 	if slices.Compare(wantFiles, gotFiles) != 0 {
-		t.Errorf("want and got directories do not have the same files.\n want: %v\ngot: %v\n", wantFiles, gotFiles)
+		missingWantFiles := diff(wantFiles, gotFiles)
+		additionalGotFiles := diff(gotFiles, wantFiles)
+		t.Errorf("want and got directories do not have the same files.\nmissing files: %v\nextra files:  %v\n", missingWantFiles, additionalGotFiles)
 	}
 
 	for _, filename := range wantFiles {
@@ -59,6 +61,20 @@ func assertSameContents(t *testing.T, wantDir, gotDir string) {
 			t.Errorf("files %s and %s are not equal", wantFile, gotFile)
 		}
 	}
+}
+
+func diff(a, b []string) []string {
+	mb := make(map[string]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
+	}
+	var diff []string
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
 }
 
 // findFiles finds all files in directory recursively.

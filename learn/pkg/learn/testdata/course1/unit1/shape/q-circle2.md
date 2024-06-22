@@ -7,7 +7,7 @@ answer: b
 
 ## Understanding sequence: `move`,`circle` commands
 
-Which program generates the following output?
+What does this program output?
 
 [question](circle/b.evy "evy:source")
 

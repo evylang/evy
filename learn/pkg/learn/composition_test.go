@@ -9,16 +9,16 @@ import (
 func TestGenerateQuestionSet(t *testing.T) {
 	questions := questionsByDifficulty{
 		"easy": []*QuestionModel{
-			{Filename: "easy1.md"},
-			{Filename: "easy2.md"},
-			{Filename: "easy3.md"},
-			{Filename: "easy4.md"},
+			{configurableModel: &configurableModel{filename: "easy1.md"}},
+			{configurableModel: &configurableModel{filename: "easy2.md"}},
+			{configurableModel: &configurableModel{filename: "easy3.md"}},
+			{configurableModel: &configurableModel{filename: "easy4.md"}},
 		},
 		"medium": []*QuestionModel{
-			{Filename: "medium1.md"},
-			{Filename: "medium2.md"},
-			{Filename: "medium3.md"},
-			{Filename: "medium4.md"},
+			{configurableModel: &configurableModel{filename: "medium1.md"}},
+			{configurableModel: &configurableModel{filename: "medium2.md"}},
+			{configurableModel: &configurableModel{filename: "medium3.md"}},
+			{configurableModel: &configurableModel{filename: "medium4.md"}},
 		},
 	}
 	composition := []DifficultyCount{
@@ -34,7 +34,7 @@ func TestGenerateQuestionSet(t *testing.T) {
 	for range repeats {
 		questionSet := GenerateQuestionSet(questions, composition)
 		for _, question := range questionSet {
-			repeatsByFilename[question.Filename]++
+			repeatsByFilename[question.Filename()]++
 		}
 	}
 	assert.Equal(t, 8, len(repeatsByFilename), "%#v", repeatsByFilename)

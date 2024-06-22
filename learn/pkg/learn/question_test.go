@@ -39,7 +39,7 @@ func TestNewQuestionModel(t *testing.T) {
 			got, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
 
-			assert.Equal(t, fname, got.Filename)
+			assert.Equal(t, fname, got.Filename())
 			want := frontmatterType("question")
 			assert.Equal(t, want, got.Frontmatter.Type)
 		})
@@ -226,15 +226,15 @@ func TestErrInconsistency(t *testing.T) {
 }
 
 func TestRendererTracking(t *testing.T) {
-	embeds := map[string][]string{
-		"question1":      nil,
-		"question2":      nil,
-		"question-img1":  {"dot-dot-a-evy-svg", "dot-dot-b-evy-svg", "dot-dot-c-evy-svg", "dot-dot-d-evy-svg"},
-		"question-img2":  {"dot-dot-a-evy-svg"},
-		"question-link1": {"dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"},
-		"question-link2": {"dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"},
-		"question-link3": {"print-print-b-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"},
-		"question-link4": {"print-print-d-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"},
+	embeds := map[string]int{
+		"question1":      0,
+		"question2":      0,
+		"question-img1":  4, // "dot-dot-a-evy-svg", "dot-dot-b-evy-svg", "dot-dot-c-evy-svg", "dot-dot-d-evy-svg"
+		"question-img2":  1, // "dot-dot-a-evy-svg"
+		"question-link1": 5, // "dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"
+		"question-link2": 5, // "dot-dot-c-evy", "dot-dot-a-evy", "dot-dot-b-evy", "dot-dot-c-evy", "dot-dot-d-evy"
+		"question-link3": 5, // "print-print-b-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"
+		"question-link4": 5, // "print-print-d-evy", "print-print-a-evy", "print-print-b-evy", "print-print-c-evy", "print-print-d-evy"
 	}
 	for name, want := range embeds {
 		t.Run(name, func(t *testing.T) {
@@ -242,14 +242,7 @@ func TestRendererTracking(t *testing.T) {
 			model, err := NewQuestionModel(fname)
 			assert.NoError(t, err)
 			got := model.embeds
-			assert.Equal(t, len(want), len(got))
-			m := map[string]bool{}
-			for _, w := range want {
-				m[w] = true
-			}
-			for _, g := range got {
-				assert.Equal(t, true, m[g.id], "cannot find "+g.id)
-			}
+			assert.Equal(t, want, len(got))
 		})
 	}
 }

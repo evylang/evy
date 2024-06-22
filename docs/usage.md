@@ -69,6 +69,8 @@ You can also get help for each subcommand by running it with the
       -s, --no-assertion-summary    Do not print assertion summary, only report
                                     failed assertion(s).
           --fail-fast               Stop execution on first failed assertion.
+      -t, --txtar=MEMBER            Read source from txtar file and select select
+                                    given filename
 
 <!-- genend -->
 

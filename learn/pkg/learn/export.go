@@ -169,24 +169,24 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 		if err != nil {
 			return err
 		}
-		tmplData := newTmplData(mdFile, model.Name(), content, !opts.SelfContained)
-		if err := writeHTMLFile(htmlFile, tmplData); err != nil {
+		tmplData := newTmplData(mdFile, model.Name(), content)
+		if err := writeHTMLFile(htmlFile, tmplData, opts.SelfContained); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func writeHTMLFile(htmlFile string, tmplData tmplData) error {
+func writeHTMLFile(htmlFile string, tmplData tmplData, selfContained bool) error {
 	out, err := os.Create(htmlFile)
 	if err != nil {
 		return err
 	}
-	if err := tmpl.Execute(out, tmplData); err != nil {
-		out.Close() //nolint:errcheck,gosec // we're returning the more important error
-		return err
+	defer out.Close() //nolint:errcheck // we're returning the more important error
+	if selfContained {
+		return selfContainedTemplate.Execute(out, tmplData)
 	}
-	return out.Close()
+	return learnTemplate.Execute(out, tmplData)
 }
 
 func writeAnswerKeyFile(models []model, answerKeyFile string) error {
@@ -238,8 +238,9 @@ func writeCatalogFile(models []model, catalogFile string) error {
 var tmplFS embed.FS
 
 var (
-	tmplFuncMap = template.FuncMap{"indent": indent}
-	tmpl        = template.Must(template.New("learn.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/learn.html.tmpl"))
+	tmplFuncMap           = template.FuncMap{"indent": indent}
+	selfContainedTemplate = template.Must(template.New("self-contained.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/self-contained.html.tmpl"))
+	learnTemplate         = template.Must(template.New("learn.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/learn.html.tmpl"))
 )
 
 func indent(indentCount int, s string) string {
@@ -255,24 +256,35 @@ func indent(indentCount int, s string) string {
 }
 
 type tmplData struct {
-	Root          string
-	Title         string
-	Content       string
-	DefaultCSS    string
-	CSSFiles      []string
-	WithHeadLinks bool
+	Root       string
+	Title      string
+	Content    string
+	DefaultCSS string
+	CSSFiles   []string
 }
 
 //go:embed tmpl/default.css
 var defaultCSS string
 
-func newTmplData(mdFile, title, content string, withHeadLinks bool) tmplData {
+func newTmplData(mdFile, title, content string) tmplData {
 	return tmplData{
-		Root:          md.ToRoot(mdFile),
-		Title:         title,
-		Content:       content,
-		DefaultCSS:    defaultCSS,
-		CSSFiles:      []string{"index.css"},
-		WithHeadLinks: withHeadLinks,
+		Root:       md.ToRoot(mdFile),
+		Title:      title,
+		Content:    content,
+		DefaultCSS: defaultCSS,
+		CSSFiles: []string{
+			"resets.css",
+			"root.css",
+			"icons.css",
+			"header.css",
+			"switch.css",
+			"dialog.css",
+			"primary.css",
+			"elements.css",
+			"header.css",
+			"syntax.css",
+			"index.css",
+			"fonts.css",
+		},
 	}
 }

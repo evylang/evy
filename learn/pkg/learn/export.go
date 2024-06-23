@@ -17,7 +17,7 @@ type ExportOptions struct {
 	WriteAnswerKey    bool
 	WriteHTML         bool
 	WithAnswersMarked bool
-	WithHeadLinks     bool /* CSS, JS, Favicon links vs standalone embeds*/
+	SelfContained     bool /* CSS, JS, Favicon links vs standalone embeds*/
 	WriteCatalog      bool
 }
 
@@ -27,6 +27,9 @@ func (opts ExportOptions) validate() error {
 	}
 	if !opts.WriteHTML && opts.WithAnswersMarked {
 		return fmt.Errorf("%w: WithAnswersMarked requires WriteHTML", ErrInvalidExportOptions)
+	}
+	if !opts.WriteHTML && opts.SelfContained {
+		return fmt.Errorf("%w: SelfContained requires WriteHTML", ErrInvalidExportOptions)
 	}
 	return nil
 }
@@ -166,7 +169,7 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 		if err != nil {
 			return err
 		}
-		tmplData := newTmplData(mdFile, model.Name(), content, opts.WithHeadLinks)
+		tmplData := newTmplData(mdFile, model.Name(), content, !opts.SelfContained)
 		if err := writeHTMLFile(htmlFile, tmplData); err != nil {
 			return err
 		}

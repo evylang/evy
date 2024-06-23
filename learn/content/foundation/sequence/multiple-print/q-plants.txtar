@@ -1,0 +1,12 @@
+-- a.evy --
+print "🌱"
+print "🌦️"
+print "🌷"
+-- b.evy --
+print "🌷"
+print "🌦️"
+print "🌱"
+-- c.evy --
+print "🌱" "🌦️" "🌷"
+-- d.evy --
+print "🌷" "🌦️" "🌱"

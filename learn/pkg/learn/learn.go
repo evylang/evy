@@ -58,7 +58,7 @@ type plainMD struct {
 
 func (p *plainMD) ToHTML(_ bool) (string, error) {
 	md.Walk(p.doc, md.RewriteLink)
-	return markdown.ToHTML(p.doc), nil
+	return toHTML(p.doc), nil
 }
 
 func (p *plainMD) Name() string {

@@ -75,7 +75,7 @@ func (m *QuizModel) buildExercises() error {
 func (m *QuizModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)

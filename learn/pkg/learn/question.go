@@ -159,7 +159,7 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 		case ok: // question block (answers are covered in the cases above)
 			embed.RenderHTML(buf)
 		default:
-			block.PrintHTML(buf)
+			printHTML(block, buf)
 		}
 		if err != nil {
 			return err
@@ -206,7 +206,7 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 			if embed, ok := m.embeds[block]; ok {
 				embed.RenderHTML(buf)
 			} else {
-				block.PrintHTML(buf)
+				printHTML(block, buf)
 			}
 		}
 		buf.WriteString("</div>\n")

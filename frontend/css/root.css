@@ -38,6 +38,11 @@
   --syntax-comment: hsl(210deg 13% 72%);
   --syntax-error-line-background: hsl(210deg 7% 20%);
   --syntax-error-background: hsl(209deg 100% 33%);
+  --alert-note: hsl(204deg 100% 75%);
+  --alert-tip: hsl(203deg 100% 86%);
+  --alert-important: hsl(266deg 100% 86%);
+  --alert-warning: hsl(27deg 100% 74%);
+  --alert-caution: hsl(359deg 100% 75%);
 
   color-scheme: dark;
 
@@ -75,6 +80,11 @@
   --syntax-comment: rgb(110 119 129);
   --syntax-error-line-background: hsl(200deg 13% 91%);
   --syntax-error-background: hsl(209deg 100% 75%);
+  --alert-note: hsl(213deg 94% 35%);
+  --alert-tip: hsl(212deg 92% 45%);
+  --alert-important: hsl(24deg 74% 51%);
+  --alert-warning: hsl(356deg 72% 47%);
+  --alert-caution: rgb(110 119 129);
 
   color-scheme: light;
 

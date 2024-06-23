@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>The print Command</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="../../../img/favicon.png" />
+    <link rel="stylesheet" href="../../../css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/root.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/header.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/dialog.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/syntax.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/index.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/fonts.css" type="text/css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "./module/highlight.js": "./module/highlight.js"
+        }
+      }
+    </script>
+    <script src="../../../index.js" type="module"></script>
+  </head>
+  <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger" id="hamburger"></button>
+        <a href="/" class="desktop">
+          <img alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">The print Command</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <button id="show-dialog-about">About</button>
+        </nav>
+        <a href="/" class="mobile logo-small"></a>
+      </div>
+    </header>
+
+    <h1>The <code>print</code> Command</h1>
+    <p>
+      The <code>print</code> command tells the program to print something to the screen. The
+      <strong>argument</strong> is the thing that you want the program to print. The argument must
+      be surrounded by quotation or talking marks <code>&quot;</code>. For example, the following
+      code will print the word <code>Hello</code> to the screen:
+    </p>
+    <pre><code>✅ print &quot;Hello&quot;
+</code></pre>
+    <p><code>&quot;Hello&quot;</code> is the argument to <code>print</code>.</p>
+    <p>Without the quotation marks, this program will generate an error.</p>
+    <pre><code>❌ print Hello
+</code></pre>
+    <h2>More Arguments</h2>
+    <p>
+      <code>print</code> takes any number of arguments: 0, 1, 2, …. Each argument is printed
+      <em>without</em> the quotation marks. Arguments are separated by a single space. After the
+      last argument has been printed a new line or return will be printed.
+    </p>
+    <p>The following program</p>
+    <pre><code class="language-evy">print &quot;Bugs like hugs.&quot;
+print &quot;👾&quot; &quot;🐛&quot; &quot;🥰&quot;
+</code></pre>
+    <p>creates the output</p>
+    <pre><code>Bugs like hugs.
+👾 🐛 🥰
+</code></pre>
+    <p><code>print</code> without any arguments prints an empty new line.</p>
+    <p><a href="index.html">Exercise</a></p>
+
+    <dialog id="dialog-about" class="large">
+      <form method="dialog">
+        <header>
+          <h1>About</h1>
+          <button class="icon-close"></button>
+        </header>
+        <main>
+          <object
+            type="image/svg+xml"
+            data="../../../img/evy-e.v1.svg"
+            class="evy-e dark-theme-only"
+          >
+            <img src="../../../img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
+          </object>
+          <object
+            type="image/svg+xml"
+            data="../../../img/evy-e-light-theme.v1.svg"
+            class="evy-e light-theme-only"
+          >
+            <img src="../../../img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
+          </object>
+          <h2>Evy is a simple programming language, made to learn coding.</h2>
+          <p>
+            Evy is a modern, beginner-friendly programming language that bridges the gap between
+            block-based coding and conventional programming languages. Its simple syntax and small
+            set of built-in functions make it easy to learn and use, but it still is powerful enough
+            for user interaction, games, and animations.
+          </p>
+          <p>
+            Created by a software engineer and parent who struggled to teach their kids programming
+            with conventional languages, Evy is designed to make real programming as fun and easy as
+            possible.
+          </p>
+          <button class="primary">Done</button>
+        </main>
+      </form>
+    </dialog>
+  </body>
+</html>

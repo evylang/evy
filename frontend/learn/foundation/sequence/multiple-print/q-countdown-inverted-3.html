@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>q-countdown-inverted-3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="../../../img/favicon.png" />
+    <link rel="stylesheet" href="../../../css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/root.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/header.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/dialog.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/syntax.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/index.css" type="text/css" />
+    <link rel="stylesheet" href="../../../css/fonts.css" type="text/css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "./module/highlight.js": "./module/highlight.js"
+        }
+      }
+    </script>
+    <script src="../../../index.js" type="module"></script>
+  </head>
+  <body>
+    <header class="topnav docs">
+      <div class="left">
+        <button class="icon-hamburger" id="hamburger"></button>
+        <a href="/" class="desktop">
+          <img alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="mobile center">
+        <span class="mobile">q-countdown-inverted-3</span>
+      </div>
+      <div class="right">
+        <nav class="docs-nav">
+          <button id="show-dialog-about">About</button>
+        </nav>
+        <a href="/" class="mobile logo-small"></a>
+      </div>
+    </header>
+
+    <form id="q-countdown-inverted-3" class="difficulty-easy">
+      <h2>Sequential <code>print</code> command</h2>
+      <p>Which program generates the following output?</p>
+      <pre><code>2 1
+</code></pre>
+      <p>Choose one correct answer:</p>
+      <fieldset>
+        <div>
+          <label for="a">a</label>
+          <input type="radio" value="a" name="answer" />
+          <pre><code class="language-evy">print "1"
+print "2"
+</code></pre>
+        </div>
+        <div>
+          <label for="b">b</label>
+          <input type="radio" value="b" name="answer" />
+          <pre><code class="language-evy">print "2"
+print "1"
+</code></pre>
+        </div>
+        <div>
+          <label for="c">c</label>
+          <input type="radio" value="c" name="answer" />
+          <pre><code class="language-evy">print "1" "2"
+</code></pre>
+        </div>
+        <div>
+          <label for="d">d</label>
+          <input type="radio" value="d" name="answer" />
+          <pre><code class="language-evy">print "2" "1"
+</code></pre>
+        </div>
+      </fieldset>
+    </form>
+
+    <dialog id="dialog-about" class="large">
+      <form method="dialog">
+        <header>
+          <h1>About</h1>
+          <button class="icon-close"></button>
+        </header>
+        <main>
+          <object
+            type="image/svg+xml"
+            data="../../../img/evy-e.v1.svg"
+            class="evy-e dark-theme-only"
+          >
+            <img src="../../../img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
+          </object>
+          <object
+            type="image/svg+xml"
+            data="../../../img/evy-e-light-theme.v1.svg"
+            class="evy-e light-theme-only"
+          >
+            <img src="../../../img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
+          </object>
+          <h2>Evy is a simple programming language, made to learn coding.</h2>
+          <p>
+            Evy is a modern, beginner-friendly programming language that bridges the gap between
+            block-based coding and conventional programming languages. Its simple syntax and small
+            set of built-in functions make it easy to learn and use, but it still is powerful enough
+            for user interaction, games, and animations.
+          </p>
+          <p>
+            Created by a software engineer and parent who struggled to teach their kids programming
+            with conventional languages, Evy is designed to make real programming as fun and easy as
+            possible.
+          </p>
+          <button class="primary">Done</button>
+        </main>
+      </form>
+    </dialog>
+  </body>
+</html>

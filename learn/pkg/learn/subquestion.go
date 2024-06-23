@@ -78,7 +78,7 @@ func newSubQuestion(m *QuestionModel, question, filename string, txtarEvyFile []
 		if txtarContent, ok := m.AnswerText.(*txtarContent); ok {
 			for _, file := range txtarContent.archive.Files {
 				if question == baseNoExt(file.Name) {
-					model.AnswerText = newRendererFromEvyBytes(file.Data, txtarContent.ResultType)
+					model.AnswerText = newRendererFromEvyBytesWithBlanked(file.Data, txtarContent.ResultType)
 				}
 			}
 		}

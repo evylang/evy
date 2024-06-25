@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Course 1</title>
+    <title>q-parse-error</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡️</text></svg>" />
     <style>
@@ -72,21 +72,35 @@
     </style>
   </head>
   <body>
-    <h1>Course 1</h1>
-<p>Only one unit ready at the moment, sorry:</p>
-<ul>
-<li><a href="unit1/index.html">Unit 1: Demo Unit</a></li>
-</ul>
-<h2>Unit 1: Demo Unit</h2>
-<a href="unit1/exercise1/index.html">🔲</a>
-<a href="unit1/exercise-txtar/index.html">🔲</a>
-<a href="unit1/exercise-parse-error/index.html">🔲</a>
-<a href="unit1/shape/index.html">🔲</a>
-<a href="unit1/quiz1.html">✨</a>
-<a href="unit1/text/index.html">🔲</a>
-<a href="unit1/cls/index.html">🔲</a>
-<a href="unit1/quiz2.html">✨</a>
-<a href="unit1/unittest.html">⭐️</a>
+    <form id=q-parse-error class="difficulty-easy">
+<h2>Parse errors</h2>
+<p>Which program causes one or more parse errors?</p>
+<p>Choose one correct answer:</p>
+<fieldset>
+<div>
+<label for="a">a</label>
+<input type="radio" value="a" name="answer" />
+<pre><code class="language-evy">print "banana"
+</code></pre></div>
+<div>
+<label for="b">b</label>
+<input type="radio" value="b" name="answer" checked />
+<pre><code class="language-evy">print "🍌
+</code></pre></div>
+<div>
+<label for="c">c</label>
+<input type="radio" value="c" name="answer" />
+<pre><code class="language-evy">print "print 🍌"
+</code></pre></div>
+<div>
+<label for="d">d</label>
+<input type="radio" value="d" name="answer" />
+<pre><code class="language-evy">print "print banana"
+</code></pre></div>
+</fieldset>
+<p><em>Note</em>: A <strong>parse error</strong> is an error that occurs while parsing the program. It is
+also called syntax error or compilation error.</p>
+</form>
 
   </body>
 </html>

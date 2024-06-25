@@ -369,3 +369,30 @@ func TestTextarQuestion(t *testing.T) {
 		}
 	}
 }
+
+func TestParseErrorQuestion(t *testing.T) {
+	fnames := []string{
+		"testdata/course1/unit1/exercise-parse-error/q-parse-error.md",
+		"testdata/course1/unit1/exercise-parse-error/q-no-parse-error.md",
+	}
+	for _, fname := range fnames {
+		model, err := NewQuestionModel(fname)
+		assert.NoError(t, err)
+		assert.Equal(t, UnknownOutput, model.ResultType)
+		assert.Equal(t, 1, len(model.AnswerChoices))
+
+		dirs := map[string]bool{
+			"question-parse-error":             false,
+			"question-parse-error-with-marked": true,
+		}
+		for dir, withMarked := range dirs {
+			got, err := model.ToHTML(withMarked)
+			assert.NoError(t, err)
+			goldenFile := "testdata/golden/" + dir + "/" + baseNoExt(fname) + ".html"
+			b, err := os.ReadFile(goldenFile)
+			assert.NoError(t, err)
+			want := string(b)
+			assert.Equal(t, want, got)
+		}
+	}
+}

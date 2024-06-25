@@ -33,6 +33,18 @@
           "single": "d"
         }
       },
+      "exercise-parse-error": {
+        "q-no-parse-error": {
+          "multi": [
+            "a",
+            "c",
+            "d"
+          ]
+        },
+        "q-parse-error": {
+          "single": "b"
+        }
+      },
       "exercise-txtar": {
         "q-banana-0e": {
           "single": "a"

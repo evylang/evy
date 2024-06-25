@@ -19,6 +19,7 @@ func TestNewUnitModel(t *testing.T) {
 	want := `
 <a href="exercise1/index.html">🔲</a>
 <a href="exercise-txtar/index.html">🔲</a>
+<a href="exercise-parse-error/index.html">🔲</a>
 <a href="shape/index.html">🔲</a>
 <a href="quiz1.html">✨</a>
 <a href="text/index.html">🔲</a>

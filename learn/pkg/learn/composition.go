@@ -123,7 +123,7 @@ func GenerateQuestionSet(questionsByDifficulty questionsByDifficulty, compositio
 		permByDifficulty[c.Difficulty] = permByDifficulty[c.Difficulty][c.Count:]
 		questions := questionsByDifficulty[c.Difficulty]
 		for _, i := range perm {
-			result = append(result, questions[i])
+			result = append(result, questions[i].pick())
 		}
 	}
 	return result

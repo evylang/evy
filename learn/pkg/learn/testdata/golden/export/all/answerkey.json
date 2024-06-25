@@ -33,6 +33,95 @@
           "single": "d"
         }
       },
+      "exercise-txtar": {
+        "q-banana-0e": {
+          "single": "a"
+        },
+        "q-banana-27": {
+          "single": "c"
+        },
+        "q-banana-76": {
+          "single": "d"
+        },
+        "q-banana-7e": {
+          "single": "b"
+        },
+        "q-banana-inverted-3": {
+          "single": "c"
+        },
+        "q-banana-inverted-b": {
+          "single": "b"
+        },
+        "q-banana-inverted-c": {
+          "single": "d"
+        },
+        "q-banana-inverted-f": {
+          "single": "a"
+        },
+        "q-print-5": {
+          "single": "c"
+        },
+        "q-print-8": {
+          "single": "d"
+        },
+        "q-print-d": {
+          "single": "b"
+        },
+        "q-print-f": {
+          "single": "a"
+        },
+        "q-print-inverted-5": {
+          "single": "d"
+        },
+        "q-print-inverted-7": {
+          "single": "a"
+        },
+        "q-print-inverted-a": {
+          "single": "b"
+        },
+        "q-print-inverted-d": {
+          "single": "c"
+        },
+        "q-print2-5": {
+          "single": "d"
+        },
+        "q-print2-9": {
+          "single": "b"
+        },
+        "q-print2-a": {
+          "single": "c"
+        },
+        "q-print2-f": {
+          "single": "a"
+        },
+        "q-print3": {
+          "single": "a"
+        },
+        "q-shape-1": {
+          "single": "c"
+        },
+        "q-shape-4": {
+          "single": "d"
+        },
+        "q-shape-9": {
+          "single": "a"
+        },
+        "q-shape-c": {
+          "single": "b"
+        },
+        "q-shape-inverted-a9": {
+          "single": "c"
+        },
+        "q-shape-inverted-d5": {
+          "single": "a"
+        },
+        "q-shape-inverted-db": {
+          "single": "d"
+        },
+        "q-shape-inverted-ea": {
+          "single": "b"
+        }
+      },
       "exercise1": {
         "question-img1": {
           "single": "b"

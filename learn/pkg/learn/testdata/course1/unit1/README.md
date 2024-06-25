@@ -21,6 +21,7 @@ Unit introduction goes here. 1-2 sentences, maybe a paragraph.
 
 - [`print` command](intro.md)
 - [Exercise: `print` 👈](exercise1/README.md)
+- [Exercise: txtar demo 👈](exercise-txtar/README.md)
 - [Drawing canvas](shape/intro.md)
 - [Draw shapes](shape/commands.md)
 - [Exercise: Shape commands 👈](shape/README.md)

@@ -1,0 +1,16 @@
+-- a.evy --
+move 40 40
+color "blue"
+circle 10
+-- b.evy --
+move 60 60
+color "blue"
+circle 10
+-- c.evy --
+move 60 40
+color "blue"
+circle 10
+-- d.evy --
+move 40 60
+color "blue"
+circle 10

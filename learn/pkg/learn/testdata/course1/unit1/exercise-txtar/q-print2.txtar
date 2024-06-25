@@ -1,0 +1,10 @@
+-- a.evy --
+print "1"
+print "2"
+-- b.evy --
+print "2"
+print "1"
+-- c.evy --
+print "1" "2"
+-- d.evy --
+print "2" "1"

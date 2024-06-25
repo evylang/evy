@@ -7,18 +7,19 @@ import (
 )
 
 func TestGenerateQuestionSet(t *testing.T) {
+	fm := &questionFrontmatter{}
 	questions := questionsByDifficulty{
 		"easy": []*QuestionModel{
-			{configurableModel: &configurableModel{filename: "easy1.md"}},
-			{configurableModel: &configurableModel{filename: "easy2.md"}},
-			{configurableModel: &configurableModel{filename: "easy3.md"}},
-			{configurableModel: &configurableModel{filename: "easy4.md"}},
+			{configurableModel: &configurableModel{filename: "easy1.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "easy2.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "easy3.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "easy4.md"}, Frontmatter: fm},
 		},
 		"medium": []*QuestionModel{
-			{configurableModel: &configurableModel{filename: "medium1.md"}},
-			{configurableModel: &configurableModel{filename: "medium2.md"}},
-			{configurableModel: &configurableModel{filename: "medium3.md"}},
-			{configurableModel: &configurableModel{filename: "medium4.md"}},
+			{configurableModel: &configurableModel{filename: "medium1.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "medium2.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "medium3.md"}, Frontmatter: fm},
+			{configurableModel: &configurableModel{filename: "medium4.md"}, Frontmatter: fm},
 		},
 	}
 	composition := []DifficultyCount{

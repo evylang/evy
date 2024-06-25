@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"strconv"
 	"testing"
 
 	"evylang.dev/evy/pkg/assert"
@@ -339,4 +340,32 @@ func TestToHTMLWithAnswersMarkedSealed(t *testing.T) {
 	assert.NoError(t, err)
 	want := string(b)
 	assert.Equal(t, want, got)
+}
+
+func TestTextarQuestion(t *testing.T) {
+	fname := "testdata/course1/unit1/exercise-txtar/q-print.md"
+	model, err := NewQuestionModel(fname)
+	assert.NoError(t, err)
+	assert.Equal(t, TextOutput, model.ResultType)
+	assert.Equal(t, 1, len(model.AnswerChoices))
+
+	models := model.subQuestions
+	assert.NoError(t, err)
+	assert.Equal(t, 4, len(models))
+
+	dirs := map[string]bool{
+		"question-txtar":             false,
+		"question-txtar-with-marked": true,
+	}
+	for dir, withMarked := range dirs {
+		for i, sub := range models {
+			got, err := sub.ToHTML(withMarked)
+			assert.NoError(t, err)
+			goldenFile := "testdata/golden/" + dir + "/sub-" + strconv.Itoa(i) + ".html"
+			b, err := os.ReadFile(goldenFile)
+			assert.NoError(t, err)
+			want := string(b)
+			assert.Equal(t, want, got)
+		}
+	}
 }

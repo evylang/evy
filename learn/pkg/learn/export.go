@@ -75,6 +75,13 @@ func newModels(srcDir string, mdFiles []string, modelOpts []Option) ([]model, er
 		if err != nil {
 			return nil, err
 		}
+		qmodel, ok := model.(*QuestionModel)
+		if ok && qmodel.hasSubQuestions() {
+			for _, qm := range qmodel.subQuestions {
+				models = append(models, qm)
+			}
+			continue
+		}
 		models = append(models, model)
 	}
 	if err := validateModelPaths(models); err != nil {
@@ -146,6 +153,10 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 		return err
 	}
 	for _, model := range models {
+		qmodel, ok := model.(*QuestionModel)
+		if ok && qmodel.hasSubQuestions() {
+			continue
+		}
 		mdFile, err := filepath.Rel(srcDir, model.Filename())
 		if err != nil {
 			return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
@@ -182,7 +193,8 @@ func writeAnswerKeyFile(models []model, answerKeyFile string) error {
 	}
 	answerKey := AnswerKey{}
 	for _, m := range models {
-		if qmodel, ok := m.(*QuestionModel); ok {
+		qmodel, ok := m.(*QuestionModel)
+		if ok {
 			ak, err := qmodel.ExportAnswerKey()
 			if err != nil {
 				return err

@@ -11,6 +11,7 @@ import (
 
 	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
+	"golang.org/x/tools/txtar"
 	"rsc.io/markdown"
 )
 
@@ -180,6 +181,50 @@ func (s *evySource) RenderHTML(buf *bytes.Buffer) {
 	buf.WriteString("</code></pre>\n")
 }
 
+func newTxtarContent(filename string, resultType ResultType) (Renderer, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	archive := txtar.Parse(b)
+	m := map[string]bool{}
+	for _, file := range archive.Files {
+		content := string(file.Data)
+		if m[content] {
+			return nil, fmt.Errorf("%w: found duplicate content in %s", ErrBadTxtar, file.Name)
+		}
+		m[content] = true
+	}
+	return &txtarContent{
+		data:       b,
+		ResultType: resultType,
+		archive:    archive,
+	}, nil
+}
+
+// txtarContent represents a the contents of txtar archive. They cannot be
+// rendered directly but are used with newRendererFromEvyBytes() when
+// generating sub-questions.
+type txtarContent struct {
+	data       []byte
+	ResultType ResultType
+	archive    *txtar.Archive
+}
+
+// RenderOutput writes placeholder error message. It should never be called
+// directly. txtarContent is mostly a placeholder for content creation in sub
+// questions, but must satisfy the renderer interface with the current
+// QuestionModel structure.
+func (*txtarContent) RenderOutput() string {
+	return "*** txtar Content ERROR ***"
+}
+
+// RenderHTML writes placeholder error message. See RenderOutput for further
+// detail.
+func (*txtarContent) RenderHTML(buf *bytes.Buffer) {
+	buf.WriteString("*** txtar Content ERROR ***")
+}
+
 // TextContent represents plain text output of an Evy program.
 type TextContent string
 
@@ -202,19 +247,26 @@ func (s TextContent) RenderHTML(buf *bytes.Buffer) {
 }
 
 func newRendererFromEvyFile(filename string, resultType ResultType) (Renderer, error) {
+	if strings.HasSuffix(filename, ".txtar") {
+		return newTxtarContent(filename, resultType)
+	}
 	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
+	return newRendererFromEvyBytes(b, resultType), nil
+}
+
+func newRendererFromEvyBytes(b []byte, resultType ResultType) Renderer {
 	switch resultType {
 	case SVGOutput:
 		content := runEvy(string(b), SVGOutput)
-		return SVGContent(content), nil
+		return SVGContent(content)
 	case TextOutput:
 		content := runEvy(string(b), TextOutput)
-		return TextContent(content), nil
+		return TextContent(content)
 	}
-	return &evySource{source: string(b)}, nil
+	return &evySource{source: string(b)}
 }
 
 func getResultTypeFromLink(link *markdown.Link) (ResultType, error) {
@@ -222,7 +274,7 @@ func getResultTypeFromLink(link *markdown.Link) (ResultType, error) {
 	if strings.HasPrefix(u, "https://") || strings.HasPrefix(u, "http://") {
 		return UnknownOutput, fmt.Errorf("%w: found external link %q, expected relative link", ErrBadMarkdownStructure, u)
 	}
-	if !strings.HasSuffix(u, ".evy") {
+	if !strings.HasSuffix(u, ".evy") && !strings.HasSuffix(u, ".txtar") {
 		return UnknownOutput, fmt.Errorf("%w: found non evy link %q, expected .evy file", ErrBadMarkdownStructure, u)
 	}
 	if !strings.HasPrefix(link.Title, "evy:") {
@@ -250,11 +302,13 @@ func toText(b markdown.Block) *markdown.Text {
 }
 
 func resultTypeFromRenderer(r Renderer) ResultType {
-	switch r.(type) {
+	switch r := r.(type) {
 	case SVGContent:
 		return SVGOutput
 	case TextContent:
 		return TextOutput
+	case *txtarContent:
+		return r.ResultType
 	}
 	return UnknownOutput
 }

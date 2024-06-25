@@ -26,6 +26,7 @@ var (
 	ErrBadMarkdownStructure = errors.New("bad Markdown structure")
 	ErrInconsistentMdoel    = errors.New("inconsistency")
 	ErrWrongAnswer          = errors.New("wrong answer")
+	ErrBadTxtar             = errors.New("bad txtar file")
 
 	ErrSingleChoice          = errors.New("single-choice answer must be a single character a-z")
 	ErrBadDirectoryStructure = errors.New("bad directory structure for course layout")

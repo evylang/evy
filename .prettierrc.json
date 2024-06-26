@@ -9,6 +9,12 @@
       "options": {
         "parser": "html"
       }
+    },
+    {
+      "files": "*.htmlf",
+      "options": {
+        "parser": "html"
+      }
     }
   ]
 }

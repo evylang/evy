@@ -205,8 +205,9 @@ func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.B
 		}
 		letter := indexToLetter(i)
 		buf.WriteString("<div>\n")
-		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
+		buf.WriteString(`<label>` + letter)
 		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" ` + checked + "/>\n")
+		buf.WriteString("</label>\n")
 		for _, block := range item.(*markdown.Item).Blocks {
 			if embed, ok := m.embeds[block]; ok {
 				embed.RenderHTML(buf)
@@ -239,8 +240,9 @@ func (m *QuestionModel) printTxtarAnswerChoicesHTML(buf *bytes.Buffer, withAnswe
 		}
 		letter := indexToLetter(i)
 		buf.WriteString("<div>\n")
-		buf.WriteString(`<label for="` + letter + `">` + letter + "</label>\n")
+		buf.WriteString(`<label>` + letter)
 		buf.WriteString(`<input type="` + inputType + `" value="` + letter + `" name="answer" ` + checked + "/>\n")
+		buf.WriteString("</label>\n")
 		if m.isParserErrorQuestion() {
 			buf.WriteString(`<pre><code class="language-evy">`)
 			buf.Write(file.Data)

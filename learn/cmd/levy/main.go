@@ -70,6 +70,8 @@ type exportCmd struct {
 	PrivateKey        string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
 	WithAnswersMarked bool   `short:"m" help:"Include marked answers in HTML output. Cannot be used with export target answerkey."`
 	SelfContained     bool   `short:"c" help:"Ensure .html files are self-contained (embed CSS, JS, Favicon)." negatable:""`
+	SkipQuestions     bool   `short:"q" help:"Skip exporting individual questions, export full exercise only."`
+	RootDir           string `short:"r" default:"/" help:"Root directory for HTML links, e.g. /learn/."`
 }
 
 type verifyCmd struct {
@@ -101,6 +103,8 @@ func (c *exportCmd) Run() error {
 		WriteCatalog:      c.ExportType == "catalog" || c.ExportType == "all",
 		WithAnswersMarked: c.WithAnswersMarked,
 		SelfContained:     c.SelfContained,
+		SkipQuestions:     c.SkipQuestions,
+		RootDir:           c.RootDir,
 	}
 	modelOptions := getOptions(c.IgnoreSealed, c.PrivateKey)
 	return learn.Export(c.Srcdir, c.Destdir, exportOptions, modelOptions...)

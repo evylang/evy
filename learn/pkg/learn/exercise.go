@@ -77,6 +77,11 @@ func (m *ExerciseModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *ExerciseModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *ExerciseModel) buildQuestions() error {
 	questionFiles, err := filepath.Glob(filepath.Dir(m.Filename()) + "/*.md")
 	if err != nil {

@@ -183,6 +183,11 @@ func (m *QuestionModel) Name() string {
 	return baseNoExt(m.Filename())
 }
 
+// Document returns the markdown ast root node.
+func (m *QuestionModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *QuestionModel) printAnswerChoicesHTML(list *markdown.List, buf *bytes.Buffer, withAnswersMarked bool) error {
 	buf.WriteString("<fieldset>\n")
 	inputType := "radio"

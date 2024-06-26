@@ -52,6 +52,11 @@ func (m *UnitModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *UnitModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 // ToHTML returns a complete standalone HTML document as string.
 func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)

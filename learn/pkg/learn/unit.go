@@ -58,9 +58,11 @@ func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	buf := &bytes.Buffer{}
 	m.Doc.Blocks[0].PrintHTML(buf)
 	unitDir := filepath.Dir(m.Filename())
+	buf.WriteString(`<div class="badges">` + "\n")
 	if err := m.printBadgesHTML(buf, unitDir); err != nil {
 		return "", err
 	}
+	buf.WriteString("</div>\n")
 	for _, block := range m.Doc.Blocks[1:] {
 		printHTML(block, buf)
 	}

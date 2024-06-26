@@ -4,13 +4,13 @@
 //
 // When deploying to firebase (any other hosting site), we need to make a few
 // changes to the HTML, CSS and JS files in the site:
-//   - Replace href/values with leading paths of /ai, /discord, /docs, /lab,
-//     /learn and /play with a subdomain instead, so /docs/foo with
-//     docs.<domain>/foo
-//   - Rename .css, .js and .wasm files to include a short-sha of the SHA256
-//     of the contents of the file and update any references to those files
-//     in .html files to include the filename with the short-sha. This is to
-//     perform cache busting when the files change.
+//   - Replace href/values with leading paths of /SUBDOMAIN, path with /, e.g. for
+//     SUBDOMAIN "learn" /learn/banana becomes /banana. Replace all paths to subdomain
+//     as above for "apex" subdomain.
+//   - Rename .css, .js and .wasm files to include a short-sha of the SHA256 of the
+//     contents of the file and update any references to those files in .html
+//     files to include the filename with the short-sha. This is to perform
+//     cache busting when the files change.
 //   - Update the importmap in .html files to include the short-sha in the
 //     javascript imports.
 //     e.g. "./module/editor.js": "./module/editor.js"
@@ -46,6 +46,7 @@ import (
 type app struct {
 	CacheBust bool   `help:"Rename .css, .js, and .wasm files to include short hash"`
 	Domain    string `help:"Rewrite top-level paths to subdomains"`
+	SubDomain string `help:"Skip URL rewrites for subdomain. Map /subdomain/PATH paths to /PATH." enum:"apex,ai,discord,docs,learn,play" default:"apex"`
 	SrcDir    string `arg:"" required:""`
 	DestDir   string `arg:"" required:""`
 
@@ -95,7 +96,7 @@ func (a *app) copyTree() error {
 
 		switch mode := d.Type() & fs.ModeType; mode {
 		case fs.ModeDir:
-			return os.Mkdir(destfile, 0o777)
+			return os.MkdirAll(destfile, 0o777)
 		case fs.ModeSymlink:
 			if err := checkSymlink(srcfile); err != nil {
 				return err
@@ -234,8 +235,7 @@ func copyFile(src, dest string) error {
 }
 
 var (
-	subdomainRE = regexp.MustCompile(`(href|value)="/(ai|discord|docs|lab|learn|play)`)
-	apexRE      = regexp.MustCompile(`(href|value)="/`) // Needs to come *after* subdomainRE replacements.
+	apexRE      = regexp.MustCompile(`(href|value)="/"`) // Needs to come *after* subdomainRE replacements.
 	jscssRefRE  = regexp.MustCompile(`(href|src)="(.*\.(?:css|js))"`)
 	importmapRE = regexp.MustCompile(`"(.*\.js)": "(.*\.js)"`)
 	wasmmapRE   = regexp.MustCompile(`"(.*\.wasm)": "(.*\.wasm)"`)
@@ -256,13 +256,20 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 	inImportmap := false
 	inWASMImports := false
 	scanner := bufio.NewScanner(r)
+	subDomainRE := newSubDomainRE(a.SubDomain)
+	subApexRE := newSubApexRE(a.SubDomain)
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Rewrite top-level path to subdomain reference
+		// Rewrite top-level path stating with /subdomain/ to /
+		if a.SubDomain != "apex" {
+			line = subApexRE.ReplaceAllString(line, `$1="/`)
+		}
+
+		// Rewrite top-level path to subDomain reference
 		if a.Domain != "" {
-			line = subdomainRE.ReplaceAllString(line, `$1="https://$2.`+a.Domain)
-			line = apexRE.ReplaceAllString(line, `$1="https://`+a.Domain+"/")
+			line = subDomainRE.ReplaceAllString(line, `$1="https://$2.`+a.Domain)
+			line = apexRE.ReplaceAllString(line, `$1="https://`+a.Domain+`/"`)
 		}
 
 		if a.CacheBust {
@@ -295,6 +302,27 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 		}
 	}
 	return scanner.Err()
+}
+
+func newSubDomainRE(subDomain string) *regexp.Regexp {
+	if subDomain == "apex" {
+		return regexp.MustCompile(`(href|value)="/(ai|discord|docs|learn|play)`)
+	}
+	var subs []string
+	for _, s := range []string{"ai", "discord", "docs", "learn", "play"} {
+		if s != subDomain {
+			subs = append(subs, s)
+		}
+	}
+	subDomains := strings.Join(subs, "|")
+	return regexp.MustCompile(`(href|value)="/(` + subDomains + `)`)
+}
+
+func newSubApexRE(subDomain string) *regexp.Regexp {
+	if subDomain == "apex" {
+		return nil
+	}
+	return regexp.MustCompile(`(href|value)="/` + subDomain + "/")
 }
 
 func updateRefs(filename, line string, renamedFiles map[string]string) string {

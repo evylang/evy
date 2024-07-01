@@ -1,0 +1,23 @@
+<h2><a id="theme-launch-" href="#theme-launch-" class="anchor">#</a>Theme: Launch 🚀</h2>
+<ul>
+  <li>
+    The <strong>Evy language</strong> is now complete and available for use in the browser and
+    command-line environments.<br />
+    <a href="/play">Try It Out</a>!
+  </li>
+  <li>
+    The <strong>Evy playground</strong> is now complete, as per the
+    <a href="https://drive.google.com/file/d/1yFJlt38oykjPNTgRYgcO1YkO90fSsEuW/view?usp=sharing"
+      >design spec</a
+    >.<br />
+    Thank you <a href="https://twitter.com/jasonstrachan">Jason</a> for donating the graphic design
+    💝!
+  </li>
+  <li>
+    <strong>Documentation</strong> for the Evy language and built-ins is now complete. For more
+    information see:<br />
+    <a href="/docs">Overview</a> |
+    <a href="https://github.com/evylang/evy/blob/main/docs/spec.md">Language specification</a> |
+    <a href="https://github.com/evylang/evy/blob/main/docs/builtins.md">Built-ins documentation</a>
+  </li>
+</ul>

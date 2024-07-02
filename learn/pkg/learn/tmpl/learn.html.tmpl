@@ -54,24 +54,26 @@
         <header class="topnav mobile">
           <button class="icon-close sidebar-close" id="sidebar-close"></button>
         </header>
-        {{.Sidebar}}
-        <ul class="icons">
-          <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
-          <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
-          <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
-          <li>
-            <label class="theme switch">
-              <input type="checkbox" id="dark-theme" checked />
-              <span class="slider"></span>
-              <script>
-                // Inline JS to avoid flash of other theme.
-                if (window.localStorage.getItem("theme") === "light") {
-                  document.querySelector("#dark-theme").checked = false
-                }
-              </script>
-            </label>
-          </li>
-        </ul>
+        <div class="sidebar-content">
+          {{.Sidebar}}
+          <ul class="icons">
+            <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
+            <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
+            <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
+            <li>
+              <label class="theme switch">
+                <input type="checkbox" id="dark-theme" checked />
+                <span class="slider"></span>
+                <script>
+                  // Inline JS to avoid flash of other theme.
+                  if (window.localStorage.getItem("theme") === "light") {
+                    document.querySelector("#dark-theme").checked = false
+                  }
+                </script>
+              </label>
+            </li>
+          </ul>
+        </div>
       </nav>
     {{end}}
 

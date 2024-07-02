@@ -47,11 +47,6 @@ li::marker {
 
 .sidebar {
   grid-area: sidebar;
-  background-color: var(--background-dimmed);
-  border-right: 1px solid var(--border-color);
-  height: 100%;
-  overflow: auto;
-  padding-bottom: 40px;
 }
 
 #hamburger {

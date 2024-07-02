@@ -148,7 +148,7 @@ conform: install
 doc: doctest godoc toc usage
 
 DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
-DOCTESTS = docs/builtins.md docs/spec.md docs/syntax_by_example.md
+DOCTESTS = docs/builtins.md docs/spec.md docs/syntax-by-example.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 

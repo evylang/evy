@@ -10,7 +10,7 @@
 </p>
 <p>
   To get an intuitive understanding of Evy, you can either look at its
-  <a href="syntax_by_example.html">syntax by example</a> or read through the
+  <a href="syntax-by-example.html">syntax by example</a> or read through the
   <a href="builtins.html">built-ins documentation</a>.
 </p>
 <h2><a id="syntax-grammar" href="#syntax-grammar" class="anchor">#</a>Syntax Grammar</h2>

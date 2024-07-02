@@ -77,6 +77,9 @@ for (const baseURL of baseURLs) {
         if (!url.startsWith(baseURL)) {
           return
         }
+        if (url.endsWith(".pdf")) {
+          return
+        }
         await page.goto(url)
         await page.locator(".topnav.doc")
         const urls = await page.$$eval("a", (elements) => elements.map((el) => el.href))

@@ -11,7 +11,7 @@
 <p>
   For a more formal definition of the Evy syntax, see the
   <a href="spec.html">Language Specification</a>, and for an intuitive understanding see
-  <a href="syntax_by_example.html">syntax by example</a>.
+  <a href="syntax-by-example.html">syntax by example</a>.
 </p>
 <h2><a id="input-and-output" href="#input-and-output" class="anchor">#</a>Input and Output</h2>
 <h3><a id="print" href="#print" class="anchor">#</a><code>print</code></h3>

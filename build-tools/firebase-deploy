@@ -22,6 +22,7 @@ main() {
 		domain=$(get_domain "${environ}")
 		go run ./build-tools/site-gen --cache-bust --domain="${domain}" frontend out/firebase/public/apex
 		go run ./build-tools/site-gen --cache-bust --domain="${domain}" --sub-domain=learn frontend/learn out/firebase/public/learn
+		go run ./build-tools/site-gen --cache-bust --domain="${domain}" --sub-domain=docs frontend/docs out/firebase/public/docs
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
 		on_ci && make_env_urls "${environ}" >>"$GITHUB_ENV"
@@ -30,6 +31,7 @@ main() {
 
 	go run ./build-tools/site-gen frontend out/firebase/public/apex
 	go run ./build-tools/site-gen --sub-domain=learn frontend/learn out/firebase/public/learn
+	go run ./build-tools/site-gen --sub-domain=docs frontend/docs out/firebase/public/docs
 	# `firebase hosting:channel:deploy` must be used with preview/non-live channels
 	result=$(firebase --json --config out/firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
 	check_deploy_error "${result}"

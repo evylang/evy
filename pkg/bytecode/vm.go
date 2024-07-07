@@ -94,7 +94,7 @@ func (vm *VM) Run() error {
 			idx := ReadUint16(ins[ip+1:])
 			frame := vm.currentFrame()
 			vm.currentFrame().ip += 2
-			vm.stack[frame.base+int(idx)] = vm.peek(0)
+			vm.stack[frame.base+int(idx)] = vm.pop()
 		case OpAdd:
 			right, left := vm.popBinaryNums()
 			err = vm.push(numVal(left + right))

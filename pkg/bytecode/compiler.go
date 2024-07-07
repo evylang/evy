@@ -287,7 +287,11 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if err := c.emit(OpNone); err != nil {
 			return err
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		code := OpSetLocal
+		if symbol.Scope == GlobalScope {
+			code = OpSetGlobal
+		}
+		if err := c.emit(code, symbol.Index); err != nil {
 			return err
 		}
 	}
@@ -310,7 +314,11 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		code := OpSetLocal
+		if symbol.Scope == GlobalScope {
+			code = OpSetGlobal
+		}
+		if err := c.emit(code, symbol.Index); err != nil {
 			return err
 		}
 	}

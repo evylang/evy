@@ -298,11 +298,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if err := c.emit(OpNone); err != nil {
 			return err
 		}
-		code := OpSetLocal
-		if symbol.Scope == GlobalScope {
-			code = OpSetGlobal
-		}
-		if err := c.emit(code, symbol.Index); err != nil {
+		if err := c.emitSymbol(symbol); err != nil {
 			return err
 		}
 	}
@@ -325,11 +321,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
 		}
-		code := OpSetLocal
-		if symbol.Scope == GlobalScope {
-			code = OpSetGlobal
-		}
-		if err := c.emit(code, symbol.Index); err != nil {
+		if err := c.emitSymbol(symbol); err != nil {
 			return err
 		}
 	}
@@ -506,10 +498,7 @@ func (c *Compiler) compileDecl(decl *parser.Decl) error {
 		return err
 	}
 	symbol := c.symbolTable.Define(decl.Var.Name)
-	if symbol.Scope == GlobalScope {
-		return c.emit(OpSetGlobal, symbol.Index)
-	}
-	return c.emit(OpSetLocal, symbol.Index)
+	return c.emitSymbol(symbol)
 }
 
 func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
@@ -522,11 +511,7 @@ func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, target.Name)
 		}
-		if symbol.Scope == GlobalScope {
-			return c.emit(OpSetGlobal, symbol.Index)
-		} else {
-			return c.emit(OpSetLocal, symbol.Index)
-		}
+		return c.emitSymbol(symbol)
 	case *parser.IndexExpression:
 		if err := c.Compile(target.Left); err != nil {
 			return err
@@ -643,4 +628,13 @@ func (c *Compiler) enterScope() {
 
 func (c *Compiler) leaveScope() {
 	c.symbolTable = c.symbolTable.Outer
+}
+
+// emitSymbol will emit an OpSetLocal or an OpSetGlobal depending upon
+// the scope of the provided symbol.
+func (c *Compiler) emitSymbol(symbol Symbol) error {
+	if symbol.Scope == GlobalScope {
+		return c.emit(OpSetGlobal, symbol.Index)
+	}
+	return c.emit(OpSetLocal, symbol.Index)
 }

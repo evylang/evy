@@ -28,7 +28,10 @@ var (
 // Compiler is responsible for turning a parsed evy program into
 // bytecode.
 type Compiler struct {
-	constants    []value
+	constants []value
+	// functions is a globally unique map of function names to their
+	// corresponding index in the constants
+	functions    map[string]int
 	instructions Instructions
 	symbolTable  *SymbolTable
 	// breaks tracks the positions of break statements in the inner-most loop.
@@ -43,7 +46,10 @@ type Bytecode struct {
 
 // NewCompiler returns a new compiler.
 func NewCompiler() *Compiler {
-	return &Compiler{symbolTable: NewSymbolTable()}
+	return &Compiler{
+		functions:   map[string]int{},
+		symbolTable: NewSymbolTable(),
+	}
 }
 
 // Compile accepts an AST node and renders it to bytecode internally.
@@ -562,30 +568,14 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 }
 
 func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
-	c.enterScope()
-	start := len(c.instructions)
-	for _, param := range call.FuncDef.Params {
-		c.symbolTable.Define(param.Name)
+	fnIdx, err := c.compileFuncDef(call.FuncDef)
+	if err != nil {
+		return err
+	}
+	if err := c.emit(OpConstant, fnIdx); err != nil {
+		return err
 	}
 	variadic := call.FuncDef.VariadicParam
-	if variadic != nil {
-		c.symbolTable.Define(variadic.Name)
-	}
-	if err := c.Compile(call.FuncDef.Body); err != nil {
-		return err
-	}
-	numLocals := c.symbolTable.numLocals()
-	c.leaveScope()
-	// reset the bytecode
-	compiledFn := funcVal{
-		Instructions: make(Instructions, len(c.instructions)-start),
-		NumLocals:    numLocals,
-	}
-	copy(compiledFn.Instructions, c.instructions[start:])
-	c.instructions = c.instructions[:start]
-	if err := c.emit(OpConstant, c.addConstant(compiledFn)); err != nil {
-		return err
-	}
 	if variadic == nil {
 		for _, arg := range call.Arguments {
 			if err := c.Compile(arg); err != nil {
@@ -605,6 +595,43 @@ func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
 	}
 	// there is now only one argument; the array
 	return c.emit(OpCall, 1)
+}
+
+// compileFuncDef compiles the function definition and returns an
+// index to the compiled function inside the constants array.
+func (c *Compiler) compileFuncDef(def *parser.FuncDefStmt) (int, error) {
+	// do not recompile the function definition if it already exists
+	if fnIdx, exists := c.functions[def.Name]; exists {
+		return fnIdx, nil
+	}
+	// create a placeholder in constants in case of a recursive function
+	// call that needs to refer to itself inside def.Body
+	fnIdx := c.addConstant(noneVal{})
+	c.functions[def.Name] = fnIdx
+	c.enterScope()
+	start := len(c.instructions)
+	for _, param := range def.Params {
+		c.symbolTable.Define(param.Name)
+	}
+	variadic := def.VariadicParam
+	if variadic != nil {
+		c.symbolTable.Define(variadic.Name)
+	}
+	if err := c.Compile(def.Body); err != nil {
+		return 0, err
+	}
+	numLocals := c.symbolTable.numLocals()
+	c.leaveScope()
+	// reset the bytecode
+	compiledFn := funcVal{
+		Instructions: make(Instructions, len(c.instructions)-start),
+		NumLocals:    numLocals,
+	}
+	copy(compiledFn.Instructions, c.instructions[start:])
+	c.instructions = c.instructions[:start]
+	// write compiled function into empty slot in constants
+	c.constants[fnIdx] = compiledFn
+	return fnIdx, nil
 }
 
 func (c *Compiler) compileReturn(stmt *parser.ReturnStmt) error {

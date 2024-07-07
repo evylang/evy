@@ -1075,9 +1075,22 @@ func TestFunctions(t *testing.T) {
 				end
 				return total
 			end
-			x := (sum 1 3)
+			x := (sum 1 3) + (sum 2 4)
 			`,
-			wantStackTop: makeValue(t, 4),
+			wantStackTop: makeValue(t, 10),
+		},
+		{
+			name: "recursive",
+			input: `
+			func factorial:num n:num
+				if (n == 0)
+					return 1
+				end
+				return n * (factorial (n - 1))
+			end
+			x := (factorial 4)
+			`,
+			wantStackTop: makeValue(t, 24),
 		},
 	}
 	for _, tt := range tests {

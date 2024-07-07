@@ -73,6 +73,8 @@ func (c *Compiler) Compile(node parser.Node) error {
 		return c.compileForStatement(node)
 	case *parser.FuncCall:
 		return c.compileFuncCall(node)
+	case *parser.FuncCallStmt:
+		return c.compileFuncCall(node.FuncCall)
 	case *parser.ReturnStmt:
 		return c.compileReturn(node)
 	case *parser.IfStmt:

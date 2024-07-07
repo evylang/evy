@@ -1092,6 +1092,20 @@ func TestFunctions(t *testing.T) {
 			`,
 			wantStackTop: makeValue(t, 24),
 		},
+		{
+			name: "bare return",
+			input: `x := 1
+			func bare a:num
+				if a == 0
+					return
+				end
+				x = 2
+			end
+			bare 0
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

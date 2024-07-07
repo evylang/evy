@@ -322,7 +322,6 @@ func (vm *VM) Run() error {
 			// to be stored in
 			vm.sp = frame.base + fn.NumLocals
 		case OpReturn:
-			// TODO: empty returns
 			retVal := vm.pop()
 			frame := vm.popFrame()
 			vm.sp = frame.base - 1

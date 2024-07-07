@@ -567,6 +567,10 @@ func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
 	for _, param := range call.FuncDef.Params {
 		c.symbolTable.Define(param.Name)
 	}
+	variadic := call.FuncDef.VariadicParam
+	if variadic != nil {
+		c.symbolTable.Define(variadic.Name)
+	}
 	if err := c.Compile(call.FuncDef.Body); err != nil {
 		return err
 	}
@@ -582,12 +586,25 @@ func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
 	if err := c.emit(OpConstant, c.addConstant(compiledFn)); err != nil {
 		return err
 	}
-	for _, arg := range call.Arguments {
-		if err := c.Compile(arg); err != nil {
-			return err
+	if variadic == nil {
+		for _, arg := range call.Arguments {
+			if err := c.Compile(arg); err != nil {
+				return err
+			}
 		}
+		return c.emit(OpCall, len(call.Arguments))
 	}
-	return c.emit(OpCall, len(call.Arguments))
+	// a variadic param cannot be mixed with other params, so all
+	// arguments are condensed into this array
+	varArg := &parser.ArrayLiteral{
+		Elements: call.Arguments,
+		T:        variadic.T,
+	}
+	if err := c.Compile(varArg); err != nil {
+		return err
+	}
+	// there is now only one argument; the array
+	return c.emit(OpCall, 1)
 }
 
 func (c *Compiler) compileReturn(stmt *parser.ReturnStmt) error {

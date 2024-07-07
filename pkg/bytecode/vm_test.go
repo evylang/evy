@@ -1065,6 +1065,20 @@ func TestFunctions(t *testing.T) {
 			`,
 			wantStackTop: makeValue(t, 1),
 		},
+		{
+			name: "variadic arg",
+			input: `
+			func sum:num args:num...
+				total := 0
+				for arg := range args
+					total = total + arg
+				end
+				return total
+			end
+			x := (sum 1 3)
+			`,
+			wantStackTop: makeValue(t, 4),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

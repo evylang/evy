@@ -54,6 +54,9 @@ func NewCompiler() *Compiler {
 
 // Compile accepts an AST node and renders it to bytecode internally.
 func (c *Compiler) Compile(node parser.Node) error {
+	if node == nil {
+		return c.emit(OpNone)
+	}
 	switch node := node.(type) {
 	case *parser.Program:
 		return c.compileProgram(node)
@@ -467,22 +470,13 @@ func (c *Compiler) compileSliceExpression(expr *parser.SliceExpression) error {
 	if err = c.Compile(expr.Left); err != nil {
 		return err
 	}
-	if err = c.compileOrEmitNone(expr.Start); err != nil {
+	if err = c.Compile(expr.Start); err != nil {
 		return err
 	}
-	if err = c.compileOrEmitNone(expr.End); err != nil {
+	if err = c.Compile(expr.End); err != nil {
 		return err
 	}
 	return c.emit(OpSlice)
-}
-
-// compilerOrEmitNone will emit OpNone if the provided parser node is
-// nil. If the node is not nil then it will be compiled as normal.
-func (c *Compiler) compileOrEmitNone(node parser.Node) error {
-	if node != nil {
-		return c.Compile(node)
-	}
-	return c.emit(OpNone)
 }
 
 func (c *Compiler) compileUnaryExpression(expr *parser.UnaryExpression) error {

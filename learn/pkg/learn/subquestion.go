@@ -55,7 +55,8 @@ func newSubQuestion(m *QuestionModel, question, filename string, txtarEvyFile []
 	model.Doc = m.Doc
 	model.ResultType = m.ResultType
 	model.AnswerChoices = m.AnswerChoices
-	model.answerList = m.answerList
+	model.AnswerText = m.AnswerText
+	model.answerBlock = m.answerBlock
 
 	fm := *m.Frontmatter
 	fm.Answer = question
@@ -64,12 +65,35 @@ func newSubQuestion(m *QuestionModel, question, filename string, txtarEvyFile []
 	model.parentQuestion = m
 	questionRenderer := newRendererFromEvyBytes(txtarEvyFile, resultType)
 	model.Question = questionRenderer
+	if m.AnswerText != nil {
+		if evySource, ok := questionRenderer.(*evySource); ok {
+			// Generate output of evy program as target answer.
+			fm.Answer = evySource.RenderOutput()
+		} else {
+			// Use initial evy source string from text tar file as target answer.
+			// The program's output is the question.
+			fm.Answer = string(txtarEvyFile)
+		}
+
+		if txtarContent, ok := m.AnswerText.(*txtarContent); ok {
+			for _, file := range txtarContent.archive.Files {
+				if question == baseNoExt(file.Name) {
+					model.AnswerText = newRendererFromEvyBytes(file.Data, txtarContent.ResultType)
+				}
+			}
+		}
+	}
 	model.embeds = maps.Clone(m.embeds)
 	for block, renderer := range model.embeds {
 		if renderer == m.Question {
 			// Update txtarContent renderer to specific txtar file, e.g.
 			// `-- a.evy --` for which we are generating a new sub question.
 			model.embeds[block] = questionRenderer
+		}
+		if renderer == m.AnswerText {
+			// Update txtarContent renderer to specific txtar file, e.g.
+			// `-- a.evy --` for which we are generating a new sub question.
+			model.embeds[block] = model.AnswerText
 		}
 	}
 	return model

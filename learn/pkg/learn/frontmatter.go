@@ -14,7 +14,7 @@ type (
 
 var (
 	validFrontmatterTypes = []string{"course", "unit", "unittest", "quiz", "exercise", "question"}
-	validAnswerTypes      = []string{"single-choice", "multiple-choice", "free-text", "multiple-free-texts", "program"}
+	validAnswerTypes      = []string{"single-choice", "multiple-choice", "text", "multiple-texts", "program"}
 	validDifficulties     = []string{"easy", "medium", "hard", "retriable"}
 	validVerifications    = []string{"match" /* default */, "none", "parse-error", "no-parse-error"}
 )

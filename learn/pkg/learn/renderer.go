@@ -38,8 +38,8 @@ const (
 	SVGOutput
 )
 
-// NewRenderer converts a markdown code block, image or link into an
-// Renderer.
+// AsRenderer converts a markdown code block, image or link into a Renderer if
+// possible.
 //
 // Markdown code blocks with an `evy` info tag are interpreted as Evy source
 // code that can generate text or image/SVG output. Code blocks with an empty
@@ -56,8 +56,8 @@ const (
 //	evy:source | evy:svg | evy:text
 //
 // Code blocks, links and images that don't meet the conditions listed above
-// are ignored. In this case NewRenderer returns nil, nil.
-func NewRenderer(block markdown.Block, field fieldType, filename string) (Renderer, error) {
+// are ignored. In this case AsRenderer returns nil, nil.
+func AsRenderer(block markdown.Block, field fieldType, filename string) (Renderer, error) {
 	if cb, ok := block.(*markdown.CodeBlock); ok {
 		return rendererFromCodeblock(cb)
 	}
@@ -95,8 +95,8 @@ func rendererFromInline(inline markdown.Inline, field fieldType, filename string
 		if err != nil {
 			return nil, fmt.Errorf("%w (link: %s)", err, inlineToString(link))
 		}
-		filename := filepath.Join(filepath.Dir(filename), link.URL)
-		return newRendererFromEvyFile(filename, ResultType)
+		targetFilename := filepath.Join(filepath.Dir(filename), link.URL)
+		return newRendererFromEvyFile(targetFilename, ResultType)
 	}
 	if inlineCode, ok := inline.(*markdown.Code); ok {
 		content := inlineCode.Text + "\n"
@@ -178,8 +178,17 @@ func (s *evySource) RenderOutput() string {
 // RenderHTML prints evy source code.
 func (s *evySource) RenderHTML(buf *bytes.Buffer) {
 	buf.WriteString(`<pre><code class="language-evy">`)
-	buf.WriteString(s.source)
+	buf.WriteString(removeCommentTags(s.source))
 	buf.WriteString("</code></pre>\n")
+}
+
+func removeCommentTags(s string) string {
+	lines := strings.Split(s, "\n")
+	trimmedLines := make([]string, len(lines))
+	for i, line := range lines {
+		trimmedLines[i] = strings.TrimSuffix(line, " //levy:blank")
+	}
+	return strings.Join(trimmedLines, "\n")
 }
 
 func newTxtarContent(filename string, resultType ResultType) (Renderer, error) {

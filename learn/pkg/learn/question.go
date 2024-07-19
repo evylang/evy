@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 
 	"evylang.dev/evy/pkg/md"
@@ -25,12 +26,15 @@ type QuestionModel struct {
 	Doc         *markdown.Document
 	Frontmatter *questionFrontmatter
 
-	Question      Renderer
-	AnswerChoices []Renderer
-	ResultType    ResultType
+	Question   Renderer
+	ResultType ResultType
 
-	embeds     map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
-	answerList markdown.Block              // use to output checkbox or radio buttons for List in HTML
+	// AnswerType determines model of choice vs text
+	AnswerChoices []Renderer
+	AnswerText    Renderer
+
+	embeds      map[markdown.Block]Renderer // use to replace markdown Link or Image with codeBlock or inline SVG
+	answerBlock markdown.Block              // use to output checkbox, radio buttons for choice questions, textarea for text questions
 
 	subQuestions   []*QuestionModel // Derived questions, generated from txtar question and links.
 	parentQuestion *QuestionModel   // Initial Model from which sub-question was generated.
@@ -56,9 +60,9 @@ func NewQuestionModel(filename string, options ...Option) (*QuestionModel, error
 		configurableModel: newConfigurableModel(filename, options),
 	}
 	if err := question.parseFrontmatterMD(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
 	}
-	if err := question.buildQuestionModelForChoice(); err != nil {
+	if err := question.buildQuestionModel(); err != nil {
 		return nil, fmt.Errorf("%w (%s)", err, question.Filename())
 	}
 	subs, err := newSubQuestions(question)
@@ -144,11 +148,13 @@ func (m *QuestionModel) PrintHTML(buf *bytes.Buffer, withAnswersMarked bool) err
 		embed, ok := m.embeds[block]
 		var err error
 		switch {
-		case block == m.answerList && m.isSubQuestion():
+		case block == m.answerBlock && m.Frontmatter.AnswerType == "text":
+			err = m.printTextAnswerHTML(buf, withAnswersMarked)
+		case block == m.answerBlock && m.isSubQuestion():
 			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
-		case block == m.answerList && m.isParserErrorQuestion():
+		case block == m.answerBlock && m.isParserErrorQuestion():
 			err = m.printTxtarAnswerChoicesHTML(buf, withAnswersMarked)
-		case block == m.answerList && !m.isSubQuestion():
+		case block == m.answerBlock:
 			err = m.printAnswerChoicesHTML(block.(*markdown.List), buf, withAnswersMarked)
 		case ok: // question block (answers are covered in the cases above)
 			embed.RenderHTML(buf)
@@ -244,6 +250,46 @@ func (m *QuestionModel) printTxtarAnswerChoicesHTML(buf *bytes.Buffer, withAnswe
 	return nil
 }
 
+func (m *QuestionModel) printTextAnswerHTML(buf *bytes.Buffer, withAnswersMarked bool) error {
+	content, err := m.answerContent(withAnswersMarked)
+	if err != nil {
+		return err
+	}
+	lineCount := strconv.Itoa(strings.Count(content, "\n") + 1)
+	buf.WriteString(`<textarea name="answer" rows="` + lineCount + `" cols="35">` + "\n")
+	buf.WriteString(content)
+	buf.WriteString("</textarea>\n")
+	return nil
+}
+
+func (m *QuestionModel) answerContent(withAnswersMarked bool) (string, error) {
+	if !withAnswersMarked {
+		if evySrc, ok := m.AnswerText.(*evySource); ok {
+			return removeCommentTaggedLines(evySrc.source), nil
+		}
+		return m.AnswerText.RenderOutput(), nil
+	}
+	answer, err := m.Frontmatter.getAnswer(m.privateKey)
+	if err != nil {
+		return "", fmt.Errorf("%w: (%s)", err, m.Filename())
+	}
+	content := removeCommentTags(answer.Text)
+	if !strings.HasSuffix(content, "\n") {
+		content += "\n"
+	}
+	return content, nil
+}
+
+func removeCommentTaggedLines(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if strings.HasSuffix(line, " //levy:blank") {
+			lines[i] = ""
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
 func (m *QuestionModel) correctAnswerIndices(withAnswersMarked bool) (map[int]bool, error) {
 	if !withAnswersMarked {
 		return nil, nil
@@ -286,16 +332,38 @@ func (m *QuestionModel) getVerifiedAnswer() (Answer, error) {
 }
 
 func (m *QuestionModel) verifyMatch(answer Answer) error {
+	switch m.Frontmatter.AnswerType {
+	case "single-choice", "multiple-choice":
+		return m.verifyChoiceMatch(answer)
+	case "text":
+		return m.verifyTextMatch(answer)
+	}
+	return fmt.Errorf("%w: verify match: unimplemented answer type %q", ErrInvalidFrontmatter, m.Frontmatter.AnswerType)
+}
+
+func (m *QuestionModel) verifyChoiceMatch(answer Answer) error {
 	correctByIndex := answer.correctAnswerIndices()
 	generated := m.Question.RenderOutput()
 	outputs := generateAnserOutputs(m.AnswerChoices)
 	for i, output := range outputs {
 		if correctByIndex[i] && generated != output {
-			return fmt.Errorf("%w: %s: answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w (%s): answer %q does not match question: %q != %q", ErrWrongAnswer, m.Filename(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
 		if !correctByIndex[i] && generated == output {
-			return fmt.Errorf("%w: %s: expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
+			return fmt.Errorf("%w (%s): expected %q: answer %q matches question: %q == %q", ErrWrongAnswer, m.Filename(), answer.correctAnswers(), indexToLetter(i), strings.TrimSuffix(output, "\n"), strings.TrimSuffix(generated, "\n"))
 		}
+	}
+	return nil
+}
+
+func (m *QuestionModel) verifyTextMatch(answer Answer) error {
+	genFromQuestion := strings.TrimSpace(m.Question.RenderOutput())
+	genFromAnswerKey := strings.TrimSpace(answer.Text)
+	if _, ok := m.AnswerText.(*evySource); ok {
+		genFromAnswerKey = strings.TrimSpace(runEvy(genFromAnswerKey, m.ResultType))
+	}
+	if genFromQuestion != genFromAnswerKey {
+		return fmt.Errorf("%w (%s): want != got \nwant:\n%q\ngot:\n%q", ErrWrongAnswer, m.Filename(), genFromQuestion, genFromAnswerKey)
 	}
 	return nil
 }
@@ -358,6 +426,42 @@ func generateParseErrors(t *txtarContent) []bool {
 	return parseErrors
 }
 
+func (m *QuestionModel) buildQuestionModel() error {
+	switch m.Frontmatter.AnswerType {
+	case "single-choice", "multiple-choice":
+		return m.buildQuestionModelForChoice()
+	case "text":
+		return m.buildQuestionModelForText()
+	}
+	return fmt.Errorf("%w: parse question: unimplemented answer type %q", ErrInvalidFrontmatter, m.Frontmatter.AnswerType)
+}
+
+func (m *QuestionModel) buildQuestionModelForText() error {
+	for _, b := range m.Doc.Blocks {
+		if m.Question == nil {
+			if err := m.buildQuestionField(b); err != nil {
+				return err
+			}
+			continue
+		}
+		if m.AnswerText == nil {
+			if err := m.buildAnswerTextField(b); err != nil {
+				return err
+			}
+		}
+	}
+	if m.Question == nil {
+		return fmt.Errorf("%w: found no question", ErrBadMarkdownStructure)
+	}
+	if m.AnswerText == nil {
+		return fmt.Errorf("%w: found no text answer section", ErrBadMarkdownStructure)
+	}
+	if err := m.inferResultType(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // buildQuestionModelForChoice operates on single-choice or multiple-choice question documents
 // and expects the following structure:
 //
@@ -403,7 +507,7 @@ func (m *QuestionModel) buildQuestionField(b markdown.Block) error {
 		return nil
 	}
 	var err error
-	m.Question, err = NewRenderer(b, questionField, m.Filename())
+	m.Question, err = AsRenderer(b, questionField, m.Filename())
 	if err != nil {
 		return err
 	}
@@ -430,7 +534,7 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	for _, item := range list.Items {
 		found := false
 		for _, b := range item.(*markdown.Item).Blocks {
-			renderer, err := NewRenderer(b, answerField, m.Filename())
+			renderer, err := AsRenderer(b, answerField, m.Filename())
 			if err != nil {
 				return err
 			}
@@ -442,7 +546,7 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 			}
 			found = true
 			m.AnswerChoices = append(m.AnswerChoices, renderer)
-			m.answerList = block
+			m.answerBlock = block
 			m.trackBlocksToReplace(b, renderer)
 		}
 	}
@@ -452,6 +556,20 @@ func (m *QuestionModel) buildAnswerChoicesField(block markdown.Block) error {
 	if m.Frontmatter.GenerateQuestions != "" && len(m.AnswerChoices) != 1 {
 		return fmt.Errorf("%w: expected exactly 1 answer for question generation, got %d", ErrBadMarkdownStructure, len(m.AnswerChoices))
 	}
+	return nil
+}
+
+func (m *QuestionModel) buildAnswerTextField(block markdown.Block) error {
+	var err error
+	m.AnswerText, err = AsRenderer(block, answerField, m.Filename())
+	if err != nil {
+		return err
+	}
+	if m.AnswerText == nil {
+		return nil
+	}
+	m.answerBlock = block
+	m.trackBlocksToReplace(block, m.Question)
 	return nil
 }
 
@@ -485,6 +603,9 @@ func escape(s string) string {
 func (m *QuestionModel) inferResultType() error {
 	resultType := UnknownOutput
 	renderers := append([]Renderer{m.Question}, m.AnswerChoices...)
+	if m.AnswerText != nil {
+		renderers = append(renderers, m.AnswerText)
+	}
 	for _, r := range renderers {
 		t := resultTypeFromRenderer(r)
 		if resultType == UnknownOutput {
@@ -520,8 +641,9 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 	if err := m.Frontmatter.validate(); err != nil {
 		return fmt.Errorf("%w (%s)", err, m.Filename())
 	}
-	if m.Frontmatter.AnswerType != "single-choice" && m.Frontmatter.AnswerType != "multiple-choice" {
-		return fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, m.Frontmatter.AnswerType)
+	answerType := m.Frontmatter.AnswerType
+	if answerType != "single-choice" && answerType != "multiple-choice" && answerType != "text" {
+		return fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, answerType)
 	}
 	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
 	m.Doc = parser.Parse(m.rawMD)

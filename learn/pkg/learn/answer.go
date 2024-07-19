@@ -42,9 +42,9 @@ func NewAnswer(answerType answerType, text string) (Answer, error) {
 			return Answer{}, fmt.Errorf("invalid multiple-choice answer: %w", err)
 		}
 		a.Multi = multi
-	case "free-text":
+	case "text":
 		a.Text = text
-	case "multiple-free-text":
+	case "multiple-texts":
 		a.Texts = splitTrim(text)
 	case "program":
 		a.Program = text
@@ -104,8 +104,8 @@ func (key AnswerKey) merge(answerKey AnswerKey) {
 // Type returns the type of the answer, one of:
 // - single-choice
 // - multiple-choice
-// - free-text
-// - multiple-free-text
+// - text
+// - multiple-texts
 // - program.
 func (a Answer) Type() string {
 	switch {
@@ -114,9 +114,9 @@ func (a Answer) Type() string {
 	case len(a.Multi) > 0:
 		return "multiple-choice"
 	case a.Text != "":
-		return "free-text"
+		return "text"
 	case len(a.Texts) > 0:
-		return "multiple-free-text"
+		return "multiple-texts"
 	case a.Program != "":
 		return "program"
 	}

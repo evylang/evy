@@ -23,6 +23,11 @@
           "source": "/evy-2401.pdf",
           "destination": "https://raw.githubusercontent.com/evylang/evy/v0.1.25/docs/papers/evy-2401.pdf",
           "type": 301
+        },
+        {
+          "source": "/l/circle-challenge",
+          "destination": "https://docs.google.com/presentation/d/1lpp6Mn7fdOqWe9kFAYxiyfy5b8HGrqlQHOvjBU_0xwk/edit#slide=id.g1f1a64b624b_0_57",
+          "type": 301
         }
       ],
       "rewrites": [
@@ -43,6 +48,10 @@
     {
       "target": "docs",
       "public": "public/docs"
+    },
+    {
+      "target": "lab",
+      "public": "public/lab"
     },
     {
       "target": "learn",

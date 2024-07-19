@@ -1,0 +1,12 @@
+// Can you change this program to
+// print the odd number from 1..20
+// and sleep 0.2 seconds?
+
+i:num
+
+while i < 10
+    print i
+    sleep 0.5 // wait 0.5 seconds
+    i = i + 1
+end
+

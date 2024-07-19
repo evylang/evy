@@ -4,13 +4,13 @@
 //
 // When deploying to firebase (any other hosting site), we need to make a few
 // changes to the HTML, CSS and JS files in the site:
-//   - Replace href/values with leading paths of /ai, /discord, /docs, /learn
-//     and /play with a subdomain instead, so /docs/foo with
+//   - Replace href/values with leading paths of /ai, /discord, /docs, /lab,
+//     /learn and /play with a subdomain instead, so /docs/foo with
 //     docs.<domain>/foo
-//   - Rename .css, .js and .wasm files to include a short-sha of the SHA256 of the
-//     contents of the file and update any references to those files in .html
-//     files to include the filename with the short-sha. This is to perform
-//     cache busting when the files change.
+//   - Rename .css, .js and .wasm files to include a short-sha of the SHA256
+//     of the contents of the file and update any references to those files
+//     in .html files to include the filename with the short-sha. This is to
+//     perform cache busting when the files change.
 //   - Update the importmap in .html files to include the short-sha in the
 //     javascript imports.
 //     e.g. "./module/editor.js": "./module/editor.js"
@@ -234,7 +234,7 @@ func copyFile(src, dest string) error {
 }
 
 var (
-	subdomainRE = regexp.MustCompile(`(href|value)="/(ai|discord|docs|learn|play)`)
+	subdomainRE = regexp.MustCompile(`(href|value)="/(ai|discord|docs|lab|learn|play)`)
 	apexRE      = regexp.MustCompile(`(href|value)="/`) // Needs to come *after* subdomainRE replacements.
 	jscssRefRE  = regexp.MustCompile(`(href|src)="(.*\.(?:css|js))"`)
 	importmapRE = regexp.MustCompile(`"(.*\.js)": "(.*\.js)"`)
@@ -243,9 +243,9 @@ var (
 
 // updateHTMLFile reads an HTML file from `r` and writes it to `w` making the
 // following alterations:
-//   - href and value attributes referencing /ai, /discord, /docs, /learn and /play
-//     are transformed to top-level domains - ai.<domain>, discord.<domain>,
-//     etc.
+//   - href and value attributes referencing /ai, /discord, /docs, /lab,
+//     /learn and /play are transformed to top-level domains - ai.<domain>,
+//     discord.<domain>, etc.
 //   - href and src attributes referencing .css or .js files that have been
 //     renamed to include their hash are updated to that name with the hash
 //   - The .js files referenced in an importmap are updated if the referenced

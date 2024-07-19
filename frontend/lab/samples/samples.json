@@ -1,0 +1,17 @@
+{
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome", "title": "👋🚀 Welcome" },
+        { "id": "coords", "title": "🎯 Coordinates" },
+        { "id": "circles", "title": "🟢🔵 Circles" },
+        { "id": "var", "title": "🧮 Variables" },
+        { "id": "loop", "title": "🎢 Loops" },
+        { "id": "move", "title": "🟣🚚 Moving Dot" }
+      ]
+    }
+  ]
+}

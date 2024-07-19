@@ -52,7 +52,7 @@ type exerciseFrontmatter struct {
 func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
 	md.Walk(m.Doc, md.RewriteLink)
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	printComposition(buf, m.Frontmatter.Composition)
 	for _, d := range validDifficulties {
 		for _, question := range m.QuestionsByDifficulty[d] {

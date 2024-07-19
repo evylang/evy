@@ -62,7 +62,7 @@ func (m *UnitModel) ToHTML(_ bool) (string, error) {
 		return "", err
 	}
 	for _, block := range m.Doc.Blocks[1:] {
-		block.PrintHTML(buf)
+		printHTML(block, buf)
 	}
 	return buf.String(), nil
 }

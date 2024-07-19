@@ -184,11 +184,20 @@ func (s *evySource) RenderHTML(buf *bytes.Buffer) {
 
 func removeCommentTags(s string) string {
 	lines := strings.Split(s, "\n")
-	trimmedLines := make([]string, len(lines))
 	for i, line := range lines {
-		trimmedLines[i] = strings.TrimSuffix(line, " //levy:blank")
+		lines[i] = strings.TrimSuffix(line, " //levy:blank")
 	}
-	return strings.Join(trimmedLines, "\n")
+	return strings.Join(lines, "\n")
+}
+
+func removeTaggedPrint(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if strings.HasSuffix(line, " //levy:blank") && strings.HasPrefix(line, "print ") {
+			lines[i] = "print"
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func newTxtarContent(filename string, resultType ResultType) (Renderer, error) {
@@ -274,6 +283,19 @@ func newRendererFromEvyBytes(b []byte, resultType ResultType) Renderer {
 		return SVGContent(content)
 	case TextOutput:
 		content := runEvy(string(b), TextOutput)
+		return TextContent(content)
+	}
+	return &evySource{source: string(b)}
+}
+
+func newRendererFromEvyBytesWithBlanked(b []byte, resultType ResultType) Renderer {
+	src := string(b)
+	switch resultType {
+	case SVGOutput:
+		content := runEvy(removeTaggedPrint(src), SVGOutput)
+		return SVGContent(content)
+	case TextOutput:
+		content := runEvy(removeTaggedPrint(src), TextOutput)
 		return TextContent(content)
 	}
 	return &evySource{source: string(b)}

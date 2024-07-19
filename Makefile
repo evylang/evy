@@ -19,7 +19,7 @@ lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
 
-check-uptodate: tidy fmt doc docs
+check-uptodate: tidy fmt doc docs learn
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files
@@ -168,21 +168,22 @@ godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
 DOCS_TARGET_DIR = frontend/docs
+LEARN_TARGET_DIR = frontend/learn
 
-## Generate static HTML documentation in frontend/docs from MarkDown in /docs
+## Generate static HTML documentation in frontend/docs from MarkDown in docs
 docs:
 	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
+## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content
+learn: install
+	levy export html --no-self-contained learn/content $(LEARN_TARGET_DIR)
+	npx --prefix $(NODEPREFIX) -y prettier --write $(LEARN_TARGET_DIR)
+
+FIND_GENERATED_CMD = fd --exclude '*.css' --exclude '*.js' --type file --full-path
 clean::
-	find $(DOCS_TARGET_DIR) -mindepth 1 \
-			! -regex '$(DOCS_TARGET_DIR)/css.*' \
-			! -regex '$(DOCS_TARGET_DIR)/img.*' \
-			! -regex '$(DOCS_TARGET_DIR)/module.*' \
-			! -regex '$(DOCS_TARGET_DIR)/favicon.ico' \
-			! -regex '$(DOCS_TARGET_DIR)/404.html' \
-			! -regex '$(DOCS_TARGET_DIR)/index.js' \
-			-delete
+	$(FIND_GENERATED_CMD) frontend/docs --exec rm
+	$(FIND_GENERATED_CMD) frontend/learn --exec rm
 
 test-urls:
 	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \

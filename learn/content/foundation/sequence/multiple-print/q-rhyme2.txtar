@@ -1,0 +1,12 @@
+-- a.evy --
+print "Clever code,"
+print "problems explode."
+-- b.evy --
+print "Every hour:"
+print "pixel power."
+-- c.evy --
+print "Madam Program, never calm, "
+print "uses code as soothing balm."
+-- d.evy --
+print "Cookies remember"
+print "things about you."

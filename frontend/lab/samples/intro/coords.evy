@@ -1,0 +1,77 @@
+// 1. Run this program.
+// 2. Tap the drawing area (canvas).
+// 3. What are the coordinates of the
+//    red dot? 🔴
+// 4. Tap the canvas again for a hint.
+// 5. Tap it again for the answer. 🎯
+
+x:num
+y:num
+drawAxisLabels
+state := "dot"
+
+on down xExact:num yExact:num
+    if state == "dot"
+        x = (round xExact/10) * 10
+        y = (round yExact/10) * 10
+        clear
+        drawAxisLabels
+        drawDot
+    else if state == "crossHair"
+        drawCrossHair
+    else
+        drawLabel
+    end
+    nextState
+end
+
+func nextState
+    if state == "dot"
+        state = "crossHair"
+    else if state == "crossHair"
+        state = "label"
+    else
+        state = "dot"
+    end
+end
+
+func drawDot
+    color "red"
+    move x y
+    circle 0.6
+end
+
+func drawLabel
+    font {align:"center" size:3}
+    if y > 90
+        font {baseline:"top"}
+    else
+        font {baseline:"bottom"}
+    end
+    move x y
+    color "black"
+    text (sprintf "%v %v" x y)
+end
+
+func drawCrossHair
+    color "grey"
+    width 0.1
+    line 0 y
+    move x y
+    line x 0
+end
+
+func drawAxisLabels
+    color "black"
+    width 0.25
+    for i := range 20 99 20
+        move 0 i
+        line 0.5 i
+        font {align:"left" baseline:"middle" size:3}
+        text (sprintf "%v" i)
+        move i 0
+        line i 0.5
+        font {align:"center" baseline:"bottom" size:3}
+        text (sprintf "%v" i)
+    end
+end

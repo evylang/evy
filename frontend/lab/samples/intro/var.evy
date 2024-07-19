@@ -1,0 +1,18 @@
+// print string
+print "Hello world!"
+
+// print numbers
+print 1 2 3
+
+// number variable x
+x:num
+x = 3 + 4
+
+// Can you guess what this prints?
+print "x:" x
+
+// How about this?
+x = x + 1
+print "x:" x
+
+// Print your name and and age:

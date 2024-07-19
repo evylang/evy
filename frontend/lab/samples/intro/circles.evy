@@ -1,0 +1,11 @@
+// Draw 2-4 circles that are
+// partly or fully Visible 🟠🟣🔴
+//
+// Colors: https://arantius.github.io/web-color-wheel/
+// Hint:   https://evy.dev/l/circle-challenge
+clear "dodgerblue"
+move 40 50
+color "yellow"
+circle 30
+
+// 🌶️🌶️🌶️ What flag is this?

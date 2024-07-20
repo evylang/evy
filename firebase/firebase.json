@@ -6,7 +6,7 @@
   "hosting": [
     {
       "target": "apex",
-      "public": "public",
+      "public": "public/apex",
       "headers": [
         {
           "source": "**/*.*.@(js|css|woff2|svg)",
@@ -39,19 +39,19 @@
     },
     {
       "target": "ai",
-      "public": "public/ai"
+      "public": "public/apex/ai"
     },
     {
       "target": "discord",
-      "public": "public/discord"
+      "public": "public/apex/discord"
     },
     {
       "target": "docs",
-      "public": "public/docs"
+      "public": "public/apex/docs"
     },
     {
       "target": "lab",
-      "public": "public/lab"
+      "public": "public/apex/lab"
     },
     {
       "target": "learn",
@@ -59,7 +59,7 @@
     },
     {
       "target": "play",
-      "public": "public/play",
+      "public": "public/apex/play",
       "rewrites": [
         {
           "source": "/version",

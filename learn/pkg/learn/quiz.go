@@ -88,6 +88,11 @@ func (m *QuizModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *QuizModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *QuizModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {

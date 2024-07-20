@@ -89,6 +89,11 @@ func (m *UnittestModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *UnittestModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *UnittestModel) parseFrontmatterMD() error {
 	var err error
 	if m.rawFrontmatter == "" && m.rawMD == "" {

@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"evylang.dev/evy/pkg/md"
+	"rsc.io/markdown"
 )
 
 // ExportOptions contains options for exporting answer key and HTML files.
@@ -19,6 +20,8 @@ type ExportOptions struct {
 	WithAnswersMarked bool
 	SelfContained     bool /* CSS, JS, Favicon links vs standalone embeds*/
 	WriteCatalog      bool
+	SkipQuestions     bool
+	RootDir           string
 }
 
 func (opts ExportOptions) validate() error {
@@ -30,6 +33,15 @@ func (opts ExportOptions) validate() error {
 	}
 	if !opts.WriteHTML && opts.SelfContained {
 		return fmt.Errorf("%w: SelfContained requires WriteHTML", ErrInvalidExportOptions)
+	}
+	if !opts.WriteHTML && opts.SkipQuestions {
+		return fmt.Errorf("%w: SkipQuestions requires WriteHTML", ErrInvalidExportOptions)
+	}
+	if !opts.SelfContained && !strings.HasPrefix(opts.RootDir, "/") {
+		return fmt.Errorf(`%w: RootDir must be an absolute path starting with "/", got %q`, ErrInvalidExportOptions, opts.RootDir)
+	}
+	if !opts.SelfContained && !strings.HasSuffix(opts.RootDir, "/") {
+		return fmt.Errorf(`%w: RootDir must be an absolute path ending with "/", got %q`, ErrInvalidExportOptions, opts.RootDir)
 	}
 	return nil
 }
@@ -155,38 +167,78 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 	if _, err := md.Copy(srcDir, destDir); err != nil {
 		return err
 	}
+	sidebarLookup, err := newSidebarLookup(models, opts.RootDir)
+	if err != nil {
+		return err
+	}
+
 	for _, model := range models {
-		qmodel, ok := model.(*QuestionModel)
-		if ok && qmodel.hasSubQuestions() {
+		dir := filepath.Dir(model.Filename())
+		sidebar := sidebarLookup[dir]
+		if _, ok := model.(*QuestionModel); ok && opts.SkipQuestions {
+			// TODO: write fragment instead of full page
 			continue
 		}
-		mdFile, err := filepath.Rel(srcDir, model.Filename())
-		if err != nil {
-			return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
-		}
-		htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
-		content, err := model.ToHTML(opts.WithAnswersMarked)
-		if err != nil {
-			return err
-		}
-		tmplData := newTmplData(mdFile, model.Name(), content)
-		if err := writeHTMLFile(htmlFile, tmplData, opts.SelfContained); err != nil {
+		if err := writeHTMLFile(model, sidebar, srcDir, destDir, opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func writeHTMLFile(htmlFile string, tmplData tmplData, selfContained bool) error {
+func writeHTMLFile(model model, sidebarContent string, srcDir, destDir string, opts ExportOptions) error {
+	qmodel, ok := model.(*QuestionModel)
+	if ok && qmodel.hasSubQuestions() {
+		return nil
+	}
+	mdFile, err := filepath.Rel(srcDir, model.Filename())
+	if err != nil {
+		return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
+	}
+	htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
+	content, err := model.ToHTML(opts.WithAnswersMarked)
+	if err != nil {
+		return err
+	}
+	tmplData := newTmplData(mdFile, model.Name(), sidebarContent, content)
 	out, err := os.Create(htmlFile)
 	if err != nil {
 		return err
 	}
 	defer out.Close() //nolint:errcheck // we're returning the more important error
-	if selfContained {
+	if opts.SelfContained {
 		return selfContainedTemplate.Execute(out, tmplData)
 	}
 	return learnTemplate.Execute(out, tmplData)
+}
+
+func newSidebarLookup(models []model, deployRootDir string) (map[string]string, error) {
+	lookup := map[string]string{}
+	for _, m := range models {
+		if course, ok := m.(*CourseModel); ok {
+			sidebar, err := newSidebar(course, deployRootDir)
+			if err != nil {
+				return nil, err
+			}
+			dir := filepath.Dir(course.Filename())
+			lookup[dir] = markdown.ToHTML(sidebar)
+		}
+	}
+	for _, m := range models {
+		if _, ok := m.(*CourseModel); ok {
+			continue
+		}
+		modelDir := filepath.Dir(m.Filename())
+		dir := modelDir
+		for dir != "." && dir != "/" {
+			if _, ok := lookup[dir]; ok {
+				lookup[modelDir] = lookup[dir]
+				break
+			}
+			dir = filepath.Dir(dir)
+		}
+	}
+	return lookup, nil
 }
 
 func writeAnswerKeyFile(models []model, answerKeyFile string) error {
@@ -259,32 +311,19 @@ type tmplData struct {
 	Root       string
 	Title      string
 	Content    string
+	Sidebar    string
 	DefaultCSS string
-	CSSFiles   []string
 }
 
 //go:embed tmpl/default.css
 var defaultCSS string
 
-func newTmplData(mdFile, title, content string) tmplData {
+func newTmplData(mdFile, title, sidebarContent, content string) tmplData {
 	return tmplData{
 		Root:       md.ToRoot(mdFile),
 		Title:      title,
 		Content:    content,
+		Sidebar:    sidebarContent,
 		DefaultCSS: defaultCSS,
-		CSSFiles: []string{
-			"resets.css",
-			"root.css",
-			"icons.css",
-			"header.css",
-			"switch.css",
-			"dialog.css",
-			"primary.css",
-			"elements.css",
-			"header.css",
-			"syntax.css",
-			"index.css",
-			"fonts.css",
-		},
 	}
 }

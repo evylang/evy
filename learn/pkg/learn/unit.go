@@ -20,11 +20,12 @@ import (
 // listed in the unit.md file, e.g. in sidebar navigation or on badge
 // summary. The order is captured in the OrderedModels slice.
 type UnitModel struct {
-	*configurableModel // used by functional options
-	Doc                *markdown.Document
-	Frontmatter        *unitFrontmatter
-	name               string // exercises, quizzes, unittests
-	OrderedModels      []model
+	*configurableModel     // used by functional options
+	Doc                    *markdown.Document
+	Frontmatter            *unitFrontmatter
+	name                   string // exercises, quizzes, unittests
+	OrderedModels          []model
+	OrderedModelsWithPlain []model
 }
 
 // NewUnitModel returns a new unit model from a unit Markdown file or its
@@ -52,15 +53,22 @@ func (m *UnitModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *UnitModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 // ToHTML returns a complete standalone HTML document as string.
 func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
 	m.Doc.Blocks[0].PrintHTML(buf)
 	unitDir := filepath.Dir(m.Filename())
+	buf.WriteString(`<div class="badges">` + "\n")
 	if err := m.printBadgesHTML(buf, unitDir); err != nil {
 		return "", err
 	}
+	buf.WriteString("</div>\n")
 	for _, block := range m.Doc.Blocks[1:] {
 		printHTML(block, buf)
 	}
@@ -113,13 +121,18 @@ func (m *UnitModel) buildModels() error {
 		switch model := model.(type) {
 		case *ExerciseModel:
 			m.OrderedModels = append(m.OrderedModels, model)
+			m.OrderedModelsWithPlain = append(m.OrderedModelsWithPlain, model)
 		case *QuizModel:
 			model.name = fmt.Sprintf("Quiz %d · %s", quizCount, m.name)
 			m.OrderedModels = append(m.OrderedModels, model)
+			m.OrderedModelsWithPlain = append(m.OrderedModelsWithPlain, model)
 			quizCount++
 		case *UnittestModel:
 			model.name = "Unit test · " + m.name
 			m.OrderedModels = append(m.OrderedModels, model)
+			m.OrderedModelsWithPlain = append(m.OrderedModelsWithPlain, model)
+		case *plainMD:
+			m.OrderedModelsWithPlain = append(m.OrderedModelsWithPlain, model)
 		}
 	}
 	return nil

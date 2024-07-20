@@ -72,8 +72,8 @@ function scrollToHeading() {
   // this should be default browser behavior for onhashchange,
   // but in combination with these CSS rules it does not seem to work.
   //
-  //    display: grid | flexbox;
-  //    height: 100% | inhert;
+  //    display: grid | flex;
+  //    height: 100% | inherit;
   //    overflow: auto;
   const hash = window.location.hash
   if (hash === "" || hash === "#") {

@@ -79,18 +79,24 @@ func collectMDLinks(doc *markdown.Document) []string {
 }
 
 func extractName(doc *markdown.Document) (string, error) {
-	for _, b := range doc.Blocks {
-		h, ok := b.(*markdown.Heading)
-		if !ok {
-			continue
-		}
-		buf := &bytes.Buffer{}
-		for _, inline := range h.Text.Inline {
-			inline.PrintText(buf)
-		}
-		return buf.String(), nil
+	heading, err := extractFirstHeading(doc)
+	if err != nil {
+		return "", err
 	}
-	return "", fmt.Errorf("%w: no heading found", ErrBadMarkdownStructure)
+	buf := &bytes.Buffer{}
+	for _, inline := range heading.Text.Inline {
+		inline.PrintText(buf)
+	}
+	return buf.String(), nil
+}
+
+func extractFirstHeading(doc *markdown.Document) (*markdown.Heading, error) {
+	for _, b := range doc.Blocks {
+		if h, ok := b.(*markdown.Heading); ok {
+			return h, nil
+		}
+	}
+	return nil, fmt.Errorf("%w: no heading found", ErrBadMarkdownStructure)
 }
 
 func toHTML(doc *markdown.Document) string {

@@ -48,6 +48,7 @@ type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
 	Name() string
 	Filename() string
+	Document() *markdown.Document
 }
 
 type plainMD struct {
@@ -67,6 +68,10 @@ func (p *plainMD) Name() string {
 
 func (p *plainMD) Filename() string {
 	return p.filename
+}
+
+func (p *plainMD) Document() *markdown.Document {
+	return p.doc
 }
 
 func newPlainMD(mdString, filename string) (*plainMD, error) {

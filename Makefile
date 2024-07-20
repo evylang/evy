@@ -177,7 +177,7 @@ docs:
 
 ## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content
 learn: install
-	levy export html --no-self-contained learn/content $(LEARN_TARGET_DIR)
+	levy export html --no-self-contained --skip-questions --root-dir="/learn/" learn/content $(LEARN_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(LEARN_TARGET_DIR)
 
 FIND_GENERATED_CMD = fd --exclude '*.css' --exclude '*.js' --type file --full-path

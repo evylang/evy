@@ -45,7 +45,7 @@ li::marker {
   font-size: 0.8em;
 }
 
-#sidebar {
+.sidebar {
   grid-area: sidebar;
   background-color: var(--background-dimmed);
   border-right: 1px solid var(--border-color);
@@ -58,6 +58,11 @@ li::marker {
 .anchor {
   scroll-margin-top: 20px;
 }
+
+#hamburger {
+  cursor: pointer;
+}
+
 /* --- Elements -------------------------------------------------------- */
 :is(h1, h2) {
   color: var(--color);
@@ -174,6 +179,7 @@ th {
   font-weight: 700;
   color: var(--color-slightly-dimmed);
 }
+
 /* --- Headings -------------------------------------------------------- */
 .anchor {
   color: var(--color-accent);
@@ -212,140 +218,10 @@ th {
   color: var(--color-accent);
 }
 
-/* --- Sidebar -------------------------------------------------------- */
-#sidebar {
-  width: 320px;
-}
-
-#sidebar h1 {
-  border: none;
-  font-size: 1.25rem;
-  padding: 0;
-  margin: 18px 20px 10px;
-}
-
-#sidebar a {
-  color: var(--color-hover);
-  text-decoration: none;
-  padding-left: 6px;
-  border-left: 3px solid transparent;
-  display: inline-block;
-}
-#sidebar a code {
-  color: var(--color-hover);
-  background: none;
-}
-#sidebar a:hover,
-#sidebar a:hover code {
-  color: var(--color-accent);
-}
-
-#sidebar ul {
-  list-style-type: none;
-  margin: 0;
-  margin-left: 18px;
-}
-#sidebar > ul {
-  margin-left: 38px;
-}
-
-#sidebar li {
-  line-height: 1.2;
-  padding-top: 8px;
-  position: relative;
-}
-
-#sidebar a {
-  margin-right: 16px;
-}
-#sidebar a:has(+ .expander) {
-  margin-right: 2.75em;
-}
-
-#sidebar div.expander {
-  mask: url("data:image/svg+xml,%3Csvg fill='currentColor' stroke='none' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z' %3E%3C/path%3E%3C/svg%3E%0A");
-  mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-  color: var(--color-very-dimmed);
-  background-color: currentcolor;
-  position: absolute;
-  width: 1em;
-  height: 1em;
-  top: calc(9px + 0.1em);
-  right: 1.5em;
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-#sidebar div.expander:hover {
-  color: var(--color-accent);
-}
-#sidebar div.expander.show {
-  transform: rotate(90deg);
-}
-#sidebar ul ul {
-  display: none;
-}
-#sidebar ul ul.show {
-  display: block;
-}
-#sidebar .highlight-within {
-  color: var(--color);
-  font-weight: 700;
-}
-#sidebar .highlight,
-#sidebar .highlight code {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-#sidebar ul.icons {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  padding: 32px 20px;
-  border-top: 1px solid var(--border-color);
-  margin: 40px 0;
-}
-
-#sidebar ul.icons li {
-  margin: 0;
-  padding: 0;
-}
-
-#sidebar ul.icons a {
-  color: var(--color);
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-}
-
-#sidebar ul.icons a:hover {
-  color: var(--color-accent);
-}
-
-#sidebar ul.icons li:last-child {
-  margin-left: auto;
-}
 /* --- responsive -------------------------------------------------------- */
-#hamburger {
-  cursor: pointer;
-}
-
 @media (max-width: 767px) {
   .docs-nav {
     display: none;
-  }
-}
-
-@media (max-width: 1280px) {
-  #sidebar {
-    width: 270px;
-  }
-  #sidebar ul {
-    margin-left: 20px;
   }
 }
 
@@ -353,41 +229,5 @@ th {
   main .max-width-wrapper {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  #sidebar {
-    width: 250px;
-  }
-}
-
-@media (max-width: 767px) {
-  #sidebar {
-    width: 312px;
-    position: absolute;
-    translate: -100%;
-    transition-timing-function: ease-in-out;
-    transition-duration: 0.3s;
-  }
-  #sidebar.show {
-    translate: 0;
-  }
-  #sidebar-close {
-    max-width: 19px;
-    cursor: pointer;
-  }
-  #sidebar > ul {
-    max-width: 600px;
-  }
-}
-
-@media (max-width: 767px) and (prefers-reduced-motion) {
-  #sidebar {
-    translate: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
-  #sidebar.show {
-    translate: 0;
-    opacity: 1;
-    pointer-events: auto;
   }
 }

@@ -1,3 +1,67 @@
+html {
+  height: 100%;
+}
+
+body {
+  line-height: 1.6;
+  height: 100%;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: min-content 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+}
+
+header.topnav {
+  grid-area: header;
+}
+
+header.topnav .center.mobile span {
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 16px;
+}
+
+main {
+  grid-area: main;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--background);
+}
+
+/* max-width-wrapper is responsible for centering content in main area.
+   If we applied the same rules to main, the scrollbar would show up offset from the
+   right edge, at `margin-right:auto` distance. */
+main .max-width-wrapper {
+  max-width: 60rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 32px;
+}
+
+li::marker {
+  font-size: 0.8em;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: var(--background-dimmed);
+  border-right: 1px solid var(--border-color);
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 40px;
+}
+
+#hamburger {
+  cursor: pointer;
+}
+
+.badges {
+  display: none; /* not yet ready for prime time */
+}
+/* --- Elements -------------------------------------------------------- */
 :is(h1, h2) {
   color: var(--color);
   font-weight: 700;
@@ -6,14 +70,6 @@
 
 h1 {
   font-size: 1.875rem;
-  margin-top: 32px;
-}
-
-/*indent all but header*/
-body > *:not(:first-child) {
-  margin-left: 32px;
-  margin-right: 32px;
-  max-width: 50rem;
 }
 
 h2 {
@@ -80,7 +136,7 @@ pre {
 
 code {
   padding: 0.25em;
-  font-size: 0.85rem;
+  font-size: max(0.85rem, 0.85em);
   background-color: var(--background-inline-code);
   border-radius: 4px;
   color: var(--color);
@@ -120,6 +176,7 @@ th {
   color: var(--color-slightly-dimmed);
 }
 
+/* --- Form elements ----------------------------------------------------- */
 form {
   margin-left: 32px;
   padding-bottom: 0;
@@ -179,6 +236,7 @@ input[type="checkbox"] {
   margin-top: 0.4rem;
 }
 
+/* --- Alert notes ------------------------------------------------------- */
 .alert {
   font-size: 0.875em;
   max-width: 32rem;
@@ -206,5 +264,45 @@ input[type="checkbox"] {
   border-color: var(--alert-note);
   .alert-title {
     color: var(--alert-note);
+  }
+}
+
+/* --- Header -------------------------------------------------------- */
+.topnav .logo {
+  margin-left: 0;
+}
+
+.topnav a strong {
+  font-weight: normal;
+  color: var(--color-accent-hover);
+  transition: color filter 0.2s ease-in-out;
+}
+
+.topnav a:hover,
+.topnav button:hover {
+  color: var(--color-accent-hover);
+}
+
+.docs-nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.docs-nav .active {
+  color: var(--color-accent);
+}
+
+/* --- responsive -------------------------------------------------------- */
+@media (max-width: 767px) {
+  .docs-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  main .max-width-wrapper {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }

@@ -16,6 +16,7 @@ func TestNewCourseModel(t *testing.T) {
 	assert.NoError(t, err)
 	got := buf.String()
 	want := `
+<div class="badges">
 <h2>Unit 1: Demo Unit</h2>
 <a href="unit1/exercise1/index.html">🔲</a>
 <a href="unit1/exercise-txtar/index.html">🔲</a>
@@ -27,6 +28,7 @@ func TestNewCourseModel(t *testing.T) {
 <a href="unit1/cls/index.html">🔲</a>
 <a href="unit1/quiz2.html">✨</a>
 <a href="unit1/unittest.html">⭐️</a>
+</div>
 `[1:]
 	assert.Equal(t, want, got)
 }

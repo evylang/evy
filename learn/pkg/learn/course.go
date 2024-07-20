@@ -71,8 +71,15 @@ func (m *CourseModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *CourseModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
 	courseDir := filepath.Dir(m.Filename())
+	buf.WriteString(`<div class="badges">` + "\n")
+
 	for _, unit := range m.Units {
 		buf.WriteString("<h2>")
 		h, ok := unit.Doc.Blocks[0].(*markdown.Heading)
@@ -86,6 +93,7 @@ func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
 			return err
 		}
 	}
+	buf.WriteString("</div>\n")
 	return nil
 }
 

@@ -1,0 +1,21 @@
+<h1>Evy</h1>
+<p>
+  Evy is a programming language that helps you learn how to code. It's made for people who are just
+  starting out, and it has simple rules that make it easy to understand.
+</p>
+<h2>Evy website</h2>
+<p>
+  You can try it out on the Evy web <a href="https://play.evy.dev">playground</a>, where you can
+  choose from a variety of examples to get you started. If you have some programming experience, you
+  may also find the <a href="https://docs.evy.dev/syntax_by_example.html">Syntax by Example</a> or
+  the <a href="https://docs.evy.dev/spec.html">Language Specification</a> helpful.
+</p>
+<p>
+  Write your code on the left. Click <code>Run</code> to see the output on the right, including any
+  text or drawings that your code generates.
+</p>
+<p><img src="img/playground-screenshot.png" alt="Screenshot of the Evy web playground" /></p>
+<h2>Hello world in Evy</h2>
+<p>Here's an Evy program that writes <code>Hello world</code> to the screen</p>
+<pre><code class="language-evy">print &quot;Hello world&quot;
+</code></pre>

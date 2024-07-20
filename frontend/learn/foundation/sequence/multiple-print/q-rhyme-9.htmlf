@@ -1,0 +1,15 @@
+<form id="q-rhyme-9" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the output of this program:</p>
+  <pre><code class="language-evy">print "Smart cookies"
+print "code together."
+print "🍪💻"
+</code></pre>
+  <p>Output:</p>
+  <textarea name="answer" rows="4" cols="35">
+
+
+🍪💻
+</textarea
+  >
+</form>

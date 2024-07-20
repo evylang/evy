@@ -1,0 +1,23 @@
+<h1>Sequential Execution</h1>
+<div class="badges">
+  <a href="print/index.html">🔲</a>
+  <a href="multiple-print/index.html">🔲</a>
+</div>
+<p>
+  In this unit, we'll learn about sequential execution, which means telling the computer to do
+  things step-by-step, just like following a recipe. We'll see how this simple idea is the backbone
+  of every program you'll ever create.
+</p>
+<h2><code>print</code> sequentially</h2>
+<ul>
+  <li><a href="evy.html">📖 Evy web interface</a></li>
+  <li>
+    <a href="print/print.html">📖 The <code>print</code> command</a>
+  </li>
+  <li>
+    <a href="print/index.html">👉 <code>print</code> command</a>
+  </li>
+  <li>
+    <a href="multiple-print/index.html">👉 Sequential <code>print</code></a>
+  </li>
+</ul>

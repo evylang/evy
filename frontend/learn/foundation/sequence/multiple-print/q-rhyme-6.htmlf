@@ -1,0 +1,15 @@
+<form id="q-rhyme-6" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the output of this program:</p>
+  <pre><code class="language-evy">print "The early bird"
+print "finds the bug."
+print "🐥🪳🐛"
+</code></pre>
+  <p>Output:</p>
+  <textarea name="answer" rows="4" cols="35">
+The early bird
+
+🐥🪳🐛
+</textarea
+  >
+</form>

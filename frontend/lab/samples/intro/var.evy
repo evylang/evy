@@ -15,4 +15,4 @@ print "x:" x
 x = x + 1
 print "x:" x
 
-// Print your name and and age:
+// Print your name and age:

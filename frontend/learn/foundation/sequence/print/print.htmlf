@@ -1,0 +1,29 @@
+<h1>The <code>print</code> Command</h1>
+<p>
+  The <code>print</code> command tells the program to print something to the screen. The
+  <strong>argument</strong> is the thing that you want the program to print. The argument must be
+  surrounded by quotation or talking marks <code>&quot;</code>. For example, the following code will
+  print the word <code>Hello</code> to the screen:
+</p>
+<pre><code>✅ print &quot;Hello&quot;
+</code></pre>
+<p><code>&quot;Hello&quot;</code> is the argument to <code>print</code>.</p>
+<p>Without the quotation marks, this program will generate an error.</p>
+<pre><code>❌ print Hello
+</code></pre>
+<h2>More Arguments</h2>
+<p>
+  <code>print</code> takes any number of arguments: 0, 1, 2, …. Each argument is printed
+  <em>without</em> the quotation marks. Arguments are separated by a single space. After the last
+  argument has been printed a new line or return will be printed.
+</p>
+<p>The following program</p>
+<pre><code class="language-evy">print &quot;Bugs like hugs.&quot;
+print &quot;👾&quot; &quot;🐛&quot; &quot;🥰&quot;
+</code></pre>
+<p>creates the output</p>
+<pre><code>Bugs like hugs.
+👾 🐛 🥰
+</code></pre>
+<p><code>print</code> without any arguments prints an empty new line.</p>
+<p><a href="index.html">Exercise</a></p>

@@ -34,7 +34,7 @@ main {
    If we applied the same rules to main, the scrollbar would show up offset from the
    right edge, at `margin-right:auto` distance. */
 main .max-width-wrapper {
-  max-width: 60rem;
+  max-width: 50rem;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -231,9 +231,13 @@ textarea {
   background: var(--background-code);
   font-family: var(--font-family-code);
 }
+label {
+  display: flex;
+  align-items: stretch;
+}
 input[type="radio"],
 input[type="checkbox"] {
-  margin-top: 0.4rem;
+  margin-left: 8px;
 }
 
 /* --- Alert notes ------------------------------------------------------- */

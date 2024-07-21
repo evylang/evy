@@ -20,7 +20,6 @@ type ExportOptions struct {
 	WithAnswersMarked bool
 	SelfContained     bool /* CSS, JS, Favicon links vs standalone embeds*/
 	WriteCatalog      bool
-	SkipQuestions     bool
 	RootDir           string
 }
 
@@ -33,9 +32,6 @@ func (opts ExportOptions) validate() error {
 	}
 	if !opts.WriteHTML && opts.SelfContained {
 		return fmt.Errorf("%w: SelfContained requires WriteHTML", ErrInvalidExportOptions)
-	}
-	if !opts.WriteHTML && opts.SkipQuestions {
-		return fmt.Errorf("%w: SkipQuestions requires WriteHTML", ErrInvalidExportOptions)
 	}
 	if !opts.SelfContained && !strings.HasPrefix(opts.RootDir, "/") {
 		return fmt.Errorf(`%w: RootDir must be an absolute path starting with "/", got %q`, ErrInvalidExportOptions, opts.RootDir)
@@ -175,10 +171,6 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 	for _, model := range models {
 		dir := filepath.Dir(model.Filename())
 		sidebar := sidebarLookup[dir]
-		if _, ok := model.(*QuestionModel); ok && opts.SkipQuestions {
-			// TODO: write fragment instead of full page
-			continue
-		}
 		if err := writeHTMLFile(model, sidebar, srcDir, destDir, opts); err != nil {
 			return err
 		}
@@ -195,10 +187,19 @@ func writeHTMLFile(model model, sidebarContent string, srcDir, destDir string, o
 	if err != nil {
 		return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
 	}
-	htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
 	content, err := model.ToHTML(opts.WithAnswersMarked)
 	if err != nil {
 		return err
+	}
+	htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
+	if !opts.SelfContained {
+		// write .htmlf HTML-Fragment file used with Sidebar mini-SPA.
+		if err := os.WriteFile(htmlFile+"f", []byte(content), 0o666); err != nil {
+			return fmt.Errorf("%w: cannot write HTML Fragment file", err)
+		}
+		if ok { // .(*QuestionModel)
+			return nil // We're done if we're working with a QuestionModel, no standalone HTML is needed.
+		}
 	}
 	tmplData := newTmplData(mdFile, model.Name(), sidebarContent, content)
 	out, err := os.Create(htmlFile)

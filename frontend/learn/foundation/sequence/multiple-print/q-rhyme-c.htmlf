@@ -1,0 +1,13 @@
+<form id="q-rhyme-c" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the output of this program:</p>
+  <pre><code class="language-evy">print "Bugs like hugs."
+print "👾🐛🥰"
+</code></pre>
+  <p>Output:</p>
+  <textarea name="answer" rows="3" cols="35">
+
+👾🐛🥰
+</textarea
+  >
+</form>

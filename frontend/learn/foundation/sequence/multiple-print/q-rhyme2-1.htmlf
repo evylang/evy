@@ -1,0 +1,9 @@
+<form id="q-rhyme2-1" class="difficulty-hard">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Write code that creates this output:</p>
+  <pre><code>Every hour:
+pixel power.
+</code></pre>
+  <p>Program:</p>
+  <textarea name="answer" rows="2" cols="35"> </textarea>
+</form>

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>evy docs · Command Line Usage</title>
+    <title>evy docs · Talks and Papers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./img/favicon.png" />
     <link rel="stylesheet" href="./css/resets.css" type="text/css" />
@@ -38,7 +38,7 @@
         </a>
       </div>
       <div class="mobile center">
-        <span class="mobile">Command Line Usage</span>
+        <span class="mobile">Talks and Papers</span>
       </div>
       <div class="right">
         <nav class="docs-nav">
@@ -560,130 +560,46 @@
 
     <main>
       <div class="max-width-wrapper">
-        <h1>Command Line Usage</h1>
-        <p>
-          The <code>evy</code> toolchain is a set of tools that can be used to parse, run, and
-          format Evy source code. It can also be used to serve the Evy web contents locally. You can
-          <a href="../index.html#-installation">install</a> the Evy toolchain locally and run it
-          from your command line. The command-line interface for Evy supports all built-in and
-          graphics functions except for event handlers. Events are currently only supported within
-          the web interface, such as on <a href="/play">play.evy.dev</a>.
-        </p>
-        <p>The Evy toolchain has three subcommands:</p>
-        <ul>
-          <li><code>evy run</code>: Parse and run Evy source code.</li>
-          <li><code>evy fmt</code>: Format Evy source code.</li>
-          <li><code>evy serve</code>: Serve Evy website(s) locally.</li>
-        </ul>
-        <p>
-          You can also get help for each subcommand by running it with the <code>--help</code> flag.
-        </p>
-        <h3><a id="evy-help" href="#evy-help" class="anchor">#</a>evy --help</h3>
-        <!-- gen:evy --help -->
-        <pre><code>Usage: evy &lt;command&gt; [flags]
-
-evy is a tool for managing evy source code.
-
-Flags:
-  -h, --help       Show context-sensitive help.
-  -V, --version    Print version information
-
-Commands:
-  run [&lt;source&gt;] [flags]
-    Run Evy program.
-
-  fmt [&lt;files&gt; ...] [flags]
-    Format Evy files.
-
-  serve export &lt;dir&gt; [flags]
-    Export embedded content.
-
-  serve start [flags]
-    Start web server, default for &quot;evy serve&quot;.
-
-Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
-</code></pre>
-        <!-- genend -->
-        <h3><a id="evy-run-help" href="#evy-run-help" class="anchor">#</a>evy run --help</h3>
-        <!-- gen:evy run --help -->
-        <pre><code>Usage: evy run [&lt;source&gt;] [flags]
-
-Run Evy program.
-
-Arguments:
-  [&lt;source&gt;]    Source file. Default: stdin.
-
-Flags:
-  -h, --help                    Show context-sensitive help.
-  -V, --version                 Print version information
-
-      --skip-sleep              Skip evy sleep command ($EVY_SKIP_SLEEP).
-      --svg-out=FILE            Output drawing to SVG file. Stdout: -.
-      --svg-style=STYLE         Style of top-level SVG element.
-  -s, --no-assertion-summary    Do not print assertion summary, only report
-                                failed assertion(s).
-      --fail-fast               Stop execution on first failed assertion.
-  -t, --txtar=MEMBER            Read source from txtar file and select select
-                                given filename
-</code></pre>
-        <!-- genend -->
-        <h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>
-        <!-- gen:evy fmt --help -->
-        <pre><code>Usage: evy fmt [&lt;files&gt; ...] [flags]
-
-Format Evy files.
-
-Arguments:
-  [&lt;files&gt; ...]    Source files. Default: stdin.
-
-Flags:
-  -h, --help       Show context-sensitive help.
-  -V, --version    Print version information
-
-  -w, --write      Update .evy file.
-  -c, --check      Check if already formatted.
-</code></pre>
-        <!-- genend -->
+        <h1>Talks and Papers</h1>
         <h3>
-          <a id="evy-serve-start-help" href="#evy-serve-start-help" class="anchor">#</a>evy serve
-          [start] --help
+          <a id="introduction-to-evy" href="#introduction-to-evy" class="anchor">#</a>Introduction
+          to Evy
         </h3>
-        <!-- gen:evy serve start --help -->
-        <pre><code>Usage: evy serve start [flags]
-
-Start web server, default for &quot;evy serve&quot;.
-
-Flags:
-  -h, --help              Show context-sensitive help.
-  -V, --version           Print version information
-
-  -p, --port=8080         Port to listen on ($EVY_PORT)
-  -a, --all-interfaces    Listen only on all interfaces not just localhost
-                          ($EVY_ALL_INTERFACES)
-  -d, --dir=DIR           Directory to serve instead of embedded content
-      --root=DIR          Directory to use as root for serving, subdirectory of
-                          DIR if given, eg &quot;play&quot;, &quot;docs&quot;
-</code></pre>
-        <!-- genend -->
+        <p>Lo-fi backstory to how Evy came to be</p>
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/YsfPSF_Dx-Y?si=EUyju3svOYlno16F"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
         <h3>
-          <a id="evy-serve-export-help" href="#evy-serve-export-help" class="anchor">#</a>evy serve
-          export --help
+          <a
+            id="building-a-beginner-s-programming-language-with-go"
+            href="#building-a-beginner-s-programming-language-with-go"
+            class="anchor"
+            >#</a
+          >Building a Beginner's Programming Language with Go
         </h3>
-        <!-- gen:evy serve export --help -->
-        <pre><code>Usage: evy serve export &lt;dir&gt; [flags]
-
-Export embedded content.
-
-Arguments:
-  &lt;dir&gt;    Directory to export embedded content to
-
-Flags:
-  -h, --help       Show context-sensitive help.
-  -V, --version    Print version information
-
-  -f, --force      Use non-empty directory
-</code></pre>
-        <!-- genend -->
+        <p>
+          Understanding the inner workings of the Evy tool chain, for people with some programming
+          experience.
+        </p>
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/QFpneG6SVxw?si=8viDXh1wABtpYTXp"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+        <h3><a id="research-papers" href="#research-papers" class="anchor">#</a>Research papers</h3>
+        <p><a href="papers/evy-2401.pdf">Evy, a New Approach to Introductory Programming</a></p>
       </div>
     </main>
 

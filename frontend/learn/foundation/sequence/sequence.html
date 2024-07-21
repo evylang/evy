@@ -21,6 +21,7 @@
       {
         "imports": {
           "./module/highlight.js": "./module/highlight.js",
+          "./module/sidebar.js": "./module/sidebar.js",
           "./module/spa.js": "./module/spa.js",
           "./module/theme.js": "./module/theme.js"
         }
@@ -51,49 +52,51 @@
       <header class="topnav mobile">
         <button class="icon-close sidebar-close" id="sidebar-close"></button>
       </header>
-      <h1><a href="/learn/foundation/index.html">🌱 Foundation</a></h1>
-      <ul>
-        <li>
-          <a href="/learn/foundation/sequence/index.html">Sequential Execution</a>
-          <div class="expander"></div>
-          <ul>
-            <li><a href="/learn/foundation/sequence/evy.html">📖 Evy</a></li>
-            <li>
-              <a href="/learn/foundation/sequence/print/print.html"
-                >📖 The <code>print</code> Command</a
-              >
-            </li>
-            <li>
-              <a href="/learn/foundation/sequence/print/index.html"
-                >👉 <code>print</code> command</a
-              >
-            </li>
-            <li>
-              <a href="/learn/foundation/sequence/multiple-print/index.html"
-                >👉 Sequential <code>print</code></a
-              >
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <div class="sidebar-content">
+        <h1><a href="/learn/foundation/index.html">🌱 Foundation</a></h1>
+        <ul>
+          <li>
+            <a href="/learn/foundation/sequence/index.html">Sequential Execution</a>
+            <div class="expander"></div>
+            <ul>
+              <li><a href="/learn/foundation/sequence/evy.html">📖 Evy</a></li>
+              <li>
+                <a href="/learn/foundation/sequence/print/print.html"
+                  >📖 The <code>print</code> Command</a
+                >
+              </li>
+              <li>
+                <a href="/learn/foundation/sequence/print/index.html"
+                  >👉 <code>print</code> command</a
+                >
+              </li>
+              <li>
+                <a href="/learn/foundation/sequence/multiple-print/index.html"
+                  >👉 Sequential <code>print</code></a
+                >
+              </li>
+            </ul>
+          </li>
+        </ul>
 
-      <ul class="icons">
-        <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
-        <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
-        <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
-        <li>
-          <label class="theme switch">
-            <input type="checkbox" id="dark-theme" checked />
-            <span class="slider"></span>
-            <script>
-              // Inline JS to avoid flash of other theme.
-              if (window.localStorage.getItem("theme") === "light") {
-                document.querySelector("#dark-theme").checked = false
-              }
-            </script>
-          </label>
-        </li>
-      </ul>
+        <ul class="icons">
+          <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
+          <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
+          <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
+          <li>
+            <label class="theme switch">
+              <input type="checkbox" id="dark-theme" checked />
+              <span class="slider"></span>
+              <script>
+                // Inline JS to avoid flash of other theme.
+                if (window.localStorage.getItem("theme") === "light") {
+                  document.querySelector("#dark-theme").checked = false
+                }
+              </script>
+            </label>
+          </li>
+        </ul>
+      </div>
     </nav>
 
     <main>

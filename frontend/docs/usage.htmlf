@@ -1,0 +1,122 @@
+<h1>Command Line Usage</h1>
+<p>
+  The <code>evy</code> toolchain is a set of tools that can be used to parse, run, and format Evy
+  source code. It can also be used to serve the Evy web contents locally. You can
+  <a href="../index.html#-installation">install</a> the Evy toolchain locally and run it from your
+  command line. The command-line interface for Evy supports all built-in and graphics functions
+  except for event handlers. Events are currently only supported within the web interface, such as
+  on <a href="/play">play.evy.dev</a>.
+</p>
+<p>The Evy toolchain has three subcommands:</p>
+<ul>
+  <li><code>evy run</code>: Parse and run Evy source code.</li>
+  <li><code>evy fmt</code>: Format Evy source code.</li>
+  <li><code>evy serve</code>: Serve Evy website(s) locally.</li>
+</ul>
+<p>You can also get help for each subcommand by running it with the <code>--help</code> flag.</p>
+<h3><a id="evy-help" href="#evy-help" class="anchor">#</a>evy --help</h3>
+<!-- gen:evy --help -->
+<pre><code>Usage: evy &lt;command&gt; [flags]
+
+evy is a tool for managing evy source code.
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+Commands:
+  run [&lt;source&gt;] [flags]
+    Run Evy program.
+
+  fmt [&lt;files&gt; ...] [flags]
+    Format Evy files.
+
+  serve export &lt;dir&gt; [flags]
+    Export embedded content.
+
+  serve start [flags]
+    Start web server, default for &quot;evy serve&quot;.
+
+Run &quot;evy &lt;command&gt; --help&quot; for more information on a command.
+</code></pre>
+<!-- genend -->
+<h3><a id="evy-run-help" href="#evy-run-help" class="anchor">#</a>evy run --help</h3>
+<!-- gen:evy run --help -->
+<pre><code>Usage: evy run [&lt;source&gt;] [flags]
+
+Run Evy program.
+
+Arguments:
+  [&lt;source&gt;]    Source file. Default: stdin.
+
+Flags:
+  -h, --help                    Show context-sensitive help.
+  -V, --version                 Print version information
+
+      --skip-sleep              Skip evy sleep command ($EVY_SKIP_SLEEP).
+      --svg-out=FILE            Output drawing to SVG file. Stdout: -.
+      --svg-style=STYLE         Style of top-level SVG element.
+  -s, --no-assertion-summary    Do not print assertion summary, only report
+                                failed assertion(s).
+      --fail-fast               Stop execution on first failed assertion.
+  -t, --txtar=MEMBER            Read source from txtar file and select select
+                                given filename
+</code></pre>
+<!-- genend -->
+<h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>
+<!-- gen:evy fmt --help -->
+<pre><code>Usage: evy fmt [&lt;files&gt; ...] [flags]
+
+Format Evy files.
+
+Arguments:
+  [&lt;files&gt; ...]    Source files. Default: stdin.
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+  -w, --write      Update .evy file.
+  -c, --check      Check if already formatted.
+</code></pre>
+<!-- genend -->
+<h3>
+  <a id="evy-serve-start-help" href="#evy-serve-start-help" class="anchor">#</a>evy serve [start]
+  --help
+</h3>
+<!-- gen:evy serve start --help -->
+<pre><code>Usage: evy serve start [flags]
+
+Start web server, default for &quot;evy serve&quot;.
+
+Flags:
+  -h, --help              Show context-sensitive help.
+  -V, --version           Print version information
+
+  -p, --port=8080         Port to listen on ($EVY_PORT)
+  -a, --all-interfaces    Listen only on all interfaces not just localhost
+                          ($EVY_ALL_INTERFACES)
+  -d, --dir=DIR           Directory to serve instead of embedded content
+      --root=DIR          Directory to use as root for serving, subdirectory of
+                          DIR if given, eg &quot;play&quot;, &quot;docs&quot;
+</code></pre>
+<!-- genend -->
+<h3>
+  <a id="evy-serve-export-help" href="#evy-serve-export-help" class="anchor">#</a>evy serve export
+  --help
+</h3>
+<!-- gen:evy serve export --help -->
+<pre><code>Usage: evy serve export &lt;dir&gt; [flags]
+
+Export embedded content.
+
+Arguments:
+  &lt;dir&gt;    Directory to export embedded content to
+
+Flags:
+  -h, --help       Show context-sensitive help.
+  -V, --version    Print version information
+
+  -f, --force      Use non-empty directory
+</code></pre>
+<!-- genend -->

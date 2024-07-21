@@ -127,7 +127,6 @@ func genHTMLFile(doc, sidebar, header *markdown.Document, htmlFile, mdf string) 
 		Sidebar: docToHTML(sidebar),
 		Header:  docToHTML(unwrapParagraph(header)),
 	}
-
 	out, err := os.Create(htmlFile)
 	if err != nil {
 		return err
@@ -136,7 +135,10 @@ func genHTMLFile(doc, sidebar, header *markdown.Document, htmlFile, mdf string) 
 		out.Close() //nolint:errcheck,gosec // we're returning the more important error
 		return err
 	}
-	return out.Close()
+	if err := out.Close(); err != nil {
+		return err
+	}
+	return os.WriteFile(htmlFile+"f", []byte(data.Content), 0o666)
 }
 
 func docToHTML(doc *markdown.Document) string {

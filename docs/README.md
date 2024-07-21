@@ -8,7 +8,7 @@ Learn programming with Evy
 
 Learn more about the Evy language and tools
 
-- [Syntax by Example](syntax_by_example.md): Learn the Evy syntax with a collection of examples.
+- [Syntax by Example](syntax-by-example.md): Learn the Evy syntax with a collection of examples.
 - [Built-in Documentation](builtins.md): Get details on built-in functions and events in Evy.
 - [Language Specification](spec.md): Read a formal definition of the Evy syntax and language.
 - [`evy` Usage](usage.md): Learn how to use the `evy` command line tool.

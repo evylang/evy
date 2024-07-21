@@ -1,0 +1,2219 @@
+<h1>Built-ins</h1>
+<p>
+  <strong>Built-ins</strong> in Evy are pre-defined functions and events that allow for user
+  interaction, graphics, animation, mathematical operations, and more.
+</p>
+<p>
+  <strong>Functions</strong> are self-contained blocks of code that perform a specific task.
+  <strong>Events</strong> are notifications that are sent to a program when something happens, such
+  as when a user moves the mouse or presses a key.
+</p>
+<p>
+  For a more formal definition of the Evy syntax, see the
+  <a href="spec.html">Language Specification</a>, and for an intuitive understanding see
+  <a href="syntax-by-example.html">syntax by example</a>.
+</p>
+<h2><a id="input-and-output" href="#input-and-output" class="anchor">#</a>Input and Output</h2>
+<h3><a id="print" href="#print" class="anchor">#</a><code>print</code></h3>
+<p>
+  <code>print</code> prints the arguments given to it to the output area. It separates them by a
+  single space and outputs a newline character at the end.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print &quot;Hello&quot;
+print 2 true &quot;blue&quot;
+print &quot;array:&quot; [1 2 3]
+print &quot;map:&quot; {name:&quot;Scholl&quot; age:21}
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">Hello
+2 true blue
+array: [1 2 3]
+map: {name:Scholl age:21}
+</code></pre>
+<h4>Reference</h4>
+<pre><code>print a:any...
+</code></pre>
+<p>
+  The <code>print</code> function prints its arguments to the output area, each separated by a
+  single space and terminated by a newline character. If no arguments are provided it only prints
+  the newline character.
+</p>
+<p>
+  The backslash character <code>\</code> can be used to represent special characters in strings. For
+  example, the <code>\t</code> escape sequence represents a tab character, and the
+  <code>\n</code> escape sequence represents a newline character. Quotes in string literals must
+  also be escaped with backslashes, otherwise they will be interpreted as the end of the string
+  literal. For example:
+</p>
+<pre><code class="language-evy">print &quot;Here's a tab: 👉\t👈\nShe said: \&quot;Thank you!\&quot;&quot;
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">Here's a tab: 👉	👈
+She said: &quot;Thank you!&quot;
+</code></pre>
+<p>
+  In a browser environment <code>print</code> outputs to the output area. When running Evy from the
+  command line interface, <code>print</code> prints to standard out.
+</p>
+<h3><a id="read" href="#read" class="anchor">#</a><code>read</code></h3>
+<p>
+  <code>read</code> reads a line of input from the user and returns it as a string. The newline
+  character is not included in the returned string.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">name := read
+print &quot;Hello, &quot;+name+&quot;!&quot;
+</code></pre>
+<p>Input</p>
+<pre><code class="language-evy-input">Mary Jackson
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">Hello, Mary Jackson!
+</code></pre>
+<h4>Reference</h4>
+<pre><code>read:string
+</code></pre>
+<p>
+  The <code>read</code> function returns a string that contains the line of input that the user
+  entered up until, excluding the newline character. It is a blocking functions, which means that it
+  will not return until the user has entered a line of input and pressed the Enter key.
+</p>
+<p>
+  In a browser environment <code>read</code> reads from the text input area. When running Evy from
+  the command line interface, <code>read</code> reads from standard in.
+</p>
+<h3><a id="cls" href="#cls" class="anchor">#</a><code>cls</code></h3>
+<p><code>cls</code> clears the output area of all printed text.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print &quot;Hello&quot;
+sleep 1
+cls
+print &quot;Bye&quot;
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">Bye
+</code></pre>
+<h4>Reference</h4>
+<pre><code>cls
+</code></pre>
+<p>
+  The <code>cls</code> function clears all text output. In a browser environment
+  <code>cls</code> clears the output area. When running Evy from the command line interface,
+  <code>cls</code> clears the terminal, similar to the Unix <code>clear</code> or Windows
+  <code>cls</code> commands.
+</p>
+<h3><a id="printf" href="#printf" class="anchor">#</a><code>printf</code></h3>
+<p><code>printf</code> stands for print formatted.</p>
+<p>
+  <code>printf</code> prints its arguments to the output area according to a <em>format</em> string.
+  The format string is the first argument, and it contains <strong>specifiers</strong>. Specifiers
+  start with a percent sign <code>%</code>. They tell the <code>printf</code> function how and where
+  to print the remaining arguments inside the format string. The rest of the format string is
+  printed to the output area without changes.
+</p>
+<p>Here are some valid specifiers in Evy:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Specifier</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>%v</code></td>
+      <td>the argument in its default format</td>
+    </tr>
+    <tr>
+      <td><code>%q</code></td>
+      <td>a double-quoted string</td>
+    </tr>
+    <tr>
+      <td><code>%%</code></td>
+      <td>a percent sign <code>%</code></td>
+    </tr>
+  </tbody>
+</table>
+<h4>Example</h4>
+<pre><code class="language-evy">printf &quot;The tank is 100%% full.\n\n&quot;
+
+weather := &quot;rainy&quot;
+printf &quot;It is %v today.\n&quot; weather
+rainfall := 10
+printf &quot;There will be %vmm of rainfall.\n&quot; rainfall
+unicorns := false
+printf &quot;There will be unicorns eating lollipops: %v.\n\n&quot; unicorns
+
+quote := &quot;Wow!&quot;
+printf &quot;They said: %q\n&quot; quote
+printf &quot;Array: %v\n&quot; [1 2 3]
+printf &quot;Map: %v\n&quot; {a:1 b:2}
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">The tank is 100% full.
+
+It is rainy today.
+There will be 10mm of rainfall.
+There will be unicorns eating lollipops: false.
+
+They said: &quot;Wow!&quot;
+Array: [1 2 3]
+Map: {a:1 b:2}
+</code></pre>
+<h4>Reference</h4>
+<pre><code>printf format:string a:any...
+</code></pre>
+<p>
+  The <code>printf</code> function prints its arguments to the output area according to the
+  <strong>format</strong> string that is the first argument. The <strong>specifiers</strong> that
+  start with <code>%</code> and are contained in the format string are replaced by the remaining
+  arguments in the given order. For example, the following code
+  <code>printf &quot;first: %s, second: %s&quot; &quot;A&quot; &quot;B&quot;</code> prints
+  <code>first: A, second: B</code>.
+</p>
+<p>Full list of valid specifiers in Evy:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Specifier</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>%v</code></td>
+      <td>the argument in a default format</td>
+    </tr>
+    <tr>
+      <td><code>%t</code></td>
+      <td>the word <code>true</code> or <code>false</code></td>
+    </tr>
+    <tr>
+      <td><code>%f</code></td>
+      <td>decimal point (floating-point) number, e.g. 123.456000</td>
+    </tr>
+    <tr>
+      <td><code>%e</code></td>
+      <td>scientific notation, e.g. -1.234456e+78</td>
+    </tr>
+    <tr>
+      <td><code>%s</code></td>
+      <td>string value</td>
+    </tr>
+    <tr>
+      <td><code>%q</code></td>
+      <td>a double-quoted string</td>
+    </tr>
+    <tr>
+      <td><code>%%</code></td>
+      <td>a literal percent sign <code>%</code>; consumes no value</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  If the arguments for the <code>%s</code>, <code>%q</code>, <code>%f</code>, <code>%e</code>, and
+  <code>%t</code> specifiers do not match the required type, a panic will occur.
+</p>
+<p>
+  The <strong>width</strong> and <strong>precision</strong> of a floating-point number can be
+  specified with the <code>%f</code> and <code>%v</code> format specifiers.
+</p>
+<ul>
+  <li>
+    Width is the number of characters that will be used to print the number. If the width is not
+    specified, it will be calculated based on the size of the number. It can be useful for padding
+    and aligned output.
+  </li>
+  <li>
+    Precision is the number of decimal places that will be displayed. If the precision is not
+    specified, it will be set to 6 for <code>%f</code>.
+  </li>
+</ul>
+<p>
+  Here is a table that shows the different ways to specify the width and precision of a
+  floating-point number:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Verb</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>%f</code></td>
+      <td>default width, default precision</td>
+    </tr>
+    <tr>
+      <td><code>%7f</code></td>
+      <td>width 7, default precision</td>
+    </tr>
+    <tr>
+      <td><code>%.2f</code></td>
+      <td>default width, precision 2</td>
+    </tr>
+    <tr>
+      <td><code>%7.2f</code></td>
+      <td>width 7, precision 2</td>
+    </tr>
+    <tr>
+      <td><code>%7.f</code></td>
+      <td>width 7, precision 0</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  If the width/precision is preceded by a <code>-</code>, the value is padded with spaces on the
+  right rather than the left. If it is preceded by a 0, the value is padded with leading zeros
+  rather than spaces.
+</p>
+<p>
+  The width, precision and alignment prefix (<code>-</code> or <code>0</code>) can be used with all
+  valid specifiers. For example:
+</p>
+<pre><code class="language-evy">printf &quot;right:  |%7.2f|\n&quot; 1
+printf &quot;left:   |%-7.2v|\n&quot; &quot;abcd&quot;
+printf &quot;zeropad:|%07.2f|\n&quot; 1.2345
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">right:  |   1.00|
+left:   |ab     |
+zeropad:|0001.23|
+</code></pre>
+<h2><a id="types" href="#types" class="anchor">#</a>Types</h2>
+<h3><a id="len" href="#len" class="anchor">#</a><code>len</code></h3>
+<p>
+  <code>len</code> returns the number of characters in a string, the number of elements in an array
+  or the number of key-value pairs in a map.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">l := len &quot;abcd&quot;
+print &quot;len \&quot;abcd\&quot;:&quot; l
+
+l = len [1 2]
+print &quot;len [1 2]:&quot; l
+
+l = len {a:3 b:4 c:5}
+print &quot;len {a:3 b:4 c:5}:&quot; l
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">len &quot;abcd&quot;: 4
+len [1 2]: 2
+len {a:3 b:4 c:5}: 3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>len:num a:any
+</code></pre>
+<p>
+  The <code>len</code> function takes a single argument, which can be a string, an array, or a map.
+  If the argument is a string, <code>len</code> returns the number of characters in the string. If
+  the argument is an array, <code>len</code> returns the number of elements in the array. If the
+  argument is a map, <code>len</code> returns the number of key-value pairs in the map. If the
+  argument is of any other type, a panic will occur.
+</p>
+<h3><a id="typeof" href="#typeof" class="anchor">#</a><code>typeof</code></h3>
+<p><code>typeof</code> returns the type of the argument as string value.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">a:any
+a = &quot;abcd&quot;
+t := typeof a
+print &quot;typeof \&quot;abcd\&quot;:&quot; t
+
+t = typeof {kind:true strong:true}
+print &quot;typeof {kind:true strong:true}:&quot; t
+
+t = typeof [[1 2] [3 4]]
+print &quot;typeof [[1 2] [3 4]]:&quot; t
+
+t = typeof [1 2 true]
+print &quot;typeof [1 2 true]:&quot; t
+
+print &quot;typeof []:&quot; (typeof [])
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">typeof &quot;abcd&quot;: string
+typeof {kind:true strong:true}: {}bool
+typeof [[1 2] [3 4]]: [][]num
+typeof [1 2 true]: []any
+typeof []: []any
+</code></pre>
+<h4>Reference</h4>
+<pre><code>typeof:string a:any
+</code></pre>
+<p>
+  The <code>typeof</code> function takes a single argument, which can be of any type. The function
+  returns a string that represents the type of the argument. The string returned by
+  <code>typeof</code> is the same as the type in an Evy program, for example <code>num</code>,
+  <code>bool</code>, <code>string</code>, <code>[]num</code>, <code>{}[]any</code>. For an empty
+  composite literal, <code>typeof</code> returns <code>[]</code> or <code>{}</code> as it can be
+  matched to any subtype, e.g. <code>[]</code> can be passed to a function that takes an argument of
+  <code>[]num</code>, or <code>[]string</code>.
+</p>
+<h2><a id="map" href="#map" class="anchor">#</a>Map</h2>
+<h3><a id="has" href="#has" class="anchor">#</a><code>has</code></h3>
+<p><code>has</code> returns whether a map has a given key or not.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">map := {a:1}
+printf &quot;has %v %q: %t\n&quot; map &quot;a&quot; (has map &quot;a&quot;)
+printf &quot;has %v %q: %t\n&quot; map &quot;X&quot; (has map &quot;X&quot;)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">has {a:1} &quot;a&quot;: true
+has {a:1} &quot;X&quot;: false
+</code></pre>
+<h4>Reference</h4>
+<pre><code>has:bool map:{} key:string
+</code></pre>
+<p>
+  The <code>has</code> function takes two arguments: a map and a key. It returns true if the map has
+  the key, and false if the map does not have the key. The map can be of any value type, such as
+  <code>{}num</code> or <code>{}[]any</code> and the key can be any string.
+</p>
+<h3><a id="del" href="#del" class="anchor">#</a><code>del</code></h3>
+<p><code>del</code> deletes a key-value entry from a map.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">map := {a:1 b:2}
+del map &quot;b&quot;
+print map
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">{a:1}
+</code></pre>
+<h4>Reference</h4>
+<pre><code>del map:{} key:string
+</code></pre>
+<p>
+  The <code>del</code> function takes two arguments: a map and a key. It deletes the key-value entry
+  from the map if the key exists. If the key does not exist, the function does nothing. The map can
+  have any value type, and the key can be any string. It is safe to delete values from the map with
+  <code>del</code> while iterating with a <code>for … range</code> loop.
+</p>
+<h2><a id="program-control" href="#program-control" class="anchor">#</a>Program control</h2>
+<h3><a id="sleep" href="#sleep" class="anchor">#</a><code>sleep</code></h3>
+<p><code>sleep</code> pauses the program for the given number of seconds.</p>
+<p>
+  <code>sleep</code> can be used to create delays in Evy programs. For example, you could use sleep
+  to create a countdown timer.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print &quot;2&quot;
+sleep 1
+print &quot;1&quot;
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">2
+1
+</code></pre>
+<h4>Reference</h4>
+<pre><code>sleep seconds:num
+</code></pre>
+<p>
+  The <code>sleep</code> function pauses the execution of the current Evy program for at least the
+  given number of seconds. Sleep may also pause for a fraction of a second, e.g.
+  <code>sleep 0.1</code>.
+</p>
+<h3><a id="exit" href="#exit" class="anchor">#</a><code>exit</code></h3>
+<p><code>exit</code> terminates the program with the given status code.</p>
+<h4>Example</h4>
+<pre><code class="language-evy-err">input := &quot;not a number&quot;
+n := str2num input
+
+if err
+    print errmsg
+    exit 1
+end
+
+print n
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">str2num: cannot parse &quot;not a number&quot;
+</code></pre>
+<h3><a id="panic" href="#panic" class="anchor">#</a><code>panic</code></h3>
+<p>
+  <code>panic</code> prints the given error message and terminates the program immediately. It is
+  used to report unrecoverable errors.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy-err">scale := -5
+
+if (scale) &lt;= 0
+    panic &quot;scale must be positive&quot;
+end
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">line 4 column 5: scale must be positive
+</code></pre>
+<h4>Reference</h4>
+<pre><code>panic msg:string
+</code></pre>
+<p>
+  The <code>panic</code> function takes a single argument, which is the error message that the
+  program will print before it terminates with exit status 1.
+</p>
+<h3><a id="assert" href="#assert" class="anchor">#</a><code>assert</code></h3>
+<p>
+  <code>assert</code> is used to check if a condition is true or two values – <code>want</code> and
+  <code>got</code> – are the same. If the condition is not true or the two values are not the same,
+  the program will print the failed assertion and terminate with exit status 1.
+</p>
+<p>
+  <code>assert</code> optionally takes a message or a formatted message with arguments to print
+  along with the failed assertion as a third and following arguments:
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy-err">answer := 6 * 9
+assert 42 answer &quot;answer is 42 not %v&quot; answer
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">❌ 1 failed assertion
+✔️ 0 passed assertions
+line 2 column 11: failed assertion: want != got: 42 != 54 (answer is 42 not 54)
+</code></pre>
+<h4>Reference</h4>
+<pre><code>assert cond:bool
+assert want:any got:any [msg:string [argsany...]]
+</code></pre>
+<p>
+  The <code>assert</code> function takes either a single boolean argument <code>cond</code> and
+  ensures it is <code>true</code>, or two arguments <code>want</code> and <code>got</code>, in that
+  order, and ensures they are the same.
+</p>
+<p>
+  In the case of the single argument, the argument must be of type <code>bool</code>.
+  <code>assert</code> verifies that this argument has the value <code>true</code>. If
+  <code>cond</code> is false, <code>assert</code> terminates the program execution and prints the
+  failed assertion.
+</p>
+<p>
+  In the case of two arguments, <code>want</code> and <code>got</code>, <code>assert</code> verifies
+  the arguments are the same. If they are not the same <code>assert</code> terminates the program
+  execution and prints the failed assertion.
+</p>
+<p>
+  <strong>Sameness</strong> of <code>want</code> and <code>got</code> means either
+  <code>want == got</code> or <code>want</code> and <code>got</code> are composite values, arrays or
+  maps, containing the same values. <code>want</code> can be of a more <em>specific</em> type than
+  <code>got</code> as long as their values are the same. For example, the following assertion holds
+  true even though <code>want</code> is of type <code>[][]num</code> and <code>got</code> is of type
+  <code>[]any</code>.
+</p>
+<pre><code class="language-evy">got:[]any
+got = [[1] [2 3]]
+assert [[1] [2 3]] got
+</code></pre>
+<p>
+  In the case of three arguments, the third argument is a message of type <code>string</code> that
+  is printed if the assertion fails.
+</p>
+<p>
+  In case of four or more arguments, the third argument is a <em>format string</em> with
+  <em>specifiers</em>. The remaining arguments are the arguments are used to replace these
+  specifiers, see <a href="#sprintf"><code>sprintf</code></a> for details on formatting. This means
+  the following two assertions are equivalent.
+</p>
+<pre><code class="language-evy">val := 2
+assert 1 val &quot;val is %v&quot; val
+assert 1 val (sprintf &quot;val is %v&quot; val)
+</code></pre>
+<p>
+  Using <code>assert</code> with four or more arguments is a convenience compared to adding an
+  inline call to <code>sprintf</code>.
+</p>
+<h2><a id="conversion" href="#conversion" class="anchor">#</a>Conversion</h2>
+<h3><a id="str2num" href="#str2num" class="anchor">#</a><code>str2num</code></h3>
+<p>
+  <code>str2num</code> converts a string to a number. If the string is not a valid number, it
+  returns <code>0</code> and sets the global <code>err</code> variable to <code>true</code>.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">n:num
+n = str2num &quot;1&quot;
+print &quot;n:&quot; n &quot;err:&quot; err
+n = str2num &quot;NOT-A-NUMBER&quot;
+print &quot;n:&quot; n &quot;err:&quot; err
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">n: 1 err: false
+n: 0 err: true
+</code></pre>
+<h4>Reference</h4>
+<pre><code>str2num:num s:string
+</code></pre>
+<p>
+  The <code>str2num</code> function converts a string to a number. It takes a single argument, which
+  is the string to convert. If the string is a valid number, the function returns the number.
+  Otherwise, the function returns 0 and sets the global <code>err</code> variable to
+  <code>true</code>. For more information on <code>err</code>, see the
+  <a href="#recoverable-errors">Recoverable Errors section</a>.
+</p>
+<h3><a id="str2bool" href="#str2bool" class="anchor">#</a><code>str2bool</code></h3>
+<p>
+  <code>str2bool</code> converts a string to a boolean. If the string is not a valid boolean, it
+  returns <code>false</code> and sets the global <code>err</code> variable to <code>true</code>.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">b:bool
+b = str2bool &quot;true&quot;
+print &quot;b:&quot; b &quot;err:&quot; err
+b = str2bool &quot;NOT-A-BOOL&quot;
+print &quot;b:&quot; b &quot;err:&quot; err
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">b: true err: false
+b: false err: true
+</code></pre>
+<h4>Reference</h4>
+<pre><code>str2bool:bool s:string
+</code></pre>
+<p>
+  The <code>str2bool</code> function converts a string to a bool. It takes a single argument, which
+  is the string to convert. The function returns <code>true</code> if the string is equal to
+  <code>&quot;true&quot;</code>, <code>&quot;True&quot;</code>, <code>&quot;TRUE&quot;</code>, or
+  <code>&quot;1&quot;</code>, and <code>false</code> if the string is equal to
+  <code>&quot;false&quot;</code>, <code>&quot;False&quot;</code>, <code>&quot;FALSE&quot;</code>, or
+  <code>&quot;0&quot;</code>. The function returns <code>false</code> and sets the global
+  <code>err</code> variable to <code>true</code> if the string is not a valid boolean. For more
+  information on <code>err</code>, see the
+  <a href="#recoverable-errors">Recoverable Errors section</a>.
+</p>
+<h2><a id="errors" href="#errors" class="anchor">#</a>Errors</h2>
+<p>Evy has two types of errors: parse errors and run-time errors.</p>
+<ul>
+  <li>
+    <strong>parse errors</strong> are reported before the program is executed. They report errors
+    with the syntax, such as a missing closing quote for <code>print &quot;abc</code>, an illegal
+    character, such as <code>#</code>, or type errors, such as
+    <code>min &quot;a&quot; &quot;b&quot;</code>.
+  </li>
+  <li>
+    <strong>Run-time errors</strong> only occur if there are no parse errors and the code path
+    causing the error is executed.
+  </li>
+</ul>
+<p>For example, the following code will <strong>sometimes</strong> cause a run-time error:</p>
+<pre><code class="language-evy">n:num
+if (rand1) &lt; 0.5
+    n = str2num &quot;not-a-number&quot;
+else
+    n = str2num &quot;5&quot;
+end
+print &quot;n:&quot; n &quot;error:&quot; err
+</code></pre>
+<p>
+  Half the time, the program above will cause a run-time error and print
+  <code>n: 0 error: true</code>. The other half of the time, no error will occur and the program
+  will print <code>n:5 error:false</code>.
+</p>
+<p>Evy has two types of run-time errors: panic and error.</p>
+<ul>
+  <li>A <strong>panic</strong> is non-recoverable. It causes the program to exit immediately.</li>
+  <li>
+    An <strong>error</strong> is recoverable. The program can continue running after the error is
+    handled.
+  </li>
+</ul>
+<h3><a id="panic-1" href="#panic-1" class="anchor">#</a>Panic</h3>
+<p>
+  A panic causes the program to exit immediately and print an error message. Panics typically occur
+  when the program encounters a situation that it cannot handle, such as trying to access an element
+  of an array that is out of bounds. Panics cannot be intercepted by the program, so it is important
+  to take steps to prevent them from occurring in the first place.
+</p>
+<p>
+  One way to do this is to use <strong>guarding code</strong>, which is code that checks for
+  potential errors and takes steps to prevent them from occurring. For example, guarding code could
+  be used to check the length of an array before trying to access an element to avoid an out of
+  bounds error. If the access index is out of bounds, the guarding code could report the error.
+</p>
+<p>Here is an example of a panic:</p>
+<pre><code class="language-evy">arr := [0 1 2]
+i := 5 // e.g. user input
+print arr[i] // out of bounds
+print &quot;This line will not be executed&quot;
+</code></pre>
+<p>
+  This code will cause a panic because the index 5 is out of bounds for the array <code>arr</code>.
+  The program will exit with the error message
+</p>
+<pre><code>line 3: panic: index out of bounds: 5
+</code></pre>
+<p>
+  If you want your own code to panic, you can use the built-in <code>panic</code> function. This is
+  typically used to highlight mistakes or bugs in your program, such as invalid function arguments
+  or conditions that should never occur. The <code>panic</code> function exits your program
+  immediately, so it should only be used when it is clear that the program cannot continue. For more
+  information, see the <a href="#panic">Panic</a> section under Program Control above.
+</p>
+<h3>
+  <a id="recoverable-errors" href="#recoverable-errors" class="anchor">#</a>Recoverable Errors
+</h3>
+<p>
+  The global <code>err</code> variable is used to indicate whether a recoverable error has occurred.
+  The global <code>errmsg</code> variable stores a detailed message about the error that occurred.
+</p>
+<p>
+  Recoverable errors are caused by code that could not be prevented from running, such as converting
+  a user input string to a number if the string is not a number. This recoverable error will set the
+  global <code>err</code> variable to <code>true</code> and the program will continue executing. If
+  there is no error, <code>err</code> is set to <code>false</code>.
+</p>
+<p>
+  The global <code>errmsg</code> variable stores a detailed message about the error which is set
+  alongside <code>err</code>. <code>errmsg</code> is set to the empty string
+  <code>&quot;&quot;</code> if no error has occurred. If an error does occur, <code>errmsg</code> is
+  set to a message that describes the error.
+</p>
+<p>
+  When a function that could potentially cause an error finishes executing without an error, the
+  <code>err</code> variable is reset to <code>false</code> and the <code>errmsg</code> variable is
+  set to the empty string. This is done even if the <code>err</code> variable was previously set to
+  <code>true</code> or the <code>errmsg</code> variable was not empty. Therefore, it is up to the
+  program to check the <code>err</code> variable after any possible error occurrence.
+</p>
+<p>Here is an example of a recoverable error:</p>
+<pre><code class="language-evy">n := str2num &quot;NOT A NUM&quot;
+print &quot;num:&quot; n
+print &quot;err:&quot; err
+print &quot;errmsg:&quot; errmsg
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">num: 0
+err: true
+errmsg: str2num: cannot parse &quot;NOT A NUM&quot;
+</code></pre>
+<p>
+  If you want your own code or function to cause a recoverable error, follow the convention of
+  setting the <code>err</code> variable to <code>true</code> and the <code>errmsg</code> variable to
+  a message describing the error in the error case. In the non-error case, make sure to set the
+  <code>err</code> variable to <code>false</code>.
+</p>
+<h2><a id="string" href="#string" class="anchor">#</a>String</h2>
+<h3><a id="sprint" href="#sprint" class="anchor">#</a><code>sprint</code></h3>
+<p><code>sprint</code> stands for print to string.</p>
+<p>
+  It returns a string representation of the arguments given to it. It separates them by a single
+  space. Unlike <code>print</code>, there is no newline added to the end.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := sprint &quot;a&quot; [true] {a:1 b:2}
+printf &quot;%q\n&quot; s
+printf &quot;%q\n&quot; (sprint)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">&quot;a [true] {a:1 b:2}&quot;
+&quot;&quot;
+</code></pre>
+<h4>Reference</h4>
+<pre><code>sprint:string a:any...
+</code></pre>
+<p>
+  The <code>sprint</code> function takes any number of arguments and returns a string that
+  represents them, separated by a single space. The arguments can be of any type, including strings,
+  numbers, booleans, and maps. Unlike the <code>print</code> function, there is no newline added to
+  the end of the string.
+</p>
+<h3><a id="sprintf" href="#sprintf" class="anchor">#</a><code>sprintf</code></h3>
+<p><code>sprintf</code> stands for print formatted to string.</p>
+<p>
+  <code>sprintf</code> returns a string representation of its arguments according to a
+  <strong>format</strong> string. Formatting in <code>sprintf</code> and <code>printf</code> work
+  the same way, see <a href="#printf"><code>printf</code></a
+  >.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := sprintf &quot;%10q: %.f&quot; &quot;val&quot; 123.45
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">     &quot;val&quot;: 123
+</code></pre>
+<h4>Reference</h4>
+<pre><code>sprintf:string format:string a:any...
+</code></pre>
+<p>
+  The <code>sprintf</code> function returns a string representation of its arguments according to a
+  <strong>format</strong> string. The format string controls how the arguments are formatted. The
+  <code>sprintf</code> function works the same way as the <code>printf</code> function, and the
+  formatting syntax is the same, see <a href="#printf"><code>printf</code></a
+  >.
+</p>
+<h3><a id="join" href="#join" class="anchor">#</a><code>join</code></h3>
+<p>
+  <code>join</code> concatenates the elements of an array of values into a single string, with the
+  given separator string placed between elements. Any elements of the array that are not strings are
+  formatted as strings.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := join [&quot;a&quot; &quot;b&quot; &quot;c&quot; 1 3.141592654 true] &quot;, &quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">a, b, c, 1, 3.141592654, true
+</code></pre>
+<h4>Reference</h4>
+<pre><code>join:string elems:[]any sep:string
+</code></pre>
+<p>
+  The <code>join</code> function takes two arguments: an array of any and a separator string. The
+  array of any is the list of elements to be concatenated. The separator string is the string that
+  will be placed between elements in the resulting string. Values of the array that are not strings
+  are formatted as strings.
+</p>
+<p>
+  The <code>join</code> function returns a single string that is the concatenation of the elements
+  in the list of any, with the separator string placed between elements.
+</p>
+<h3><a id="split" href="#split" class="anchor">#</a><code>split</code></h3>
+<p>
+  <code>split</code> splits a string into a list of substrings separated by the given separator. The
+  separator can be any string, including the empty string.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (split &quot;a,b,c&quot; &quot;,&quot;)
+print (split &quot;a,b,c&quot; &quot;.&quot;)
+print (split &quot;a,b,c&quot; &quot;&quot;)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">[a b c]
+[a,b,c]
+[a , b , c]
+</code></pre>
+<h4>Reference</h4>
+<pre><code>split:[]string s:string sep:string
+</code></pre>
+<p>
+  The <code>split</code> function takes two arguments: the string to be split and the separator
+  string. The string to be split is the string that will be split into substrings. The separator
+  string is the string that will be used to split the string.
+</p>
+<p>
+  The <code>split</code> function returns a list of substrings. The list of substrings contains all
+  of the substrings of the original string that are separated by the separator string.
+</p>
+<p>
+  If the string does not contain the separator, the <code>split</code> function returns an array of
+  length 1 containing the original string.
+</p>
+<p>
+  If the separator is the empty string, the <code>split</code> function splits the string after each
+  character (UTF-8 sequence).
+</p>
+<p>
+  If both the string and the separator are empty, the <code>split</code> function returns an empty
+  list.
+</p>
+<h3><a id="upper" href="#upper" class="anchor">#</a><code>upper</code></h3>
+<p><code>upper</code> returns a string with all lowercase letters converted to uppercase.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := upper &quot;abc D e ü&quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">ABC D E Ü
+</code></pre>
+<h4>Reference</h4>
+<pre><code>upper:string s:string
+</code></pre>
+<p>
+  The <code>upper</code> function takes a single argument: the string to be converted to uppercase.
+  The function returns a new string with all lowercase letters converted to uppercase. All other
+  characters are left unchanged.
+</p>
+<p>
+  The <code>upper</code> function uses the Unicode character database to determine which characters
+  are lowercase and their equivalent uppercase form.
+</p>
+<h3><a id="lower" href="#lower" class="anchor">#</a><code>lower</code></h3>
+<p><code>lower</code> returns a string with all uppercase letters converted to lowercase.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := lower &quot;abc D e ü&quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">abc d e ü
+</code></pre>
+<h4>Reference</h4>
+<pre><code>lower:string s:string
+</code></pre>
+<p>
+  The <code>lower</code> function takes a single argument: the string to be converted to lowercase.
+  The function returns a new string with all uppercase letters converted to lowercase. All other
+  characters are left unchanged.
+</p>
+<p>
+  The <code>lower</code> function uses the Unicode character database to determine which characters
+  are uppercase and their equivalent lowercase form.
+</p>
+<h3><a id="index" href="#index" class="anchor">#</a><code>index</code></h3>
+<p>
+  <code>index</code> returns the position of a substring in a string, or -1 if the substring is not
+  present.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">n := index &quot;abcde&quot; &quot;de&quot;
+print n
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>index:num s:string sub:string
+</code></pre>
+<p>
+  The <code>index</code> function finds the index of a substring <code>sub</code> in a string
+  <code>s</code>. It returns the index of the first occurrence of a <code>sub</code> within
+  <code>s</code>, or -1 if the substring is not present.
+</p>
+<h3><a id="startswith" href="#startswith" class="anchor">#</a><code>startswith</code></h3>
+<p><code>startswith</code> tests whether a string begins with a given prefix.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">b := startswith &quot;abcde&quot; &quot;ab&quot;
+print b
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">true
+</code></pre>
+<h4>Reference</h4>
+<pre><code>startswith:bool s:string prefix:string
+</code></pre>
+<p>
+  The <code>startswith</code> function tests whether the string <code>s</code> begins with
+  <code>prefix</code> and returns <code>true</code> if <code>s</code> starts with
+  <code>prefix</code>, <code>false</code> otherwise.
+</p>
+<h3><a id="endswith" href="#endswith" class="anchor">#</a><code>endswith</code></h3>
+<p><code>endswith</code> tests whether a string ends with a given suffix.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">b := endswith &quot;abcde&quot; &quot;ab&quot;
+print b
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">false
+</code></pre>
+<h4>Reference</h4>
+<pre><code>endswith:bool s:string suffix:string
+</code></pre>
+<p>
+  The <code>endswith</code> function tests whether the string <code>s</code> ends with
+  <code>suffix</code> and returns <code>true</code> if <code>s</code> ends with <code>suffix</code>,
+  <code>false</code> otherwise.
+</p>
+<h3><a id="trim" href="#trim" class="anchor">#</a><code>trim</code></h3>
+<p><code>trim</code> removes leading and trailing characters from a string.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := trim &quot;.,..abc.de.&quot; &quot;.,&quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">abc.de
+</code></pre>
+<h4>Reference</h4>
+<pre><code>trim:string s:string cutset:string
+</code></pre>
+<p>
+  The <code>trim</code> function removes any characters in <code>cutset</code> from the beginning
+  and end of string <code>s</code>. It returns a copy of the resulting string.
+</p>
+<h3><a id="replace" href="#replace" class="anchor">#</a><code>replace</code></h3>
+<p>
+  <code>replace</code> replaces all occurrences of a substring with another substring in a string.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := replace &quot;abc123xyzabc abc&quot; &quot;abc&quot; &quot;ABC&quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">ABC123xyzABC ABC
+</code></pre>
+<h4>Reference</h4>
+<pre><code>replace:string s:string old:string new:string
+</code></pre>
+<p>
+  The <code>replace</code> function replaces all occurrences of the substring <code>old</code> in
+  the string <code>s</code> with the substring <code>new</code>.
+</p>
+<h3><a id="repr" href="#repr" class="anchor">#</a><code>repr</code></h3>
+<p>
+  <code>repr</code> returns a string representation of its arguments, typically as valid, formatted
+  Evy code. The notable exception are maps with keys that could not be used in a map literal.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">s := repr 1 &quot;abc&quot;
+print s
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">1 &quot;abc&quot;
+</code></pre>
+<h4>Reference</h4>
+<pre><code>repr:string a:any...
+</code></pre>
+<p>
+  The <code>repr</code> function returns a string representation of its arguments, typically as
+  valid, formatted Evy code. The notable exception are maps with keys that could not be used in a
+  map literal.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Representation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>num</code></td>
+      <td>as is</td>
+    </tr>
+    <tr>
+      <td><code>bool</code></td>
+      <td>as is</td>
+    </tr>
+    <tr>
+      <td><code>string</code></td>
+      <td>double-quoted with internal quotes escaped</td>
+    </tr>
+    <tr>
+      <td><code>[]</code>...</td>
+      <td>enclosed in square brackets, details below</td>
+    </tr>
+    <tr>
+      <td><code>{}</code>...</td>
+      <td>enclosed in curly braces, details below</td>
+    </tr>
+  </tbody>
+</table>
+<p>The elements of an array are printed according to <code>repr</code> and space-separated.</p>
+<p>
+  The key-value pairs of a map are space-separated, with keys separated from values by
+  <code>:</code>. Keys are printed without quotes if they are valid identifiers or Evy keywords, and
+  surrounded by quotes with escaped internal quotes if not. Values are printed according to
+  <code>repr</code>.
+</p>
+<h2><a id="random" href="#random" class="anchor">#</a>Random</h2>
+<h3><a id="rand" href="#rand" class="anchor">#</a><code>rand</code></h3>
+<p><code>rand</code> returns a random, non-negative integer less than the argument.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (rand 3)
+print (rand 3)
+</code></pre>
+<p>Sample output</p>
+<pre><code>2
+0
+</code></pre>
+<h4>Reference</h4>
+<pre><code>rand:num n:num
+</code></pre>
+<p>
+  The <code>rand</code> functions returns, a non-negative pseudo-random integer number in the
+  half-open interval <code>[0,n)</code>. A panic occurs for <code>n &lt;= 0</code>.
+</p>
+<h3><a id="rand1" href="#rand1" class="anchor">#</a><code>rand1</code></h3>
+<p><code>rand1</code> returns a random, non-negative floating point number less than 1.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (rand1)
+print (rand1)
+</code></pre>
+<p>Sample output</p>
+<pre><code>0.7679753163102002
+0.6349044894123325
+</code></pre>
+<h4>Reference</h4>
+<pre><code>rand1:num
+</code></pre>
+<p>
+  The <code>rand1</code> function returns a pseudo-random floating point number in the half-open
+  interval <code>[0.0,1.0)</code>.
+</p>
+<h2><a id="math" href="#math" class="anchor">#</a>Math</h2>
+<h3><a id="min" href="#min" class="anchor">#</a><code>min</code></h3>
+<p><code>min</code> returns the smaller of the two given numbers.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (min 3 1)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">1
+</code></pre>
+<h4>Reference</h4>
+<pre><code>min:num n1:num n2:num
+</code></pre>
+<p>The <code>min</code> function returns the smaller of the two given number arguments.</p>
+<h3><a id="max" href="#max" class="anchor">#</a><code>max</code></h3>
+<p><code>max</code> returns the greater of the two given numbers.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (max 3 1)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>max:num n1:num n2:num
+</code></pre>
+<p>The <code>max</code> function returns the greater of the two given number arguments.</p>
+<h3><a id="abs" href="#abs" class="anchor">#</a><code>abs</code></h3>
+<p><code>abs</code> returns the absolute value of a number.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (abs 3)
+print (abs -2.5)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">3
+2.5
+</code></pre>
+<h4>Reference</h4>
+<pre><code>abs:num n:num
+</code></pre>
+<p>
+  The <code>abs</code> function returns the absolute value of a number, which is its magnitude
+  without regard to its sign.
+</p>
+<h3><a id="floor" href="#floor" class="anchor">#</a><code>floor</code></h3>
+<p><code>floor</code> returns the greatest integer value less than or equal to the given number.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (floor 2.7)
+print (floor 3)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">2
+3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>floor:num n:num
+</code></pre>
+<p>
+  The <code>floor</code> function returns the greatest integer value less than or equal to its
+  number argument <code>n</code>.
+</p>
+<h3><a id="ceil" href="#ceil" class="anchor">#</a><code>ceil</code></h3>
+<p><code>ceil</code> returns the smallest integer greater than or equal to the given number.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (ceil 2.1)
+print (ceil 4)
+</code></pre>
+<p>Sample output</p>
+<pre><code>3
+4
+</code></pre>
+<h4>Reference</h4>
+<pre><code>ceil:num n:num
+</code></pre>
+<p>
+  The <code>ceil</code> function returns the smallest integer greater than or equal to its number
+  argument <code>n</code>.
+</p>
+<h3><a id="round" href="#round" class="anchor">#</a><code>round</code></h3>
+<p>
+  <code>round</code> returns the nearest integer to the given number, rounding half away from 0.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (round 2.4)
+print (round 2.5)
+</code></pre>
+<p>Sample output</p>
+<pre><code>2
+3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>round:num n:num
+</code></pre>
+<p>
+  The <code>round</code> function returns the nearest integer to the given number argument
+  <code>n</code>, rounding half away from 0.
+</p>
+<h3><a id="pow" href="#pow" class="anchor">#</a><code>pow</code></h3>
+<p>
+  <code>pow</code> returns the value of the first number raised to the power of the second number.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (pow 2 3)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">8
+</code></pre>
+<h4>Reference</h4>
+<pre><code>pow:num b:num exp:num
+</code></pre>
+<p>
+  The <code>pow</code> function returns <code>b</code> to the power of <code>exp</code>. The first
+  number argument <code>b</code> is the base. The second number argument <code>exp</code> is the
+  exponent.
+</p>
+<h3><a id="log" href="#log" class="anchor">#</a><code>log</code></h3>
+<p><code>log</code> returns the logarithm of the given number, to the base of e.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">printf &quot;%.2f\n&quot; (log 1)
+printf &quot;%.2f\n&quot; (log 2.7183) // e
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">0.00
+1.00
+</code></pre>
+<h4>Reference</h4>
+<pre><code>log:num n:num
+</code></pre>
+<p>
+  The <code>log</code> function returns the <strong>natural logarithm</strong>, the logarithm of the
+  given number argument <code>n</code>, to the base of <code>e</code>.
+</p>
+<h3><a id="sqrt" href="#sqrt" class="anchor">#</a><code>sqrt</code></h3>
+<p><code>sqrt</code> returns the square root of the given number.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">print (sqrt 9)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">3
+</code></pre>
+<h4>Reference</h4>
+<pre><code>sqrt:num n:num
+</code></pre>
+<p>
+  The <code>sqrt</code> function returns the positive square root of the number argument
+  <code>n</code>.
+</p>
+<h3><a id="sin" href="#sin" class="anchor">#</a><code>sin</code></h3>
+<p><code>sin</code> returns the sine of the given angle in radians.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">pi := 3.14159265
+print (sin 0.5*pi)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">1
+</code></pre>
+<h4>Reference</h4>
+<pre><code>sin:num n:num
+</code></pre>
+<p>The <code>sin</code> function returns the sine of the given angle <code>n</code> in radians.</p>
+<h3><a id="cos" href="#cos" class="anchor">#</a><code>cos</code></h3>
+<p><code>cos</code> returns the cosine of the given angle in radians.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">pi := 3.14159265
+print (cos pi)
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">-1
+</code></pre>
+<h4>Reference</h4>
+<pre><code>cos:num n:num
+</code></pre>
+<p>
+  The <code>cos</code> function returns the cosine of the given angle <code>n</code> in radians.
+</p>
+<h3><a id="atan2" href="#atan2" class="anchor">#</a><code>atan2</code></h3>
+<p>
+  <code>atan2</code> returns the angle in radians between the positive x-axis and the ray from the
+  origin to the point <code>x y</code>.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">pi := 3.14159265
+rad := atan2 1 1
+degrees := rad * 180 / pi
+printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
+</code></pre>
+<p>Output</p>
+<pre><code class="language-evy-output">rad: 0.79 degrees: 45.00
+</code></pre>
+<h4>Reference</h4>
+<pre><code>atan2:num y:num x:num
+</code></pre>
+<p>
+  The <code>atan2</code> function returns the angle in radians between the positive x-axis and the
+  ray from the origin to the point <code>x y</code>. More formally, it returns the arc tangent of
+  <code>y/x</code> for given arguments <code>y</code> and <code>x</code>, using the signs of the two
+  to determine the quadrant of the return value.
+</p>
+<h2><a id="graphics" href="#graphics" class="anchor">#</a>Graphics</h2>
+<p>Evy on the web outputs drawing commands to a drawing area called the <strong>canvas</strong>.</p>
+<p>
+  Positions on the canvas are defined by a coordinate system, similar to the Cartesian coordinate
+  system used in mathematics. The horizontal dimension is called the <strong>x-axis</strong>, and
+  the vertical dimension is called the <strong>y-axis</strong>.
+</p>
+<p>
+  A point on the canvas is defined by its <strong>x</strong> and <strong>y coordinates</strong>,
+  which are written as <code>x y</code>. For example, the point <code>30 60</code> has an
+  x-coordinate of 30 and a y-coordinate of 60. It is located 30 units from the left edge of the
+  canvas and 60 units from the bottom edge.
+</p>
+<img
+  width="300"
+  alt="Cartesian coordinates with x and y axes and point (30, 60)"
+  src="img/coords.png"
+/>
+<p>
+  <a
+    href="/play#content=H4sIAAAAAAAAE0WRwW6EIBCG7/MUE86NAV1w8dqkL7HxYJFtSVE2rmnXNn33DgL2NDMfA///h7fFjWCCDwuyVz+YDwZfblzfkVcnAO9mixwF5zCFz9jyxIhQC7fgN7zsQ48XfUZRydTEOfG8tL8SYSVRn/sIcokc4BrmFX/u7tt2J7wOk/Nbx17cMuBzGO0TTmEO99tgLPtNXrREAat9rMgeLCFBMKPtQGWJM0ioOVJQp3gJqY48hKUma7VG2VJtRK47z0t0qGKeus3LLSrRF56laomqzvq72OFBYK2L1e6fC5JQJVXXRJ4/Z7EjO/yTV+MW4+kC/AGSFdVbwgEAAA=="
+    >Evy source: coordinates</a
+  >.
+</p>
+<p>
+  The canvas ranges from coordinates <code>0 0</code> to <code>100 100</code>. The center of the
+  canvas has the coordinates <code>50 50</code>.
+</p>
+<p>
+  Shapes are drawn on the canvas using a <strong>pen</strong>. The pen has an
+  <code>x y</code> position and a style. The position of the pen is also known as the current
+  <strong>cursor position</strong>.
+</p>
+<p>
+  Some graphics functions, like <code>line</code>, <code>rect</code>, <code>circle</code>, and
+  <code>text</code>, create shapes on the canvas. Other graphics functions such as
+  <code>color</code>, <code>width</code>, and <code>font</code> set the style of the pen for
+  subsequent drawing commands.
+</p>
+<h3><a id="move" href="#move" class="anchor">#</a><code>move</code></h3>
+<p><code>move</code> sets the position of the pen to the given coordinates.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">grid
+move 30 60
+circle 1
+</code></pre>
+<p>Output</p>
+<img width="300" alt="small black dot at coords 30 60" src="img/move-30-60.png" />
+<h4>Reference</h4>
+<pre><code>move x:num y:num
+</code></pre>
+<p>
+  The <code>move</code> function sets the position of the cursor to the given <code>x</code> and
+  <code>y</code> coordinates. The initial cursor position is <code>0 0</code>.
+</p>
+<h3><a id="line" href="#line" class="anchor">#</a><code>line</code></h3>
+<p><code>line</code> draws a line from the current position of the pen to the given coordinates.</p>
+<h4>Example</h4>
+<p>The following example draws a triangle.</p>
+<pre><code class="language-evy">move 30 20
+line 70 20
+line 50 50
+line 30 20
+</code></pre>
+<p>Output</p>
+<img width="300" alt="triangle in bottom half of canvas" src="img/triangle.png" />
+<h4>Reference</h4>
+<pre><code>line x:num y:num
+</code></pre>
+<p>
+  The <code>line</code> function draws a line from the current cursor position to the given
+  <code>x</code> and <code>y</code> coordinates. The cursor position is then updated to the given
+  coordinates, which allows for easy polygon drawing.
+</p>
+<h3><a id="rect" href="#rect" class="anchor">#</a><code>rect</code></h3>
+<p>
+  <code>rect</code> draws a rectangle with the given width and height at the pen's current position.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">grid
+move 40 20
+rect 10 30
+rect 40 20
+</code></pre>
+<p>Output</p>
+<img width="300" alt="two black rectangles with touching vertices" src="img/rects.png" />
+<h4>Reference</h4>
+<pre><code>rect width:num height:num
+</code></pre>
+<p>
+  The <code>rect</code> function draws a rectangle with the given <code>width</code> and
+  <code>height</code> at the current cursor position. The cursor position is then updated to the
+  position that is the width and height away from the current position. In other words, the opposite
+  corner of the rectangle is at the new cursor position.
+</p>
+<h3><a id="circle" href="#circle" class="anchor">#</a><code>circle</code></h3>
+<p><code>circle</code> draws a circle with given radius at the pen's current position.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">grid
+move 50 50
+circle 10
+</code></pre>
+<p>Output</p>
+<img width="300" alt="black circle in the canvas center" src="img/circle.png" />
+<h4>Reference</h4>
+<pre><code>circle radius:num
+</code></pre>
+<p>
+  The <code>circle</code> function draws a circle with the given <code>radius</code> centered at the
+  current cursor position. The cursor position does not change after drawing a circle.
+</p>
+<h3><a id="color" href="#color" class="anchor">#</a><code>color</code></h3>
+<p>
+  <code>color</code> changes the color of the pen. All
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value"
+    >CSS (Cascading Style Sheets) color values</a
+  >
+  are supported. You can start by using the simpler
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color">named CSS colors</a> , such
+  as <code>&quot;red&quot;</code>, <code>&quot;darkmagenta&quot;</code>, and
+  <code>&quot;springgreen&quot;</code>.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">color &quot;darkmagenta&quot;
+rect 20 20
+</code></pre>
+<p>Output</p>
+<img width="300" alt="dark magenta square in bottom left corner" src="img/magenta.png" />
+<h4>Reference</h4>
+<pre><code>color c:string
+</code></pre>
+<p>
+  The <code>color</code> function changes the color of the <strong>stroke</strong> and the
+  <strong>fill</strong> to the given CSS color string <code>c</code>. Evy supports all
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">CSS color values</a>,
+  including semi-transparent ones. For example, the following code changes the color to a shade of
+  red that is 60% opaque: <code>color &quot;rgb(100% 0% 0% / 60%)&quot;</code>.
+</p>
+<p>
+  <strong>Named CSS colors</strong>, such as <code>&quot;red&quot;</code>,
+  <code>&quot;darkmagenta&quot;</code>, and <code>&quot;springgreen&quot;</code>, are a simpler way
+  of specifying common colors. For a complete list of named CSS colors, see the
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color"
+    >Mozilla Developer documentation</a
+  >.
+</p>
+<p>
+  If the color string <code>c</code> is not recognized as a valid CSS color, the color does not
+  change. The initial color is <code>&quot;black&quot;</code>.
+</p>
+<h3><a id="colour" href="#colour" class="anchor">#</a><code>colour</code></h3>
+<p>
+  <code>colour</code> is an alternate spelling of <code>color</code>. See
+  <a href="#color"><code>color</code></a
+  >.
+</p>
+<h3><a id="hsl" href="#hsl" class="anchor">#</a><code>hsl</code></h3>
+<p>
+  <code>hsl</code> returns a string to be used with the <a href="#color"><code>color</code></a> and
+  <a href="#clear"><code>clear</code></a> functions. The arguments to the <code>hsl</code> function
+  are numbers and therefore are more suited to mathematical manipulation, e.g. to find the
+  complimentary color, create a trail in animations with the alpha value or create color gradients.
+</p>
+<p>
+  <code>hsl</code> takes one to four arguments - <code>hue</code>, <code>saturation</code>,
+  <code>lightness</code>, and <code>alpha</code> - and returns a
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl"
+    >CSS (Cascading Style Sheets) hsl function</a
+  >
+  string specifying a color.
+</p>
+<p>
+  The <code>hue</code> argument is required. It is a number from 0 to 360 that represents the color
+  on the <a href="https://www.joshwcomeau.com/css/color-formats/#hsl-4">color wheel</a>:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th><code>hue</code></th>
+      <th>color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="img/box/red.svg" alt="red" /></td>
+      <td>0</td>
+      <td>&quot;red&quot;</td>
+    </tr>
+    <tr>
+      <td><img src="img/box/yellow.svg" alt="yellow" /></td>
+      <td>60</td>
+      <td>&quot;yellow&quot;</td>
+    </tr>
+    <tr>
+      <td><img src="img/box/lime.svg" alt="lime" /></td>
+      <td>120</td>
+      <td>&quot;lime&quot; green</td>
+    </tr>
+    <tr>
+      <td><img src="img/box/cyan.svg" alt="cyan" /></td>
+      <td>180</td>
+      <td>&quot;cyan&quot;</td>
+    </tr>
+    <tr>
+      <td><img src="img/box/blue.svg" alt="blue" /></td>
+      <td>240</td>
+      <td>&quot;blue&quot;</td>
+    </tr>
+    <tr>
+      <td><img src="img/box/magenta.svg" alt="magenta" /></td>
+      <td>300</td>
+      <td>&quot;magenta&quot;</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  The <code>saturation</code>, <code>lightness</code> and <code>alpha</code> arguments are optional
+  and must range between 0 and 100 percent if given:
+</p>
+<ul>
+  <li>
+    <code>saturation</code> is measure for vibrancy with 100 meaning maximum vibrancy and 0 meaning
+    a shade of grey (default: 100)
+  </li>
+  <li>
+    <code>lightness</code> is measure for brightness with 100 meaning white and 0 meaning black
+    (default: 50)
+  </li>
+  <li>
+    <code>alpha</code> is measure for opacity or transparency with 100 meaning fully opaque and 0
+    meaning fully transparent (default: 100)
+  </li>
+</ul>
+<h4>Example</h4>
+<pre><code class="language-evy">for i := range 360
+    color (hsl i)
+    move i/3.6 0
+    rect 1/3.6 100
+end
+</code></pre>
+<p>Output</p>
+<img
+  width="300"
+  alt="vertical color gradient from red to aqua to red again"
+  src="img/gradient.png"
+/>
+<h4>Reference</h4>
+<pre><code>hsl:string hue:num [saturation:num [lightness:num [alpha:num]]]
+</code></pre>
+<p>
+  <code>hsl</code> returns a string to be used with the <a href="#color"><code>color</code></a> and
+  <a href="#clear"><code>clear</code></a> functions. <code>hsl</code> takes one to four
+  <code>num</code> arguments - <code>hue</code>, <code>saturation</code>, <code>lightness</code>,
+  and <code>alpha</code> - and returns <code>string</code> containing a
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl">CSS hsl function</a>
+  string.
+</p>
+<p>
+  The <code>hue</code> value must be between 0 and 360. The <code>saturation</code>,
+  <code>lightness</code> and <code>alpha</code> values must be between 0 and 100. See the Mozilla
+  Developer documentation on the
+  <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl">CSS hsl function</a>
+  for more details.
+</p>
+<h3><a id="width" href="#width" class="anchor">#</a><code>width</code></h3>
+<p><code>width</code> sets the thickness of the lines drawn by the pen.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">width 10
+line 30 30
+width 1
+line 60 60
+width 0.1
+line 90 90
+grid
+</code></pre>
+<p>Output</p>
+<img width="300" alt="diagonal lines of different width" src="img/width.png" />
+<h4>Reference</h4>
+<pre><code>width n:num
+</code></pre>
+<p>
+  The <code>width</code> function sets the thickness of the <strong>stroke</strong> to the given
+  <code>n</code>
+  units. The stroke is the visible line that is drawn when using the
+  <code>line</code> function or any other shape function after setting
+  <code>fill &quot;none&quot;</code>. The initial stroke width it 0.1 units.
+</p>
+<h3><a id="clear" href="#clear" class="anchor">#</a><code>clear</code></h3>
+<p>
+  <code>clear</code> clears the canvas. Optionally, it can take a color argument to clear the canvas
+  to.
+</p>
+<h4>Example</h4>
+<p>
+  The following example code shows how to draw a magenta square, clear the canvas, and then draw a
+  blue circle. The final result is a canvas with a blue circle centered at <code>20 20</code>. The
+  magenta square is not visible because it has been removed by the <code>clear</code> function.
+</p>
+<pre><code class="language-evy">color &quot;darkmagenta&quot;
+rect 20 20
+clear
+color &quot;blue&quot;
+circle 5
+grid
+</code></pre>
+<p>Output</p>
+<img width="300" alt="blue circle in bottom left corner" src="img/blue-circle.png" />
+<h4>Reference</h4>
+<pre><code>clear [c:string]
+</code></pre>
+<p>
+  The <code>clear</code> function clears the canvas. It can optionally take a color as a string
+  argument, in which case the canvas will be cleared to that color. If no color is specified, the
+  canvas will be cleared to <code>&quot;white&quot;</code>. Initially the canvas is cleared to
+  <code>&quot;white&quot;</code>, not <code>&quot;transparent&quot;</code>.
+</p>
+<h3><a id="grid" href="#grid" class="anchor">#</a><code>grid</code></h3>
+<p>
+  <code>grid</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and each
+  grid line is spaced 10 units apart.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">grid
+</code></pre>
+<p>Output</p>
+<img width="300" alt="10x10 grid lines" src="img/grid.png" />
+<h4>Reference</h4>
+<pre><code>grid
+</code></pre>
+<p>
+  The <code>grid</code> function draws a grid on the canvas. The grid lines are parallel to the x
+  and y axes, and each grid line is spaced 10 units apart. The grid lines are 0.1 units thin and
+  have a semi-transparent gray color, with an opacity of 50%. This makes the grid lines faint enough
+  to be drawn on top of other shapes. The grid lines that go through the point <code>50 50</code>,
+  which is the center of the canvas, are slightly thicker. The thickness of these grid lines is 0.2
+  units, which makes it easier to see the center of the canvas.
+</p>
+<p>
+  The <code>grid</code> function is a shorthand of the <code>gridn</code> function with the
+  arguments <code>10</code> and <code>&quot;hsl(0deg 100% 0% / 50%)&quot;</code>, see
+  <a href="#gridn"><code>gridn</code></a
+  >. It is roughly equivalent to the following Evy code. However, the current color, cursor
+  position, and line width are not affected by the built-in <code>grid</code> function.
+</p>
+<pre><code class="language-evy">color &quot;hsl(0deg 100% 0% / 50%)&quot;
+for i := range 0 101 10
+    width 0.1
+    if i == 50
+        width 0.2
+    end
+    move i 0
+    line i 100
+    move 0 i
+    line 100 i
+end
+</code></pre>
+<h3><a id="gridn" href="#gridn" class="anchor">#</a><code>gridn</code></h3>
+<p>
+  <code>gridn</code> draws a grid on the canvas. The grid is parallel to the x and y axes, and each
+  grid line is spaced the given number of units apart. The color of the grid is set to the given
+  color.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">gridn 2 &quot;red&quot;
+</code></pre>
+<p>Output</p>
+<img width="300" alt="50x50 red grid lines" src="img/gridn.png" />
+<h4>Reference</h4>
+<pre><code>gridn n:num c:string
+</code></pre>
+<p>
+  The <code>gridn</code> function draws a grid on the canvas. The grid lines are parallel to the x
+  and y axes, and each grid line is spaced <code>n</code> units apart. The color of the grid is set
+  to the color specified by the string argument <code>c</code>. The default line width is 0.1 units.
+  Every fifth grid line is slightly thicker, with a line width of 0.2 units.
+</p>
+<p>
+  The <code>gridn</code> function is roughly equivalent to the following Evy code, but the current
+  color, cursor position, and line width are not affected by the built-in
+  <code>gridn</code> function.
+</p>
+<pre><code class="language-evy">c := &quot;red&quot;
+n := 2
+
+color c
+linecnt := 0
+for i := range 0 101 n
+    width 0.1
+    if linecnt % 5 == 0
+        width 0.2
+    end
+    linecnt = linecnt + 1
+    move i 0
+    line i 100
+    move 0 i
+    line 100 i
+end
+</code></pre>
+<h3><a id="poly" href="#poly" class="anchor">#</a><code>poly</code></h3>
+<p><code>poly</code> draws polylines and polygons for the given coordinates.</p>
+<h4>Example</h4>
+<p>The following code draws a w-shaped red polyline and a yellow triangle.</p>
+<pre><code class="language-evy">width 1
+color &quot;red&quot;
+
+fill &quot;none&quot;
+poly [10 80] [30 60] [50 80] [70 60] [90 80]
+
+fill &quot;gold&quot;
+poly [10 20] [50 50] [20 10] [10 20]
+</code></pre>
+<p>Output</p>
+<img width="300" alt="w-shaped red polyline, yellow triangle" src="img/poly.png" />
+<h4>Reference</h4>
+<pre><code>poly xy:[]num...
+</code></pre>
+<p>
+  The <code>poly</code> function draws polylines and polygons for the given coordinates. A polyline
+  is a sequence of connected line segments, and a polygon is a closed polyline.
+</p>
+<p>
+  The <code>poly</code> function takes a variadic number of arguments of type <code>[]num</code>.
+  Each argument has to be a number array with two elements <code>[x y]</code>. The first element
+  representing the x coordinate and the second the y coordinate of a vertex in the polyline or
+  polygon. If the array does not have two elements, a panic occurs. For example, the
+  <code>poly</code> function can be called as follows:
+</p>
+<pre><code>poly [x1 y1] [x2 y2] [x3 y3]
+</code></pre>
+<p>
+  Use <code>fill &quot;none&quot;</code> to draw a line without filling. To draw a closed polygon,
+  make sure that the first and last coordinates are the same. The <code>poly</code> function does
+  not use or change the cursor position.
+</p>
+<h3><a id="ellipse" href="#ellipse" class="anchor">#</a><code>ellipse</code></h3>
+<p>
+  <code>ellipse</code> draws an ellipse for given center, radii and optional tilt, start and end
+  angles.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">// red circle
+color &quot;red&quot;
+ellipse 50 50 40
+
+// yellow, flat ellipse
+color &quot;gold&quot;
+ellipse 50 50 40 10
+
+// blue, flat ellipse tilted by 45°
+color &quot;blue&quot;
+ellipse 50 50 40 10 45
+
+// white, flat, half ellipse tilted by 135°
+color &quot;white&quot;
+ellipse 50 50 40 10 135 0 180
+</code></pre>
+<p>Output</p>
+<img
+  width="300"
+  alt="red circle with yellow ellilpse, tilted blue ellipse and whit half-ellipse"
+  src="img/ellipse.png"
+/>
+<h4>Reference</h4>
+<pre><code>ellipse x:num y:num rx:num [ry:num [tilt:num [start:num end:num]]]
+</code></pre>
+<p>
+  The <code>ellipse</code> function draws an ellipse with the given center, radii, tilt, and start
+  and end angles. It can take 3, 4, 5, or 7 arguments. Default values are used for omitted
+  arguments.
+</p>
+<p>
+  The first two arguments are the coordinates of the center of the ellipse. The third argument is
+  the radius of the ellipse in the x direction. The fourth argument is the radius of the ellipse in
+  the y direction. If the fourth argument is omitted, the ellipse is drawn as a circle. The fifth
+  argument is the tilt of the ellipse in degrees, with a default value of 0. The sixth and seventh
+  arguments are the start and end angles of the ellipse in degrees, with default values of 0 and
+  360, respectively.
+</p>
+<h3><a id="stroke" href="#stroke" class="anchor">#</a><code>stroke</code></h3>
+<p><code>stroke</code> sets the color of the outline of shapes.</p>
+<h4>Example</h4>
+<p>The following code draws two red squares, one with a blue outline.</p>
+<pre><code class="language-evy">width 1
+color &quot;red&quot;
+rect 30 30
+
+stroke &quot;blue&quot;
+rect 30 30
+</code></pre>
+<p>Output</p>
+<img width="300" alt="two red sqaures one with blue outline" src="img/stroke.png" />
+<h4>Reference</h4>
+<pre><code>stroke c:string
+</code></pre>
+<p>
+  The <code>stroke</code> function sets the color of the <strong>stroke</strong> to the given string
+  argument <code>c</code>. The stroke is the visible line that is drawn when you use the line
+  function or any other shape function after calling fill &quot;none&quot;. The initial stroke color
+  is <code>&quot;black&quot;</code>.
+</p>
+<h3><a id="fill" href="#fill" class="anchor">#</a><code>fill</code></h3>
+<p><code>fill</code> sets the color of the interior of shapes.</p>
+<h4>Example</h4>
+<p>The following code draws a red square and a blue square with a red outline.</p>
+<pre><code class="language-evy">width 1
+color &quot;red&quot;
+rect 30 30
+
+fill &quot;blue&quot;
+rect 30 30
+</code></pre>
+<p>Output</p>
+<img width="300" alt="a red sqaures and a blue square with red outline" src="img/fill.png" />
+<h4>Reference</h4>
+<pre><code>fill c:string
+</code></pre>
+<p>
+  The <code>fill</code> function sets the color of the <strong>fill</strong> to the given string
+  argument <code>c</code>. The fill is the interior of a shape. The initial fill color is
+  <code>&quot;black&quot;</code>.
+</p>
+<h3><a id="dash" href="#dash" class="anchor">#</a><code>dash</code></h3>
+<p><code>dash</code> sets the line dash pattern.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">width 2
+
+dash 5 // same as: dash 5 5, dash 5 5 5
+hline 85 &quot;red&quot;
+
+dash 10 4 1 4
+hline 75 &quot;blue&quot;
+
+dash 10 5 10 // same as: dash 10 5 10 10 5 10
+hline 65 &quot;gold&quot;
+
+dash // reset dash
+hline 50 &quot;black&quot;
+
+gridn 5 &quot;gray&quot;
+
+func hline y:num c:string
+    color c
+    move 0 y
+    line 100 y
+end
+</code></pre>
+<p>Output</p>
+<img width="300" alt="dash patterns" src="img/dashes.png" />
+<h4>Reference</h4>
+<pre><code>dash segments:num...
+</code></pre>
+<p>
+  The <code>dash</code> function sets the line dash pattern used when stroking lines. The dash
+  pattern is specified as a variadic number of arguments, where each argument represents the length
+  of a dash or gap. For example, the arguments <code>5 10</code> would create a line with 5-unit
+  long dashes and 10-unit long gaps.
+</p>
+<p>
+  If the number of arguments is odd, they are copied and concatenated. For example, the arguments
+  <code>10 5 10</code> would become <code>10 5 10 10 5 10</code>. If no arguments are given, the
+  line returns to being solid.
+</p>
+<p>The initial dash pattern is a solid line.</p>
+<h3><a id="linecap" href="#linecap" class="anchor">#</a><code>linecap</code></h3>
+<p><code>linecap</code> sets the shape of the ends of lines.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">width 5
+grid
+
+linecap &quot;round&quot;
+hline 70
+
+linecap &quot;butt&quot;
+hline 50
+
+linecap &quot;square&quot;
+hline 30
+
+func hline y:num
+    move 10 y
+    line 90 y
+end
+</code></pre>
+<p>Output</p>
+<img width="300" alt="round and square line caps" src="img/linecaps.png" />
+<h4>Reference</h4>
+<pre><code>linecap style:string
+</code></pre>
+<p>
+  The <code>linecap</code> function sets the shape of the ends of lines to the
+  <code>style</code> string argument. Valid styles are <code>&quot;round&quot;</code>,
+  <code>&quot;butt&quot;</code> or <code>&quot;square&quot;</code>. An invalid style takes no
+  effect.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Style</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>&quot;round&quot;</code></td>
+      <td>The ends of the line are rounded.</td>
+    </tr>
+    <tr>
+      <td><code>&quot;butt&quot;</code></td>
+      <td>The ends of the line are squared off at the endpoints.</td>
+    </tr>
+    <tr>
+      <td><code>&quot;square&quot;</code></td>
+      <td>
+        The ends of the line are squared off by adding a box with an equal width and half the height
+        of the line's thickness.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>The initial linecap style is <code>&quot;round&quot;</code>.</p>
+<h3><a id="text" href="#text" class="anchor">#</a><code>text</code></h3>
+<p><code>text</code> prints text to the canvas at the current cursor position.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">move 20 70
+text &quot;“Time is an illusion.&quot;
+move 20 63
+text &quot;Lunchtime doubly so.”&quot;
+move 35 48
+text &quot;― Douglas Adams&quot;
+</code></pre>
+<p>Output</p>
+<img width="300" alt="text sample" src="img/text.png" />
+<h4>Reference</h4>
+<pre><code>text s:string
+</code></pre>
+<p>
+  The <code>text</code> function prints the string argument <code>s</code> to the canvas at the
+  current cursor position. The cursor position is not updated after writing text. Only
+  <code>fill</code> and <code>color</code> have an effect on the text; <code>stroke</code> has no
+  effect. For more text styling, such as setting <strong>font size</strong> or
+  <strong>font family</strong>, see <a href="#font"><code>font</code></a
+  >.
+</p>
+<h3><a id="font" href="#font" class="anchor">#</a><code>font</code></h3>
+<p>
+  <code>font</code> sets the font properties for text. The font properties are
+  <code>family</code>,<code>size</code>, <code>weight</code>, <code>style</code>,
+  <code>letterspacing</code>, <code>baseline</code>, and <code>align</code>.
+</p>
+<h4>Example</h4>
+<pre><code class="language-evy">font {family:&quot;Bradley Hand, cursive&quot; size:4}
+
+move 10 65
+text &quot;“The wonderful thing about programming&quot;
+move 10 60
+text &quot;is that anyone can learn it and do it. You&quot;
+move 10 55
+text &quot;don't have to be a genius or have a specific&quot;
+move 10 50
+text &quot;background. You just need curiosity and&quot;
+move 10 45
+text &quot;the willingness to try.”&quot;
+
+// all font properties
+font {
+    size:9
+    style:&quot;normal&quot; // &quot;normal&quot;
+    family:&quot;Tahomana, sans-serif&quot; // see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+    weight:900
+    letterspacing:-0.5 // extra inter-character space. negative allowed. default:0
+    align:&quot;right&quot; // &quot;left&quot;, &quot;right&quot;
+    baseline:&quot;middle&quot; // &quot;top&quot;, &quot;bottom&quot;, &quot;alphabetic&quot; (default)
+}
+
+move 90 32
+color &quot;red&quot;
+text &quot;Grace Hopper&quot;
+color &quot;black&quot;
+font {size:4 letterspacing:0 weight:100 style:&quot;normal&quot;}
+move 90 25
+text &quot;computer scientist, compiler builder&quot;
+</code></pre>
+<p>Output</p>
+<img width="300" alt="styled text sample" src="img/font.png" />
+<p>
+  The following example shows the effect of the <code>align</code> and
+  <code>baseline</code> properties:
+</p>
+<pre><code class="language-evy">font {size:6 family:&quot;Fira Code, monospace&quot;}
+
+move 25 78
+line 25 86
+move 25 80
+font {align:&quot;left&quot;}
+text &quot;left&quot;
+
+move 25 63
+line 25 71
+move 25 65
+font {align:&quot;right&quot;}
+text &quot;right&quot;
+
+move 25 48
+line 25 56
+move 25 50
+font {align:&quot;center&quot;}
+text &quot;center&quot;
+
+move 55 80
+line 90 80
+move 55 80
+font {baseline:&quot;bottom&quot; align:&quot;left&quot;}
+text &quot;bottom&quot;
+
+move 55 65
+line 90 65
+move 55 65
+font {baseline:&quot;top&quot;}
+text &quot;top&quot;
+
+move 55 50
+line 90 50
+move 55 50
+font {baseline:&quot;middle&quot;}
+text &quot;middle&quot;
+
+move 55 35
+line 90 35
+move 55 35
+font {baseline:&quot;alphabetic&quot;}
+text &quot;alphabetic&quot;
+</code></pre>
+<p>Output</p>
+<img width="300" alt="styled text sample" src="img/align.png" />
+<h4>Reference</h4>
+<pre><code>font props:{}any
+</code></pre>
+<p>
+  The <code>font</code> function sets the font properties for text. The font properties are
+  <code>family</code>, <code>size</code>, <code>weight</code>, <code>style</code>,
+  <code>letterspacing</code>, <code>align</code>, and <code>baseline</code>.
+</p>
+<p>
+  The <code>family</code> property specifies a prioritized list of one or more font family names.
+  Values are separated by commas to indicate that they are alternatives. The browser will select the
+  first available font. For example, the value <code>&quot;Fira Code, monospace&quot;</code> would
+  specify that the browser should try to use the Fira Code font, but if that font is not available,
+  it should use a monospace font. The default font family is the browser default.
+</p>
+<p>
+  The <code>size</code> property specifies the height of a letter in canvas units. The default size
+  is 6.
+</p>
+<p>
+  The <code>weight</code> property specifies the boldness of the font. The values 100, 200, ..., 900
+  can be used to specify the weight of the font. The value 400 is normal, 700 is bold. The default
+  weight is 400.
+</p>
+<p>
+  The <code>style</code> property specifies the sloping of the font. The values
+  <code>&quot;normal&quot;</code> and <code>&quot;italic&quot;</code> can be used to specify the
+  style of the font. The default style is &quot;normal&quot;.
+</p>
+<p>
+  The <code>letterspacing</code> property specifies the additional horizontal space between text
+  characters in canvas units. The default value is 0.
+</p>
+<p>
+  The <code>align</code> property specifies the horizontal alignment of the text. The values
+  <code>&quot;left&quot;</code>, <code>&quot;right&quot;</code>, and
+  <code>&quot;center&quot;</code> can be used to specify the alignment. The default value is
+  <code>&quot;left&quot;</code>.
+</p>
+<p>
+  The <code>baseline</code> property specifies the vertical cursor position relative to the vertical
+  text position. The values <code>&quot;top&quot;</code>, <code>&quot;bottom&quot;</code>,
+  <code>&quot;middle&quot;</code>, and <code>&quot;alphabetic&quot;</code> can be used to specify
+  the baseline. The default value is <code>&quot;alphabetic&quot;</code>.
+</p>
+<p>Here is an example of how to use the font function:</p>
+<pre><code class="language-evy">font {
+    family:&quot;Fira Code, monospace&quot;
+    size:9
+    weight:700
+    style:&quot;italic&quot;
+    letterspacing:0.5
+    baseline:&quot;top&quot;
+    align:&quot;center&quot;
+}
+</code></pre>
+<p>
+  This code sets the font properties to use the Fira Code font, a size of 9, a weight of 700, an
+  italic style, a letterspacing of 0.5, a top baseline, and a center alignment.
+</p>
+<h2><a id="event-handlers" href="#event-handlers" class="anchor">#</a>Event Handlers</h2>
+<p>
+  Evy first executes all top-level code in the order it appears in the source code. If there is at
+  least one event handler, Evy then enters an event loop. In the event loop, Evy waits for external
+  events, such as a key press or a pointer down event. When an event occurs, Evy calls the
+  corresponding event handler function if it has been implemented. The event handler function can
+  optionally receive arguments, such as the key character or the pointer coordinates. Once the event
+  handler function has finished, Evy returns to the event loop and waits for the next event.
+</p>
+<p>
+  Event handlers are declared using the <code>on</code> keyword. Only predefined events can be
+  handled: <code>key</code>, <code>down</code>, <code>up</code>, <code>move</code>,
+  <code>animate</code>, and <code>input</code>. For example, the following code defines an event
+  handler for the key press event:
+</p>
+<pre><code class="language-evy">on key k:string
+    print k
+end
+</code></pre>
+<p>
+  The parameters to the event handlers must match the expected signature. The <code>key</code> event
+  handler expects a single parameter of type string, which is the character that was pressed. The
+  parameters can be fully omitted or fully specified. If only some parameters are needed, use the
+  anonymous <code>_</code> parameter. The <code>down</code> event handler, for instance, expects two
+  parameters, the x and y coordinates of the pointer. If you only need the x coordinate, you can use
+  <code>on down x:num _:num</code>.
+</p>
+<p>
+  Pointer events, such as <code>down</code>, <code>up</code>, and <code>move</code>, occur when a
+  pointing input device, such as a mouse, a pen or stylus, or a finger, is used to interact with the
+  canvas.
+</p>
+<h3><a id="key" href="#key" class="anchor">#</a><code>key</code></h3>
+<p><code>key</code> is called when a key on the keyboard is pressed.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">on key k:string
+    print k
+end
+</code></pre>
+<p>Sample output</p>
+<pre><code>Escape
+Shift
+R
+o
+</code></pre>
+<h4>Reference</h4>
+<pre><code>key k:string
+</code></pre>
+<p>
+  The <code>key</code> event handler is called when a <strong>keydown</strong> event occurs. The
+  handler is passed a string argument which is the character of the key that was pressed. For
+  example, if the user presses the <code>a</code> key, the argument would be the string
+  <code>&quot;a&quot;</code>.
+</p>
+<p>
+  Some keys do not have a character representation, such as the arrow keys or the shift key. For
+  these keys, the argument is a special string, such as <code>&quot;ArrowRight&quot;</code>,
+  <code>&quot;ArrowUp&quot;</code>, <code>&quot;Shift&quot;</code>, <code>&quot;Enter&quot;</code>,
+  <code>&quot;Control&quot;</code>, <code>&quot;Alt&quot;</code>,
+  <code>&quot;Backspace&quot;</code>, or <code>&quot;Escape&quot;</code>.
+</p>
+<p>
+  When the shift key is pressed and then another key is pressed, the argument is the uppercase or
+  special character representation of the key that was pressed. For example, if the user presses
+  <code>shift</code>+<code>a</code>, the argument is the string <code>&quot;A&quot;</code>.
+</p>
+<h3><a id="down" href="#down" class="anchor">#</a><code>down</code></h3>
+<p><code>down</code> is called when the pointer is pressed down.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">on down x:num y:num
+    printf &quot;x: %2.0f y: %2.0f\n&quot; x y
+end
+</code></pre>
+<p>Sample output</p>
+<pre><code>x: 42 y: 85
+x:  7 y:  6
+</code></pre>
+<h4>Reference</h4>
+<pre><code>down x:num y:num
+</code></pre>
+<p>
+  The <code>down</code> event handler is called when a <strong>pointerdown</strong> event occurs on
+  the canvas. The handler is passed two number arguments, <code>x</code> and <code>y</code>, which
+  are the coordinates of the pointer location when the pointer was pressed down. The pointer is
+  typically a mouse, stylus or finger.
+</p>
+<h3><a id="up" href="#up" class="anchor">#</a><code>up</code></h3>
+<p><code>up</code> is called when the pointer is lifted up.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">on up x:num y:num
+    move x y
+    color &quot;red&quot;
+    circle 1
+end
+</code></pre>
+<p>Sample output</p>
+<img width="300" alt="red dots" src="img/up.png" />
+<h4>Reference</h4>
+<pre><code>up x:num y:num
+</code></pre>
+<p>
+  The <code>up</code> event handler is called when a <strong>pointerup</strong> event occurs on the
+  canvas. The handler is passed two number arguments, <code>x</code> and <code>y</code>, which are
+  the coordinates of the pointer location when the pointer was lifted up. The pointer is typically a
+  mouse, stylus or finger.
+</p>
+<h3><a id="move-1" href="#move-1" class="anchor">#</a><code>move</code></h3>
+<p><code>move</code> is called when the pointer is moved.</p>
+<h4>Example</h4>
+<p>The following sample draws a line following the pointer's movement.</p>
+<pre><code class="language-evy">down := false
+width 1
+
+on down x:num y:num
+    down = true
+    move x y
+end
+
+on move x:num y:num
+    if down
+        line x y
+    end
+end
+
+on up
+    down = false
+end
+</code></pre>
+<p>Sample output</p>
+<img width="300" alt="black line tracking short and fast mouse movement" src="img/move.png" />
+<h4>Reference</h4>
+<pre><code>move x:num y:num
+</code></pre>
+<p>
+  The <code>move</code> event handler is called when a <strong>pointermove</strong> event occurs on
+  the canvas. The handler is passed two number arguments, <code>x</code> and <code>y</code>, which
+  are the coordinates of the position that the pointer has moved to. The pointer is typically a
+  mouse, stylus or finger.
+</p>
+<h3><a id="animate" href="#animate" class="anchor">#</a><code>animate</code></h3>
+<p><code>animate</code> gets called periodically around 60 times per second.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">semiblack := &quot;hsl(0deg 0% 0% / 10%)&quot;
+width 1
+fill semiblack
+stroke &quot;red&quot;
+
+on animate ms:num
+    clear semiblack
+    y := 100 - (ms / 20) % 100
+    move 50 y
+    circle 10
+end
+</code></pre>
+<p>Output</p>
+<img width="300" alt="red circle reapeated falling" src="img/animate.gif" />
+<h4>Reference</h4>
+<pre><code>animate elapsed:num
+</code></pre>
+<p>
+  The <code>animate</code> event handler is called when an animation frame is available. This means
+  that the handler will be called typically 60 times in a second, but it will generally match the
+  display refresh rate. If the computations within a single animate call take too long, the frame
+  rate will drop.
+</p>
+<p>
+  The animate event handler is passed a single numeric argument which is the number of elapsed
+  milliseconds since the start of the animation. This allows you to track the progress of the
+  animation and to update the animation accordingly.
+</p>
+<h3><a id="input" href="#input" class="anchor">#</a><code>input</code></h3>
+<p><code>input</code> is called when the value of an input element changes.</p>
+<h4>Example</h4>
+<pre><code class="language-evy">on input id:string val:string
+    print &quot;id:&quot; id &quot;val:&quot; val
+end
+</code></pre>
+<p>Sample Output from the Evy website</p>
+<pre><code>id: sliderx val: 15
+id: slidery val: 0
+id: slidery val: 100
+</code></pre>
+<h4>Reference</h4>
+<pre><code>input id:string val:id
+</code></pre>
+<p>
+  The <code>input</code> event handler is called when the value of an input element changes. The
+  handler is passed two string arguments: the id of the input element and its new value.
+</p>
+<p>
+  For example, if you have an input element with the id <code>sliderx</code> and the user changes
+  the value of the slider to <code>15</code>, the input event handler will be called with the
+  arguments <code>sliderx</code> and <code>15</code>.
+</p>
+<p>
+  The Evy web interface has two sliders that are used as input elements. The sliders range from 0 to
+  100, and their ids are <code>sliderx</code> and <code>slidery</code>. When you change the position
+  of the sliders the <code>input</code> event handler is called with the new position value of the
+  slider.
+</p>

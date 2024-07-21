@@ -11,7 +11,7 @@ key.
 
 For a more formal definition of the Evy syntax, see the
 [Language Specification](spec.md), and for an intuitive understanding
-see [syntax by example](syntax_by_example.md).
+see [syntax by example](syntax-by-example.md).
 
 #### Table of Contents
 

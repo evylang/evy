@@ -1,5 +1,13 @@
 .sidebar {
   width: 320px;
+  background-color: var(--background-dimmed);
+  border-right: 1px solid var(--border-color);
+  height: calc(100vh - var(--topnav-height));
+}
+
+.sidebar .sidebar-content {
+  overflow: auto;
+  height: calc(100vh - var(--topnav-height));
 }
 
 .sidebar h1 {
@@ -104,7 +112,7 @@
   width: 100%;
   padding: 32px 20px;
   border-top: 1px solid var(--border-color);
-  margin: 40px 0;
+  margin: 40px 0 0;
 }
 
 .sidebar ul.icons li {
@@ -153,6 +161,12 @@
     translate: -100%;
     transition-timing-function: ease-in-out;
     transition-duration: 0.3s;
+    height: 100vh;
+  }
+
+  .sidebar .sidebar-content {
+    overflow: auto;
+    height: calc(100vh - var(--topnav-height));
   }
 
   .sidebar.show {

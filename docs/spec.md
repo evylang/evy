@@ -7,7 +7,7 @@ tooling and syntax. Several features typical of modern programming
 languages are purposefully left out.
 
 To get an intuitive understanding of Evy, you can either look at its
-[syntax by example](syntax_by_example.md) or read through the
+[syntax by example](syntax-by-example.md) or read through the
 [built-ins documentation](builtins.md).
 
 [statically typed]: https://developer.mozilla.org/en-US/docs/Glossary/Static_typing

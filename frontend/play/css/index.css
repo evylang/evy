@@ -298,7 +298,9 @@ button.share > div {
   overflow: hidden;
   color: transparent;
 }
-
+.editor textarea::selection {
+  background: var(--selection-highlight);
+}
 .editor pre {
   line-height: inherit;
   white-space: pre-wrap;

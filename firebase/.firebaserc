@@ -11,9 +11,6 @@
         "apex": [
           "evy-lang-stage"
         ],
-        "ai": [
-          "evy-lang-stage-ai"
-        ],
         "discord": [
           "evy-lang-stage-discord"
         ],
@@ -36,9 +33,6 @@
         "apex": [
           "evy-lang-test"
         ],
-        "ai": [
-          "evy-lang-test-ai"
-        ],
         "discord": [
           "evy-lang-test-discord"
         ],
@@ -60,9 +54,6 @@
       "hosting": {
         "apex": [
           "evy-lang"
-        ],
-        "ai": [
-          "evy-lang-ai"
         ],
         "discord": [
           "evy-lang-discord"

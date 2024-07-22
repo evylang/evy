@@ -161,7 +161,7 @@ make_env_urls() {
 	# Generate URLs for the deployment environment for a live firebase site, with an
 	# APEX url and a bunch of subdomain URLS.
 
-	local domain subdomains=(ai discord docs lab learn play)
+	local domain subdomains=(discord docs lab learn play)
 	domain=$(get_domain "${env}")
 
 	printf 'BASEURL_APEX=https://%s\n' "${domain}"
@@ -174,7 +174,6 @@ make_pr_urls() {
 	local json_result="$1"
 	# The following jq command generates the following output from a firebase deployment result:
 	# BASEURL_APEX=https://evy-lang-stage--dev-mtnwzsbm.web.app
-	# BASEURL_AI=https://evy-lang-stage--dev-bta34sbm.web.app
 	# BASEURL_DISCORD=https://evy-lang-stage-discord--dev-pap726z0.web.app
 	# BASEURL_DOCS=https://evy-lang-stage-docs--dev-62qb1rk7.web.app
 	# BASEURL_LAB=https://evy-lang-stage-lab--dev-12kbj4k8.web.app

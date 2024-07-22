@@ -1,1 +1,0 @@
-../../module/editor.js

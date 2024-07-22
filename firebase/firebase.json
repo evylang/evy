@@ -38,10 +38,6 @@
       ]
     },
     {
-      "target": "ai",
-      "public": "public/apex/ai"
-    },
-    {
       "target": "discord",
       "public": "public/apex/discord"
     },

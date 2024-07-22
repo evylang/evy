@@ -5,9 +5,10 @@
       "title": "Introduction",
       "emoji": "",
       "samples": [
-        { "id": "welcome", "title": "👋🚀 Welcome" },
+        { "id": "welcome", "title": "👋🌏 Welcome" },
+        { "id": "worm", "title": "🐛 Worm" },
         { "id": "coords", "title": "🎯 Coordinates" },
-        { "id": "circles", "title": "🟢🔵 Circles" },
+        { "id": "circles", "title": "🇵🇼 Circles" },
         { "id": "var", "title": "🧮 Variables" },
         { "id": "loop", "title": "🎢 Loops" },
         { "id": "move", "title": "🟣🚚 Moving Dot" }

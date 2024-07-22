@@ -96,7 +96,7 @@
         <div class="output">
           <div class="canvas"><canvas id="canvas"></canvas></div>
           <div class="read hidden">
-            <label>input&gt;</label>
+            <label for="read">input&gt;</label>
             <textarea id="read" rows="1"></textarea>
           </div>
           <div class="input slider hidden">
@@ -186,7 +186,8 @@
         <main>
           <p class="note hidden">⚠️ Code has <span class="err">errors</span>!</p>
           <div class="copy">
-            <input type="text" value="/play#gzipped+and+base64+encoded+evy+code+content" />
+            <label for="share-url">Sharable URL</label>
+            <input type="text" id="share-url" />
             <button type="button" class="icon-copy"></button>
           </div>
           <button class="primary">Done</button>

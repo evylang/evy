@@ -784,7 +784,12 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  editor = new Editor(".editor", { sessionKey: "evy-editor", highlighter: highlightEvy })
+  const options = {
+    highlighter: highlightEvy,
+    id: "evy-editor",
+    sessionKey: "evy-editor",
+  }
+  editor = new Editor(".editor", options)
   document.querySelector(".editor-wrap").classList.remove("noscrollbar")
 }
 

@@ -43,6 +43,7 @@
   --alert-important: hsl(266deg 100% 86%);
   --alert-warning: hsl(27deg 100% 74%);
   --alert-caution: hsl(359deg 100% 75%);
+  --selection-highlight: hsl(0deg 0% 100% / 15%);
 
   color-scheme: dark;
 
@@ -85,6 +86,7 @@
   --alert-important: hsl(24deg 74% 51%);
   --alert-warning: hsl(356deg 72% 47%);
   --alert-caution: rgb(110 119 129);
+  --selection-highlight: hsl(0deg 0% 0% / 15%);
 
   color-scheme: light;
 

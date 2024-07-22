@@ -283,7 +283,6 @@ button.share > div {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 1;
   resize: none;
   caret-color: var(--color);
   padding: inherit;
@@ -298,7 +297,9 @@ button.share > div {
   overflow: hidden;
   color: transparent;
 }
-
+.editor textarea::selection {
+  background: var(--selection-highlight);
+}
 .editor pre {
   line-height: inherit;
   white-space: pre-wrap;
@@ -312,12 +313,13 @@ button.share > div {
   pointer-events: none;
   font-family: inherit;
 }
-
 .editor pre.highlighted {
   position: relative;
   overflow: hidden;
 }
-
+.editor pre.highlighted a {
+  pointer-events: auto;
+}
 .editor pre.lines {
   position: absolute;
   height: 100%;
@@ -640,7 +642,9 @@ dialog .copy input {
   flex: 1;
   min-width: 10em;
 }
-
+dialog .copy label {
+  display: none;
+}
 dialog .err {
   font-family: var(--font-family-code);
   color: var(--color);

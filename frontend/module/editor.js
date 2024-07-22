@@ -26,9 +26,9 @@ export default class Editor {
   init() {
     this.textarea = document.createElement("textarea")
     this.textarea.spellcheck = false
-    this.textarea.autocorrect = "off"
+    this.textarea.autocorrect = false
     this.textarea.autocomplete = "off"
-    this.textarea.autocapitalize = "none"
+    this.textarea.autocapitalize = "off"
     this.textarea.wrap = "off"
 
     this.highlighted = document.createElement("pre")

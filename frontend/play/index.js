@@ -14,6 +14,7 @@ let jsReadInitialised = false
 let stopped = true
 let animationStart
 let sampleData
+let currentSample = "welcome"
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
@@ -359,9 +360,22 @@ async function fetchSamples() {
   const resp = await fetch("samples/samples.json")
   sampleData = await resp.json()
   sampleData.byID = {}
+  let previous = null
   for (const section of sampleData.sections) {
-    for (const sample of section.samples) {
-      sampleData.byID[sample.id] = { ...sample, sectionTitle: section.title, sectionID: section.id }
+    for (let i = 0; i < section.samples.length; ++i) {
+      const sample = section.samples[i]
+      sampleData.byID[sample.id] = {
+        ...sample,
+        sectionTitle: section.title,
+        sectionID: section.id,
+        sectionTotal: section.samples.length,
+        sectionIndex: i + 1,
+        previous: previous,
+      }
+      if (previous) {
+        sampleData.byID[previous].next = sample.id
+      }
+      previous = sample.id
     }
   }
 }
@@ -393,14 +407,14 @@ async function handleHashChange() {
     opts = { sample: "welcome" }
     history.replaceState({}, "", "#welcome")
   }
-  const { source, crumbs } = await fetchSourceWithCrumbs(opts)
+  const { source } = await fetchSourceWithSampleTitle(opts)
 
   !editor && initEditor()
   editor.onUpdate(null)
   editor.update({ value: source, errorLines: {} })
 
   document.querySelector(".editor-wrap").scrollTo(0, 0)
-  crumbs && updateBreadcrumbs(crumbs)
+  updateSampleTitle()
   clearOutput()
   await format()
   editor.onUpdate(clearHash)
@@ -432,7 +446,7 @@ function parseHash() {
   return Object.fromEntries(entries)
 }
 
-async function fetchSourceWithCrumbs({ content, sample, source }) {
+async function fetchSourceWithSampleTitle({ content, sample, source }) {
   if (content) {
     const src = await decode(content)
     return { source: src }
@@ -443,10 +457,10 @@ async function fetchSourceWithCrumbs({ content, sample, source }) {
   }
   // sample ID is set
   const s = sampleData.byID[sample]
-  const crumbs = [s.sectionTitle, s.title]
+  currentSample = sample
   const url = `samples/${s.sectionID}/${sample}.evy`
   const src = await fetchSource(url)
-  return { crumbs, source: src }
+  return { source: src }
 }
 
 async function fetchSource(url) {
@@ -898,7 +912,10 @@ function initModal() {
     }
     modalMain.appendChild(sectionEl)
   }
-  updateBreadcrumbs([sampleData.sections[0].title, sampleData.sections[0].samples[0].title])
+  document.querySelector("#sample-selector").onclick = showSamples
+  document.querySelector("#sample-previous").onclick = showPreviousSample
+  document.querySelector("#sample-next").onclick = showNextSample
+  updateSampleTitle()
 }
 
 function hideModal() {
@@ -911,21 +928,36 @@ function showSamples() {
   samples.classList.remove("hidden")
   const modal = document.querySelector("#modal")
   modal.classList.remove("hidden")
+  samples.querySelectorAll("a").forEach((a) => a.classList.remove("highlight"))
+  samples.querySelector(`a[href$="#${currentSample}"]`)?.classList.add("highlight")
 }
 
-function updateBreadcrumbs(crumbs) {
-  const ul = document.querySelector("header ul.breadcrumbs")
-  const breadcrumbs = crumbs.map((c) => breadcrumb(c))
-  ul.replaceChildren(...breadcrumbs)
+function showPreviousSample() {
+  if (sampleData.byID[currentSample].previous) {
+    currentSample = sampleData.byID[currentSample].previous
+    history.pushState({}, "", `#${currentSample}`)
+    handleHashChange()
+  }
 }
 
-function breadcrumb(s) {
-  const btn = document.createElement("button")
-  btn.textContent = s
-  btn.onclick = () => showSamples()
-  const li = document.createElement("li")
-  li.appendChild(btn)
-  return li
+function showNextSample() {
+  if (sampleData.byID[currentSample].next) {
+    currentSample = sampleData.byID[currentSample].next
+    history.pushState({}, "", `#${currentSample}`)
+    handleHashChange()
+  }
+}
+
+function updateSampleTitle() {
+  const titleDiv = document.querySelector("#sample-title")
+  const sample = sampleData.byID[currentSample]
+  titleDiv.textContent = sample.title
+  const indexDiv = document.querySelector("#sample-index")
+  indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
+  const prevButton = document.querySelector("#sample-previous")
+  sample.previous ? prevButton.classList.remove("hidden") : prevButton.classList.add("hidden")
+  const nextButton = document.querySelector("#sample-next")
+  sample.next ? nextButton.classList.remove("hidden") : nextButton.classList.add("hidden")
 }
 
 // --- UI: sidebar --------------------------------------------

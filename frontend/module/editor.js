@@ -13,6 +13,7 @@ export default class Editor {
       value: "",
       lineNumbers: true,
       plugins: [preserveIndent(), history(), tab()],
+      id: `evy-editor-${Math.random().toString(36).slice(2)}`,
     }
 
     this.options = {
@@ -30,6 +31,7 @@ export default class Editor {
     this.textarea.autocomplete = "off"
     this.textarea.autocapitalize = "off"
     this.textarea.wrap = "off"
+    this.textarea.id = this.options.id
 
     this.highlighted = document.createElement("pre")
     this.highlighted.classList.add("highlighted")
@@ -37,7 +39,12 @@ export default class Editor {
     this.lines.classList.add("lines")
     this.errorLines = {}
 
-    this.root.replaceChildren(this.textarea, this.lines, this.highlighted)
+    const label = document.createElement("label")
+    label.htmlFor = this.options.id
+    label.textContent = "Evy editor"
+    label.style.display = "none"
+
+    this.root.replaceChildren(label, this.textarea, this.lines, this.highlighted)
 
     this.addTextareaEvents()
     this.update({ value: this.options.value })

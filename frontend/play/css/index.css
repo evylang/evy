@@ -642,7 +642,9 @@ dialog .copy input {
   flex: 1;
   min-width: 10em;
 }
-
+dialog .copy label {
+  display: none;
+}
 dialog .err {
   font-family: var(--font-family-code);
   color: var(--color);

@@ -1,9 +1,17 @@
 // evy highlighter
 export default function highlightEvy(val, errorLines) {
   const tokens = tokenize(val, errorLines)
-  const span = (t) => `<span class="${t.err}${t.type}">${escapeHTML(t.val)}</span>`
-  const result = tokens.map((t) => span(t)).join("")
+  const result = tokens.map(tokenToSpan).join("")
   return result
+}
+
+function tokenToSpan(token) {
+  if (token.type !== "comment") {
+    return `<span class="${token.type}">${escapeHTML(token.val)}</span>`
+  }
+  let words = escapeHTML(token.val).split(" ")
+  words = words.map((w) => (w.startsWith("https://") ? `<a href=${w} target="_blank">${w}</a>` : w))
+  return `<span class="comment">${words.join(" ")}</span>`
 }
 
 function escapeHTML(unsafe) {

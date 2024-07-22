@@ -28,3 +28,8 @@
   font-style: italic;
   font-weight: 300;
 }
+
+.language-evy .comment a {
+  color: var(--syntax-comment);
+  text-decoration: underline;
+}

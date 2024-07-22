@@ -283,7 +283,6 @@ button.share > div {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 1;
   resize: none;
   caret-color: var(--color);
   padding: inherit;
@@ -314,12 +313,13 @@ button.share > div {
   pointer-events: none;
   font-family: inherit;
 }
-
 .editor pre.highlighted {
   position: relative;
   overflow: hidden;
 }
-
+.editor pre.highlighted a {
+  pointer-events: auto;
+}
 .editor pre.lines {
   position: absolute;
   height: 100%;

@@ -18,9 +18,9 @@
       "title": "Drawing",
       "emoji": "🎨",
       "samples": [
-        { "id": "circle-rect", "title": "Circle and Rectangle" },
+        { "id": "circle-rect", "title": "Circle & Rectangle" },
         { "id": "lines", "title": "Lines" },
-        { "id": "poly", "title": "Polygon and Polyline" },
+        { "id": "poly", "title": "Polygon & Polyline" },
         { "id": "fill", "title": "Stroke and Fill" },
         { "id": "linestyle", "title": "Line Styles" },
         { "id": "text", "title": "Text" }

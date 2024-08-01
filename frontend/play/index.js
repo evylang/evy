@@ -1026,7 +1026,7 @@ function showAbout() {
 
 async function share() {
   hideSidebar()
-  const note = document.querySelector("#dialog-share .note")
+  const note = document.querySelector("#dialog-share .dialog-note")
   await format()
   errors ? note.classList.remove("hidden") : note.classList.add("hidden")
   const baseurl = window.location.origin + window.location.pathname

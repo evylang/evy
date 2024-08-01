@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test"
+
+const platform = process.env.PLATFORM_OVERRIDE || process.platform
 export default defineConfig({
   use: {
     baseURL: process.env.BASEURL || "http://localhost:8080",
@@ -14,4 +16,5 @@ export default defineConfig({
     },
   ],
   testMatch: "*test.js",
+  snapshotPathTemplate: `{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-${platform}{ext}`,
 })

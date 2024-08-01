@@ -1,6 +1,7 @@
 /.hermit/
 /e2e/test-results
 /e2e/**/*-darwin.png
+/e2e/**/*-linux.png
 /firebase/*.log
 /firebase/.firebase/
 /frontend/module/evy.wasm

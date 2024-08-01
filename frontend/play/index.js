@@ -22,10 +22,8 @@ let editorHidden = false
 
 // --- Initialize ------------------------------------------------------
 
-await initWasm()
-initUI()
-initCanvas()
-initThemeToggle("#dark-theme", "theme")
+await Promise.all([initWasm(), initUI()])
+await format()
 
 // --- Wasm ------------------------------------------------------------
 
@@ -342,6 +340,8 @@ function clearOutput() {
 // --- UI: initialization ----------------------------------------------
 
 async function initUI() {
+  initCanvas()
+  initThemeToggle("#dark-theme", "theme")
   document.addEventListener("keydown", ctrlEnterListener)
   await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
@@ -350,7 +350,7 @@ async function initUI() {
   document.querySelector("#sidebar-about").onclick = showAbout
   document.querySelector("#sidebar-share").onclick = share
   document.querySelector("#sidebar-icon-share").onclick = share
-  handleHashChange()
+  await handleHashChangeNoFormat() // Evy wasm for formatting might not be ready yet
   initModal()
   initSidebar()
   initDialog()
@@ -395,6 +395,11 @@ function ctrlEnterListener(e) {
 // Then, it loads new source code depending on URL hash contents.
 // Finally it updates editor.
 async function handleHashChange() {
+  await handleHashChangeNoFormat()
+  await format()
+}
+
+async function handleHashChangeNoFormat() {
   hideModal()
   await stopAndSlide() // go to code screen for new code
   let opts = parseHash()
@@ -416,7 +421,6 @@ async function handleHashChange() {
   document.querySelector(".editor-wrap").scrollTo(0, 0)
   updateSampleTitle()
   clearOutput()
-  await format()
   editor.onUpdate(clearHash)
   editorHidden = opts.editor === "none"
   const classList = document.querySelector(".editor-wrap").classList

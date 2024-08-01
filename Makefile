@@ -205,9 +205,12 @@ endef
 PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.44.1-jammy
 PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
+  --user $(shell id -u):$(shell id -g) \
   --network host --add-host=host.docker.internal:host-gateway \
   --env BASEURL=$(BASEURL) \
   --env NPM_CONFIG_UPDATE_NOTIFIER=false \
+  --env PLATFORM_OVERRIDE=docker \
+  --env HOME=/tmp \
   $(PLAYWRIGHT_OCI_IMAGE) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD_LOCAL))"
 
 PLAYWRIGHT_CMD = $(PLAYWRIGHT_CMD_$(if $(USE_DOCKER),DOCKER,LOCAL))

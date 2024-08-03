@@ -114,6 +114,9 @@ button.arrow svg {
   background: hsl(0deg 0% 85%);
   padding: 0 2px;
 }
+#sample-index.hidden {
+  display: none;
+}
 #sample-title {
   text-align: start;
   display: inline-block;
@@ -127,6 +130,10 @@ button.arrow svg {
   text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
+}
+#sample-index.hidden + #sample-title {
+  text-align: center;
+  margin: auto;
 }
 
 button.share {

@@ -1,0 +1,63 @@
+<h1>🟣🚚 Moving Dot</h1>
+<p>
+  ⭐ Can you draw 6 purple circles at x coordinates <code>0</code>, <code>20</code>,
+  <code>40</code>, <code>60</code>, <code>80</code>, and <code>100</code>?
+</p>
+<details class="small">
+  <summary>Hint</summary>
+  <img src="samples/intro/img/move-6circles.svg" alt="6 circles on horizontally center aligned" />
+</details>
+
+<p>⭐ Can you draw these 6 purple circles using a loop?</p>
+<details class="small">
+  <summary><code>while</code> loop structure</summary>
+  <pre><code class="language-evy">while loop_condition
+    loop_body
+    // …
+end</code></pre>
+  <details class="small">
+    <summary>Hint</summary>
+    <pre><code class="language-evy">x:num
+while x <= ❓
+    move x 50
+    circle 10
+    x = x + ❓
+end</code></pre>
+  </details>
+</details>
+<p>
+  ⭐ Can you change the program to make the circle move from left to right, using the
+  <a href="/docs/builtins.html#clear" target="_blank"><code>clear</code></a> and
+  <a href="/docs/builtins.html#sleep" target="_blank"><code>sleep</code></a> commands?
+</p>
+
+<details class="small">
+  <summary>Hint</summary>
+  <img src="samples/intro/img/1-circle.gif" alt="one horizontally moving circle" />
+  <pre><code class="language-evy">while // …
+   clear
+   // …
+   sleep 0.2
+end</code></pre>
+</details>
+
+<p>⭐ Make 2 circles move in opposite direction</p>
+<details class="small">
+  <summary>Hint</summary>
+  <img src="samples/intro/img/2-circles.gif" alt="two horizontally moving circle" />
+  <pre><code class="language-evy">move x 40
+    circle 10
+    move 100-x 60
+   // …</code></pre>
+</details>
+
+<p>⭐ Make 4 circles move in opposite direction</p>
+<details class="small">
+  <summary>Hint</summary>
+  <img src="samples/intro/img/4-circles.gif" alt="four moving circles" />
+
+  <pre><code class="language-evy">move 100-x 60
+circle 10
+move  40 x
+// …</code></pre>
+</details>

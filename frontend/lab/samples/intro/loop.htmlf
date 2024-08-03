@@ -1,0 +1,28 @@
+<h1>💫 Loops</h1>
+
+<p>Can you change this program to</p>
+<ul class="starlist">
+  <li>print the numbers from 0 to 20?</li>
+  <li>sleep only 0.2 seconds?</li>
+  <li>print even numbers only?</li>
+  <li>print odd numbers only?</li>
+</ul>
+
+<details>
+  <summary>Understanding Loops 📖</summary>
+  <p>
+    A loop in programming is a powerful way to automate repetitive tasks. In Evy, a loop is created
+    using the <code>while</code> keyword.
+  </p>
+  <p>Here's the basic structure:</p>
+  <pre><code class="language-evy">while loop_condition
+    loop_body
+    // …
+end</code></pre>
+  <ul>
+    <li><code>while</code>: Start of the loop.</li>
+    <li><strong>loop_condition</strong>: As long as this condition is true, the loop repeats.</li>
+    <li><strong>loop_body</strong>: Instructions to be repeated.</li>
+    <li><code>end</code>: End of the loop.</li>
+  </ul>
+</details>

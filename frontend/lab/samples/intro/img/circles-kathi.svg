@@ -1,0 +1,18 @@
+<svg
+  stroke="black"
+  stroke-linecap="round"
+  font-size="60"
+  viewBox="0 0 1000 1000"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g>
+    <rect fill="white" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+    <rect fill="aqua" stroke="aqua" x="0" y="0" width="100%" height="100%"></rect>
+  </g>
+  <g fill="white" stroke="white">
+    <circle cx="620" cy="240" r="100"></circle>
+    <circle cx="450" cy="250" r="200"></circle>
+    <circle cx="250" cy="300" r="150"></circle>
+    <circle cx="280" cy="150" r="50"></circle>
+  </g>
+</svg>

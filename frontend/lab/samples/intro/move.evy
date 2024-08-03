@@ -1,26 +1,4 @@
 color "purple"
-
 move 0 50
 circle 10
 
-// 🌶️🌶️
-// Draw 6 circles at x coordinates 0,
-// 20, 40, 60, 80, and 100.
-// Can you do it in a loop?
-// https://github.com/evylang/evy/wiki/6-circles
-
-// 🌶️🌶️
-// Can you change the program to make
-// the circle move from left to right?
-// Use `clear` and `sleep` commands.
-// https://github.com/evylang/evy/wiki/1-circle
-
-// 🌶️🌶️🌶️
-// Can you change the program to make
-// 2 circles move like this:
-// https://github.com/evylang/evy/wiki/2-circles
-
-// 🌶️🌶️🌶️
-// Can you change the program to make
-// 4 circles move like this:
-// https://github.com/evylang/evy/wiki/4-circles

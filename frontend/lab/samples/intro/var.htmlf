@@ -1,0 +1,22 @@
+<h1>🧮 Variables</h1>
+
+<ul class="starlist">
+  <li>
+    <em>Without running</em> the program, can you work out what the first two
+    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands output?
+  </li>
+  <li>What do you think the last two print commands output?</li>
+  <li>Can you print your name and your age using variables?</li>
+</ul>
+
+<details>
+  <summary>Understanding Variables 📖</summary>
+  <p>
+    We <strong>declare</strong> the variable <code>x</code> to be of <strong>type</strong> number
+    variable with
+  </p>
+  <pre><code class="language-evy"><span class="ident">x</span><span class="punc">:</span><span class="keyword">num</span></code></pre>
+  <p>A variable <strong>must</strong> be declared before it can be used.</p>
+  <p>We <strong>assign</strong> a value to a variable with</p>
+  <pre><code class="language-evy"><span class="ident">x</span><span class="ws"> </span><span class="op">=</span><span class="ws"> </span><span class="num">3</span><span class="ws"> </span><span class="op">+</span><span class="ws"> </span><span class="num">4</span></code></pre>
+</details>

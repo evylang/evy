@@ -1,0 +1,10 @@
+clear "black"
+move 50 60
+color "pink"
+circle 10
+move 30 20
+color "palevioletred"
+circle 10
+move 80 20
+color "lavenderblush"
+circle 10

@@ -19,7 +19,7 @@ lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
 ## Full clean build and up-to-date checks as run on CI
 ci: clean check-uptodate all
 
-check-uptodate: tidy fmt doc docs learn
+check-uptodate: tidy fmt doc docs learn lab
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files
@@ -169,6 +169,7 @@ godoc: install
 
 DOCS_TARGET_DIR = frontend/docs
 LEARN_TARGET_DIR = frontend/learn
+LAB_TARGET_DIR = frontend/lab
 
 ## Generate static HTML documentation in frontend/docs from MarkDown in docs
 docs: | $(NODELIB)
@@ -179,6 +180,12 @@ docs: | $(NODELIB)
 learn: install | $(NODELIB)
 	levy export html --no-self-contained --root-dir="/learn/" learn/content $(LEARN_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(LEARN_TARGET_DIR)
+
+## Generate SVG files from .evy files for lab.evy.dev in frontend/lab
+lab: IMAGES := $(shell fd --full-path --glob '**/img/*.evy' $(LAB_TARGET_DIR))
+lab: | $(NODELIB)
+	$(foreach image,$(IMAGES),evy run --svg-out "$(image:evy=svg)" "$(image)"$(nl))
+	npx --prefix $(NODEPREFIX) -y prettier --write $(LAB_TARGET_DIR)
 
 FIND_GENERATED_CMD = fd --exclude '*.css' --exclude '*.js' --type file --full-path
 clean::
@@ -191,7 +198,7 @@ test-urls:
 		xargs -n1 curl  -sL -o /dev/null -w "%{http_code} %{url}\n"  | \
 		grep -v '^200 '
 
-.PHONY: doc docs doctest godoc sdocs test-urls toc usage
+.PHONY: doc docs doctest godoc lab learn sdocs test-urls toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node

@@ -121,7 +121,7 @@ FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_
 .PHONY: check-coverage cover test-cli test-go test-tiny
 
 # --- Lint ---------------------------------------------------------------------
-EVY_FILES = $(shell fd --extension evy)
+EVY_FILES = $(shell fd --type file --extension evy)
 
 ## Lint go source code
 lint-go:
@@ -171,12 +171,12 @@ DOCS_TARGET_DIR = frontend/docs
 LEARN_TARGET_DIR = frontend/learn
 
 ## Generate static HTML documentation in frontend/docs from MarkDown in docs
-docs:
+docs: | $(NODELIB)
 	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
 ## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content
-learn: install
+learn: install | $(NODELIB)
 	levy export html --no-self-contained --root-dir="/learn/" learn/content $(LEARN_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(LEARN_TARGET_DIR)
 

@@ -18,12 +18,8 @@ const docsDir = overviewHref.substring(0, overviewHref.lastIndexOf("/") + 1)
 const docsLinks = querySPALinks(docsDir)
 const target = document.querySelector("main div.max-width-wrapper")
 const scrollTop = document.querySelector("body>main")
-wireSPALinks(docsLinks, target, scrollTop, sidebar.hide)
-
-// --- Syntax coloring -----------------------------------------------
-document.querySelectorAll(".language-evy").forEach((el) => {
-  el.innerHTML = hightlightEvy(el.textContent)
-})
+wireSPALinks(docsLinks, target, scrollTop, afterNavigate)
+highlight()
 
 // --- Hide/show about dialog ----------------------------------------
 const aboutDialog = document.querySelector("#dialog-about")
@@ -31,3 +27,15 @@ const showAboutDialog = document.querySelector("#show-dialog-about")
 showAboutDialog.addEventListener("click", () => {
   aboutDialog.showModal()
 })
+
+// --- Utilities -----------------------------------------------
+function afterNavigate() {
+  sidebar.hide()
+  highlight()
+}
+
+function highlight() {
+  document.querySelectorAll(".language-evy").forEach((el) => {
+    el.innerHTML = hightlightEvy(el.textContent)
+  })
+}

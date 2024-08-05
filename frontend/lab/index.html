@@ -1,1 +1,261 @@
-../play/index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy · Playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="css/resets.css" type="text/css" />
+    <link rel="stylesheet" href="css/root.css" type="text/css" />
+    <link rel="stylesheet" href="css/elements.css" type="text/css" />
+    <link rel="stylesheet" href="css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="css/icons.css" type="text/css" />
+    <link rel="stylesheet" href="css/header.css" type="text/css" />
+    <link rel="stylesheet" href="./css/switch.css" type="text/css" />
+    <link rel="stylesheet" href="css/dialog.css" type="text/css" />
+    <link rel="stylesheet" href="css/syntax.css" type="text/css" />
+    <link rel="stylesheet" href="css/index.css" type="text/css" />
+    <link rel="stylesheet" href="css/fonts.css" type="text/css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "./module/confetti.js": "./module/confetti.js",
+          "./module/editor.js": "./module/editor.js",
+          "./module/highlight.js": "./module/highlight.js",
+          "./module/theme.js": "./module/theme.js"
+        }
+      }
+    </script>
+    <script>
+      const wasmImports = {
+        // Replaced for cache busting, e.g. as "./module/evy.wasm": "./module/evy.11738cdd.wasm"
+        "./module/evy.wasm": "./module/evy.wasm",
+      }
+    </script>
+    <script src="module/wasm_exec.js" type="module"></script>
+    <script src="index.js" type="module"></script>
+  </head>
+
+  <body>
+    <header class="topnav">
+      <div class="left">
+        <button id="hamburger" class="icon-hamburger"></button>
+        <a href="/" class="desktop">
+          <img alt="Evy logo" class="logo" />
+        </a>
+      </div>
+      <div class="center">
+        <button id="sample-previous" class="arrow">
+          <svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1.4L3.4 6L8 10.6L6.6 12L0.6 6L6.6 0L8 1.4Z" fill="currentColor" />
+          </svg>
+        </button>
+        <button id="sample-selector">
+          <div id="sample-index">1/6</div>
+          <div id="sample-title">Welcome</div>
+        </button>
+        <button id="sample-next" class="arrow">
+          <svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 1.4L4.6 6L0 10.6L1.4 12L7.4 6L1.4 0L0 1.4Z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+      <div class="right">
+        <button class="desktop share" id="share">
+          <div class="icon-share"></div>
+          <span>Share</span>
+        </button>
+        <a href="/" class="mobile logo-small"></a>
+      </div>
+    </header>
+
+    <div class="max-width-wrapper">
+      <main class="main">
+        <div class="editor-wrap noscrollbar">
+          <div class="editor language-evy" style="padding-left: calc(2ch + 1.5rem)">
+            <!-- These editor sample contents are replaced by JS, once evy toolchain and editor are ready. -->
+            <pre class="lines">
+<span class="num">  1</span>
+<span class="num">  2</span>
+<span class="num">  3</span>
+<span class="num">  4</span>
+<span class="num">  5</span>
+<span class="num">  6</span>
+<span class="num">  7</span>
+<span class="num">  8</span>
+<span class="num">  9</span>
+<span class="num"> 10</span>
+<span class="num"> 11</span>
+<span class="num"> 12</span>
+            </pre>
+            <pre class="highlighted placeholder">
+<span class="builtin">move</span> <span class="num">10</span> <span class="num">20</span>
+<span class="builtin">line</span> <span class="num">50</span> <span class="num">50</span>
+<span class="builtin">rect</span> <span class="num">25</span> <span class="num">25</span>
+<span class="builtin">color</span> <span class="str">"red"</span>
+<span class="builtin">circle</span> <span class="num">10</span>
+
+<span class="ident">x</span> <span class="op">:=</span> <span class="num">12</span>
+<span class="builtin">print</span> <span class="str">"x:"</span> <span class="ident">x</span>
+<span class="keyword">if</span> <span class="ident">x</span> <span class="op">&gt;</span> <span class="num">10</span>
+<span class="builtin">    print</span> <span class="str">"🍦 big x"</span>
+<span class="keyword">end</span><br>
+            </pre>
+          </div>
+        </div>
+        <div class="output">
+          <div class="canvas"><canvas id="canvas"></canvas></div>
+          <div class="read hidden">
+            <label for="read">input&gt;</label>
+            <textarea id="read" rows="1"></textarea>
+          </div>
+          <div class="input slider hidden">
+            <input type="range" id="sliderx" min="0" max="100" />
+            <input type="range" id="slidery" min="0" max="100" />
+          </div>
+          <div class="console" id="console"></div>
+          <div class="run desktop">
+            <button
+              id="run"
+              class="primary loading"
+              onclick="document.querySelector('#dialog-loading').showModal()"
+            >
+              Run
+            </button>
+          </div>
+        </div>
+      </main>
+      <!-- Add separate mobile button because of position:fixed and output transform -->
+      <div class="run mobile">
+        <button
+          id="run-mobile"
+          class="primary loading"
+          onclick="document.querySelector('#dialog-loading').showModal()"
+        >
+          Run
+        </button>
+      </div>
+    </div>
+
+    <nav id="sidebar" class="hidden">
+      <header class="topnav">
+        <button id="sidebar-close" class="left icon-close"></button>
+      </header>
+      <ul>
+        <li><button id="sidebar-about">About Evy</button></li>
+        <li><a href="/docs" target="_blank">Docs</a></li>
+        <li><a href="/discord" target="_blank">Discord</a></li>
+        <li><a href="https://github.com/evylang/evy" target="_blank">GitHub</a></li>
+        <li><a href="https://github.com/evylang/evy/wiki/gallery" target="_blank">Gallery</a></li>
+        <li><a href="https://github.com/sponsors/evylang" target="_blank">Sponsor</a></li>
+        <li class="mobile"><button id="sidebar-share">Share</button></li>
+      </ul>
+      <ul class="icons">
+        <li><a href="/discord" class="icon-discord" target="_blank"></a></li>
+        <li><a href="https://github.com/evylang/evy" class="icon-github" target="_blank"></a></li>
+        <li><a href="mailto:evy@evy.dev" class="icon-email" target="_blank"></a></li>
+        <li id="sidebar-icon-share" class="mobile"><button class="icon-share"></button></li>
+        <li>
+          <label class="theme switch">
+            <input type="checkbox" id="dark-theme" checked />
+            <span class="slider"></span>
+            <script>
+              // Inline JS to avoid flash of other theme.
+              if (window.localStorage.getItem("theme") === "light") {
+                document.querySelector("#dark-theme").checked = false
+              }
+            </script>
+          </label>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Modal evy code sample selection, showed on sample modal click -->
+    <div id="modal" class="hidden">
+      <header class="topnav">
+        <button id="modal-close" class="icon-close"></button>
+      </header>
+      <div class="modal-main" id="modal-samples">
+        <div class="item">
+          <h2>🌱 Getting Started</h2>
+          <ul>
+            <li><a href="#helloworld">Hello, World</a></li>
+            <li><a href="#welcome">Welcome</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evy sharing dialog -->
+    <dialog id="dialog-share">
+      <form method="dialog">
+        <header>
+          <h1>Share</h1>
+          <button class="icon-close"></button>
+        </header>
+        <main>
+          <p class="dialog-note hidden">⚠️ Code has <span class="err">errors</span>!</p>
+          <div class="copy">
+            <label for="share-url">Sharable URL</label>
+            <input type="text" id="share-url" />
+            <button type="button" class="icon-copy"></button>
+          </div>
+          <button class="primary">Done</button>
+        </main>
+      </form>
+    </dialog>
+
+    <!-- Evy loading dialog -->
+    <dialog id="dialog-loading">
+      <form method="dialog">
+        <header>
+          <h1>Loading</h1>
+          <button class="icon-close"></button>
+        </header>
+        <main>
+          <p>Hold tight, getting the editor and compiler ready. 🧘</p>
+          <button class="primary">Ok</button>
+        </main>
+      </form>
+    </dialog>
+
+    <!-- About Evy -->
+    <dialog id="dialog-about" class="large">
+      <form method="dialog">
+        <header>
+          <h1>About</h1>
+          <button class="icon-close"></button>
+        </header>
+        <main>
+          <object type="image/svg+xml" data="img/evy-e.v1.svg" class="evy-e">
+            <img src="img/evy-e.v1.svg" alt="large, interactive letter 'e' as evy logo" />
+          </object>
+          <h2>Evy is a simple programming language, made to learn coding.</h2>
+          <p>
+            Evy is a modern, beginner-friendly programming language that bridges the gap between
+            block-based coding and conventional programming languages. Its simple syntax and small
+            set of built-in functions make it easy to learn and use, but it still is powerful enough
+            for user interaction, games, and animations.
+          </p>
+          <p>
+            Created by a software engineer and parent who struggled to teach their kids programming
+            with conventional languages, Evy is designed to make real programming as fun and easy as
+            possible.
+          </p>
+          <button class="primary">Done</button>
+        </main>
+      </form>
+    </dialog>
+    <script type="text/javascript">
+      // Avoid flicker of placeholder sample in editor if we have a saved session.
+      // Syntax coloring is added once Yace editor is loaded.
+      if (sessionStorage.getItem("evy-editor")) {
+        document.querySelector(".placeholder").innerText = sessionStorage.getItem("evy-editor")
+        document.querySelector(".lines").innerText = ""
+      }
+      if (window.location.hash.includes("editor=none")) {
+        document.querySelector(".editor-wrap").classList.add("hidden")
+      }
+    </script>
+  </body>
+</html>

@@ -362,20 +362,27 @@ async function fetchSamples() {
   sampleData.byID = {}
   let previous = null
   for (const section of sampleData.sections) {
-    for (let i = 0; i < section.samples.length; ++i) {
-      const sample = section.samples[i]
-      sampleData.byID[sample.id] = {
+    const listedSamples = section.samples.filter((s) => !s.unlisted)
+    const sectionTotal = listedSamples.length
+    let index = 1
+    for (const sample of section.samples) {
+      const sampleByID = {
         ...sample,
         sectionTitle: section.title,
         sectionID: section.id,
-        sectionTotal: section.samples.length,
-        sectionIndex: i + 1,
-        previous: previous,
       }
+      sampleData.byID[sample.id] = sampleByID
+      if (sample.unlisted) {
+        continue
+      }
+      sampleByID.sectionTotal = sectionTotal
+      sampleByID.sectionIndex = index
+      sampleByID.previous = previous
       if (previous) {
         sampleData.byID[previous].next = sample.id
       }
       previous = sample.id
+      index++
     }
   }
 }
@@ -957,10 +964,17 @@ function updateSampleTitle() {
   const sample = sampleData.byID[currentSample]
   titleDiv.textContent = sample.title
   const indexDiv = document.querySelector("#sample-index")
-  indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
   const prevButton = document.querySelector("#sample-previous")
-  sample.previous ? prevButton.classList.remove("hidden") : prevButton.classList.add("hidden")
   const nextButton = document.querySelector("#sample-next")
+  if (sample.unlisted) {
+    indexDiv.classList.add("hidden")
+    prevButton.classList.add("hidden")
+    nextButton.classList.add("hidden")
+    return
+  }
+  indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
+  indexDiv.classList.remove("hidden")
+  sample.previous ? prevButton.classList.remove("hidden") : prevButton.classList.add("hidden")
   sample.next ? nextButton.classList.remove("hidden") : nextButton.classList.add("hidden")
 }
 
@@ -1012,7 +1026,7 @@ function showAbout() {
 
 async function share() {
   hideSidebar()
-  const note = document.querySelector("#dialog-share .note")
+  const note = document.querySelector("#dialog-share .dialog-note")
   await format()
   errors ? note.classList.remove("hidden") : note.classList.add("hidden")
   const baseurl = window.location.origin + window.location.pathname

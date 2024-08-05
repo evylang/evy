@@ -12,12 +12,10 @@
   --editor-width: auto;
   --editor-padding-bottom: 16px;
   --editor-border: 1px solid var(--border-color);
-  --editor-margin: 20px 0 16px 16px;
   --canvas-size: min(33vw, 60vh);
   --wrapper-max-width: calc(75ch + var(--canvas-size) + 32px);
   --console-width: var(--canvas-size);
   --output-width: calc(var(--canvas-size) + 2px);
-  --output-margin: 20px 16px 16px 24px;
   --output-border: 1px solid var(--output-border-mid);
   --output-border-top-width: 23px;
   --output-border-radius: 6px;
@@ -36,13 +34,11 @@
     --main-width: 200vw;
     --main-translate: 0;
     --output-width: 100vw;
-    --output-margin: 0;
     --output-border: none;
     --output-border-top-width: 0;
     --output-border-radius: 0;
     --output-border-width: 0;
     --editor-border: none;
-    --editor-margin: 4px 0 0 0;
     --editor-padding-bottom: 72px;
     --editor-width: 100vw;
     --canvas-size: min(100vw, 60vh);
@@ -114,6 +110,9 @@ button.arrow svg {
   background: hsl(0deg 0% 85%);
   padding: 0 2px;
 }
+#sample-index.hidden {
+  display: none;
+}
 #sample-title {
   text-align: start;
   display: inline-block;
@@ -128,6 +127,10 @@ button.arrow svg {
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
 }
+#sample-index.hidden + #sample-title {
+  text-align: center;
+  margin: auto;
+}
 
 button.share {
   display: flex;
@@ -137,15 +140,6 @@ button.share > div {
   width: 1.2em;
   height: 1.2em;
   margin-right: 8px;
-}
-
-@media (max-width: 767px) {
-  .breadcrumbs li:not(:last-child) {
-    display: none;
-  }
-  .breadcrumbs li {
-    margin-top: -0.2em;
-  }
 }
 
 /* --- Sidebar ---------------------------------------------------------- */
@@ -243,6 +237,8 @@ button.share > div {
   height: calc(100vh - var(--topnav-height));
   display: flex;
   overflow: clip;
+  gap: 24px;
+  padding: 20px 16px 16px;
   transition: translate 0.3s ease-in-out;
   justify-content: center;
 }
@@ -253,6 +249,11 @@ button.share > div {
   }
   .main {
     justify-content: left;
+    gap: 0;
+    padding: 0;
+  }
+  .main .editor-wrap {
+    margin-top: 4px;
   }
 }
 
@@ -291,7 +292,7 @@ button.share > div {
 
 /* --- Editor -------------------------------------------------------- */
 .editor-wrap {
-  margin: var(--editor-margin);
+  margin: 0;
   padding-bottom: var(--editor-padding-bottom);
   padding-top: 10px;
   padding-right: 1em;
@@ -432,7 +433,7 @@ dialog .err,
   overflow: hidden;
   background: var(--output-border-light);
   border-radius: var(--output-border-radius);
-  margin: var(--output-margin);
+  margin: 0;
   border: var(--output-border);
   border-top-width: var(--output-border-top-width);
 }
@@ -704,7 +705,7 @@ dialog .err {
   margin-right: 8px;
 }
 
-dialog .note {
+dialog .dialog-note {
   margin-bottom: 16px;
 }
 /* --- Utilities ----------------------------------------------------- */

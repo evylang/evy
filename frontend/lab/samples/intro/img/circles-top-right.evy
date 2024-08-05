@@ -1,4 +1,4 @@
 clear "dodgerblue"
-move 40 50
+move 100 100
 color "yellow"
 circle 30

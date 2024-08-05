@@ -19,6 +19,7 @@ let actions = "fmt,ui,eval"
 let editor
 let errors = false
 let editorHidden = false
+let notesHidden = true
 
 // --- Initialize ------------------------------------------------------
 
@@ -234,7 +235,7 @@ async function handleRun() {
 // handleMobRun handles three states for mobile devices:
 // run -> stop -> code
 async function handleMobRun() {
-  if (editorHidden) {
+  if (editorHidden && notesHidden) {
     handleRun()
     return
   }
@@ -343,13 +344,13 @@ async function initUI() {
   initCanvas()
   initThemeToggle("#dark-theme", "theme")
   document.addEventListener("keydown", ctrlEnterListener)
-  await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
   document.querySelector("#share").onclick = share
   document.querySelector("#sidebar-about").onclick = showAbout
   document.querySelector("#sidebar-share").onclick = share
   document.querySelector("#sidebar-icon-share").onclick = share
+  await fetchSamples()
   await handleHashChangeNoFormat() // Evy wasm for formatting might not be ready yet
   initModal()
   initSidebar()
@@ -419,19 +420,43 @@ async function handleHashChangeNoFormat() {
     opts = { sample: "welcome" }
     history.replaceState({}, "", "#welcome")
   }
-  const { source } = await fetchSourceWithSampleTitle(opts)
-
-  !editor && initEditor()
-  editor.onUpdate(null)
-  editor.update({ value: source, errorLines: {} })
-
-  document.querySelector(".editor-wrap").scrollTo(0, 0)
+  const { source, notes } = await fetchSourceWithNotes(opts)
+  updateNotes(notes)
+  updateEditorContent(source)
   updateSampleTitle()
   clearOutput()
   editor.onUpdate(clearHash)
   editorHidden = opts.editor === "none"
   const classList = document.querySelector(".editor-wrap").classList
   editorHidden ? classList.add("hidden") : classList.remove("hidden")
+}
+
+function updateNotes(notes) {
+  const notesEl = document.querySelector("#notes")
+  if (!notesEl) {
+    notesHidden = true
+    return
+  }
+  if (!notes) {
+    notesHidden = true
+    notesEl.classList.add("hidden")
+    notesEl.innerHTML = ""
+    return
+  }
+  notesHidden = false
+  notesEl.classList.remove("hidden")
+  notesEl.innerHTML = notes
+  notesEl.querySelectorAll(".language-evy").forEach((el) => {
+    el.innerHTML = highlightEvy(el.textContent)
+  })
+  notesEl.scrollTo(0, 0)
+}
+
+function updateEditorContent(content) {
+  !editor && initEditor()
+  editor.onUpdate(null)
+  editor.update({ value: content, errorLines: {} })
+  document.querySelector(".editor-wrap").scrollTo(0, 0)
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -451,42 +476,52 @@ function parseHash() {
     // shortcut for evy.dev#abc loading evy.dev/samples/draw/abc.evy
     const sample = entries[0][0]
     if (sampleData && sampleData.byID[sample]) {
-      return { sample }
+      return { sample, editor: sampleData.byID[sample].editor }
     }
   }
   return Object.fromEntries(entries)
 }
 
-async function fetchSourceWithSampleTitle({ content, sample, source }) {
+async function fetchSourceWithNotes({ content, sample, source }) {
   if (content) {
     const src = await decode(content)
     return { source: src }
   }
   if (source) {
-    const src = await fetchSource(source)
+    const src = await fetchText(source)
     return { source: src }
   }
   // sample ID is set
   const s = sampleData.byID[sample]
   currentSample = sample
   const url = `samples/${s.sectionID}/${sample}.evy`
-  const src = await fetchSource(url)
-  return { source: src }
+  return await fetchSample(s)
 }
 
-async function fetchSource(url) {
-  let source
+async function fetchSample(sample) {
+  const evyURL = `samples/${sample.sectionID}/${sample.id}.evy`
+  if (!sample.notes) {
+    const source = await fetchText(evyURL)
+    return { source }
+  }
+  const notesURL = sample.notes && `samples/${sample.sectionID}/${sample.id}.htmlf`
+  const [source, notes] = await Promise.all([fetchText(evyURL), fetchText(notesURL)])
+  return { source, notes }
+}
+
+async function fetchText(url) {
+  let text
   try {
     const response = await fetch(url)
     if (response.status < 200 || response.status > 299) {
       throw new Error("invalid response status", response.status)
     }
-    source = await response.text()
+    text = await response.text()
   } catch (err) {
-    console.error(err)
-    source = "Oops! Could not load source code."
+    console.error(err, url)
+    text = `Oops! Could not load sample.`
   }
-  return source
+  return text
 }
 
 function clearHash() {

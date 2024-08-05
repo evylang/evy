@@ -1,0 +1,44 @@
+// generate coords-30-60.svg with
+// evy run --svg-out coords-30-60.svg coords-30-60.evy
+clear "white"
+grid
+color "black"
+width 0.4
+
+line 0 100
+move 0 0
+line 100 0
+
+poly [100 0] [98 1.5] [98 0] [100 0]
+poly [0 100] [1.5 98] [0 98] [0 100]
+
+move 30 0
+line 30 60
+line 0 60
+
+poly [30 59] [29 57] [31 57] [30 59]
+poly [29 60] [27 59] [27 61] [29 60]
+
+// text
+width 0.1
+font {size:4 family:"Fira Code, monospace"}
+
+move 95 1
+text "x"
+move 1 95
+text "y"
+move 1 1
+text "0"
+
+move 25 62
+text "30 60"
+
+move 31 29
+text "y:60"
+
+move 10 56
+text "x:30"
+
+color "red"
+move 30 60
+circle 1

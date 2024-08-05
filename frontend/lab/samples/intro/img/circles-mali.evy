@@ -1,0 +1,14 @@
+clear "turquoise"
+
+colour "red"
+move 20 50
+circle 30
+
+colour "orange"
+move 50 80
+circle 30
+
+colour "yellow"
+move 80 50
+circle 30
+

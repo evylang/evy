@@ -1,11 +1,3 @@
-// 🌶️ Can you guess the coordinates?
-// 1. Run this program.
-// 2. Tap the drawing area (canvas).
-// 3. What are the coordinates of the
-//    red dot? 🔴
-// 4. Tap the canvas again for a hint.
-// 5. Tap it again for the answer. 🎯
-
 x:num
 y:num
 drawAxisLabels

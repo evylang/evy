@@ -1,0 +1,13 @@
+clear "SpringGreen"
+move 50 50
+color "black"
+circle 30
+move 40 50
+color "SpringGreen"
+circle 20
+move 30 50
+color "black"
+circle 10
+move 25 50
+color "SpringGreen"
+circle 5

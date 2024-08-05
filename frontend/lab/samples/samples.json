@@ -5,13 +5,14 @@
       "title": "Introduction",
       "emoji": "",
       "samples": [
-        { "id": "welcome", "title": "👋🌏 Welcome" },
-        { "id": "worm", "title": "🐛 Worm" },
-        { "id": "coords", "title": "🎯 Coordinates" },
-        { "id": "circles", "title": "🇵🇼 Circles" },
-        { "id": "var", "title": "🧮 Variables" },
-        { "id": "loop", "title": "🎢 Loops" },
-        { "id": "move", "title": "🟣🚚 Moving Dot" }
+        { "id": "welcome", "title": "👋🌏 Welcome", "notes": true },
+        { "id": "worm", "title": "🐛 Worm", "notes": true },
+        { "id": "coords", "title": "🎯 Coordinates", "notes": true, "editor": "none" },
+        { "id": "coords-code", "title": "🎯 Coordinates", "unlisted": true },
+        { "id": "circles", "title": "🇵🇼 Circles", "notes": true },
+        { "id": "var", "title": "🧮 Variables", "notes": true },
+        { "id": "loop", "title": "💫 Loops", "notes": true },
+        { "id": "move", "title": "🟣🚚 Moving Dot", "notes": true }
       ]
     }
   ]

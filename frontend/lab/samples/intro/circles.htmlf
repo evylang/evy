@@ -1,0 +1,53 @@
+<h1>🇵🇼 Circles</h1>
+
+<p>Run this program and read the code.</p>
+<p>⭐ Can you move the circle center to each corner?</p>
+<details class="small">
+  <summary>Hint</summary>
+  <table class="images">
+    <tr>
+      <td>
+        <img src="samples/intro/img/circles-top-left.svg" alt="Quater cirlce top left" />
+      </td>
+      <td><img src="samples/intro/img/circles-top-right.svg" alt="Quater circle top right" /></td>
+    </tr>
+    <tr>
+      <td>
+        <img src="samples/intro/img/circles-bottom-left.svg" alt="Quater cirlce bottom left" />
+      </td>
+      <td>
+        <img src="samples/intro/img/circles-bottom-right.svg" alt="Quater cirlce bottom right" />
+      </td>
+    </tr>
+  </table>
+</details>
+
+<p>⭐ Draw 2-4 circles that are partly or fully visible.</p>
+<details class="small">
+  <summary>Examples</summary>
+  <table class="images">
+    <tr>
+      <td>
+        <img src="samples/intro/img/circles-anika.svg" alt="Three circles of same size" />
+      </td>
+      <td>
+        <img
+          src="samples/intro/img/circles-mali.svg"
+          alt="Three large overlapping circles in warm colors"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="samples/intro/img/circles-camh.svg" alt="Overlapping circles" />
+      </td>
+      <td><img src="samples/intro/img/circles-kathi.svg" alt="Cloud made from circles" /></td>
+    </tr>
+  </table>
+</details>
+
+<p>Which country has this flag? 🇵🇼</p>
+<details class="small">
+  <summary>Answer</summary>
+  <p><a href="https://en.wikipedia.org/wiki/Palau">Palau</a></p>
+</details>

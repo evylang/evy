@@ -1,0 +1,213 @@
+/* Make wider for 3 columns */
+.max-width-wrapper:not(:has(.main > .hidden)) {
+  max-width: 84rem;
+}
+
+/* Reduce in-between white-space */
+@media (min-width: 768px) {
+  .main {
+    gap: 12px;
+    padding: 16px 12px;
+  }
+}
+/* --- Notes -------------------------------------------------------- */
+.notes {
+  max-width: min(20rem, 25vw);
+  background: var(--background);
+  border-radius: 6px;
+  border: var(--editor-border);
+  margin: 0;
+  font-family: var(--font-family);
+  overflow-y: auto;
+  height: 100%;
+  padding: 8px 16px var(--editor-padding-bottom) 16px;
+}
+
+.notes:has(+ .editor-wrap.hidden) {
+  display: block;
+  width: var(--editor-width);
+  max-width: unset;
+  flex: 1;
+}
+
+.notes h1 {
+  color: var(--color);
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+}
+:is(.notes h2, .notes h3, .notes h4, .notes summary) {
+  color: var(--color);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.notes summary {
+  margin: 0;
+  cursor: pointer;
+}
+
+.notes details {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.notes summary + p {
+  margin-top: 12px;
+}
+.notes h2,
+.notes summary {
+  font-weight: 600;
+}
+.notes details.small {
+  margin-top: -8px;
+  margin-bottom: 20px;
+}
+.notes details.small summary {
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+}
+
+.notes h4 {
+  color: var(--color-slightly-dimmed);
+}
+
+.notes p,
+.notes td {
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+}
+/* Reduce margin bottom if code block follows */
+.notes p:has(+ pre) {
+  margin-bottom: 8px;
+}
+
+.notes ul,
+.notes ol {
+  margin: 12px 24px;
+}
+
+.notes .starlist {
+  margin: 4px 12px;
+  list-style-type: "⭐ ";
+}
+.notes > .starlist {
+  margin-left: 24px;
+}
+.notes li {
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.notes a {
+  color: var(--color-accent);
+  &:hover,
+  &:hover code {
+    color: var(--color-accent-hover);
+  }
+}
+
+.notes a > code {
+  color: var(--color-accent);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.notes pre {
+  margin: 16px 0 24px;
+  padding: 16px;
+  border-left: 6px solid var(--border-color);
+  overflow-x: auto;
+  background: var(--background-code);
+}
+
+.notes code {
+  padding: 0.25em;
+  font-size: 0.85rem;
+  background-color: var(--background-inline-code);
+  border-radius: 4px;
+  color: var(--color);
+}
+
+.notes pre code {
+  padding: 0;
+  color: var(--color);
+  background: none;
+  margin-bottom: 24px;
+}
+
+.notes table {
+  border-collapse: collapse;
+  margin: 16px 0 36px;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.notes tr {
+  border-top: 1px solid var(--border-color);
+}
+.notes table tr:first-child {
+  border-top: none;
+}
+.notes th,
+.notes td {
+  text-align: left;
+  line-height: 2;
+  padding: 2px 24px;
+  &:first-child {
+    padding-left: 0px;
+  }
+}
+.notes table.images tr {
+  border: none;
+}
+.notes table.images td {
+  padding: 2px;
+}
+.notes table.images img {
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.notes th {
+  font-weight: 600;
+  color: var(--color-slightly-dimmed);
+}
+
+.notes figure {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+}
+
+.notes img,
+.notes figcaption {
+  width: 16rem;
+  max-width: 80%;
+}
+
+@media (max-width: 767px) {
+  .notes {
+    display: none;
+  }
+  .notes:has(+ .editor-wrap.hidden) {
+    display: block;
+  }
+}
+
+@media (hover: hover) {
+  .notes summary:hover {
+    color: var(--color-accent);
+  }
+  .notes details.small summary:hover {
+    color: var(--color-accent);
+  }
+}

@@ -1,0 +1,15 @@
+<h1>Let's Get Started 🚀</h1>
+<ol>
+  <li><strong>Run</strong> this program.<br />Create some cool output.</li>
+  <li>
+    Can you change this program to draw a circle with:
+    <ul class="starlist">
+      <li>Your favourite <strong>colour</strong>?</li>
+      <li>A slightly different <strong>size</strong>?</li>
+      <li>
+        A different <strong>outline color</strong>? <br />Use the
+        <a href="/docs/builtins.html#stroke" target="_blank"><code>stroke</code></a> command.
+      </li>
+    </ul>
+  </li>
+</ol>

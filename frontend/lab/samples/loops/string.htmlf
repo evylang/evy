@@ -1,0 +1,39 @@
+<h1>🧵 Strings</h1>
+
+<p>Run the program on the right and see if you understand its code.</p>
+
+<p>⭐ Use a loop to write a program that prints:</p>
+<pre><code>tick...
+tick...
+tick...
+tick...
+BOOM!</code></pre>
+
+<p>⭐⭐ Write a program that prints:</p>
+<pre><code>tick...tick...tick...BOOM!</code></pre>
+
+<p>
+  <strong>String concatenation</strong> joins two or more strings together with the
+  <code>+</code> operator.
+</p>
+
+<details>
+  <summary>Hint</summary>
+  <ul>
+    <li>Use a <code>while</code>loop.</li>
+    <li>Use a separate string variable <code>s</code>.</li>
+    <li>Use string concatenation with <code>+</code>.</li>
+  </ul>
+  <details>
+    <summary>Hint 2</summary>
+    <pre><code class="language-evy">x:num
+s:❓
+while x < ❓
+    s = s + ❓
+    x = x + ❓
+end
+s = ❓ + ❓
+print s
+</code></pre>
+  </details>
+</details>

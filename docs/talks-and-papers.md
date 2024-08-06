@@ -1,5 +1,14 @@
 # Talks and Papers
 
+### Evy Labs Playlist
+
+The [Evy Labs Playlist] is a step-by-step guide through the interactive coding labs on [lab.evy.dev].
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/?listType=playlist&list=PLSSU-Bb3IOxe-15D2NCvwtvvEDqZT-epV" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+[Evy Labs Playlist]: https://www.youtube.com/playlist?list=PLSSU-Bb3IOxe-15D2NCvwtvvEDqZT-epV
+[lab.evy.dev]: https://lab.evy.dev
+
 ### Introduction to Evy
 
 Lo-fi backstory to how Evy came to be

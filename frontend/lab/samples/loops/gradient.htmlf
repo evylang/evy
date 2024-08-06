@@ -1,0 +1,44 @@
+<h1>🌈🫵 Gradient</h1>
+
+<p>Run the program on the right and see if you understand its code.</p>
+
+<p>⭐ Can you replace the value <code>30</code> with a variable?</p>
+<details class="small">
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+x = 30
+c = hsl ❓+200
+color c
+move ❓ 100
+// One more to replace
+  </code></pre>
+</details>
+
+<p>⭐ Can you use this variable to create a loop from 0 to 100 with a step of 10?</p>
+<details class="small">
+  <summary>Hint</summary>
+  <pre><code class="language-evy">while x <= ❓
+    c = hsl __
+    color c
+    move __
+    line __
+    x = x + ❓
+end
+  </code></pre>
+</details>
+
+<p>⭐ Can you animate the lines with the <code>sleep</code> command.?</p>
+<details class="small">
+  <summary>Hint</summary>
+  <pre><code class="language-evy">while x <= __
+  	// ...
+    sleep ❓
+    x = x + __
+end
+  </code></pre>
+</details>
+
+<p>
+  ⭐ Can you reduce the line <code>width</code>, <code>sleep</code> and loop increment to create a
+  smooth gradient?
+</p>

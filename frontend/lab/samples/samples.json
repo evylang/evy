@@ -5,7 +5,8 @@
       "title": "Introduction",
       "emoji": "",
       "samples": [
-        { "id": "welcome", "title": "👋🌏 Welcome", "notes": true },
+        { "id": "welcome", "title": "👋 Welcome", "notes": true, "editor": "none" },
+        { "id": "helloworld", "title": "👋🌏 Hello World", "notes": true },
         { "id": "worm", "title": "🐛 Worm", "notes": true },
         { "id": "coords", "title": "🎯 Coordinates", "notes": true, "editor": "none" },
         { "id": "coords-code", "title": "🎯 Coordinates", "unlisted": true },
@@ -13,6 +14,23 @@
         { "id": "var", "title": "🧮 Variables", "notes": true },
         { "id": "loop", "title": "💫 Loops", "notes": true },
         { "id": "move", "title": "🟣🚚 Moving Dot", "notes": true }
+      ]
+    },
+    {
+      "id": "loops",
+      "title": "Loops",
+      "emoji": "",
+      "samples": [
+        { "id": "string", "title": "🧵 Strings", "notes": true },
+        { "id": "target-show", "title": "🎯📺 Target", "notes": true, "editor": "none" },
+        { "id": "target", "title": "🎯🫵 Target", "notes": true },
+        { "id": "sequence", "title": "🔢 Sequences", "notes": true },
+        { "id": "hsl", "title": "🤹 HSL colors", "notes": true, "editor": "none" },
+        { "id": "hsl-code", "title": "🤹 HSL colors", "unlisted": true },
+        { "id": "gradient-show", "title": "🌈📺  Gradient", "notes": true, "editor": "none" },
+        { "id": "gradient", "title": "🌈🫵  Gradient", "notes": true },
+        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none" },
+        { "id": "lines", "title": "🌐🫵 Lines", "notes": true }
       ]
     }
   ]

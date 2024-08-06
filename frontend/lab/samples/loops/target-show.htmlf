@@ -1,0 +1,16 @@
+<h1>🎯 Target board</h1>
+
+<p>Hit <strong>Run</strong> to draw an animated target board.</p>
+
+<p>How would you go about writing this program?</p>
+
+<details>
+  <summary>💡 Some clues</summary>
+  <ul>
+    <li>Break down the problem into smaller bits.</li>
+    <li>Create a static image that fits on the canvas:</li>
+    <img src="samples/loops/img/target.svg" alt="target board" />
+    <li>Animate the circles with the <code>sleep</code> command.</li>
+    <li>Increase the starting radius to cover the whole canvas.</li>
+  </ul>
+</details>

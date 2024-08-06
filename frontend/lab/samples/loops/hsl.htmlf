@@ -1,0 +1,41 @@
+<h1>🤹 HSL colors</h1>
+
+<p>
+  HSL stands for <strong>Hue, Saturation, Lightness</strong>. <br />
+  It's a way to describe how colors are created.
+</p>
+
+<h2>🧪 Experiment!</h2>
+<ul>
+  <li>Run the program.</li>
+  <li>Tap the canvas.</li>
+  <li>Observe how changing the HSL values affects the color.</li>
+</ul>
+
+<details>
+  <summary>Understanding HSL(A) 📖</summary>
+  <p>
+    <strong>Hue</strong> is the color type, like red, green, or blue. It is a number between
+    <code>0</code> and <code>360</code> degrees.
+  </p>
+  <p>
+    <strong>Saturation</strong> is the intensity of the color. It is a number between
+    <code>0</code> and <code>100</code> percent. Optional, default <code>100</code>.
+  </p>
+  <p>
+    <strong>Lightness</strong> is the brightness of the color. It is a number between
+    <code>0</code> and <code>100</code> percent. Optional, default <code>50</code>.
+  </p>
+  <p>
+    <strong>Alpha</strong> is the transparency of the color. It is a number between
+    <code>0</code> and <code>1</code>. Optional, default <code>1</code>.
+  </p>
+</details>
+<p>Explore the <a href="" target="_blank">HSL documentation</a> for more details.</p>
+<details>
+  <summary>Where is the code?</summary>
+  <p>
+    The source code for this program is hidden, but if you're interested in how it works, you can
+    take a peek at the <a href="#hsl-code" target="_blank">full example</a>.
+  </p>
+</details>

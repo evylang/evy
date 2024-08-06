@@ -1,0 +1,7 @@
+width 2
+stroke "red"
+move 50 50
+
+for r := range 46 0 -5
+    circle r
+end

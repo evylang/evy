@@ -1,0 +1,8 @@
+width 0.2
+for i := range 0 100 0.2
+    color (hsl i+200)
+    move i 0
+    line i 100
+    sleep 0.001
+end
+

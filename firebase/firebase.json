@@ -25,8 +25,8 @@
           "type": 301
         },
         {
-          "source": "/l/circle-challenge",
-          "destination": "https://docs.google.com/presentation/d/1lpp6Mn7fdOqWe9kFAYxiyfy5b8HGrqlQHOvjBU_0xwk/edit#slide=id.g1f1a64b624b_0_57",
+          "source": "/send",
+          "destination": "https://docs.google.com/forms/d/e/1FAIpQLSeGSw3Ot3Ha-ElvVbu361MovzroNaGv1fjQq8geS1fs9Kookg/viewform",
           "type": 301
         }
       ],
@@ -47,7 +47,14 @@
     },
     {
       "target": "lab",
-      "public": "public/apex/lab"
+      "public": "public/apex/lab",
+      "redirects": [
+        {
+          "source": "/playlist",
+          "destination": "https://www.youtube.com/playlist?list=PLSSU-Bb3IOxe-15D2NCvwtvvEDqZT-epV",
+          "type": 301
+        }
+      ]
     },
     {
       "target": "learn",

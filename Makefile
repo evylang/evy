@@ -10,7 +10,7 @@ GOFILES = $(shell find . -name '*.go')
 ## Build, test, check coverage and lint
 all: build-full test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
-	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
+	@echo '$(COLOR_GREEN)Success$(COLOR_NORMAL)'
 
 test: test-go test-tiny test-cli check-coverage
 
@@ -116,7 +116,7 @@ cover: test-go
 	go tool cover -html=$(COVERFILE)
 
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
-FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_NORMAL)'; exit 1; }
+FAIL_COVERAGE = { echo '$(COLOR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOR_NORMAL)'; exit 1; }
 
 .PHONY: check-coverage cover test-cli test-go test-tiny
 
@@ -332,10 +332,10 @@ define NEXTTAG_CMD
 endef
 
 # --- Utilities ----------------------------------------------------------------
-COLOUR_NORMAL = $(shell tput sgr0 2>/dev/null)
-COLOUR_RED    = $(shell tput setaf 1 2>/dev/null)
-COLOUR_GREEN  = $(shell tput setaf 2 2>/dev/null)
-COLOUR_WHITE  = $(shell tput setaf 7 2>/dev/null)
+COLOR_NORMAL = $(shell tput sgr0 2>/dev/null)
+COLOR_RED    = $(shell tput setaf 1 2>/dev/null)
+COLOR_GREEN  = $(shell tput setaf 2 2>/dev/null)
+COLOR_WHITE  = $(shell tput setaf 7 2>/dev/null)
 
 help:
 	$(eval export HELP_AWK)
@@ -351,7 +351,7 @@ define HELP_AWK
 /^## / { desc = desc substr($$0, 3) }
 /^[A-Za-z0-9%_-]+:/ && desc {
 	sub(/::?$$/, "", $$1)
-	printf "$(COLOUR_WHITE)%s$(COLOUR_NORMAL)\t%s\n", $$1, desc
+	printf "$(COLOR_WHITE)%s$(COLOR_NORMAL)\t%s\n", $$1, desc
 	desc = ""
 }
 endef

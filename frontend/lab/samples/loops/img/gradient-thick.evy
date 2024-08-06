@@ -1,0 +1,7 @@
+width 10
+
+for x := range 0 101 10
+    color (hsl x+200)
+    move x 0
+    line x 100
+end

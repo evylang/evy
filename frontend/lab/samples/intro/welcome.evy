@@ -1,1 +1,23 @@
-print "Hello, world! 👋🌏"
+i := 1
+clear
+while i < 130
+    clear
+    move i 60
+    color "orange"
+    circle 8
+
+    move 100-i 40
+    color "red"
+    circle 8
+
+    move 40 i
+    color "purple"
+    circle 8
+
+    move 60 100-i
+    color "gold"
+    circle 8
+
+    i = i + 0.1
+    sleep 0.001
+end

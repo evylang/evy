@@ -5,7 +5,8 @@
       "title": "Introduction",
       "emoji": "",
       "samples": [
-        { "id": "welcome", "title": "👋🌏 Welcome", "notes": true },
+        { "id": "welcome", "title": "👋 Welcome", "notes": true, "editor": "none" },
+        { "id": "helloworld", "title": "👋🌏 Hello World", "notes": true },
         { "id": "worm", "title": "🐛 Worm", "notes": true },
         { "id": "coords", "title": "🎯 Coordinates", "notes": true, "editor": "none" },
         { "id": "coords-code", "title": "🎯 Coordinates", "unlisted": true },

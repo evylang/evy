@@ -47,7 +47,14 @@
     },
     {
       "target": "lab",
-      "public": "public/apex/lab"
+      "public": "public/apex/lab",
+      "redirects": [
+        {
+          "source": "/playlist",
+          "destination": "https://www.youtube.com/playlist?list=PLSSU-Bb3IOxe-15D2NCvwtvvEDqZT-epV",
+          "type": 301
+        }
+      ]
     },
     {
       "target": "learn",

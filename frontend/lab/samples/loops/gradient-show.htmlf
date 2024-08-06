@@ -1,0 +1,49 @@
+<h1>🌈📺 Gradient</h1>
+
+<p>Run the program to draw an animated color gradient.</p>
+
+<p>
+  This program was created using the
+  <a
+    href="https://docs.evy.dev/builtins.html#line"
+    target="_blank
+	"
+    ><code>line</code></a
+  >
+  and
+  <a
+    href="https://docs.evy.dev/builtins.html#width"
+    target="_blank
+	"
+    ><code>width</code></a
+  >
+  commands.
+</p>
+
+<details class="small">
+  <summary><code>line</code> and <code>width</code> commands 📖</summary>
+  <p>The following code draws a line from point <code>10 20</code> to point <code>80 50</code>:</p>
+
+  <pre><code class="language-evy">width 2
+move 10 20
+line 80 50
+</code></pre>
+
+  <p>Output:</p>
+
+  <img src="samples/loops/img/gradient-line.svg" alt="Line from 10 20 to 80 50" />
+</details>
+
+<h2>Implementation</h2>
+<p>How would you go about writing this program?</p>
+
+<details class="small">
+  <summary>💡 Some clues</summary>
+  <ul>
+    <li>Break down the problem into smaller bits.</li>
+    <li>Create a static image with line <code>width 10</code>:</li>
+    <img src="samples/loops/img/gradient-thick.svg" alt="thick vertical lines" />
+    <li>Animate the lines with the <code>sleep</code> command.</li>
+    <li>Reduce the line width, move, sleep and loop increment.</li>
+  </ul>
+</details>

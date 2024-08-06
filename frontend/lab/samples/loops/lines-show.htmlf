@@ -1,0 +1,42 @@
+<h1>🌐📺 Lines</h1>
+
+<p>Run the program to draw and check out the cool animation.</p>
+
+<p>For this program we have two <strong>nested loops</strong> 🤯.</p>
+
+<details class="small">
+  <summary>Nested loops 📖</summary>
+  <p>Explore the following code:</p>
+
+  <pre><code class="language-evy">a:num
+b:num
+while a <= 1
+    while b <= 10
+        print a b
+        b = b + 10
+    end
+    b = 0 // reset inner loop counter
+    a = a + 1
+end</code></pre>
+
+  <p>Its output is:</p>
+
+  <pre><code>0 0
+0 10
+1 0
+1 10</code></pre>
+</details>
+<h2>Implementation</h2>
+
+<p>How would you go about writing this program?</p>
+
+<details class="small">
+  <summary>💡 Some clues</summary>
+  <ul>
+    <li>Break down your problem into smaller bits.</li>
+    <li>Create a static with image with step <code>10</code> first.</li>
+    <img src="samples/loops/img/lines.svg" alt="target board" />
+    <li>Make the <code>step</code> a variable.</li>
+    <li>Wrap the code in a second <code>while</code> loop with a <code>sleep</code>.</li>
+  </ul>
+</details>

@@ -1,0 +1,42 @@
+<h1>🌐🫵 Lines</h1>
+
+<p>⭐ Can you complete the program on the right to create this output?</p>
+<img src="samples/loops/img/lines.svg" alt="target board" />
+<br />
+<p>⭐ Can you do it using a loop?</p>
+<details class="small">
+  <summary>Hint</summary>
+  <pre><code class="language-evy">while x < ❓
+    move ❓
+    line ❓
+    x = x + ❓
+end
+  </code></pre>
+</details>
+<p>
+  ⭐ Can you make the step <code>10</code> a variable and run the program with different step
+  values?
+</p>
+<details class="small">
+  <summary>Hint</summary>
+  <pre><code class="language-evy">
+step = ❓
+while x < __
+  	// ...
+    x = x + ❓
+end
+  </code></pre>
+</details>
+
+<details>
+  <summary>⭐⭐⭐ Animation!</summary>
+  <p>Add a second, wrapping, outer loop that ranges over the <code>step</code> variable.</p>
+  <ul>
+    <li>Set <code>step</code> to <code>10</code> at the beginning</li>
+    <li>Reduce the <code>step</code> variable by <code>-0.05</code>.</li>
+    <li>Keep looping as long as <code>step</code> is greater then <code>2</code></li>
+    <li>Use the <code>clear</code> command.</li>
+    <li>Use the <code>sleep 0.01</code> command.</li>
+    <li>Reset the position variable <code>x</code> to <code>0</code>.</li>
+  </ul>
+</details>

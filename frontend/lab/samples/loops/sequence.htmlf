@@ -1,0 +1,75 @@
+<h1>🔢 Sequences</h1>
+
+<p><strong>⭐ Warm up:</strong> Can you write a program that prints the numbers from 0 to 9?</p>
+<details>
+  <summary>Hint</summary>
+  <p><code>while</code> loop structure</p>
+  <pre><code class="language-evy">while loop_condition
+    loop_body
+    // …
+end</code></pre>
+  <details>
+    <summary>Hint 2</summary>
+    <pre><code class="language-evy">x:num
+while x <= ❓
+    print x
+    x = x + ❓
+end</code></pre>
+  </details>
+</details>
+
+<p>Write programs that generate the first 20 numbers of the following sequences:</p>
+<ul class="starlist">
+  <li>0, 2, 4, 6, …</li>
+  <li>1, 4, 7, 10, …</li>
+  <li>20, 18.5, 17, …</li>
+  <li>1, 2, 4, 8, …</li>
+  <li>1, 10, 100, 1000, …</li>
+  <li>1, 0.5, 0.25, 0.125, …</li>
+  <li>1, 3, 6, 10, …</li>
+</ul>
+
+<p>
+  Use <em>two different</em> variables to track the count used in the loop condition and the printed
+  sequence number.
+</p>
+
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+a:num
+while x <= ❓
+    print a
+    a =  ❓
+    x = x + ❓
+end</code></pre>
+</details>
+
+<details>
+  <summary>Number Sequences 📖</summary>
+  <p>
+    The first 3 sequences are <strong>arithmetic sequences</strong> where you add the same amount to
+    get from one number to the next.
+  </p>
+  <p>
+    The next 3 sequences are <strong>geometric sequences</strong> where you multiply by the same
+    amount to get from one number to the next.
+  </p>
+  <p>
+    The last sequence is the <strong>triangle sequence</strong> where each number is the sum of the
+    previous number and its position in the sequence.
+  </p>
+</details>
+
+<details>
+  <summary>Answers for the 20th number</summary>
+  <ul>
+    <li>38</li>
+    <li>58</li>
+    <li>-8.5</li>
+    <li>524288</li>
+    <li>10000000000000000000</li>
+    <li>0.0000019073486328125</li>
+    <li>210</li>
+  </ul>
+</details>

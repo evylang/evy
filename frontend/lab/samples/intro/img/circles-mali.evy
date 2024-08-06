@@ -1,14 +1,14 @@
 clear "turquoise"
 
-colour "red"
+color "red"
 move 20 50
 circle 30
 
-colour "orange"
+color "orange"
 move 50 80
 circle 30
 
-colour "yellow"
+color "yellow"
 move 80 50
 circle 30
 

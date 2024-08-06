@@ -300,7 +300,7 @@ func (c *fmtCmd) fmtTxtarFile(filename string) error {
 }
 
 func writeAtomically(b []byte, filename string) error {
-	tempFile, err := os.CreateTemp("", "evy")
+	tempFile, err := os.CreateTemp(filepath.Dir(filename), "evy")
 	if err != nil {
 		return fmt.Errorf("%s: %w", filename, err)
 	}

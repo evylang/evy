@@ -190,6 +190,15 @@
   max-width: 80%;
 }
 
+.youtube {
+  margin: 32px auto;
+  display: block;
+  width: 400px;
+  height: 225px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
 @media (max-width: 767px) {
   .notes {
     display: none;

@@ -10,21 +10,39 @@ y0 := 35
 l := 40
 cx := 25
 cy := 55
+drag := false
 
 draw
 
 func draw
     clear background
+    drawText
+    drawColorBox
     drawWheel
     drawSquare
-    drawText
-    //gridn 10 "grey"
 end
 
 on down x:num y:num
+    drag = true
+    update x y
+    draw
+end
+
+on up
+    drag = false
+end
+
+on move x:num y:num
+    if drag
+        update x y
+        draw
+    end
+end
+
+func update x:num y:num
     th := 3.5
-    dx := abs cx-x
-    dy := abs cy-y
+    dx := cx - x
+    dy := cy - y
     if (abs x-x0) < th and y - y0 > 0 and y - y0 < l
         sat = (y - y0) / l * 100
     else if (abs y-y0) < th and x - x0 > 0 and x - x0 < l
@@ -32,18 +50,14 @@ on down x:num y:num
     else if x >= x0 and x <= (x0 + l) and y >= y0 and y <= (y0 + l)
         sat = (y - y0) / l * 100
         light = (x - x0) / l * 100
-    else if (sqrt (dx * dx + dy * dy)) <= 20
-        hue = ((atan2 cx-x cy-y) * 180 / pi) + 180
-    else
-        return
+    else if (sqrt (dx * dx + dy * dy)) <= 20 + th
+        hue = ((atan2 dx dy) * 180 / pi) + 180
     end
-
-    draw
 end
 
 func drawText
-    x := 28
-    y := 12
+    x := 31
+    y := 8
     font {size:5 style:"normal" family:"Fira Code, monospace"}
     width 0.2
     fill (hsl 27 100 74) // orange
@@ -64,7 +78,7 @@ func drawText
     end
 
     y = 78
-    move 20 y
+    move 21 y
     text "Hue"
 
     move 62 y-52
@@ -78,6 +92,22 @@ func drawText
         move x y-i*w
         text s[i]
     end
+end
+
+func drawColorBox
+    x := 10
+    y := 7
+    w := 16
+
+    width 0.5
+    stroke "white"
+    fill background
+    move x y
+    rect w w
+
+    color (hsl hue sat light)
+    move x+1 y+1
+    rect w-2 w-2
 end
 
 func drawWheel
@@ -113,13 +143,14 @@ func drawHue
 end
 
 func drawSquare
-    for s := range 100
-        y := y0 + 40 * 0.01 * s
-        for l := range 100
-            x := x0 + 40 * 0.01 * l
+    steps := 20
+    for ys := range steps
+        y := y0 + ys / steps * l
+        for xs := range steps
+            x := x0 + xs / steps * l
+            color (hsl hue ys/steps*100 xs/steps*100)
             move x+1 y+1
-            color (hsl hue s l)
-            circle 0.1
+            rect l/steps l/steps
         end
     end
 
@@ -133,7 +164,7 @@ func drawSquare
 end
 
 func drawSat
-    move x0 y0+40*0.01*sat
+    move x0 y0+l*0.01*sat
     stroke "white"
     fill background
     circle 3.5
@@ -142,7 +173,7 @@ func drawSat
 end
 
 func drawLight
-    move x0+40*0.01*light y0
+    move x0+l*0.01*light y0
     stroke "white"
     fill background
     circle 3.5

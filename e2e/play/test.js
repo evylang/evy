@@ -54,7 +54,7 @@ end
 
       // show sidebar
       await page.locator("#hamburger").click()
-      await page.getByText("About Evy Docs Discord GitHub").click()
+      await page.getByText("About Evy Labs Docs Discord").click()
       await expect(page).toHaveScreenshot("sidebar.png")
 
       // hide sidebar by click on main
@@ -67,7 +67,7 @@ end
 
       // show sidebar again
       await page.locator("#hamburger").click()
-      await page.getByText("About Evy Docs Discord GitHub").click()
+      await page.getByText("About Evy Labs Docs Discord").click()
       await expect(page).toHaveScreenshot("sidebar.png")
 
       // hide sidebar by click on top menu

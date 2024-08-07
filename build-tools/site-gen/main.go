@@ -3,22 +3,23 @@
 // Usage: site-gen <src-dir> <dest-dir> <domain>
 //
 // When deploying to firebase (any other hosting site), we need to make a few
-// changes to the HTML, CSS and JS files in the site:
+// changes to the HTML, CSS, JS and WASM files in the site (HTML files have
+// extensions .html and .htmlf):
 //   - Replace href/values with leading paths of /SUBDOMAIN, path with /, e.g. for
 //     SUBDOMAIN "learn" /learn/banana becomes /banana. Replace all paths to subdomain
 //     as above for "apex" subdomain.
 //   - Rename .css, .js and .wasm files to include a short-sha of the SHA256 of the
-//     contents of the file and update any references to those files in .html
+//     contents of the file and update any references to those files in HTML
 //     files to include the filename with the short-sha. This is to perform
 //     cache busting when the files change.
-//   - Update the importmap in .html files to include the short-sha in the
+//   - Update the importmap in HTML files to include the short-sha in the
 //     javascript imports.
 //     e.g. "./module/editor.js": "./module/editor.js"
 //     becomes "./module/editor.js": "./module/editor.1a2b3c4d.js"
 //   - Copy .js files with their original filename so that clients that do
 //     not support import map can still import the .js files. They miss out
 //     on cache busting and may need to sometimes force-reload.
-//   - Update the wasmImports map in .html files to include the short-sha in
+//   - Update the wasmImports map in HTML files to include the short-sha in
 //     wasm imports. The wasmImports allows for cache busting hashed filenames
 //     for wasm files. The replacements are of the same form as the importmap.
 //
@@ -50,7 +51,7 @@ type app struct {
 	SrcDir    string `arg:"" required:""`
 	DestDir   string `arg:"" required:""`
 
-	skippedFiles []string
+	htmlFiles    []string
 	renamedFiles map[string]string
 }
 
@@ -136,7 +137,7 @@ func checkSymlink(srcfile string) error {
 
 // handleFile checks the extension of filename and processes it according
 // to the rules of this program:
-// - Record .html filename for later processing.
+// - Record HTML files for later processing.
 // - Copy .js, .css and .wasm files with a hash in their name.
 // - Copy .js and all other files with their original name.
 func (a *app) handleFile(filename string) error {
@@ -144,8 +145,8 @@ func (a *app) handleFile(filename string) error {
 	destfile := filepath.Join(a.DestDir, filename)
 	ext := filepath.Ext(filename)
 
-	if ext == ".html" {
-		a.skippedFiles = append(a.skippedFiles, filename)
+	if ext == ".html" || ext == ".htmlf" {
+		a.htmlFiles = append(a.htmlFiles, filename)
 		return nil
 	}
 	if a.CacheBust && (ext == ".js" || ext == ".css" || ext == ".wasm") {
@@ -172,7 +173,7 @@ func (a *app) handleFile(filename string) error {
 }
 
 func (a *app) copyHTMLFiles() error {
-	for _, filename := range a.skippedFiles {
+	for _, filename := range a.htmlFiles {
 		in, out, err := openInOut(filepath.Join(a.SrcDir, filename), filepath.Join(a.DestDir, filename))
 		if err != nil {
 			return err

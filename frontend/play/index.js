@@ -417,8 +417,9 @@ async function handleHashChangeNoFormat() {
       editor.loadSession()
       return
     }
-    opts = { sample: "welcome" }
-    history.replaceState({}, "", "#welcome")
+    const sample = "welcome"
+    opts = { sample, editor: sampleData?.byID[sample]?.editor }
+    history.replaceState({}, "", "#" + sample)
   }
   const { source, notes } = await fetchSourceWithNotes(opts)
   updateNotes(notes)

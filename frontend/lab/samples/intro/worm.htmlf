@@ -1,15 +1,21 @@
-<h1>Let's Get Started 🚀</h1>
+<h1>🐛 Make a Worm</h1>
 <ol>
-  <li><strong>Run</strong> this program.<br />Create some cool output.</li>
+  <li><strong>Run</strong> this program.</li>
+  <li><strong>Create</strong> some cool output.</li>
   <li>
-    Can you change this program to draw a circle with:
+    <strong>Change</strong> this program to draw a circle with
     <ul class="starlist">
-      <li>Your favorite <strong>color</strong>?</li>
-      <li>A slightly different <strong>size</strong>?</li>
+      <li>your favorite <strong>color</strong></li>
+      <li>a slightly different <strong>size</strong></li>
       <li>
-        A different <strong>outline color</strong>? <br />Use the
+        a different <strong>outline color</strong> <br />Use the
         <a href="/docs/builtins.html#stroke" target="_blank"><code>stroke</code></a> command.
       </li>
     </ul>
   </li>
 </ol>
+
+<p>
+  🧪 Explore and experiment! <br />
+  You don't need to understand all the code to make changes.
+</p>

@@ -1,14 +1,14 @@
 <h1>👋 Welcome</h1>
-<p>Programming is for everyone!</p>
 <p>
-  You don't need any special skills or background, just a willingness to learn. Anyone can do it
-  with a little curiosity and practice.
+  Programming is for everyone – no special skills required, just curiosity and a willingness to
+  learn.
 </p>
 <p>
-  Hit <strong>Run</strong> on the right 👉. <br />
-  That's what we'll build up to in this first lab—a bit of a whirlwind tour!
+  Let's dive in! Hit <strong>Run</strong> on the right 👉. <br />
+  That's what we'll build up to in this first lab—a bit of a whirlwind tour.
 </p>
-<p>There is also a step-by-step video guide:</p>
+<h2>🚀 Let's get started!</h2>
+<p>There is also a step-by-step walk through video guide 🎬:</p>
 <iframe
   src="https://www.youtube.com/embed/FBqyiU4iZNY"
   title="YouTube video player for Lab 1 walk through"
@@ -18,5 +18,3 @@
   allowfullscreen
   class="youtube"
 ></iframe>
-
-<p>Let's get started!</p>

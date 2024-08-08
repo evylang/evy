@@ -4,7 +4,7 @@
 <img src="samples/loops/img/lines.svg" alt="target board" />
 <br />
 <p>⭐ Can you do it using a loop?</p>
-<details class="small">
+<details>
   <summary>Hint</summary>
   <pre><code class="language-evy">while x < ❓
     move ❓
@@ -17,12 +17,12 @@ end
   ⭐ Can you make the step <code>10</code> a variable and run the program with different step
   values?
 </p>
-<details class="small">
+<details>
   <summary>Hint</summary>
   <pre><code class="language-evy">
 step = ❓
 while x < __
-  	// ...
+    // ...
     x = x + ❓
 end
   </code></pre>

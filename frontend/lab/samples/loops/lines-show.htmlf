@@ -4,7 +4,7 @@
 
 <p>For this program we have two <strong>nested loops</strong> 🤯.</p>
 
-<details class="small">
+<details>
   <summary>Nested loops 📖</summary>
   <p>Explore the following code:</p>
 
@@ -30,7 +30,7 @@ end</code></pre>
 
 <p>How would you go about writing this program?</p>
 
-<details class="small">
+<details>
   <summary>💡 Some clues</summary>
   <ul>
     <li>Break down your problem into smaller bits.</li>

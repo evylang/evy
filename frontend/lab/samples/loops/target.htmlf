@@ -3,7 +3,7 @@
 <p>⭐ Draw a target board with concentric circles.</p>
 <img src="samples/loops/img/target.svg" alt="Target board" />
 
-<details class="small">
+<details>
   <summary>Hint</summary>
   <pre><code class="language-evy">//...
 while r > ❓
@@ -15,7 +15,7 @@ end
 
 <p>⭐ Animate the circles with a <code>sleep</code> for 0.2 seconds.</p>
 
-<details class="small">
+<details>
   <summary>Hint</summary>
   <pre><code class="language-evy">//...
 while r > ❓

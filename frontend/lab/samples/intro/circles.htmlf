@@ -2,7 +2,7 @@
 
 <p>Run this program and read the code.</p>
 <p>⭐ Can you move the circle center to each corner?</p>
-<details class="small">
+<details>
   <summary>Hint</summary>
   <table class="images">
     <tr>
@@ -23,7 +23,7 @@
 </details>
 
 <p>⭐ Draw 2-4 circles that are partly or fully visible.</p>
-<details class="small">
+<details>
   <summary>Examples</summary>
   <table class="images">
     <tr>
@@ -47,7 +47,7 @@
 </details>
 
 <p>Which country has this flag? 🇵🇼</p>
-<details class="small">
+<details>
   <summary>Answer</summary>
   <p><a href="https://en.wikipedia.org/wiki/Palau" target="_blank">Palau</a></p>
 </details>

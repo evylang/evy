@@ -137,9 +137,9 @@
       </header>
       <ul>
         <li><button id="sidebar-about">About Evy</button></li>
+        <li><a href="/playground" target="_blank">Playground</a></li>
         <li><a href="/docs" target="_blank">Docs</a></li>
         <li><a href="/discord" target="_blank">Discord</a></li>
-        <li><a href="https://github.com/evylang/evy" target="_blank">GitHub</a></li>
         <li><a href="https://github.com/evylang/evy/wiki/gallery" target="_blank">Gallery</a></li>
         <li><a href="https://github.com/sponsors/evylang" target="_blank">Sponsor</a></li>
         <li class="mobile"><button id="sidebar-share">Share</button></li>
@@ -247,7 +247,8 @@
         document.querySelector(".placeholder").innerText = sessionStorage.getItem("evy-editor")
         document.querySelector(".lines").innerText = ""
       }
-      if (window.location.hash.includes("editor=none")) {
+      const hash = window.location.hash
+      if (hash.includes("editor=none") || hash === "" || hash.startsWith("#welcome")) {
         document.querySelector(".editor-wrap").classList.add("hidden")
       }
     </script>

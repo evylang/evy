@@ -29,8 +29,8 @@
         { "id": "hsl-code", "title": "🤹 HSL colors", "unlisted": true },
         { "id": "gradient-show", "title": "🌈📺  Gradient", "notes": true, "editor": "none" },
         { "id": "gradient", "title": "🌈🫵  Gradient", "notes": true },
-        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none" },
-        { "id": "lines", "title": "🌐🫵 Lines", "notes": true }
+        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none", "unlisted": true },
+        { "id": "lines", "title": "🌐🫵 Lines", "notes": true, "unlisted": true }
       ]
     }
   ]

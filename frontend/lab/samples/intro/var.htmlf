@@ -2,21 +2,24 @@
 
 <ul class="starlist">
   <li>
-    <em>Without running</em> the program, can you work out what the first two
-    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands output?
+    What will the first two
+    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands show? <br />
+    <em>Don't run the code yet!</em>
   </li>
-  <li>What do you think the last two print commands output?</li>
+  <li>What about the last two?</li>
   <li>Can you print your name and your age using variables?</li>
 </ul>
 
 <details>
   <summary>Understanding Variables 📖</summary>
+  <p>In Evy, we create a variable and its type with the pattern:</p>
+  <pre><code><span class="ident">name:type</span></code></pre>
   <p>
-    We <strong>declare</strong> the variable <code>x</code> to be of <strong>type</strong> number
-    variable with
+    Let's <strong>declare</strong> the variable <code>x</code>, which can only store a number value:
   </p>
   <pre><code class="language-evy"><span class="ident">x</span><span class="punc">:</span><span class="keyword">num</span></code></pre>
-  <p>A variable <strong>must</strong> be declared before it can be used.</p>
-  <p>We <strong>assign</strong> a value to a variable with</p>
+  <p>Now we can <strong>assign</strong> a value to it using the equality sign <code>=</code>:</p>
   <pre><code class="language-evy"><span class="ident">x</span><span class="ws"> </span><span class="op">=</span><span class="ws"> </span><span class="num">3</span><span class="ws"> </span><span class="op">+</span><span class="ws"> </span><span class="num">4</span></code></pre>
+
+  <p>📌 A variable <em>must</em> be declared before it can be used.</p>
 </details>

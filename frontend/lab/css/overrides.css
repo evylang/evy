@@ -18,7 +18,7 @@
 
 @media (min-width: 768px) {
   .notes:has(+ .editor-wrap.hidden) {
-    max-width: min(60%, 32rem);
+    min-width: 440px;
   }
   .main {
     gap: 12px;
@@ -39,31 +39,27 @@
   margin-top: 16px;
   margin-bottom: 12px;
 }
-
-.notes summary {
-  margin: 0;
-  cursor: pointer;
+.notes h2 {
+  font-weight: 600;
 }
 
 .notes details {
   margin-top: 16px;
   margin-bottom: 12px;
 }
-
+.notes summary {
+  margin: 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-slightly-dimmed);
+  font-size: 0.875rem;
+}
 .notes summary + p {
   margin-top: 12px;
 }
-.notes h2,
-.notes summary {
-  font-weight: 600;
-}
-.notes p + details.small {
+.notes p + details {
   margin-top: -8px;
   margin-bottom: 20px;
-}
-.notes details.small summary {
-  color: var(--color-dimmed);
-  font-size: 0.875rem;
 }
 
 .notes h4 {
@@ -79,6 +75,10 @@
 /* Reduce margin bottom if code block follows */
 .notes p:has(+ pre) {
   margin-bottom: 8px;
+}
+
+.notes strong {
+  color: var(--color);
 }
 
 .notes ul,
@@ -191,10 +191,12 @@
 }
 
 .youtube {
+  --youtube-width: 380px;
+  --aspect-ratio: calc(16 / 9);
   margin: 32px auto;
   display: block;
-  width: 400px;
-  height: 225px;
+  width: var(--youtube-width);
+  height: calc(var(--youtube-width) / var(--aspect-ratio));
   border: 1px solid var(--border-color);
   border-radius: 6px;
 }

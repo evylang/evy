@@ -7,11 +7,17 @@
 
 <h2>🧪 Experiment!</h2>
 <ul>
-  <li>Run the program.</li>
-  <li>Tap the canvas.</li>
-  <li>Observe how changing the HSL values affects the color.</li>
+  <li><strong>Run</strong> the program.</li>
+  <li><strong>Tap</strong> the canvas.</li>
+  <li><strong>Observe</strong> how changing the HSL values affects the color.</li>
 </ul>
-
+<details>
+  <summary>Where is the code? 🔎</summary>
+  <p>
+    The source code for this program is hidden, but if you're interested in how it works, you can
+    take a peek at the <a href="#hsl-code" target="_blank">full example</a>.
+  </p>
+</details>
 <details>
   <summary>Understanding HSL(A) 📖</summary>
   <p>
@@ -30,12 +36,5 @@
     <strong>Alpha</strong> is the transparency of the color. It is a number between
     <code>0</code> and <code>1</code>. Optional, default <code>1</code>.
   </p>
-</details>
-<p>Explore the <a href="" target="_blank">HSL documentation</a> for more details.</p>
-<details>
-  <summary>Where is the code?</summary>
-  <p>
-    The source code for this program is hidden, but if you're interested in how it works, you can
-    take a peek at the <a href="#hsl-code" target="_blank">full example</a>.
-  </p>
+  <p>Explore the <a href="" target="_blank">HSL documentation</a> for more details.</p>
 </details>

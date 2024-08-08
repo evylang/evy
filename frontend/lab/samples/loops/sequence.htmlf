@@ -23,9 +23,13 @@ end</code></pre>
   <li>0, 2, 4, 6, …</li>
   <li>1, 4, 7, 10, …</li>
   <li>20, 18.5, 17, …</li>
+</ul>
+<ul class="starlist">
   <li>1, 2, 4, 8, …</li>
   <li>1, 10, 100, 1000, …</li>
   <li>1, 0.5, 0.25, 0.125, …</li>
+</ul>
+<ul class="starlist">
   <li>1, 3, 6, 10, …</li>
 </ul>
 
@@ -46,6 +50,19 @@ end</code></pre>
 </details>
 
 <details>
+  <summary>Answer: 20th number</summary>
+  <ul>
+    <li>38</li>
+    <li>58</li>
+    <li>-8.5</li>
+    <li>524288</li>
+    <li>10000000000000000000</li>
+    <li>0.0000019073486328125</li>
+    <li>210</li>
+  </ul>
+</details>
+
+<details>
   <summary>Number Sequences 📖</summary>
   <p>
     The first 3 sequences are <strong>arithmetic sequences</strong> where you add the same amount to
@@ -59,17 +76,4 @@ end</code></pre>
     The last sequence is the <strong>triangle sequence</strong> where each number is the sum of the
     previous number and its position in the sequence.
   </p>
-</details>
-
-<details>
-  <summary>Answers for the 20th number</summary>
-  <ul>
-    <li>38</li>
-    <li>58</li>
-    <li>-8.5</li>
-    <li>524288</li>
-    <li>10000000000000000000</li>
-    <li>0.0000019073486328125</li>
-    <li>210</li>
-  </ul>
 </details>

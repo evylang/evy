@@ -247,7 +247,8 @@
         document.querySelector(".placeholder").innerText = sessionStorage.getItem("evy-editor")
         document.querySelector(".lines").innerText = ""
       }
-      if (window.location.hash.includes("editor=none")) {
+      const hash = window.location.hash
+      if (hash.includes("editor=none") || hash === "" || hash.startsWith("#welcome")) {
         document.querySelector(".editor-wrap").classList.add("hidden")
       }
     </script>

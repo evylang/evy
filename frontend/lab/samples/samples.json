@@ -21,6 +21,7 @@
       "title": "Loops",
       "emoji": "",
       "samples": [
+        { "id": "welcome-loops", "title": "👋💫 Welcome", "notes": true, "editor": "none" },
         { "id": "string", "title": "🧵 Strings", "notes": true },
         { "id": "target-show", "title": "🎯📺 Target", "notes": true, "editor": "none" },
         { "id": "target", "title": "🎯🫵 Target", "notes": true },

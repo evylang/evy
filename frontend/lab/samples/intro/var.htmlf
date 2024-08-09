@@ -2,9 +2,9 @@
 
 <ul class="starlist">
   <li>
+    <em>Don't run the code yet!</em><br />
     What will the first two
-    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands show? <br />
-    <em>Don't run the code yet!</em>
+    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands show?
   </li>
   <li>What about the last two?</li>
   <li>Can you print your name and your age using variables?</li>

@@ -173,7 +173,7 @@ LAB_TARGET_DIR = frontend/lab
 
 ## Generate static HTML documentation in frontend/docs from MarkDown in docs
 docs: | $(NODELIB)
-	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
+	go run ./build-tools/docsite-gen docs $(DOCS_TARGET_DIR)
 	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
 
 ## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content

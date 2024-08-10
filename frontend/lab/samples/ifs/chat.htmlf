@@ -1,0 +1,54 @@
+<h1>💬 Let's Chat</h1>
+<p>⭐ <strong>Before you run the code:</strong> Can you predict what will happen?</p>
+<p>Now, hit <strong>Run</strong> and see if you were right!</p>
+<p>⭐ <strong>Think about it:</strong> What's the purpose of the <code>:=</code> operator?</p>
+<details>
+  <summary><code>:=</code> Declaration with type inference 📖</summary>
+  <p>In Evy, you can declare a variable and assign it a value in one step using <code>:=</code>.</p>
+  <p>Instead of</p>
+  <pre><code class="language-evy">s:string
+s = &quot;banana&quot;
+</code></pre>
+  <p>you can use the shortcut</p>
+  <pre><code class="language-evy">s := &quot;banana&quot;
+</code></pre>
+</details>
+<p>
+  ⭐ <strong>Challenge:</strong> Can you add a different response if the answer is &quot;no&quot;?
+  Use <code>else if</code> to create an alternative message.
+</p>
+<details>
+  <summary>Code hint 🧚</summary>
+  <pre><code class="language-evy">if answer == &quot;yes&quot;
+    print &quot;🍪 Sweet!&quot;
+else if answer == ❓
+    ❓❓
+else
+    print &quot;I'm confused&quot;
+end
+</code></pre>
+</details>
+<p>⭐ <strong>Your turn:</strong> Can you create your own chat bot?</p>
+<details>
+  <summary>Some ideas</summary>
+  <ul>
+    <li>🍦 Ask about their favorite ice cream flavor instead of cookies.</li>
+    <li>
+      🎁 Ask if they want to open a surprise.
+      <ul>
+        <li>
+          If they say <code>&quot;yes&quot;</code>, reveal the surprise (let your imagination run
+          wild 🐉).
+        </li>
+        <li>
+          If they say <code>&quot;no&quot;</code>, respond with something like &quot;And so it
+          remains my secret 🔒&quot;.
+        </li>
+        <li>If they say anything else, respond with &quot;I don't understand.&quot;</li>
+      </ul>
+    </li>
+  </ul>
+  <p>
+    You could also ask about their favorite color, band, or football team and respond accordingly!
+  </p>
+</details>

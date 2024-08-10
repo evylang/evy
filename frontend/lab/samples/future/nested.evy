@@ -1,0 +1,27 @@
+w := 2
+dw := 0.1
+s := 10
+
+while true
+    clear "slategrey"
+    x := s
+    y := s
+
+    while x <= 100 - s
+        while y <= 100 - s
+            c := hsl 2*x+2*y
+            fill c
+            move x-w/2 y-w/2
+            rect w w
+            y = y + s
+        end
+        x = x + s
+        y = s
+    end
+
+    if w < 2 or w > 8
+        dw = -dw
+    end
+    w = w + dw
+    sleep 0.001
+end

@@ -1,0 +1,30 @@
+<h1>🌈 Transparent Colors</h1>
+<p>⭐ <strong>Read</strong> and <strong>Run</strong> the code. Does it make sense to you?</p>
+<p>⭐ <strong>Complete it</strong> to create the following drawing:</p>
+<p>
+  <img src="samples/ifs/img/red-dot-two-squares.svg" alt="simple drawing of circles and squares" />
+</p>
+<p>
+  ⭐ <strong>Modify the Alpha</strong> parameter to the
+  <a href="/docs/builtins.html#hsl"><code>hsl</code></a> function to make the bottom quadrant grey,
+  like so:
+</p>
+<p>
+  <img
+    src="samples/ifs/img/red-dot-two-squares-alpha.svg"
+    alt="simple drawing of circles and squares"
+  />
+</p>
+<details>
+  <summary>Understanding Alpha 📖</summary>
+  <p>
+    In the interactive <a href="/docs/builtins.html#hsl"><code>hsl</code></a> function
+    <a href="#hsl">color explorer</a> we learned how hsl takes three values: hue, saturation,
+    lightness values to create a color.
+  </p>
+  <p>
+    There is an optional fourth value called <strong>alpha</strong> that controls the transparency
+    of the color. The alpha value ranges from <code>0</code> to <code>100</code>, where
+    <code>0</code> is fully transparent and <code>100</code> is fully opaque.
+  </p>
+</details>

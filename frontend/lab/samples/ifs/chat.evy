@@ -1,0 +1,8 @@
+print "Do you like cookies?"
+answer := read
+
+if answer == "yes"
+    print "🍪 Sweet!"
+else
+    print "I'm confused"
+end

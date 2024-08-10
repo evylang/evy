@@ -18,6 +18,14 @@ const (
 	OpSetGlobal
 	// OpDrop pops and discards the top N elements of the stack.
 	OpDrop
+	// OpGetLocal retrieves a symbol from the current local-scoped
+	// symbol table at the specified index. This index also corresponds
+	// to its location on the VM stack.
+	OpGetLocal
+	// OpSetLocal adds a symbol to the specified index in the current
+	// local-scoped symbol table. This index also corresponds to its
+	// location on the VM stack.
+	OpSetLocal
 	// OpAdd instructs the virtual machine to perform an addition.
 	OpAdd
 	// OpSubtract instructs the virtual machine to perform a subtraction.
@@ -137,6 +145,8 @@ var definitions = map[Opcode]*OpDefinition{
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
 	OpDrop:      {"OpDrop", []int{2}},
+	OpGetLocal:  {"OpGetLocal", []int{2}},
+	OpSetLocal:  {"OpSetLocal", []int{2}},
 	// Operations like OpAdd have no operand width because the virtual
 	// machine is expected to pop the values from the stack when reading
 	// this instruction.

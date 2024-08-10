@@ -474,6 +474,8 @@ func (c *compileCmd) Run() error {
 		return err
 	}
 	bc := comp.Bytecode()
+	fmt.Println("Num globals:", bc.GlobalCount)
+	fmt.Println("Num locals:", bc.LocalCount)
 	fmt.Println("Constants:")
 	for i, c := range bc.Constants {
 		fmt.Printf("%d: %v\n", i, c)

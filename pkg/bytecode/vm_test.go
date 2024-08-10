@@ -595,6 +595,37 @@ func TestIf(t *testing.T) {
 			x = x`,
 			wantStackTop: makeValue(t, 1),
 		},
+		{
+			name: "local scope",
+			input: `x := 1
+			if false
+				x := 2
+				x = x + 1
+			else if false
+				x := 3
+				x = x + 1
+			else if false
+				x := 4
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "shadowing",
+			input: `x := 3
+			if true
+				x := 2
+				x = x
+			end
+			if x == 3
+				// this branch should be taken,
+				// we think it isn't because shadowing isn't implemented:
+				x = 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -650,6 +681,19 @@ func TestWhile(t *testing.T) {
 				end
 				x = x + 1
 				break
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local scope",
+			input: `
+			x := 1
+			while true
+				x := 5
+				if x == 5
+					break
+				end
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 1),
@@ -759,6 +803,16 @@ func TestStepRange(t *testing.T) {
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 15),
+		},
+		{
+			name: "local scope",
+			input: `x := 1
+			for i := range 5
+				x := i
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
 		},
 	}
 	for _, tt := range tests {
@@ -948,6 +1002,59 @@ func TestStringRange(t *testing.T) {
 			// iterated, which is the first thing pushed when compiling
 			// the for string range bytecode.
 			wantStackTop: makeValue(t, "hello world"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bytecode := compileBytecode(t, tt.input)
+			vm := NewVM(bytecode)
+			err := vm.Run()
+			assert.NoError(t, err, "runtime error")
+			got := vm.lastPoppedStackElem()
+			assert.Equal(t, tt.wantStackTop, got)
+		})
+	}
+}
+
+func TestScope(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "define and resolve local",
+			input: `x := 0
+			if true
+				y := 1
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local shadows global",
+			input: `x := 5
+			if true
+				x := 1
+				x = x + 1
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 5),
+		},
+		{
+			// test that stack operations (y + 3) does not overwrite the
+			// local y on the stack. The local y should be in position 0
+			// on the stack and y + 3 should be computed in position 1 and
+			// 2, with the result left in position 1. y should be unchanged.
+			name: "local stack no overlap",
+			input: `x := 0
+			if true
+				y := 2
+				x = y + 3
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 2),
 		},
 	}
 	for _, tt := range tests {

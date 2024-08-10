@@ -39,6 +39,8 @@ type Compiler struct {
 type Bytecode struct {
 	Constants    []value
 	Instructions Instructions
+	GlobalCount  int
+	LocalCount   int
 }
 
 // NewCompiler returns a new compiler.
@@ -126,6 +128,8 @@ func (c *Compiler) Bytecode() *Bytecode {
 	return &Bytecode{
 		Instructions: c.instructions,
 		Constants:    c.constants,
+		GlobalCount:  c.symbolTable.index,
+		LocalCount:   c.symbolTable.nestedMaxIndex,
 	}
 }
 
@@ -235,11 +239,13 @@ func (c *Compiler) compileStringBinaryExpression(expr *parser.BinaryExpression) 
 }
 
 func (c *Compiler) compileBlockStatement(block *parser.BlockStatement) error {
+	c.enterScope()
 	for _, stmt := range block.Statements {
 		if err := c.Compile(stmt); err != nil {
 			return err
 		}
 	}
+	c.leaveScope()
 	return nil
 }
 
@@ -283,7 +289,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if err := c.emit(OpNone); err != nil {
 			return err
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		if err := c.emitSetVar(symbol); err != nil {
 			return err
 		}
 	}
@@ -306,7 +312,7 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		if err := c.emitSetVar(symbol); err != nil {
 			return err
 		}
 	}
@@ -487,7 +493,7 @@ func (c *Compiler) compileDecl(decl *parser.Decl) error {
 		return err
 	}
 	symbol := c.symbolTable.Define(decl.Var.Name)
-	return c.emit(OpSetGlobal, symbol.Index)
+	return c.emitSetVar(symbol)
 }
 
 func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
@@ -500,7 +506,7 @@ func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, target.Name)
 		}
-		return c.emit(OpSetGlobal, symbol.Index)
+		return c.emitSetVar(symbol)
 	case *parser.IndexExpression:
 		if err := c.Compile(target.Left); err != nil {
 			return err
@@ -518,7 +524,10 @@ func (c *Compiler) compileVar(variable *parser.Var) error {
 	if !ok {
 		return fmt.Errorf("%w %s", ErrUndefinedVar, variable.Name)
 	}
-	return c.emit(OpGetGlobal, symbol.Index)
+	if symbol.Scope == GlobalScope {
+		return c.emit(OpGetGlobal, symbol.Index)
+	}
+	return c.emit(OpGetLocal, symbol.Index)
 }
 
 func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
@@ -532,4 +541,21 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Compiler) enterScope() {
+	c.symbolTable = c.symbolTable.Push()
+}
+
+func (c *Compiler) leaveScope() {
+	c.symbolTable = c.symbolTable.Pop()
+}
+
+// emitSetVar will emit an OpSetLocal or an OpSetGlobal depending upon
+// the scope of the provided symbol.
+func (c *Compiler) emitSetVar(symbol Symbol) error {
+	if symbol.Scope == GlobalScope {
+		return c.emit(OpSetGlobal, symbol.Index)
+	}
+	return c.emit(OpSetLocal, symbol.Index)
 }

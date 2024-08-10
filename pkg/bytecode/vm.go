@@ -8,9 +8,6 @@ import (
 const (
 	// StackSize defines an upper limit for the size of the stack.
 	StackSize = 2048
-	// GlobalsSize is the total number of globals that can be specified
-	// in an evy program.
-	GlobalsSize = 65536
 )
 
 var (
@@ -40,10 +37,10 @@ type VM struct {
 func NewVM(bytecode *Bytecode) *VM {
 	return &VM{
 		constants:    bytecode.Constants,
-		globals:      make([]value, GlobalsSize),
+		globals:      make([]value, bytecode.GlobalCount),
 		instructions: bytecode.Instructions,
 		stack:        make([]value, StackSize),
-		sp:           0,
+		sp:           bytecode.LocalCount, // leave space for locals at top of stack.
 	}
 }
 
@@ -70,6 +67,14 @@ func (vm *VM) Run() error {
 			globalIndex := ReadUint16(vm.instructions[ip+1:])
 			ip += 2
 			vm.globals[globalIndex] = vm.pop()
+		case OpGetLocal:
+			idx := ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			err = vm.push(vm.stack[idx])
+		case OpSetLocal:
+			idx := ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.stack[int(idx)] = vm.pop()
 		case OpDrop:
 			n := ReadUint16(vm.instructions[ip+1:])
 			ip += 2

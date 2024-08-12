@@ -11,6 +11,7 @@ import (
 
 	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/md"
 	"evylang.dev/evy/pkg/parser"
 	"golang.org/x/tools/txtar"
 	"rsc.io/markdown"
@@ -82,18 +83,18 @@ func rendererFromInline(inline markdown.Inline, field fieldType, filename string
 	mdImg, ok := inline.(*markdown.Image)
 	if ok && strings.HasSuffix(mdImg.URL, ".evy.svg") {
 		if err := ensureField(mdImg.Inner, field); err != nil {
-			return nil, fmt.Errorf("%w (image: %s)", err, inlineToString(mdImg))
+			return nil, fmt.Errorf("%w (image: %s)", err, md.Undecorate(mdImg))
 		}
 		return newSVGContentFromFile(filepath.Join(filepath.Dir(filename), mdImg.URL))
 	}
 	link, ok := inline.(*markdown.Link)
 	if ok && strings.HasPrefix(link.Title, "evy:") {
 		if err := ensureField(link.Inner, field); err != nil {
-			return nil, fmt.Errorf("%w (link: %s)", err, inlineToString(link))
+			return nil, fmt.Errorf("%w (link: %s)", err, md.Undecorate(link))
 		}
 		ResultType, err := getResultTypeFromLink(link)
 		if err != nil {
-			return nil, fmt.Errorf("%w (link: %s)", err, inlineToString(link))
+			return nil, fmt.Errorf("%w (link: %s)", err, md.Undecorate(link))
 		}
 		targetFilename := filepath.Join(filepath.Dir(filename), link.URL)
 		return newRendererFromEvyFile(targetFilename, ResultType)
@@ -109,18 +110,12 @@ func ensureField(inner []markdown.Inline, field fieldType) error {
 	if len(inner) != 1 {
 		return fmt.Errorf("%w: found %d inner elements, expected 1", ErrBadMarkdownStructure, len(inner))
 	}
-	got := inlineToString(inner[0])
+	got := md.Undecorate(inner[0])
 	want := fieldTypeToString[field]
 	if got != want {
 		return fmt.Errorf("%w: expected %q text, found %q", ErrBadMarkdownStructure, want, got)
 	}
 	return nil
-}
-
-func inlineToString(inline markdown.Inline) string {
-	b := &bytes.Buffer{}
-	inline.PrintText(b)
-	return b.String()
 }
 
 // SVGContent represents SVG image content.

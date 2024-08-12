@@ -62,7 +62,7 @@ func (m *UnitModel) Document() *markdown.Document {
 func (m *UnitModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	m.Doc.Blocks[0].PrintHTML(buf)
+	buf.WriteString(markdown.ToHTML(m.Doc.Blocks[0]))
 	unitDir := filepath.Dir(m.Filename())
 	buf.WriteString(`<div class="badges">` + "\n")
 	if err := m.printBadgesHTML(buf, unitDir); err != nil {

@@ -7,6 +7,8 @@ COVERAGE = 69
 VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
+PRETTIER = npx --prefix $(NODEPREFIX) -y prettier --log-level warn
+
 ## Build, test, check coverage and lint
 all: build-full test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
@@ -50,7 +52,7 @@ install-full: embed
 ## Build and install binaries without embedded frontend in $GOBIN
 install:
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go install -C learn -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 # Use `go version` to ensure the right go version is installed when using tinygo.
 go-version:
@@ -174,23 +176,35 @@ LAB_TARGET_DIR = frontend/lab
 ## Generate static HTML documentation in frontend/docs from MarkDown in docs
 docs: | $(NODELIB)
 	go run ./build-tools/docsite-gen docs $(DOCS_TARGET_DIR)
-	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
+	$(PRETTIER) --write $(DOCS_TARGET_DIR)
 
 ## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content
 learn: install | $(NODELIB)
 	levy export html --no-self-contained --root-dir="/learn/" learn/content $(LEARN_TARGET_DIR)
-	npx --prefix $(NODEPREFIX) -y prettier --write $(LEARN_TARGET_DIR)
+	$(PRETTIER) --write $(LEARN_TARGET_DIR)
+
+LAB_SVG_SRC := $(shell fd --full-path --glob '**/img/*.evy' $(LAB_TARGET_DIR))
+LAB_SVG := $(LAB_SVG_SRC:%.evy=%.svg)
+LAB_HTMLF_SRC := $(shell fd --full-path --extension md $(LAB_TARGET_DIR))
+LAB_HTMLF := $(LAB_HTMLF_SRC:%.md=%.htmlf)
 
 ## Generate SVG files from .evy files for lab.evy.dev in frontend/lab
-lab: IMAGES := $(shell fd --full-path --glob '**/img/*.evy' $(LAB_TARGET_DIR))
-lab: | $(NODELIB)
-	$(foreach image,$(IMAGES),evy run --svg-out "$(image:evy=svg)" "$(image)"$(nl))
-	npx --prefix $(NODEPREFIX) -y prettier --write $(LAB_TARGET_DIR)
+lab: $(LAB_SVG) $(LAB_HTMLF)
+
+%.svg: %.evy | $(NODELIB)
+	go run . run --svg-out "$@" "$<"
+	$(PRETTIER) --write "$@"
+
+%.htmlf: %.md | $(NODELIB)
+	go run ./build-tools/labsite-gen "$<" "$@"
+	$(PRETTIER) --write "$@"
 
 FIND_GENERATED_CMD = fd --exclude '*.css' --exclude '*.js' --type file --full-path
 clean::
 	$(FIND_GENERATED_CMD) frontend/docs --exec rm
 	$(FIND_GENERATED_CMD) frontend/learn --exec rm
+	rm -f $(LAB_SVG)
+	$(foreach file,$(LAB_MDFILES),rm -f "$(file:md=htmlf)"$(nl))
 
 test-urls:
 	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
@@ -235,11 +249,11 @@ serve:
 
 ## Format code with prettier
 prettier: | $(NODELIB)
-	npx --prefix $(NODEPREFIX) -y prettier --write .
+	$(PRETTIER) --write .
 
 ## Ensure code is formatted with prettier
 check-prettier: | $(NODELIB)
-	npx --prefix $(NODEPREFIX) -y prettier --check .
+	$(PRETTIER) --check .
 
 ## Fix CSS files with stylelint
 style: | $(NODELIB)

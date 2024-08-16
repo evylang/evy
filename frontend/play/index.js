@@ -450,6 +450,9 @@ function updateNotes(notes) {
   notesEl.querySelectorAll(".language-evy").forEach((el) => {
     el.innerHTML = highlightEvy(el.textContent)
   })
+  notesEl.querySelectorAll("a").forEach((el) => {
+    el.target = "_blank"
+  })
   notesEl.scrollTo(0, 0)
 }
 

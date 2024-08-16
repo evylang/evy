@@ -1,33 +1,29 @@
 <h1>🌐🫵 Lines</h1>
-
 <p>⭐ Can you complete the program on the right to create this output?</p>
-<img src="samples/loops/img/lines.svg" alt="target board" />
-<br />
+<p><img src="samples/loops/img/lines.svg" alt="target board" /></p>
 <p>⭐ Can you do it using a loop?</p>
 <details>
-  <summary>Hint</summary>
-  <pre><code class="language-evy">while x < ❓
+  <summary>Code hint 🧚</summary>
+  <pre><code class="language-evy">while x &lt; ❓
     move ❓
     line ❓
     x = x + ❓
 end
-  </code></pre>
+</code></pre>
 </details>
 <p>
   ⭐ Can you make the step <code>10</code> a variable and run the program with different step
   values?
 </p>
 <details>
-  <summary>Hint</summary>
-  <pre><code class="language-evy">
-step = ❓
-while x < __
+  <summary>Code hint 🧚</summary>
+  <pre><code class="language-evy">step = ❓
+while x &lt; __
     // ...
     x = x + ❓
 end
-  </code></pre>
+</code></pre>
 </details>
-
 <details>
   <summary>⭐⭐⭐ Animation!</summary>
   <p>Add a second, wrapping, outer loop that ranges over the <code>step</code> variable.</p>

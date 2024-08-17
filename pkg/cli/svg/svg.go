@@ -30,7 +30,7 @@ type Attr struct {
 	Stroke          string   `xml:"stroke,attr,omitempty"`
 	StrokeWidth     *float64 `xml:"stroke-width,attr,omitempty"`
 	StrokeLinecap   string   `xml:"stroke-linecap,attr,omitempty"`
-	StorkeDashArray string   `xml:"stroke-dasharray,attr,omitempty"`
+	StrokeDashArray string   `xml:"stroke-dasharray,attr,omitempty"`
 }
 
 // TextAttr represents the attributes of text or group SVG elements and

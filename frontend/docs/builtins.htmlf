@@ -397,6 +397,10 @@ print map
   <code>sleep</code> can be used to create delays in Evy programs. For example, you could use sleep
   to create a countdown timer.
 </p>
+<p>
+  In the <a href="spec.html#runtimes">browser runtime</a> <code>sleep</code> pauses a minimum of 1
+  millisecond.
+</p>
 <h4>Example</h4>
 <pre><code class="language-evy">print &quot;2&quot;
 sleep 1

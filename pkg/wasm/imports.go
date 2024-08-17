@@ -26,11 +26,16 @@ func newJSRuntime() *jsRuntime {
 	return &jsRuntime{yielder: newSleepingYielder()}
 }
 
-func (rt *jsRuntime) Yielder() evaluator.Yielder       { return rt.yielder }
-func (rt *jsRuntime) Print(s string)                   { jsPrint(s) }
-func (rt *jsRuntime) Cls()                             { jsCls() }
-func (rt *jsRuntime) Read() string                     { return rt.yielder.Read() }
-func (rt *jsRuntime) Sleep(dur time.Duration)          { rt.yielder.Sleep(dur) }
+func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
+func (rt *jsRuntime) Print(s string)             { jsPrint(s) }
+func (rt *jsRuntime) Cls()                       { jsCls() }
+func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
+
+func (rt *jsRuntime) Sleep(dur time.Duration) {
+	// Enforce a lower bound to stop browser tabs from freezing.
+	rt.yielder.Sleep(max(minSleepDur, dur))
+}
+
 func (rt *jsRuntime) Move(x, y float64)                { move(x, y) }
 func (rt *jsRuntime) Line(x, y float64)                { line(x, y) }
 func (rt *jsRuntime) Rect(x, y float64)                { rect(x, y) }

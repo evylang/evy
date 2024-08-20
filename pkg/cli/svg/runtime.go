@@ -72,6 +72,8 @@ func NewGraphicsRuntime() *GraphicsRuntime {
 			},
 		},
 	}
+	rt.x = rt.transformX(0)
+	rt.y = rt.transformY(0)
 	rt.Clear("white")
 	return rt
 }

@@ -1,0 +1,52 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+        description: "The environment to deploy to (stage|prod)"
+        default: "stage"
+      channel:
+        type: string
+        required: true
+        description: "Firebase deployment channel, live or PRNUM"
+      ref:
+        type: string
+        required: true
+        description: "The commit ref to deploy"
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: string
+        required: true
+        default: "stage"
+      channel:
+        type: string
+        required: true
+      ref:
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
+      - run: ./bin/make deploy ENV=${ENV} CHANNEL=${CHANNEL}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENV: ${{ inputs.environment }}
+          CHANNEL: ${{ inputs.channel }}
+      - run: ./bin/make e2e USE_DOCKER=1
+        env:
+          BASEURL: ${{ env.BASEURL_APEX }}
+          BASEURL_PLAY: ${{ env.BASEURL_PLAY }}
+          BASEURL_DOCS: ${{ env.BASEURL_DOCS }}

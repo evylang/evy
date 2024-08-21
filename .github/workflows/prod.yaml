@@ -10,6 +10,8 @@ jobs:
   deploy-stage:
     uses: ./.github/workflows/stage.yaml
     secrets: inherit
+    with:
+      channel: live
 
   release:
     runs-on: ubuntu-latest
@@ -26,21 +28,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-prod:
-    runs-on: ubuntu-latest
-    needs: release
-    environment: prod
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - run: ./bin/make deploy ENV=prod CHANNEL=live
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
-      - run: ./bin/make e2e USE_DOCKER=1
-        env:
-          BASEURL: ${{ env.BASEURL_APEX }}
-          BASEURL_PLAY: ${{ env.BASEURL_PLAY }}
-          BASEURL_DOCS: ${{ env.BASEURL_DOCS }}
+    uses: ./.github/workflows/deploy.yaml
+    secrets: inherit
+    with:
+      environment: prod
+      channel: live
+      ref: ${{ github.ref }}
 
   howl-on-fail:
     runs-on: ubuntu-latest

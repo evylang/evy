@@ -4,6 +4,11 @@ run-name: Staging Deployment
 on:
   pull_request:
   workflow_call:
+    inputs:
+      channel:
+        type: string
+        required: true
+        description: "Firebase deployment channel, live or PRNUM"
 
 jobs:
   test:
@@ -23,18 +28,21 @@ jobs:
       - run: ./bin/make lint
 
   deploy:
+    if: github.repository_owner == 'evylang'
+    uses: ./.github/workflows/deploy.yaml
+    secrets: inherit
+    with:
+      environment: stage
+      channel: ${{ inputs.channel || github.event.number }}
+      ref: ${{ github.ref }}
+
+  trigger-deploy:
+    if: github.event.repository_owner != 'evylang'
     runs-on: ubuntu-latest
-    environment: stage
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make deploy ENV=stage CHANNEL= # empty channel becomes PR-NUM or "live"
+      - run: gh workflow run deploy.yaml -r ${{ github.ref }} -f environment=stage -f channel=${{ github.event.number }} -f ref=${{ github.ref }}
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: ./bin/make e2e USE_DOCKER=1
-        env:
-          BASEURL: ${{ env.BASEURL_APEX }}
-          BASEURL_PLAY: ${{ env.BASEURL_PLAY }}
-          BASEURL_DOCS: ${{ env.BASEURL_DOCS }}

@@ -668,8 +668,8 @@ var randsource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 func randFunc(_ *scope, args []value) (value, error) {
 	upper := args[0].(*numVal).V
-	if upper <= 0 || upper > 2147483647 { // [1, 2^31-1]
-		return nil, fmt.Errorf(`%w: "rand %0.f" not in range 1 to 2147483647`, ErrBadArguments, upper)
+	if upper < 1 || upper > 2147483647 { // [1, 2^31-1]
+		return nil, fmt.Errorf(`%w: "rand %v" not in range 1 to 2147483647`, ErrBadArguments, upper)
 	}
 	return &numVal{V: float64(randsource.Int31n(int32(upper)))}, nil
 }

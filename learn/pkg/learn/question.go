@@ -652,7 +652,7 @@ func (m *QuestionModel) parseFrontmatterMD() error {
 	if answerType != "single-choice" && answerType != "multiple-choice" && answerType != "text" {
 		return fmt.Errorf("%w: unimplemented answerType %q", ErrInvalidFrontmatter, answerType)
 	}
-	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
+	parser := markdown.Parser{AutoLinkText: true, TaskList: true}
 	m.Doc = parser.Parse(m.rawMD)
 	return nil
 }

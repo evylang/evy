@@ -86,7 +86,7 @@ func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
 		if !ok {
 			buf.WriteString("Unit:" + unit.Filename() + "\n")
 		} else {
-			h.Text.PrintHTML(buf)
+			buf.WriteString(markdown.ToHTML(h.Text))
 		}
 		buf.WriteString("</h2>\n")
 		if err := unit.printBadgesHTML(buf, courseDir); err != nil {

@@ -186,7 +186,7 @@ func removeTOC(doc *markdown.Document) {
 	var blocks []markdown.Block
 	for i, b := range doc.Blocks {
 		if h, ok := b.(*markdown.Heading); ok {
-			htext := strings.ToLower(strings.TrimSpace(markdown.ToMarkdown(h.Text)))
+			htext := strings.ToLower(strings.TrimSpace(markdown.Format(h.Text)))
 			inTOC = htext == "table of contents"
 		}
 		if !inTOC {
@@ -266,7 +266,7 @@ func extractTitle(doc *markdown.Document) string {
 func inlineText(inlines []markdown.Inline) string {
 	buf := &bytes.Buffer{}
 	for _, inline := range inlines {
-		inline.PrintText(buf)
+		buf.WriteString(md.Undecorate(inline))
 	}
 	return buf.String()
 }

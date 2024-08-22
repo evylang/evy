@@ -26,7 +26,7 @@ func format(frontmatter any, doc *markdown.Document) ([]byte, error) {
 	buf.WriteString("---\n")
 	buf.Write(b)
 	buf.WriteString("---\n\n")
-	buf.WriteString(markdown.ToMarkdown(doc))
+	buf.WriteString(markdown.Format(doc))
 	return buf.Bytes(), nil
 }
 
@@ -52,7 +52,7 @@ func readSplitMDFile(filename string) (string, string, error) {
 }
 
 func parseMD(rawMD string) *markdown.Document {
-	parser := markdown.Parser{AutoLinkText: true, TaskListItems: true}
+	parser := markdown.Parser{AutoLinkText: true, TaskList: true}
 	return parser.Parse(rawMD)
 }
 
@@ -85,7 +85,7 @@ func extractName(doc *markdown.Document) (string, error) {
 	}
 	buf := &bytes.Buffer{}
 	for _, inline := range heading.Text.Inline {
-		inline.PrintText(buf)
+		buf.WriteString(md.Undecorate(inline))
 	}
 	return buf.String(), nil
 }
@@ -111,7 +111,7 @@ func printHTML(block markdown.Block, buf *bytes.Buffer) {
 	if alertType, ok := alertBlock(block); ok {
 		printAlert(block.(*markdown.Quote), buf, alertType)
 	} else {
-		block.PrintHTML(buf)
+		buf.WriteString(markdown.ToHTML(block))
 	}
 }
 
@@ -155,7 +155,7 @@ func printAlert(quote *markdown.Quote, buf *bytes.Buffer, alertType string) {
 	buf.WriteString(strings.Title(alertType)) //nolint: staticcheck // we can savely use it here as we know all strings we want to use and have no punctuation.
 	buf.WriteString(`</p>`)
 	for _, block := range quote.Blocks {
-		block.PrintHTML(buf)
+		buf.WriteString(markdown.ToHTML(block))
 	}
 	buf.WriteString(`</div>`)
 }

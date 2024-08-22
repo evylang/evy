@@ -3,15 +3,12 @@
 package md
 
 import (
-	"bytes"
-
 	"rsc.io/markdown"
 )
 
-// Node is a subset of markdown.Block and markdown.Inline interfaces.
-type Node interface {
-	PrintHTML(*bytes.Buffer)
-}
+// Node should be either a markdown.Block or markdown.Inline interface for the
+// Walk function to take effect.
+type Node interface{}
 
 // Walk visits a markdown AST node, executes function f on it and recursively
 // visits all children.

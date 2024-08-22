@@ -518,7 +518,7 @@ that the program will print before it terminates with exit status 1.
 the same, the program will print the failed test and terminate with exit
 status 1.
 
-`test` optionally takes a message or a formatted message with arguments to
+`test` optionally takes a message or a format string with arguments to
 print along with the failed test as a third and following arguments:
 
 #### Example

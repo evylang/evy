@@ -30,13 +30,13 @@ func reverse:string str:string
     return reversed
 end
 
-func test
-    assert "" (makePalindrome "")
-    assert "x" (makePalindrome "x")
-    assert "xyzyx" (makePalindrome "xyz")
-    assert "xyx" (makePalindrome "xyx")
-    assert "catac" (makePalindrome "cata")
-    assert "jerryrrej" (makePalindrome "jerry")
+func testAll
+    test "" (makePalindrome "")
+    test "x" (makePalindrome "x")
+    test "xyzyx" (makePalindrome "xyz")
+    test "xyx" (makePalindrome "xyx")
+    test "catac" (makePalindrome "cata")
+    test "jerryrrej" (makePalindrome "jerry")
 end
 
-test
+testAll

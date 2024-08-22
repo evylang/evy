@@ -22,18 +22,18 @@ func solve:num nums:[]num
     return result
 end
 
-func test
-    assert 6 (solve [1 2 3])
-    assert 14 (solve [1 4 9])
-    assert 0 (solve [])
-    assert 9 (solve [1 1 1 1 1 1 1 1 1])
-    assert -3 (solve [-1 -1 -1 -1 -1 -1 -1 -1 -1])
-    assert 0 (solve [0])
-    assert -126 (solve [-1 -5 2 -1 -5])
-    assert 3030 (solve [-56 -99 1 0 -2])
-    assert 0 (solve [-1 0 0 0 0 0 0 0 -1])
-    assert -14196 (solve [-16 -9 -2 36 36 26 -20 25 -40 20 -4 12 -26 35 37])
-    assert -1448 (solve [-1 -3 17 -1 -15 13 -1 14 -14 -12 -5 14 -14 6 13 11 16 16 4 10])
+func testAll
+    test 6 (solve [1 2 3])
+    test 14 (solve [1 4 9])
+    test 0 (solve [])
+    test 9 (solve [1 1 1 1 1 1 1 1 1])
+    test -3 (solve [-1 -1 -1 -1 -1 -1 -1 -1 -1])
+    test 0 (solve [0])
+    test -126 (solve [-1 -5 2 -1 -5])
+    test 3030 (solve [-56 -99 1 0 -2])
+    test 0 (solve [-1 0 0 0 0 0 0 0 -1])
+    test -14196 (solve [-16 -9 -2 36 36 26 -20 25 -40 20 -4 12 -26 35 37])
+    test -1448 (solve [-1 -3 17 -1 -15 13 -1 14 -14 -12 -5 14 -14 6 13 11 16 16 4 10])
 end
 
-test
+testAll

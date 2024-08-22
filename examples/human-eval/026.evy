@@ -21,10 +21,10 @@ func removeDuplicates:[]num nums:[]num
     return result
 end
 
-func test
-    assert [] (removeDuplicates [])
-    assert [1 2 3 4] (removeDuplicates [1 2 3 4])
-    assert [1 4 5] (removeDuplicates [1 2 3 2 4 3 5])
+func testAll
+    test [] (removeDuplicates [])
+    test [1 2 3 4] (removeDuplicates [1 2 3 4])
+    test [1 4 5] (removeDuplicates [1 2 3 2 4 3 5])
 end
 
-test
+testAll

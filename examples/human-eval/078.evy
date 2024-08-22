@@ -28,14 +28,14 @@ func hexprimes:num str:string
     return result
 end
 
-func test
-    assert 1 (hexprimes "AB")
-    assert 2 (hexprimes "1077E")
-    assert 4 (hexprimes "ABED1A33")
-    assert 2 (hexprimes "2020")
-    assert 6 (hexprimes "123456789ABCDEF0")
-    assert 12 (hexprimes "112233445566778899AABBCCDDEEFF00")
-    assert 0 (hexprimes "")
+func testAll
+    test 1 (hexprimes "AB")
+    test 2 (hexprimes "1077E")
+    test 4 (hexprimes "ABED1A33")
+    test 2 (hexprimes "2020")
+    test 6 (hexprimes "123456789ABCDEF0")
+    test 12 (hexprimes "112233445566778899AABBCCDDEEFF00")
+    test 0 (hexprimes "")
 end
 
-test
+testAll

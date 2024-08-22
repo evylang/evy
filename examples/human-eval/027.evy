@@ -14,10 +14,10 @@ func flipCase:string str:string
     return result
 end
 
-func test
-    assert "" (flipCase "")
-    assert "hELLO!" (flipCase "Hello!")
-    assert "tHESE VIOLENT DELIGHTS HAVE VIOLENT ENDS" (flipCase "These violent delights have violent ends")
+func testAll
+    test "" (flipCase "")
+    test "hELLO!" (flipCase "Hello!")
+    test "tHESE VIOLENT DELIGHTS HAVE VIOLENT ENDS" (flipCase "These violent delights have violent ends")
 end
 
-test
+testAll

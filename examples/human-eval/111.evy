@@ -36,15 +36,15 @@ func histogram:{}num s:string
     return result
 end
 
-func test
-    assert {a:2 b:2} (histogram "a b b a")
-    assert {a:2 b:2} (histogram "a b c a b")
-    assert {a:1 b:1 c:1 d:1 g:1} (histogram "a b c d g")
-    assert {r:1 t:1 g:1} (histogram "r t g")
-    assert {b:4} (histogram "b b b b a")
-    assert {r:1 t:1 g:1} (histogram "r t g")
-    assert {} (histogram "")
-    assert {a:1} (histogram "a")
+func testAll
+    test {a:2 b:2} (histogram "a b b a")
+    test {a:2 b:2} (histogram "a b c a b")
+    test {a:1 b:1 c:1 d:1 g:1} (histogram "a b c d g")
+    test {r:1 t:1 g:1} (histogram "r t g")
+    test {b:4} (histogram "b b b b a")
+    test {r:1 t:1 g:1} (histogram "r t g")
+    test {} (histogram "")
+    test {a:1} (histogram "a")
 end
 
-test
+testAll

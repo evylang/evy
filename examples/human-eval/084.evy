@@ -16,12 +16,12 @@ func solve:string n:num
     return result
 end
 
-func test
-    assert "1" (solve 1000)
-    assert "110" (solve 150)
-    assert "1100" (solve 147)
-    assert "1001" (solve 333)
-    assert "10010" (solve 963)
+func testAll
+    test "1" (solve 1000)
+    test "110" (solve 150)
+    test "1100" (solve 147)
+    test "1001" (solve 333)
+    test "10010" (solve 963)
 end
 
-test
+testAll

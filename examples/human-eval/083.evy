@@ -7,12 +7,12 @@ func count1:num n:num
     return 18 * (pow 10 n-2)
 end
 
-func test
-    assert 1 (count1 1)
-    assert 18 (count1 2)
-    assert 180 (count1 3)
-    assert 1800 (count1 4)
-    assert 18000 (count1 5)
+func testAll
+    test 1 (count1 1)
+    test 18 (count1 2)
+    test 180 (count1 3)
+    test 1800 (count1 4)
+    test 18000 (count1 5)
 end
 
-test
+testAll

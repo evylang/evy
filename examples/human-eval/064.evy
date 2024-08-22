@@ -20,15 +20,15 @@ func vowelCount:num str:string
     return result
 end
 
-func test
-    assert 0 (vowelCount "")
-    assert 2 (vowelCount "abcde")
-    assert 3 (vowelCount "Alone")
-    assert 2 (vowelCount "key")
-    assert 1 (vowelCount "bye")
-    assert 2 (vowelCount "keY")
-    assert 1 (vowelCount "bYe")
-    assert 3 (vowelCount "ACEDY")
+func testAll
+    test 0 (vowelCount "")
+    test 2 (vowelCount "abcde")
+    test 3 (vowelCount "Alone")
+    test 2 (vowelCount "key")
+    test 1 (vowelCount "bye")
+    test 2 (vowelCount "keY")
+    test 1 (vowelCount "bYe")
+    test 3 (vowelCount "ACEDY")
 end
 
-test
+testAll

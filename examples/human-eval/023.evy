@@ -5,10 +5,10 @@ func strlen:num str:string
     return len str
 end
 
-func test
-    assert 0 (strlen "")
-    assert 1 (strlen "x")
-    assert 9 (strlen "asdasnakj")
+func testAll
+    test 0 (strlen "")
+    test 1 (strlen "x")
+    test 9 (strlen "asdasnakj")
 end
 
-test
+testAll

@@ -35,15 +35,15 @@ func isPrime:bool n:num
     return true
 end
 
-func test
-    assert "NO" (intersectPrime [1 2] [2 3])
-    assert "NO" (intersectPrime [-1 1] [0 4])
-    assert "YES" (intersectPrime [-3 -1] [-5 5])
-    assert "YES" (intersectPrime [-2 2] [-4 0])
-    assert "NO" (intersectPrime [-11 2] [-1 -1])
-    assert "NO" (intersectPrime [1 2] [3 5])
-    assert "NO" (intersectPrime [1 2] [1 2])
-    assert "NO" (intersectPrime [-2 -2] [-3 -2])
+func testAll
+    test "NO" (intersectPrime [1 2] [2 3])
+    test "NO" (intersectPrime [-1 1] [0 4])
+    test "YES" (intersectPrime [-3 -1] [-5 5])
+    test "YES" (intersectPrime [-2 2] [-4 0])
+    test "NO" (intersectPrime [-11 2] [-1 -1])
+    test "NO" (intersectPrime [1 2] [3 5])
+    test "NO" (intersectPrime [1 2] [1 2])
+    test "NO" (intersectPrime [-2 -2] [-3 -2])
 end
 
-test
+testAll

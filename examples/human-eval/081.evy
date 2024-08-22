@@ -58,13 +58,13 @@ func grade:string gpa:num
     return sprint "invalid gpa" gpa
 end
 
-func test
-    assert ["A+" "B" "C-" "C" "A-"] (grades [4 3 1.7 2 3.5])
-    assert ["D+"] (grades [1.2])
-    assert ["D-"] (grades [0.5])
-    assert ["E"] (grades [0])
-    assert ["D" "D-" "C-" "B" "B+"] (grades [1 0.3 1.5 2.8 3.3])
-    assert ["E" "D-"] (grades [0 0.7])
+func testAll
+    test ["A+" "B" "C-" "C" "A-"] (grades [4 3 1.7 2 3.5])
+    test ["D+"] (grades [1.2])
+    test ["D-"] (grades [0.5])
+    test ["E"] (grades [0])
+    test ["D" "D-" "C-" "B" "B+"] (grades [1 0.3 1.5 2.8 3.3])
+    test ["E" "D-"] (grades [0 0.7])
 end
 
-test
+testAll

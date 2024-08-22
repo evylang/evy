@@ -28,14 +28,14 @@ func count:num nums:[]num remainderMod2:num
     return result
 end
 
-func test
-    assert "YES" (solve [1 2 3 4] [1 2 3 4])
-    assert "NO" (solve [1 2 3 4] [1 5 3 4])
-    assert "YES" (solve [1 2 3 4] [2 1 4 3])
-    assert "YES" (solve [5 7 3] [2 6 4])
-    assert "NO" (solve [5 7 3] [2 6 3])
-    assert "NO" (solve [3 2 6 1 8 9] [3 5 5 1 1 1])
-    assert "YES" (solve [100 200] [200 200])
+func testAll
+    test "YES" (solve [1 2 3 4] [1 2 3 4])
+    test "NO" (solve [1 2 3 4] [1 5 3 4])
+    test "YES" (solve [1 2 3 4] [2 1 4 3])
+    test "YES" (solve [5 7 3] [2 6 4])
+    test "NO" (solve [5 7 3] [2 6 3])
+    test "NO" (solve [3 2 6 1 8 9] [3 5 5 1 1 1])
+    test "YES" (solve [100 200] [200 200])
 end
 
-test
+testAll

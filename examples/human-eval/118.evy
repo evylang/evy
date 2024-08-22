@@ -24,20 +24,20 @@ func findVowel:string s:string
     return ""
 end
 
-func test
-    assert "u" (findVowel "yogurt")
-    assert "u" (findVowel "full")
-    assert "" (findVowel "easy")
-    assert "" (findVowel "eAsy")
-    assert "" (findVowel "ali")
-    assert "a" (findVowel "bad")
-    assert "o" (findVowel "most")
-    assert "" (findVowel "ab")
-    assert "" (findVowel "ba")
-    assert "" (findVowel "quick")
-    assert "i" (findVowel "anime")
-    assert "" (findVowel "Asia")
-    assert "o" (findVowel "Above")
+func testAll
+    test "u" (findVowel "yogurt")
+    test "u" (findVowel "full")
+    test "" (findVowel "easy")
+    test "" (findVowel "eAsy")
+    test "" (findVowel "ali")
+    test "a" (findVowel "bad")
+    test "o" (findVowel "most")
+    test "" (findVowel "ab")
+    test "" (findVowel "ba")
+    test "" (findVowel "quick")
+    test "i" (findVowel "anime")
+    test "" (findVowel "Asia")
+    test "o" (findVowel "Above")
 end
 
-test
+testAll

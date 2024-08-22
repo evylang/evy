@@ -21,13 +21,13 @@ func eat:[]num done:num need:num stock:num
     end
 end
 
-func test
-    assert [11 4] (eat 5 6 10)
-    assert [12 1] (eat 4 8 9)
-    assert [11 0] (eat 1 10 10)
-    assert [7 0] (eat 2 11 5)
-    assert [9 2] (eat 4 5 7)
-    assert [5 0] (eat 4 5 1)
+func testAll
+    test [11 4] (eat 5 6 10)
+    test [12 1] (eat 4 8 9)
+    test [11 0] (eat 1 10 10)
+    test [7 0] (eat 2 11 5)
+    test [9 2] (eat 4 5 7)
+    test [5 0] (eat 4 5 1)
 end
 
-test
+testAll

@@ -15,17 +15,17 @@ func checkLast:bool s:string
     return (len last) == 1 and (has abc last)
 end
 
-func test
-    assert (checkLast "apple") false
-    assert (checkLast "apple pi e") true
-    assert (checkLast "eeeee") false
-    assert (checkLast "A") true
-    assert (checkLast "Pumpkin pie ") false
-    assert (checkLast "Pumpkin pie 1") false
-    assert (checkLast "") false
-    assert (checkLast "eeeee e ") false
-    assert (checkLast "apple pie") false
-    assert (checkLast "apple pi e ") false
+func testAll
+    test (checkLast "apple") false
+    test (checkLast "apple pi e") true
+    test (checkLast "eeeee") false
+    test (checkLast "A") true
+    test (checkLast "Pumpkin pie ") false
+    test (checkLast "Pumpkin pie 1") false
+    test (checkLast "") false
+    test (checkLast "eeeee e ") false
+    test (checkLast "apple pie") false
+    test (checkLast "apple pi e ") false
 end
 
-test
+testAll

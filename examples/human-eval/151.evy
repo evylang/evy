@@ -15,13 +15,13 @@ func squareSum:num nums:[]num
     return result
 end
 
-func test
-    assert 0 (squareSum [])
-    assert 25 (squareSum [5 4])
-    assert 0 (squareSum [0.1 0.2 0.3])
-    assert 0 (squareSum [-10 -20 -30])
-    assert 0 (squareSum [-1 -2 8])
-    assert 34 (squareSum [0.2 3 5])
+func testAll
+    test 0 (squareSum [])
+    test 25 (squareSum [5 4])
+    test 0 (squareSum [0.1 0.2 0.3])
+    test 0 (squareSum [-10 -20 -30])
+    test 0 (squareSum [-1 -2 8])
+    test 34 (squareSum [0.2 3 5])
 end
 
-test
+testAll

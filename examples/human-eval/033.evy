@@ -35,14 +35,14 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [1 2 3] (sort_third [1 2 3])
-    assert [1 3 -5 2 -3 3 5 0 123 9 -10] (sort_third [5 3 -5 2 -3 3 9 0 123 1 -10])
-    assert [-10 8 -12 3 23 2 4 11 12 5] (sort_third [5 8 -12 4 23 2 3 11 12 -10])
-    assert [2 6 3 4 8 9 5] (sort_third [5 6 3 4 8 9 2])
-    assert [2 8 3 4 6 9 5] (sort_third [5 8 3 4 6 9 2])
-    assert [2 6 9 4 8 3 5] (sort_third [5 6 9 4 8 3 2])
-    assert [2 6 3 4 8 9 5 1] (sort_third [5 6 3 4 8 9 2 1])
+func testAll
+    test [1 2 3] (sort_third [1 2 3])
+    test [1 3 -5 2 -3 3 5 0 123 9 -10] (sort_third [5 3 -5 2 -3 3 9 0 123 1 -10])
+    test [-10 8 -12 3 23 2 4 11 12 5] (sort_third [5 8 -12 4 23 2 3 11 12 -10])
+    test [2 6 3 4 8 9 5] (sort_third [5 6 3 4 8 9 2])
+    test [2 8 3 4 6 9 5] (sort_third [5 8 3 4 6 9 2])
+    test [2 6 9 4 8 3 5] (sort_third [5 6 9 4 8 3 2])
+    test [2 6 3 4 8 9 5 1] (sort_third [5 6 3 4 8 9 2 1])
 end
 
-test
+testAll

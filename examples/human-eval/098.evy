@@ -14,14 +14,14 @@ func countUpper:num s:string
     return result
 end
 
-func test
-    assert 1 (countUpper "aBCdEf")
-    assert 0 (countUpper "abcdefg")
-    assert 0 (countUpper "dBBE")
-    assert 0 (countUpper "B")
-    assert 1 (countUpper "U")
-    assert 0 (countUpper "")
-    assert 2 (countUpper "EEEE")
+func testAll
+    test 1 (countUpper "aBCdEf")
+    test 0 (countUpper "abcdefg")
+    test 0 (countUpper "dBBE")
+    test 0 (countUpper "B")
+    test 1 (countUpper "U")
+    test 0 (countUpper "")
+    test 2 (countUpper "EEEE")
 end
 
-test
+testAll

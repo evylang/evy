@@ -5,12 +5,12 @@ func add:num x:num y:num
     return x + y
 end
 
-func test
-    assert 1 (add 0 1)
-    assert 1 (add 1 0)
-    assert 5 (add 2 3)
-    assert 12 (add 5 7)
-    assert 12 (add 7 5)
+func testAll
+    test 1 (add 0 1)
+    test 1 (add 1 0)
+    test 5 (add 2 3)
+    test 12 (add 5 7)
+    test 12 (add 7 5)
 end
 
-test
+testAll

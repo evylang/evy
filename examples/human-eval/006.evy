@@ -26,10 +26,10 @@ func parseNestedParens:[]num paren_string:string
     return result
 end
 
-func test
-    assert [2 3 1 3] (parseNestedParens "(()()) ((())) () ((())()())")
-    assert [1 2 3 4] (parseNestedParens "() (()) ((())) (((())))")
-    assert [4] (parseNestedParens "(()(())((())))")
+func testAll
+    test [2 3 1 3] (parseNestedParens "(()()) ((())) () ((())()())")
+    test [1 2 3 4] (parseNestedParens "() (()) ((())) (((())))")
+    test [4] (parseNestedParens "(()(())((())))")
 end
 
-test
+testAll

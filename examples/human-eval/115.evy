@@ -41,12 +41,12 @@ func lowerCount:num wells:[][]num capacity:num
     return result
 end
 
-func test
-    assert 6 (lowerCount [[0 0 1 0] [0 1 0 0] [1 1 1 1]] 1)
-    assert 5 (lowerCount [[0 0 1 1] [0 0 0 0] [1 1 1 1] [0 1 1 1]] 2)
-    assert 0 (lowerCount [[0 0 0] [0 0 0]] 5)
-    assert 4 (lowerCount [[1 1 1 1] [1 1 1 1]] 2)
-    assert 2 (lowerCount [[1 1 1 1] [1 1 1 1]] 9)
+func testAll
+    test 6 (lowerCount [[0 0 1 0] [0 1 0 0] [1 1 1 1]] 1)
+    test 5 (lowerCount [[0 0 1 1] [0 0 0 0] [1 1 1 1] [0 1 1 1]] 2)
+    test 0 (lowerCount [[0 0 0] [0 0 0]] 5)
+    test 4 (lowerCount [[1 1 1 1] [1 1 1 1]] 2)
+    test 2 (lowerCount [[1 1 1 1] [1 1 1 1]] 9)
 end
 
-test
+testAll

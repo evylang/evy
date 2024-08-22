@@ -33,7 +33,7 @@ func find_zero:num xs:[]num
     return 0
 end
 
-func test
+func testAll
     // rng := random.Random (42)
     //     ncoeff := 2 * rng.randint (1 4)
     //     coeffs := []
@@ -44,8 +44,8 @@ func test
     //         coeffs = coeffs + [coeff]
     //     end
     //     solution := .candidate (copy.deepcopy (coeffs))
-    //     assert math.fabs (.poly (coeffs solution)) < 0.0001
+    //     test math.fabs (.poly (coeffs solution)) < 0.0001
     // end
 end
 
-test
+testAll

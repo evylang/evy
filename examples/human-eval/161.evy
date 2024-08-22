@@ -30,15 +30,15 @@ func solve:string s:string
     return reversed
 end
 
-func test
-    assert "aSdF" (solve "AsDf")
-    assert "4321" (solve "1234")
-    assert "AB" (solve "ab")
-    assert "#A@c" (solve "#a@C")
-    assert "#aSDFw^45" (solve "#AsdfW^45")
-    assert "2@6#" (solve "#6@2")
-    assert "#$A^d" (solve "#$a^D")
-    assert "#CCC" (solve "#ccc")
+func testAll
+    test "aSdF" (solve "AsDf")
+    test "4321" (solve "1234")
+    test "AB" (solve "ab")
+    test "#A@c" (solve "#a@C")
+    test "#aSDFw^45" (solve "#AsdfW^45")
+    test "2@6#" (solve "#6@2")
+    test "#$A^d" (solve "#$a^D")
+    test "#CCC" (solve "#ccc")
 end
 
-test
+testAll

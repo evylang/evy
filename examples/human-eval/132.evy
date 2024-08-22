@@ -29,21 +29,21 @@ func isNested:bool s:string
     return false
 end
 
-func test
-    assert true (isNested "[[]]")
-    assert false (isNested "[]]]]]]][[[[[]")
-    assert false (isNested "[][]")
-    assert false (isNested ("[]"))
-    assert true (isNested "[[[[]]]]")
-    assert false (isNested "[]]]]]]]]]]")
-    assert true (isNested "[][][[]]")
-    assert false (isNested "[[]")
-    assert false (isNested "[]]")
-    assert true (isNested "[[]][[")
-    assert true (isNested "[[][]]")
-    assert false (isNested "")
-    assert false (isNested "[[[[[[[[")
-    assert false (isNested "]]]]]]]]")
+func testAll
+    test true (isNested "[[]]")
+    test false (isNested "[]]]]]]][[[[[]")
+    test false (isNested "[][]")
+    test false (isNested ("[]"))
+    test true (isNested "[[[[]]]]")
+    test false (isNested "[]]]]]]]]]]")
+    test true (isNested "[][][[]]")
+    test false (isNested "[[]")
+    test false (isNested "[]]")
+    test true (isNested "[[]][[")
+    test true (isNested "[[][]]")
+    test false (isNested "")
+    test false (isNested "[[[[[[[[")
+    test false (isNested "]]]]]]]]")
 end
 
-test
+testAll

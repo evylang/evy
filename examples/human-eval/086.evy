@@ -73,14 +73,14 @@ func sort:string str:string
     return s
 end
 
-func test
-    assert "Hi" (antiShuffle "Hi")
-    assert "ehllo" (antiShuffle "hello")
-    assert "bemnru" (antiShuffle "number")
-    assert "abcd" (antiShuffle "abcd")
-    assert "Hello !!!Wdlor" (antiShuffle "Hello World!!!")
-    assert "" (antiShuffle "")
-    assert ".Hi My aemn is Meirst .Rboot How aer ?ouy" (antiShuffle "Hi. My name is Mister Robot. How are you?")
+func testAll
+    test "Hi" (antiShuffle "Hi")
+    test "ehllo" (antiShuffle "hello")
+    test "bemnru" (antiShuffle "number")
+    test "abcd" (antiShuffle "abcd")
+    test "Hello !!!Wdlor" (antiShuffle "Hello World!!!")
+    test "" (antiShuffle "")
+    test ".Hi My aemn is Meirst .Rboot How aer ?ouy" (antiShuffle "Hi. My name is Mister Robot. How are you?")
 end
 
-test
+testAll

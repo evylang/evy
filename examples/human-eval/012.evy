@@ -22,10 +22,10 @@ func longest:string strings:[]string
     return ""
 end
 
-func test
-    assert "" (longest [])
-    assert "x" (longest ["x" "y" "z"])
-    assert "zzzz" (longest ["x" "yyy" "zzzz" "www" "kkkk" "abc"])
+func testAll
+    test "" (longest [])
+    test "x" (longest ["x" "y" "z"])
+    test "zzzz" (longest ["x" "yyy" "zzzz" "www" "kkkk" "abc"])
 end
 
-test
+testAll

@@ -23,15 +23,15 @@ func asciiSum:num str:string
     return result
 end
 
-func test
-    assert 0 (asciiSum "")
-    assert 131 (asciiSum "abAB")
-    assert 67 (asciiSum "abcCd")
-    assert 69 (asciiSum "helloE")
-    assert 131 (asciiSum "woArBld")
-    assert 153 (asciiSum "aAaaaXa")
-    assert 151 (asciiSum " How are yOu?")
-    assert 327 (asciiSum "You arE Very Smart")
+func testAll
+    test 0 (asciiSum "")
+    test 131 (asciiSum "abAB")
+    test 67 (asciiSum "abcCd")
+    test 69 (asciiSum "helloE")
+    test 131 (asciiSum "woArBld")
+    test 153 (asciiSum "aAaaaXa")
+    test 151 (asciiSum " How are yOu?")
+    test 327 (asciiSum "You arE Very Smart")
 end
 
-test
+testAll

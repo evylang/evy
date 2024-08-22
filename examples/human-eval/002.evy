@@ -7,10 +7,10 @@ func truncateNumber:num number:num
     return number % 1
 end
 
-func test
-    assert 0.5 (truncateNumber 3.5)
-    assert true (((abs (truncateNumber (1.33 - 0.33))) < 0.000001))
-    assert true (((abs (truncateNumber (123.456 - 0.456))) < 0.000001))
+func testAll
+    test 0.5 (truncateNumber 3.5)
+    test true (((abs (truncateNumber (1.33 - 0.33))) < 0.000001))
+    test true (((abs (truncateNumber (123.456 - 0.456))) < 0.000001))
 end
 
-test
+testAll

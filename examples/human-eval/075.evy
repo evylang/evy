@@ -40,17 +40,17 @@ func calcPrimes:[]num n:num
     return result
 end
 
-func test
-    assert false (prime3 5)
-    assert true (prime3 30)
-    assert true (prime3 8)
-    assert false (prime3 10)
-    assert true (prime3 125)
-    assert true (prime3 3*5*7)
-    assert false (prime3 3*6*7)
-    assert false (prime3 9*9*9)
-    assert false (prime3 11*9*9)
-    assert true (prime3 11*13*7)
+func testAll
+    test false (prime3 5)
+    test true (prime3 30)
+    test true (prime3 8)
+    test false (prime3 10)
+    test true (prime3 125)
+    test true (prime3 3*5*7)
+    test false (prime3 3*6*7)
+    test false (prime3 9*9*9)
+    test false (prime3 11*9*9)
+    test true (prime3 11*13*7)
 end
 
-test
+testAll

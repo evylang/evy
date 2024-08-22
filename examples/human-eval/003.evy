@@ -14,13 +14,13 @@ func belowZero:bool operations:[]num
     return false
 end
 
-func test
-    assert false (belowZero [])
-    assert false (belowZero [1 2 -3 1 2 -3])
-    assert true (belowZero [1 2 -4 5 6])
-    assert false (belowZero [1 -1 2 -2 5 -5 4 -4])
-    assert true (belowZero [1 -1 2 -2 5 -5 4 -5])
-    assert true (belowZero [1 -2 2 -2 5 -5 4 -4])
+func testAll
+    test false (belowZero [])
+    test false (belowZero [1 2 -3 1 2 -3])
+    test true (belowZero [1 2 -4 5 6])
+    test false (belowZero [1 -1 2 -2 5 -5 4 -4])
+    test true (belowZero [1 -1 2 -2 5 -5 4 -5])
+    test true (belowZero [1 -2 2 -2 5 -5 4 -4])
 end
 
-test
+testAll

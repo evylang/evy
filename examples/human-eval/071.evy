@@ -16,16 +16,16 @@ func triangleArea:num a:num b:num c:num
     return (round result*100) / 100 // round to 2 decimals
 end
 
-func test
-    assert 6 (triangleArea 3 4 5)
-    assert -1 (triangleArea 1 2 10)
-    assert 8.18 (triangleArea 4 8 5)
-    assert 1.73 (triangleArea 2 2 2)
-    assert -1 (triangleArea 1 2 3)
-    assert 16.25 (triangleArea 10 5 7)
-    assert -1 (triangleArea 2 6 3)
-    assert 0.43 (triangleArea 1 1 1)
-    assert -1 (triangleArea 2 2 10)
+func testAll
+    test 6 (triangleArea 3 4 5)
+    test -1 (triangleArea 1 2 10)
+    test 8.18 (triangleArea 4 8 5)
+    test 1.73 (triangleArea 2 2 2)
+    test -1 (triangleArea 1 2 3)
+    test 16.25 (triangleArea 10 5 7)
+    test -1 (triangleArea 2 6 3)
+    test 0.43 (triangleArea 1 1 1)
+    test -1 (triangleArea 2 2 10)
 end
 
-test
+testAll

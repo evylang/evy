@@ -24,7 +24,7 @@ var (
 		Stroke:          "black",
 		StrokeWidth:     &defaultStrokeWidth,
 		StrokeLinecap:   "round",
-		StorkeDashArray: "",
+		StrokeDashArray: "",
 	}
 )
 
@@ -105,8 +105,8 @@ func (rt *GraphicsRuntime) nonDefaultAttr() Attr {
 	if rt.attr.StrokeLinecap == defaultAttr.StrokeLinecap {
 		attr.StrokeLinecap = ""
 	}
-	if rt.attr.StorkeDashArray == defaultAttr.StorkeDashArray {
-		attr.StorkeDashArray = ""
+	if rt.attr.StrokeDashArray == defaultAttr.StrokeDashArray {
+		attr.StrokeDashArray = ""
 	}
 	return attr
 }
@@ -327,7 +327,7 @@ func (rt *GraphicsRuntime) Dash(segments []float64) {
 	for i, segment := range segments {
 		segmentStrings[i] = ftoa(rt.scale(segment))
 	}
-	rt.attr.StorkeDashArray = strings.Join(segmentStrings, " ")
+	rt.attr.StrokeDashArray = strings.Join(segmentStrings, " ")
 }
 
 // Linecap sets the stroke linecap style.

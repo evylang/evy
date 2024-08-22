@@ -23,6 +23,7 @@ for (const baseURL of baseURLs) {
       }
 
       await page.getByRole("button", { name: "About" }).click()
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // unflakes snapshot test :(
       await expect(page).toHaveScreenshot("dialog.png")
 
       await page.getByRole("button", { name: "Done" }).click()
@@ -32,6 +33,7 @@ for (const baseURL of baseURLs) {
       await expect(page).toHaveScreenshot("start-theme.png")
 
       await page.getByRole("button", { name: "About" }).click()
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // unflakes snapshot test :(
       await expect(page).toHaveScreenshot("dialog-theme.png")
     })
 

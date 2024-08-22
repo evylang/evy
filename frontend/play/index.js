@@ -354,7 +354,7 @@ async function initUI() {
   await handleHashChangeNoFormat() // Evy wasm for formatting might not be ready yet
   initModal()
   initSidebar()
-  initDialog()
+  initShareDialog()
 }
 
 async function fetchSamples() {
@@ -1043,15 +1043,18 @@ function handleOutsideSidebarClick(e) {
 
 // --- UI: dialog --------------------------------------------
 
-function initDialog() {
-  const input = document.querySelector("#dialog-share .copy input")
+function initShareDialog() {
+  const shareDialog = document.querySelector("#dialog-share")
+  const input = shareDialog.querySelector(".copy input")
   input.onclick = input.select
-  const copyButton = document.querySelector("#dialog-share .copy button")
+  const closeButton = shareDialog.querySelector(".icon-close")
+  closeButton.onclick = () => shareDialog.close()
+  const copyButton = shareDialog.querySelector("#copy")
   copyButton.onclick = () => {
     const url = input.value
     navigator.clipboard.writeText(url)
     input.value = "Copied!"
-    setTimeout(() => (input.value = url), 2000)
+    setTimeout(() => shareDialog.close(), 500)
   }
 }
 

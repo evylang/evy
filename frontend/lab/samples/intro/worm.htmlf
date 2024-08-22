@@ -4,18 +4,15 @@
   <li><strong>Create</strong> some cool output.</li>
   <li>
     <strong>Change</strong> this program to draw a circle with
-    <ul class="starlist">
-      <li>your favorite <strong>color</strong></li>
-      <li>a slightly different <strong>size</strong></li>
+    <ul>
+      <li>⭐ your favorite <strong>color</strong></li>
+      <li>⭐ a slightly different <strong>size</strong></li>
       <li>
-        a different <strong>outline color</strong> <br />Use the
-        <a href="/docs/builtins.html#stroke" target="_blank"><code>stroke</code></a> command.
+        ⭐ a different <strong>outline color</strong>. Use the
+        <a href="/docs/builtins.html#stroke"><code>stroke</code></a> command.
       </li>
     </ul>
   </li>
 </ol>
-
-<p>
-  🧪 Explore and experiment! <br />
-  You don't need to understand all the code to make changes.
-</p>
+<h2>🧪 Explore and experiment!</h2>
+<p>You don't need to understand all the code to make changes.</p>

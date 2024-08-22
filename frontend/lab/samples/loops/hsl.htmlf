@@ -1,10 +1,8 @@
 <h1>🤹 HSL colors</h1>
-
 <p>
-  HSL stands for <strong>Hue, Saturation, Lightness</strong>. <br />
-  It's a way to describe how colors are created.
+  HSL stands for <strong>Hue, Saturation, Lightness</strong>. It's a way to describe how colors are
+  created.
 </p>
-
 <h2>🧪 Experiment!</h2>
 <ul>
   <li><strong>Run</strong> the program.</li>
@@ -15,7 +13,7 @@
   <summary>Where is the code? 🔎</summary>
   <p>
     The source code for this program is hidden, but if you're interested in how it works, you can
-    take a peek at the <a href="#hsl-code" target="_blank">full example</a>.
+    take a peek at the <a href="#hsl-code">full example</a>.
   </p>
 </details>
 <details>
@@ -36,5 +34,5 @@
     <strong>Alpha</strong> is the transparency of the color. It is a number between
     <code>0</code> and <code>1</code>. Optional, default <code>1</code>.
   </p>
-  <p>Explore the <a href="" target="_blank">HSL documentation</a> for more details.</p>
+  <p>Explore the <a href="/docs/builtins.html#hsl">HSL documentation</a> for more details.</p>
 </details>

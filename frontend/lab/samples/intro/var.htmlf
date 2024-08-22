@@ -1,25 +1,22 @@
 <h1>🧮 Variables</h1>
-
-<ul class="starlist">
+<ul>
   <li>
-    <em>Don't run the code yet!</em><br />
-    What will the first two
-    <a href="/docs/builtins.html#print" target="_blank"><code>print</code></a> commands show?
+    ⭐️ <em>Don't run the code yet!</em> What will the first two
+    <a href="/docs/builtins.html#print"><code>print</code></a> commands show?
   </li>
-  <li>What about the last two?</li>
-  <li>Can you print your name and your age using variables?</li>
+  <li>⭐️ What about the last two?</li>
+  <li>⭐️ Can you print your name and your age using variables?</li>
 </ul>
-
 <details>
   <summary>Understanding Variables 📖</summary>
   <p>In Evy, we create a variable and its type with the pattern:</p>
-  <pre><code><span class="ident">name:type</span></code></pre>
-  <p>
-    Let's <strong>declare</strong> the variable <code>x</code>, which can only store a number value:
-  </p>
-  <pre><code class="language-evy"><span class="ident">x</span><span class="punc">:</span><span class="keyword">num</span></code></pre>
-  <p>Now we can <strong>assign</strong> a value to it using the equality sign <code>=</code>:</p>
-  <pre><code class="language-evy"><span class="ident">x</span><span class="ws"> </span><span class="op">=</span><span class="ws"> </span><span class="num">3</span><span class="ws"> </span><span class="op">+</span><span class="ws"> </span><span class="num">4</span></code></pre>
-
+  <pre><code class="language-evy">name:type
+</code></pre>
+  <p>Let's <em>declare</em> the variable <code>x</code>, which can only store a number value:</p>
+  <pre><code class="language-evy">x:num
+</code></pre>
+  <p>Now we can <em>assign</em> a value to it using the equality sign <code>=</code>:</p>
+  <pre><code class="language-evy">x = 3 + 4
+</code></pre>
   <p>📌 A variable <em>must</em> be declared before it can be used.</p>
 </details>

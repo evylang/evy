@@ -32,7 +32,7 @@
   margin-bottom: 16px;
   font-size: 1.5rem;
 }
-:is(.notes h2, .notes h3, .notes h4, .notes summary) {
+.notes :is(h2, h3, h4, summary) {
   color: var(--color);
   font-size: 1rem;
   font-weight: 400;
@@ -83,16 +83,9 @@
 
 .notes ul,
 .notes ol {
-  margin: 12px 24px;
+  margin: 4px 16px 16px;
 }
 
-.notes .starlist {
-  margin: 4px 12px 12px;
-  list-style-type: "⭐ ";
-}
-.notes > .starlist {
-  margin-left: 24px;
-}
 .notes li {
   color: var(--color-dimmed);
   font-size: 0.875rem;
@@ -136,6 +129,11 @@
   margin-bottom: 24px;
 }
 
+.notes img {
+  width: 16rem;
+  max-width: 80%;
+}
+
 .notes table {
   border-collapse: collapse;
   margin: 16px 0 36px;
@@ -146,11 +144,15 @@
 .notes tr {
   border-top: 1px solid var(--border-color);
 }
-.notes table tr:first-child {
+.notes tr:first-child {
   border-top: none;
 }
-.notes th,
-.notes td {
+.notes th {
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--color-slightly-dimmed);
+}
+.notes :is(th, td) {
   text-align: left;
   line-height: 2;
   padding: 2px 24px;
@@ -158,38 +160,29 @@
     padding-left: 0px;
   }
 }
-.notes table.images tr {
-  border: none;
-}
-.notes table.images td {
+.notes :is(th, td):has(img) {
   padding: 2px;
 }
-.notes table.images img {
+.notes :is(th, td):has(img) {
+  padding: 2px;
+  border: none;
+}
+.notes table img {
   padding: 0;
   width: 100%;
   max-width: 100%;
 }
 
-.notes th {
-  font-weight: 600;
-  color: var(--color-slightly-dimmed);
+.youtube {
+  --youtube-width: 380px;
+  --aspect-ratio: calc(16 / 9);
+  margin: 32px auto;
+  display: block;
+  width: var(--youtube-width);
+  height: calc(var(--youtube-width) / var(--aspect-ratio));
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
 }
-
-.notes figure {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  color: var(--color-dimmed);
-  font-size: 0.875rem;
-}
-
-.notes img,
-.notes figcaption {
-  width: 16rem;
-  max-width: 80%;
-}
-
 .youtube {
   --youtube-width: 380px;
   --aspect-ratio: calc(16 / 9);
@@ -212,10 +205,10 @@
 }
 
 @media (hover: hover) {
-  .notes summary:hover {
-    color: var(--color-accent);
-  }
-  .notes details.small summary:hover {
-    color: var(--color-accent);
+  .notes summary {
+    &:hover,
+    &:hover code {
+      color: var(--color-accent);
+    }
   }
 }

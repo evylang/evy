@@ -513,35 +513,35 @@ func TestIndexErr(t *testing.T) {
 	}
 }
 
-func TestAssertion(t *testing.T) {
+func TestEvyTest(t *testing.T) {
 	rt := &testRT{}
 	rt.UnimplementedRuntime.print = rt.Print
 	eval := NewEvaluator(rt)
 	prog := `
-assert true
-assert 2 1+1
-assert "abc" "abc" "string comparison"
-assert "abc" "abc" "string comparison %q" "abc"
+test true
+test 2 1+1
+test "abc" "abc" "string comparison"
+test "abc" "abc" "string comparison %q" "abc"
 	`
 	err := eval.Run(prog)
 	assert.NoError(t, err)
-	assert.Equal(t, 0, eval.AssertInfo.FailCount())
-	assert.Equal(t, 4, eval.AssertInfo.SuccessCount())
+	assert.Equal(t, 0, eval.TestInfo.FailCount())
+	assert.Equal(t, 4, eval.TestInfo.SuccessCount())
 }
 
-func TestCompositeAssertion(t *testing.T) {
+func TestCompositeEvyTest(t *testing.T) {
 	progs := []string{
 		`
 got:[]num
-assert [] got`,
+test [] got`,
 		`got:{}[]{}[]num
-assert {} got`,
+test {} got`,
 		`got:[]any
 got = [1 2 3]
-assert [1 2 3] got`,
+test [1 2 3] got`,
 		`got:[]any
 got = [[1] [2 3]]
-assert [[1] [2 3]] got`,
+test [[1] [2 3]] got`,
 	}
 	for _, prog := range progs {
 		t.Run(prog, func(t *testing.T) {
@@ -550,21 +550,21 @@ assert [[1] [2 3]] got`,
 			eval := NewEvaluator(rt)
 			err := eval.Run(prog)
 			assert.NoError(t, err)
-			assert.Equal(t, 0, eval.AssertInfo.FailCount())
-			assert.Equal(t, 1, eval.AssertInfo.SuccessCount())
+			assert.Equal(t, 0, eval.TestInfo.FailCount())
+			assert.Equal(t, 1, eval.TestInfo.SuccessCount())
 		})
 	}
 }
 
-func TestFailedAssertion(t *testing.T) {
+func TestFailedEvyTest(t *testing.T) {
 	progs := map[string]string{
-		"assert false": "line 1 column 8: failed assertion: not true",
-		"assert 1 2":   "line 1 column 10: failed assertion: want != got: 1 != 2",
-		`assert "abc" "123" "string comparison"
-		`: `line 1 column 14: failed assertion: want != got: "abc" != "123" (string comparison)`,
+		"test false": "line 1 column 6: failed test: not true",
+		"test 1 2":   "line 1 column 8: failed test: want != got: 1 != 2",
+		`test "abc" "123" "string comparison"
+		`: `line 1 column 12: failed test: want != got: "abc" != "123" (string comparison)`,
 		`answer := 6*9
-		assert 42 answer "the answer is 42, not %v" answer
-		`: `line 2 column 13: failed assertion: want != got: 42 != 54 (the answer is 42, not 54)`,
+		test 42 answer "the answer is 42, not %v" answer
+		`: `line 2 column 11: failed test: want != got: 42 != 54 (the answer is 42, not 54)`,
 	}
 	for prog, want := range progs {
 		t.Run(prog, func(t *testing.T) {
@@ -572,109 +572,109 @@ func TestFailedAssertion(t *testing.T) {
 			rt.UnimplementedRuntime.print = rt.Print
 			eval := NewEvaluator(rt)
 			err := eval.Run(prog)
-			assert.Error(t, ErrAssert, err)
+			assert.Error(t, ErrTest, err)
 			assert.Equal(t, want, err.Error())
-			assert.Equal(t, 0, eval.AssertInfo.SuccessCount(), "%#v", eval.AssertInfo)
-			assert.Equal(t, 1, eval.AssertInfo.FailCount())
+			assert.Equal(t, 0, eval.TestInfo.SuccessCount(), "%#v", eval.TestInfo)
+			assert.Equal(t, 1, eval.TestInfo.FailCount())
 		})
 	}
 }
 
-func TestMultipleFailedAssertion(t *testing.T) {
+func TestMultipleFailedEvyTest(t *testing.T) {
 	prog := `
-assert true
-assert false
-assert 1 2
-assert 1 1
-assert "abc" "123" "custom message"
+test true
+test false
+test 1 2
+test 1 1
+test "abc" "123" "custom message"
 	`
 	rt := &testRT{}
 	rt.UnimplementedRuntime.print = rt.Print
 	eval := NewEvaluator(rt)
 	err := eval.Run(prog)
-	assert.Error(t, ErrAssert, err)
+	assert.Error(t, ErrTest, err)
 
-	assert.Equal(t, 2, eval.AssertInfo.SuccessCount())
-	assert.Equal(t, 3, eval.AssertInfo.FailCount())
-	assert.Equal(t, 5, eval.AssertInfo.TotalCount())
+	assert.Equal(t, 2, eval.TestInfo.SuccessCount())
+	assert.Equal(t, 3, eval.TestInfo.FailCount())
+	assert.Equal(t, 5, eval.TestInfo.TotalCount())
 
-	assertionErrors := AssertionErrors{}
-	assert.Equal(t, true, errors.As(err, &assertionErrors))
-	assert.Equal(t, 3, len(assertionErrors))
+	testErrors := TestErrors{}
+	assert.Equal(t, true, errors.As(err, &testErrors))
+	assert.Equal(t, 3, len(testErrors))
 
 	want := `
-line 3 column 8: failed assertion: not true
-line 4 column 10: failed assertion: want != got: 1 != 2
-line 6 column 14: failed assertion: want != got: "abc" != "123" (custom message)`[1:]
-	assert.Equal(t, want, assertionErrors.Error())
+line 3 column 6: failed test: not true
+line 4 column 8: failed test: want != got: 1 != 2
+line 6 column 12: failed test: want != got: "abc" != "123" (custom message)`[1:]
+	assert.Equal(t, want, testErrors.Error())
 
 	eval = NewEvaluator(rt)
-	eval.AssertInfo.FailFast = true
+	eval.TestInfo.FailFast = true
 	err = eval.Run(prog)
-	assert.Error(t, ErrAssert, err)
+	assert.Error(t, ErrTest, err)
 
-	assert.Equal(t, 1, eval.AssertInfo.SuccessCount())
-	assert.Equal(t, 1, eval.AssertInfo.FailCount())
-	assert.Equal(t, 2, eval.AssertInfo.TotalCount())
+	assert.Equal(t, 1, eval.TestInfo.SuccessCount())
+	assert.Equal(t, 1, eval.TestInfo.FailCount())
+	assert.Equal(t, 2, eval.TestInfo.TotalCount())
 }
 
-func TestFailedAssertionReporting(t *testing.T) {
+func TestFailedEvyTestReporting(t *testing.T) {
 	prog := `
-assert true
-assert false
-assert 1 2
-assert 1 1
-assert "abc" "123" "custom message"
+test true
+test false
+test 1 2
+test 1 1
+test "abc" "123" "custom message"
 	`
 	rt := &testRT{}
 	rt.UnimplementedRuntime.print = rt.Print
 	eval := NewEvaluator(rt)
-	eval.AssertInfo.NoAssertionSummary = true
+	eval.TestInfo.NoTestSummary = true
 	err := eval.Run(prog)
-	assert.Error(t, ErrAssert, err)
+	assert.Error(t, ErrTest, err)
 	assert.Equal(t, "", rt.b.String())
 
 	rt = &testRT{}
 	eval = NewEvaluator(rt)
 	err = eval.Run(prog)
-	assert.Error(t, ErrAssert, err)
+	assert.Error(t, ErrTest, err)
 	want := `
-❌ 3 failed assertions
-✔️ 2 passed assertions
+❌ 3 failed tests
+✔️ 2 passed tests
 `[1:]
 	assert.Equal(t, want, rt.b.String())
 
 	rt = &testRT{}
 	eval = NewEvaluator(rt)
-	eval.AssertInfo.FailFast = true
+	eval.TestInfo.FailFast = true
 	err = eval.Run(prog)
-	assert.Error(t, ErrAssert, err)
+	assert.Error(t, ErrTest, err)
 	want = `
-❌ 1 failed assertion
-✔️ 1 passed assertion
+❌ 1 failed test
+✔️ 1 passed test
 `[1:]
 	assert.Equal(t, want, rt.b.String())
 
 	prog = `
-assert true
-assert 1 1`
+test true
+test 1 1`
 	rt = &testRT{}
 	eval = NewEvaluator(rt)
 	err = eval.Run(prog)
 	assert.NoError(t, err)
 	want = `
-✅ 2 passed assertions
+✅ 2 passed tests
 `[1:]
 	assert.Equal(t, want, rt.b.String())
 
 	prog = `
-assert 1 1`
+test 1 1`
 	rt = &testRT{}
 	eval = NewEvaluator(rt)
 	err = eval.Run(prog)
 	assert.NoError(t, err)
 	want = `
-✅ 1 passed assertion
+✅ 1 passed test
 `[1:]
 	assert.Equal(t, want, rt.b.String())
 }
@@ -1417,7 +1417,7 @@ print n a m`
 	assert.Equal(t, want, got)
 }
 
-func TestTypeAssertion(t *testing.T) {
+func TestTypetest(t *testing.T) {
 	prog := `
 a := {v:[1 2 3]}
 b:any
@@ -1429,7 +1429,7 @@ print c`
 	assert.Equal(t, want, got)
 }
 
-func TestTypeAssertionErr(t *testing.T) {
+func TestTypetestErr(t *testing.T) {
 	// Note the zero value for any is a false bool
 	prog := `
 a:any

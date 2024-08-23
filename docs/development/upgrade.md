@@ -1,12 +1,13 @@
 # Upgrade Tools and Dependencies
 
 We attempt to upgrade tools and dependencies once a month. This upgrade process
-has four parts:
+has five parts:
 
 1. [Upgrade Hermitised Tools](#upgrade-hermitised-tools)
 2. [Upgrade Go Dependencies](#upgrade-go-dependencies)
 3. [Upgrade Frontend Tools](#upgrade-frontend-tools)
 4. [Upgrade Playwright](#upgrade-playwright)
+5. [Test External URLs](#test-external-urls)
 
 Each step should follow in the listed order and be committed separately. Ensure
 `make ci` still passes before continuing with the next step.
@@ -132,3 +133,11 @@ Commit changes and ensure the build still works with
 
 [Playwright]: https://playwright.dev/
 [Playwright Docker documentation]: https://playwright.dev/docs/docker
+
+## Test External URLs
+
+Run
+
+    make test-urls
+
+to check that all external URLs are reachable.

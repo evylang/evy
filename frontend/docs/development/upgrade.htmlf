@@ -1,12 +1,13 @@
 <h1>Upgrade Tools and Dependencies</h1>
 <p>
-  We attempt to upgrade tools and dependencies once a month. This upgrade process has four parts:
+  We attempt to upgrade tools and dependencies once a month. This upgrade process has five parts:
 </p>
 <ol>
   <li><a href="#upgrade-hermitised-tools">Upgrade Hermitised Tools</a></li>
   <li><a href="#upgrade-go-dependencies">Upgrade Go Dependencies</a></li>
   <li><a href="#upgrade-frontend-tools">Upgrade Frontend Tools</a></li>
   <li><a href="#upgrade-playwright">Upgrade Playwright</a></li>
+  <li><a href="#test-external-urls">Test External URLs</a></li>
 </ol>
 <p>
   Each step should follow in the listed order and be committed separately. Ensure
@@ -137,3 +138,10 @@ npx --prefix e2e playwright install
 <p>Commit changes and ensure the build still works with</p>
 <pre><code>make ci
 </code></pre>
+<h2>
+  <a id="test-external-urls" href="#test-external-urls" class="anchor">#</a>Test External URLs
+</h2>
+<p>Run</p>
+<pre><code>make test-urls
+</code></pre>
+<p>to check that all external URLs are reachable.</p>

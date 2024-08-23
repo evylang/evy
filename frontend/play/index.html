@@ -188,21 +188,18 @@
 
     <!-- Evy sharing dialog -->
     <dialog id="dialog-share">
-      <form method="dialog">
-        <header>
-          <h1>Share</h1>
-          <button class="icon-close"></button>
-        </header>
-        <main>
-          <p class="dialog-note hidden">⚠️ Code has <span class="err">errors</span>!</p>
-          <div class="copy">
-            <label for="share-url">Sharable URL</label>
-            <input type="text" id="share-url" />
-            <button type="button" class="icon-copy"></button>
-          </div>
-          <button class="primary">Done</button>
-        </main>
-      </form>
+      <header>
+        <h1>Share</h1>
+        <button class="icon-close"></button>
+      </header>
+      <main>
+        <p class="dialog-note hidden">⚠️ Code has <span class="err">errors</span>!</p>
+        <div class="copy">
+          <label for="share-url">Sharable URL</label>
+          <input type="text" id="share-url" />
+        </div>
+        <button class="primary" id="copy">Copy</button>
+      </main>
     </dialog>
 
     <!-- Evy loading dialog -->

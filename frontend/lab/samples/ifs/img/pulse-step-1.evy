@@ -1,0 +1,6 @@
+width 1
+clear "black"
+fill "none"
+stroke "blue"
+move 50 50
+circle 1

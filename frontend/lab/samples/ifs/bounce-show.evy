@@ -1,0 +1,18 @@
+x:num
+x = 10
+s:num
+s = 0.4
+width 1
+fill (hsl 0 0 0 3)
+stroke "springgreen"
+
+while true
+    clear (hsl 0 0 0 4)
+    move x 50
+    circle 10
+    x = x + s
+    if x < 10 or x > 90
+        s = -s
+    end
+    sleep 0.001
+end

@@ -34,7 +34,7 @@
     </g>
   </g>
   <g stroke-width="4">
-    <line x1="0" y1="0" x2="0" y2="0"></line>
+    <line x1="0" y1="1000" x2="0" y2="0"></line>
     <line x1="0" y1="1000" x2="1000" y2="1000"></line>
     <polyline points="1000,1000 980,985 980,1000 1000,1000"></polyline>
     <polyline points="0,0 15,20 0,20 0,0"></polyline>

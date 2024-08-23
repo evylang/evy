@@ -19,8 +19,13 @@ func TestRuntimeCircleRect(t *testing.T) {
 	rt.Color("red")
 	rt.Circle(10)
 	rt.Gridn(10, "hsl(0deg 100% 0% / 50%)")
-
 	assertSVG(t, "testdata/circle-rect.svg", rt)
+}
+
+func TestRuntimeQuarterCircle(t *testing.T) {
+	rt := newTestRuntime()
+	rt.Circle(100) // should be centered at 0 0
+	assertSVG(t, "testdata/quarter-circle.svg", rt)
 }
 
 func TestRuntimeEllipse(t *testing.T) {

@@ -1,15 +1,23 @@
-/* Make wider for 3 columns */
+/* Special treatment of 3 column layout */
+:root {
+  --notes-max-width: min(25vw, calc(20rem + 32px));
+  --editor-max-width: calc(36rem + 16px);
+}
+
 .max-width-wrapper:not(:has(.main > .hidden)) {
-  max-width: 84rem;
+  max-width: calc(var(--editor-max-width) + var(--notes-max-width) + var(--canvas-size) + 64px);
 }
 
 /* --- Notes -------------------------------------------------------- */
+.editor-wrap {
+  max-width: var(--editor-max-width);
+}
+
 .notes {
-  max-width: min(20rem, 25vw);
+  max-width: var(--notes-max-width);
   background: var(--background);
   border-radius: 6px;
   border: var(--editor-border);
-  margin: 0;
   font-family: var(--font-family);
   overflow-y: auto;
   height: 100%;
@@ -173,16 +181,6 @@
   max-width: 100%;
 }
 
-.youtube {
-  --youtube-width: 380px;
-  --aspect-ratio: calc(16 / 9);
-  margin: 32px auto;
-  display: block;
-  width: var(--youtube-width);
-  height: calc(var(--youtube-width) / var(--aspect-ratio));
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-}
 .youtube {
   --youtube-width: 380px;
   --aspect-ratio: calc(16 / 9);

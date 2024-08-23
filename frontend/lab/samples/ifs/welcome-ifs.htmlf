@@ -1,0 +1,15 @@
+<h1>👋 Welcome to the <code>if</code> Lab</h1>
+<p>Hit <strong>Run</strong> to see a blue, pulsing shape 🧿👉.</p>
+<p>This is what we'll build in this lab!</p>
+<p>
+  The <code>if</code> statement is key here. It lets your code make decisions, adding logic and
+  interactivity.
+</p>
+<p>
+  ⭐ Observe the animation. What kind of <em>decisions</em> would the code need to make while it's
+  running to create the pulsing effect?
+</p>
+<details>
+  <summary>💡 Tip</summary>
+  <p>Focus on when the animation changes direction.</p>
+</details>

@@ -1,0 +1,12 @@
+blue := (hsl 240 100 50 100)
+yellow := (hsl 60 100 50 100)
+
+color "red"
+move 50 50
+circle 30
+
+color blue
+move 0 0
+rect 50 100
+
+color yellow

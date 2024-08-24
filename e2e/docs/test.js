@@ -64,6 +64,7 @@ for (const baseURL of baseURLs) {
       await link.hover()
       await expect(page).toHaveScreenshot("comment-hover.png", sreenshotOpts)
       await link.click()
+      await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("comment-page.png", sreenshotOpts)
     })
 

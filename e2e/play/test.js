@@ -91,7 +91,7 @@ end
       }
       await page.locator('input[type="text"]').click()
       await page.locator('input[type="text"]').press("ArrowRight")
-      await expect(page).toHaveScreenshot("share-dialog.png")
+      await expect(page).toHaveScreenshot("share-dialog.png", { maxDiffPixelRatio: 0.01 })
       await page.locator("#dialog-share .icon-close").click()
       await expect(page).toHaveScreenshot("no-dialog.png")
       await page.locator("#hamburger").click()

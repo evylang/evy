@@ -23,13 +23,13 @@ func sameCaseKey:bool m:{}string
     return up != low
 end
 
-func test
-    assert true (sameCaseKey {p:"pineapple" b:"banana"})
-    assert false (sameCaseKey {p:"pineapple" A:"banana" B:"banana"})
-    assert false (sameCaseKey {p:"pineapple" _:"banana" a:"apple"})
-    assert false (sameCaseKey {Name:"John" Age:"36" City:"Houston"})
-    assert true (sameCaseKey {STATE:"NC" ZIP:"12345"})
-    assert true (sameCaseKey {fruit:"Orange" taste:"Sweet"})
+func testAll
+    test true (sameCaseKey {p:"pineapple" b:"banana"})
+    test false (sameCaseKey {p:"pineapple" A:"banana" B:"banana"})
+    test false (sameCaseKey {p:"pineapple" _:"banana" a:"apple"})
+    test false (sameCaseKey {Name:"John" Age:"36" City:"Houston"})
+    test true (sameCaseKey {STATE:"NC" ZIP:"12345"})
+    test true (sameCaseKey {fruit:"Orange" taste:"Sweet"})
 end
 
-test
+testAll

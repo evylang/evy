@@ -31,12 +31,12 @@ func spaceString:string n:num
     return "-"
 end
 
-func test
-    assert "Example" (replaceSpaces "Example")
-    assert "Mudasir_Hanif_" (replaceSpaces "Mudasir Hanif ")
-    assert "Yellow_Yellow__Dirty__Fellow" (replaceSpaces "Yellow Yellow  Dirty  Fellow")
-    assert "Exa-mple" (replaceSpaces "Exa   mple")
-    assert "-Exa_1_2_2_mple" (replaceSpaces "   Exa 1 2 2 mple")
+func testAll
+    test "Example" (replaceSpaces "Example")
+    test "Mudasir_Hanif_" (replaceSpaces "Mudasir Hanif ")
+    test "Yellow_Yellow__Dirty__Fellow" (replaceSpaces "Yellow Yellow  Dirty  Fellow")
+    test "Exa-mple" (replaceSpaces "Exa   mple")
+    test "-Exa_1_2_2_mple" (replaceSpaces "   Exa 1 2 2 mple")
 end
 
-test
+testAll

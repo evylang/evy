@@ -41,15 +41,15 @@ func binOnes:num n:num
     return result
 end
 
-func test
-    assert [1 2 4 3 5] (binSort [1 5 2 3 4])
-    assert [-4 -2 -6 -5 -3] (binSort [-2 -3 -4 -5 -6])
-    assert [0 1 2 4 3] (binSort [1 0 2 3 4])
-    assert [] (binSort [])
-    assert [2 2 4 4 3 3 5 5 5 7 77] (binSort [2 5 77 4 5 3 5 7 2 3 4])
-    assert [32 3 5 6 12 44] (binSort [3 6 44 12 32 5])
-    assert [2 4 8 16 32] (binSort [2 4 8 16 32])
-    assert [2 4 8 16 32] (binSort [2 4 8 16 32])
+func testAll
+    test [1 2 4 3 5] (binSort [1 5 2 3 4])
+    test [-4 -2 -6 -5 -3] (binSort [-2 -3 -4 -5 -6])
+    test [0 1 2 4 3] (binSort [1 0 2 3 4])
+    test [] (binSort [])
+    test [2 2 4 4 3 3 5 5 5 7 77] (binSort [2 5 77 4 5 3 5 7 2 3 4])
+    test [32 3 5 6 12 44] (binSort [3 6 44 12 32 5])
+    test [2 4 8 16 32] (binSort [2 4 8 16 32])
+    test [2 4 8 16 32] (binSort [2 4 8 16 32])
 end
 
-test
+testAll

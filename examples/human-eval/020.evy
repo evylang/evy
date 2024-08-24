@@ -27,12 +27,12 @@ func findClosest:[]num nums:[]num
     return result
 end
 
-func test
-    assert [3.9 4] (findClosest [1 2 3.9 4 5 2.2])
-    assert [5 5.9] (findClosest [1 2 5.9 4 5])
-    assert [2 2.2] (findClosest [1 2 3 4 5 2.2])
-    assert [2 2] (findClosest [1 2 3 4 5 2])
-    assert [2.2 3.1] (findClosest [1.1 2.2 3.1 4.1 5.1])
+func testAll
+    test [3.9 4] (findClosest [1 2 3.9 4 5 2.2])
+    test [5 5.9] (findClosest [1 2 5.9 4 5])
+    test [2 2.2] (findClosest [1 2 3 4 5 2.2])
+    test [2 2] (findClosest [1 2 3 4 5 2])
+    test [2.2 3.1] (findClosest [1.1 2.2 3.1 4.1 5.1])
 end
 
-test
+testAll

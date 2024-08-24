@@ -11,12 +11,12 @@ func derivative:[]num xs:[]num
     return result
 end
 
-func test
-    assert [1 4 12 20] (derivative [3 1 2 4 5])
-    assert [2 6] (derivative [1 2 3])
-    assert [2 2] (derivative [3 2 1])
-    assert [2 2 0 16] (derivative [3 2 1 0 4])
-    assert [] (derivative [1])
+func testAll
+    test [1 4 12 20] (derivative [3 1 2 4 5])
+    test [2 6] (derivative [1 2 3])
+    test [2 2] (derivative [3 2 1])
+    test [2 2 0 16] (derivative [3 2 1 0 4])
+    test [] (derivative [1])
 end
 
-test
+testAll

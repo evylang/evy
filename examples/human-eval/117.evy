@@ -28,14 +28,14 @@ func selectWords:[]string s:string targetConsonants:num
     return result
 end
 
-func test
-    assert ["little"] (selectWords "Mary had a little lamb" 4)
-    assert ["Mary" "lamb"] (selectWords "Mary had a little lamb" 3)
-    assert [] (selectWords "simple white space" 2)
-    assert ["world"] (selectWords "Hello world" 4)
-    assert ["Uncle"] (selectWords "Uncle sam" 3)
-    assert [] (selectWords "" 4)
-    assert ["b" "c" "d" "f"] (selectWords "a b c d e f" 1)
+func testAll
+    test ["little"] (selectWords "Mary had a little lamb" 4)
+    test ["Mary" "lamb"] (selectWords "Mary had a little lamb" 3)
+    test [] (selectWords "simple white space" 2)
+    test ["world"] (selectWords "Hello world" 4)
+    test ["Uncle"] (selectWords "Uncle sam" 3)
+    test [] (selectWords "" 4)
+    test ["b" "c" "d" "f"] (selectWords "a b c d e f" 1)
 end
 
-test
+testAll

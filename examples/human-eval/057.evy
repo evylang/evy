@@ -23,15 +23,15 @@ func sort arr:[]num inc:bool
     end
 end
 
-func test
-    assert true (monotonic [1 2 4 10])
-    assert true (monotonic [1 2 4 20])
-    assert false (monotonic [1 20 4 10])
-    assert true (monotonic [4 1 0 -10])
-    assert true (monotonic [4 1 1 0])
-    assert false (monotonic [1 2 3 2 5 60])
-    assert true (monotonic [1 2 3 4 5 60])
-    assert true (monotonic [9 9 9 9])
+func testAll
+    test true (monotonic [1 2 4 10])
+    test true (monotonic [1 2 4 20])
+    test false (monotonic [1 20 4 10])
+    test true (monotonic [4 1 0 -10])
+    test true (monotonic [4 1 1 0])
+    test false (monotonic [1 2 3 2 5 60])
+    test true (monotonic [1 2 3 4 5 60])
+    test true (monotonic [9 9 9 9])
 end
 
-test
+testAll

@@ -74,10 +74,10 @@ func newBuiltins(rt Runtime) builtins {
 		"has": {Func: builtinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: builtinFunc(delFunc), Decl: delDecl},
 
-		"sleep":  {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
-		"exit":   {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
-		"panic":  {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
-		"assert": {Func: assertFunc, Decl: assertDecl},
+		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":  {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic": {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"test":  {Func: testFunc, Decl: testDecl},
 
 		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
@@ -532,25 +532,25 @@ func panicFunc(_ *scope, args []value) (value, error) {
 	return nil, PanicError(s)
 }
 
-var assertDecl = &parser.FuncDefStmt{
-	Name:          "assert",
+var testDecl = &parser.FuncDefStmt{
+	Name:          "test",
 	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func assertFunc(_ *scope, args []value) (value, error) {
-	if err := validateAssertArgs(args); err != nil {
+func testFunc(_ *scope, args []value) (value, error) {
+	if err := validateTestArgs(args); err != nil {
 		return nil, err
 	}
 	if len(args) == 1 {
 		if !args[0].(*anyVal).V.(*boolVal).V {
-			return nil, fmt.Errorf(`%w: not true`, ErrAssert)
+			return nil, fmt.Errorf(`%w: not true`, ErrTest)
 		}
 	} else {
 		want := args[0]
 		got := args[1]
 		if !same(want, got) {
-			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrAssert, want.Repr(), got.Repr(), assertMessage(args))
+			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrTest, want.Repr(), got.Repr(), testMessage(args))
 		}
 	}
 	return nil, nil
@@ -628,24 +628,24 @@ func sameMap(want, got *mapVal) bool {
 	return true
 }
 
-func validateAssertArgs(args []value) error {
+func validateTestArgs(args []value) error {
 	if len(args) == 0 {
-		return fmt.Errorf(`%w: "assert" expects at least one argument`, ErrBadArguments)
+		return fmt.Errorf(`%w: "test" expects at least one argument`, ErrBadArguments)
 	}
 	if len(args) == 1 {
 		if _, ok := args[0].(*anyVal).V.(*boolVal); !ok {
-			return fmt.Errorf(`%w: "assert" with one argument expects bool argument`, ErrBadArguments)
+			return fmt.Errorf(`%w: "test" with one argument expects bool argument`, ErrBadArguments)
 		}
 	}
 	if len(args) > 2 {
 		if _, ok := args[2].(*anyVal).V.(*stringVal); !ok {
-			return fmt.Errorf(`%w: "assert" with three or more argument expects third argument to be string message`, ErrBadArguments)
+			return fmt.Errorf(`%w: "test" with three or more argument expects third argument to be string message`, ErrBadArguments)
 		}
 	}
 	return nil
 }
 
-func assertMessage(args []value) string {
+func testMessage(args []value) string {
 	if len(args) <= 2 {
 		return ""
 	}

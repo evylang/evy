@@ -28,11 +28,11 @@ func separateParenGroups:[]string paren_string:string
     return result
 end
 
-func test
-    assert ["(()())" "((()))" "()" "((())()())"] (separateParenGroups "(()()) ((())) () ((())()())")
-    assert ["()" "(())" "((()))" "(((())))"] (separateParenGroups "() (()) ((())) (((())))")
-    assert ["(()(())((())))"] (separateParenGroups "(()(())((())))")
-    assert ["()" "(())" "(()())"] (separateParenGroups "( ) (( )) (( )( ))")
+func testAll
+    test ["(()())" "((()))" "()" "((())()())"] (separateParenGroups "(()()) ((())) () ((())()())")
+    test ["()" "(())" "((()))" "(((())))"] (separateParenGroups "() (()) ((())) (((())))")
+    test ["(()(())((())))"] (separateParenGroups "(()(())((())))")
+    test ["()" "(())" "(()())"] (separateParenGroups "( ) (( )) (( )( ))")
 end
 
-test
+testAll

@@ -19,19 +19,19 @@ func checkBrackets:bool input:string
     return depth == 0
 end
 
-func test
-    assert true (checkBrackets "()")
-    assert true (checkBrackets "(()())")
-    assert true (checkBrackets "()()(()())()")
-    assert true (checkBrackets "()()((()()())())(()()(()))")
-    assert false (checkBrackets "((()())))")
-    assert false (checkBrackets ")(()")
-    assert false (checkBrackets "(")
-    assert false (checkBrackets "((((")
-    assert false (checkBrackets ")")
-    assert false (checkBrackets "(()")
-    assert false (checkBrackets "()()(()())())(()")
-    assert false (checkBrackets "()()(()())()))()")
+func testAll
+    test true (checkBrackets "()")
+    test true (checkBrackets "(()())")
+    test true (checkBrackets "()()(()())()")
+    test true (checkBrackets "()()((()()())())(()()(()))")
+    test false (checkBrackets "((()())))")
+    test false (checkBrackets ")(()")
+    test false (checkBrackets "(")
+    test false (checkBrackets "((((")
+    test false (checkBrackets ")")
+    test false (checkBrackets "(()")
+    test false (checkBrackets "()()(()())())(()")
+    test false (checkBrackets "()()(()())()))()")
 end
 
-test
+testAll

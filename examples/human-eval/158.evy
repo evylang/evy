@@ -44,17 +44,17 @@ func uniques:num s:string
     return len m
 end
 
-func test
-    assert "string" (maxUniques ["name" "of" "string"])
-    assert "enam" (maxUniques ["name" "enam" "game"])
-    assert "aaaaaaa" (maxUniques ["aaaaaaa" "bb" "cc"])
-    assert "abc" (maxUniques ["abc" "cba"])
-    assert "footbott" (maxUniques ["play" "this" "game" "of" "footbott"])
-    assert "gonna" (maxUniques ["we" "are" "gonna" "rock"])
-    assert "nation" (maxUniques ["we" "are" "a" "mad" "nation"])
-    assert "this" (maxUniques ["this" "is" "a" "prrk"])
-    assert "b" (maxUniques ["b"])
-    assert "play" (maxUniques ["play" "play" "play"])
+func testAll
+    test "string" (maxUniques ["name" "of" "string"])
+    test "enam" (maxUniques ["name" "enam" "game"])
+    test "aaaaaaa" (maxUniques ["aaaaaaa" "bb" "cc"])
+    test "abc" (maxUniques ["abc" "cba"])
+    test "footbott" (maxUniques ["play" "this" "game" "of" "footbott"])
+    test "gonna" (maxUniques ["we" "are" "gonna" "rock"])
+    test "nation" (maxUniques ["we" "are" "a" "mad" "nation"])
+    test "this" (maxUniques ["this" "is" "a" "prrk"])
+    test "b" (maxUniques ["b"])
+    test "play" (maxUniques ["play" "play" "play"])
 end
 
-test
+testAll

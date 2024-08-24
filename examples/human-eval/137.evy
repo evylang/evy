@@ -27,15 +27,15 @@ func toNum:num a:any
     return str2num sn
 end
 
-func test
-    assert 2 (compare 1 2)
-    assert 2.5 (compare 1 2.5)
-    assert 3 (compare 2 3)
-    assert 6 (compare 5 6)
-    assert "2,3" (compare 1 "2,3")
-    assert "6" (compare "5,1" "6")
-    assert "2" (compare "1" "2")
-    assert false (compare "1" 1)
+func testAll
+    test 2 (compare 1 2)
+    test 2.5 (compare 1 2.5)
+    test 3 (compare 2 3)
+    test 6 (compare 5 6)
+    test "2,3" (compare 1 "2,3")
+    test "6" (compare "5,1" "6")
+    test "2" (compare "1" "2")
+    test false (compare "1" 1)
 end
 
-test
+testAll

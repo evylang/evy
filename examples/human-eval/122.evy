@@ -16,12 +16,12 @@ func solve:num nums:[]num k:num
     return result
 end
 
-func test
-    assert -4 (solve [1 -2 -3 41 57 76 87 88 99] 3)
-    assert 0 (solve [111 121 3 4000 5 6] 2)
-    assert 125 (solve [11 21 3 90 5 6 7 8 9] 4)
-    assert 24 (solve [111 21 3 4000 5 6 7 8 9] 4)
-    assert 1 (solve [1] 1)
+func testAll
+    test -4 (solve [1 -2 -3 41 57 76 87 88 99] 3)
+    test 0 (solve [111 121 3 4000 5 6] 2)
+    test 125 (solve [11 21 3 90 5 6 7 8 9] 4)
+    test 24 (solve [111 21 3 4000 5 6 7 8 9] 4)
+    test 1 (solve [1] 1)
 end
 
-test
+testAll

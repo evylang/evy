@@ -10,10 +10,10 @@ end
 
 empty_string_array:[]string
 
-func test
-    assert empty_string_array (allPrefixes "")
-    assert ["a" "as" "asd" "asdf" "asdfg" "asdfgh"] (allPrefixes "asdfgh")
-    assert ["W" "WW" "WWW"] (allPrefixes "WWW")
+func testAll
+    test empty_string_array (allPrefixes "")
+    test ["a" "as" "asd" "asdf" "asdfg" "asdfgh"] (allPrefixes "asdfgh")
+    test ["W" "WW" "WWW"] (allPrefixes "WWW")
 end
 
-test
+testAll

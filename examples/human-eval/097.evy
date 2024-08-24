@@ -14,15 +14,15 @@ func multiply:num a:num b:num
     return result
 end
 
-func test
-    assert 16 (multiply 148 412)
-    assert 72 (multiply 19 28)
-    assert 0 (multiply 2020 1851)
-    assert 20 (multiply 14 -15)
-    assert 42 (multiply 76 67)
-    assert 49 (multiply 17 27)
-    assert 0 (multiply 0 1)
-    assert 0 (multiply 0 0)
+func testAll
+    test 16 (multiply 148 412)
+    test 72 (multiply 19 28)
+    test 0 (multiply 2020 1851)
+    test 20 (multiply 14 -15)
+    test 42 (multiply 76 67)
+    test 49 (multiply 17 27)
+    test 0 (multiply 0 1)
+    test 0 (multiply 0 0)
 end
 
-test
+testAll

@@ -11,9 +11,9 @@ func filterByPrefix:[]string strings:[]string prefix:string
     return result
 end
 
-func test
-    assert [] (filterByPrefix [] "john")
-    assert ["xxx" "xxxAAA" "xxx"] (filterByPrefix ["xxx" "asd" "xxy" "john doe" "xxxAAA" "xxx"] "xxx")
+func testAll
+    test [] (filterByPrefix [] "john")
+    test ["xxx" "xxxAAA" "xxx"] (filterByPrefix ["xxx" "asd" "xxy" "john doe" "xxxAAA" "xxx"] "xxx")
 end
 
-test
+testAll

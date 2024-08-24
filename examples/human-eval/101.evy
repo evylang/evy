@@ -14,13 +14,13 @@ func words:[]string s:string
     return result
 end
 
-func test
-    assert ["Hi" "my" "name" "is" "John"] (words "Hi, my name is John")
-    assert ["One" "two" "three" "four" "five" "six"] (words "One, two, three, four, five, six")
-    assert ["Hi" "my" "name"] (words "Hi, my name")
-    assert ["One" "two" "three" "four" "five" "six"] (words "One,, two, three, four, five, six,")
-    assert [] (words "")
-    assert ["ahmed" "gamal"] (words "ahmed     , gamal")
+func testAll
+    test ["Hi" "my" "name" "is" "John"] (words "Hi, my name is John")
+    test ["One" "two" "three" "four" "five" "six"] (words "One, two, three, four, five, six")
+    test ["Hi" "my" "name"] (words "Hi, my name")
+    test ["One" "two" "three" "four" "five" "six"] (words "One,, two, three, four, five, six,")
+    test [] (words "")
+    test ["ahmed" "gamal"] (words "ahmed     , gamal")
 end
 
-test
+testAll

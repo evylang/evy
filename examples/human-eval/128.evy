@@ -31,15 +31,15 @@ func sign:num n:num
     return 0
 end
 
-func test
-    assert -9 (signedAbsSum [1 2 2 -4])
-    assert 0 (signedAbsSum [0 1])
-    assert -10 (signedAbsSum [1 1 1 2 3 -1 1])
-    assert false (signedAbsSum [])
-    assert 20 (signedAbsSum [2 4 1 2 -1 -1 9])
-    assert 4 (signedAbsSum [-1 1 -1 1])
-    assert -4 (signedAbsSum [-1 1 1 1])
-    assert 0 (signedAbsSum [-1 1 1 0])
+func testAll
+    test -9 (signedAbsSum [1 2 2 -4])
+    test 0 (signedAbsSum [0 1])
+    test -10 (signedAbsSum [1 1 1 2 3 -1 1])
+    test false (signedAbsSum [])
+    test 20 (signedAbsSum [2 4 1 2 -1 -1 9])
+    test 4 (signedAbsSum [-1 1 -1 1])
+    test -4 (signedAbsSum [-1 1 1 1])
+    test 0 (signedAbsSum [-1 1 1 0])
 end
 
-test
+testAll

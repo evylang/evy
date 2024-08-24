@@ -11,12 +11,12 @@ func collisions:num n:num
     return n * n
 end
 
-func test
-    assert 4 (collisions 2)
-    assert 9 (collisions 3)
-    assert 16 (collisions 4)
-    assert 64 (collisions 8)
-    assert 100 (collisions 10)
+func testAll
+    test 4 (collisions 2)
+    test 9 (collisions 3)
+    test 16 (collisions 4)
+    test 64 (collisions 8)
+    test 100 (collisions 10)
 end
 
-test
+testAll

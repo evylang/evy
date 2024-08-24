@@ -17,14 +17,14 @@ func set:{}bool s:string
     return result
 end
 
-func test
-    assert true (sameChars "eabcdzzzz" "dddzzzzzzzddeddabc")
-    assert true (sameChars "abcd" "dddddddabc")
-    assert true (sameChars "dddddddabc" "abcd")
-    assert false (sameChars "eabcd" "dddddddabc")
-    assert false (sameChars "abcd" "dddddddabcf")
-    assert false (sameChars "eabcdzzzz" "dddzzzzzzzddddabc")
-    assert false (sameChars "aabb" "aaccc")
+func testAll
+    test true (sameChars "eabcdzzzz" "dddzzzzzzzddeddabc")
+    test true (sameChars "abcd" "dddddddabc")
+    test true (sameChars "dddddddabc" "abcd")
+    test false (sameChars "eabcd" "dddddddabc")
+    test false (sameChars "abcd" "dddddddabcf")
+    test false (sameChars "eabcdzzzz" "dddzzzzzzzddddabc")
+    test false (sameChars "aabb" "aaccc")
 end
 
-test
+testAll

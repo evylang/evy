@@ -15,17 +15,17 @@ func xIfPrime:num n:num x:num y:num
     return x
 end
 
-func test
-    assert 34 (xIfPrime 7 34 12)
-    assert 5 (xIfPrime 15 8 5)
-    assert 33 (xIfPrime 3 33 5212)
-    assert 3 (xIfPrime 1259 3 52)
-    assert -1 (xIfPrime 7919 -1 12)
-    assert 583 (xIfPrime 3609 1245 583)
-    assert 129 (xIfPrime 91 56 129)
-    assert 1234 (xIfPrime 6 34 1234)
-    assert 0 (xIfPrime 1 2 0)
-    assert 2 (xIfPrime 2 2 0)
+func testAll
+    test 34 (xIfPrime 7 34 12)
+    test 5 (xIfPrime 15 8 5)
+    test 33 (xIfPrime 3 33 5212)
+    test 3 (xIfPrime 1259 3 52)
+    test -1 (xIfPrime 7919 -1 12)
+    test 583 (xIfPrime 3609 1245 583)
+    test 129 (xIfPrime 91 56 129)
+    test 1234 (xIfPrime 6 34 1234)
+    test 0 (xIfPrime 1 2 0)
+    test 2 (xIfPrime 2 2 0)
 end
 
-test
+testAll

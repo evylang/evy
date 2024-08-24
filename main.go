@@ -101,13 +101,13 @@ func main() {
 }
 
 type runCmd struct {
-	Source             string `arg:"" help:"Source file. Default: stdin." default:"-"`
-	SkipSleep          bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
-	SVGOut             string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
-	SVGStyle           string `help:"Style of top-level SVG element." placeholder:"STYLE"`
-	NoAssertionSummary bool   `short:"s" help:"Do not print assertion summary, only report failed assertion(s)."`
-	FailFast           bool   `help:"Stop execution on first failed assertion."`
-	Txtar              string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
+	Source        string `arg:"" help:"Source file. Default: stdin." default:"-"`
+	SkipSleep     bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
+	SVGOut        string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
+	SVGStyle      string `help:"Style of top-level SVG element." placeholder:"STYLE"`
+	NoTestSummary bool   `short:"s" help:"Do not print test summary, only report failed tests."`
+	FailFast      bool   `help:"Stop execution on first failed test."`
+	Txtar         string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
 }
 
 type fmtCmd struct {
@@ -154,8 +154,8 @@ func (c *runCmd) Run() error {
 	rt := cli.NewRuntime(c.runtimeOptions()...)
 
 	eval := evaluator.NewEvaluator(rt)
-	eval.AssertInfo.NoAssertionSummary = c.NoAssertionSummary
-	eval.AssertInfo.FailFast = c.FailFast
+	eval.TestInfo.NoTestSummary = c.NoTestSummary
+	eval.TestInfo.FailFast = c.FailFast
 	evyErr := eval.Run(string(b))
 	if !errors.As(evyErr, &parser.Errors{}) {
 		// even if there was an evaluator error, we want to write as much of the SVG that was produced.

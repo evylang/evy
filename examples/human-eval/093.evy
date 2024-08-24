@@ -22,12 +22,12 @@ func encode:string str:string
     return result
 end
 
-func test
-    assert "tgst" (encode "TEST")
-    assert "mWDCSKR" (encode "Mudasir")
-    assert "ygs" (encode "YES")
-    assert "tHKS KS C MGSSCGG" (encode "This is a message")
-    assert "k dQnT kNqW wHcT Tq wRkTg" (encode "I DoNt KnOw WhAt tO WrItE")
+func testAll
+    test "tgst" (encode "TEST")
+    test "mWDCSKR" (encode "Mudasir")
+    test "ygs" (encode "YES")
+    test "tHKS KS C MGSSCGG" (encode "This is a message")
+    test "k dQnT kNqW wHcT Tq wRkTg" (encode "I DoNt KnOw WhAt tO WrItE")
 end
 
-test
+testAll

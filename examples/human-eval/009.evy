@@ -16,11 +16,11 @@ func rollingMax:[]num numbers:[]num
     return result
 end
 
-func test
-    assert [] (rollingMax [])
-    assert [1 2 3 4] (rollingMax [1 2 3 4])
-    assert [4 4 4 4] (rollingMax [4 3 2 1])
-    assert [3 3 3 100 100] (rollingMax [3 2 3 100 3])
+func testAll
+    test [] (rollingMax [])
+    test [1 2 3 4] (rollingMax [1 2 3 4])
+    test [4 4 4 4] (rollingMax [4 3 2 1])
+    test [3 3 3 100 100] (rollingMax [3 2 3 100 3])
 end
 
-test
+testAll

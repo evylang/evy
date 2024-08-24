@@ -16,16 +16,16 @@ func convertBase:string n:num base:num
     return result
 end
 
-func test
-    assert "22" (convertBase 8 3)
-    assert "100" (convertBase 9 3)
-    assert "11101010" (convertBase 234 2)
-    assert "10000" (convertBase 16 2)
-    assert "1000" (convertBase 8 2)
-    assert "111" (convertBase 7 2)
+func testAll
+    test "22" (convertBase 8 3)
+    test "100" (convertBase 9 3)
+    test "11101010" (convertBase 234 2)
+    test "10000" (convertBase 16 2)
+    test "1000" (convertBase 8 2)
+    test "111" (convertBase 7 2)
     for x := range 9
-        assert (sprint x) (convertBase x x+1)
+        test (sprint x) (convertBase x x+1)
     end
 end
 
-test
+testAll

@@ -22,11 +22,11 @@ func compare:[]num scores:[]num guesses:[]num
     return result
 end
 
-func test
-    assert [0 0 0 0 3 3] (compare [1 2 3 4 5 1] [1 2 3 4 2 -2])
-    assert [0 0 0 0 0 0] (compare [0 0 0 0 0 0] [0 0 0 0 0 0])
-    assert [2 4 6] (compare [1 2 3] [-1 -2 -3])
-    assert [2 0 0 1] (compare [1 2 3 5] [-1 2 3 4])
+func testAll
+    test [0 0 0 0 3 3] (compare [1 2 3 4 5 1] [1 2 3 4 2 -2])
+    test [0 0 0 0 0 0] (compare [0 0 0 0 0 0] [0 0 0 0 0 0])
+    test [2 4 6] (compare [1 2 3] [-1 -2 -3])
+    test [2 0 0 1] (compare [1 2 3 5] [-1 2 3 4])
 end
 
-test
+testAll

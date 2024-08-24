@@ -13,10 +13,10 @@ func stringXor:string a:string b:string
     return res
 end
 
-func test
-    assert "010010" (stringXor "111000" "101010")
-    assert "0" (stringXor "1" "1")
-    assert "0101" (stringXor "0101" "0000")
+func testAll
+    test "010010" (stringXor "111000" "101010")
+    test "0" (stringXor "1" "1")
+    test "0101" (stringXor "0101" "0000")
 end
 
-test
+testAll

@@ -21,14 +21,14 @@ func digitProd:num n:num
     return 0
 end
 
-func test
-    assert 5 (digitProd 5)
-    assert 5 (digitProd 54)
-    assert 1 (digitProd 120)
-    assert 5 (digitProd 5014)
-    assert 315 (digitProd 98765)
-    assert 2625 (digitProd 5576543)
-    assert 0 (digitProd 2468)
+func testAll
+    test 5 (digitProd 5)
+    test 5 (digitProd 54)
+    test 1 (digitProd 120)
+    test 5 (digitProd 5014)
+    test 315 (digitProd 98765)
+    test 2625 (digitProd 5576543)
+    test 0 (digitProd 2468)
 end
 
-test
+testAll

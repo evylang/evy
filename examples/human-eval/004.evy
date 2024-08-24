@@ -20,10 +20,10 @@ func sum:num numbers:[]num
     return total
 end
 
-func test
-    assert true ((abs ((meanAbsoluteDeviation [1 2 3]) - 2 / 3)) < 0.000001)
-    assert true ((abs ((meanAbsoluteDeviation [1 2 3 4]) - 1)) < 0.000001)
-    assert true ((abs ((meanAbsoluteDeviation [1 2 3 4 5]) - 6 / 5)) < 0.000001)
+func testAll
+    test true ((abs ((meanAbsoluteDeviation [1 2 3]) - 2 / 3)) < 0.000001)
+    test true ((abs ((meanAbsoluteDeviation [1 2 3 4]) - 1)) < 0.000001)
+    test true ((abs ((meanAbsoluteDeviation [1 2 3 4 5]) - 6 / 5)) < 0.000001)
 end
 
-test
+testAll

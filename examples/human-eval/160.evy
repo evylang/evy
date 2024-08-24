@@ -56,14 +56,14 @@ func solveOp:num a:num op:string b:num
     return -1
 end
 
-func test
-    assert 14 (solve ["+" "*"] [2 3 4])
-    assert 9 (solve ["+" "*" "-"] [2 3 4 5])
-    assert 8 (solve ["//" "*"] [7 3 4])
-    assert 7 (solve ["+" "*"] [1 2 3])
-    assert 5 (solve ["*" "+"] [1 2 3])
-    assert 14 (solve ["*" "+" "*"] [1 2 3 4])
-    assert 11 (solve ["+" "*" "+"] [1 2 3 4])
+func testAll
+    test 14 (solve ["+" "*"] [2 3 4])
+    test 9 (solve ["+" "*" "-"] [2 3 4 5])
+    test 8 (solve ["//" "*"] [7 3 4])
+    test 7 (solve ["+" "*"] [1 2 3])
+    test 5 (solve ["*" "+"] [1 2 3])
+    test 14 (solve ["*" "+" "*"] [1 2 3 4])
+    test 11 (solve ["+" "*" "+"] [1 2 3 4])
 end
 
-test
+testAll

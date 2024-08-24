@@ -14,16 +14,16 @@ func int:bool n:num
     return n == (round n)
 end
 
-func test
-    assert true (sum 2 3 1)
-    assert false (sum 2.5 2 3)
-    assert false (sum 1.5 5 3.5)
-    assert false (sum 2 6 2)
-    assert true (sum 4 2 2)
-    assert false (sum 2.2 2.2 2.2)
-    assert true (sum -4 6 2)
-    assert true (sum 2 1 1)
-    assert true (sum 3 4 7)
+func testAll
+    test true (sum 2 3 1)
+    test false (sum 2.5 2 3)
+    test false (sum 1.5 5 3.5)
+    test false (sum 2 6 2)
+    test true (sum 4 2 2)
+    test false (sum 2.2 2.2 2.2)
+    test true (sum -4 6 2)
+    test true (sum 2 1 1)
+    test true (sum 3 4 7)
 end
 
-test
+testAll

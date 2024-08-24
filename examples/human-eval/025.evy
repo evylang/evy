@@ -22,15 +22,15 @@ func factorize:[]num n:num
     return result
 end
 
-func test
-    assert [2] (factorize 2)
-    assert [2 2] (factorize 4)
-    assert [2 2 2] (factorize 8)
-    assert [3 19] (factorize 3*19)
-    assert [3 3 19 19] (factorize 3*19*3*19)
-    assert [3 3 3 19 19 19] (factorize 3*19*3*19*3*19)
-    assert [3 19 19 19] (factorize 3*19*19*19)
-    assert [2 3 3] (factorize 3*2*3)
+func testAll
+    test [2] (factorize 2)
+    test [2 2] (factorize 4)
+    test [2 2 2] (factorize 8)
+    test [3 19] (factorize 3*19)
+    test [3 3 19 19] (factorize 3*19*3*19)
+    test [3 3 3 19 19 19] (factorize 3*19*3*19*3*19)
+    test [3 19 19 19] (factorize 3*19*19*19)
+    test [2 3 3] (factorize 3*2*3)
 end
 
-test
+testAll

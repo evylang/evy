@@ -60,17 +60,16 @@ You can also get help for each subcommand by running it with the
       [<source>]    Source file. Default: stdin.
 
     Flags:
-      -h, --help                    Show context-sensitive help.
-      -V, --version                 Print version information
+      -h, --help               Show context-sensitive help.
+      -V, --version            Print version information
 
-          --skip-sleep              Skip evy sleep command ($EVY_SKIP_SLEEP).
-          --svg-out=FILE            Output drawing to SVG file. Stdout: -.
-          --svg-style=STYLE         Style of top-level SVG element.
-      -s, --no-assertion-summary    Do not print assertion summary, only report
-                                    failed assertion(s).
-          --fail-fast               Stop execution on first failed assertion.
-      -t, --txtar=MEMBER            Read source from txtar file and select select
-                                    given filename
+          --skip-sleep         Skip evy sleep command ($EVY_SKIP_SLEEP).
+          --svg-out=FILE       Output drawing to SVG file. Stdout: -.
+          --svg-style=STYLE    Style of top-level SVG element.
+      -s, --no-test-summary    Do not print test summary, only report failed tests.
+          --fail-fast          Stop execution on first failed test.
+      -t, --txtar=MEMBER       Read source from txtar file and select select given
+                               filename
 
 <!-- genend -->
 

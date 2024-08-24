@@ -18,20 +18,20 @@ func isPrime:bool n:num
     return true
 end
 
-func test
-    assert false (isPrime 6)
-    assert true (isPrime 101)
-    assert true (isPrime 11)
-    assert true (isPrime 13441)
-    assert true (isPrime 61)
-    assert false (isPrime 4)
-    assert false (isPrime 1)
-    assert true (isPrime 5)
-    assert true (isPrime 11)
-    assert true (isPrime 17)
-    assert false (isPrime 5*17)
-    assert false (isPrime 11*7)
-    assert false (isPrime 13441*19)
+func testAll
+    test false (isPrime 6)
+    test true (isPrime 101)
+    test true (isPrime 11)
+    test true (isPrime 13441)
+    test true (isPrime 61)
+    test false (isPrime 4)
+    test false (isPrime 1)
+    test true (isPrime 5)
+    test true (isPrime 11)
+    test true (isPrime 17)
+    test false (isPrime 5*17)
+    test false (isPrime 11*7)
+    test false (isPrime 13441*19)
 end
 
-test
+testAll

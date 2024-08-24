@@ -18,15 +18,15 @@ func encrypt:string s:string
     return result
 end
 
-func test
-    assert "lm" (encrypt "hi")
-    assert "ewhjklnop" (encrypt "asdfghjkl")
-    assert "kj" (encrypt "gf")
-    assert "ix" (encrypt "et")
-    assert "jeiajeaijeiak" (encrypt "faewfawefaewg")
-    assert "lippsqcjvmirh" (encrypt "hellomyfriend")
-    assert "hbdhpqrmpjylqmpyjlpmlyjrqpmqryjlpmqryjljygyjl" (encrypt "dxzdlmnilfuhmilufhlihufnmlimnufhlimnufhfucufh")
-    assert "e" (encrypt "a")
+func testAll
+    test "lm" (encrypt "hi")
+    test "ewhjklnop" (encrypt "asdfghjkl")
+    test "kj" (encrypt "gf")
+    test "ix" (encrypt "et")
+    test "jeiajeaijeiak" (encrypt "faewfawefaewg")
+    test "lippsqcjvmirh" (encrypt "hellomyfriend")
+    test "hbdhpqrmpjylqmpyjlpmlyjrqpmqryjlpmqryjljygyjl" (encrypt "dxzdlmnilfuhmilufhlihufnmlimnufhlimnufhfucufh")
+    test "e" (encrypt "a")
 end
 
-test
+testAll

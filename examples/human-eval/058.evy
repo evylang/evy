@@ -50,11 +50,11 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [1 5 653] (common [1 4 3 34 653 2 5] [5 7 1 5 9 653 121])
-    assert [2 3] (common [5 3 2 8] [3 2])
-    assert [2 3 4] (common [4 3 2 8] [3 2 4])
-    assert [] (common [4 3 2 8] [])
+func testAll
+    test [1 5 653] (common [1 4 3 34 653 2 5] [5 7 1 5 9 653 121])
+    test [2 3] (common [5 3 2 8] [3 2])
+    test [2 3 4] (common [4 3 2 8] [3 2 4])
+    test [] (common [4 3 2 8] [])
 end
 
-test
+testAll

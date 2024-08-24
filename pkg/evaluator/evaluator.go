@@ -14,11 +14,11 @@ import (
 //   - ErrStopped is returned when the program has been stopped externally.
 //   - ErrPanic and errors wrapping ErrPanic report runtime errors, such as an index out of bounds error.
 //   - ErrInternal and errors wrapping ErrInternal report internal errors of the evaluator or AST. These errors should not occur.
-//   - ErrAssert and errors wrapping ErrAssert for failed assertions.
+//   - ErrTest and errors wrapping ErrTest for failed tests.
 var (
 	ErrStopped = errors.New("stopped")
 
-	ErrAssert = errors.New("failed assertion")
+	ErrTest = errors.New("failed test")
 
 	ErrPanic         = errors.New("panic")
 	ErrIndexValue    = fmt.Errorf("%w: index not an integer", ErrPanic)
@@ -90,17 +90,17 @@ func newErr(node parser.Node, err error) *Error {
 	return &Error{Token: node.Token(), err: err}
 }
 
-// AssertionErrors is an Evy evaluator error list associated with multiple
-// failed assertions.
-type AssertionErrors []error
+// TestErrors is an Evy evaluator error list associated with multiple
+// failed tests.
+type TestErrors []error
 
 // Unwrap returns the wrapped error.
-func (e AssertionErrors) Unwrap() []error {
+func (e TestErrors) Unwrap() []error {
 	return e
 }
 
-// Error prints all assertion errors separated by newline.
-func (e AssertionErrors) Error() string {
+// Error prints all test errors separated by newline.
+func (e TestErrors) Error() string {
 	s := make([]string, len(e))
 	for i, err := range e {
 		s[i] = err.Error()
@@ -141,7 +141,7 @@ type Evaluator struct {
 	// https://github.com/tinygo-org/tinygo/issues/2735.
 	Stopped           bool
 	EventHandlerNames []string
-	AssertInfo        AssertInfo
+	TestInfo          TestInfo
 
 	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	builtins      builtins
@@ -193,12 +193,12 @@ type Yielder interface {
 // true, evaluation is stopped and [ErrStopped] is returned.
 func (e *Evaluator) Eval(prog *parser.Program) error {
 	_, err := e.eval(prog)
-	e.AssertInfo.Report(e.builtins.Runtime.Print)
+	e.TestInfo.Report(e.builtins.Runtime.Print)
 	if err != nil {
 		return err
 	}
-	if len(e.AssertInfo.errors) != 0 {
-		return AssertionErrors(e.AssertInfo.errors)
+	if len(e.TestInfo.errors) != 0 {
+		return TestErrors(e.TestInfo.errors)
 	}
 	return err
 }
@@ -434,16 +434,16 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 	builtin, ok := e.builtins.Funcs[funcCall.Name]
 	if ok {
 		val, err := builtin.Func(e.scope, args)
-		if funcCall.Name == "assert" {
-			e.AssertInfo.total++
-			if errors.Is(err, ErrAssert) {
+		if funcCall.Name == "test" {
+			e.TestInfo.total++
+			if errors.Is(err, ErrTest) {
 				token := funcCall.Arguments[0]
 				if len(funcCall.Arguments) > 1 {
 					token = funcCall.Arguments[1]
 				}
-				assertErr := newErr(token, err)
-				e.AssertInfo.errors = append(e.AssertInfo.errors, assertErr)
-				if !e.AssertInfo.FailFast {
+				testErr := newErr(token, err)
+				e.TestInfo.errors = append(e.TestInfo.errors, testErr)
+				if !e.TestInfo.FailFast {
 					err = nil
 				}
 			}

@@ -209,7 +209,7 @@
                     <a href="builtins.html#panic"><code>panic</code></a>
                   </li>
                   <li>
-                    <a href="builtins.html#assert"><code>assert</code></a>
+                    <a href="builtins.html#test"><code>test</code></a>
                   </li>
                 </ul>
               </li>
@@ -616,17 +616,16 @@ Arguments:
   [&lt;source&gt;]    Source file. Default: stdin.
 
 Flags:
-  -h, --help                    Show context-sensitive help.
-  -V, --version                 Print version information
+  -h, --help               Show context-sensitive help.
+  -V, --version            Print version information
 
-      --skip-sleep              Skip evy sleep command ($EVY_SKIP_SLEEP).
-      --svg-out=FILE            Output drawing to SVG file. Stdout: -.
-      --svg-style=STYLE         Style of top-level SVG element.
-  -s, --no-assertion-summary    Do not print assertion summary, only report
-                                failed assertion(s).
-      --fail-fast               Stop execution on first failed assertion.
-  -t, --txtar=MEMBER            Read source from txtar file and select select
-                                given filename
+      --skip-sleep         Skip evy sleep command ($EVY_SKIP_SLEEP).
+      --svg-out=FILE       Output drawing to SVG file. Stdout: -.
+      --svg-style=STYLE    Style of top-level SVG element.
+  -s, --no-test-summary    Do not print test summary, only report failed tests.
+      --fail-fast          Stop execution on first failed test.
+  -t, --txtar=MEMBER       Read source from txtar file and select select given
+                           filename
 </code></pre>
         <!-- genend -->
         <h3><a id="evy-fmt-help" href="#evy-fmt-help" class="anchor">#</a>evy fmt --help</h3>

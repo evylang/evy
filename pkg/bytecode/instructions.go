@@ -45,5 +45,5 @@ func fmtInstruction(def *OpDefinition, operands []int) string {
 // instruction at opPosition with the given operand.
 // The width of the operand must be 2.
 func (ins Instructions) changeOperand(opPosition int, operand int) {
-	binary.BigEndian.PutUint16(ins[opPosition+1:], uint16(operand))
+	binary.BigEndian.PutUint16(ins[opPosition+1:], uint16(operand)) //nolint:gosec // we are just going to be lax about overflow errors at the moment
 }

@@ -52,7 +52,7 @@
       <div class="max-width-wrapper">
         <h1>Upgrade Tools and Dependencies</h1>
         <p>
-          We attempt to upgrade tools and dependencies once a month. This upgrade process has four
+          We attempt to upgrade tools and dependencies once a month. This upgrade process has five
           parts:
         </p>
         <ol>
@@ -60,6 +60,7 @@
           <li><a href="#upgrade-go-dependencies">Upgrade Go Dependencies</a></li>
           <li><a href="#upgrade-frontend-tools">Upgrade Frontend Tools</a></li>
           <li><a href="#upgrade-playwright">Upgrade Playwright</a></li>
+          <li><a href="#test-external-urls">Test External URLs</a></li>
         </ol>
         <p>
           Each step should follow in the listed order and be committed separately. Ensure
@@ -102,6 +103,11 @@ go mod tidy
         <pre><code>go -C learn get -u ./...
 go -C learn mod tidy
 </code></pre>
+        <p>
+          Verify that the Go version specified in the <code>go.mod</code> files matches the Go
+          version that Hermit installs, which has potentially been upgraded in the prior step. If
+          necessary, change the Go version in the <code>go.mod</code> files.
+        </p>
         <p>Commit changes and ensure the build still works with</p>
         <pre><code>make ci
 </code></pre>
@@ -114,9 +120,8 @@ go -C learn mod tidy
           <a href="https://prettier.io/">prettier</a> or
           <a href="https://stylelint.io/">stylelint</a>. From the repository root directory run
         </p>
-        <pre><code>cd .hermit/node/
-npx -y npm-check-updates -u
-npm install
+        <pre><code>npx --prefix .hermit/node -y npm-check-updates --packageFile .hermit/node/package.json -u
+npm --prefix .hermit/node install
 </code></pre>
         <p>Commit changes and ensure the build still works with</p>
         <pre><code>make ci
@@ -138,10 +143,9 @@ npm install
           browser testing.
         </p>
         <p>From the repository root directory run</p>
-        <pre><code>cd e2e
-npx -y npm-check-updates -u
-npm install
-npx playwright install
+        <pre><code>npx --prefix e2e -y npm-check-updates --packageFile e2e/package.json -u
+npm --prefix e2e install
+npx --prefix e2e playwright install
 </code></pre>
         <p>
           If a new version of Playwright has been installed, also update the Docker image version of
@@ -192,6 +196,14 @@ npx playwright install
         <p>Commit changes and ensure the build still works with</p>
         <pre><code>make ci
 </code></pre>
+        <h2>
+          <a id="test-external-urls" href="#test-external-urls" class="anchor">#</a>Test External
+          URLs
+        </h2>
+        <p>Run</p>
+        <pre><code>make test-urls
+</code></pre>
+        <p>to check that all external URLs are reachable.</p>
       </div>
     </main>
 

@@ -17,7 +17,7 @@ including any text or drawings that your code generates.
 ![Screenshot of the Evy web playground](img/playground-screenshot.png)
 
 [playground]: https://play.evy.dev
-[Syntax by Example]: https://docs.evy.dev/syntax_by_example.html
+[Syntax by Example]: https://docs.evy.dev/syntax-by-example.html
 [Language Specification]: https://docs.evy.dev/spec.html
 
 ## Hello world in Evy

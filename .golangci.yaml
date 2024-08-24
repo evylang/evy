@@ -19,6 +19,7 @@ linters:
     - execinquery
     - exhaustive
     - exhaustruct
+    - exportloopref
     - forbidigo
     - forcetypeassert
     - funlen

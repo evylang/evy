@@ -85,10 +85,9 @@ We use [Playwright] for automated end-to-end and browser testing.
 
 From the repository root directory run
 
-    cd e2e
-    npx -y npm-check-updates -u
-    npm install
-    npx playwright install
+    npx --prefix e2e -y npm-check-updates --packageFile e2e/package.json -u
+    npm --prefix e2e install
+    npx --prefix e2e playwright install
 
 If a new version of Playwright has been installed, also update the Docker image
 version of Playwright used in Makefile and on CI.

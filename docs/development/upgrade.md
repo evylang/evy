@@ -67,9 +67,8 @@ Commit changes and ensure the build still works with
 Upgrade other NPM frontend formatting and linting tools such as [prettier] or
 [stylelint]. From the repository root directory run
 
-    cd .hermit/node/
-    npx -y npm-check-updates -u
-    npm install
+    npx --prefix .hermit/node -y npm-check-updates --packageFile .hermit/node/package.json -u
+    npm --prefix .hermit/node install
 
 Commit changes and ensure the build still works with
 

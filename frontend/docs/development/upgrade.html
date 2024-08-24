@@ -119,9 +119,8 @@ go -C learn mod tidy
           <a href="https://prettier.io/">prettier</a> or
           <a href="https://stylelint.io/">stylelint</a>. From the repository root directory run
         </p>
-        <pre><code>cd .hermit/node/
-npx -y npm-check-updates -u
-npm install
+        <pre><code>npx --prefix .hermit/node -y npm-check-updates --packageFile .hermit/node/package.json -u
+npm --prefix .hermit/node install
 </code></pre>
         <p>Commit changes and ensure the build still works with</p>
         <pre><code>make ci

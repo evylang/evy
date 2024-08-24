@@ -54,6 +54,10 @@ and the same again for the `evy/learn` sub-module
     go -C learn get -u ./...
     go -C learn mod tidy
 
+Verify that the Go version specified in the `go.mod` files matches the Go
+version that Hermit installs, which has potentially been upgraded in the prior
+step. If necessary, change the Go version in the `go.mod` files.
+
 Commit changes and ensure the build still works with
 
     make ci

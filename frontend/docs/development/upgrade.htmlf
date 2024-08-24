@@ -49,6 +49,11 @@ go mod tidy
 <pre><code>go -C learn get -u ./...
 go -C learn mod tidy
 </code></pre>
+<p>
+  Verify that the Go version specified in the <code>go.mod</code> files matches the Go version that
+  Hermit installs, which has potentially been upgraded in the prior step. If necessary, change the
+  Go version in the <code>go.mod</code> files.
+</p>
 <p>Commit changes and ensure the build still works with</p>
 <pre><code>make ci
 </code></pre>

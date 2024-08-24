@@ -204,7 +204,7 @@ func Make(op Opcode, operands ...int) ([]byte, error) {
 	for i, o := range operands {
 		width := def.OperandWidths[i]
 		if width == 2 {
-			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
+			binary.BigEndian.PutUint16(instruction[offset:], uint16(o)) //nolint:gosec // we are just going to be lax about overflow errors at the moment
 		}
 		offset += width
 	}

@@ -26,6 +26,12 @@ html {
   height: 100%;
   padding: 8px 16px var(--editor-padding-bottom) 16px;
   scroll-behavior: smooth;
+  position: relative;
+}
+.notes:after {
+  content: "";
+  display: block;
+  height: 80%;
 }
 
 @media (min-width: 768px) {

@@ -1,14 +1,21 @@
 # 💬 Let's Chat
 
-⭐ **Before you run the code:** Can you predict what will happen?
+## ⭐ Intro
 
-Now, hit **Run** and see if you were right!
+**Read** the code. What do you think will happen when you run it?
 
-⭐ **Think about it:** What's the purpose of the `:=` operator?
+**Run** the code. Was it what you expected?
 
-## [>] `:=` Declaration with type inference 📖
+[Next]
+
+## ⭐ Type Inference
+
+Note the new `:=` operator. Have a guess how it works.
+
+## [>] Docs
 
 In Evy, you can declare a variable and assign it a value in one step using `:=`.
+This is called **Declaration with Type Inference**.
 
 Instead of
 
@@ -23,12 +30,14 @@ you can use the shortcut
 s := "banana"
 ```
 
----
+[Next]
 
-⭐ **Challenge:** Can you add a different response if the answer is "no"? Use
-`else if` to create an alternative message.
+## ⭐ Add `else if`
 
-### [>] Code hint 🧚
+Can you add a different response to the program if the answer is `"no"`? Use `else
+if` to create an alternative message.
+
+### [>] Hint
 
 ```evy
 if answer == "yes"
@@ -40,18 +49,22 @@ else
 end
 ```
 
----
+[Next]
 
-⭐ **Your turn:** Can you create your own chat bot?
+## ⭐ Your Turn
 
-### [>] Some ideas
+Can you create your own chat bot?
 
-- 🍦 Ask about their favorite ice cream flavor instead of cookies.
-- 🎁 Ask if they want to open a surprise.
-  - If they say `"yes"`, reveal the surprise (let your imagination run wild 🐉).
-  - If they say `"no"`, respond with something like "And so it remains my secret
-    🔒".
-  - If they say anything else, respond with "I don't understand."
+### Some ideas
+
+🍦 Ask about their favorite ice cream flavor instead of cookies.
+
+🎁 Ask if they want to open a surprise.
+
+- If they say `"yes"`, reveal the surprise (let your imagination run wild 🐉).
+- If they say `"no"`, respond with something like `"And so it remains my secret
+🔒"`.
+- If they say anything else, respond with `"I don't understand."`
 
 You could also ask about their favorite color, band, or football team and
 respond accordingly!

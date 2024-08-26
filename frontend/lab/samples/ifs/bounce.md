@@ -5,6 +5,8 @@
 Check out the [bouncing ball page 🏓📺](#bounce-show) or observe the
 animation below.
 
+## Demo
+
 <details>
   <summary>Animation demo</summary>
   <p><img src="samples/ifs/img/bounce.gif" alt="small centered circle" /></p>
@@ -27,7 +29,7 @@ animation below.
 ⭐ Finally, to change direction at the edges use the reversible increment trick
 from the [Pulse challenge](#pulse).
 
-### [>] Code hint 🧚
+### [>] Hint
 
 Inside the loop body add:
 

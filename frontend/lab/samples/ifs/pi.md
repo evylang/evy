@@ -1,26 +1,38 @@
 # 🥧 Monte Carlo 💕 π
 
-This lab shows how to estimate the mathematical constant π (pi) using a Monte
-Carlo algorithm.
+## ⭐ Introduction
 
-- ⭐ What do you know about **π**?
-- ⭐ Do you know the **area** of a circle with radius `1`?
+This lab shows how to estimate the mathematical constant **π** (pi) using
+a **Monte Carlo algorithm**.
 
-## Quarter circle
+- What do you know about **π**?
+- Do you know the **area** of a circle with radius `1`?
+
+## [>] Docs
+
+A **Monte Carlo algorithm** is a computer program that simulates the behavior of
+other systems. It's not a method that gives you a perfectly precise answer, but
+rather an approximate one, often relying on **randomness** and **statistics**
+to reach a result. The more times you run it, the closer you get to the true
+answer.
+
+[Next]
+
+## ⭐ Quarter circle
 
 ![quarter circle](samples/ifs/img/quarter-circle.svg)
 
-⭐ What's the **area** of the red **quarter-circle** if the radius is `1`? Can
+What's the **area** of the red **quarter-circle** if the radius is `1`? Can
 you estimate it to the nearest tenth?
 
-⭐ What's the total **area** of the **square** (including both the red and black
+What's the total **area** of the **square** (including both the red and black
 areas)?
 
-⭐ If we place a dot **randomly** within the square, what's the **probability**
+If we place a dot **randomly** within the square, what's the **probability**
 it will land inside the red quarter-circle? Does your answer make sense
 visually?
 
-### [>] Math hint 🧮
+### [>] Hint
 
 - **Square Area:** If the width of the square is `1`, its area is `1 * 1 = 1`.
 
@@ -32,7 +44,7 @@ visually?
 
 - **Probability:** The probability of a random point landing inside the red
   quarter-circle is the ratio of the quarter-circle's area to the square's
-  area: `(π / 4) / 1 = π / 4`. This is about 0.8, which seems visually
+  area: `(π / 4) / 1 = π / 4`. This is about `0.8`, which seems visually
   reasonable.
 
 - **Estimating π:** This means if we randomly place many dots within the square,
@@ -41,17 +53,17 @@ visually?
   more dots we place, the more precise our estimate of π should become. Let's
   put this theory to the test!
 
-## Let's get coding
+[Next]
 
-⭐ **Your Task:** Modify the code on the right to draw `"red"` dots for points
-inside the quarter-circle, just like in the image above.
+## ⭐ Draw a Red Quarter Circle
+
+Modify the code on the right to draw `"red"` dots for points inside the
+quarter-circle, just like in the image above.
 
 Use the [`sqrt`] function to calculate the distance from each dot to the
 circle's center at `0 0`.
 
 [`sqrt`]: /docs/builtins.html#sqrt
-
-### [>] Math hint 🧮
 
 The distance from the circle's center at `0 0` to any point `x y` is calculated
 using the Pythagorean theorem `a² + b² = c²`:
@@ -66,7 +78,7 @@ If this distance is less than or equal to `1`, the point lies within the
 quarter-circle and should be colored red. (Remember, we're scaling `x` and `y`
 by 100 when positioning the dots, as the Evy canvas is 100 by 100.)
 
-### [>] Code hint 🧚
+### [>] Hint
 
 Add the following code inside the loop after declaring `x` and `y` and before
 drawing the circle.
@@ -80,19 +92,17 @@ else
 end
 ```
 
----
+[Next]
 
-## Estimate π
+## ⭐ Estimate π
 
-⭐ Can you calculate π by tallying up red dots and black dots?
-
-### [>] Math hint 🧮
+Can you calculate π by tallying up red dots and black dots?
 
 We know the total number of points is `i`. Let's count the `"red"` dots in the
 variable `reds`. We'll then calculate the ratio of `reds / i` and multiply by
 `4` to get an estimate of π.
 
-### [>] Code hint 🧚
+### [>] Hint
 
 At the top of your code, add:
 
@@ -114,16 +124,8 @@ And at the bottom of the loop, add:
 ```evy
 while // ...
   // ...
-  pi := reds / total * 4
+  pi := reds / i * 4
   cls // clears the text output
   print "PI: " pi
 end
 ```
-
-## [>] Monte Carlo Algorithm 📖
-
-A **Monte Carlo algorithm** is a computer program that simulates the behavior of
-other systems. It's not a method that gives you a perfectly precise answer, but
-rather an approximate one, often relying on **randomness** and **statistics**
-to reach a result. The more times you run it, the closer you get to the true
-answer.

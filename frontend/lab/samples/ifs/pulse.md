@@ -1,39 +1,47 @@
 # 🧿 Pulse
 
-⭐ **Your Task:** Write a program that draws a small blue circle.
+## ⭐ 1 Little Blue Circle
+
+Write a program that draws:
 
 ![small centered circle](samples/ifs/img/pulse-step-1.svg)
 
-- Background (`clear`): `"black"`
-- Circle outline width: `1`
-- Circle fill color: `"none"`
-- Circle outline color (`stroke`): `"blue"`
-- Initial radius: `1`
+- Background: `"black"`
+- Outline width: `1`
+- Fill color: `"none"`
+- Outline color (`stroke`): `"blue"`
+- Radius: `1`
 
-### [>] Code hint 🧚
+### [>] Hint
 
 ```evy
-width ❓
 clear ❓
+width ❓
 fill ❓
 stroke ❓
+
 move 50 ❓
 circle ❓
 ```
 
----
+[Next]
 
-⭐ **Enhance your program:** Create this drawing of concentric circles:
+## ⭐ Many Circles
 
-![small centered circle](samples/ifs/img/pulse-step-2.svg)
+Extend your program to draw:
 
-- Use a variable `r` for the circle radius, starting at `1`.
-- Within a loop:
-  - Draw the circle with radius `r`.
-  - Increase the radius `r` by `2` in each loop iteration.
-- Keep looping as long as the radius `r` is less than `45`.
+![many concentric circles](samples/ifs/img/pulse-step-2.svg)
 
-### [>] Code hint 🧚
+Use a variable `r` for the circle radius, starting at `1`.
+
+Within a loop:
+
+- Draw the circle with radius `r`.
+- Increase `r` by `2`.
+
+Keep looping as long as the radius `r` is less than `45`.
+
+### [>] Hint
 
 ```evy
 r := ❓
@@ -43,16 +51,18 @@ while r < ❓
 end
 ```
 
----
+[Next]
 
-⭐ Add a `sleep` of `0.1` seconds after drawing each circle to create an
+## ⭐ Animate
+
+Add a `sleep` of `0.1` seconds after drawing each circle to create an
 animation.
 
-### [>] Animation demo
+### [>] Demo
 
 ![small centered circle](samples/ifs/img/pulse-step-3.gif)
 
-### [>] Code hint 🧚
+### [>] Hint
 
 ```evy
 while r < __
@@ -62,17 +72,20 @@ while r < __
 end
 ```
 
----
+[Next]
 
-⭐ Now, at the beginning of each loop iteration, add a nearly transparent black overlay.
+## ⭐ Add Transparency
 
-Use `clear` with `hsl 0 0 0 15` to achieve the fading effect.
+Add a **nearly transparent black** overlay at the beginning of each loop
+iteration to create a fading effect.
 
-### [>] Animation demo
+Use `clear` with `hsl 0 0 0 15`.
+
+### [>] Demo
 
 ![small centered circle](samples/ifs/img/pulse-step-4.gif)
 
-### [>] Code hint 🧚
+### [>] Hint
 
 ```evy
 while r < __
@@ -83,25 +96,29 @@ while r < __
 end
 ```
 
----
+[Next]
 
-⭐ Make the animation smoother.
+## ⭐ Tweak for a Smooth Animation
 
-Reduce the loop increment, sleep duration, and alpha value.
+Reduce the
 
-### [>] Animation demo
+- loop increment
+- sleep duration
+- alpha value
+
+### [>] Demo
 
 ![small centered circle](samples/ifs/img/pulse-step-5.gif)
 
-### [>] Code hint 🧚
+### [>] Hint
 
 - increment: r = r + 0.1
 - sleep: 0.001 seconds
 - alpha: hsl 0 0 0 1
 
----
+[Next]
 
-⭐ **Final step: the pulse**
+## ⭐ Add the Pulse
 
 Let's make the circle continuously grow and shrink.
 
@@ -126,7 +143,7 @@ end
 **Reverse the Change:** Inside the loop, check if `r` goes below 1 or above 45.
 If it does, flip the sign of `inc` to reverse the animation's direction.
 
-### [>] Code Hint 🧚
+### [>] Hint
 
 ```evy
 inc := 0.1

@@ -1,16 +1,16 @@
 # 💫 Loops
 
+## ⭐️ Introduction
+
 Can you change this program to
 
-- ⭐️ `print` the numbers from `0` to `20`?
-- ⭐️ `sleep` only `0.2` seconds?
-- ⭐️ `print` even numbers only?
-- ⭐️ `print` odd numbers only?
+- `print` the numbers from `0` to `20`?
+- `sleep` only `0.2` seconds?
 
-# [>] Understanding Loops 📖
+# [>] Docs
 
-A loop in programming is a powerful way to automate repetitive tasks. In Evy, a loop is created
-using the `while` keyword.
+A **loop** in programming is a powerful way to automate repetitive tasks. In
+Evy, a loop is created using the `while` keyword.
 
 Here's the basic structure:
 
@@ -25,3 +25,12 @@ end
 - **loop_condition**: As long as this condition is true, the loop repeats.
 - **loop_body**: Instructions to be repeated.
 - `end`: End of the loop.
+
+[Next]
+
+## ⭐️ Update the Loop
+
+Can you change this program to
+
+- `print` even numbers only?
+- `print` odd numbers only?

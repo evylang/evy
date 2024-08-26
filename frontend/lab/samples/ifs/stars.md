@@ -1,16 +1,21 @@
 # ✨ Random Stars
 
-⭐ Write a program that draws:
+## ⭐ Introduction
+
+Write a program that draws:
 
 - A black background using `clear`
 - A `"white"` circle with radius `1` anywhere on the canvas.
 
-⭐ Use the [`rand`] function to generate random coordinates for your white
-circle.
+[Next]
 
-`rand n` generates a random whole numbers between 0 and `n`.
+## ⭐ Random Position
 
-## [>] Code hint 🧚
+Use the [`rand`] function to generate random coordinates for your white circle.
+
+`rand n` generates a random whole numbers between `0` and `n`.
+
+## [>] Hint
 
 ```evy
 x := rand 100
@@ -21,14 +26,16 @@ circle ❓
 
 [`rand`]: /docs/builtins.html#rand
 
----
+[Next]
 
-⭐ Draw `200` circles with radius `1` in random positions.
+## ⭐ 200 Circles
+
+Draw `200` circles with radius `1` in random positions.
 
 - You'll need a loop for this.
 - Make sure to generate new random coordinates **inside** the loop.
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 i := 0
@@ -39,27 +46,32 @@ while i ❓
 end
 ```
 
----
+[Next]
 
-⭐ Make the circle sizes random between `0` and `0.6`.
+## ⭐ 200 Stars
+
+Make the circle sizes random between `0` and `0.6`.
 
 - Use the [`rand1`] function to get a random number between 0 and 1.
+  (`rand1` has _no_ space before the`1` !)
 - Multiply that random number by `0.6` to scale it to the desired range.
 
 [`rand1`]: /docs/builtins.html#rand1
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 size := (rand1) * 0.6
 circle size
 ```
 
----
+[Next]
 
-⭐ Change the color of 10% or your circles to `"gold"`
+## ⭐ Sprinkle a Bit of Gold
 
-## [>] Code hint 🧚
+Change the color of 10% or your circles to `"gold"`
+
+## [>] Hint
 
 ```evy
 c := rand1
@@ -70,7 +82,11 @@ else
 end
 ```
 
----
+[Next]
 
-⭐ Make it your own. Change the number of stars, sizes and colors to create your
-favorite night sky.
+## ⭐ Make It Your Own
+
+Change the number of stars, sizes and colors to create your
+favorite night sky - here's [mine].
+
+[mine]: https://play.evy.dev/#content=H4sIAAAAAAAAA2WO0QqDMAxF3/sVlz5tDqQ+yGDox7g2m8HOSnVT/360HUyRQMJNTi5XW2o85N02upOCcauhxNyyJTAqlEoJAFjCwTe9KaJc91I7694ecm55IhlXL/chLFmhFNbQE7d/4wc0Kqg8ya3T01mTjMiOtCHLA2qIhoH77o8fkE0u6k2cY4hyilnOyKDya3LW7LUljNmvUlDUYFxQiPD+BRnfw+AzAQAA

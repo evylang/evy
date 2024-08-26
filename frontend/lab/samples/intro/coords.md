@@ -7,12 +7,12 @@ Can you figure out the coordinates?
 3. What are the coordinates of the red dot? 🔴
 4. **Tap** the canvas again for a hint and the solution. 🎯
 
-## [>] Where is the code? 🔎
+## [>] Source
 
 The source code for this program is hidden, but if you're interested in how it works, you can
 take a peek at the <a href="#coords-code" target="_blank">full example</a>.
 
-## [>] Coordinates on the Evy Canvas 📖
+## [>] Docs
 
 Imagine the canvas as a grid. Each point on this grid is identified by two numbers:
 

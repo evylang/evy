@@ -423,30 +423,43 @@ async function handleHashChangeNoFormat() {
   }
   const { source, notes } = await fetchSourceWithNotes(opts)
   updateNotes(notes)
-  updateEditorContent(source)
+  updateEditor(source, opts)
   updateSampleTitle()
   clearOutput()
-  editor.onUpdate(clearHash)
-  editorHidden = opts.editor === "none"
-  const classList = document.querySelector(".editor-wrap").classList
-  editorHidden ? classList.add("hidden") : classList.remove("hidden")
 }
 
 function updateNotes(notes) {
+  hasNotes(notes) ? addNotes(notes) : removeNotes()
+}
+
+function hasNotes(notes) {
+  return !!notes && !!document.querySelector("#notes")
+}
+
+function removeNotes() {
+  notesHidden = true
   const notesEl = document.querySelector("#notes")
-  if (!notesEl) {
-    notesHidden = true
-    return
-  }
-  if (!notes) {
-    notesHidden = true
-    notesEl.classList.add("hidden")
-    notesEl.innerHTML = ""
-    return
-  }
+  if (!notesEl) return
+  notesEl.classList.add("hidden")
+  notesEl.innerHTML = ""
+}
+
+function addNotes(notes) {
   notesHidden = false
+  const notesEl = document.querySelector("#notes")
   notesEl.classList.remove("hidden")
   notesEl.innerHTML = notes
+
+  // hide all notes after first "next" button:
+  // <p><button class="next-btn">Next</button></p>
+  let el = notesEl.querySelector(".next-btn")?.parentElement?.nextElementSibling
+  while (el) {
+    el.classList.add("hidden")
+    el = el.nextElementSibling
+  }
+  notesEl.querySelectorAll(".next-btn").forEach((btn) => {
+    btn.onclick = handleNotesNextClick
+  })
   notesEl.querySelectorAll(".language-evy").forEach((el) => {
     el.innerHTML = highlightEvy(el.textContent)
   })
@@ -456,11 +469,27 @@ function updateNotes(notes) {
   notesEl.scrollTo(0, 0)
 }
 
-function updateEditorContent(content) {
+function handleNotesNextClick(e) {
+  const btn = e.target
+  let el = btn?.parentElement?.nextElementSibling
+  // show until following "next" button or end
+  while (el && !el.classList.contains("next-btn")) {
+    el.classList.remove("hidden")
+    if (el.querySelector(".next-btn")) break
+    el = el.nextElementSibling
+  }
+  btn.nextElementSibling?.scrollIntoView({ behavior: "smooth" })
+}
+
+function updateEditor(content, opts) {
   !editor && initEditor()
   editor.onUpdate(null)
   editor.update({ value: content, errorLines: {} })
   document.querySelector(".editor-wrap").scrollTo(0, 0)
+  editor.onUpdate(clearHash)
+  editorHidden = opts.editor === "none"
+  const classList = document.querySelector(".editor-wrap").classList
+  editorHidden ? classList.add("hidden") : classList.remove("hidden")
 }
 
 // parseHash parses URL fragment into object e.g.:

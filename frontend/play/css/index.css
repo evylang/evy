@@ -25,8 +25,19 @@
   --sample-selector-width: 180px;
   --sample-selector-index-width: 32px;
   --sample-selector-gap: 6px;
+  --sample-selector-color: hsl(210deg 5% 15%);
+  --sample-selector-background: hsl(0deg 0% 100%);
+  --sample-selector-border-width: 0;
+  --sample-selector-index-background: hsl(0deg 0% 85%);
 }
-
+/* light theme colors
+   minimal example: frontend/css/switch.html */
+:root:has(#dark-theme:not(:checked)) {
+  --sample-selector-color: hsl(0deg 0% 0%);
+  --sample-selector-background: hsl(0deg 0% 92%);
+  --sample-selector-index-background: hsl(0deg 0% 100%);
+  --sample-selector-border-width: 1px;
+}
 @media (max-width: 767px) {
   /* responsive mobile */
   :root {
@@ -92,12 +103,13 @@ button.arrow svg {
   padding: 0 var(--sample-selector-gap);
   font-size: 0.875rem;
   width: var(--sample-selector-width);
-  background: var(--color);
-  color: var(--background);
+  background: var(--sample-selector-background);
+  color: var(--sample-selector-color);
   margin-left: 6px;
   margin-right: 6px;
   border-radius: 6px;
   height: 28px;
+  border: var(--sample-selector-border-width) solid var(--border-color);
 }
 #sample-selector:hover {
   color: var(--color-accent);
@@ -107,7 +119,7 @@ button.arrow svg {
   border-radius: 6px;
   width: var(--sample-selector-index-width);
   font-size: 0.75rem;
-  background: hsl(0deg 0% 85%);
+  background: var(--sample-selector-index-background);
   padding: 0 2px;
 }
 #sample-index.hidden {

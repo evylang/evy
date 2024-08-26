@@ -1,10 +1,11 @@
 <h1>🎯 Target board</h1>
+<h2>⭐ Draw a target board</h2>
 <p>
-  ⭐ Draw a target board with concentric circles.
+  Draw a target board with concentric circles.
   <img src="samples/loops/img/target.svg" alt="Target board" />
 </p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">//...
 while r &gt; ❓
     circle r
@@ -12,14 +13,18 @@ while r &gt; ❓
 end
 </code></pre>
 </details>
-<p>⭐ Animate the circles with a <code>sleep</code> for 0.2 seconds.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Animation</h2>
+<p>Animate the circles with a <code>sleep</code> for 0.2 seconds.</p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">//...
 while r &gt; ❓
     // ...
     sleep ❓
 end
 </code></pre>
-  <p>⭐ Increase the starting radius to cover the whole canvas.</p>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Tweak</h2>
+<p>Increase the starting radius to cover the whole canvas.</p>

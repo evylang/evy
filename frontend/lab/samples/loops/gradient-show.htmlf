@@ -6,7 +6,7 @@
 </p>
 <p>How would you go about writing this program?</p>
 <details>
-  <summary>💡 Some tips</summary>
+  <summary>Hint</summary>
   <ul>
     <li>Break down the problem into smaller bits.</li>
     <li>
@@ -18,7 +18,7 @@
   </ul>
 </details>
 <details>
-  <summary><code>line</code> and <code>width</code> commands 📖</summary>
+  <summary>Docs</summary>
   <p>The following code draws a line from point <code>10 20</code> to point <code>80 50</code>:</p>
   <pre><code class="language-evy">width 2
 move 10 20

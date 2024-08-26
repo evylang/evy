@@ -1,31 +1,38 @@
 <h1>✨ Random Stars</h1>
-<p>⭐ Write a program that draws:</p>
+<h2>⭐ Introduction</h2>
+<p>Write a program that draws:</p>
 <ul>
   <li>A black background using <code>clear</code></li>
   <li>
     A <code>&quot;white&quot;</code> circle with radius <code>1</code> anywhere on the canvas.
   </li>
 </ul>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Random Position</h2>
 <p>
-  ⭐ Use the <a href="/docs/builtins.html#rand"><code>rand</code></a> function to generate random
+  Use the <a href="/docs/builtins.html#rand"><code>rand</code></a> function to generate random
   coordinates for your white circle.
 </p>
-<p><code>rand n</code> generates a random whole numbers between 0 and <code>n</code>.</p>
+<p>
+  <code>rand n</code> generates a random whole numbers between <code>0</code> and <code>n</code>.
+</p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">x := rand 100
 y := ❓
 move ❓ ❓
 circle ❓
 </code></pre>
 </details>
-<p>⭐ Draw <code>200</code> circles with radius <code>1</code> in random positions.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ 200 Circles</h2>
+<p>Draw <code>200</code> circles with radius <code>1</code> in random positions.</p>
 <ul>
   <li>You'll need a loop for this.</li>
   <li>Make sure to generate new random coordinates <strong>inside</strong> the loop.</li>
 </ul>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">i := 0
 while i ❓
     x := rand ❓
@@ -34,23 +41,27 @@ while i ❓
 end
 </code></pre>
 </details>
-<p>⭐ Make the circle sizes random between <code>0</code> and <code>0.6</code>.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ 200 Stars</h2>
+<p>Make the circle sizes random between <code>0</code> and <code>0.6</code>.</p>
 <ul>
   <li>
     Use the <a href="/docs/builtins.html#rand1"><code>rand1</code></a> function to get a random
-    number between 0 and 1.
+    number between 0 and 1. (<code>rand1</code> has <em>no</em> space before the<code>1</code> !)
   </li>
   <li>Multiply that random number by <code>0.6</code> to scale it to the desired range.</li>
 </ul>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">size := (rand1) * 0.6
 circle size
 </code></pre>
 </details>
-<p>⭐ Change the color of 10% or your circles to <code>&quot;gold&quot;</code></p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Sprinkle a Bit of Gold</h2>
+<p>Change the color of 10% or your circles to <code>&quot;gold&quot;</code></p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">c := rand1
 if c &lt; 0.1
     color &quot;gold&quot;
@@ -59,7 +70,12 @@ else
 end
 </code></pre>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Make It Your Own</h2>
 <p>
-  ⭐ Make it your own. Change the number of stars, sizes and colors to create your favorite night
-  sky.
+  Change the number of stars, sizes and colors to create your favorite night sky - here's
+  <a
+    href="https://play.evy.dev/#content=H4sIAAAAAAAAA2WO0QqDMAxF3/sVlz5tDqQ+yGDox7g2m8HOSnVT/360HUyRQMJNTi5XW2o85N02upOCcauhxNyyJTAqlEoJAFjCwTe9KaJc91I7694ecm55IhlXL/chLFmhFNbQE7d/4wc0Kqg8ya3T01mTjMiOtCHLA2qIhoH77o8fkE0u6k2cY4hyilnOyKDya3LW7LUljNmvUlDUYFxQiPD+BRnfw+AzAQAA"
+    >mine</a
+  >.
 </p>

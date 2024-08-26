@@ -1,10 +1,16 @@
 <h1>💬 Let's Chat</h1>
-<p>⭐ <strong>Before you run the code:</strong> Can you predict what will happen?</p>
-<p>Now, hit <strong>Run</strong> and see if you were right!</p>
-<p>⭐ <strong>Think about it:</strong> What's the purpose of the <code>:=</code> operator?</p>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Type Inference</h2>
+<p>Note the new <code>:=</code> operator. Have a guess how it works.</p>
 <details>
-  <summary><code>:=</code> Declaration with type inference 📖</summary>
-  <p>In Evy, you can declare a variable and assign it a value in one step using <code>:=</code>.</p>
+  <summary>Docs</summary>
+  <p>
+    In Evy, you can declare a variable and assign it a value in one step using <code>:=</code>. This
+    is called <strong>Declaration with Type Inference</strong>.
+  </p>
   <p>Instead of</p>
   <pre><code class="language-evy">s:string
 s = &quot;banana&quot;
@@ -13,12 +19,14 @@ s = &quot;banana&quot;
   <pre><code class="language-evy">s := &quot;banana&quot;
 </code></pre>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add <code>else if</code></h2>
 <p>
-  ⭐ <strong>Challenge:</strong> Can you add a different response if the answer is &quot;no&quot;?
-  Use <code>else if</code> to create an alternative message.
+  Can you add a different response to the program if the answer is <code>&quot;no&quot;</code>? Use
+  <code>else if</code> to create an alternative message.
 </p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">if answer == &quot;yes&quot;
     print &quot;🍪 Sweet!&quot;
 else if answer == ❓
@@ -28,27 +36,23 @@ else
 end
 </code></pre>
 </details>
-<p>⭐ <strong>Your turn:</strong> Can you create your own chat bot?</p>
-<details>
-  <summary>Some ideas</summary>
-  <ul>
-    <li>🍦 Ask about their favorite ice cream flavor instead of cookies.</li>
-    <li>
-      🎁 Ask if they want to open a surprise.
-      <ul>
-        <li>
-          If they say <code>&quot;yes&quot;</code>, reveal the surprise (let your imagination run
-          wild 🐉).
-        </li>
-        <li>
-          If they say <code>&quot;no&quot;</code>, respond with something like &quot;And so it
-          remains my secret 🔒&quot;.
-        </li>
-        <li>If they say anything else, respond with &quot;I don't understand.&quot;</li>
-      </ul>
-    </li>
-  </ul>
-  <p>
-    You could also ask about their favorite color, band, or football team and respond accordingly!
-  </p>
-</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Your Turn</h2>
+<p>Can you create your own chat bot?</p>
+<h3>Some ideas</h3>
+<p>🍦 Ask about their favorite ice cream flavor instead of cookies.</p>
+<p>🎁 Ask if they want to open a surprise.</p>
+<ul>
+  <li>
+    If they say <code>&quot;yes&quot;</code>, reveal the surprise (let your imagination run wild
+    🐉).
+  </li>
+  <li>
+    If they say <code>&quot;no&quot;</code>, respond with something like
+    <code>&quot;And so it remains my secret 🔒&quot;</code>.
+  </li>
+  <li>If they say anything else, respond with <code>&quot;I don't understand.&quot;</code></li>
+</ul>
+<p>
+  You could also ask about their favorite color, band, or football team and respond accordingly!
+</p>

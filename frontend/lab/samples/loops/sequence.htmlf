@@ -1,38 +1,53 @@
 <h1>🔢 Sequences</h1>
-<p><strong>⭐ Warm up:</strong> Can you write a program that prints the numbers from 0 to 9?</p>
-<details>
-  <summary><code>while</code> loop structure</summary>
-  <pre><code class="language-evy">while loop_condition
+<h2>⭐ Warm Up</h2>
+<p>Can you write a program that prints the numbers from <code>0</code> to <code>9</code>?</p>
+<h3><code>while</code> loop structure</h3>
+<pre><code class="language-evy">while loop_condition
     loop_body
     // …
 end
 </code></pre>
-  <details>
-    <summary>Code hint 🧚</summary>
-    <pre><code class="language-evy">x:num
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
 while x &lt;= ❓
     print x
     x = x + ❓
 end
 </code></pre>
-  </details>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Number Sequences</h2>
 <p>Write programs that generate the first 20 numbers of the following sequences:</p>
 <ul>
-  <li>⭐️ 0, 2, 4, 6, …</li>
-  <li>⭐️ 1, 4, 7, 10, …</li>
-  <li>⭐️ 20, 18.5, 17, …</li>
-  <li>⭐️ 1, 2, 4, 8, …</li>
-  <li>⭐️ 1, 10, 100, 1000, …</li>
-  <li>⭐️ 1, 0.5, 0.25, 0.125, …</li>
-  <li>⭐️ 1, 3, 6, 10, …</li>
+  <li>
+    <p><code>0</code>, <code>2</code>, <code>4</code>, <code>6</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>4</code>, <code>7</code>, <code>10</code>, …</p>
+  </li>
+  <li>
+    <p><code>20</code>, <code>18.5</code>, <code>17</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>2</code>, <code>4</code>, <code>8</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>10</code>, <code>100</code>, <code>1000</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>0.5</code>, <code>0.25</code>, <code>0.125</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>3</code>, <code>6</code>, <code>10</code>, …</p>
+  </li>
 </ul>
 <p>
   Use <em>two different</em> variables to track the count used in the loop condition and the printed
   sequence number.
 </p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">x:num
 a:num
 while x &lt;= ❓
@@ -43,33 +58,20 @@ end
 </code></pre>
 </details>
 <details>
-  <summary>Solution: 20th number</summary>
+  <summary>Answer</summary>
+  <p>The solution for 20th number is</p>
   <ul>
-    <li>
-      <p>38</p>
-    </li>
-    <li>
-      <p>58</p>
-    </li>
-    <li>
-      <p>-8.5</p>
-    </li>
-    <li>
-      <p>524288</p>
-    </li>
-    <li>
-      <p>10000000000000000000</p>
-    </li>
-    <li>
-      <p>0.0000019073486328125</p>
-    </li>
-    <li>
-      <p>210</p>
-    </li>
+    <li>38</li>
+    <li>58</li>
+    <li>-8.5</li>
+    <li>524288</li>
+    <li>10000000000000000000</li>
+    <li>0.0000019073486328125</li>
+    <li>210</li>
   </ul>
 </details>
 <details>
-  <summary>Number Sequences 📖</summary>
+  <summary>Docs</summary>
   <p>
     The first 3 sequences are <strong>arithmetic sequences</strong> where you add the same amount to
     get from one number to the next.

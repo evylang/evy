@@ -46,7 +46,7 @@
         { "id": "alpha", "title": "🌈 Transparency", "notes": true },
         { "id": "pulse-show", "title": "🧿📺 Pulse", "notes": true, "editor": "none" },
         { "id": "pulse", "title": "🧿🫵 Pulse", "notes": true },
-        { "id": "bounce", "title": "🏓 Bouncing ball", "notes": true },
+        { "id": "bounce", "title": "🏓 Bouncing ball", "notes": true, "unlisted": true },
         {
           "id": "bounce-show",
           "title": "🏓📺 Bouncing ball",

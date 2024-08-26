@@ -6,7 +6,7 @@
 
 ⭐ Can you do it using a loop?
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 while x < ❓
@@ -21,7 +21,7 @@ end
 ⭐ Can you make the step `10` a variable and run the program with different step
 values?
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 step = ❓

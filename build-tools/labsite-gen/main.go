@@ -14,7 +14,12 @@ import (
 	"rsc.io/markdown"
 )
 
-const marker = "[>]"
+const (
+	detailsMarker    = "[>]"
+	nextButtonMarker = "[Next]"
+)
+
+var nextButton = newNextButton()
 
 func main() {
 	if len(os.Args) != 3 {
@@ -34,6 +39,7 @@ func run(mdFile, htmlfFile string) error {
 		return err
 	}
 	doc := parse(string(md))
+	replaceNextButton(doc)
 	doc.Blocks = collapse(doc.Blocks)
 	html := markdown.ToHTML(doc)
 
@@ -43,6 +49,29 @@ func run(mdFile, htmlfFile string) error {
 func parse(md string) *markdown.Document {
 	p := markdown.Parser{Table: true}
 	return p.Parse(md)
+}
+
+func replaceNextButton(doc *markdown.Document) {
+	for i, block := range doc.Blocks {
+		if isNextButton(block) {
+			doc.Blocks[i] = nextButton
+		}
+	}
+}
+
+func isNextButton(block markdown.Block) bool {
+	paragraph, ok := block.(*markdown.Paragraph)
+	if !ok {
+		return false
+	}
+	if len(paragraph.Text.Inline) != 1 {
+		return false
+	}
+	plain, ok := paragraph.Text.Inline[0].(*markdown.Plain)
+	if !ok {
+		return false
+	}
+	return plain.Text == nextButtonMarker
 }
 
 func collapse(blocks []markdown.Block) []markdown.Block {
@@ -75,19 +104,22 @@ func isCollapsible(block markdown.Block) bool {
 		return false
 	}
 	plain, ok := heading.Text.Inline[0].(*markdown.Plain)
-	return ok && strings.HasPrefix(plain.Text, marker)
+	return ok && strings.HasPrefix(plain.Text, detailsMarker)
 }
 
 func deleteCollapseMarker(heading *markdown.Heading) {
 	// assumes isCollapsible returned true
 	plain := heading.Text.Inline[0].(*markdown.Plain)
-	s := strings.TrimPrefix(plain.Text, marker)
+	s := strings.TrimPrefix(plain.Text, detailsMarker)
 	s = strings.TrimLeftFunc(s, unicode.IsSpace)
 	plain.Text = s
 }
 
 func findEndIdx(level, start int, blocks []markdown.Block) int {
 	for i := start; i < len(blocks); i++ {
+		if blocks[i] == nextButton {
+			return i
+		}
 		if _, ok := blocks[i].(*markdown.ThematicBreak); ok {
 			return i
 		}
@@ -110,8 +142,15 @@ func toDetailsHTML(heading *markdown.Heading, blocks []markdown.Block) *markdown
 		buf.WriteString(markdown.ToHTML(block))
 	}
 	buf.WriteString("</details>")
-	doc := parse(buf.String())
-	return doc.Blocks[0].(*markdown.HTMLBlock)
+	htmlBlock := &markdown.HTMLBlock{
+		Text: strings.Split(buf.String(), "\n"),
+	}
+	return htmlBlock
+}
+
+func newNextButton() *markdown.Paragraph {
+	doc := parse(`<button class="next-btn">Next</button>`)
+	return doc.Blocks[0].(*markdown.Paragraph)
 }
 
 func isThematicBreak(blocks []markdown.Block, idx int) bool {

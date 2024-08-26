@@ -1,38 +1,38 @@
 <h1>🧿 Pulse</h1>
-<p>⭐ <strong>Your Task:</strong> Write a program that draws a small blue circle.</p>
+<h2>⭐ 1 Little Blue Circle</h2>
+<p>Write a program that draws:</p>
 <p><img src="samples/ifs/img/pulse-step-1.svg" alt="small centered circle" /></p>
 <ul>
-  <li>Background (<code>clear</code>): <code>&quot;black&quot;</code></li>
-  <li>Circle outline width: <code>1</code></li>
-  <li>Circle fill color: <code>&quot;none&quot;</code></li>
-  <li>Circle outline color (<code>stroke</code>): <code>&quot;blue&quot;</code></li>
-  <li>Initial radius: <code>1</code></li>
+  <li>Background: <code>&quot;black&quot;</code></li>
+  <li>Outline width: <code>1</code></li>
+  <li>Fill color: <code>&quot;none&quot;</code></li>
+  <li>Outline color (<code>stroke</code>): <code>&quot;blue&quot;</code></li>
+  <li>Radius: <code>1</code></li>
 </ul>
 <details>
-  <summary>Code hint 🧚</summary>
-  <pre><code class="language-evy">width ❓
-clear ❓
+  <summary>Hint</summary>
+  <pre><code class="language-evy">clear ❓
+width ❓
 fill ❓
 stroke ❓
+
 move 50 ❓
 circle ❓
 </code></pre>
 </details>
-<p>⭐ <strong>Enhance your program:</strong> Create this drawing of concentric circles:</p>
-<p><img src="samples/ifs/img/pulse-step-2.svg" alt="small centered circle" /></p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Many Circles</h2>
+<p>Extend your program to draw:</p>
+<p><img src="samples/ifs/img/pulse-step-2.svg" alt="many concentric circles" /></p>
+<p>Use a variable <code>r</code> for the circle radius, starting at <code>1</code>.</p>
+<p>Within a loop:</p>
 <ul>
-  <li>Use a variable <code>r</code> for the circle radius, starting at <code>1</code>.</li>
-  <li>
-    Within a loop:
-    <ul>
-      <li>Draw the circle with radius <code>r</code>.</li>
-      <li>Increase the radius <code>r</code> by <code>2</code> in each loop iteration.</li>
-    </ul>
-  </li>
-  <li>Keep looping as long as the radius <code>r</code> is less than <code>45</code>.</li>
+  <li>Draw the circle with radius <code>r</code>.</li>
+  <li>Increase <code>r</code> by <code>2</code>.</li>
 </ul>
+<p>Keep looping as long as the radius <code>r</code> is less than <code>45</code>.</p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">r := ❓
 while r &lt; ❓
 	circle ❓
@@ -40,16 +40,18 @@ while r &lt; ❓
 end
 </code></pre>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Animate</h2>
 <p>
-  ⭐ Add a <code>sleep</code> of <code>0.1</code> seconds after drawing each circle to create an
+  Add a <code>sleep</code> of <code>0.1</code> seconds after drawing each circle to create an
   animation.
 </p>
 <details>
-  <summary>Animation demo</summary>
+  <summary>Demo</summary>
   <p><img src="samples/ifs/img/pulse-step-3.gif" alt="small centered circle" /></p>
 </details>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">while r &lt; __
 	circle __
 	r = r + __
@@ -57,14 +59,19 @@ end
 end
 </code></pre>
 </details>
-<p>⭐ Now, at the beginning of each loop iteration, add a nearly transparent black overlay.</p>
-<p>Use <code>clear</code> with <code>hsl 0 0 0 15</code> to achieve the fading effect.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Transparency</h2>
+<p>
+  Add a <strong>nearly transparent black</strong> overlay at the beginning of each loop iteration to
+  create a fading effect.
+</p>
+<p>Use <code>clear</code> with <code>hsl 0 0 0 15</code>.</p>
 <details>
-  <summary>Animation demo</summary>
+  <summary>Demo</summary>
   <p><img src="samples/ifs/img/pulse-step-4.gif" alt="small centered circle" /></p>
 </details>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">while r &lt; __
 	clear (hsl ❓)
 	circle __
@@ -73,21 +80,28 @@ end
 end
 </code></pre>
 </details>
-<p>⭐ Make the animation smoother.</p>
-<p>Reduce the loop increment, sleep duration, and alpha value.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Tweak for a Smooth Animation</h2>
+<p>Reduce the</p>
+<ul>
+  <li>loop increment</li>
+  <li>sleep duration</li>
+  <li>alpha value</li>
+</ul>
 <details>
-  <summary>Animation demo</summary>
+  <summary>Demo</summary>
   <p><img src="samples/ifs/img/pulse-step-5.gif" alt="small centered circle" /></p>
 </details>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <ul>
     <li>increment: r = r + 0.1</li>
     <li>sleep: 0.001 seconds</li>
     <li>alpha: hsl 0 0 0 1</li>
   </ul>
 </details>
-<p>⭐ <strong>Final step: the pulse</strong></p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add the Pulse</h2>
 <p>Let's make the circle continuously grow and shrink.</p>
 <p>
   <strong>Loop Forever:</strong> Change the loop condition to <code>true</code> to create an endless
@@ -111,7 +125,7 @@ end
   above 45. If it does, flip the sign of <code>inc</code> to reverse the animation's direction.
 </p>
 <details>
-  <summary>Code Hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">inc := 0.1
 while true
     if r &lt; 1 or r &gt; 45

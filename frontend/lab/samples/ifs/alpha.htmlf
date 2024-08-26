@@ -1,13 +1,18 @@
 <h1>🌈 Transparent Colors</h1>
-<p>⭐ <strong>Read</strong> and <strong>Run</strong> the code. Does it make sense to you?</p>
-<p>⭐ <strong>Complete it</strong> to create the following drawing:</p>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add a Yellow Rectangle</h2>
+<p>Complete the code to create the following drawing:</p>
 <p>
   <img src="samples/ifs/img/red-dot-two-squares.svg" alt="simple drawing of circles and squares" />
 </p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Tweak the Alpha</h2>
 <p>
-  ⭐ <strong>Modify the Alpha</strong> parameter to the
-  <a href="/docs/builtins.html#hsl"><code>hsl</code></a> function to make the bottom quadrant grey,
-  like so:
+  Tweak the Alpha parameter to the <a href="/docs/builtins.html#hsl"><code>hsl</code></a> function,
+  its fourth parameter, to make the bottom left quadrant grey:
 </p>
 <p>
   <img
@@ -16,7 +21,7 @@
   />
 </p>
 <details>
-  <summary>Understanding Alpha 📖</summary>
+  <summary>Docs</summary>
   <p>
     In the interactive <a href="/docs/builtins.html#hsl"><code>hsl</code></a> function
     <a href="#hsl">color explorer</a> we learned how hsl takes three values: hue, saturation,

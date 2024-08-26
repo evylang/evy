@@ -1,28 +1,40 @@
 <h1>🥧 Monte Carlo 💕 π</h1>
+<h2>⭐ Introduction</h2>
 <p>
-  This lab shows how to estimate the mathematical constant π (pi) using a Monte Carlo algorithm.
+  This lab shows how to estimate the mathematical constant <strong>π</strong> (pi) using a
+  <strong>Monte Carlo algorithm</strong>.
 </p>
 <ul>
-  <li>⭐ What do you know about <strong>π</strong>?</li>
-  <li>⭐ Do you know the <strong>area</strong> of a circle with radius <code>1</code>?</li>
+  <li>What do you know about <strong>π</strong>?</li>
+  <li>Do you know the <strong>area</strong> of a circle with radius <code>1</code>?</li>
 </ul>
-<h2>Quarter circle</h2>
+<details>
+  <summary>Docs</summary>
+  <p>
+    A <strong>Monte Carlo algorithm</strong> is a computer program that simulates the behavior of
+    other systems. It's not a method that gives you a perfectly precise answer, but rather an
+    approximate one, often relying on <strong>randomness</strong> and <strong>statistics</strong> to
+    reach a result. The more times you run it, the closer you get to the true answer.
+  </p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Quarter circle</h2>
 <p><img src="samples/ifs/img/quarter-circle.svg" alt="quarter circle" /></p>
 <p>
-  ⭐ What's the <strong>area</strong> of the red <strong>quarter-circle</strong> if the radius is
+  What's the <strong>area</strong> of the red <strong>quarter-circle</strong> if the radius is
   <code>1</code>? Can you estimate it to the nearest tenth?
 </p>
 <p>
-  ⭐ What's the total <strong>area</strong> of the <strong>square</strong> (including both the red
-  and black areas)?
+  What's the total <strong>area</strong> of the <strong>square</strong> (including both the red and
+  black areas)?
 </p>
 <p>
-  ⭐ If we place a dot <strong>randomly</strong> within the square, what's the
+  If we place a dot <strong>randomly</strong> within the square, what's the
   <strong>probability</strong> it will land inside the red quarter-circle? Does your answer make
   sense visually?
 </p>
 <details>
-  <summary>Math hint 🧮</summary>
+  <summary>Hint</summary>
   <ul>
     <li>
       <p>
@@ -47,7 +59,8 @@
       <p>
         <strong>Probability:</strong> The probability of a random point landing inside the red
         quarter-circle is the ratio of the quarter-circle's area to the square's area:
-        <code>(π / 4) / 1 = π / 4</code>. This is about 0.8, which seems visually reasonable.
+        <code>(π / 4) / 1 = π / 4</code>. This is about <code>0.8</code>, which seems visually
+        reasonable.
       </p>
     </li>
     <li>
@@ -61,33 +74,30 @@
     </li>
   </ul>
 </details>
-<h2>Let's get coding</h2>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Draw a Red Quarter Circle</h2>
 <p>
-  ⭐ <strong>Your Task:</strong> Modify the code on the right to draw
-  <code>&quot;red&quot;</code> dots for points inside the quarter-circle, just like in the image
-  above.
+  Modify the code on the right to draw <code>&quot;red&quot;</code> dots for points inside the
+  quarter-circle, just like in the image above.
 </p>
 <p>
   Use the <a href="/docs/builtins.html#sqrt"><code>sqrt</code></a> function to calculate the
   distance from each dot to the circle's center at <code>0 0</code>.
 </p>
-<details>
-  <summary>Math hint 🧮</summary>
-  <p>
-    The distance from the circle's center at <code>0 0</code> to any point <code>x y</code> is
-    calculated using the Pythagorean theorem <code>a² + b² = c²</code>:
-  </p>
-  <pre><code class="language-evy">c := sqrt a*a+b*b
+<p>
+  The distance from the circle's center at <code>0 0</code> to any point <code>x y</code> is
+  calculated using the Pythagorean theorem <code>a² + b² = c²</code>:
+</p>
+<pre><code class="language-evy">c := sqrt a*a+b*b
 </code></pre>
-  <p><img src="samples/ifs/img/quarter-circle-triangle.svg" alt="quarter circle" /></p>
-  <p>
-    If this distance is less than or equal to <code>1</code>, the point lies within the
-    quarter-circle and should be colored red. (Remember, we're scaling <code>x</code> and
-    <code>y</code> by 100 when positioning the dots, as the Evy canvas is 100 by 100.)
-  </p>
-</details>
+<p><img src="samples/ifs/img/quarter-circle-triangle.svg" alt="quarter circle" /></p>
+<p>
+  If this distance is less than or equal to <code>1</code>, the point lies within the quarter-circle
+  and should be colored red. (Remember, we're scaling <code>x</code> and <code>y</code> by 100 when
+  positioning the dots, as the Evy canvas is 100 by 100.)
+</p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <p>
     Add the following code inside the loop after declaring <code>x</code> and <code>y</code> and
     before drawing the circle.
@@ -100,18 +110,16 @@ else
 end
 </code></pre>
 </details>
-<h2>Estimate π</h2>
-<p>⭐ Can you calculate π by tallying up red dots and black dots?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Estimate π</h2>
+<p>Can you calculate π by tallying up red dots and black dots?</p>
+<p>
+  We know the total number of points is <code>i</code>. Let's count the
+  <code>&quot;red&quot;</code> dots in the variable <code>reds</code>. We'll then calculate the
+  ratio of <code>reds / i</code> and multiply by <code>4</code> to get an estimate of π.
+</p>
 <details>
-  <summary>Math hint 🧮</summary>
-  <p>
-    We know the total number of points is <code>i</code>. Let's count the
-    <code>&quot;red&quot;</code> dots in the variable <code>reds</code>. We'll then calculate the
-    ratio of <code>reds / i</code> and multiply by <code>4</code> to get an estimate of π.
-  </p>
-</details>
-<details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <p>At the top of your code, add:</p>
   <pre><code class="language-evy">reds := 0
 </code></pre>
@@ -124,18 +132,9 @@ else // ...
   <p>And at the bottom of the loop, add:</p>
   <pre><code class="language-evy">while // ...
   // ...
-  pi := reds / total * 4
+  pi := reds / i * 4
   cls // clears the text output
   print &quot;PI: &quot; pi
 end
 </code></pre>
-</details>
-<details>
-  <summary>Monte Carlo Algorithm 📖</summary>
-  <p>
-    A <strong>Monte Carlo algorithm</strong> is a computer program that simulates the behavior of
-    other systems. It's not a method that gives you a perfectly precise answer, but rather an
-    approximate one, often relying on <strong>randomness</strong> and <strong>statistics</strong> to
-    reach a result. The more times you run it, the closer you get to the true answer.
-  </p>
 </details>

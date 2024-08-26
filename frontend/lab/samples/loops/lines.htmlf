@@ -3,7 +3,7 @@
 <p><img src="samples/loops/img/lines.svg" alt="target board" /></p>
 <p>⭐ Can you do it using a loop?</p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">while x &lt; ❓
     move ❓
     line ❓
@@ -16,7 +16,7 @@ end
   values?
 </p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <pre><code class="language-evy">step = ❓
 while x &lt; __
     // ...

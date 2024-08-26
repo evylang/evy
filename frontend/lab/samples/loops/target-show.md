@@ -4,7 +4,7 @@ Hit **Run** to draw an animated target board.
 
 How would you go about writing this program?
 
-## [>] 💡 Some clues
+## [>] Hint
 
 - Break down the problem into smaller bits.
 - Create a static image that fits on the canvas:

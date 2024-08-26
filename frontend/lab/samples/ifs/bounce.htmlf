@@ -3,6 +3,7 @@
 <p>
   Check out the <a href="#bounce-show">bouncing ball page 🏓📺</a> or observe the animation below.
 </p>
+<h2>Demo</h2>
 <details>
   <summary>Animation demo</summary>
   <p><img src="samples/ifs/img/bounce.gif" alt="small centered circle" /></p>
@@ -26,7 +27,7 @@
   <a href="#pulse">Pulse challenge</a>.
 </p>
 <details>
-  <summary>Code hint 🧚</summary>
+  <summary>Hint</summary>
   <p>Inside the loop body add:</p>
   <pre><code class="language-evy">x = x + inc
 if x &lt; 10 or x &gt; 90

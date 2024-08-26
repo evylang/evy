@@ -1,10 +1,19 @@
 # 🌈🫵 Gradient
 
-**Run** the program on the right and see if you understand its code.
+## ⭐ Intro
 
-⭐ Can you replace the value `30` with a variable in 3 places?
+**Read** the code. What do you think will happen when you run it?
 
-### [>] Code hint 🧚
+**Run** the code. Was it what you expected?
+
+[Next]
+
+## ⭐ Use a Variable
+
+Can you replace the value `30` with a variable in 3 places?
+We will iterate over this variable in a following step.
+
+### [>] Hint
 
 ```evy
 x:num
@@ -15,11 +24,13 @@ move ❓ 100
 // One more to replace
 ```
 
----
+[Next]
 
-⭐ Can you use this variable to create a loop from 0 to 100 with a step of 10?
+## ⭐ Use a Loop
 
-### [>] Code hint 🧚
+Can you use this variable to create a loop from 0 to 100 with a step of 10?
+
+### [>] Hint
 
 ```evy
 while x <= ❓
@@ -31,11 +42,13 @@ while x <= ❓
 end
 ```
 
----
+[Next]
 
-⭐ Can you animate the lines with the `sleep` command?
+## ⭐ Animation
 
-### [>] Code hint 🧚
+Can you animate the lines with the `sleep` command?
+
+### [>] Hint
 
 ```evy
 while x <= __
@@ -45,7 +58,9 @@ while x <= __
 end
 ```
 
----
+[Next]
 
-⭐ Can you reduce the line `width`, `sleep` and loop increment to create a
-smooth gradient?
+## ⭐ Animation Smoothing
+
+Can you reduce the line `width`, `sleep` and loop increment to create a smooth
+gradient?

@@ -1,17 +1,29 @@
 # 🌈 Transparent Colors
 
-⭐ **Read** and **Run** the code. Does it make sense to you?
+## ⭐ Intro
 
-⭐ **Complete it** to create the following drawing:
+**Read** the code. What do you think will happen when you run it?
+
+**Run** the code. Was it what you expected?
+
+[Next]
+
+## ⭐ Add a Yellow Rectangle
+
+Complete the code to create the following drawing:
 
 ![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares.svg)
 
-⭐ **Modify the Alpha** parameter to the [`hsl`] function to make the bottom
-quadrant grey, like so:
+[Next]
+
+## ⭐ Tweak the Alpha
+
+Tweak the Alpha parameter to the [`hsl`] function, its fourth parameter, to make
+the bottom left quadrant grey:
 
 ![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares-alpha.svg)
 
-## [>] Understanding Alpha 📖
+## [>] Docs
 
 In the interactive [`hsl`] function [color explorer](#hsl) we learned how hsl
 takes three values: hue, saturation, lightness values to create a color.

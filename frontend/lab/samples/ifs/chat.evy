@@ -1,4 +1,5 @@
-print "Do you like cookies?"
+question := "Do you like cookies?"
+print question
 answer := read
 
 if answer == "yes"

@@ -1,9 +1,11 @@
 # 🎯 Target board
 
-⭐ Draw a target board with concentric circles.
+## ⭐ Draw a target board
+
+Draw a target board with concentric circles.
 ![Target board](samples/loops/img/target.svg)
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 //...
@@ -13,11 +15,13 @@ while r > ❓
 end
 ```
 
----
+[Next]
 
-⭐ Animate the circles with a `sleep` for 0.2 seconds.
+## ⭐ Animation
 
-## [>] Code hint 🧚
+Animate the circles with a `sleep` for 0.2 seconds.
+
+## [>] Hint
 
 ```evy
 //...
@@ -27,4 +31,8 @@ while r > ❓
 end
 ```
 
-⭐ Increase the starting radius to cover the whole canvas.
+[Next]
+
+## ⭐ Tweak
+
+Increase the starting radius to cover the whole canvas.

@@ -1,8 +1,12 @@
 <h1>🇵🇼 Circles</h1>
-<p>Run this program and read the code.</p>
-<p>⭐ Can you move the circle center to each corner?</p>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Circles in corner</h2>
+<p>Can you move the circle center to each corner?</p>
 <details>
-  <summary>Result</summary>
+  <summary>Demo</summary>
   <table>
     <thead>
       <tr>
@@ -24,9 +28,14 @@
     </tbody>
   </table>
 </details>
-<p>⭐ Draw 2-4 circles that are partly or fully visible.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Create Your Own Circles</h2>
+<p>
+  Draw 2-4 circles on the canvas using any colors you like. The circles can be fully or partially
+  visible.
+</p>
 <details>
-  <summary>Examples</summary>
+  <summary>Samples</summary>
   <table>
     <thead>
       <tr>
@@ -47,6 +56,8 @@
     </tbody>
   </table>
 </details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Flag Quiz</h2>
 <p>Which country has this flag? 🇵🇼</p>
 <details>
   <summary>Answer</summary>

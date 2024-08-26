@@ -64,6 +64,26 @@ anybody here?`,
 </details>
 </details>
 `[1:],
+	}, {
+		name: "codeblocks",
+		in: `
+# [>] hallo
+
+` + "```evy" + `
+print 1
+
+print 2
+` + "```" + `
+`,
+		want: `
+<details>
+<summary>hallo</summary>
+<pre><code class="language-evy">print 1
+
+print 2
+</code></pre>
+</details>
+`[1:],
 	},
 }
 
@@ -75,6 +95,64 @@ func TestCollapse(t *testing.T) {
 			doc.Blocks = collapse(doc.Blocks)
 			got := markdown.Format(doc)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+var nextButtonTests = []struct {
+	name     string
+	in       string
+	wantMD   string
+	wantHTML string
+}{
+	{
+		name:     "no marker",
+		in:       "hallo",
+		wantMD:   "hallo\n",
+		wantHTML: "<p>hallo</p>\n",
+	},
+	{
+		name:     "single button",
+		in:       `[Next]`,
+		wantMD:   `<button class="next-btn">Next</button>` + "\n",
+		wantHTML: `<p><button class="next-btn">Next</button></p>` + "\n",
+	},
+	{
+		name: "multiple buttons",
+		in: `# Heading
+[Next]
+
+paragraph
+
+[Next]`,
+		wantMD: `
+# Heading
+
+<button class="next-btn">Next</button>
+
+paragraph
+
+<button class="next-btn">Next</button>
+`[1:],
+		wantHTML: `
+<h1>Heading</h1>
+<p><button class="next-btn">Next</button></p>
+<p>paragraph</p>
+<p><button class="next-btn">Next</button></p>
+`[1:],
+	},
+}
+
+func TestReplaceNextButton(t *testing.T) {
+	for _, tt := range nextButtonTests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := markdown.Parser{}
+			doc := p.Parse(tt.in)
+			replaceNextButton(doc)
+			gotMD := markdown.Format(doc)
+			assert.Equal(t, tt.wantMD, gotMD)
+			gotHTML := markdown.ToHTML(doc)
+			assert.Equal(t, tt.wantHTML, gotHTML)
 		})
 	}
 }

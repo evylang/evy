@@ -1,8 +1,10 @@
 # 🔢 Sequences
 
-**⭐ Warm up:** Can you write a program that prints the numbers from 0 to 9?
+## ⭐ Warm Up
 
-## [>] `while` loop structure
+Can you write a program that prints the numbers from `0` to `9`?
+
+### `while` loop structure
 
 ```evy
 while loop_condition
@@ -11,7 +13,7 @@ while loop_condition
 end
 ```
 
-### [>] Code hint 🧚
+### [>] Hint
 
 ```evy
 x:num
@@ -21,22 +23,25 @@ while x <= ❓
 end
 ```
 
----
+[Next]
+
+## ⭐ Number Sequences
 
 Write programs that generate the first 20 numbers of the following sequences:
 
-- ⭐️ 0, 2, 4, 6, …
-- ⭐️ 1, 4, 7, 10, …
-- ⭐️ 20, 18.5, 17, …
-- ⭐️ 1, 2, 4, 8, …
-- ⭐️ 1, 10, 100, 1000, …
-- ⭐️ 1, 0.5, 0.25, 0.125, …
-- ⭐️ 1, 3, 6, 10, …
+- `0`, `2`, `4`, `6`, …
+- `1`, `4`, `7`, `10`, …
+- `20`, `18.5`, `17`, …
+
+- `1`, `2`, `4`, `8`, …
+- `1`, `10`, `100`, `1000`, …
+- `1`, `0.5`, `0.25`, `0.125`, …
+- `1`, `3`, `6`, `10`, …
 
 Use _two different_ variables to track the count used in the loop condition and the printed
 sequence number.
 
-## [>] Code hint 🧚
+## [>] Hint
 
 ```evy
 x:num
@@ -48,19 +53,19 @@ while x <= ❓
 end
 ```
 
-## [>] Solution: 20th number
+## [>] Answer
+
+The solution for 20th number is
 
 - 38
 - 58
 - -8.5
-
 - 524288
 - 10000000000000000000
 - 0.0000019073486328125
-
 - 210
 
-## [>] Number Sequences 📖
+## [>] Docs
 
 The first 3 sequences are **arithmetic sequences** where you add the same amount to
 get from one number to the next.

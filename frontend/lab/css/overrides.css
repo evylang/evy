@@ -3,6 +3,9 @@
   --notes-max-width: min(25vw, calc(20rem + 32px));
   --editor-max-width: calc(36rem + 16px);
 }
+html {
+  scroll-behavior: smooth;
+}
 
 .max-width-wrapper:not(:has(.main > .hidden)) {
   max-width: calc(var(--editor-max-width) + var(--notes-max-width) + var(--canvas-size) + 64px);
@@ -22,6 +25,7 @@
   overflow-y: auto;
   height: 100%;
   padding: 8px 16px var(--editor-padding-bottom) 16px;
+  scroll-behavior: smooth;
 }
 
 @media (min-width: 768px) {
@@ -40,34 +44,28 @@
   margin-bottom: 16px;
   font-size: 1.5rem;
 }
-.notes :is(h2, h3, h4, summary) {
+.notes :is(h2, h3) {
   color: var(--color);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 600;
   margin-top: 16px;
   margin-bottom: 12px;
 }
-.notes h2 {
-  font-weight: 600;
+.notes h3 {
+  font-size: 0.875rem;
 }
 
 .notes details {
-  margin-top: 16px;
   margin-bottom: 12px;
 }
-.notes summary {
+.notes details pre {
   margin: 0;
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--color-slightly-dimmed);
-  font-size: 0.875rem;
 }
-.notes summary + p {
-  margin-top: 12px;
+.notes details[open] > summary + * {
+  margin-top: 8px;
 }
-.notes p + details {
-  margin-top: -8px;
-  margin-bottom: 20px;
+.notes details[open] {
+  margin-bottom: 16px;
 }
 
 .notes h4 {
@@ -124,7 +122,7 @@
 
 .notes code {
   padding: 0.25em;
-  font-size: 0.85rem;
+  font-size: 0.875em;
   background-color: var(--background-inline-code);
   border-radius: 4px;
   color: var(--color);
@@ -135,6 +133,7 @@
   color: var(--color);
   background: none;
   margin-bottom: 24px;
+  pointer-events: none;
 }
 
 .notes img {
@@ -191,7 +190,31 @@
   border: 1px solid var(--border-color);
   border-radius: 6px;
 }
-
+.notes summary {
+  list-style: none;
+  display: block;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+.notes summary,
+.notes .next-btn {
+  background: none;
+  border: 1px solid var(--color-accent-hover);
+  color: var(--color-accent-hover);
+  border-radius: 10px;
+  padding: 4px;
+  min-width: 100px;
+  margin-left: auto;
+  margin-right: 0;
+  display: block;
+  width: fit-content;
+  text-align: center;
+  font-size: 1rem;
+}
+.next-btn.hidden {
+  display: none;
+}
 @media (max-width: 767px) {
   .notes {
     display: none;
@@ -203,10 +226,13 @@
 }
 
 @media (hover: hover) {
-  .notes summary {
+  .notes summary,
+  .notes .next-btn {
     &:hover,
     &:hover code {
-      color: var(--color-accent);
+      color: hsl(201deg 100% 78%);
+      border-color: hsl(201deg 100% 78%);
+      cursor: pointer;
     }
   }
 }

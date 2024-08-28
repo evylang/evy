@@ -1,5 +1,10 @@
 # Talks and Papers
 
+### Evy Cheat Sheet
+
+Download the [Evy Cheat Sheet](papers/evy-cheat-sheet.pdf) for a quick reference
+to the syntax of Evy.
+
 ### Evy Labs Playlist
 
 The [Evy Labs Playlist] is a step-by-step guide through the interactive coding labs on [lab.evy.dev].

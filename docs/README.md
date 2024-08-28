@@ -5,6 +5,7 @@ Learn programming with Evy
 - Check out the [Lab Challenges].
 - Explore the samples on the [Playground] or the [Gallery].
 - Ask questions or discuss Evy in the [Evy community] on Discord.
+- Keep an [Evy Cheat Sheet](papers/evy-cheat-sheet.pdf) handy.
 
 Learn more about the Evy language and tools
 

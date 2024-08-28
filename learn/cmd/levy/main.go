@@ -94,7 +94,7 @@ type unsealCmd struct {
 
 func (c *exportCmd) Run() error {
 	if c.WithAnswersMarked && c.ExportType != "all" && c.ExportType != "html" {
-		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
+		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`)
 	}
 	exportOptions := learn.ExportOptions{
 		WriteHTML:         c.ExportType == "html" || c.ExportType == "all",

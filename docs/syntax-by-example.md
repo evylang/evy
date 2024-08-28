@@ -1,9 +1,12 @@
 # Syntax by Example
 
-The following examples will help you understand the syntax of Evy. For a
-more formal definition of the syntax, see the
-[Language Specification](spec.md). Built-in functions, such as `print`
-and `circle`, are documented in the [Built-ins section](builtins.md).
+The following examples will help you understand the syntax of Evy. We also have
+a one page [Cheat Sheet](papers/evy-cheat-sheet.pdf) that you can print and
+keep handy.
+
+For a more formal definition of the syntax, see the
+[Language Specification](spec.md). Built-in functions, such as `print` and
+`circle`, are documented in the [Built-ins section](builtins.md).
 
 ## Comment
 

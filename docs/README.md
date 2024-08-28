@@ -2,9 +2,10 @@
 
 Learn programming with Evy
 
-- Check out the [Learn and Practise] resources.
+- Check out the [Lab Challenges].
 - Explore the samples on the [Playground] or the [Gallery].
 - Ask questions or discuss Evy in the [Evy community] on Discord.
+- Keep an [Evy Cheat Sheet](papers/evy-cheat-sheet.pdf) handy.
 
 Learn more about the Evy language and tools
 
@@ -13,7 +14,7 @@ Learn more about the Evy language and tools
 - [Language Specification](spec.md): Read a formal definition of the Evy syntax and language.
 - [`evy` Usage](usage.md): Learn how to use the `evy` command line tool.
 
-[Learn and Practise]: https://github.com/evylang/evy/wiki
+[Lab Challenges]: https://lab.evy.dev
 [Playground]: https://play.evy.dev
-[Gallery]: https://github.com/evylang/evy/wiki/gallery
+[Gallery]: https://gallery.evy.dev
 [Evy community]: https://discord.evy.dev

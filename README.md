@@ -44,15 +44,15 @@ Here is a "hello world" program in Evy
 
 Here are some resources for learning more about Evy:
 
-- [Learn and Practise]\: A guided tour that teaches you programming using Evy.
 - [Syntax by Example](docs/syntax-by-example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
+- [Interactive Labs]: A guided tour with challenges that teaches you programming using Evy.
 
 For questions and discussions, join the [Evy community] on Discord.
 
 [Evy community]: https://discord.evy.dev
-[Learn and Practise]: https://github.com/evylang/evy/wiki
+[Interactive Labs]: https://lab.evy.dev
 
 ## 📦 Installation
 
@@ -132,11 +132,11 @@ directory by installing [Hermit shell hooks] with
 
 Evy would not be here today without the help of many people.
 
-- [camh]\: Thank you for your support, guidance, generosity and endless patience.
-- [Jason]\: Thank you for donating the Evy website design. It is beautiful!
-- [@ckaser]\: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
-- [@fcostin]\: Thank you for the [Splash of Trig] sample, your wisdom and your willingness to help.
-- [@starkcoffee], [@alecthomas], [@loislambeth]\: Thank you for your insights, support, and encouragement. I am grateful for your friendship!
+- [camh]: Thank you for your support, guidance, generosity and endless patience.
+- [Jason]: Thank you for donating the Evy website design. It is beautiful!
+- [@ckaser]: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
+- [@fcostin]: Thank you for the [Splash of Trig] sample, your wisdom and your willingness to help.
+- [@starkcoffee], [@alecthomas], [@loislambeth]: Thank you for your insights, support, and encouragement. I am grateful for your friendship!
 - My daughter Mali: Thank you for being keen to learn programming and for testing Evy with me.
 
 [camh]: https://github.com/camh-

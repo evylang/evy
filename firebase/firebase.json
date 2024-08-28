@@ -46,6 +46,10 @@
       "public": "public/apex/docs"
     },
     {
+      "target": "gallery",
+      "public": "public/apex/gallery"
+    },
+    {
       "target": "lab",
       "public": "public/apex/lab",
       "redirects": [

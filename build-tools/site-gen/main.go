@@ -47,7 +47,7 @@ import (
 type app struct {
 	CacheBust bool   `help:"Rename .css, .js, and .wasm files to include short hash"`
 	Domain    string `help:"Rewrite top-level paths to subdomains"`
-	SubDomain string `help:"Skip URL rewrites for subdomain. Map /subdomain/PATH paths to /PATH." enum:"apex,discord,docs,lab,learn,play" default:"apex"`
+	SubDomain string `help:"Skip URL rewrites for subdomain. Map /subdomain/PATH paths to /PATH." enum:"apex,discord,docs,gallery,lab,learn,play" default:"apex"`
 	SrcDir    string `arg:"" required:""`
 	DestDir   string `arg:"" required:""`
 
@@ -244,7 +244,7 @@ var (
 
 // updateHTMLFile reads an HTML file from `r` and writes it to `w` making the
 // following alterations:
-//   - href and value attributes referencing /discord, /docs, /lab,
+//   - href and value attributes referencing /discord, /docs, /gallery, /lab,
 //     /learn and /play are transformed to top-level domains - discord.<domain>,
 //     docs.<domain>, etc.
 //   - href and src attributes referencing .css or .js files that have been
@@ -307,10 +307,10 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 
 func newSubDomainRE(subDomain string) *regexp.Regexp {
 	if subDomain == "apex" {
-		return regexp.MustCompile(`(href|value)="/(discord|docs|lab|learn|play)`)
+		return regexp.MustCompile(`(href|value)="/(discord|docs|gallery|lab|learn|play)`)
 	}
 	var subs []string
-	for _, s := range []string{"discord", "docs", "lab", "learn", "play"} {
+	for _, s := range []string{"discord", "docs", "gallery", "lab", "learn", "play"} {
 		if s != subDomain {
 			subs = append(subs, s)
 		}

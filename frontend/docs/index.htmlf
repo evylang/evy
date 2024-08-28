@@ -1,12 +1,9 @@
 <h1>Documentation</h1>
 <p>Learn programming with Evy</p>
 <ul>
+  <li>Check out the <a href="/lab">Lab Challenges</a>.</li>
   <li>
-    Check out the <a href="https://github.com/evylang/evy/wiki">Learn and Practise</a> resources.
-  </li>
-  <li>
-    Explore the samples on the <a href="/play">Playground</a> or the
-    <a href="https://github.com/evylang/evy/wiki/gallery">Gallery</a>.
+    Explore the samples on the <a href="/play">Playground</a> or the <a href="/gallery">Gallery</a>.
   </li>
   <li>Ask questions or discuss Evy in the <a href="/discord">Evy community</a> on Discord.</li>
 </ul>

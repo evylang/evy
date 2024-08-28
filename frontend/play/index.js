@@ -415,6 +415,8 @@ async function handleHashChangeNoFormat() {
     if (hasEditorSession()) {
       !editor && initEditor()
       editor.loadSession()
+      loadNotes()
+      toggleEditorVisibility(true)
       return
     }
     const sample = "welcome"
@@ -442,6 +444,7 @@ function removeNotes() {
   if (!notesEl) return
   notesEl.classList.add("hidden")
   notesEl.innerHTML = ""
+  sessionStorage.removeItem("evy-sample-id")
 }
 
 function addNotes(notes) {
@@ -449,6 +452,7 @@ function addNotes(notes) {
   const notesEl = document.querySelector("#notes")
   notesEl.classList.remove("hidden")
   notesEl.innerHTML = notes
+  sessionStorage.setItem("evy-sample-id", currentSample)
 
   // hide all notes after first "next" button:
   // <p><button class="next-btn">Next</button></p>
@@ -467,6 +471,21 @@ function addNotes(notes) {
     el.target = "_blank"
   })
   notesEl.scrollTo(0, 0)
+}
+
+async function loadNotes() {
+  const sampleID = sessionStorage.getItem("evy-sample-id")
+  const sample = sampleData.byID[sampleID]
+  if (!sample?.notes) {
+    removeNotes()
+    return
+  }
+  currentSample = sampleID
+
+  const notesURL = `samples/${sample.sectionID}/${sample.id}.htmlf`
+  const notes = await fetchText(notesURL)
+  addNotes(notes)
+  toggleEditorVisibility(sample.editor !== "none")
 }
 
 function handleNotesNextClick(e) {
@@ -488,9 +507,13 @@ function updateEditor(content, opts) {
   editor.update({ value: content, errorLines: {} })
   document.querySelector(".editor-wrap").scrollTo(0, 0)
   editor.onUpdate(clearHash)
-  editorHidden = opts.editor === "none"
+  toggleEditorVisibility(opts.editor !== "none")
+}
+
+function toggleEditorVisibility(isVisible) {
+  editorHidden = !isVisible
   const classList = document.querySelector(".editor-wrap").classList
-  editorHidden ? classList.add("hidden") : classList.remove("hidden")
+  isVisible ? classList.remove("hidden") : classList.add("hidden")
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -528,7 +551,6 @@ async function fetchSourceWithNotes({ content, sample, source }) {
   // sample ID is set
   const s = sampleData.byID[sample]
   currentSample = sample
-  const url = `samples/${s.sectionID}/${sample}.evy`
   return await fetchSample(s)
 }
 

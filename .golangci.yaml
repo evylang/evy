@@ -8,6 +8,15 @@ issues:
     - "^G304: Potential file inclusion via variable"
     - "^G306: Expect WriteFile permissions to be 0600 or less"
     - "^G301: Expect directory permissions to be 0750 or less"
+  exclude-rules:
+    # Dynamic errors are OK in main packages. Packages should use sentinels.
+    - path: "^([^/]*|build-tools/.*)$"
+      linters:
+        - err113
+    # Used with `cd learn; golangci-lint run`
+    - path: "^cmd/.*$"
+      linters:
+        - err113
 
 linters:
   enable-all: true

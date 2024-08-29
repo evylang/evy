@@ -126,7 +126,7 @@ func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []
 	case "course":
 		return NewCourseModel(mdFile, opts...)
 	}
-	return nil, fmt.Errorf("unsupported frontmatter type %q", string(fm.Type)) //nolint:err113 // dynamic errors in main are fine.
+	return nil, fmt.Errorf("%w: unsupported frontmatter type %q", ErrInvalidFrontmatter, string(fm.Type))
 }
 
 type baseFrontmatter struct {

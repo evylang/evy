@@ -52,8 +52,8 @@ Upgrade all Go package dependencies with
 
 and the same again for the `evy/learn` sub-module
 
-    go -C learn get -u ./...
-    go -C learn mod tidy
+    go get -C learn -u ./...
+    go mod -C learn tidy
 
 Verify that the Go version specified in the `go.mod` files matches the Go
 version that Hermit installs, which has potentially been upgraded in the prior

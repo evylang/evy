@@ -47,8 +47,8 @@
 go mod tidy
 </code></pre>
 <p>and the same again for the <code>evy/learn</code> sub-module</p>
-<pre><code>go -C learn get -u ./...
-go -C learn mod tidy
+<pre><code>go get -C learn -u ./...
+go mod -C learn tidy
 </code></pre>
 <p>
   Verify that the Go version specified in the <code>go.mod</code> files matches the Go version that

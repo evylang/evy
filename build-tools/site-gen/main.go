@@ -106,7 +106,6 @@ func (a *app) copyTree() error {
 		case 0: // normal file
 			return a.handleFile(filename)
 		default:
-			//nolint:goerr113 // dynamic errors in package main is ok
 			return fmt.Errorf("unknown file type: %s: %s", mode, srcfile)
 		}
 	})
@@ -125,11 +124,9 @@ func checkSymlink(srcfile string) error {
 	}
 	mode := fi.Mode() & fs.ModeType
 	if mode == fs.ModeDir {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("symlink dirs not allowed: %s", srcfile)
 	}
 	if mode != 0 {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("symlink to unknown file type: %s: %s", mode, srcfile)
 	}
 	return nil
@@ -157,7 +154,6 @@ func (a *app) handleFile(filename string) error {
 		basename := strings.TrimSuffix(filepath.Base(filename), ext)
 		target := basename + "." + shortSha + ext
 		if _, ok := a.renamedFiles[filename]; ok {
-			//nolint:goerr113 // dynamic errors in package main is ok
 			return fmt.Errorf("duplicate filename: %s", srcfile)
 		}
 		a.renamedFiles[filename] = target

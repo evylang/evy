@@ -42,12 +42,12 @@ build-full: embed | $(O)
 ## Build evy binaries without web content embedded
 build-go: $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go build -o ../$(O) -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go build -C learn -o ../$(O) -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries in $GOBIN
 install-full: embed
 	go install -tags full -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go -C learn install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries without embedded frontend in $GOBIN
 install:
@@ -94,7 +94,7 @@ EXPORTDIR = $(O)/export-test
 ## Run non-tinygo tests and generate a coverage file
 test-go: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
-	cd learn; go test -coverprofile=../$(LEARNCOVERFILE) ./...
+	go test -C learn -coverprofile=../$(LEARNCOVERFILE) ./...
 
 ## Test evy CLI
 test-cli: build-full

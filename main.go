@@ -167,7 +167,6 @@ func (c *runCmd) Run() error {
 
 func (c *runCmd) fileBytes() ([]byte, error) {
 	if c.Txtar != "" && filepath.Ext(c.Source) != ".txtar" {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return nil, errors.New("txtar member specified but source file is not a txtar archive")
 	}
 	b, err := fileBytes(c.Source)
@@ -181,7 +180,6 @@ func (c *runCmd) fileBytes() ([]byte, error) {
 				return file.Data, nil
 			}
 		}
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return nil, fmt.Errorf("file %q not found in txtar archive", c.Txtar)
 	}
 	return b, nil
@@ -391,7 +389,6 @@ func validateExportDir(force bool, name string) error {
 		if force {
 			return nil
 		}
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("%q is not empty, use --force", name)
 	}
 	return err

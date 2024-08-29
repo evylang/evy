@@ -12,19 +12,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make build-go test
+      - run: ./bin/make -j $(nproc) build-go test
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: ./bin/make lint
+      - run: ./bin/make -j $(nproc) lint
 
   check-uptodate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: ./bin/make ci-check-uptodate
+      - run: ./bin/make -j $(nproc) ci-check-uptodate
         env:
           TERM: vt100
 
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make deploy ENV=stage CHANNEL= # empty channel becomes PR-NUM or "live"
+      - run: ./bin/make -j $(nproc) deploy ENV=stage CHANNEL= # empty channel becomes PR-NUM or "live"
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVY_LANG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -151,22 +151,22 @@ conform: install
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage
 
-DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/doctest-out.md && mv $(O)/doctest-out.md $(md)
 DOCTESTS = docs/builtins.md docs/spec.md docs/syntax-by-example.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
-TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/toc-out.md && mv $(O)/toc-out.md $(md)
 TOCFILES = docs/builtins.md docs/spec.md
-toc:
+toc: | $(O)
 	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
 
-USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/usage-out.md && mv $(O)/usage-out.md $(md)
 USAGEFILES = docs/usage.md
 usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
-GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
+GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/godoc-out.go && mv $(O)/godoc-out.go $(filename)
 GODOCFILES = main.go learn/cmd/levy/main.go
 godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
@@ -292,7 +292,8 @@ snaps: run-playwright
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier e2e prettier serve
+.PHONY: check-prettier check-style e2e e2e-diff install-playwright run-playwright prettier serve snaps style
+.NOTPARALLEL: check-prettier check-style prettier style
 
 # --- deploy -----------------------------------------------------------------
 CHANNEL = live

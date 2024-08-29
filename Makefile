@@ -10,27 +10,25 @@ GOFILES = $(shell find . -name '*.go')
 PRETTIER = npx --prefix $(NODEPREFIX) -y prettier --log-level warn
 
 ## Build, test, check coverage and lint
-all: build-full test lint
+all: test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
 	@echo '$(COLOR_GREEN)Success$(COLOR_NORMAL)'
 
-test: test-go test-tiny test-cli check-coverage
+test: build-full test-go test-tiny test-cli check-coverage
 
-lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
+lint: lint-go lint-sh lint-node check-fmt-evy conform
 
-## Full clean build and up-to-date checks as run on CI
-ci: ci-check-uptodate .WAIT all
+## Full clean build and up-to-date checks as run on CI for local execution
+ci: check-uptodate .WAIT all
 
-ci-check-uptodate: clean .WAIT check-uptodate
-
-check-uptodate: tidy fmt doc docs learn lab
+check-uptodate: clean .WAIT tidy fmt doc docs learn lab
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate ci ci-check-uptodate test lint clean
+.PHONY: all check-uptodate check-uptodate ci clean lint test
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)
@@ -132,6 +130,8 @@ lint-go:
 	golangci-lint run
 	cd learn; golangci-lint run
 
+lint-node: install-npm-deps .WAIT check-prettier check-style
+
 ## Format evy sample code
 fmt-evy:
 	go run . fmt --write $(EVY_FILES)
@@ -146,7 +146,7 @@ conform: install
 	  evy run "$$n"; \
 	done
 
-.PHONY: check-fmt-evy conform fmt-evy lint-go
+.PHONY: check-fmt-evy conform fmt-evy lint-go lint-node
 
 # --- Docs ---------------------------------------------------------------------
 doc: doctest godoc toc usage
@@ -258,14 +258,19 @@ check-prettier: | $(NODELIB)
 	$(PRETTIER) --check .
 
 ## Fix CSS files with stylelint
+# Run `make install-npm-deps` first if needed, kept out of deps for speed.
+# Only included as dependency with .WAIT in `check-uptodate` and `lint`.
 style: | $(NODELIB)
-	npm --prefix $(NODEPREFIX) ci
 	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json --fix frontend/**/*.css
 
 ## Lint CSS files with stylelint
+# Run `make install-npm-deps` first if needed, see comment on `style` above.
 check-style: | $(NODELIB)
-	npm --prefix $(NODEPREFIX) ci
 	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json frontend/**/*.css
+
+## Install npm dependencies to run frontend tooling like stylelint.
+install-npm-deps:
+	npm --prefix $(NODEPREFIX) ci
 
 ## Install playwright on host system for `e2e` to use.
 install-playwright:
@@ -275,6 +280,9 @@ install-playwright:
 run-playwright:
 	@echo "running playwright against $(BASEURL)"
 	$(PLAYWRIGHT_CMD)
+
+docker-pull:
+	docker pull $(PLAYWRIGHT_OCI_IMAGE)
 
 ## Run end-to-end tests with playwright (see run-playwright)
 e2e: run-playwright
@@ -292,8 +300,7 @@ snaps: run-playwright
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier check-style e2e e2e-diff install-playwright run-playwright prettier serve snaps style
-.NOTPARALLEL: check-prettier check-style prettier style
+.PHONY: check-prettier check-style docker-pull e2e e2e-diff install-npm-deps install-playwright prettier run-playwright serve snaps style
 
 # --- deploy -----------------------------------------------------------------
 CHANNEL = live

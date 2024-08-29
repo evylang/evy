@@ -12,15 +12,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: ./bin/make check-uptodate build-go test
-        env:
-          TERM: vt100
+      - run: ./bin/make build-go test
 
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: ./bin/make lint
+
+  check-uptodate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./bin/make ci-check-uptodate
+        env:
+          TERM: vt100
 
   deploy:
     runs-on: ubuntu-latest

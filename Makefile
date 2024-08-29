@@ -19,7 +19,9 @@ test: test-go test-tiny test-cli check-coverage
 lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
 
 ## Full clean build and up-to-date checks as run on CI
-ci: clean check-uptodate all
+ci: ci-check-uptodate .WAIT all
+
+ci-check-uptodate: clean .WAIT check-uptodate
 
 check-uptodate: tidy fmt doc docs learn lab
 	test -z "$$(git status --porcelain)" || { git status; false; }
@@ -28,7 +30,7 @@ check-uptodate: tidy fmt doc docs learn lab
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate ci test lint clean
+.PHONY: all check-uptodate ci ci-check-uptodate test lint clean
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)

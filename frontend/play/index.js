@@ -478,7 +478,8 @@ function handleNotesNextClick(e) {
     if (el.querySelector(".next-btn")) break
     el = el.nextElementSibling
   }
-  document.querySelector("#notes").scrollTo({ top: btn.offsetTop + 38, behavior: "smooth" })
+  const top = btn.offsetTop + btn.offsetHeight
+  document.querySelector("#notes").scrollTo({ top, behavior: "smooth" })
 }
 
 function updateEditor(content, opts) {

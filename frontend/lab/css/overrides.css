@@ -28,7 +28,7 @@ html {
   scroll-behavior: smooth;
   position: relative;
 }
-.notes:after {
+.notes:not(.notes:has(+ .editor-wrap.hidden)):after {
   content: "";
   display: block;
   height: 80%;
@@ -122,7 +122,7 @@ html {
     padding: 0;
     background: none;
     margin-bottom: 24px;
-    pointer-events: none;
+    user-select: none;
   }
 }
 

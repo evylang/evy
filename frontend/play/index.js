@@ -413,6 +413,7 @@ async function handleHashChangeNoFormat() {
   let opts = parseHash()
   if (!opts.source && !opts.sample && !opts.content) {
     if (hasEditorSession()) {
+      currentSample = "<UNSET>"
       !editor && initEditor()
       editor.loadSession()
       loadNotes()
@@ -540,18 +541,14 @@ function parseHash() {
 }
 
 async function fetchSourceWithNotes({ content, sample, source }) {
-  if (content) {
-    const src = await decode(content)
-    return { source: src }
+  if (sample) {
+    const s = sampleData.byID[sample]
+    currentSample = sample
+    return await fetchSample(s)
   }
-  if (source) {
-    const src = await fetchText(source)
-    return { source: src }
-  }
-  // sample ID is set
-  const s = sampleData.byID[sample]
-  currentSample = sample
-  return await fetchSample(s)
+  currentSample = "<UNSET>"
+  const src = await (content ? decode(content) : fetchText(source))
+  return { source: src }
 }
 
 async function fetchSample(sample) {
@@ -1052,12 +1049,13 @@ function showNextSample() {
 
 function updateSampleTitle() {
   const titleDiv = document.querySelector("#sample-title")
-  const sample = sampleData.byID[currentSample]
-  titleDiv.textContent = sample.title
   const indexDiv = document.querySelector("#sample-index")
   const prevButton = document.querySelector("#sample-previous")
   const nextButton = document.querySelector("#sample-next")
-  if (sample.unlisted) {
+
+  const sample = sampleData.byID[currentSample]
+  titleDiv.textContent = sample?.title || sampleData.defaultTitle
+  if (!sample || sample.unlisted) {
     indexDiv.classList.add("hidden")
     prevButton.classList.add("hidden")
     nextButton.classList.add("hidden")

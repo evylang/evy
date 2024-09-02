@@ -11,12 +11,6 @@ That's what we'll build up to in this first lab—a bit of a whirlwind tour.
 
 There is also a step-by-step walk through video guide 🎬:
 
-<iframe
-  src="https://www.youtube-nocookie.com/embed/FBqyiU4iZNY"
-  title="YouTube video player for Introductory Lab Walk Through"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  referrerpolicy="strict-origin-when-cross-origin"
-  allowfullscreen
-  class="youtube"
-></iframe>
+<a href="https://youtu.be/FBqyiU4iZNY" target="_blank" class="youtube" >
+<img src="samples/intro/img/youtube.jpeg" alt="Screenshot of YouTube walk through" />
+</a>

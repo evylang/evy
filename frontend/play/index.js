@@ -413,8 +413,11 @@ async function handleHashChangeNoFormat() {
   let opts = parseHash()
   if (!opts.source && !opts.sample && !opts.content) {
     if (hasEditorSession()) {
+      currentSample = "<UNSET>"
       !editor && initEditor()
       editor.loadSession()
+      loadNotes()
+      toggleEditorVisibility(true)
       return
     }
     const sample = "welcome"
@@ -442,6 +445,7 @@ function removeNotes() {
   if (!notesEl) return
   notesEl.classList.add("hidden")
   notesEl.innerHTML = ""
+  sessionStorage.removeItem("evy-sample-id")
 }
 
 function addNotes(notes) {
@@ -449,6 +453,7 @@ function addNotes(notes) {
   const notesEl = document.querySelector("#notes")
   notesEl.classList.remove("hidden")
   notesEl.innerHTML = notes
+  sessionStorage.setItem("evy-sample-id", currentSample)
 
   // hide all notes after first "next" button:
   // <p><button class="next-btn">Next</button></p>
@@ -467,6 +472,21 @@ function addNotes(notes) {
     el.target = "_blank"
   })
   notesEl.scrollTo(0, 0)
+}
+
+async function loadNotes() {
+  const sampleID = sessionStorage.getItem("evy-sample-id")
+  const sample = sampleData.byID[sampleID]
+  if (!sample?.notes) {
+    removeNotes()
+    return
+  }
+  currentSample = sampleID
+
+  const notesURL = `samples/${sample.sectionID}/${sample.id}.htmlf`
+  const notes = await fetchText(notesURL)
+  addNotes(notes)
+  toggleEditorVisibility(sample.editor !== "none")
 }
 
 function handleNotesNextClick(e) {
@@ -488,9 +508,13 @@ function updateEditor(content, opts) {
   editor.update({ value: content, errorLines: {} })
   document.querySelector(".editor-wrap").scrollTo(0, 0)
   editor.onUpdate(clearHash)
-  editorHidden = opts.editor === "none"
+  toggleEditorVisibility(opts.editor !== "none")
+}
+
+function toggleEditorVisibility(isVisible) {
+  editorHidden = !isVisible
   const classList = document.querySelector(".editor-wrap").classList
-  editorHidden ? classList.add("hidden") : classList.remove("hidden")
+  isVisible ? classList.remove("hidden") : classList.add("hidden")
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -517,19 +541,14 @@ function parseHash() {
 }
 
 async function fetchSourceWithNotes({ content, sample, source }) {
-  if (content) {
-    const src = await decode(content)
-    return { source: src }
+  if (sample) {
+    const s = sampleData.byID[sample]
+    currentSample = sample
+    return await fetchSample(s)
   }
-  if (source) {
-    const src = await fetchText(source)
-    return { source: src }
-  }
-  // sample ID is set
-  const s = sampleData.byID[sample]
-  currentSample = sample
-  const url = `samples/${s.sectionID}/${sample}.evy`
-  return await fetchSample(s)
+  currentSample = "<UNSET>"
+  const src = await (content ? decode(content) : fetchText(source))
+  return { source: src }
 }
 
 async function fetchSample(sample) {
@@ -1030,12 +1049,13 @@ function showNextSample() {
 
 function updateSampleTitle() {
   const titleDiv = document.querySelector("#sample-title")
-  const sample = sampleData.byID[currentSample]
-  titleDiv.textContent = sample.title
   const indexDiv = document.querySelector("#sample-index")
   const prevButton = document.querySelector("#sample-previous")
   const nextButton = document.querySelector("#sample-next")
-  if (sample.unlisted) {
+
+  const sample = sampleData.byID[currentSample]
+  titleDiv.textContent = sample?.title || sampleData.defaultTitle
+  if (!sample || sample.unlisted) {
     indexDiv.classList.add("hidden")
     prevButton.classList.add("hidden")
     nextButton.classList.add("hidden")

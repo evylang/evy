@@ -202,15 +202,15 @@ summary::-webkit-details-marker {
   display: none;
 }
 
-.youtube {
-  --youtube-width: 380px;
-  --aspect-ratio: calc(16 / 9);
-  margin: 32px auto;
+a.youtube {
+  margin: 32px 16px;
   display: block;
-  width: var(--youtube-width);
-  height: calc(var(--youtube-width) / var(--aspect-ratio));
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  & img {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+  }
 }
 
 @media (max-width: 767px) {

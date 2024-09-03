@@ -1,12 +1,18 @@
-// querySPALinks returns all relative links, and links within rootDir. Links
-// containing `:`, e.g. https://..., http://..., mailto:.... are excluded.
+// querySPALinks returns all relative links, and links within rootDir to .html
+// files, including to anchor tags within .html files, e.g.
+// sibling.html#middle.
+//
+// Links to file with other extensions and links containing `:`, e.g.
+// https://..., http://..., mailto:.... are excluded.
 export function querySPALinks(rootDir) {
   const internalLinks = document.querySelectorAll('a:not([href*=":"])')
   return [...internalLinks].filter((link) => {
     // use literal href="..." contents, not derived, absolute link.href
     const href = link.getAttribute("href")
-    // relative link or course root
-    return !href.startsWith("/") || href.startsWith(rootDir)
+    // relative link or root directory links to .html files only
+    const isRelativeLink = !href.startsWith("/") || href.startsWith(rootDir)
+    const isHTMLFile = href.split("#").shift().endsWith(".html")
+    return isRelativeLink && isHTMLFile
   })
 }
 

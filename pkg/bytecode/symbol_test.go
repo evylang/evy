@@ -19,6 +19,26 @@ func TestDefine(t *testing.T) {
 	}
 }
 
+func TestIndex(t *testing.T) {
+	t.Run("enclosed index", func(t *testing.T) {
+		global := NewSymbolTable()
+		global.Define("a")
+		global.Define("b")
+		nested := global.Push()
+		symbol := nested.Define("c")
+		assert.Equal(t, 0, symbol.Index)
+		nested2 := nested.Push()
+		s2 := nested2.Define("d")
+		assert.Equal(t, 1, s2.Index)
+	})
+	t.Run("empty outer", func(t *testing.T) {
+		global := NewSymbolTable()
+		local := global.Push()
+		symbol := local.Define("c")
+		assert.Equal(t, 0, symbol.Index)
+	})
+}
+
 func TestResolveGlobal(t *testing.T) {
 	expected := []Symbol{
 		{Name: "a", Scope: GlobalScope, Index: 0},

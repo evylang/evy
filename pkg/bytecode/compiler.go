@@ -30,7 +30,7 @@ var (
 type Compiler struct {
 	constants    []value
 	instructions Instructions
-	globals      *SymbolTable
+	symbolTable  *SymbolTable
 	// breaks tracks the positions of break statements in the inner-most loop.
 	breaks []int
 }
@@ -39,11 +39,13 @@ type Compiler struct {
 type Bytecode struct {
 	Constants    []value
 	Instructions Instructions
+	GlobalCount  int
+	LocalCount   int
 }
 
 // NewCompiler returns a new compiler.
 func NewCompiler() *Compiler {
-	return &Compiler{globals: NewSymbolTable()}
+	return &Compiler{symbolTable: NewSymbolTable()}
 }
 
 // Compile accepts an AST node and renders it to bytecode internally.
@@ -126,6 +128,8 @@ func (c *Compiler) Bytecode() *Bytecode {
 	return &Bytecode{
 		Instructions: c.instructions,
 		Constants:    c.constants,
+		GlobalCount:  c.symbolTable.index,
+		LocalCount:   c.symbolTable.nestedMaxIndex,
 	}
 }
 
@@ -235,11 +239,13 @@ func (c *Compiler) compileStringBinaryExpression(expr *parser.BinaryExpression) 
 }
 
 func (c *Compiler) compileBlockStatement(block *parser.BlockStatement) error {
+	c.enterScope()
 	for _, stmt := range block.Statements {
 		if err := c.Compile(stmt); err != nil {
 			return err
 		}
 	}
+	c.leaveScope()
 	return nil
 }
 
@@ -279,11 +285,11 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 		// declare the loop var with a noneVal to start with. The top
 		// of the loop will overwrite this with a value of the correct type
 		// for the loop.
-		symbol := c.globals.Define(stmt.LoopVar.Name)
+		symbol := c.symbolTable.Define(stmt.LoopVar.Name)
 		if err := c.emit(OpNone); err != nil {
 			return err
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		if err := c.emitSetVar(symbol); err != nil {
 			return err
 		}
 	}
@@ -302,11 +308,11 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 	// Assign the current loop value to the loop var. The rangeOp has left it
 	// on the stack if we told it we have a loop var (hasLoopVar).
 	if stmt.LoopVar != nil {
-		symbol, ok := c.globals.Resolve(stmt.LoopVar.Name)
+		symbol, ok := c.symbolTable.Resolve(stmt.LoopVar.Name)
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, stmt.LoopVar.Name)
 		}
-		if err := c.emit(OpSetGlobal, symbol.Index); err != nil {
+		if err := c.emitSetVar(symbol); err != nil {
 			return err
 		}
 	}
@@ -317,7 +323,6 @@ func (c *Compiler) compileForStatement(stmt *parser.ForStmt) error {
 	if err := c.Compile(stmt.Block); err != nil {
 		return err
 	}
-
 	if err := c.emit(OpJump, topOfLoop); err != nil {
 		return err
 	}
@@ -487,8 +492,8 @@ func (c *Compiler) compileDecl(decl *parser.Decl) error {
 	if err := c.Compile(decl.Value); err != nil {
 		return err
 	}
-	symbol := c.globals.Define(decl.Var.Name)
-	return c.emit(OpSetGlobal, symbol.Index)
+	symbol := c.symbolTable.Define(decl.Var.Name)
+	return c.emitSetVar(symbol)
 }
 
 func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
@@ -497,11 +502,11 @@ func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
 	}
 	switch target := stmt.Target.(type) {
 	case *parser.Var:
-		symbol, ok := c.globals.Resolve(target.Name)
+		symbol, ok := c.symbolTable.Resolve(target.Name)
 		if !ok {
 			return fmt.Errorf("%w %s", ErrUndefinedVar, target.Name)
 		}
-		return c.emit(OpSetGlobal, symbol.Index)
+		return c.emitSetVar(symbol)
 	case *parser.IndexExpression:
 		if err := c.Compile(target.Left); err != nil {
 			return err
@@ -515,11 +520,14 @@ func (c *Compiler) compileAssignment(stmt *parser.AssignmentStmt) error {
 }
 
 func (c *Compiler) compileVar(variable *parser.Var) error {
-	symbol, ok := c.globals.Resolve(variable.Name)
+	symbol, ok := c.symbolTable.Resolve(variable.Name)
 	if !ok {
 		return fmt.Errorf("%w %s", ErrUndefinedVar, variable.Name)
 	}
-	return c.emit(OpGetGlobal, symbol.Index)
+	if symbol.Scope == GlobalScope {
+		return c.emit(OpGetGlobal, symbol.Index)
+	}
+	return c.emit(OpGetLocal, symbol.Index)
 }
 
 func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
@@ -533,4 +541,21 @@ func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Compiler) enterScope() {
+	c.symbolTable = c.symbolTable.Push()
+}
+
+func (c *Compiler) leaveScope() {
+	c.symbolTable = c.symbolTable.Pop()
+}
+
+// emitSetVar will emit an OpSetLocal or an OpSetGlobal depending upon
+// the scope of the provided symbol.
+func (c *Compiler) emitSetVar(symbol Symbol) error {
+	if symbol.Scope == GlobalScope {
+		return c.emit(OpSetGlobal, symbol.Index)
+	}
+	return c.emit(OpSetLocal, symbol.Index)
 }

@@ -663,15 +663,17 @@ var randDecl = &parser.FuncDefStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-// We need to manually seed for tinygo 0.28.1.
-var randsource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+// RandSource is the source used by the rand1 and rand builtins. By default it
+// is initialized with the current time. It is exported so it can be overridden
+// by a fixed seed to generate deterministic output.
+var RandSource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 func randFunc(_ *scope, args []value) (value, error) {
 	upper := args[0].(*numVal).V
 	if upper < 1 || upper > 2147483647 { // [1, 2^31-1]
 		return nil, fmt.Errorf(`%w: "rand %v" not in range 1 to 2147483647`, ErrBadArguments, upper)
 	}
-	return &numVal{V: float64(randsource.Int31n(int32(upper)))}, nil
+	return &numVal{V: float64(RandSource.Int31n(int32(upper)))}, nil
 }
 
 var rand1Decl = &parser.FuncDefStmt{
@@ -681,7 +683,7 @@ var rand1Decl = &parser.FuncDefStmt{
 }
 
 func rand1Func(_ *scope, _ []value) (value, error) {
-	return &numVal{V: randsource.Float64()}, nil
+	return &numVal{V: RandSource.Float64()}, nil
 }
 
 var hslDecl = &parser.FuncDefStmt{

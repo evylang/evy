@@ -42,6 +42,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -108,6 +109,7 @@ type runCmd struct {
 	NoTestSummary bool   `short:"s" help:"Do not print test summary, only report failed tests."`
 	FailFast      bool   `help:"Stop execution on first failed test."`
 	Txtar         string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
+	RandSeed      int64  `help:"Seed for random number generation (0 means random seed)."`
 }
 
 type fmtCmd struct {
@@ -152,7 +154,9 @@ func (c *runCmd) Run() error {
 		return err
 	}
 	rt := cli.NewRuntime(c.runtimeOptions()...)
-
+	if c.RandSeed != 0 {
+		evaluator.RandSource = rand.New(rand.NewSource(c.RandSeed)) //nolint:gosec // not for security
+	}
 	eval := evaluator.NewEvaluator(rt)
 	eval.TestInfo.NoTestSummary = c.NoTestSummary
 	eval.TestInfo.FailFast = c.FailFast

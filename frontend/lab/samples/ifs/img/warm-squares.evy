@@ -1,0 +1,18 @@
+colors := [
+    "purple"
+    "mediumvioletred"
+    "orange"
+    "darkorange"
+    "gold"
+    "firebrick"
+    "maroon"
+]
+cnt := len colors
+
+for x := range 6.5 90 10
+    for y := range 6.5 90 10
+        color colors[rand cnt]
+        move x y
+        rect 7 7
+    end
+end

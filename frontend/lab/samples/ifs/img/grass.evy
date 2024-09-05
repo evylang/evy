@@ -1,0 +1,7 @@
+color (hsl 90 100 20 30)
+x := 0
+while x < 100
+    move x 0
+    rect 1 (rand 50)+10
+    x = x + 0.1
+end

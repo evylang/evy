@@ -1,0 +1,95 @@
+<h1>🪟 Rectangles</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Create with Rectangles</h2>
+<p>
+  Use rectangles to create your own unique drawing. Experiment with colors, sizes, and positions.
+</p>
+<p>Need ideas? <strong>Click</strong> on the images below for their Evy code.</p>
+<table>
+  <thead>
+    <tr>
+      <th><img src="samples/ifs/img/perspective.svg" alt="Perspective" title="evy:edit" /></th>
+      <th><img src="samples/ifs/img/2-squares.svg" alt="2 Squares" title="evy:edit" /></th>
+    </tr>
+  </thead>
+</table>
+<p>Be inspired by culture and art</p>
+<details>
+  <summary>Samples</summary>
+  <table>
+    <thead>
+      <tr>
+        <th><img src="samples/ifs/img/bauhaus.svg" alt="Bauhaus" title="evy:edit" /></th>
+        <th><img src="samples/ifs/img/mondrian.svg" alt="Mondrian" title="evy:edit" /></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img src="samples/ifs/img/monster.svg" alt="Monster" title="evy:edit" /></td>
+        <td><img src="samples/ifs/img/tetris.svg" alt="Tetris" title="evy:edit" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <details>
+    <summary>More</summary>
+    <table>
+      <thead>
+        <tr>
+          <th><img src="samples/ifs/img/window.svg" alt="Window" title="evy:edit" /></th>
+          <th><img src="samples/ifs/img/apartments.svg" alt="Apartments" title="evy:edit" /></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <img
+              src="samples/ifs/img/bwrect.svg"
+              alt="Black and White Rectangles"
+              title="evy:edit"
+            />
+          </td>
+          <td>
+            <img
+              src="samples/ifs/img/red-green-squares.svg"
+              alt="Red Green Squares"
+              title="evy:edit"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </details>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Use Loops and Randomness</h2>
+<p>Draw many rectangles with a loop. Play with random sizes, positions or colors.</p>
+<p>For example:</p>
+<pre><code class="language-evy">y := 5
+while y &lt; 95
+    move 2 y
+    rect (rand1)*y 4
+    y = y + 5
+end
+</code></pre>
+<details>
+  <summary>More</summary>
+  <table>
+    <thead>
+      <tr>
+        <th><img src="samples/ifs/img/grass.svg" alt="Grass" title="evy:edit" /></th>
+        <th>
+          <img src="samples/ifs/img/randrect.svg" alt="Random Purple Rectangles" title="evy:edit" />
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img src="samples/ifs/img/stripes.svg" alt="Stripes" title="evy:edit" /></td>
+        <td><img src="samples/ifs/img/warm-squares.svg" alt="Warm Squares" title="evy:edit" /></td>
+      </tr>
+    </tbody>
+  </table>
+</details>

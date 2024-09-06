@@ -36,4 +36,5 @@ var fullContent embed.FS
 func init() {
 	content = fullContent
 	contentDir = "out/embed"
+	fullBuild = true
 }

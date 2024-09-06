@@ -256,7 +256,7 @@ button.share > div {
 }
 
 @media (max-width: 767px) {
-  .main.view-output {
+  .main.view-output:not(:has(> .hidden)) {
     translate: -100vw;
   }
   .main {

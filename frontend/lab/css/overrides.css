@@ -202,6 +202,16 @@ a.youtube {
   }
 }
 
+#hamburger div {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color);
+}
+
+#show-notes[disabled] {
+  cursor: none;
+  color: var(--color-dimmed);
+}
 /* --- Notes responsive tweaks ---------------------------------- */
 @media (hover: hover) {
   .notes summary,
@@ -217,10 +227,36 @@ a.youtube {
 
 @media (max-width: 767px) {
   .notes {
-    display: none;
+    padding-top: 16px;
     width: var(--editor-width);
-    &:has(+ .editor-wrap.hidden) {
-      display: block;
+  }
+  /* 3 column layout */
+  .main:not(:has(> .hidden)) {
+    width: 300vw;
+    &.view-notes {
+      translate: 0;
+    }
+    &.view-code {
+      translate: -100vw;
+    }
+    &.view-output {
+      translate: -200vw;
+    }
+  }
+  /* 2 column layout */
+  .main:has(> .hidden) {
+    &.view-notes,
+    &.view-code {
+      translate: 0;
+    }
+    &.view-output {
+      translate: -100vw;
+    }
+  }
+  /* 1 column layout */
+  .main:has(.notes.hidden, .editorWrap.hidden) {
+    &.view-output {
+      translate: 0;
     }
   }
 }

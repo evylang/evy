@@ -52,7 +52,7 @@
         {
           "id": "bounce-show",
           "title": "🏓📺 Bouncing ball",
-          "notes": true,
+          "notes": false,
           "unlisted": true,
           "editor": "none"
         }

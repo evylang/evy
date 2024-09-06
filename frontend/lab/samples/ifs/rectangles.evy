@@ -1,0 +1,17 @@
+color "midnightblue"
+
+move 4 4
+rect 44 44
+
+move 52 4
+rect 44 44
+
+move 4 52
+rect 44 44
+
+move 52 52
+rect 44 44
+
+color "white"
+move 30 30
+rect 40 40

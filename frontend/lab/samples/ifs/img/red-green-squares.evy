@@ -1,0 +1,11 @@
+x := 6.5
+while x < 90
+    y := 6.5
+    while y < 90
+        color (hsl x y 50)
+        move x y
+        rect 7 7
+        y = y + 10
+    end
+    x = x + 10
+end

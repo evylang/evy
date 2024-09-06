@@ -1,0 +1,57 @@
+// px treats the canvas like a 10x10 grid of big pixels.
+// It draws a big pixel at the given coordinates 0 0 to 9 9.
+func px x:num y:num
+    move x*10 y*10
+    rect 10 10
+end
+
+clear "black"
+
+fill "purple"
+
+// legs
+px 1 0
+px 1 1
+px 3 1
+px 4 0
+px 6 0
+px 7 1
+px 9 0
+px 9 1
+
+// middle
+x := 1
+while x < 10
+    px x 2
+    px x 3
+    x = x + 1
+end
+x = 2
+while x < 9
+    px x 4
+    px x 5
+    px x 6
+    x = x + 1
+end
+
+// top
+px 3 7
+px 4 7
+px 5 7
+px 6 7
+px 7 7
+px 4 8
+px 6 8
+
+// eyes
+fill "black"
+px 3 4
+px 6 4
+
+fill "beige"
+px 4 4
+px 3 5
+px 4 5
+px 7 4
+px 6 5
+px 7 5

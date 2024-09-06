@@ -1,0 +1,21 @@
+color "sienna"
+move 10 10
+rect 75 75
+
+color "skyblue"
+
+move 15 15
+rect 30 30
+
+move 50 15
+rect 30 30
+
+move 15 50
+rect 30 30
+
+move 50 50
+rect 30 30
+
+color "yellow"
+move 30 64
+circle 7

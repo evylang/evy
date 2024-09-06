@@ -471,6 +471,11 @@ function addNotes(notes) {
   notesEl.querySelectorAll("a").forEach((el) => {
     el.target = "_blank"
   })
+  notesEl.querySelectorAll("img[title='evy:edit']").forEach((img) => {
+    img.onclick = handleNotesImgEditClick
+    img.title = "Click to edit"
+    img.style.cursor = "pointer"
+  })
   notesEl.scrollTo(0, 0)
 }
 
@@ -500,6 +505,13 @@ function handleNotesNextClick(e) {
   }
   const top = btn.offsetTop + btn.offsetHeight
   document.querySelector("#notes").scrollTo({ top, behavior: "smooth" })
+}
+
+async function handleNotesImgEditClick(e) {
+  const img = e.target
+  const url = img.src.replace(".svg", ".evy")
+  const evyImgSource = await fetchText(url)
+  editor.update({ value: evyImgSource, errorLines: {} })
 }
 
 function updateEditor(content, opts) {

@@ -138,6 +138,9 @@ html {
   overflow-x: auto;
   white-space: nowrap;
 }
+.notes table.hidden {
+  display: none;
+}
 .notes tr:not(:first-child) {
   border-top: 1px solid var(--border-color);
 }

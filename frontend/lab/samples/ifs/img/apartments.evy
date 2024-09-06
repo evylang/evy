@@ -1,0 +1,34 @@
+// walls
+fill "tan"
+
+width 0.5
+
+move 25 0
+rect 50 80
+
+move 24.5 80
+rect 52 6
+
+// windows
+fill "skyblue"
+move 29 8
+rect 10 8
+move 61 8
+rect 10 8
+y := 20
+while y < 75
+    move 29 y
+    rect 10 8
+    move 45 y
+    rect 10 8
+    move 61 y
+    rect 10 8
+    y = y + 12
+end
+
+// doors
+fill "slategrey"
+move 43 0
+rect 7 13
+move 50 0
+rect 7 13

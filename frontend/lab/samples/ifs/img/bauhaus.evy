@@ -1,0 +1,27 @@
+// Bauhaus style inspired
+clear "wheat"
+
+color "black"
+move 0 40
+rect 20 40
+rect 20 20
+
+color "firebrick"
+move 0 20
+rect 60 20
+move 60 20
+rect 20 20
+move 20 60
+rect 20 20
+rect 20 20
+
+color "gold"
+move 40 0
+rect 20 60
+
+color "royalblue"
+move 20 0
+rect 20 20
+move 60 80
+rect 20 20
+

@@ -1,0 +1,32 @@
+// Mondrian look alike
+color "firebrick"
+move 0 70
+rect 37 30
+
+color "gold"
+move 39 22
+rect 15 28
+
+color "darkblue"
+move 81 22
+rect 20 28
+
+color "black"
+
+// horizontal lines
+move 0 68
+rect 100 2
+move 0 49
+rect 100 2
+move 0 22
+rect 100 2
+move 37 5.5
+rect 43 2
+
+// vertical lines
+move 37 0
+rect 2.5 100
+move 53 0
+rect 1.5 100
+move 80 0
+rect 2 50

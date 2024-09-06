@@ -1,0 +1,64 @@
+fill "none"
+width 0.5
+
+// outline
+move 20 0
+rect 60 80
+
+// roof
+move 19 80
+rect 62 3
+move 20 74
+rect 60 1.5
+
+// windows
+window 24 49
+window 24 26
+window 52 49
+window 52 26
+
+// ground floor
+move 0 0
+rect 100 0.2
+move 20 2
+rect 60 18
+move 24 5.5
+rect 52 11.5
+
+move 36 2
+rect 28 18
+
+fill "white"
+move 42.5 2
+rect 15 18
+move 44.5 2
+rect 11 18
+move 46 3.5
+rect 8 15
+move 46 11.5
+rect 8 2.5
+
+// left/right ground floor decoration
+y := 2
+while y < 20
+    move 20 y
+    rect 4 1
+    move 76 y
+    rect 4 1
+    y = y + 1
+end
+
+func window x:num y:num
+    move x y
+    rect 24 2
+    move x y+2
+    rect 24 6
+    move x y+3.75
+    rect 24 2.5
+    move x+1 y+2
+    rect 11 17
+    move x+12 y+2
+    rect 11 17
+    move x+1 y+16
+    rect 22 3
+end

@@ -193,8 +193,12 @@ LAB_HTMLF := $(LAB_HTMLF_SRC:%.md=%.htmlf)
 ## Generate SVG files from .evy files for lab.evy.dev in frontend/lab
 lab: $(LAB_SVG) $(LAB_HTMLF)
 
+FLAGS_frontend/lab/samples/ifs/img/randrect.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/ifs/img/stripes.svg = --rand-seed=2
+FLAGS_frontend/lab/samples/ifs/img/warm-squares.svg = --rand-seed=2
+FLAGS_frontend/lab/samples/ifs/img/grass.svg = --rand-seed=1
 %.svg: %.evy | $(NODELIB)
-	go run . run --svg-out "$@" "$<"
+	go run . run --svg-out "$@" $(FLAGS_$@) "$<"
 	$(PRETTIER) --write "$@"
 
 %.htmlf: %.md | $(NODELIB)

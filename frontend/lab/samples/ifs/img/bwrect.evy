@@ -1,0 +1,13 @@
+fill "white"
+
+x := 0
+while x < 100
+    y := 0
+    while y < 100
+        move x y
+        width (x + y)/50
+        rect 5 5
+        y = y + 5
+    end
+    x = x + 5
+end

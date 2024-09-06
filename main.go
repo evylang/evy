@@ -47,6 +47,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"time"
 
@@ -61,7 +62,7 @@ import (
 
 // Globals overridden by linker flags on release build.
 var (
-	version = "v0.0.0"
+	version = ""
 )
 
 // Errors returned by the Evy tool.
@@ -75,6 +76,7 @@ var (
 	//go:embed build-tools/default-embed
 	content    embed.FS
 	contentDir = "build-tools/default-embed"
+	fullBuild  = false
 )
 
 const description = `
@@ -95,10 +97,38 @@ type app struct {
 func main() {
 	kopts := []kong.Option{
 		kong.Description(description),
-		kong.Vars{"version": version},
+		kong.Vars{"version": getVersion()},
 	}
 	kctx := kong.Parse(&app{}, kopts...)
 	kctx.FatalIfErrorf(kctx.Run())
+}
+
+func getVersion() string {
+	if version == "" {
+		version = getBuildInfoVersion()
+	}
+	if !fullBuild {
+		version += "-slim"
+	}
+	return version
+}
+
+func getBuildInfoVersion() string {
+	var mainVersion, revision string
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if info.Main.Version != "" && info.Main.Version != "(devel)" {
+			mainVersion = info.Main.Version
+		}
+		settings := map[string]string{}
+		for _, s := range info.Settings {
+			settings[s.Key] = s.Value
+		}
+		revision = settings["vcs.revision"]
+		if revision != "" && settings["vcs.modified"] == "true" {
+			revision += "-dirty"
+		}
+	}
+	return cmp.Or(mainVersion, revision, "unknown")
 }
 
 type runCmd struct {

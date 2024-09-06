@@ -1,23 +1,15 @@
-/* Special treatment of 3 column layout */
 :root {
-  --notes-max-width: min(25vw, calc(20rem + 32px));
-  --editor-max-width: calc(36rem + 16px);
+  --gap: 12px;
 }
 html {
   scroll-behavior: smooth;
 }
 
-.max-width-wrapper:not(:has(.main > .hidden)) {
-  max-width: calc(var(--editor-max-width) + var(--notes-max-width) + var(--canvas-size) + 64px);
+@media (min-width: 768px) {
 }
 
-/* --- Notes -------------------------------------------------------- */
-.editor-wrap {
-  max-width: var(--editor-max-width);
-}
-
+/* --- Notes ----------------------------------------------------- */
 .notes {
-  max-width: var(--notes-max-width);
   background: var(--background);
   border-radius: 6px;
   border: var(--editor-border);
@@ -27,20 +19,10 @@ html {
   padding: 8px 16px var(--editor-padding-bottom) 16px;
   scroll-behavior: smooth;
   position: relative;
-}
-.notes:not(.notes:has(+ .editor-wrap.hidden)):after {
-  content: "";
-  display: block;
-  height: 80%;
-}
-
-@media (min-width: 768px) {
-  .notes:has(+ .editor-wrap.hidden) {
-    min-width: 440px;
-  }
-  .main {
-    gap: 12px;
-    padding: 16px 12px;
+  &:not(.notes:has(+ .editor-wrap.hidden)):after {
+    content: "";
+    display: block;
+    height: 90%;
   }
 }
 
@@ -131,15 +113,16 @@ html {
   max-width: 80%;
 }
 
+/* --- Notes table ----------------------------------------------- */
 .notes table {
   border-collapse: collapse;
   margin: 16px 0;
   display: block;
   overflow-x: auto;
   white-space: nowrap;
-}
-.notes table.hidden {
-  display: none;
+  &.hidden {
+    display: none;
+  }
 }
 .notes tr:not(:first-child) {
   border-top: 1px solid var(--border-color);
@@ -166,6 +149,7 @@ html {
   width: 100%;
   max-width: 100%;
 }
+
 .notes details {
   margin-bottom: 12px;
   & pre {
@@ -180,6 +164,7 @@ html {
   }
 }
 
+/* --- Notes details, next buttons-------------------------------- */
 .notes :is(summary, .next-btn) {
   background: none;
   border: 1px solid var(--color-accent-hover);
@@ -205,6 +190,7 @@ summary::-webkit-details-marker {
   display: none;
 }
 
+/* --- Notes custom classes -------------------------------------- */
 a.youtube {
   margin: 32px 16px;
   display: block;
@@ -216,16 +202,7 @@ a.youtube {
   }
 }
 
-@media (max-width: 767px) {
-  .notes {
-    display: none;
-  }
-  .notes:has(+ .editor-wrap.hidden) {
-    display: block;
-    min-width: var(--editor-width);
-  }
-}
-
+/* --- Notes responsive tweaks ---------------------------------- */
 @media (hover: hover) {
   .notes summary,
   .notes .next-btn {
@@ -235,5 +212,44 @@ a.youtube {
       border-color: hsl(201deg 100% 78%);
       cursor: pointer;
     }
+  }
+}
+
+@media (max-width: 767px) {
+  .notes {
+    display: none;
+    width: var(--editor-width);
+    &:has(+ .editor-wrap.hidden) {
+      display: block;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    gap: var(--gap);
+    padding: 16px var(--gap);
+  }
+  /* 2 column layout */
+  .max-width-wrapper {
+    --col-width: calc(min(var(--canvas-size), calc(32rem)) + var(--gap));
+    max-width: calc(var(--col-width) * 2 + var(--gap));
+    & > main > * {
+      --2col-width: calc(100% / 2 - var(--gap) * 1.5);
+      width: var(--2col-width);
+    }
+  }
+  /* 3 column layout */
+  .max-width-wrapper:not(:has(.main > .hidden)) {
+    max-width: calc(var(--col-width) * 3);
+    & > main > * {
+      --3col-width: calc(100% / 3 - var(--gap) * 1.3);
+      width: var(--3col-width);
+    }
+  }
+  .output .canvas {
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    height: unset;
   }
 }

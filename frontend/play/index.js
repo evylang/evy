@@ -35,7 +35,7 @@ async function initWasm() {
   const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
   runButton.classList.remove("loading")
-  runButtonMob.onclick = handleMobRun
+  runButtonMob.onclick = handlePrimaryClick
   runButtonMob.classList.remove("loading")
 }
 
@@ -232,28 +232,52 @@ async function handleRun() {
   stopped ? start() : stop()
 }
 
-// handleMobRun handles three states for mobile devices:
-// run -> stop -> code
-async function handleMobRun() {
+// handlePrimaryClick handles view states (mobile, code, output) on mobile.
+async function handlePrimaryClick() {
+  // single column layout: run <-> stop
   if (editorHidden && notesHidden) {
     handleRun()
     return
   }
-  if (onCodeScreen()) {
+  const view = getView()
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (view == "view-notes" && !editorHidden) {
+    await slide("view-code")
+    if (showNotesBtn) showNotesBtn.disabled = false
+    return
+  }
+  if (view === "view-notes" || view === "view-code") {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
-    await slide()
+    await slide("view-output")
+    if (showNotesBtn) showNotesBtn.disabled = false
     start()
     return
   }
-  // on output screen
-  if (stopped) {
-    const runButtonMob = document.querySelector("#run-mobile")
-    runButtonMob.innerText = "Run"
-    slide()
+  // on output view, running
+  if (!stopped) {
+    stop()
     return
   }
-  stop()
+  // on output view, stopped
+  document.querySelector("#run-mobile").innerText = "Run"
+  const nextScreen = editorHidden ? "view-notes" : "view-code"
+  slide(nextScreen)
+}
+
+function getView() {
+  const cl = document.querySelector("main.main").classList
+  if (cl.contains("view-output")) return "view-output"
+  if (cl.contains("view-code")) return "view-code"
+  if (cl.contains("view-notes")) return "view-notes"
+}
+
+function showNotes() {
+  if (notesHidden) return
+  if (!stopped) stop()
+  slide("view-notes")
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (showNotesBtn) showNotesBtn.disabled = true
 }
 
 // start calls evy wasm/go main(). It parses, formats and evaluates evy
@@ -301,36 +325,48 @@ function afterStop() {
   wasmInst = undefined
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mobile")
   runButton.classList.remove("running")
   runButton.innerText = "Run"
-  runButtonMob.classList.remove("running")
-  runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
+  updateMobilePrimaryButton()
 
   const readEl = document.querySelector("#read")
   document.activeElement === readEl && readEl.blur()
 }
 
-function onCodeScreen() {
-  return !document.querySelector("main").classList.contains("view-output")
+function updateMobilePrimaryButton() {
+  const classList = document.querySelector("#run-mobile")
+  classList.classList.remove("running")
+  classList.innerText = mobilePrimaryButtonText()
 }
 
-async function slide() {
-  const el = document.querySelector("main")
+function mobilePrimaryButtonText() {
+  if (editorHidden && notesHidden) return "Run"
+  const view = getView()
+  if (view === "view-notes" && !editorHidden) return "Code"
+  if (view === "view-notes" && editorHidden) return "Run"
+  if (view === "view-code") return "Run"
+  // output screen
+  if (editorHidden) return "Notes"
+  return "Code"
+}
+
+async function slide(view) {
+  const el = document.querySelector("main.main")
   const cl = el.classList
   return new Promise((resolve) => {
     el.ontransitionend = () => setTimeout(resolve, 100)
     el.onanimationend = () => cl.remove("animate")
     cl.add("animate")
-    onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
+    setView(view)
   })
 }
 
-async function stopAndSlide() {
-  if (!onCodeScreen()) {
-    await slide()
-  }
-  stop()
+function setView(view) {
+  const cl = document.querySelector("main.main").classList
+  const viewClasses = ["view-code", "view-notes", "view-output"]
+  viewClasses.map((c) => cl.remove(c))
+  cl.add(view)
+  updateMobilePrimaryButton()
 }
 
 function clearOutput() {
@@ -346,10 +382,13 @@ async function initUI() {
   document.addEventListener("keydown", ctrlEnterListener)
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
-  document.querySelector("#share").onclick = share
   document.querySelector("#sidebar-about").onclick = showAbout
   document.querySelector("#sidebar-share").onclick = share
   document.querySelector("#sidebar-icon-share").onclick = share
+  const shareBtn = document.querySelector("#share")
+  if (shareBtn) shareBtn.onclick = share
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (showNotesBtn) showNotesBtn.onclick = showNotes
   await fetchSamples()
   await handleHashChangeNoFormat() // Evy wasm for formatting might not be ready yet
   initModal()
@@ -409,15 +448,11 @@ async function handleHashChange() {
 
 async function handleHashChangeNoFormat() {
   hideModal()
-  await stopAndSlide() // go to code screen for new code
+  await stop() // go to code screen for new code
   let opts = parseHash()
   if (!opts.source && !opts.sample && !opts.content) {
-    if (hasEditorSession()) {
-      currentSample = "<UNSET>"
-      !editor && initEditor()
-      editor.loadSession()
-      loadNotes()
-      toggleEditorVisibility(true)
+    if (sessionStorage.getItem("evy-editor") !== null) {
+      loadSession()
       return
     }
     const sample = "welcome"
@@ -428,7 +463,33 @@ async function handleHashChangeNoFormat() {
   updateNotes(notes)
   updateEditor(source, opts)
   updateSampleTitle()
+  resetView()
   clearOutput()
+}
+
+function loadSession() {
+  currentSample = "<UNSET>"
+  !editor && initEditor()
+  editor.loadSession()
+  loadNotes()
+  toggleEditorVisibility(true)
+  resetView() // on mobile go to Notes view or Code view if no notes available.
+}
+
+// resetView resets the view based on content availability, on mobile only.
+// If notes are available, navigates to the notes view.
+// If no notes but the editor is present, switches to the code view.
+// Otherwise, defaults to the output view
+function resetView() {
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (showNotesBtn) showNotesBtn.disabled = true
+  if (!notesHidden) {
+    setView("view-notes")
+  } else if (!editorHidden) {
+    setView("view-code")
+  } else {
+    setView("view-output")
+  }
 }
 
 function updateNotes(notes) {
@@ -918,10 +979,6 @@ function initEditor() {
   document.querySelector(".editor-wrap").classList.remove("noscrollbar")
 }
 
-function hasEditorSession() {
-  return !!sessionStorage.getItem("evy-editor")
-}
-
 // --- eventHandlers, evy `on` -----------------------------------------
 
 // registerEventHandler is exported to evy go/wasm
@@ -937,7 +994,7 @@ function registerEventHandler(ptr, len) {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
     c.onmouseleave = (e) => exp.onMove(...leaveXY(e)) // pointer can leave in middle of canvas
   } else if (s === "key") {
-    unfocusRunBotton()
+    unfocusRunButton()
     document.addEventListener("keydown", keydownListener)
   } else if (s === "input") {
     addInputHandlers()
@@ -948,7 +1005,7 @@ function registerEventHandler(ptr, len) {
   }
 }
 
-function unfocusRunBotton() {
+function unfocusRunButton() {
   const runButton = document.querySelector("#run")
   const runButtonMob = document.querySelector("#run-mobile")
   document.activeElement === runButton && runButton.blur()

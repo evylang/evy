@@ -40,7 +40,10 @@
   <body>
     <header class="topnav">
       <div class="left">
-        <button id="hamburger" class="icon-hamburger"></button>
+        <button id="hamburger">
+          <div class="mobile logo-small"></div>
+          <div class="desktop icon-hamburger"></div>
+        </button>
         <a href="/" class="desktop">
           <img alt="Evy logo" class="logo" />
         </a>
@@ -62,16 +65,16 @@
         </button>
       </div>
       <div class="right">
+        <button class="mobile icon-book" id="show-notes" disabled></button>
         <button class="desktop share" id="share">
           <div class="icon-share"></div>
           <span>Share</span>
         </button>
-        <a href="/" class="mobile logo-small"></a>
       </div>
     </header>
 
     <div class="max-width-wrapper">
-      <main class="main">
+      <main class="main view-notes">
         <div class="notes" id="notes">
           <h1>👋 Welcome!</h1>
           <p>Programming is for everyone!</p>

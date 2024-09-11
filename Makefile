@@ -129,6 +129,8 @@ EVY_FILES = $(shell fd --type file --extension evy)
 lint-go:
 	golangci-lint run
 	cd learn; golangci-lint run
+	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+	go run golang.org/x/vuln/cmd/govulncheck@latest -C learn ./...
 
 lint-node: install-npm-deps .WAIT check-prettier check-style
 

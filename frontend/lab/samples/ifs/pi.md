@@ -124,8 +124,9 @@ And at the bottom of the loop, add:
 ```evy
 while // ...
   // ...
-  pi := reds / i * 4
+  piCalc := reds / i * 4
   cls // clears the text output
-  print "PI: " pi
+  print "Calculated Pi:" piCalc
+  print "Builtin Pi:   " pi
 end
 ```

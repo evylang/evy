@@ -132,9 +132,10 @@ else // ...
   <p>And at the bottom of the loop, add:</p>
   <pre><code class="language-evy">while // ...
   // ...
-  pi := reds / i * 4
+  piCalc := reds / i * 4
   cls // clears the text output
-  print &quot;PI: &quot; pi
+  print &quot;Calculated Pi:&quot; piCalc
+  print &quot;Builtin Pi:   &quot; pi
 end
 </code></pre>
 </details>

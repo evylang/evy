@@ -35,7 +35,6 @@ print z // 5
 Arithmetic, number expressions
 
 ```evy
-pi := 3.1415
 x := 5 * (3 + pi) - 2 / 7.6
 print x // 30.44434210526316
 ```

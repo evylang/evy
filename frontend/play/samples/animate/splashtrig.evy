@@ -7,7 +7,6 @@ orbits := len speed // number of moving rings
 dots := len colors // number of dots per ring
 radius := 100 / (orbits * 4 + 2)
 
-pi := 3.141593
 tau := 2 * pi
 
 dot:{}num

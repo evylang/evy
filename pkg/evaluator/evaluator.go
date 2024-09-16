@@ -115,9 +115,7 @@ func NewEvaluator(rt Runtime) *Evaluator {
 	builtins := newBuiltins(rt)
 	scope := newScope()
 	for _, global := range builtins.Globals {
-		t := global.Type()
-		z := zero(t)
-		scope.set(global.Name, z)
+		scope.set(global.parserVar.Name, global.val)
 	}
 	return &Evaluator{
 		builtins: builtins,

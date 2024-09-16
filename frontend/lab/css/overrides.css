@@ -207,11 +207,6 @@ a.youtube {
   height: 1.5rem;
   color: var(--color);
 }
-
-#show-notes[disabled] {
-  cursor: none;
-  color: var(--color-dimmed);
-}
 /* --- Notes responsive tweaks ---------------------------------- */
 @media (hover: hover) {
   .notes summary,

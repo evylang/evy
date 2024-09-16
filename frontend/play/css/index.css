@@ -267,11 +267,14 @@ button.share > div {
   .main .editor-wrap {
     margin-top: 4px;
   }
+  .main.no-translate-transition {
+    transition: translate 0s;
+  }
 }
 
 @media (prefers-reduced-motion) {
   .main {
-    transition: translate 0s ease-in-out 0.1s;
+    transition: translate 0s;
   }
   .main.animate {
     animation: fadein 0.2s ease-in forwards;

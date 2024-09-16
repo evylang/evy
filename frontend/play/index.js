@@ -480,7 +480,9 @@ function loadSession() {
 // If notes are available, navigates to the notes view.
 // If no notes but the editor is present, switches to the code view.
 // Otherwise, defaults to the output view
-function resetView() {
+async function resetView() {
+  const mainClassList = document.querySelector("main.main").classList
+  mainClassList.add("no-translate-transition")
   const showNotesBtn = document.querySelector("#show-notes")
   if (showNotesBtn) showNotesBtn.classList.add("hidden")
   if (!notesHidden) {
@@ -490,6 +492,9 @@ function resetView() {
   } else {
     setView("view-output")
   }
+  // sleep for 0.3 seconds, otherwise translate transition kicks in.
+  await new Promise((r) => setTimeout(r, 300))
+  mainClassList.remove("no-translate-transition")
 }
 
 function updateNotes(notes) {

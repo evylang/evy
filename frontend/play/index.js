@@ -1141,14 +1141,14 @@ function updateSampleTitle() {
   titleDiv.textContent = sample?.title || sampleData.defaultTitle
   if (!sample || sample.unlisted) {
     indexDiv.classList.add("hidden")
-    prevButton.classList.add("hidden")
-    nextButton.classList.add("hidden")
+    prevButton.disabled = true
+    nextButton.disabled = true
     return
   }
   indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
   indexDiv.classList.remove("hidden")
-  sample.previous ? prevButton.classList.remove("hidden") : prevButton.classList.add("hidden")
-  sample.next ? nextButton.classList.remove("hidden") : nextButton.classList.add("hidden")
+  prevButton.disabled = !sample.previous
+  nextButton.disabled = !sample.next
 }
 
 // --- UI: sidebar --------------------------------------------

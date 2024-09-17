@@ -81,16 +81,13 @@ button.arrow {
   height: 28px;
   width: 28px;
 }
-button.arrow:hover {
+button.arrow:not(:disabled):hover {
   background: var(--primary-button-color);
   color: var(--color-accent-hover);
 }
-button.arrow.hidden {
-  display: block;
-  color: transparent;
-  background: transparent;
-  border-color: transparent;
-  pointer-events: none;
+button.arrow:disabled {
+  color: var(--border-color);
+  cursor: default;
 }
 button.arrow svg {
   margin-left: auto;

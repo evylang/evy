@@ -240,17 +240,16 @@ async function handlePrimaryClick() {
     return
   }
   const view = getView()
-  const showNotesBtn = !notesHidden && document.querySelector("#show-notes")
   if (view == "view-notes" && !editorHidden) {
     await slide("view-code")
-    if (showNotesBtn) showNotesBtn.classList.remove("hidden")
+    toggleNotesButtonVisiblity(true)
     return
   }
   if (view === "view-notes" || view === "view-code") {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
     await slide("view-output")
-    if (showNotesBtn) showNotesBtn.classList.remove("hidden")
+    toggleNotesButtonVisiblity(true)
     start()
     return
   }
@@ -276,8 +275,20 @@ function showNotes() {
   if (notesHidden) return
   if (!stopped) stop()
   slide("view-notes")
+  toggleNotesButtonVisiblity(false)
+}
+
+function toggleNotesButtonVisiblity(show) {
   const showNotesBtn = document.querySelector("#show-notes")
-  if (showNotesBtn) showNotesBtn.classList.add("hidden")
+  if (!showNotesBtn) return
+  const hamburgerBtn = document.querySelector("#hamburger")
+  if (!notesHidden && show) {
+    showNotesBtn.classList.remove("hidden")
+    hamburgerBtn.classList.add("hidden")
+    return
+  }
+  showNotesBtn.classList.add("hidden")
+  hamburgerBtn.classList.remove("hidden")
 }
 
 // start calls evy wasm/go main(). It parses, formats and evaluates evy
@@ -483,8 +494,7 @@ function loadSession() {
 async function resetView() {
   const mainClassList = document.querySelector("main.main").classList
   mainClassList.add("no-translate-transition")
-  const showNotesBtn = document.querySelector("#show-notes")
-  if (showNotesBtn) showNotesBtn.classList.add("hidden")
+  toggleNotesButtonVisiblity(false)
   if (!notesHidden) {
     setView("view-notes")
   } else if (!editorHidden) {

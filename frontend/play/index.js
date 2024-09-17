@@ -439,9 +439,16 @@ async function fetchSamples() {
 }
 
 function ctrlEnterListener(e) {
-  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
     document.querySelector(".editor textarea").blur()
     handleRun()
+  }
+}
+
+function escListener(e) {
+  if (e.key === "Escape") {
+    hideModal()
+    hideSidebar()
   }
 }
 
@@ -1104,6 +1111,7 @@ function initModal() {
 function hideModal() {
   const el = document.querySelector("#modal")
   el.classList.add("hidden")
+  document.removeEventListener("keydown", escListener)
 }
 
 function showSamples() {
@@ -1113,6 +1121,7 @@ function showSamples() {
   modal.classList.remove("hidden")
   samples.querySelectorAll("a").forEach((a) => a.classList.remove("highlight"))
   samples.querySelector(`a[href$="#${currentSample}"]`)?.classList.add("highlight")
+  document.addEventListener("keydown", escListener)
 }
 
 function showPreviousSample() {
@@ -1162,11 +1171,13 @@ function showSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = "none"
   document.querySelector("#sidebar").classList.remove("hidden")
   document.addEventListener("click", handleOutsideSidebarClick)
+  document.addEventListener("keydown", escListener)
 }
 function hideSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = ""
   document.querySelector("#sidebar").classList.add("hidden")
   document.removeEventListener("click", handleOutsideSidebarClick)
+  document.removeEventListener("keydown", escListener)
 }
 function handleOutsideSidebarClick(e) {
   const sidebar = document.querySelector("#sidebar")

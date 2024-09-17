@@ -1,8 +1,6 @@
 // String art
 // Inpsired by https://youtu.be/dLiSXcaBZmk
 
-pi := 3.141592654
-
 lissajousA := 0
 lissajousB := 0
 lissajousPct := 0

@@ -16,10 +16,15 @@ type builtin struct {
 	Decl *parser.FuncDefStmt
 }
 
+type global struct {
+	parserVar *parser.Var
+	val       value
+}
+
 type builtins struct {
 	Funcs         map[string]builtin
 	EventHandlers map[string]*parser.EventHandlerStmt
-	Globals       map[string]*parser.Var
+	Globals       map[string]global
 	Runtime       Runtime
 }
 
@@ -36,10 +41,14 @@ func builtinsDeclsFromBuiltins(b builtins) parser.Builtins {
 	for name, builtin := range b.Funcs {
 		funcs[name] = builtin.Decl
 	}
+	globals := make(map[string]*parser.Var, len(b.Globals))
+	for name, global := range b.Globals {
+		globals[name] = global.parserVar
+	}
 	return parser.Builtins{
 		Funcs:         funcs,
 		EventHandlers: b.EventHandlers,
-		Globals:       b.Globals,
+		Globals:       globals,
 	}
 }
 
@@ -138,9 +147,19 @@ func newBuiltins(rt Runtime) builtins {
 		"input":   {Name: "input", Params: inputParams},
 		"animate": {Name: "animate", Params: numParam},
 	}
-	globals := map[string]*parser.Var{
-		"err":    {Name: "err", T: parser.BOOL_TYPE},
-		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
+	globals := map[string]global{
+		"err": {
+			parserVar: &parser.Var{Name: "err", T: parser.BOOL_TYPE},
+			val:       &boolVal{V: false},
+		},
+		"errmsg": {
+			parserVar: &parser.Var{Name: "errmsg", T: parser.STRING_TYPE},
+			val:       &stringVal{V: ""},
+		},
+		"pi": {
+			parserVar: &parser.Var{Name: "pi", T: parser.NUM_TYPE},
+			val:       &numVal{V: math.Pi},
+		},
 	}
 	return builtins{
 		EventHandlers: eventHandlers,

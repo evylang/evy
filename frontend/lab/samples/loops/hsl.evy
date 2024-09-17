@@ -2,7 +2,6 @@ background := (hsl 210 5 15) // near black
 hue := 310
 sat := 80
 light := 40
-pi := 3.14159265359
 radf := pi / 180
 
 x0 := 56

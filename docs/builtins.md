@@ -1416,6 +1416,12 @@ Output
 The `sqrt` function returns the positive square root of the number
 argument `n`.
 
+### `pi`
+
+`pi` is a global variable with the value of the mathematical constant [π].
+
+[π]: https://en.wikipedia.org/wiki/Pi
+
 ### `sin`
 
 `sin` returns the sine of the given angle in radians.
@@ -1423,7 +1429,6 @@ argument `n`.
 #### Example
 
 ```evy
-pi := 3.14159265
 print (sin 0.5*pi)
 ```
 
@@ -1446,7 +1451,6 @@ The `sin` function returns the sine of the given angle `n` in radians.
 #### Example
 
 ```evy
-pi := 3.14159265
 print (cos pi)
 ```
 
@@ -1470,7 +1474,6 @@ ray from the origin to the point `x y`.
 #### Example
 
 ```evy
-pi := 3.14159265
 rad := atan2 1 1
 degrees := rad * 180 / pi
 printf "rad: %.2f degrees: %.2f" rad degrees

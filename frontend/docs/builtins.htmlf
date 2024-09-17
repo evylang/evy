@@ -1175,11 +1175,15 @@ printf &quot;%.2f\n&quot; (log 2.7183) // e
   The <code>sqrt</code> function returns the positive square root of the number argument
   <code>n</code>.
 </p>
+<h3><a id="pi" href="#pi" class="anchor">#</a><code>pi</code></h3>
+<p>
+  <code>pi</code> is a global variable with the value of the mathematical constant
+  <a href="https://en.wikipedia.org/wiki/Pi">π</a>.
+</p>
 <h3><a id="sin" href="#sin" class="anchor">#</a><code>sin</code></h3>
 <p><code>sin</code> returns the sine of the given angle in radians.</p>
 <h4>Example</h4>
-<pre><code class="language-evy">pi := 3.14159265
-print (sin 0.5*pi)
+<pre><code class="language-evy">print (sin 0.5*pi)
 </code></pre>
 <p>Output</p>
 <pre><code class="language-evy-output">1
@@ -1191,8 +1195,7 @@ print (sin 0.5*pi)
 <h3><a id="cos" href="#cos" class="anchor">#</a><code>cos</code></h3>
 <p><code>cos</code> returns the cosine of the given angle in radians.</p>
 <h4>Example</h4>
-<pre><code class="language-evy">pi := 3.14159265
-print (cos pi)
+<pre><code class="language-evy">print (cos pi)
 </code></pre>
 <p>Output</p>
 <pre><code class="language-evy-output">-1
@@ -1209,8 +1212,7 @@ print (cos pi)
   origin to the point <code>x y</code>.
 </p>
 <h4>Example</h4>
-<pre><code class="language-evy">pi := 3.14159265
-rad := atan2 1 1
+<pre><code class="language-evy">rad := atan2 1 1
 degrees := rad * 180 / pi
 printf &quot;rad: %.2f degrees: %.2f&quot; rad degrees
 </code></pre>

@@ -40,10 +40,8 @@
   <body>
     <header class="topnav">
       <div class="left">
-        <button id="hamburger">
-          <div class="mobile logo-small"></div>
-          <div class="desktop icon-hamburger"></div>
-        </button>
+        <button id="hamburger" class="icon-hamburger"></button>
+        <button id="show-notes" class="mobile icon-back hidden"></button>
         <a href="/" class="desktop">
           <img alt="Evy logo" class="logo" />
         </a>
@@ -65,28 +63,29 @@
         </button>
       </div>
       <div class="right">
-        <button class="mobile icon-back hidden" id="show-notes"></button>
         <button class="desktop share" id="share">
           <div class="icon-share"></div>
           <span>Share</span>
         </button>
+        <a href="/" class="mobile logo-small"></a>
       </div>
     </header>
 
     <div class="max-width-wrapper">
       <main class="main view-notes">
         <div class="notes" id="notes">
-          <h1>👋 Welcome!</h1>
-          <p>Programming is for everyone!</p>
+          <h1>👋 Welcome</h1>
           <p>
-            Check out the program on the right 👉.<br />
-            Hit <strong>Run</strong> to see the result!
+            Programming is for everyone – no special skills required, just curiosity and a
+            willingness to learn.
           </p>
-          <p>Can you change the program to print <strong>your name</strong>?</p>
-          <p>
-            Check out the docs for more info on the
-            <a href="/docs/builtins.html#print" target="_blank"><code>print</code> command</a>.
-          </p>
+          <p>Let's dive in! Hit <strong>Run</strong> on the right 👉.</p>
+          <p>That's what we'll build up to in this first lab—a bit of a whirlwind tour.</p>
+          <h2>🚀 Let's get started!</h2>
+          <p>There is also a step-by-step walk through video guide 🎬:</p>
+          <a href="https://youtu.be/FBqyiU4iZNY" target="_blank" class="youtube">
+            <img src="samples/intro/img/youtube.jpeg" alt="Screenshot of YouTube walk through" />
+          </a>
         </div>
         <div class="editor-wrap noscrollbar">
           <div class="editor language-evy" style="padding-left: calc(2ch + 1.5rem)">

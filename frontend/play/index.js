@@ -240,17 +240,16 @@ async function handlePrimaryClick() {
     return
   }
   const view = getView()
-  const showNotesBtn = !notesHidden && document.querySelector("#show-notes")
   if (view == "view-notes" && !editorHidden) {
     await slide("view-code")
-    if (showNotesBtn) showNotesBtn.classList.remove("hidden")
+    toggleNotesButtonVisiblity(true)
     return
   }
   if (view === "view-notes" || view === "view-code") {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
     await slide("view-output")
-    if (showNotesBtn) showNotesBtn.classList.remove("hidden")
+    toggleNotesButtonVisiblity(true)
     start()
     return
   }
@@ -276,8 +275,20 @@ function showNotes() {
   if (notesHidden) return
   if (!stopped) stop()
   slide("view-notes")
+  toggleNotesButtonVisiblity(false)
+}
+
+function toggleNotesButtonVisiblity(show) {
   const showNotesBtn = document.querySelector("#show-notes")
-  if (showNotesBtn) showNotesBtn.classList.add("hidden")
+  if (!showNotesBtn) return
+  const hamburgerBtn = document.querySelector("#hamburger")
+  if (!notesHidden && show) {
+    showNotesBtn.classList.remove("hidden")
+    hamburgerBtn.classList.add("hidden")
+    return
+  }
+  showNotesBtn.classList.add("hidden")
+  hamburgerBtn.classList.remove("hidden")
 }
 
 // start calls evy wasm/go main(). It parses, formats and evaluates evy
@@ -428,9 +439,16 @@ async function fetchSamples() {
 }
 
 function ctrlEnterListener(e) {
-  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
     document.querySelector(".editor textarea").blur()
     handleRun()
+  }
+}
+
+function escListener(e) {
+  if (e.key === "Escape") {
+    hideModal()
+    hideSidebar()
   }
 }
 
@@ -483,8 +501,7 @@ function loadSession() {
 async function resetView() {
   const mainClassList = document.querySelector("main.main").classList
   mainClassList.add("no-translate-transition")
-  const showNotesBtn = document.querySelector("#show-notes")
-  if (showNotesBtn) showNotesBtn.classList.add("hidden")
+  toggleNotesButtonVisiblity(false)
   if (!notesHidden) {
     setView("view-notes")
   } else if (!editorHidden) {
@@ -1094,6 +1111,7 @@ function initModal() {
 function hideModal() {
   const el = document.querySelector("#modal")
   el.classList.add("hidden")
+  document.removeEventListener("keydown", escListener)
 }
 
 function showSamples() {
@@ -1103,6 +1121,7 @@ function showSamples() {
   modal.classList.remove("hidden")
   samples.querySelectorAll("a").forEach((a) => a.classList.remove("highlight"))
   samples.querySelector(`a[href$="#${currentSample}"]`)?.classList.add("highlight")
+  document.addEventListener("keydown", escListener)
 }
 
 function showPreviousSample() {
@@ -1131,14 +1150,14 @@ function updateSampleTitle() {
   titleDiv.textContent = sample?.title || sampleData.defaultTitle
   if (!sample || sample.unlisted) {
     indexDiv.classList.add("hidden")
-    prevButton.classList.add("hidden")
-    nextButton.classList.add("hidden")
+    prevButton.disabled = true
+    nextButton.disabled = true
     return
   }
   indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
   indexDiv.classList.remove("hidden")
-  sample.previous ? prevButton.classList.remove("hidden") : prevButton.classList.add("hidden")
-  sample.next ? nextButton.classList.remove("hidden") : nextButton.classList.add("hidden")
+  prevButton.disabled = !sample.previous
+  nextButton.disabled = !sample.next
 }
 
 // --- UI: sidebar --------------------------------------------
@@ -1152,11 +1171,13 @@ function showSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = "none"
   document.querySelector("#sidebar").classList.remove("hidden")
   document.addEventListener("click", handleOutsideSidebarClick)
+  document.addEventListener("keydown", escListener)
 }
 function hideSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = ""
   document.querySelector("#sidebar").classList.add("hidden")
   document.removeEventListener("click", handleOutsideSidebarClick)
+  document.removeEventListener("keydown", escListener)
 }
 function handleOutsideSidebarClick(e) {
   const sidebar = document.querySelector("#sidebar")

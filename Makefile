@@ -151,7 +151,7 @@ conform: install
 .PHONY: check-fmt-evy conform fmt-evy lint-go lint-node
 
 # --- Docs ---------------------------------------------------------------------
-doc: doctest godoc toc usage
+doc: godoc usage doctest .WAIT toc
 
 DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/doctest-out.md && mv $(O)/doctest-out.md $(md)
 DOCTESTS = docs/builtins.md docs/spec.md docs/syntax-by-example.md

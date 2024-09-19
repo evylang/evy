@@ -1,0 +1,157 @@
+// Game of life
+//
+// Setup mode has a white background. In setup mode, you can click
+// on cells to turn them on and off, press "z" to randomise the
+// board, or press "c" to clear the board.
+//
+// When you're ready, press "r" to run of the game of life.
+//
+// When it is running, the background is yellow. Press "s" to pause
+// and go back to setup mode.
+
+// Size is the number of cells on each axis.
+size := 30
+
+// msPerTick is how fast the board updates in milliseconds.
+msPerTick := 750
+
+scale := 100 / size
+board := [false] * (size * size)
+
+tick := 0
+mode := "setup" // or "run"
+bg := {setup:"white" run:"lightyellow"}
+fg := "black"
+width 0
+
+setMode "setup"
+
+on key k:string
+    if mode == "setup"
+        if k == "r"
+            setMode "run"
+        else if k == "c"
+            board = [false] * (size * size)
+        else if k == "z"
+            randomize
+        else
+            return
+        end
+    else
+        if k == "s"
+            setMode "setup"
+        else
+            return
+        end
+    end
+    draw
+end
+
+on animate ms:num
+    newTick := floor (ms / msPerTick)
+    if mode == "setup" or newTick == tick
+        return
+    end
+    tick = newTick
+    draw
+    update
+end
+
+on down x:num y:num
+    if mode != "setup"
+        return
+    end
+    // Convert to board coordinates
+    x = min (floor x/scale) size-1
+    y = min (floor y/scale) size-1
+    if get x y
+        color bg[mode]
+        drawCell x y
+        set board x y false
+    else
+        color fg
+        drawCell x y
+        set board x y true
+    end
+end
+
+func randomize
+    for x := range size
+        for y := range size
+            v := (rand1) < 0.5
+            set board x y v
+        end
+    end
+end
+
+func update
+    newBoard := [false] * (size * size)
+    for x := range size
+        for y := range size
+            alive := get x y
+            n := ncount x y
+            if n == 3 or (alive and n == 2)
+                set newBoard x y true
+            end
+        end
+    end
+    board = newBoard
+end
+
+func draw
+    clear bg[mode]
+    color fg
+    for x := range size
+        for y := range size
+            if get x y
+                drawCell x y
+            end
+        end
+    end
+end
+
+func drawCell x:num y:num
+    move x*scale y*scale
+    rect scale scale
+end
+
+// ncount returns the count of neighbours for the given x,y position.
+func ncount:num x:num y:num
+    count := 0
+    for i := range -1 2
+        for j := range -1 2
+            // Ignore ourself - we can't be our own neighbour
+            if !(i == 0 and j == 0)
+                if get (x + i + size)%size (y + j + size)%size
+                    count = count + 1
+                end
+            end
+        end
+    end
+    return count
+end
+
+func get:bool x:num y:num
+    return board[y * size + x]
+end
+
+func set g:[]bool x:num y:num val:bool
+    g[y * size + x] = val
+end
+
+func setMode m:string
+    mode = m
+    instructions
+end
+
+func instructions
+    cls
+    if mode == "run"
+        print "Press 's' to stop/pause"
+    else
+        print "Click to toggle cells"
+        print "Press 'r' to run"
+        print "Press 'c' to clear"
+        print "Press 'z' to randomize board"
+    end
+end

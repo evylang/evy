@@ -46,7 +46,8 @@
       "samples": [
         { "id": "ellipse", "title": "Watermelon Ellipse" },
         { "id": "draw", "title": "Draw" },
-        { "id": "coords", "title": "Coordinates" }
+        { "id": "coords", "title": "Coordinates" },
+        { "id": "life", "title": "Game of Life" }
       ]
     },
     {

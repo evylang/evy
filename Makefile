@@ -231,7 +231,7 @@ define PLAYWRIGHT_CMD_LOCAL
 	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
 endef
 
-PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.47.1-jammy
+PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.48.0-jammy
 PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
   --user $(shell id -u):$(shell id -g) \

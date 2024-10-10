@@ -215,7 +215,7 @@ clean::
 	$(foreach file,$(LAB_MDFILES),rm -f "$(file:md=htmlf)"$(nl))
 
 test-urls:
-	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
+	! grep -rIioEh 'https?://[^[:space:]"]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
 		sort -u | \
 		xargs -n1 curl  -sL -o /dev/null -w "%{http_code} %{url}\n"  | \
 		grep -v '^200 '

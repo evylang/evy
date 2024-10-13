@@ -1,0 +1,8 @@
+for y := range 98 -1 -14
+    c := hsl y
+    color c
+    move 30 y
+    rect 40 7
+    sleep 0.2
+end
+

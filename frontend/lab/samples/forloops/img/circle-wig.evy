@@ -1,0 +1,10 @@
+for x := range 12 100 19
+    for y := range 12 100 19
+        color "black"
+        move x y
+        circle 9
+        color "white"
+        move x-5 y-5
+        circle 5
+    end
+end

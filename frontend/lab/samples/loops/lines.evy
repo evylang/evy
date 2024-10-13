@@ -1,8 +1,0 @@
-move 10 0
-line 100 10+10
-
-move 20 0
-line 100 20+10
-
-move 30 0
-line 100 30+10

@@ -1,0 +1,152 @@
+<h1>👾 Game</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. Pretty similar to the last challenge, isn't it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p>Note how we are using the <code>text</code> command to display text on the drawing area.</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Move with Keys</h2>
+<p>Use the <code>key</code> event handler to move our friend left and right 👾:</p>
+<ul>
+  <li>Move left with <code>←</code> or <code>h</code></li>
+  <li>Move right with <code>→</code> or <code>l</code></li>
+</ul>
+<p>
+  Can you work out a way that the movement wraps around the screen? Use the modulo operator
+  <code>%</code>.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">on key k:string
+    if k == &quot;ArrowLeft&quot; or k == &quot;h&quot;
+        x = (x + 99) % 100
+    else if k == ❓
+        x = ❓
+    end
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Gold Arrow</h2>
+<p>
+  Add a <code>&quot;gold&quot;</code> colored arrow with <code>text &quot;▶▶&quot;</code> that
+  moves left to right on the screen at y-coordinate <code>30</code>. Store its x-coordinate in a
+  global variable <code>gold</code> and initialize with <code>0</code>.
+</p>
+<p>Update the <code>gold</code> x-position inside the <code>animate</code> event handler with:</p>
+<pre><code class="language-evy">gold = (gold + 0.3) % 110
+</code></pre>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">gold := 0
+
+on animate
+    // Update
+    y = (y + 0.1) % 100
+    gold = (gold + 0.3) % 110
+
+    // Draw
+    clear
+    move x y
+    text &quot;👾&quot; // size around 7x5
+    color &quot;gold&quot; // arrows
+    move gold 30
+    text &quot;▶▶&quot;
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Orange and Red Arrow</h2>
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Orange Arrow</th>
+      <th>Red Arrow</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Text</td>
+      <td><code>&quot;◀◀&quot;</code></td>
+      <td><code>&quot;▶▶&quot;</code></td>
+    </tr>
+    <tr>
+      <td>Variable</td>
+      <td><code>orange</code></td>
+      <td><code>red</code></td>
+    </tr>
+    <tr>
+      <td>Initial</td>
+      <td><code>50</code></td>
+      <td><code>0</code></td>
+    </tr>
+    <tr>
+      <td>Color</td>
+      <td><code>&quot;orange&quot;</code></td>
+      <td><code>&quot;orangered&quot;</code></td>
+    </tr>
+  </tbody>
+</table>
+<p>Use the update functions:</p>
+<pre><code class="language-evy">orange = 100 - (100 - orange + 0.5) % 120
+red = (red + 0.7) % 130
+</code></pre>
+<p>Place along-side <code>gold</code> arrow from previous step.</p>
+<p>Run code and ensure you see three flying arrows as well as our moving friend.</p>
+<details>
+  <summary>Hint</summary>
+  <p>
+    Check out this
+    <a
+      href="https://play.evy.dev/#content=H4sIAAAAAAAAA21RzWrCQBC+5yk+Fgop0rpWgijsodBjT4U+wNKMMRizZZPWpCdfoRc99i089mF8gj5CmdmIUQwsMzvfz85kGswMEh21HHUUZa5IQ+q8LTPqYE9dNXIlbJmvbE0RAAyHeH1Pj7cWBnGLAfT96BY3GGktdXE1iCUyOhZ0FNDuJcN03CEOoasyOxH2Q2BzKwYxB8Ymgo11dGznydu15G8FWS/Zyn0SGrRyqampof5+vn8V06v8i2C9+yhTTJokKF3hPBR3KxzrvVtXJysZY6x7doft/rDdq7469K9Oqm6g5Ey32xx2mys6T2lPysNOrr1HZSorWVKL5ayqfV5mQsvnWMIYqEfu/ZnmtYLzXW0RrPlr+F82GGA67S+MioouPF7ybNE3Ka6YnC2de+PzDzXeqUNjAgAA"
+      >solution</a
+    >
+    on the Evy Playground.
+  </p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Collision detection</h2>
+<p>Add a collision detection the game to the end of <code>animate</code> event handler.</p>
+<p>
+  When friend's x coordinate and gold arrow's x coordinate are less than <code>6</code> apart, and
+  their y coordinates are less than <code>4.5</code> print a game over message and exit the program:
+</p>
+<pre><code class="language-evy">print &quot;🟡 Game over.&quot;
+exit 0
+</code></pre>
+<p>Do the same for <code>orange</code> and <code>red</code> arrows.</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">// Check collision
+if (abs x-gold) &lt; 6 and (abs y-30) &lt; 4.5
+  print &quot;🟡 Game over.&quot;
+  exit 0
+else if (abs x-orange) &lt; 6 and (abs y-50) &lt; ❓
+  print &quot;🟠 Game over.&quot;
+  exit 0
+else if (abs x-red) ❓
+  ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Level messages</h2>
+<p>Add a level message that increments every time our friend successfully gets to the top.</p>
+<p>Use a global variable <code>level</code> and initialize with <code>0</code>.</p>
+<p>
+  At the beginning of the <code>animate</code> event handler check if <code>y</code> is less than
+  <code>0.1</code> and increment and print the <code>level</code>:
+</p>
+<pre><code class="language-evy">level = level + 1
+print &quot;Level&quot; level
+</code></pre>
+<details>
+  <summary>Hint</summary>
+  <p>
+    Check out this
+    <a
+      href="https://play.evy.dev/#content=H4sIAAAAAAAAA21RzWrCQBC+5yk+Fgop0rpWgijsodBjT4U+wNKMMRizZZPWpCdfoRc99i089mF8gj5CmdmIUQwsMzvfz85kGswMEh21HHUUZa5IQ+q8LTPqYE9dNXIlbJmvbE0RAAyHeH1Pj7cWBnGLAfT96BY3GGktdXE1iCUyOhZ0FNDuJcN03CEOoasyOxH2Q2BzKwYxB8Ymgo11dGznydu15G8FWS/Zyn0SGrRyqampof5+vn8V06v8i2C9+yhTTJokKF3hPBR3KxzrvVtXJysZY6x7doft/rDdq7469K9Oqm6g5Ey32xx2mys6T2lPysNOrr1HZSorWVKL5ayqfV5mQsvnWMIYqEfu/ZnmtYLzXW0RrPlr+F82GGA67S+MioouPF7ybNE3Ka6YnC2de+PzDzXeqUNjAgAA"
+      >solution</a
+    >
+    on the Evy Playground.
+  </p>
+</details>

@@ -1,0 +1,7 @@
+x := 0
+
+on animate
+    x = (x + 0.2) % 100
+    move x 50
+    circle 10
+end

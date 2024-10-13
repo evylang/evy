@@ -1,0 +1,12 @@
+<h1>👋💫 Welcome to the Games Lab!</h1>
+<p>Hit <strong>Run</strong> and play the game.</p>
+<p>Help our purple friend get to the top 👾!</p>
+<ul>
+  <li>Move left with <code>←</code>, <code>h</code>, or by touching the left side.</li>
+  <li>Move right with <code>→</code>, <code>l</code>, or by touching the right side.</li>
+</ul>
+<p>
+  In this lab, you'll use <strong>event handlers</strong> (<code>on</code> keyword) to react to
+  events like keyboard input, which is essential for games!
+</p>
+<h2>🚀 Let's get started!</h2>

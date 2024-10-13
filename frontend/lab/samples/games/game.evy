@@ -1,0 +1,13 @@
+x := 50
+y := 0
+
+on animate
+    // Update
+    y = (y + 0.1) % 100
+
+    // Draw
+    clear
+    move x y
+    text "👾" // size around 7x5
+end
+

@@ -1,0 +1,10 @@
+x := 0
+inc := 0.2
+
+on animate
+    clear
+    x = (x + inc) % 100
+    move x 50
+    circle 10
+end
+

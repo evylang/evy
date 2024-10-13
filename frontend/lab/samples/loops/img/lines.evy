@@ -1,5 +1,0 @@
-d := 10
-for i := range 0 100 d
-    move i 0
-    line 100 i+d
-end

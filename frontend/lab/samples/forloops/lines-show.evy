@@ -1,9 +1,8 @@
-for d := range 10 2 -0.05
+for d := range 20 1 -0.05
     clear
     for a := range 0 100 d
         move a 0
         line 100 a+d
-        a = a + d
     end
     sleep 0.02
 end

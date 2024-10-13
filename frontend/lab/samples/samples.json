@@ -30,9 +30,7 @@
         { "id": "hsl", "title": "🤹 HSL colors", "notes": true, "editor": "none" },
         { "id": "hsl-code", "title": "🤹 HSL colors", "unlisted": true },
         { "id": "gradient-show", "title": "🌈📺  Gradient", "notes": true, "editor": "none" },
-        { "id": "gradient", "title": "🌈🫵  Gradient", "notes": true },
-        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none", "unlisted": true },
-        { "id": "lines", "title": "🌐🫵 Lines", "notes": true, "unlisted": true }
+        { "id": "gradient", "title": "🌈🫵  Gradient", "notes": true }
       ]
     },
     {
@@ -56,6 +54,21 @@
           "unlisted": true,
           "editor": "none"
         }
+      ]
+    },
+    {
+      "id": "forloops",
+      "title": "For Loops",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome-forloops", "title": "👋💫 Welcome", "notes": true, "editor": "none" },
+        { "id": "forwhile", "title": "👯 While & for", "notes": true },
+        { "id": "zebra", "title": "🦓 Zebra", "notes": true },
+        { "id": "forcircles", "title": "🟢 Circles", "notes": true },
+        { "id": "forsequence", "title": "🔢 Sequences", "notes": true },
+        { "id": "bubble", "title": "🫧 Bubble", "notes": true },
+        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none" },
+        { "id": "lines", "title": "🌐🫵 Lines", "notes": true }
       ]
     }
   ]

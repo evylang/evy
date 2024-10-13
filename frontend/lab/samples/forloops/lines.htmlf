@@ -1,0 +1,69 @@
+<h1>🌐🫵 Lines</h1>
+<p>⭐ Can you complete the program create this output?</p>
+<p><img src="samples/forloops/img/lines.svg" alt="Static lines" /></p>
+<p><button class="next-btn">Next</button></p>
+<p>⭐ Can you update the program with a single <code>for</code> loop to create same output?</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">for a := range 0 100 20
+    move ❓ 0
+    line ❓ ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<p>
+  ⭐ Can you change the program to create the following outputs, with step <code>25</code>,
+  <code>10</code>, <code>5</code>, and <code>2</code>.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th><img src="samples/forloops/img/4-lines.svg" alt="4 Lines" title="evy:edit" /></th>
+      <th><img src="samples/forloops/img/10-lines.svg" alt="10 Lines" title="evy:edit" /></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="samples/forloops/img/20-lines.svg" alt="20 Lines" title="evy:edit" /></td>
+      <td><img src="samples/forloops/img/50-lines.svg" alt="50 Lines" title="evy:edit" /></td>
+    </tr>
+  </tbody>
+</table>
+<p><button class="next-btn">Next</button></p>
+<p>
+  ⭐ Can you declare a variable called <code>step</code> and use it with <code>range</code> and
+  <code>line</code>?
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">step := 10
+for a := range 0 100 step
+    move ❓ 0
+    line ❓ ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Animate</h2>
+<p>Add a second, wrapping, outer loop that ranges over the <code>step</code> variable.</p>
+<ul>
+  <li>Start <code>step</code> at <code>20</code></li>
+  <li>Keep looping as long as <code>step</code> is greater then <code>1</code></li>
+  <li>Reduce the <code>step</code> variable by <code>-0.05</code></li>
+  <li>Use the <code>clear</code> command.</li>
+  <li>Use the <code>sleep 0.01</code> command.</li>
+</ul>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">for step := range ❓ ❓ ❓
+  clear
+  for a := range 0 100 step
+    move ❓ 0
+    line ❓ ❓
+  end
+  sleep ❓
+end
+</code></pre>
+  <p>⭐ Why do you think it seems like the animation gets faster?</p>
+</details>

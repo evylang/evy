@@ -1,0 +1,6 @@
+for x := range 0 100 8
+    for y := range 0 100 8
+        move x y
+        circle 0.5+(rand 4)
+    end
+end

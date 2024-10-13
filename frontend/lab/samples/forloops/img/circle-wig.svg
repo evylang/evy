@@ -1,0 +1,59 @@
+<svg
+  stroke="black"
+  stroke-linecap="round"
+  font-size="60"
+  viewBox="0 0 1000 1000"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect fill="white" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+  <circle cx="120" cy="880" r="90"></circle>
+  <circle fill="white" stroke="white" cx="70" cy="930" r="50"></circle>
+  <circle cx="120" cy="690" r="90"></circle>
+  <circle fill="white" stroke="white" cx="70" cy="740" r="50"></circle>
+  <circle cx="120" cy="500" r="90"></circle>
+  <circle fill="white" stroke="white" cx="70" cy="550" r="50"></circle>
+  <circle cx="120" cy="310" r="90"></circle>
+  <circle fill="white" stroke="white" cx="70" cy="360" r="50"></circle>
+  <circle cx="120" cy="120" r="90"></circle>
+  <circle fill="white" stroke="white" cx="70" cy="170" r="50"></circle>
+  <circle cx="310" cy="880" r="90"></circle>
+  <circle fill="white" stroke="white" cx="260" cy="930" r="50"></circle>
+  <circle cx="310" cy="690" r="90"></circle>
+  <circle fill="white" stroke="white" cx="260" cy="740" r="50"></circle>
+  <circle cx="310" cy="500" r="90"></circle>
+  <circle fill="white" stroke="white" cx="260" cy="550" r="50"></circle>
+  <circle cx="310" cy="310" r="90"></circle>
+  <circle fill="white" stroke="white" cx="260" cy="360" r="50"></circle>
+  <circle cx="310" cy="120" r="90"></circle>
+  <circle fill="white" stroke="white" cx="260" cy="170" r="50"></circle>
+  <circle cx="500" cy="880" r="90"></circle>
+  <circle fill="white" stroke="white" cx="450" cy="930" r="50"></circle>
+  <circle cx="500" cy="690" r="90"></circle>
+  <circle fill="white" stroke="white" cx="450" cy="740" r="50"></circle>
+  <circle cx="500" cy="500" r="90"></circle>
+  <circle fill="white" stroke="white" cx="450" cy="550" r="50"></circle>
+  <circle cx="500" cy="310" r="90"></circle>
+  <circle fill="white" stroke="white" cx="450" cy="360" r="50"></circle>
+  <circle cx="500" cy="120" r="90"></circle>
+  <circle fill="white" stroke="white" cx="450" cy="170" r="50"></circle>
+  <circle cx="690" cy="880" r="90"></circle>
+  <circle fill="white" stroke="white" cx="640" cy="930" r="50"></circle>
+  <circle cx="690" cy="690" r="90"></circle>
+  <circle fill="white" stroke="white" cx="640" cy="740" r="50"></circle>
+  <circle cx="690" cy="500" r="90"></circle>
+  <circle fill="white" stroke="white" cx="640" cy="550" r="50"></circle>
+  <circle cx="690" cy="310" r="90"></circle>
+  <circle fill="white" stroke="white" cx="640" cy="360" r="50"></circle>
+  <circle cx="690" cy="120" r="90"></circle>
+  <circle fill="white" stroke="white" cx="640" cy="170" r="50"></circle>
+  <circle cx="880" cy="880" r="90"></circle>
+  <circle fill="white" stroke="white" cx="830" cy="930" r="50"></circle>
+  <circle cx="880" cy="690" r="90"></circle>
+  <circle fill="white" stroke="white" cx="830" cy="740" r="50"></circle>
+  <circle cx="880" cy="500" r="90"></circle>
+  <circle fill="white" stroke="white" cx="830" cy="550" r="50"></circle>
+  <circle cx="880" cy="310" r="90"></circle>
+  <circle fill="white" stroke="white" cx="830" cy="360" r="50"></circle>
+  <circle cx="880" cy="120" r="90"></circle>
+  <circle fill="white" stroke="white" cx="830" cy="170" r="50"></circle>
+</svg>

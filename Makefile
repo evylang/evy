@@ -28,7 +28,7 @@ check-uptodate: clean .WAIT tidy fmt doc docs learn lab
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate check-uptodate ci clean lint test
+.PHONY: all check-uptodate ci clean lint test
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)
@@ -199,6 +199,8 @@ FLAGS_frontend/lab/samples/ifs/img/randrect.svg = --rand-seed=1
 FLAGS_frontend/lab/samples/ifs/img/stripes.svg = --rand-seed=2
 FLAGS_frontend/lab/samples/ifs/img/warm-squares.svg = --rand-seed=2
 FLAGS_frontend/lab/samples/ifs/img/grass.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/forloops/img/bubble.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/forloops/img/circle-rand.svg = --rand-seed=1
 %.svg: %.evy | $(NODELIB)
 	go run . run --svg-out "$@" $(FLAGS_$@) "$<"
 	$(PRETTIER) --write "$@"

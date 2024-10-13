@@ -1,0 +1,7 @@
+y := 0
+while y < 100
+    move 30 y
+    rect 40 7
+    y = y + 14
+end
+

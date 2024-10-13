@@ -1,0 +1,19 @@
+print "loop 1: tick tick tick"
+for range 3
+    print "tick"
+end
+
+print "loop 2: 0 1 2"
+for x := range 3
+    print x
+end
+
+print "loop 3: 10 11 12"
+for x := range 10 13
+    print x
+end
+
+print "loop 4: 100 400 700"
+for x := range 100 800 300
+    print x
+end

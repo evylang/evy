@@ -1,0 +1,10 @@
+color "skyblue"
+x := 50
+for y := range 0 110 0.5
+    clear
+    r := rand 5 // 0..4
+    x = x + r - 2
+    move x y
+    circle 5
+    sleep 0.02
+end

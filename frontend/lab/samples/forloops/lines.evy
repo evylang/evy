@@ -1,0 +1,8 @@
+move 0 0
+line 100 0+20
+
+move 20 0
+line 100 20+20
+
+move 40 0
+line 100 40+20

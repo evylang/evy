@@ -1,0 +1,36 @@
+gridn 20 "grey"
+
+// head
+color "black"
+move 40 80
+circle 20
+
+// eyes
+color "yellow"
+move 32 70
+circle 2
+move 50 70
+circle 2
+
+// ears
+color "black"
+move 20 80
+rect 40 20
+color "white"
+move 40 100
+circle 20
+
+// body
+color "black"
+move 0 0
+rect 100 20
+move 20 20
+rect 40 20
+move 40 40
+circle 20
+color "white"
+move 0 20
+circle 20
+move 80 20
+circle 20
+

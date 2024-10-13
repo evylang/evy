@@ -1,0 +1,56 @@
+<h1>👯 <code>for</code> as <code>while</code> loops</h1>
+<p>⭐ Can you re-write the program using <code>while</code> instead of <code>for</code> loops?</p>
+<p>Make sure you still generate the same output.</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+
+x = ❓ // START
+while x &lt; ❓ // STOP
+  print x
+  x = x + ❓ // STEP
+end
+</code></pre>
+</details>
+<details>
+  <summary>Docs</summary>
+  <h2><code>for</code> loops</h2>
+  <p>
+    <code>for</code> loops, also known as <strong>count-controlled</strong> loops, are a shortcut
+    for writing certain <code>while</code> loops (<strong>condition-controlled</strong> loops).
+  </p>
+  <p>
+    Every <code>for</code> loop can be written as a <code>while</code> loop, but not every
+    <code>while</code> loop can be written as a <code>for</code> loop.
+  </p>
+  <p><code>for</code> loops have the following structure:</p>
+  <pre><code class="language-evy">for VAR := range START STOP STEP
+  // code block
+end
+</code></pre>
+  <p>
+    This loop will execute the code block repeatedly, with <code>VAR</code> taking on values from
+    <code>START</code> up to (but not including) <code>STOP</code>, incrementing by
+    <code>STEP</code> each time. <code>VAR</code> is a new variable that only exists within the
+    loop.
+  </p>
+  <p>
+    For example, this code prints the numbers <code>0</code>, <code>2</code>, <code>4</code>, and
+    <code>6</code>:
+  </p>
+  <pre><code class="language-evy">for i := range 0 7 2
+  print i
+end
+</code></pre>
+  <p><code>START</code>, <code>STEP</code>, and <code>VAR</code> are optional.</p>
+  <ul>
+    <li><code>START</code> defaults to 0.</li>
+    <li><code>STEP</code> defaults to 1.</li>
+    <li>If variable <code>VAR</code> is left out, you can't access the loop counter.</li>
+  </ul>
+  <p>The following code prints <code>&quot;hello&quot;</code> three times.</p>
+  <pre><code class="language-evy">for range 3
+    print &quot;hello&quot;
+end
+</code></pre>
+</details>

@@ -28,7 +28,7 @@ check-uptodate: clean .WAIT tidy fmt doc docs learn lab
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate check-uptodate ci clean lint test
+.PHONY: all check-uptodate ci clean lint test
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)

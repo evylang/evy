@@ -1,5 +1,4 @@
+/frontend/**/*.htmlf linguist-generated=true
 /frontend/docs/**/*.html linguist-generated=true
-/frontend/docs/**/*.htmlf linguist-generated=true
 /frontend/learn/**/*.html linguist-generated=true
-/frontend/learn/**/*.htmlf linguist-generated=true
 /frontend/learn/index.html linguist-generated=false

@@ -43,6 +43,7 @@ func run(mdFile, htmlfFile string) error {
 	}
 	doc := parse(string(md))
 	updateImgURL(doc, mdFile)
+	updateLabLinks(doc)
 	replaceNextButton(doc)
 	doc.Blocks = collapse(doc.Blocks)
 	html := markdown.ToHTML(doc)
@@ -78,6 +79,21 @@ func updateImgURL(doc *markdown.Document, mdFile string) {
 func updateIMGPath(mdPath, imgPath string) string {
 	labDir := filepath.Base(filepath.Dir(mdPath))
 	return "samples/" + labDir + "/" + imgPath
+}
+
+func updateLabLinks(doc *markdown.Document) {
+	md.Walk(doc, func(n md.Node) {
+		link, ok := n.(*markdown.Link)
+		if !ok {
+			return
+		}
+		u, err := url.Parse(link.URL)
+		if err != nil || u.IsAbs() || !strings.HasSuffix(u.Path, ".md") {
+			return
+		}
+		// change ../loops/hsl.md and hsl.md to #hsl
+		link.URL = "#" + strings.TrimSuffix(filepath.Base(u.Path), ".md")
+	})
 }
 
 func replaceNextButton(doc *markdown.Document) {

@@ -25,7 +25,7 @@ the bottom left quadrant grey:
 
 ## [>] Docs
 
-In the interactive [`hsl`] function [color explorer](#hsl) we learned how hsl
+In the interactive [`hsl`] function [color explorer](../loops/hsl.md) we learned how hsl
 takes three values: hue, saturation, lightness values to create a color.
 
 There is an optional fourth value called **alpha** that controls the

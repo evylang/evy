@@ -23,7 +23,7 @@ Imagine the canvas as a grid. Each point on this grid is identified by two numbe
 
 You write these coordinates together like this: `x y`.
 
-![Coordinates 30 60 on the Evy Canvas](samples/intro/img/coords-30-60.svg)
+![Coordinates 30 60 on the Evy Canvas](img/coords-30-60.svg)
 [Image Source]
 
 [Image Source]: https://play.evy.dev/#content=H4sIAAAAAAAAA2WRQW6DMBBF9z7Fl9cFbIidmG2lXgKxoOAQqwRHhpDQqnevDIaq6mpmnv/M99hJglb32lWjRm2ta4YoY5Fk8TC1eJjxQpIEeprh7j2iaJjayN7H/9I/QE8zqTtdOdDHxYyaktaZhtS2sw70vavqD0oephkvYPGBkM70GgycMXK1k0/ZyjjzKbnZbkaxFCUKdQKPxZr4euVBtEzxMBZQp9KDEDwn6/xsN8gYJNv85W6VMQhVokgVxLFEkfEQFx5EqYL0VukxiI+QvNw48Q836ue4L8rJ2fYjvgbzqfMDztXVdHNO34yr8Gob/YKr7e1wq2pNv8NNlQAnfgrok66IQ4mA5h1tIkZDYyog0wCXJbeDjCNVW3/+yzmDkJtVnnke/svphu7vJhmpjas7DU5+AAOGBlk8AgAA

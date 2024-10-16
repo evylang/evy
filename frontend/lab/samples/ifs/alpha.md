@@ -12,7 +12,7 @@
 
 Complete the code to create the following drawing:
 
-![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares.svg)
+![simple drawing of circles and squares](img/red-dot-two-squares.svg)
 
 [Next]
 
@@ -21,7 +21,7 @@ Complete the code to create the following drawing:
 Tweak the Alpha parameter to the [`hsl`] function, its fourth parameter, to make
 the bottom left quadrant grey:
 
-![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares-alpha.svg)
+![simple drawing of circles and squares](img/red-dot-two-squares-alpha.svg)
 
 ## [>] Docs
 

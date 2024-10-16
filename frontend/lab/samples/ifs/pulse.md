@@ -4,7 +4,7 @@
 
 Write a program that draws:
 
-![small centered circle](samples/ifs/img/pulse-step-1.svg)
+![small centered circle](img/pulse-step-1.svg)
 
 - Background: `"black"`
 - Outline width: `1`
@@ -30,7 +30,7 @@ circle ❓
 
 Extend your program to draw:
 
-![many concentric circles](samples/ifs/img/pulse-step-2.svg)
+![many concentric circles](img/pulse-step-2.svg)
 
 Use a variable `r` for the circle radius, starting at `1`.
 
@@ -60,7 +60,7 @@ animation.
 
 ### [>] Demo
 
-![small centered circle](samples/ifs/img/pulse-step-3.gif)
+![small centered circle](img/pulse-step-3.gif)
 
 ### [>] Hint
 
@@ -83,7 +83,7 @@ Use `clear` with `hsl 0 0 0 15`.
 
 ### [>] Demo
 
-![small centered circle](samples/ifs/img/pulse-step-4.gif)
+![small centered circle](img/pulse-step-4.gif)
 
 ### [>] Hint
 
@@ -108,7 +108,7 @@ Reduce the
 
 ### [>] Demo
 
-![small centered circle](samples/ifs/img/pulse-step-5.gif)
+![small centered circle](img/pulse-step-5.gif)
 
 ### [>] Hint
 

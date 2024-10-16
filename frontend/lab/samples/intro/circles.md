@@ -18,10 +18,10 @@ Can you move the circle center to each corner?
 | ----------------------------- | ------------------------------ |
 | ![Quarter circle bottom left] | ![Quarter circle bottom right] |
 
-[Quarter circle top left]: samples/intro/img/circles-top-left.svg
-[Quarter circle top right]: samples/intro/img/circles-top-right.svg
-[Quarter circle bottom left]: samples/intro/img/circles-bottom-left.svg
-[Quarter circle bottom right]: samples/intro/img/circles-bottom-right.svg
+[Quarter circle top left]: img/circles-top-left.svg
+[Quarter circle top right]: img/circles-top-right.svg
+[Quarter circle bottom left]: img/circles-bottom-left.svg
+[Quarter circle bottom right]: img/circles-bottom-right.svg
 
 [Next]
 
@@ -36,10 +36,10 @@ fully or partially visible.
 | ----------------------------- | ------------------------------------------------- |
 | ![Overlapping circles]        | ![Cloud made from circles]                        |
 
-[Three circles of same size]: samples/intro/img/circles-anika.svg
-[Three large overlapping circles in warm colors]: samples/intro/img/circles-mali.svg
-[Overlapping circles]: samples/intro/img/circles-camh.svg
-[Cloud made from circles]: samples/intro/img/circles-kathi.svg
+[Three circles of same size]: img/circles-anika.svg
+[Three large overlapping circles in warm colors]: img/circles-mali.svg
+[Overlapping circles]: img/circles-camh.svg
+[Cloud made from circles]: img/circles-kathi.svg
 
 [Next]
 

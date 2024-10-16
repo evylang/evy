@@ -3,7 +3,7 @@
 ## ⭐ Draw a target board
 
 Draw a target board with concentric circles.
-![Target board](samples/loops/img/target.svg)
+![Target board](img/target.svg)
 
 ## [>] Hint
 

@@ -2,7 +2,7 @@
 
 ⭐ Can you complete the program create this output?
 
-![Static lines](samples/forloops/img/lines.svg)
+![Static lines](img/lines.svg)
 
 [Next]
 
@@ -26,10 +26,10 @@ end
 | ----------- | ----------- |
 | ![20 Lines] | ![50 Lines] |
 
-[4 Lines]: samples/forloops/img/4-lines.svg "evy:edit"
-[10 Lines]: samples/forloops/img/10-lines.svg "evy:edit"
-[20 Lines]: samples/forloops/img/20-lines.svg "evy:edit"
-[50 Lines]: samples/forloops/img/50-lines.svg "evy:edit"
+[4 Lines]: img/4-lines.svg "evy:edit"
+[10 Lines]: img/10-lines.svg "evy:edit"
+[20 Lines]: img/20-lines.svg "evy:edit"
+[50 Lines]: img/50-lines.svg "evy:edit"
 
 [Next]
 

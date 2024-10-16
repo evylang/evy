@@ -23,7 +23,7 @@ end
 
 Change the x-coordinate by a maximum of ± 2 of its previous value.
 
-![Animated bubble](samples/forloops/img/bubble.gif)
+![Animated bubble](img/bubble.gif)
 
 ## [>] Hint
 

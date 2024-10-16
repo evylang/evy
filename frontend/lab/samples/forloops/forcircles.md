@@ -26,10 +26,10 @@ Use `for` loops and circles to create your own unique drawing.
 | -------------------------------- | ---------------------- |
 | ![Circle with random radius]     | ![Cat made of circles] |
 
-[Circle with different outline]: samples/forloops/img/circle-outline.svg "evy:edit"
-[Circle in wig shape]: samples/forloops/img/circle-wig.svg "evy:edit"
-[Circle with random radius]: samples/forloops/img/circle-rand.svg "evy:edit"
-[Cat made of circles]: samples/forloops/img/circle-cat.svg "evy:edit"
+[Circle with different outline]: img/circle-outline.svg "evy:edit"
+[Circle in wig shape]: img/circle-wig.svg "evy:edit"
+[Circle with random radius]: img/circle-rand.svg "evy:edit"
+[Cat made of circles]: img/circle-cat.svg "evy:edit"
 
 [Next]
 
@@ -37,7 +37,7 @@ Use `for` loops and circles to create your own unique drawing.
 
 Use the code from the cat sample above and make its eyes move:
 
-![Black cat with moving yellow eyes](samples/forloops/img/cat.gif)
+![Black cat with moving yellow eyes](img/cat.gif)
 
 ## [>] Hint
 

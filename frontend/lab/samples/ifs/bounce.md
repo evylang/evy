@@ -7,10 +7,9 @@ animation below.
 
 ## Demo
 
-<details>
-  <summary>Animation demo</summary>
-  <p><img src="samples/ifs/img/bounce.gif" alt="small centered circle" /></p>
-</details>
+### [>] Animation demo
+
+![small centered circle](img/bounce.gif)
 
 ## Animation notes 🗒
 

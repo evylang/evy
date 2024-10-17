@@ -32,7 +32,7 @@ values?
 
 ⭐ Can you use `hsl` to create a green-to-red gradient animation like below?
 
-![Animate rainbow zebra crossing](samples/forloops/img/zebra.gif)
+![Animate rainbow zebra crossing](img/zebra.gif)
 
 ## [>] Hint
 

@@ -20,7 +20,7 @@ answer.
 
 ## ⭐ Quarter circle
 
-![quarter circle](samples/ifs/img/quarter-circle.svg)
+![quarter circle](img/quarter-circle.svg)
 
 What's the **area** of the red **quarter-circle** if the radius is `1`? Can
 you estimate it to the nearest tenth?
@@ -72,7 +72,7 @@ using the Pythagorean theorem `a² + b² = c²`:
 c := sqrt a*a+b*b
 ```
 
-![quarter circle](samples/ifs/img/quarter-circle-triangle.svg)
+![quarter circle](img/quarter-circle-triangle.svg)
 
 If this distance is less than or equal to `1`, the point lies within the
 quarter-circle and should be colored red. (Remember, we're scaling `x` and `y`

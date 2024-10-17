@@ -7,7 +7,7 @@ Can you draw 6 purple circles at x coordinates `0`, `20`, `40`, `60`, `80`, and
 
 ### [>] Demo
 
-![6 circles on horizontally center aligned](samples/intro/img/move-6circles.svg)
+![6 circles on horizontally center aligned](img/move-6circles.svg)
 
 [Next]
 
@@ -47,7 +47,7 @@ Can you change the program to make the circle move from left to right, using the
 
 ### [>] Demo
 
-![one horizontally jumping circle](samples/intro/img/1-jumpy-circle.gif)
+![one horizontally jumping circle](img/1-jumpy-circle.gif)
 
 ### [>] Hint
 
@@ -71,7 +71,7 @@ Reduce the `x` increment and the `sleep` time.
 
 ### [>] Demo
 
-![one horizontally moving circle](samples/intro/img/1-circle.gif)
+![one horizontally moving circle](img/1-circle.gif)
 
 ### [>] Hint
 
@@ -92,7 +92,7 @@ Make 2 circles move in opposite direction.
 
 ### [>] Demo
 
-![two horizontally moving circles](samples/intro/img/2-circles.gif)
+![two horizontally moving circles](img/2-circles.gif)
 
 ### [>] Hint
 
@@ -110,7 +110,7 @@ circle 10
 
 ### [>] Demo
 
-![four moving circles](samples/intro/img/4-circles.gif)
+![four moving circles](img/4-circles.gif)
 
 ### [>] Hint
 

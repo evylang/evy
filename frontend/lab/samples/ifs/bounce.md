@@ -2,15 +2,14 @@
 
 ⭐ **Your Challenge:** Can you create a bouncing ball animation?
 
-Check out the [bouncing ball page 🏓📺](#bounce-show) or observe the
+Check out the [bouncing ball page 🏓📺](bounce-show.md) or observe the
 animation below.
 
 ## Demo
 
-<details>
-  <summary>Animation demo</summary>
-  <p><img src="samples/ifs/img/bounce.gif" alt="small centered circle" /></p>
-</details>
+### [>] Animation demo
+
+![small centered circle](img/bounce.gif)
 
 ## Animation notes 🗒
 
@@ -24,10 +23,10 @@ animation below.
 ⭐ Start by making a single green circle at position `0 50`.
 
 ⭐ Move the ball horizontally across the screen, like in the
-[🟣🚚 Move challenge](#move) in the Introduction lab, don't worry about the bounce yet.
+[🟣🚚 Move challenge](../intro/move.md) in the Introduction lab, don't worry about the bounce yet.
 
 ⭐ Finally, to change direction at the edges use the reversible increment trick
-from the [Pulse challenge](#pulse).
+from the [Pulse challenge](pulse.md).
 
 ### [>] Hint
 

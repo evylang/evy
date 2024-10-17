@@ -38,10 +38,12 @@ func WithSkipSleep(skipSleep bool) Option {
 
 // WithSVG sets up an SVG graphics runtime and writes its output to the
 // given writer.
-func WithSVG(svgStyle string) Option {
+func WithSVG(svgStyle string, svgWidth string, svgHeight string) Option {
 	return func(rt *Runtime) {
 		svgRT := svg.NewGraphicsRuntime()
 		svgRT.SVG.Style = svgStyle
+		svgRT.SVG.Width = svgWidth
+		svgRT.SVG.Height = svgHeight
 		rt.GraphicsRuntime = svgRT
 	}
 }

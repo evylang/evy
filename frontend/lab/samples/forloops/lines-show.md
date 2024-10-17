@@ -12,4 +12,4 @@ For this program we need two **nested** `for` loops.
 - Create a _static_ image with 10 lines (see picture below).
 - What needs to change to turn the static image into an animation?
 
-  ![Static lines](samples/forloops/img/10-lines.svg)
+  ![Static lines](img/10-lines.svg)

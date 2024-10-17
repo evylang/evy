@@ -13,7 +13,7 @@ How would you go about writing this program?
 
 - Break down the problem into smaller bits.
 - Create a static image with line `width 10`:
-  ![thick vertical lines](samples/loops/img/gradient-thick.svg)
+  ![thick vertical lines](img/gradient-thick.svg)
 - Animate the lines with the `sleep` command.
 - Reduce the line width, move, sleep and loop increment.
 
@@ -29,4 +29,4 @@ line 80 50
 
 Output:
 
-![Line from 10 20 to 80 50](samples/loops/img/gradient-line.svg)
+![Line from 10 20 to 80 50](img/gradient-line.svg)

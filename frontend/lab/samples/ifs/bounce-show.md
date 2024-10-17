@@ -9,4 +9,4 @@ Hit **Run** and watch the ball bounce!
 - How is the fading effect created?
 - What concepts from previous labs are being used here?
 
-Let's explore further in the interactive [Bounce Challenge](#bounce).
+Let's explore further in the interactive [Bounce Challenge](bounce.md).

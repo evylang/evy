@@ -136,6 +136,8 @@ type runCmd struct {
 	SkipSleep     bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
 	SVGOut        string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
 	SVGStyle      string `help:"Style of top-level SVG element." placeholder:"STYLE"`
+	SVGWidth      string `help:"Width of SVG file." placeholder:"WIDTH"`
+	SVGHeight     string `help:"Height of SVG file." placeholder:"HEIGHT"`
 	NoTestSummary bool   `short:"s" help:"Do not print test summary, only report failed tests."`
 	FailFast      bool   `help:"Stop execution on first failed test."`
 	Txtar         string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
@@ -222,7 +224,7 @@ func (c *runCmd) fileBytes() ([]byte, error) {
 func (c *runCmd) runtimeOptions() []cli.Option {
 	opts := []cli.Option{cli.WithSkipSleep(c.SkipSleep)}
 	if c.SVGOut != "" {
-		opts = append(opts, cli.WithSVG(c.SVGStyle))
+		opts = append(opts, cli.WithSVG(c.SVGStyle, c.SVGWidth, c.SVGHeight))
 	}
 	return opts
 }

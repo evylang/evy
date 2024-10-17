@@ -7,10 +7,13 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"unicode"
 
+	"evylang.dev/evy/pkg/md"
 	"rsc.io/markdown"
 )
 
@@ -39,6 +42,8 @@ func run(mdFile, htmlfFile string) error {
 		return err
 	}
 	doc := parse(string(md))
+	updateImgURL(doc, mdFile)
+	updateLabLinks(doc)
 	replaceNextButton(doc)
 	doc.Blocks = collapse(doc.Blocks)
 	html := markdown.ToHTML(doc)
@@ -49,6 +54,46 @@ func run(mdFile, htmlfFile string) error {
 func parse(md string) *markdown.Document {
 	p := markdown.Parser{Table: true}
 	return p.Parse(md)
+}
+
+// Change relative links to work for frontend lab root which is where it will be
+// requested from on https://lab.evy.dev. The generated .htmlf files are loaded
+// as fragments and image links relative to these fragments do not work, they need
+// to be relative to the initially loaded frontend/lab/index.html site.
+func updateImgURL(doc *markdown.Document, mdFile string) {
+	md.Walk(doc, func(n md.Node) {
+		img, ok := n.(*markdown.Image)
+		if !ok {
+			return
+		}
+		u, err := url.Parse(img.URL)
+		if err != nil || u.IsAbs() {
+			return
+		}
+		// change img/circle.svg to samples/ifs/img/circle.svg
+		u.Path = updateIMGPath(mdFile, u.Path)
+		img.URL = u.String()
+	})
+}
+
+func updateIMGPath(mdPath, imgPath string) string {
+	labDir := filepath.Base(filepath.Dir(mdPath))
+	return "samples/" + labDir + "/" + imgPath
+}
+
+func updateLabLinks(doc *markdown.Document) {
+	md.Walk(doc, func(n md.Node) {
+		link, ok := n.(*markdown.Link)
+		if !ok {
+			return
+		}
+		u, err := url.Parse(link.URL)
+		if err != nil || u.IsAbs() || !strings.HasSuffix(u.Path, ".md") {
+			return
+		}
+		// change ../loops/hsl.md and hsl.md to #hsl
+		link.URL = "#" + strings.TrimSuffix(filepath.Base(u.Path), ".md")
+	})
 }
 
 func replaceNextButton(doc *markdown.Document) {

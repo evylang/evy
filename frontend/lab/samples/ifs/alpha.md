@@ -12,7 +12,7 @@
 
 Complete the code to create the following drawing:
 
-![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares.svg)
+![simple drawing of circles and squares](img/red-dot-two-squares.svg)
 
 [Next]
 
@@ -21,11 +21,11 @@ Complete the code to create the following drawing:
 Tweak the Alpha parameter to the [`hsl`] function, its fourth parameter, to make
 the bottom left quadrant grey:
 
-![simple drawing of circles and squares](samples/ifs/img/red-dot-two-squares-alpha.svg)
+![simple drawing of circles and squares](img/red-dot-two-squares-alpha.svg)
 
 ## [>] Docs
 
-In the interactive [`hsl`] function [color explorer](#hsl) we learned how hsl
+In the interactive [`hsl`] function [color explorer](../loops/hsl.md) we learned how hsl
 takes three values: hue, saturation, lightness values to create a color.
 
 There is an optional fourth value called **alpha** that controls the

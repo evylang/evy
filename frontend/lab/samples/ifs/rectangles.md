@@ -20,8 +20,8 @@ Need ideas? **Click** on the images below for their Evy code.
 
 Be inspired by culture and art
 
-[Perspective]: samples/ifs/img/perspective.svg "evy:edit"
-[2 Squares]: samples/ifs/img/2-squares.svg "evy:edit"
+[Perspective]: img/perspective.svg "evy:edit"
+[2 Squares]: img/2-squares.svg "evy:edit"
 
 ### [>] Samples
 
@@ -29,10 +29,10 @@ Be inspired by culture and art
 | ---------- | ----------- |
 | ![Monster] | ![Tetris]   |
 
-[Bauhaus]: samples/ifs/img/bauhaus.svg "evy:edit"
-[Mondrian]: samples/ifs/img/mondrian.svg "evy:edit"
-[Monster]: samples/ifs/img/monster.svg "evy:edit"
-[Tetris]: samples/ifs/img/tetris.svg "evy:edit"
+[Bauhaus]: img/bauhaus.svg "evy:edit"
+[Mondrian]: img/mondrian.svg "evy:edit"
+[Monster]: img/monster.svg "evy:edit"
+[Tetris]: img/tetris.svg "evy:edit"
 
 #### [>] More
 
@@ -42,10 +42,10 @@ Be inspired by culture and art
 
 [Next]
 
-[Window]: samples/ifs/img/window.svg "evy:edit"
-[Apartments]: samples/ifs/img/apartments.svg "evy:edit"
-[Black and White Rectangles]: samples/ifs/img/bwrect.svg "evy:edit"
-[Red Green Squares]: samples/ifs/img/red-green-squares.svg "evy:edit"
+[Window]: img/window.svg "evy:edit"
+[Apartments]: img/apartments.svg "evy:edit"
+[Black and White Rectangles]: img/bwrect.svg "evy:edit"
+[Red Green Squares]: img/red-green-squares.svg "evy:edit"
 
 ## ⭐ Use Loops and Randomness
 
@@ -68,7 +68,7 @@ end
 | ---------- | --------------------------- |
 | ![Stripes] | ![Warm Squares]             |
 
-[Grass]: samples/ifs/img/grass.svg "evy:edit"
-[Random Purple Rectangles]: samples/ifs/img/randrect.svg "evy:edit"
-[Warm Squares]: samples/ifs/img/warm-squares.svg "evy:edit"
-[Stripes]: samples/ifs/img/stripes.svg "evy:edit"
+[Grass]: img/grass.svg "evy:edit"
+[Random Purple Rectangles]: img/randrect.svg "evy:edit"
+[Warm Squares]: img/warm-squares.svg "evy:edit"
+[Stripes]: img/stripes.svg "evy:edit"

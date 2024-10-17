@@ -346,7 +346,7 @@ func runEvy(source string, t ResultType) string {
 		cli.WithSkipSleep(true),
 		cli.WithOutputWriter(textWriter),
 		cli.WithCls(textWriter.Reset),
-		cli.WithSVG("" /* root style */),
+		cli.WithSVG("", "", "" /* root style, width, height */),
 	}
 	rt := cli.NewRuntime(opts...)
 	eval := evaluator.NewEvaluator(rt)

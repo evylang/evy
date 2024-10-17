@@ -202,7 +202,7 @@ FLAGS_frontend/lab/samples/ifs/img/grass.svg = --rand-seed=1
 FLAGS_frontend/lab/samples/forloops/img/bubble.svg = --rand-seed=1
 FLAGS_frontend/lab/samples/forloops/img/circle-rand.svg = --rand-seed=1
 %.svg: %.evy | $(NODELIB)
-	go run . run --svg-out "$@" $(FLAGS_$@) "$<"
+	go run . run --svg-width "200px" --svg-height "200px" --svg-out "$@" $(FLAGS_$@) "$<"
 	$(PRETTIER) --write "$@"
 
 %.htmlf: %.md | $(NODELIB)

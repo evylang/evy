@@ -1,0 +1,48 @@
+<h1>🏓 Bouncy Ball Bonus</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. Pretty similar to the last challenge, isn't it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Bounce</h2>
+<p>Make the ball bounce back and forth on the drawing area.</p>
+<p>Remember the <a href="#pulse">Pulse Challenge</a>?</p>
+<p>The bounce motion uses a similar trick to change direction.</p>
+<details>
+  <summary>Hint</summary>
+  <p>Inside <code>animate</code> add:</p>
+  <pre><code class="language-evy">x = x + inc
+if x &lt; 10 or x &gt; ❓
+    inc = -❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Move with Keys</h2>
+<p>Use the <code>key</code> event handler to move the ball up and down:</p>
+<ul>
+  <li>Move up with <code>⬆</code> or <code>k</code></li>
+  <li>Move down with <code>⬇</code> or <code>j</code></li>
+</ul>
+<p>
+  Declare a global variable <code>y</code> that's used inside <code>animate</code> to set the balls
+  y-coordinate. Update it inside the <code>key</code> event handler.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">y := 50
+
+on animate
+  // ...
+  move x ❓
+  // ...
+end
+
+on key k:string
+  if k == &quot;ArrowUp&quot; or k == &quot;k&quot;
+    y = y + 1
+  else if ❓
+    y = ❓
+  end
+end
+</code></pre>
+</details>

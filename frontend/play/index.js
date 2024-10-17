@@ -1035,7 +1035,7 @@ function unfocusRunButton() {
 }
 
 function keydownListener(e) {
-  if (e.target.id == "code") return // skip for source code input
+  if (e.target.id == "evy-editor") return // skip for source code input
   const { ptr, len } = stringToMem(e.key)
   wasmInst.exports.onKey(ptr, len)
 }

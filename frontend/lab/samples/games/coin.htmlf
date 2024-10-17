@@ -1,0 +1,45 @@
+<h1>🪙 Coin Toss</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What will happen when it's run?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Toss</h2>
+<p>Add the computer's coin toss.</p>
+<p>
+  At the beginning of the <code>key</code> event handler, add a <code>coin</code> variable that
+  randomly gets assigned <code>&quot;h&quot;</code> or <code>&quot;t&quot;</code>.
+</p>
+<p>
+  Just after <code>print &quot;Your guess:&quot; guess</code> add
+  <code>print &quot;My coin: &quot; coin</code>
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">on key guess:string
+    coin := &quot;h&quot;
+    if (rand1) &lt; ❓
+        coin = ❓
+    end
+    print &quot;Your guess:&quot; guess
+    print &quot;My coin:   &quot; ❓
+    sleep 1
+</code></pre>
+  <p>There multiple variants that will get you to the same result, e.g. <code>rand 2</code>.</p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Win or Lose?</h2>
+<p>Compare your guess to the computer's coin toss.</p>
+<p>
+  If they match, print <code>&quot;You win!&quot;</code> otherwise print
+  <code>&quot;You lose!&quot;</code>.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">if guess == ❓
+	print &quot;You win!&quot;
+else
+	❓
+end
+sleep 1
+</code></pre>
+</details>

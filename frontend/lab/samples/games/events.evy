@@ -1,0 +1,7 @@
+on down x:num y:num
+    print "down:" (round x) (round y)
+end
+
+on key k:string
+    print "key:" k
+end

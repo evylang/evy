@@ -1,0 +1,40 @@
+<h1>🎪 Events</h1>
+<p>
+  In Evy, <strong>event handlers</strong> react to events like keyboard input (<code>on key</code>).
+</p>
+<details>
+  <summary>Docs</summary>
+  <p>
+    An event handler starts with <code>on</code>, then the event type, parameters, code, and ends
+    with <code>end</code>. This example prints the pressed key:
+  </p>
+  <pre><code class="language-evy">on key k:string
+  print k
+end
+</code></pre>
+  <p><code>k:string</code> is the parameter (must be a string).</p>
+  <p>
+    There are six types of events in Evy: <code>key</code>, <code>down</code>, <code>up</code>,
+    <code>move</code>, <code>animate</code>, and <code>input</code>.
+  </p>
+</details>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What will happen when it's run?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Update <code>down</code></h2>
+<p>
+  Update the <code>down</code> event handler to draw a circle with radius <code>1</code> at
+  <code>x y</code>.
+</p>
+<p>Can you see circles on click or tap?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Update <code>key</code></h2>
+<p>Update the <code>key</code> event handler:</p>
+<ul>
+  <li>If the key is <code>&quot;r&quot;</code>, clear with <code>&quot;red&quot;</code>.</li>
+  <li>If the key is <code>&quot;g&quot;</code>, clear with <code>&quot;green&quot;</code>.</li>
+  <li>If the key is <code>&quot;b&quot;</code>, clear with <code>&quot;blue&quot;</code>.</li>
+  <li>Otherwise, just use <code>clear</code>.</li>
+</ul>
+<p>Can you change the background color?</p>

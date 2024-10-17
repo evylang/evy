@@ -1,0 +1,7 @@
+width 1
+
+on down x:num y:num
+    move x y
+    circle 1
+end
+

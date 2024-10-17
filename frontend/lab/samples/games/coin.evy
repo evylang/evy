@@ -1,0 +1,10 @@
+msg := "Heads (h) or Tails (t)?"
+print msg
+
+on key guess:string
+    print "Your guess:" guess
+    sleep 1
+    print
+    print msg
+end
+

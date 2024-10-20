@@ -1,0 +1,71 @@
+<h1>🎨 Paint</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What will happen when it's run?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Circle Color</h2>
+<p>
+  Change the color of the circle to <code>&quot;orange&quot;</code> in the <code>down</code> event
+  handler.
+</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add a <code>up</code> Event Handler</h2>
+<p>
+  Add an <code>up</code> event handler to draw a <code>&quot;red&quot;</code> circle with radius
+  <code>1</code> at <code>x y</code>.
+</p>
+<p>Run and test the program. Do you see orange and red circles?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add a <code>move</code> Event Handler</h2>
+<p>
+  Add an <code>move</code> event handler to draw a <code>&quot;black&quot;</code> line to
+  <code>x y</code>.
+</p>
+<p>Run and test the program. Do you see black lines connecting orange and red circles?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Only Paint When Down</h2>
+<p>If you're using a touchscreen device, you can skip this step.</p>
+<p>
+  If you're <em>not</em> on a touchscreen, you might have noticed that lines are drawn even when
+  you're not clicking. To fix this, we'll track whether the mouse button is pressed.
+</p>
+<p>
+  Add a global variable <code>d</code> with the value <code>false</code>. In the
+  <code>down</code> handler, set <code>d</code> to <code>true</code>. In the
+  <code>up</code> handler, set it to <code>false</code>. Only draw a line if <code>d</code> is
+  <code>true</code>.
+</p>
+<details>
+  <summary>Hint</summary>
+  <p>Check out the <a href="https://play.evy.dev/#draw">Playground Drawing Sample</a>.</p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Change Drawing Pen Color</h2>
+<p>Add a black-and-green palette at the bottom. Clicking it changes the pen color.</p>
+<p><img src="samples/games/img/drawing.gif" alt="Screencast of drawing program" /></p>
+<p>
+  Add a <code>&quot;black&quot;</code> rectangle with dimensions <code>50 20</code> at
+  <code>0 0</code>.
+</p>
+<p>
+  Add a <code>&quot;green&quot;</code> rectangle with dimensions <code>50 20</code> at
+  <code>50 0</code>.
+</p>
+<p>Add a global variable <code>pen</code> with the value <code>&quot;black&quot;</code>.</p>
+<p>
+  In the <code>down</code> handler, if <code>y</code> is less than <code>20</code> update the
+  <code>pen</code> variable: If <code>x</code> is less than <code>50</code> set <code>pen</code> to
+  <code>&quot;black&quot;</code>, otherwise set it to <code>&quot;green&quot;</code>.
+</p>
+<p>In the <code>move</code> handler set the color to <code>pen</code>.</p>
+<details>
+  <summary>Hint</summary>
+  <p>
+    Check out this working
+    <a
+      href="https://play.evy.dev/#content=H4sIAAAAAAAAA22PUQ6CMBBE//cUk54ATPgx6l2QLtpYtqSAwO1Na6EJ2qRNd3Yy+9ZzM6IqcCqoc28O34IaZ52HenhmUeSzhWajxydKop4F5yvU3dbNS5EORVvbgYmcQLtZsJxl6rCGlwBA44rRTxwL02LFLWQinTh+wboLicL5Wh6ssmx8YxllFNgOHLIWXFDlrECX4TbjsZ32i23RFG6An/q/6Gm7H9SE6Vl/o3a+Le/rPiSaFvqwac+yK9ZInrDBfQBGJrOLrAEAAA=="
+      >solution</a
+    >
+    on the Evy Playground.
+  </p>
+</details>

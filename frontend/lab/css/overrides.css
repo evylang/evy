@@ -111,6 +111,7 @@ html {
 .notes img {
   width: 16rem;
   max-width: 80%;
+  margin: 0 auto;
 }
 
 /* --- Notes table ----------------------------------------------- */

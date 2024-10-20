@@ -142,11 +142,10 @@ check-fmt-evy:
 	go run . fmt --check $(EVY_FILES)
 
 ## Conform runs evy over an example suite with asserts.
+CONFORM_CMD = @printf "%s " $(notdir $f); evy run $f
+CONFORM_EVY_FILES = $(wildcard examples/human-eval/*.evy)
 conform: install
-	for n in examples/human-eval/*.evy; do \
-	  printf "%s " "$${n##*/}"; \
-	  evy run "$$n"; \
-	done
+	$(foreach f,$(CONFORM_EVY_FILES),$(CONFORM_CMD)$(nl))
 
 .PHONY: check-fmt-evy conform fmt-evy lint-go lint-node
 

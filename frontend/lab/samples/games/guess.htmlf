@@ -1,0 +1,61 @@
+<h1>🎲 Guess my Number</h1>
+<p>
+  Create a number guessing game. The player guesses a number between 0 and 9 and gets hints if their
+  guess is too high or too low.
+</p>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What will happen when it's run?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Check Guess</h2>
+<p>
+  Delete the two <code>print</code> statements at the bottom of the <code>key</code> event handler.
+</p>
+<p>
+  Print the message <code>&quot;You win!&quot;</code> if the player guesses the number correctly,
+  otherwise print <code>&quot;Try again.&quot;</code>.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">if guess == ❓
+  print ❓
+else
+  print ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ New Game</h2>
+<p>Start a new game after winning:</p>
+<ul>
+  <li>Sleep for a second</li>
+  <li>Print the message stored in <code>msg</code> again</li>
+  <li>Generate a new random number</li>
+</ul>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">if guess == ...
+  print ...
+  sleep ❓
+  print ❓
+  number = ❓
+else
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Add Hints</h2>
+<p>
+  Print <code>&quot;Too low.&quot;</code> if the guess is less than the number,
+  <code>&quot;Too high.&quot;</code> if the guess is greater.
+</p>
+<p>Start a new game after winning:</p>
+<p>Add a <code>guess</code> variable to store the player's guess. Print the guess to the</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">else if guess &lt; ❓
+  print guess &quot;is too ❓.&quot;
+else
+  print ❓
+end
+</code></pre>
+</details>

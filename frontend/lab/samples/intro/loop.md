@@ -26,7 +26,7 @@ end
 - **loop_body**: Instructions to be repeated.
 - `end`: End of the loop.
 
-[Next]
+---
 
 ## ⭐️ Update the Loop
 

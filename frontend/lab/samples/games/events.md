@@ -24,7 +24,7 @@ and `input`.
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Update `down`
 
@@ -32,7 +32,7 @@ Update the `down` event handler to draw a circle with radius `1` at `x y`.
 
 Can you see circles on click or tap?
 
-[Next]
+---
 
 ## ⭐ Update `key`
 

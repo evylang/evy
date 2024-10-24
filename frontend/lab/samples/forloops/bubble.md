@@ -17,7 +17,7 @@ for y := range 0 110 ❓
 end
 ```
 
-[Next]
+---
 
 ⭐ Add randomness to the x-coordinate of the bubble.
 

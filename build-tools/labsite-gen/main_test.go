@@ -113,18 +113,19 @@ var nextButtonTests = []struct {
 	},
 	{
 		name:     "single button",
-		in:       `[Next]`,
+		in:       `---`,
 		wantMD:   `<button class="next-btn">Next</button>` + "\n",
 		wantHTML: `<p><button class="next-btn">Next</button></p>` + "\n",
 	},
 	{
 		name: "multiple buttons",
 		in: `# Heading
-[Next]
+
+---
 
 paragraph
 
-[Next]`,
+---`,
 		wantMD: `
 # Heading
 

@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Circles with `for` Loops
 
@@ -31,7 +31,7 @@ Use `for` loops and circles to create your own unique drawing.
 [Circle with random radius]: img/circle-rand.svg "evy:edit"
 [Cat made of circles]: img/circle-cat.svg "evy:edit"
 
-[Next]
+---
 
 ## ⭐ Move the Cat Eyes 👀
 

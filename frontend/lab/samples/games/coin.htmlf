@@ -36,9 +36,9 @@
 <details>
   <summary>Hint</summary>
   <pre><code class="language-evy">if guess == ❓
-	print &quot;You win!&quot;
+    print &quot;You win!&quot;
 else
-	❓
+    ❓
 end
 sleep 1
 </code></pre>

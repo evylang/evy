@@ -10,7 +10,7 @@ It lets you create animations and handle user input simultaneously.
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Color and Trail
 
@@ -24,7 +24,7 @@ Consider updating `fill` and `stroke` color as well as `width`.
 
 Use `clear` at the beginning of the `animate` event handler.
 
-[Next]
+---
 
 ## ⭐ Fading Trail
 

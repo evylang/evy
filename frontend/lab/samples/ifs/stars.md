@@ -7,7 +7,7 @@ Write a program that draws:
 - A black background using `clear`
 - A `"white"` circle with radius `1` anywhere on the canvas.
 
-[Next]
+---
 
 ## ⭐ Random Position
 
@@ -26,7 +26,7 @@ circle ❓
 
 [`rand`]: /docs/builtins.html#rand
 
-[Next]
+---
 
 ## ⭐ 200 Circles
 
@@ -46,7 +46,7 @@ while i ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ 200 Stars
 
@@ -65,7 +65,7 @@ size := (rand1) * 0.6
 circle size
 ```
 
-[Next]
+---
 
 ## ⭐ Sprinkle a Bit of Gold
 
@@ -82,7 +82,7 @@ else
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Make It Your Own
 

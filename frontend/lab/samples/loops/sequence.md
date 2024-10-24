@@ -23,7 +23,7 @@ while x <= ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Number Sequences
 

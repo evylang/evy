@@ -24,7 +24,7 @@ move 50 ❓
 circle ❓
 ```
 
-[Next]
+---
 
 ## ⭐ Many Circles
 
@@ -51,7 +51,7 @@ while r < ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animate
 
@@ -72,7 +72,7 @@ while r < __
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Add Transparency
 
@@ -96,7 +96,7 @@ while r < __
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Tweak for a Smooth Animation
 
@@ -116,7 +116,7 @@ Reduce the
 - sleep: 0.001 seconds
 - alpha: hsl 0 0 0 1
 
-[Next]
+---
 
 ## ⭐ Add the Pulse
 

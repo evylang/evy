@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Circles in corner
 
@@ -23,7 +23,7 @@ Can you move the circle center to each corner?
 [Quarter circle bottom left]: img/circles-bottom-left.svg
 [Quarter circle bottom right]: img/circles-bottom-right.svg
 
-[Next]
+---
 
 ## ⭐ Create Your Own Circles
 
@@ -41,7 +41,7 @@ fully or partially visible.
 [Overlapping circles]: img/circles-camh.svg
 [Cloud made from circles]: img/circles-kathi.svg
 
-[Next]
+---
 
 ## ⭐ Flag Quiz
 

@@ -8,7 +8,7 @@
 
 Note how we are using the `text` command to display text on the drawing area.
 
-[Next]
+---
 
 ## ⭐ Move with Keys
 
@@ -32,7 +32,7 @@ on key k:string
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Add Gold Arrow
 
@@ -65,7 +65,7 @@ on animate
     text "▶▶"
 ```
 
-[Next]
+---
 
 ## ⭐ Add Orange and Red Arrow
 
@@ -93,7 +93,7 @@ Check out this [solution] on the Evy Playground.
 
 [solution]: https://play.evy.dev/#content=H4sIAAAAAAAAA21RzWrCQBC+5yk+Fgop0rpWgijsodBjT4U+wNKMMRizZZPWpCdfoRc99i089mF8gj5CmdmIUQwsMzvfz85kGswMEh21HHUUZa5IQ+q8LTPqYE9dNXIlbJmvbE0RAAyHeH1Pj7cWBnGLAfT96BY3GGktdXE1iCUyOhZ0FNDuJcN03CEOoasyOxH2Q2BzKwYxB8Ymgo11dGznydu15G8FWS/Zyn0SGrRyqampof5+vn8V06v8i2C9+yhTTJokKF3hPBR3KxzrvVtXJysZY6x7doft/rDdq7469K9Oqm6g5Ey32xx2mys6T2lPysNOrr1HZSorWVKL5ayqfV5mQsvnWMIYqEfu/ZnmtYLzXW0RrPlr+F82GGA67S+MioouPF7ybNE3Ka6YnC2de+PzDzXeqUNjAgAA
 
-[Next]
+---
 
 ## ⭐ Add Collision detection
 
@@ -124,7 +124,7 @@ else if (abs x-red) ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Add Level messages
 

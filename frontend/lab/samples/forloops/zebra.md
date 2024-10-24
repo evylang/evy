@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ⭐ Can you change the program to use a `for` loop?
 
@@ -19,16 +19,16 @@ for y := range ❓ ❓ ❓
 end
 ```
 
-[Next]
+---
 
 ⭐ Can you _animate_ the stripes with `sleep 0.2`?
 
-[Next]
+---
 
 ⭐ Can you make the animation go the _opposite_ direction by changing the `range`
 values?
 
-[Next]
+---
 
 ⭐ Can you use `hsl` to create a green-to-red gradient animation like below?
 

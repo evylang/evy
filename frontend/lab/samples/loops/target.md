@@ -15,7 +15,7 @@ while r > ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animation
 
@@ -31,7 +31,7 @@ while r > ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Tweak
 

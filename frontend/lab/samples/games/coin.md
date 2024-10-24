@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Toss
 
@@ -32,7 +32,7 @@ on key guess:string
 
 There multiple variants that will get you to the same result, e.g. `rand 2`.
 
-[Next]
+---
 
 ## ⭐ Win or Lose?
 
@@ -44,9 +44,9 @@ If they match, print `"You win!"` otherwise print `"You lose!"`.
 
 ```evy
 if guess == ❓
-	print "You win!"
+    print "You win!"
 else
-	❓
+    ❓
 end
 sleep 1
 ```

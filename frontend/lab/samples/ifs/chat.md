@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Type Inference
 
@@ -30,7 +30,7 @@ you can use the shortcut
 s := "banana"
 ```
 
-[Next]
+---
 
 ## ⭐ Add `else if`
 
@@ -49,7 +49,7 @@ else
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Your Turn
 

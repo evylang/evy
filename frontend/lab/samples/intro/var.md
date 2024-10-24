@@ -33,7 +33,7 @@ x = 3 + 4
 
 📌 A variable _must_ be declared before it can be used.
 
-[Next]
+---
 
 ## ⭐ Your Turn
 

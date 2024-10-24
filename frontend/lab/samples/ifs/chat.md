@@ -12,7 +12,7 @@
 
 Note the new `:=` operator. Have a guess how it works.
 
-## [>] Docs
+### [>] Docs
 
 In Evy, you can declare a variable and assign it a value in one step using `:=`.
 This is called **Declaration with Type Inference**.

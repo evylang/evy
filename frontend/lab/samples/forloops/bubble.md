@@ -6,7 +6,7 @@
 - increment the y-coordinate by `0.5`
 - animate it with a sleep for `0.02` seconds.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 for y := range 0 110 ❓
@@ -25,7 +25,7 @@ Change the x-coordinate by a maximum of ± 2 of its previous value.
 
 ![Animated bubble](img/bubble.gif)
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 //...

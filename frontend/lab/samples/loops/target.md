@@ -5,7 +5,7 @@
 Draw a target board with concentric circles.
 ![Target board](img/target.svg)
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 //...
@@ -21,7 +21,7 @@ end
 
 Animate the circles with a `sleep` for 0.2 seconds.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 //...

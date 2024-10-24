@@ -2,7 +2,7 @@
 
 In Evy, **event handlers** react to events like keyboard input (`on key`).
 
-## [>] Docs
+### [>] Docs
 
 An event handler starts with `on`, then the event type, parameters, code, and
 ends with `end`. This example prints the pressed key:

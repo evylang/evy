@@ -34,7 +34,7 @@ values?
 
 ![Animate rainbow zebra crossing](img/zebra.gif)
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 for ❓ range 98 -1 -❓

@@ -23,7 +23,7 @@ the bottom left quadrant grey:
 
 ![simple drawing of circles and squares](img/red-dot-two-squares-alpha.svg)
 
-## [>] Docs
+### [>] Docs
 
 In the interactive [`hsl`] function [color explorer](../loops/hsl.md) we learned how hsl
 takes three values: hue, saturation, lightness values to create a color.

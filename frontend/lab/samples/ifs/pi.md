@@ -8,7 +8,7 @@ a **Monte Carlo algorithm**.
 - What do you know about **π**?
 - Do you know the **area** of a circle with radius `1`?
 
-## [>] Docs
+### [>] Docs
 
 A **Monte Carlo algorithm** is a computer program that simulates the behavior of
 other systems. It's not a method that gives you a perfectly precise answer, but

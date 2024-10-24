@@ -46,7 +46,7 @@ Update the `gold` x-position inside the `animate` event handler with:
 gold = (gold + 0.3) % 110
 ```
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 gold := 0

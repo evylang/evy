@@ -15,7 +15,7 @@ Use the [`rand`] function to generate random coordinates for your white circle.
 
 `rand n` generates a random whole numbers between `0` and `n`.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 x := rand 100
@@ -35,7 +35,7 @@ Draw `200` circles with radius `1` in random positions.
 - You'll need a loop for this.
 - Make sure to generate new random coordinates **inside** the loop.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 i := 0
@@ -58,7 +58,7 @@ Make the circle sizes random between `0` and `0.6`.
 
 [`rand1`]: /docs/builtins.html#rand1
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 size := (rand1) * 0.6
@@ -71,7 +71,7 @@ circle size
 
 Change the color of 10% or your circles to `"gold"`
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 c := rand1

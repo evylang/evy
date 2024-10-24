@@ -6,7 +6,7 @@ For this program we need two **nested** `for` loops.
 
 ⭐ How would you go about writing this program?
 
-## [>] Hint
+### [>] Hint
 
 - Break down your problem into smaller bits.
 - Create a _static_ image with 10 lines (see picture below).

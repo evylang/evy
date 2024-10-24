@@ -14,7 +14,6 @@ end
 </details>
 <details>
   <summary>Docs</summary>
-  <h2><code>for</code> loops</h2>
   <p>
     <code>for</code> loops, also known as <strong>count-controlled</strong> loops, are a shortcut
     for writing certain <code>while</code> loops (<strong>condition-controlled</strong> loops).

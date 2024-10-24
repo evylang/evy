@@ -7,7 +7,7 @@ Can you change this program to
 - `print` the numbers from `0` to `20`?
 - `sleep` only `0.2` seconds?
 
-# [>] Docs
+### [>] Docs
 
 A **loop** in programming is a powerful way to automate repetitive tasks. In
 Evy, a loop is created using the `while` keyword.

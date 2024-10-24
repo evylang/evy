@@ -12,7 +12,7 @@
 
 Can you move the circle center to each corner?
 
-## [>] Demo
+### [>] Demo
 
 | ![Quarter circle top left]    | ![Quarter circle top right]    |
 | ----------------------------- | ------------------------------ |
@@ -30,7 +30,7 @@ Can you move the circle center to each corner?
 Draw 2-4 circles on the canvas using any colors you like. The circles can be
 fully or partially visible.
 
-## [>] Samples
+### [>] Samples
 
 | ![Three circles of same size] | ![Three large overlapping circles in warm colors] |
 | ----------------------------- | ------------------------------------------------- |
@@ -47,7 +47,7 @@ fully or partially visible.
 
 Which country has this flag? 🇵🇼
 
-## [>] Answer
+### [>] Answer
 
 [Palau]
 

@@ -9,7 +9,7 @@ This program was created using the [`line`] and [`width`] commands.
 
 How would you go about writing this program?
 
-## [>] Hint
+### [>] Hint
 
 - Break down the problem into smaller bits.
 - Create a static image with line `width 10`:
@@ -17,7 +17,7 @@ How would you go about writing this program?
 - Animate the lines with the `sleep` command.
 - Reduce the line width, move, sleep and loop increment.
 
-## [>] Docs
+### [>] Docs
 
 The following code draws a line from point `10 20` to point `80 50`:
 

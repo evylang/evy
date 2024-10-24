@@ -39,7 +39,7 @@ Use the code from the cat sample above and make its eyes move:
 
 ![Black cat with moving yellow eyes](img/cat.gif)
 
-## [>] Hint
+### [>] Hint
 
 Wrap the whole cat drawing in a `for` loop and modify the `// eyes` block:
 

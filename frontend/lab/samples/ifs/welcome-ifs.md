@@ -10,6 +10,6 @@ and interactivity.
 ⭐ Observe the animation. What kind of _decisions_ would the code need to make
 while it's running to create the pulsing effect?
 
-## [>] Hint
+### [>] Hint
 
 Focus on when the animation changes direction.

@@ -41,7 +41,7 @@ Write programs that generate the first 20 numbers of the following sequences:
 Use _two different_ variables to track the count used in the loop condition and the printed
 sequence number.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 x:num
@@ -53,7 +53,7 @@ while x <= ❓
 end
 ```
 
-## [>] Answer
+### [>] Answer
 
 The solution for 20th number is
 
@@ -65,7 +65,7 @@ The solution for 20th number is
 - 0.0000019073486328125
 - 210
 
-## [>] Docs
+### [>] Docs
 
 The first 3 sequences are **arithmetic sequences** where you add the same amount to
 get from one number to the next.

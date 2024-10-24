@@ -11,7 +11,7 @@ Now, **Run** the code. Did the output match your expectation?
 
 [`print`]: /docs/builtins.html#print
 
-## [>] Docs
+### [>] Docs
 
 In Evy, we create a variable and its type with the pattern:
 

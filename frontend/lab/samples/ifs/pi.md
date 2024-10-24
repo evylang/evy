@@ -8,7 +8,7 @@ a **Monte Carlo algorithm**.
 - What do you know about **π**?
 - Do you know the **area** of a circle with radius `1`?
 
-## [>] Docs
+### [>] Docs
 
 A **Monte Carlo algorithm** is a computer program that simulates the behavior of
 other systems. It's not a method that gives you a perfectly precise answer, but
@@ -16,7 +16,7 @@ rather an approximate one, often relying on **randomness** and **statistics**
 to reach a result. The more times you run it, the closer you get to the true
 answer.
 
-[Next]
+---
 
 ## ⭐ Quarter circle
 
@@ -53,7 +53,7 @@ visually?
   more dots we place, the more precise our estimate of π should become. Let's
   put this theory to the test!
 
-[Next]
+---
 
 ## ⭐ Draw a Red Quarter Circle
 
@@ -92,7 +92,7 @@ else
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Estimate π
 

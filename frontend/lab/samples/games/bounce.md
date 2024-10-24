@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Bounce
 
@@ -27,7 +27,7 @@ if x < 10 or x > ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Move with Keys
 

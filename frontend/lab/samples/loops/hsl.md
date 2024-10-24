@@ -9,14 +9,14 @@ It's a way to describe how colors are created.
 - **Tap** the canvas.
 - **Observe** how changing the HSL values affects the color.
 
-## [>] Source
+### [>] Source
 
 The source code for this program is hidden, but if you're interested in how it works, you can
 take a peek at the [full example].
 
 [full example]: #hsl-code
 
-## [>] Docs
+### [>] Docs
 
 **Hue** is the color type, like red, green, or blue. It is a number between
 `0` and `360` degrees.

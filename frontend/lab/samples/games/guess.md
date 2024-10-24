@@ -9,7 +9,7 @@ gets hints if their guess is too high or too low.
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Check Guess
 
@@ -28,7 +28,7 @@ else
 end
 ```
 
-[Next]
+---
 
 ## ⭐ New Game
 
@@ -49,7 +49,7 @@ if guess == ...
 else
 ```
 
-[Next]
+---
 
 ## ⭐ Add Hints
 

@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Create with Rectangles
 
@@ -40,7 +40,7 @@ Be inspired by culture and art
 | ----------------------------- | -------------------- |
 | ![Black and White Rectangles] | ![Red Green Squares] |
 
-[Next]
+---
 
 [Window]: img/window.svg "evy:edit"
 [Apartments]: img/apartments.svg "evy:edit"

@@ -9,8 +9,6 @@ That's what we'll build up to in this first lab—a bit of a whirlwind tour.
 
 ## 🚀 Let's get started!
 
-There is also a step-by-step walk through video guide 🎬:
+There is also a step-by-step walk through [video guide] 🎬.
 
-<a href="https://youtu.be/FBqyiU4iZNY" target="_blank" class="youtube" >
-<img src="samples/intro/img/youtube.jpeg" alt="Screenshot of YouTube walk through" />
-</a>
+[video guide]: https://youtu.be/FBqyiU4iZNY

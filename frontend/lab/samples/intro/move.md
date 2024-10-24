@@ -9,7 +9,7 @@ Can you draw 6 purple circles at x coordinates `0`, `20`, `40`, `60`, `80`, and
 
 ![6 circles on horizontally center aligned](img/move-6circles.svg)
 
-[Next]
+---
 
 ## ⭐ 6 Circles in a Loop
 
@@ -35,7 +35,7 @@ while x <= ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animation
 
@@ -59,7 +59,7 @@ while x <= _
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animation Smoothing
 
@@ -84,7 +84,7 @@ while // …
 end
 ```
 
-[Next]
+---
 
 ## ⭐ 2 Moving circles
 
@@ -104,7 +104,7 @@ move 100-x 60
 circle 10
 ```
 
-[Next]
+---
 
 ## ⭐ 4 Moving circles
 

@@ -6,13 +6,13 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Circles in corner
 
 Can you move the circle center to each corner?
 
-## [>] Demo
+### [>] Demo
 
 | ![Quarter circle top left]    | ![Quarter circle top right]    |
 | ----------------------------- | ------------------------------ |
@@ -23,14 +23,14 @@ Can you move the circle center to each corner?
 [Quarter circle bottom left]: img/circles-bottom-left.svg
 [Quarter circle bottom right]: img/circles-bottom-right.svg
 
-[Next]
+---
 
 ## ⭐ Create Your Own Circles
 
 Draw 2-4 circles on the canvas using any colors you like. The circles can be
 fully or partially visible.
 
-## [>] Samples
+### [>] Samples
 
 | ![Three circles of same size] | ![Three large overlapping circles in warm colors] |
 | ----------------------------- | ------------------------------------------------- |
@@ -41,13 +41,13 @@ fully or partially visible.
 [Overlapping circles]: img/circles-camh.svg
 [Cloud made from circles]: img/circles-kathi.svg
 
-[Next]
+---
 
 ## ⭐ Flag Quiz
 
 Which country has this flag? 🇵🇼
 
-## [>] Answer
+### [>] Answer
 
 [Palau]
 

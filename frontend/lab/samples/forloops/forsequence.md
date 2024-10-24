@@ -8,7 +8,7 @@
 - `8`, `5`, `2`
 - `-1`, `-4`, `-7`
 
-## [>] Hint
+### [>] Hint
 
 You only need to find the correct `START`, `STOP` and `STEP` values in:
 

@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Use a Variable
 
@@ -24,7 +24,7 @@ move ❓ 100
 // One more to replace
 ```
 
-[Next]
+---
 
 ## ⭐ Use a Loop
 
@@ -42,7 +42,7 @@ while x <= ❓
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animation
 
@@ -58,7 +58,7 @@ while x <= __
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animation Smoothing
 

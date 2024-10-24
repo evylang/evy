@@ -6,13 +6,13 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Type Inference
 
 Note the new `:=` operator. Have a guess how it works.
 
-## [>] Docs
+### [>] Docs
 
 In Evy, you can declare a variable and assign it a value in one step using `:=`.
 This is called **Declaration with Type Inference**.
@@ -30,7 +30,7 @@ you can use the shortcut
 s := "banana"
 ```
 
-[Next]
+---
 
 ## ⭐ Add `else if`
 
@@ -49,7 +49,7 @@ else
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Your Turn
 

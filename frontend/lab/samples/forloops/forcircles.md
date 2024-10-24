@@ -6,7 +6,7 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Circles with `for` Loops
 
@@ -31,7 +31,7 @@ Use `for` loops and circles to create your own unique drawing.
 [Circle with random radius]: img/circle-rand.svg "evy:edit"
 [Cat made of circles]: img/circle-cat.svg "evy:edit"
 
-[Next]
+---
 
 ## ⭐ Move the Cat Eyes 👀
 
@@ -39,7 +39,7 @@ Use the code from the cat sample above and make its eyes move:
 
 ![Black cat with moving yellow eyes](img/cat.gif)
 
-## [>] Hint
+### [>] Hint
 
 Wrap the whole cat drawing in a `for` loop and modify the `// eyes` block:
 

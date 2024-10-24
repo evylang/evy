@@ -4,11 +4,11 @@
 
 ![Static lines](img/lines.svg)
 
-[Next]
+---
 
 ⭐ Can you update the program with a single `for` loop to create same output?
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 for a := range 0 100 20
@@ -17,7 +17,7 @@ for a := range 0 100 20
 end
 ```
 
-[Next]
+---
 
 ⭐ Can you change the program to create the following outputs, with step `25`,
 `10`, `5`, and `2`.
@@ -31,11 +31,11 @@ end
 [20 Lines]: img/20-lines.svg "evy:edit"
 [50 Lines]: img/50-lines.svg "evy:edit"
 
-[Next]
+---
 
 ⭐ Can you declare a variable called `step` and use it with `range` and `line`?
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 step := 10
@@ -45,7 +45,7 @@ for a := range 0 100 step
 end
 ```
 
-[Next]
+---
 
 ## ⭐ Animate
 
@@ -57,7 +57,7 @@ Add a second, wrapping, outer loop that ranges over the `step` variable.
 - Use the `clear` command.
 - Use the `sleep 0.01` command.
 
-## [>] Hint
+### [>] Hint
 
 ```evy
 for step := range ❓ ❓ ❓

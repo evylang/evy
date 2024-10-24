@@ -16,9 +16,7 @@ while x < ❓ // STOP
 end
 ```
 
-# [>] Docs
-
-## `for` loops
+### [>] Docs
 
 `for` loops, also known as **count-controlled** loops, are a shortcut for
 writing certain `while` loops (**condition-controlled** loops).

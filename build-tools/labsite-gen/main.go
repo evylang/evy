@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	detailsMarker    = "[>]"
-	nextButtonMarker = "[Next]"
+	detailsMarker = "[>]"
 )
 
 var nextButton = newNextButton()
@@ -98,25 +97,10 @@ func updateLabLinks(doc *markdown.Document) {
 
 func replaceNextButton(doc *markdown.Document) {
 	for i, block := range doc.Blocks {
-		if isNextButton(block) {
+		if _, ok := block.(*markdown.ThematicBreak); ok {
 			doc.Blocks[i] = nextButton
 		}
 	}
-}
-
-func isNextButton(block markdown.Block) bool {
-	paragraph, ok := block.(*markdown.Paragraph)
-	if !ok {
-		return false
-	}
-	if len(paragraph.Text.Inline) != 1 {
-		return false
-	}
-	plain, ok := paragraph.Text.Inline[0].(*markdown.Plain)
-	if !ok {
-		return false
-	}
-	return plain.Text == nextButtonMarker
 }
 
 func collapse(blocks []markdown.Block) []markdown.Block {

@@ -6,13 +6,13 @@
 
 **Run** the code. Was it what you expected?
 
-[Next]
+---
 
 ## ⭐ Circle Color
 
 Change the color of the circle to `"orange"` in the `down` event handler.
 
-[Next]
+---
 
 ## ⭐ Add a `up` Event Handler
 
@@ -20,7 +20,7 @@ Add an `up` event handler to draw a `"red"` circle with radius `1` at `x y`.
 
 Run and test the program. Do you see orange and red circles?
 
-[Next]
+---
 
 ## ⭐ Add a `move` Event Handler
 
@@ -29,7 +29,7 @@ Add an `move` event handler to draw a `"black"` line to `x y`.
 Run and test the program. Do you see black lines connecting orange and red
 circles?
 
-[Next]
+---
 
 ## ⭐ Only Paint When Down
 
@@ -49,7 +49,7 @@ Check out the [Playground Drawing Sample].
 
 [Playground Drawing Sample]: https://play.evy.dev/#draw
 
-[Next]
+---
 
 ## ⭐ Change Drawing Pen Color
 

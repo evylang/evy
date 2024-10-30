@@ -42,6 +42,7 @@ type GraphicsRuntime interface {
 	// advanced graphics functions
 	Poly(vertices [][]float64)
 	Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64)
+	Transform(a, b, c, d, e, f float64)
 	Stroke(s string)
 	Fill(s string)
 	Dash(segments []float64)
@@ -142,4 +143,9 @@ func (rt *UnimplementedRuntime) Font(map[string]any) { rt.unimplemented("font") 
 // Ellipse is a no-op that prints an "unimplemented" message.
 func (rt *UnimplementedRuntime) Ellipse(float64, float64, float64, float64, float64, float64, float64) {
 	rt.unimplemented("ellipse")
+}
+
+// Transform is a no-op that prints an "unimplemented" message.
+func (rt *UnimplementedRuntime) Transform(float64, float64, float64, float64, float64, float64) {
+	rt.unimplemented("transform")
 }

@@ -296,6 +296,12 @@ func (rt *GraphicsRuntime) Gridn(unit float64, color string) {
 	rt.elements = append(rt.elements, &group)
 }
 
+// Transform sets the transform for all successive shapes.
+func (rt *GraphicsRuntime) Transform(a, b, c, d, e, f float64) {
+	rt.Push()
+	rt.attr.Transform = fmt.Sprintf("matrix(%f %f %f %f %f %f)", a, b, c, d, e, f)
+}
+
 // Width sets the stroke width.
 func (rt *GraphicsRuntime) Width(w float64) {
 	rt.Push()

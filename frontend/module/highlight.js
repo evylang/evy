@@ -78,6 +78,7 @@ const builtins = new Set([
   "str2num",
   "stroke",
   "text",
+  "transform",
   "trim",
   "upper",
   "width",

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>evy · Intro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="img/favicon.png" />
+  </head>
+
+  <body>
+    <canvas
+      id="canvas"
+      width="100"
+      height="100"
+      style="border: 1px solid black; width: 600px; height: 600px"
+    >
+    </canvas>
+    <script>
+      const ctx = document.getElementById("canvas").getContext("2d")
+      function rotate(theta) {
+        const st = Math.sin(theta)
+        const ct = Math.cos(theta)
+        //transform ct -st st ct 50+(sin theta) 50+(cos theta)
+        ctx.setTransform(ct, -st, st, ct, 50, 50) //+(sin theta)*20 50+(cos theta)*20
+      }
+      for (let i = 0; i < 12; i++) {
+        ctx.fillStyle = "black"
+        const theta = (i * Math.PI) / 6
+        rotate(theta)
+        ctx.fillRect(-1, 20, 2, 10)
+
+        ctx.fillStyle = "red"
+        ctx.resetTransform()
+        ctx.fillRect(49 + Math.sin(theta) * 20, 49 + Math.cos(theta) * 20, 2, 2)
+      }
+
+      // ctx.fillRect(10, 10, 20, 20)
+      // ctx.fillStyle = "hsl(0, 0%, 50%, 50%)"
+      // const y = 3
+      // // ctx.transform(1, 0, 0, y, 0, 0) // scale y 2
+      // ctx.fillRect(10, 10, 20, 20)
+      // ctx.fillStyle = "black"
+      // ctx.fillRect(10, 10, 20, 20)
+
+      // ctx.fillStyle = "hsl(0, 100%, 50%, 50%)"
+
+      // const a = Math.PI / 4
+      // const sa = Math.sin(a)
+      // const ca = Math.cos(a)
+      // ctx.setTransform(ca, -sa, sa, ca, 50, 50)
+      // //ctx.fillRect(10, 10, 20, 20)
+      // ctx.fillRect(-10, -10, 20, 20)
+
+      // ctx.transform(10, 0, 0, 10, 0, -200) // scale y 2
+      // ctx.fillStyle = "hsl(240, 100%, 50%, 25%)" // blue
+      // ctx.fillRect(10, 30, 20, 60)
+
+      // ctx.resetTransform()
+      // ctx.fillStyle = "hsl(120, 100%, 50%, 25%)" // green
+      // ctx.setTransform(0.1, 0, 0, -0.1, 0, 100)
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.resetTransform()
+      // ctx.fillStyle = "hsl(0, 100%, 50%, 25%)" // red
+      // //ctx.transform(1, 0, 0, 3, 0, 2000)
+      // ctx.transform(1, 0, 0, 4, 0, -3000) // 4000-1000
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // {{0.1,0,0},{0,-0.3,300},{0,0,1}}
+      // {{10,0,0},{0,-10,7667},{0,0,1}}
+      // ctx.transform(0.1, 0, 0, -0.3, 0, 300) // (1, 0, 0, -y, 0, y * 100)
+      // ctx.fillRect(100, 700, 200, 200)
+      // ctx.transform(10, 0, 0, -10, 0, 7667)
+      // ctx.fillStyle = "hsl(240, 100%, 50%, 25%)" // blue
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.fillStyle = "hsl(240, 100%, 50%, 25%)" // blue
+      // ctx.transform(10, 0, 0, 10, 0, -7000)
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.fillStyle = "hsl(0, 100%, 50%, 50%)"
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.fillStyle = "hsl(90, 100%, 50%, 50%)"
+      // ctx.transform(1, 0, 0, -2, 0, 2000)
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.fillStyle = "hsl(180, 100%, 50%, 50%)"
+      // ctx.transform(10, 0, 0, -10, 0, 1000)
+      // ctx.fillRect(100, 700, 200, 200)
+
+      // ctx.setTransform(10, 0, 0, -10, 0, 1000)
+      // ctx.fillStyle = "hsl(180, 100%, 50%, 40%)"
+      // ctx.fillRect(10, 10, 20, 20)
+    </script>
+  </body>
+</html>

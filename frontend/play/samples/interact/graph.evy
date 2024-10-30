@@ -1,0 +1,306 @@
+// globals
+xmin := -50
+ymin := -50
+scale := 1
+// derived and set by update(xmin, ymin, scale)
+extend:num
+xmax:num
+ymax:num
+tick:num
+originHidden:bool
+zooming:bool
+
+// drag
+isdrag := false
+xdrag := 0
+ydrag := 0
+
+// initialize
+zoomHome
+
+func draw
+    drawGraphPaper
+
+    // add your graphing function calls here, ex:
+    color "red"
+    drawSin
+end
+
+func drawSin
+    gmove xmin 5*(sin xmin)
+    for x := range xmin xmax (xstep)
+        y := 5 * (sin x)
+        gline x y
+    end
+end
+
+func xstep:num
+    if zooming
+        return extend / 100
+    end
+    return extend / 1000
+end
+
+func update xmin1:num ymin1:num scale1:num
+    xmin = xmin1
+    ymin = ymin1
+    scale = scale1
+    // derived
+    extend = 100 / scale
+    xmax = xmin + extend
+    ymax = ymin + extend
+    tick = calcTick extend
+    originHidden = xmin > 0 or xmax < 0 or ymin > 0 or ymax <= 0
+end
+
+on down x:num y:num
+    if isHome x y
+        zoomHome
+    else if isZoomIn x y
+        zoomIn
+    else if isZoomOut x y
+        zoomOut
+    else
+        drag true x y
+    end
+end
+
+on move x:num y:num
+    if isdrag
+        update xmin+(xdrag - x)/scale ymin+(ydrag - y)/scale scale
+        drag true x y
+        draw
+    end
+end
+
+on up
+    drag false 0 0
+end
+
+func drag d:bool x:num y:num
+    isdrag = d
+    xdrag = x
+    ydrag = y
+end
+
+func zoomHome
+    update -50 -50 1
+    draw
+end
+
+func zoomIn
+    zoom 1.1 7 0.01
+end
+
+func zoomOut
+    zoom 1/1.1 7 0.01
+end
+
+func zoom f:num count:num dur:num
+
+    zooming = true
+    for range count-1
+        d := extend * (f - 1) / (2 * f)
+        update xmin+d ymin+d scale*f
+        draw
+        sleep dur
+    end
+    zooming = false
+    d := extend * (f - 1) / (2 * f)
+    update xmin+d ymin+d scale*f
+    draw
+end
+
+func drawGraphPaper
+    clear
+
+    width 0.05
+    color "gainsboro"
+    drawGrid tick/5
+
+    width 0.1
+    color "dimgrey"
+    drawGrid tick
+
+    width 0.2
+    color (hsl 0 0 20)
+    drawAxes
+    if !zooming
+        drawXLabels
+        drawYLabels
+        drawButtons
+    end
+end
+
+func drawGrid dist:num
+    start := roundUp xmin dist
+    stop := xmax + dist
+    for x := range start stop dist
+        gv x ymin ymax
+    end
+    start = roundUp ymin dist
+    stop = ymax + tick
+    for y := range start stop dist
+        gh xmin xmax y
+    end
+end
+
+func drawAxes
+    gh xmin xmax 0 // x-Axis
+    gv 0 ymin ymax // y-Axis
+    if !originHidden
+        font {baseline:"alphabetic" align:"left" size:2}
+        gtextnum 0.05*tick 0.05*tick 0
+    end
+end
+
+func drawXLabels
+    y := ymin // labels on very bottom if x-axis not visible
+    if ymin <= 0 and ymax > 0
+        y = 0 // x-axis visible
+    end
+    font {baseline:"alphabetic" align:"center" size:2}
+    start := roundUp xmin tick
+    stop := xmax + tick
+    tl := 0.025 * tick
+    for x := range start stop tick
+        gv x y-tl y+tl
+        if x != 0 or originHidden
+            gtextnum x y+2*tl x
+        end
+    end
+end
+
+func drawYLabels
+    font {baseline:"middle" align:"left" size:2}
+    x := xmin // labels on very left if y-axis not visible
+    if xmin <= 0 and xmax > 0
+        x = 0 // y-axis visible
+    end
+    start := roundUp ymin tick
+    stop := ymax + tick
+    tl := 0.025 * tick
+    for y := range start stop tick
+        gh x-tl x+tl y
+        if y != 0 or originHidden
+            gtextnum x+2*tl y y
+        end
+    end
+end
+
+func drawButtons
+    fill "gainsboro"
+    stroke "darkgrey"
+    width 0.3
+
+    move 93 93
+    rect 6 6
+
+    move 93 85
+    rect 6 6
+
+    move 93 79
+    rect 6 6
+
+    // labels
+    color "grey"
+    font {baseline:"alphabetic" align:"left" size:3}
+
+    move 94.1 94.6
+    text "🏠"
+
+    font {baseline:"alphabetic" align:"left" size:6}
+    move 94.2 86.1
+    text "+"
+    move 94.2 80.1
+    text "-"
+end
+
+func isHome:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 93 and y <= 99
+end
+
+func isZoomIn:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 85 and y <= 91
+end
+
+func isZoomOut:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 79 and y <= 85
+end
+
+func calcTick:num extend:num
+    d := log10 extend/10
+    f := d - (floor d)
+    if f > 0.15 and f < 0.42
+        return 2 * (pow 10 (round d))
+    else if f >= 0.42 and f < 0.5
+        return 5 * (pow 10 (round d))
+    else if f >= 0.5 and f < 0.78
+        return 0.5 * (pow 10 (round d))
+    end
+    return pow 10 (round d)
+end
+
+func gmove x:num y:num
+    move (ex x) (ey y)
+end
+
+func gline x:num y:num
+    line (ex x) (ey y)
+end
+
+// vertical line
+func gv x:num y1:num y2:num
+    gmove x y1
+    gline x y2
+end
+
+// horizontal line
+func gh x1:num x2:num y:num
+    gmove x1 y
+    gline x2 y
+end
+
+func gtextnum x:num y:num n:num
+    gmove x y
+    text (sprintf "%g" n)
+end
+
+// ex is the evy x coordinate (0, 100) for a given
+// graphing x coordinate graphX (xmin, xmin+extend).
+func ex:num graphX:num
+    return scale * (graphX - xmin)
+end
+
+// ey is the evy y coordinate (0, 100) for a  given
+// graphing y coordinate graphY (ymin, ymin+extend).
+func ey:num graphY:num
+    return scale * (graphY - ymin)
+end
+
+// gx is the grpahing x coordinate (xmin, xmin+extend)
+// for a gvien evy x coordinate evyX (0, 100)
+func gx:num evyX:num
+    return xmin + evyX / scale
+end
+
+// gy is the grpahing y coordinate (ymin, ymin+extend)
+// for a gvien evy y coordinate evyY(0, 100)
+func gy:num evyY:num
+    return ymin + evyY / scale
+end
+
+func roundUp:num n:num multiple:num
+    r := (abs n) % multiple
+    if r == 0
+        return n
+    end
+    if n > 0
+        return n + multiple - r
+    end
+    return -(-n + multiple - r)
+end
+
+func log10:num n:num
+    return (log n) / (log 10)
+end

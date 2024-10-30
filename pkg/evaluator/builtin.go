@@ -118,8 +118,9 @@ func newBuiltins(rt Runtime) builtins {
 		"grid":  {Func: gridFunc(rt.Gridn), Decl: emptyDecl("grid")},
 		"gridn": {Func: gridnFunc(rt.Gridn), Decl: gridnDecl},
 
-		"poly":    {Func: polyFunc(rt.Poly), Decl: polyDecl},
-		"ellipse": {Func: ellipseFunc(rt.Ellipse), Decl: ellipseDecl},
+		"poly":      {Func: polyFunc(rt.Poly), Decl: polyDecl},
+		"ellipse":   {Func: ellipseFunc(rt.Ellipse), Decl: ellipseDecl},
+		"transform": {Func: transformFunc(rt.Transform), Decl: transformDecl},
 
 		"stroke":  stringBuiltin("stroke", rt.Stroke),
 		"fill":    stringBuiltin("fill", rt.Fill),
@@ -850,6 +851,26 @@ func ellipseFunc(ellipseFn func(x, y, radiusX, radiusY, rotation, startAngle, en
 			endAngle = args[6].(*numVal).V
 		}
 		ellipseFn(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+		return &noneVal{}, nil
+	}
+}
+
+var transformDecl = &parser.FuncDefStmt{
+	Name: "transform",
+	Params: []*parser.Var{
+		{Name: "a", T: parser.NUM_TYPE},
+		{Name: "b", T: parser.NUM_TYPE},
+		{Name: "c", T: parser.NUM_TYPE},
+		{Name: "d", T: parser.NUM_TYPE},
+		{Name: "e", T: parser.NUM_TYPE},
+		{Name: "f", T: parser.NUM_TYPE},
+	},
+	ReturnType: parser.NONE_TYPE,
+}
+
+func transformFunc(transformFn func(a, b, c, d, e, f float64)) builtinFunc {
+	return func(_ *scope, args []value) (value, error) {
+		transformFn(args[0].(*numVal).V, args[1].(*numVal).V, args[2].(*numVal).V, args[3].(*numVal).V, args[4].(*numVal).V, args[5].(*numVal).V)
 		return &noneVal{}, nil
 	}
 }

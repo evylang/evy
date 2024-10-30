@@ -63,6 +63,7 @@ function newEvyGo() {
     // advanced canvas
     poly,
     ellipse,
+    transform,
     stroke,
     fill,
     dash,
@@ -105,6 +106,7 @@ function needsCanvas(f) {
     f.gridn ||
     f.poly ||
     f.ellipse ||
+    f.transform ||
     f.stroke ||
     f.fill ||
     f.dash ||
@@ -707,6 +709,8 @@ function initCanvas() {
 function resetCanvas() {
   clear(0, 0)
   const ctx = canvas.ctx
+  ctx.resetTransform()
+  clear(0, 0)
   ctx.fillStyle = "black"
   ctx.strokeStyle = "black"
   ctx.lineWidth = 1
@@ -847,6 +851,16 @@ function ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle) {
   )
   fill && ctx.fill()
   stroke && ctx.stroke()
+}
+
+// transform is exported to evy go/wasm.
+// A point (x, y) is transformed to (ax+cy+e, bx+dy+f).
+// see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setTransform
+function transform(a, b, c, d, e, f) {
+  // TODO: Express in terms of scaleX|Y, transformX|Y etc.
+  const e1 = e * 10 + c * 1000
+  const f1 = f * -10 + 1000 - 1000 * d
+  canvas.ctx.setTransform(a, -b, -c, d, e1, f1)
 }
 
 // stroke is exported to evy go/wasm.

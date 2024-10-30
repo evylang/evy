@@ -47,6 +47,7 @@
         { "id": "ellipse", "title": "Watermelon Ellipse" },
         { "id": "draw", "title": "Draw" },
         { "id": "coords", "title": "Coordinates" },
+        { "id": "rotate", "title": "Rotate" },
         { "id": "life", "title": "Game of Life" }
       ]
     },

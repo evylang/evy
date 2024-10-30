@@ -76,6 +76,10 @@ func (rt *jsRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float6
 	ellipse(x, y, rX, rY, rotation, startAngle, endAngle)
 }
 
+func (rt *jsRuntime) Transform(a, b, c, d, e, f float64) {
+	transform(a, b, c, d, e, f)
+}
+
 func floatsToString(floats []float64) string {
 	if len(floats) == 0 {
 		return ""
@@ -233,6 +237,11 @@ func poly(s string)
 //
 //export ellipse
 func ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64)
+
+// transform is imported from JS
+//
+//export transform
+func transform(a, b, c, d, e, f float64)
 
 // stroke is imported from JS
 //

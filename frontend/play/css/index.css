@@ -450,6 +450,7 @@ dialog .err,
   margin: 0;
   border: var(--output-border);
   border-top-width: var(--output-border-top-width);
+  outline: none;
 }
 
 .output .canvas {

@@ -1,0 +1,83 @@
+// globals
+level := 0
+
+// position of 👾
+x := 50
+y := 0
+
+// x-position of arrows
+gold := 0
+orange := 50
+red := 0
+
+on animate
+    updateLevel
+    updatePositions
+    draw
+    checkCollision
+end
+
+// updateLevel increments level global and prints it
+// every time we start at the bottom (again).
+func updateLevel
+    if y < 0.1
+        level = level + 1
+        print "Level" level
+    end
+end
+
+// updatePositions updates 👾 and arrow position globals
+func updatePositions
+    y = (y + 0.1) % 100
+    gold = (gold + 0.3) % 110
+    orange = 100 - (100 - orange + 0.5) % 120
+    red = (red + 0.7) % 130
+end
+
+func draw
+    clear
+    drawText "👾" x y ""
+    drawText "▶▶" gold 30 "gold"
+    drawText "◀◀" orange 50 "orange"
+    drawText "▶▶" red 70 "orangered"
+end
+
+func drawText s:string x:num y:num hue:string
+    color hue
+    move x y
+    text s
+end
+
+// checkCollision ends game with "Game over" message if
+// 👾 collides with arrows.
+func checkCollision
+    if (abs x-gold) < 6 and (abs y-30) < 4.5
+        print "🟡 Game over."
+        exit 0
+    else if (abs x-orange) < 6 and (abs y-50) < 4.5
+        print "🟠 Game over."
+        exit 0
+    else if (abs x-red) < 6 and (abs y-70) < 4.5
+        print "🔴 Game over."
+        exit 0
+    end
+end
+
+// on key moves 👾 left/right for arrow keys and h/l
+on key k:string
+    if k == "ArrowLeft" or k == "h"
+        x = (x + 99) % 100
+    else if k == "ArrowRight" or k == "l"
+        x = (x + 1) % 100
+    end
+end
+
+// on down moves 👾 left/right for mouse/touch events
+// near left and right edge.
+on down xd:num _:num
+    if xd < 20
+        x = (x + 99) % 100
+    else if xd > 80
+        x = (x + 1) % 100
+    end
+end

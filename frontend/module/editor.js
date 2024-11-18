@@ -12,7 +12,7 @@ export default class Editor {
     const defaultOptions = {
       value: "",
       lineNumbers: true,
-      plugins: [preserveIndent(), history(), tab()],
+      plugins: [smartIndent(), history(), tab()],
       id: `evy-editor-${Math.random().toString(36).slice(2)}`,
     }
 
@@ -327,8 +327,11 @@ function history() {
   }
 }
 
-// source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/plugins/preserveIndent.js
-const preserveIndent = () => (textareaProps, event) => {
+// smartIndent preserves indent of current line by default
+// It increases the indent after block opening keywords 'func' 'on' 'if' 'else' while' 'for'.
+// It updates the current line indent for 'end' and 'else' keywords, decreasing the indent if needed.
+// Inspired by https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/plugins/preserveIndent.js
+const smartIndent = () => (textareaProps, event) => {
   const { value, selectionStart, selectionEnd } = textareaProps
 
   if (!isKey("enter", event)) {
@@ -343,25 +346,55 @@ const preserveIndent = () => (textareaProps, event) => {
 
   const lines = value.split("\n")
   const currentLine = lines[currentLineNumber]
-  const matches = /^\s+/.exec(currentLine)
-
-  if (!matches) {
+  const matches = /^(\s+)?((func|on|if|else|while|for)\b)?(end\b)?/.exec(currentLine)
+  if (matches[0] === "") {
+    return
+  }
+  if (selectionStart !== selectionEnd && matches[4] !== undefined) {
+    // fixing current line indent for 'end' and 'else' with selection is too hard.
     return
   }
 
   event.preventDefault()
-  const indent = matches[0]
-  const newLine = "\n"
+  let indent = matches[1] || ""
+  let before = value.substring(0, selectionStart)
+  const after = value.substring(selectionEnd)
 
-  const inserted = newLine + indent
+  // Matches block-closing keywords, 'end' 'else'
+  if (matches[4] !== undefined || matches[2] === "else") {
+    // Decrease indent of current line, if indent of current and previous line equal.
+    if (shouldDedent(indent, lines, currentLineNumber)) {
+      const dedent = Math.min(4, indent.length)
+      const beforeCurrentLine = before.substring(0, before.length - currentLine.length)
+      const dedentedCurrentLine = currentLine.substring(dedent)
+      before = beforeCurrentLine + dedentedCurrentLine
+      // Decrease indent
+      indent = indent.substring(dedent)
+    }
+  }
 
-  const newValue = value.substring(0, selectionStart) + inserted + value.substring(selectionEnd)
+  // Matches block-opening keywords, 'func' 'on' 'if' 'else' 'while' 'for'.
+  if (matches[2] !== undefined) {
+    // Increase indent.
+    indent += "    "
+  }
 
+  const newValue = before + "\n" + indent + after
+  const newIdx = newValue.length - after.length
   return {
     value: newValue,
-    selectionStart: selectionStart + inserted.length,
-    selectionEnd: selectionStart + inserted.length,
+    selectionStart: newIdx,
+    selectionEnd: newIdx,
   }
+}
+
+function shouldDedent(indent, lines, currentLineNumber) {
+  if (indent.length === 0 || currentLineNumber === 0) {
+    return false
+  }
+  const previousLine = lines[currentLineNumber - 1]
+  const previousIndent = /^\s+/.exec(previousLine)
+  return !previousIndent || previousIndent[0].length === indent.length
 }
 
 // source: https://github.com/petersolopov/yace/blob/8ed1f99977c4db9bdd60db4e2f5ba4edfcfc1940/src/plugins/tab.js

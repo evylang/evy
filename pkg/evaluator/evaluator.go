@@ -64,7 +64,7 @@ func (e PanicError) Error() string {
 // Unwrap returns the ErrPanic sentinel error so that it can be used in
 //
 //	errors.Is(err, evaluator.ErrPanic)
-func (e *PanicError) Unwrap() error {
+func (e PanicError) Unwrap() error {
 	return ErrPanic
 }
 

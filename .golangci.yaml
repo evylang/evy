@@ -25,7 +25,6 @@ linters:
     - depguard
     - dupword
     - dupl
-    - execinquery
     - exhaustive
     - exhaustruct
     - exportloopref
@@ -36,7 +35,6 @@ linters:
     - goconst
     - gocyclo
     - godox
-    - gomnd
     - gomoddirectives
     - inamedparam
     - interfacebloat

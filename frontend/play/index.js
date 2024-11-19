@@ -443,6 +443,10 @@ function ctrlEnterListener(e) {
     document.querySelector(".editor textarea").blur()
     handleRun()
   }
+  if ((e.metaKey || e.ctrlKey) && e.key === "a") {
+    e.preventDefault()
+    editor?.selectAll()
+  }
 }
 
 function escListener(e) {

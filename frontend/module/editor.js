@@ -65,6 +65,12 @@ export default class Editor {
     this.textarea.addEventListener("keydown", this.handleKeydown)
   }
 
+  selectAll() {
+    this.textarea.selectionStart = 0
+    this.textarea.selectionEnd = this.textarea.value.length - 1
+    this.textarea.focus()
+  }
+
   update(textareaProps) {
     const { value, selectionStart, selectionEnd, errorLines } = textareaProps
     // should be before updating selection otherwise selection will be lost

@@ -47,7 +47,8 @@
         { "id": "ellipse", "title": "Watermelon Ellipse" },
         { "id": "draw", "title": "Draw" },
         { "id": "coords", "title": "Coordinates" },
-        { "id": "life", "title": "Game of Life" }
+        { "id": "life", "title": "Game of Life" },
+        { "id": "graph", "title": "Zoomable Graph" }
       ]
     },
     {
@@ -58,6 +59,7 @@
         { "id": "rand", "title": "Guess my Number" },
         { "id": "hanoi", "title": "Towers of Hanoi" },
         { "id": "tictactoe", "title": "Tic Tac Toe" },
+        { "id": "dodger", "title": "Alien Dodger" },
         { "id": "tictactoetext", "title": "Text Tic Tac Toe", "unlisted": true }
       ]
     }

@@ -134,14 +134,14 @@ Evy would not be here today without the help of many people.
 
 - [camh]: Thank you for your support, guidance, generosity and endless patience.
 - [Jason]: Thank you for donating the Evy website design. It is beautiful!
-- [@ckaser]: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
+- [@chkas]: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
 - [@fcostin]: Thank you for the [Splash of Trig] sample, your wisdom and your willingness to help.
 - [@starkcoffee], [@alecthomas], [@loislambeth]: Thank you for your insights, support, and encouragement. I am grateful for your friendship!
 - My daughter Mali: Thank you for being keen to learn programming and for testing Evy with me.
 
 [camh]: https://github.com/camh-
 [Jason]: https://twitter.com/jasonstrachan
-[@ckaser]: https://github.com/ckaser
+[@chkas]: https://github.com/chkas
 [easylang]: https://easylang.online/
 [@fcostin]: https://github.com/fcostin
 [Splash of Trig]: https://play.evy.dev#splashtrig

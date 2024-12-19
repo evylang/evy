@@ -48,7 +48,7 @@ To get an intuitive understanding of Evy, you can either look at its
     [Assignability of variable values](#assignability-of-variable-values), [Assignability of constant values](#assignability-of-constant-values), [Assignability of empty composite literals](#assignability-of-empty-composite-literals)
 24. [**Run-time Panics and Recoverable Errors**](#run-time-panics-and-recoverable-errors)
 25. [**Execution Model and Event Handlers**](#execution-model-and-event-handlers)
-26. [**Runtimes**](#runtimes)
+26. [**Platforms**](#platforms)
 
 <!-- genend:toc -->
 
@@ -1490,15 +1490,16 @@ only some parameters are needed, use the anonymous `_` parameter.
 For more information on individual event handlers, see the
 [built-in documentation](builtins.md#event-handlers).
 
-## Runtimes
+## Platforms
 
-Evy has two runtimes: the **terminal runtime** and the **browser runtime**.
+Evy has two platforms: the **terminal platform** and the **browser
+platform**.
 
-The browser runtime can be tried at [play.evy.dev]. It fully
+The browser platform can be tried at [play.evy.dev]. It fully
 supports all built-in functions and event handlers as described in the
 [built-in documentation](builtin.md).
 
-To use the terminal runtime, first install Evy and then run
+To use the terminal platform, first install Evy and then run
 
     evy run FILE.evy
 
@@ -1509,6 +1510,6 @@ with
     evy fmt FILE.evy
 
 For more details, run `evy run --help` or `evy fmt --help`. The terminal
-runtime does not support event handlers or graphics functions.
+platform does not support event handlers or graphics functions.
 
 [play.evy.dev]: https://play.evy.dev

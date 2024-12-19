@@ -433,7 +433,7 @@ with `del` while iterating with a `for … range` loop.
 `sleep` can be used to create delays in Evy programs. For example, you
 could use sleep to create a countdown timer.
 
-In the [browser runtime](spec.md#runtimes) `sleep` pauses a minimum of 1
+In the [browser platform](spec.md#platforms) `sleep` pauses a minimum of 1
 millisecond.
 
 #### Example

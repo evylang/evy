@@ -25,14 +25,14 @@ type builtins struct {
 	Funcs         map[string]builtin
 	EventHandlers map[string]*parser.EventHandlerStmt
 	Globals       map[string]global
-	Runtime       Runtime
+	Platform      Platform
 }
 
 // BuiltinDecls returns the signatures of all built-in functions and
 // event handlers, as well as predefined global variables, for use by
 // the [parser.Parse] function.
 func BuiltinDecls() parser.Builtins {
-	b := newBuiltins(&UnimplementedRuntime{})
+	b := newBuiltins(&UnimplementedPlatform{})
 	return builtinsDeclsFromBuiltins(b)
 }
 
@@ -54,7 +54,7 @@ func builtinsDeclsFromBuiltins(b builtins) parser.Builtins {
 
 type builtinFunc func(scope *scope, args []value) (value, error)
 
-func newBuiltins(rt Runtime) builtins {
+func newBuiltins(rt Platform) builtins {
 	funcs := map[string]builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
 		"cls":    {Func: clsFunc(rt.Cls), Decl: emptyDecl("cls")},
@@ -165,7 +165,7 @@ func newBuiltins(rt Runtime) builtins {
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
 		Globals:       globals,
-		Runtime:       rt,
+		Platform:      rt,
 	}
 }
 

@@ -1,6 +1,6 @@
 //go:build !tinygo
 
-// Package cli provides an Evy runtime to for Evy CLI execution in terminal.
+// Package cli provides an Evy platform to for Evy CLI execution in terminal.
 package cli
 
 import (
@@ -16,58 +16,58 @@ import (
 	"evylang.dev/evy/pkg/evaluator"
 )
 
-// Runtime implements evaluator.Runtime.
-type Runtime struct {
-	evaluator.GraphicsRuntime
+// Platform implements evaluator.Platform.
+type Platform struct {
+	evaluator.GraphicsPlatform
 	reader    *bufio.Reader
 	writer    io.Writer
 	clsFn     func()
 	SkipSleep bool
 }
 
-// Option is used on Runtime creation to set optional parameters.
-type Option func(*Runtime)
+// Option is used on Platform creation to set optional parameters.
+type Option func(*Platform)
 
-// WithSkipSleep sets the SkipSleep field Runtime and is intended to be used
-// with NewRuntime.
+// WithSkipSleep sets the SkipSleep field Platform and is intended to be used
+// with NewPlatform.
 func WithSkipSleep(skipSleep bool) Option {
-	return func(rt *Runtime) {
+	return func(rt *Platform) {
 		rt.SkipSleep = skipSleep
 	}
 }
 
-// WithSVG sets up an SVG graphics runtime and writes its output to the
+// WithSVG sets up an SVG graphics platform and writes its output to the
 // given writer.
 func WithSVG(svgStyle string, svgWidth string, svgHeight string) Option {
-	return func(rt *Runtime) {
-		svgRT := svg.NewGraphicsRuntime()
+	return func(rt *Platform) {
+		svgRT := svg.NewGraphicsPlatform()
 		svgRT.SVG.Style = svgStyle
 		svgRT.SVG.Width = svgWidth
 		svgRT.SVG.Height = svgHeight
-		rt.GraphicsRuntime = svgRT
+		rt.GraphicsPlatform = svgRT
 	}
 }
 
 // WithOutputWriter sets the text output writer, which defaults to os.Stdout.
 func WithOutputWriter(w io.Writer) Option {
-	return func(rt *Runtime) {
+	return func(rt *Platform) {
 		rt.writer = w
 	}
 }
 
 // WithCls sets the action to be done for `cls` command.
 func WithCls(clsFn func()) Option {
-	return func(rt *Runtime) {
+	return func(rt *Platform) {
 		rt.clsFn = clsFn
 	}
 }
 
-// NewRuntime returns an initialized cli runtime.
-func NewRuntime(options ...Option) *Runtime {
-	rt := &Runtime{
-		reader:          bufio.NewReader(os.Stdin),
-		writer:          os.Stdout,
-		GraphicsRuntime: &evaluator.UnimplementedRuntime{},
+// NewPlatform returns an initialized cli platform.
+func NewPlatform(options ...Option) *Platform {
+	rt := &Platform{
+		reader:           bufio.NewReader(os.Stdin),
+		writer:           os.Stdout,
+		GraphicsPlatform: &evaluator.UnimplementedPlatform{},
 	}
 	for _, opt := range options {
 		opt(rt)
@@ -76,12 +76,12 @@ func NewRuntime(options ...Option) *Runtime {
 }
 
 // Print prints s to stdout.
-func (rt *Runtime) Print(s string) {
+func (rt *Platform) Print(s string) {
 	fmt.Fprint(rt.writer, s) //nolint:errcheck // no need to check for stdout
 }
 
 // Cls clears the screen.
-func (rt *Runtime) Cls() {
+func (rt *Platform) Cls() {
 	if rt.clsFn != nil {
 		rt.clsFn()
 		return
@@ -97,7 +97,7 @@ func (rt *Runtime) Cls() {
 }
 
 // Read reads a line of input from stdin and strips trailing newline.
-func (rt *Runtime) Read() string {
+func (rt *Platform) Read() string {
 	s, err := rt.reader.ReadString('\n')
 	if err != nil {
 		panic(err)
@@ -106,7 +106,7 @@ func (rt *Runtime) Read() string {
 }
 
 // Sleep sleeps for dur. If the --skip-sleep flag is used, it does nothing.
-func (rt *Runtime) Sleep(dur time.Duration) {
+func (rt *Platform) Sleep(dur time.Duration) {
 	if !rt.SkipSleep {
 		time.Sleep(dur)
 	}
@@ -115,11 +115,11 @@ func (rt *Runtime) Sleep(dur time.Duration) {
 // Yielder returns a no-op yielder for CLI evy as it is not needed. By
 // contrast, browser Evy needs to explicitly hand over control to JS
 // host with Yielder.
-func (*Runtime) Yielder() evaluator.Yielder { return nil }
+func (*Platform) Yielder() evaluator.Yielder { return nil }
 
 // WriteSVG writes the graphics output in SVG format to the writer set with
 // option WithSVGWriter.
-func (rt *Runtime) WriteSVG(w io.Writer) error {
-	graphicsRT := rt.GraphicsRuntime.(*svg.GraphicsRuntime)
+func (rt *Platform) WriteSVG(w io.Writer) error {
+	graphicsRT := rt.GraphicsPlatform.(*svg.GraphicsPlatform)
 	return graphicsRT.WriteSVG(w)
 }

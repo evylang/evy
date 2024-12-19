@@ -41,7 +41,7 @@ func main() {
 		prepareUI(ast)
 	}
 	if actions["eval"] {
-		rt := newJSRuntime()
+		rt := newJSPlatform()
 		err := evaluate(ast, rt)
 		if err == nil || errors.Is(err, evaluator.ErrStopped) {
 			return
@@ -94,7 +94,7 @@ func prepareUI(prog *parser.Program) {
 	jsPrepareUI(strings.Join(names, ","))
 }
 
-func evaluate(prog *parser.Program, rt *jsRuntime) error {
+func evaluate(prog *parser.Program, rt *jsPlatform) error {
 	eval = evaluator.NewEvaluator(rt)
 	if err := eval.Eval(prog); err != nil {
 		return err

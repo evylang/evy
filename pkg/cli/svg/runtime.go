@@ -42,8 +42,8 @@ var (
 	}
 )
 
-// GraphicsRuntime implements evaluator.GraphcisRuntime for SVG output.
-type GraphicsRuntime struct {
+// GraphicsPlatform implements evaluator.GraphicsPlatform for SVG output.
+type GraphicsPlatform struct {
 	x float64 // current cursor position
 	y float64 // current cursor position
 
@@ -53,11 +53,11 @@ type GraphicsRuntime struct {
 	elements []any
 }
 
-// NewGraphicsRuntime returns a new GraphicsRuntime with default attributes
+// NewGraphicsPlatform returns a new GraphicsPlatform with default attributes
 // set suitable for Evy drawing output.
-func NewGraphicsRuntime() *GraphicsRuntime {
+func NewGraphicsPlatform() *GraphicsPlatform {
 	viewBox := fmt.Sprintf("0 0 %d %d", evyWidth*scaleFactor, evyHeight*scaleFactor)
-	rt := &GraphicsRuntime{
+	rt := &GraphicsPlatform{
 		attr:     defaultAttr,
 		textAttr: defaultTextAttr,
 		SVG: SVG{
@@ -78,22 +78,22 @@ func NewGraphicsRuntime() *GraphicsRuntime {
 	return rt
 }
 
-func (rt *GraphicsRuntime) transformX(x float64) float64 {
+func (rt *GraphicsPlatform) transformX(x float64) float64 {
 	return rt.scale(x)
 }
 
 // transformY flips the y axis. Evy operates in a Cartesian number plain,
 // SVG has an inverted y-axis like most computer graphics. We cannot
 // directly use SVG `transform` as it would turn all text upside down.
-func (rt *GraphicsRuntime) transformY(y float64) float64 {
+func (rt *GraphicsPlatform) transformY(y float64) float64 {
 	return rt.scale(evyHeight) - rt.scale(y)
 }
 
-func (rt *GraphicsRuntime) scale(s float64) float64 {
+func (rt *GraphicsPlatform) scale(s float64) float64 {
 	return scaleFactor * s
 }
 
-func (rt *GraphicsRuntime) nonDefaultAttr() Attr {
+func (rt *GraphicsPlatform) nonDefaultAttr() Attr {
 	attr := rt.attr
 	if rt.attr.Fill == defaultAttr.Fill {
 		attr.Fill = ""
@@ -113,7 +113,7 @@ func (rt *GraphicsRuntime) nonDefaultAttr() Attr {
 	return attr
 }
 
-func (rt *GraphicsRuntime) nonDefaultTextAttr() TextAttr {
+func (rt *GraphicsPlatform) nonDefaultTextAttr() TextAttr {
 	textAttr := rt.textAttr
 	if rt.textAttr.TextAnchor == defaultTextAttr.TextAnchor {
 		textAttr.TextAnchor = ""
@@ -146,7 +146,7 @@ func (rt *GraphicsRuntime) nonDefaultTextAttr() TextAttr {
 // If there are multiple collected elements, they are wrapped in a group and
 // the styles are applied to the group element. If there is only one element,
 // the styles are applied directly to that element.
-func (rt *GraphicsRuntime) Push() {
+func (rt *GraphicsPlatform) Push() {
 	if len(rt.elements) == 0 {
 		return
 	}
@@ -168,13 +168,13 @@ func (rt *GraphicsRuntime) Push() {
 }
 
 // Move sets the current cursor position.
-func (rt *GraphicsRuntime) Move(x, y float64) {
+func (rt *GraphicsPlatform) Move(x, y float64) {
 	rt.x = rt.transformX(x)
 	rt.y = rt.transformY(y)
 }
 
 // Line draws a line from the current cursor position to the given x, y.
-func (rt *GraphicsRuntime) Line(x, y float64) {
+func (rt *GraphicsPlatform) Line(x, y float64) {
 	x = rt.transformX(x)
 	y = rt.transformY(y)
 	line := Line{X1: rt.x, Y1: rt.y, X2: x, Y2: y}
@@ -185,7 +185,7 @@ func (rt *GraphicsRuntime) Line(x, y float64) {
 
 // Rect draws a rectangle from the current cursor position for given width and
 // height. Negative values are permitted.
-func (rt *GraphicsRuntime) Rect(width, height float64) {
+func (rt *GraphicsPlatform) Rect(width, height float64) {
 	x := rt.x
 	y := rt.y
 	width = rt.scale(width)
@@ -202,7 +202,7 @@ func (rt *GraphicsRuntime) Rect(width, height float64) {
 }
 
 // Circle draws a circle at the current cursor position with the given radius.
-func (rt *GraphicsRuntime) Circle(radius float64) {
+func (rt *GraphicsPlatform) Circle(radius float64) {
 	radius = rt.scale(radius)
 	circle := Circle{CX: rt.x, CY: rt.y, R: radius}
 	rt.elements = append(rt.elements, &circle)
@@ -211,7 +211,7 @@ func (rt *GraphicsRuntime) Circle(radius float64) {
 // Clear sets the background color of the SVG canvas. We cannot simply remove
 // all previous SVG elements as the background color could be
 // semi-transparent overlaying previous elements.
-func (rt *GraphicsRuntime) Clear(color string) {
+func (rt *GraphicsPlatform) Clear(color string) {
 	if color == "" {
 		color = "white"
 	}
@@ -229,7 +229,7 @@ func (rt *GraphicsRuntime) Clear(color string) {
 }
 
 // Poly draws a polygon or polyline with the given vertices.
-func (rt *GraphicsRuntime) Poly(vertices [][]float64) {
+func (rt *GraphicsPlatform) Poly(vertices [][]float64) {
 	points := make([]string, len(vertices))
 	for i, v := range vertices {
 		x := rt.transformX(v[0])
@@ -244,7 +244,7 @@ func (rt *GraphicsRuntime) Poly(vertices [][]float64) {
 
 // Ellipse draws an ellipse at the given x, y with the given radii.
 // Note: startAngle, endAngle are not implemented.
-func (rt *GraphicsRuntime) Ellipse(x, y, radiusX, radiusY, rotation, _, _ float64) {
+func (rt *GraphicsPlatform) Ellipse(x, y, radiusX, radiusY, rotation, _, _ float64) {
 	// TODO: implement the last two parameters: startAngle, endAngle.
 	x = rt.transformX(x)
 	y = rt.transformX(y)
@@ -263,7 +263,7 @@ func (rt *GraphicsRuntime) Ellipse(x, y, radiusX, radiusY, rotation, _, _ float6
 }
 
 // Text draws a text at the current cursor position.
-func (rt *GraphicsRuntime) Text(str string) {
+func (rt *GraphicsPlatform) Text(str string) {
 	text := Text{
 		X:     rt.x,
 		Y:     rt.y,
@@ -276,7 +276,7 @@ func (rt *GraphicsRuntime) Text(str string) {
 }
 
 // Gridn draws a grid with the given unit and color.
-func (rt *GraphicsRuntime) Gridn(unit float64, color string) {
+func (rt *GraphicsPlatform) Gridn(unit float64, color string) {
 	unit = rt.transformX(unit)
 	group := Group{Attr: Attr{Stroke: color}}
 	lineCnt := 0
@@ -297,33 +297,33 @@ func (rt *GraphicsRuntime) Gridn(unit float64, color string) {
 }
 
 // Width sets the stroke width.
-func (rt *GraphicsRuntime) Width(w float64) {
+func (rt *GraphicsPlatform) Width(w float64) {
 	rt.Push()
 	strokeWidth := rt.scale(w)
 	rt.attr.StrokeWidth = &strokeWidth
 }
 
 // Color sets the stroke and fill color.
-func (rt *GraphicsRuntime) Color(color string) {
+func (rt *GraphicsPlatform) Color(color string) {
 	rt.Push()
 	rt.attr.Stroke = color
 	rt.attr.Fill = color
 }
 
 // Stroke sets the stroke color only.
-func (rt *GraphicsRuntime) Stroke(str string) {
+func (rt *GraphicsPlatform) Stroke(str string) {
 	rt.Push()
 	rt.attr.Stroke = str
 }
 
 // Fill sets the fill color only.
-func (rt *GraphicsRuntime) Fill(str string) {
+func (rt *GraphicsPlatform) Fill(str string) {
 	rt.Push()
 	rt.attr.Fill = str
 }
 
 // Dash sets the stroke dash array.
-func (rt *GraphicsRuntime) Dash(segments []float64) {
+func (rt *GraphicsPlatform) Dash(segments []float64) {
 	rt.Push()
 	segmentStrings := make([]string, len(segments))
 	for i, segment := range segments {
@@ -333,7 +333,7 @@ func (rt *GraphicsRuntime) Dash(segments []float64) {
 }
 
 // Linecap sets the stroke linecap style.
-func (rt *GraphicsRuntime) Linecap(str string) {
+func (rt *GraphicsPlatform) Linecap(str string) {
 	rt.Push()
 	rt.attr.StrokeLinecap = str
 }
@@ -348,7 +348,7 @@ func (rt *GraphicsRuntime) Linecap(str string) {
 //	"baseline": "top", // | "middle" | "bottom" | "alphabetic"
 //	"align": "left", // | "center" | "right"
 //	"letterspacing": 1 // number, see size. extra inter-character space. negative allowed.
-func (rt *GraphicsRuntime) Font(props map[string]any) {
+func (rt *GraphicsPlatform) Font(props map[string]any) {
 	rt.Push()
 
 	if family, ok := props["family"].(string); ok {
@@ -393,7 +393,7 @@ func (rt *GraphicsRuntime) Font(props map[string]any) {
 }
 
 // WriteSVG writes the SVG output to the given writer.
-func (rt *GraphicsRuntime) WriteSVG(w io.Writer) error {
+func (rt *GraphicsPlatform) WriteSVG(w io.Writer) error {
 	rt.Push()
 	encoder := xml.NewEncoder(w)
 	encoder.Indent("", "  ")

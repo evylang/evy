@@ -108,10 +108,10 @@ func (e TestErrors) Error() string {
 	return strings.Join(s, "\n")
 }
 
-// NewEvaluator creates a new Evaluator for a given [Runtime]. Runtimes
-// target different environments, such as the browser or the command
-// line.
-func NewEvaluator(rt Runtime) *Evaluator {
+// NewEvaluator creates a new Evaluator for a given [Platform].
+// Platforms target different environments, such as the browser or the
+// command line.
+func NewEvaluator(rt Platform) *Evaluator {
 	builtins := newBuiltins(rt)
 	scope := newScope()
 	for _, global := range builtins.Globals {
@@ -121,7 +121,7 @@ func NewEvaluator(rt Runtime) *Evaluator {
 		builtins: builtins,
 		scope:    scope,
 		global:   scope,
-		yielder:  builtins.Runtime.Yielder(),
+		yielder:  builtins.Platform.Yielder(),
 	}
 }
 
@@ -171,19 +171,19 @@ func (e *Evaluator) Run(input string) error {
 	return e.Eval(prog)
 }
 
-// Yielder is a runtime-implemented mechanism that causes the
-// evaluation process to periodically give up control to the runtime.
-// The Yield method of the Yielder interface is called at the
-// beginning of each evaluation step. This allows the runtime to
-// handle external tasks, such as processing events. For a sample
-// implementation, see the sleepingYielder of the browser environment
-// in the pkg/wasm directory.
+// Yielder is a platform-implemented mechanism that causes the
+// evaluation process to periodically give up control to the platform.
+// The Yield method of the Yielder interface is called at the beginning
+// of each evaluation step. This allows the platform to handle external
+// tasks, such as processing events. For a sample implementation, see
+// the sleepingYielder of the browser environment in the pkg/wasm
+// directory.
 type Yielder interface {
 	Yield()
 }
 
 // Eval evaluates a [parser.Program], which is the root node of the AST.
-// The program's statements are evaluated in order. If a runtime panic
+// The program's statements are evaluated in order. If a platform panic
 // occurs, a wrapped [ErrPanic] is returned. If an internal error
 // occurs, a wrapped [ErrInternal] is returned. Evaluation is also
 // stopped if the built-in exit function is called, which results in an
@@ -191,7 +191,7 @@ type Yielder interface {
 // true, evaluation is stopped and [ErrStopped] is returned.
 func (e *Evaluator) Eval(prog *parser.Program) error {
 	_, err := e.eval(prog)
-	e.TestInfo.Report(e.builtins.Runtime.Print)
+	e.TestInfo.Report(e.builtins.Platform.Print)
 	if err != nil {
 		return err
 	}

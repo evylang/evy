@@ -152,7 +152,7 @@ func printAlert(quote *markdown.Quote, buf *bytes.Buffer, alertType string) {
 	buf.WriteString(`<svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="`)
 	buf.WriteString(alertIconPath[alertType])
 	buf.WriteString(`"></path></svg>`)
-	buf.WriteString(strings.Title(alertType)) //nolint: staticcheck // we can savely use it here as we know all strings we want to use and have no punctuation.
+	buf.WriteString(strings.Title(alertType)) //nolint:staticcheck // we can safely use it here as we know all strings we want to use and have no punctuation.
 	buf.WriteString(`</p>`)
 	for _, block := range quote.Blocks {
 		buf.WriteString(markdown.ToHTML(block))

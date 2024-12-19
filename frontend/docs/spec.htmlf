@@ -1490,17 +1490,17 @@ num
   For more information on individual event handlers, see the
   <a href="builtins.html#event-handlers">built-in documentation</a>.
 </p>
-<h2><a id="runtimes" href="#runtimes" class="anchor">#</a>Runtimes</h2>
+<h2><a id="platforms" href="#platforms" class="anchor">#</a>Platforms</h2>
 <p>
-  Evy has two runtimes: the <strong>terminal runtime</strong> and the
-  <strong>browser runtime</strong>.
+  Evy has two platforms: the <strong>terminal platform</strong> and the
+  <strong>browser platform</strong>.
 </p>
 <p>
-  The browser runtime can be tried at <a href="/play">play.evy.dev</a>. It fully supports all
+  The browser platform can be tried at <a href="/play">play.evy.dev</a>. It fully supports all
   built-in functions and event handlers as described in the
   <a href="builtin.html">built-in documentation</a>.
 </p>
-<p>To use the terminal runtime, first install Evy and then run</p>
+<p>To use the terminal platform, first install Evy and then run</p>
 <pre><code>evy run FILE.evy
 </code></pre>
 <p>
@@ -1511,5 +1511,5 @@ num
 </code></pre>
 <p>
   For more details, run <code>evy run --help</code> or <code>evy fmt --help</code>. The terminal
-  runtime does not support event handlers or graphics functions.
+  platform does not support event handlers or graphics functions.
 </p>

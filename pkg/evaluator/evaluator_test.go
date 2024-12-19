@@ -10,7 +10,7 @@ import (
 )
 
 type testRT struct {
-	UnimplementedRuntime
+	UnimplementedPlatform
 	b bytes.Buffer
 }
 
@@ -24,7 +24,7 @@ func (*testRT) Yielder() Yielder {
 
 func run(input string) string {
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedPlatform.print = rt.Print
 	eval := NewEvaluator(rt)
 	err := eval.Run(input)
 	if err != nil {
@@ -145,7 +145,7 @@ end
 `
 
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedPlatform.print = rt.Print
 	eval := NewEvaluator(&testRT{})
 	err := eval.Run(prog)
 	assert.Equal(t, true, errors.Is(err, ErrVarNotSet))
@@ -515,7 +515,7 @@ func TestIndexErr(t *testing.T) {
 
 func TestEvyTest(t *testing.T) {
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedPlatform.print = rt.Print
 	eval := NewEvaluator(rt)
 	prog := `
 test true
@@ -546,7 +546,7 @@ test [[1] [2 3]] got`,
 	for _, prog := range progs {
 		t.Run(prog, func(t *testing.T) {
 			rt := &testRT{}
-			rt.UnimplementedRuntime.print = rt.Print
+			rt.UnimplementedPlatform.print = rt.Print
 			eval := NewEvaluator(rt)
 			err := eval.Run(prog)
 			assert.NoError(t, err)
@@ -569,7 +569,7 @@ func TestFailedEvyTest(t *testing.T) {
 	for prog, want := range progs {
 		t.Run(prog, func(t *testing.T) {
 			rt := &testRT{}
-			rt.UnimplementedRuntime.print = rt.Print
+			rt.UnimplementedPlatform.print = rt.Print
 			eval := NewEvaluator(rt)
 			err := eval.Run(prog)
 			assert.Error(t, ErrTest, err)
@@ -589,7 +589,7 @@ test 1 1
 test "abc" "123" "custom message"
 	`
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedPlatform.print = rt.Print
 	eval := NewEvaluator(rt)
 	err := eval.Run(prog)
 	assert.Error(t, ErrTest, err)
@@ -627,7 +627,7 @@ test 1 1
 test "abc" "123" "custom message"
 	`
 	rt := &testRT{}
-	rt.UnimplementedRuntime.print = rt.Print
+	rt.UnimplementedPlatform.print = rt.Print
 	eval := NewEvaluator(rt)
 	eval.TestInfo.NoTestSummary = true
 	err := eval.Run(prog)
@@ -2182,7 +2182,7 @@ func TestNestedTypeof(t *testing.T) {
 			in += "\n print (typeof a)"
 			var got string
 			rt := &testRT{}
-			rt.UnimplementedRuntime.print = rt.Print
+			rt.UnimplementedPlatform.print = rt.Print
 			eval := NewEvaluator(rt)
 			err := eval.Run(in)
 			if err != nil {

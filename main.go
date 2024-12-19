@@ -185,7 +185,7 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	rt := cli.NewRuntime(c.runtimeOptions()...)
+	rt := cli.NewPlatform(c.platformOptions()...)
 	if c.RandSeed != 0 {
 		evaluator.RandSource = rand.New(rand.NewSource(c.RandSeed)) //nolint:gosec // not for security
 	}
@@ -221,7 +221,7 @@ func (c *runCmd) fileBytes() ([]byte, error) {
 	return b, nil
 }
 
-func (c *runCmd) runtimeOptions() []cli.Option {
+func (c *runCmd) platformOptions() []cli.Option {
 	opts := []cli.Option{cli.WithSkipSleep(c.SkipSleep)}
 	if c.SVGOut != "" {
 		opts = append(opts, cli.WithSVG(c.SVGStyle, c.SVGWidth, c.SVGHeight))
@@ -229,7 +229,7 @@ func (c *runCmd) runtimeOptions() []cli.Option {
 	return opts
 }
 
-func (c *runCmd) writeSVG(rt *cli.Runtime) error {
+func (c *runCmd) writeSVG(rt *cli.Platform) error {
 	if c.SVGOut == "" {
 		return nil
 	}

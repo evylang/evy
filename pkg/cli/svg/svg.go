@@ -1,6 +1,6 @@
 //go:build !tinygo
 
-// Package svg provides an Evy runtime to generate SVG output for evy programs
+// Package svg provides an Evy platform to generate SVG output for evy programs
 // that contain graphics function calls. The SVG elements modeled in this
 // package, such as <svg>, <circle> or <g>, and their attributes, "fill"
 // or "stroke-width", are a small subset of all SVG elements and attributes.

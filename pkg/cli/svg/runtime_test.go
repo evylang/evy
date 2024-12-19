@@ -10,8 +10,8 @@ import (
 	"evylang.dev/evy/pkg/assert"
 )
 
-func TestRuntimeCircleRect(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformCircleRect(t *testing.T) {
+	rt := newTestPlatform()
 	rt.Move(20, 0)
 	rt.Rect(10, 30)
 	rt.Rect(20, 5)
@@ -22,22 +22,22 @@ func TestRuntimeCircleRect(t *testing.T) {
 	assertSVG(t, "testdata/circle-rect.svg", rt)
 }
 
-func TestRuntimeQuarterCircle(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformQuarterCircle(t *testing.T) {
+	rt := newTestPlatform()
 	rt.Circle(100) // should be centered at 0 0
 	assertSVG(t, "testdata/quarter-circle.svg", rt)
 }
 
-func TestRuntimeEllipse(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformEllipse(t *testing.T) {
+	rt := newTestPlatform()
 	rt.Ellipse(50, 85, 30, 10, 0, 0, 0)
 	rt.Ellipse(50, 55, 30, 10, 30, 0, 0)
 
 	assertSVG(t, "testdata/ellipse.svg", rt)
 }
 
-func TestRuntimeFill(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformFill(t *testing.T) {
+	rt := newTestPlatform()
 	rt.Width(2)
 	rt.Move(10, 65)
 	rt.Color("red")
@@ -85,8 +85,8 @@ func TestRuntimeFill(t *testing.T) {
 	assertSVG(t, "testdata/fill.svg", rt)
 }
 
-func TestRuntimeLines(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformLines(t *testing.T) {
+	rt := newTestPlatform()
 	for i := float64(0); i < 100; i += 3 {
 		rt.Move(i, 0)
 		rt.Line(100, i)
@@ -94,8 +94,8 @@ func TestRuntimeLines(t *testing.T) {
 	assertSVG(t, "testdata/lines.svg", rt)
 }
 
-func TestRuntimeLinestyle(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformLinestyle(t *testing.T) {
+	rt := newTestPlatform()
 
 	rt.Width(3)
 	rt.Linecap("round")
@@ -122,8 +122,8 @@ func TestRuntimeLinestyle(t *testing.T) {
 	assertSVG(t, "testdata/linestyle.svg", rt)
 }
 
-func TestRuntimePoly(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformPoly(t *testing.T) {
+	rt := newTestPlatform()
 	rt.Width(1)
 	rt.Color("red")
 	rt.Fill("none")
@@ -134,8 +134,8 @@ func TestRuntimePoly(t *testing.T) {
 	assertSVG(t, "testdata/poly.svg", rt)
 }
 
-func TestRuntimeText(t *testing.T) {
-	rt := newTestRuntime()
+func TestPlatformText(t *testing.T) {
+	rt := newTestPlatform()
 
 	rt.Move(10, 85)
 	rt.Text("“Time is an illusion.")
@@ -199,7 +199,7 @@ func TestRuntimeText(t *testing.T) {
 	assertSVG(t, "testdata/text.svg", rt)
 }
 
-func assertSVG(t *testing.T, wantFilename string, gotRT *GraphicsRuntime) {
+func assertSVG(t *testing.T, wantFilename string, gotRT *GraphicsPlatform) {
 	t.Helper()
 	b, err := os.ReadFile(wantFilename)
 	assert.NoError(t, err)
@@ -215,8 +215,8 @@ func assertSVG(t *testing.T, wantFilename string, gotRT *GraphicsRuntime) {
 
 const testStyle = "border: 1px solid red; width: 400px; height: 400px"
 
-func newTestRuntime() *GraphicsRuntime {
-	rt := NewGraphicsRuntime()
+func newTestPlatform() *GraphicsPlatform {
+	rt := NewGraphicsPlatform()
 	rt.SVG.Style = testStyle
 	return rt
 }

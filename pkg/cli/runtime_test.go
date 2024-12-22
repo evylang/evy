@@ -22,7 +22,7 @@ func TestGraphics(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			style := "border: 1px solid red; width: 400px; height: 400px"
 			svgWriter := &bytes.Buffer{}
-			rt := NewRuntime(WithSVG(style, "", ""), WithSkipSleep(true))
+			rt := NewPlatform(WithSVG(style, "", ""), WithSkipSleep(true))
 
 			eval := evaluator.NewEvaluator(rt)
 			evyFilename := strings.TrimSuffix(file, filepath.Ext(file)) + ".evy"
@@ -45,10 +45,10 @@ func TestGraphics(t *testing.T) {
 func TestPrintRead(t *testing.T) {
 	readBuffer := &bytes.Buffer{}
 	writeBuffer := &bytes.Buffer{}
-	rt := &Runtime{
-		reader:          bufio.NewReader(readBuffer),
-		writer:          writeBuffer,
-		GraphicsRuntime: &evaluator.UnimplementedRuntime{},
+	rt := &Platform{
+		reader:           bufio.NewReader(readBuffer),
+		writer:           writeBuffer,
+		GraphicsPlatform: &evaluator.UnimplementedPlatform{},
 	}
 	readBuffer.WriteString("Hello world\n")
 	s := rt.Read()

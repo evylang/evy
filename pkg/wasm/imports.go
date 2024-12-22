@@ -4,8 +4,8 @@ package main
 
 // This file contains JS functions imported into Go/WASM. Functions are
 // declared without body, the full definition can be found in the JS
-// implementation. The `jsRuntime` struct wraps these functions to
-// implement evaluator.Runtime.
+// implementation. The `jsPlatform` struct wraps these functions to
+// implement evaluator.Platform.
 
 import (
 	"fmt"
@@ -17,39 +17,39 @@ import (
 
 const minSleepDur = time.Millisecond
 
-// jsRuntime implements evaluator.Runtime.
-type jsRuntime struct {
+// jsPlatform implements evaluator.Platform.
+type jsPlatform struct {
 	yielder *sleepingYielder
 }
 
-func newJSRuntime() *jsRuntime {
-	return &jsRuntime{yielder: newSleepingYielder()}
+func newJSPlatform() *jsPlatform {
+	return &jsPlatform{yielder: newSleepingYielder()}
 }
 
-func (rt *jsRuntime) Yielder() evaluator.Yielder { return rt.yielder }
-func (rt *jsRuntime) Print(s string)             { jsPrint(s) }
-func (rt *jsRuntime) Cls()                       { jsCls() }
-func (rt *jsRuntime) Read() string               { return rt.yielder.Read() }
+func (rt *jsPlatform) Yielder() evaluator.Yielder { return rt.yielder }
+func (rt *jsPlatform) Print(s string)             { jsPrint(s) }
+func (rt *jsPlatform) Cls()                       { jsCls() }
+func (rt *jsPlatform) Read() string               { return rt.yielder.Read() }
 
-func (rt *jsRuntime) Sleep(dur time.Duration) {
+func (rt *jsPlatform) Sleep(dur time.Duration) {
 	// Enforce a lower bound to stop browser tabs from freezing.
 	rt.yielder.Sleep(max(minSleepDur, dur))
 }
 
-func (rt *jsRuntime) Move(x, y float64)                { move(x, y) }
-func (rt *jsRuntime) Line(x, y float64)                { line(x, y) }
-func (rt *jsRuntime) Rect(x, y float64)                { rect(x, y) }
-func (rt *jsRuntime) Circle(r float64)                 { circle(r) }
-func (rt *jsRuntime) Width(w float64)                  { width(w) }
-func (rt *jsRuntime) Color(s string)                   { color(s) }
-func (rt *jsRuntime) Clear(color string)               { clear(color) }
-func (rt *jsRuntime) Gridn(unit float64, color string) { gridn(unit, color) }
-func (rt *jsRuntime) Stroke(s string)                  { stroke(s) }
-func (rt *jsRuntime) Fill(s string)                    { fill(s) }
-func (rt *jsRuntime) Dash(segments []float64)          { dash(floatsToString(segments)) }
-func (rt *jsRuntime) Linecap(s string)                 { linecap(s) }
-func (rt *jsRuntime) Text(s string)                    { text(s) }
-func (rt *jsRuntime) Font(props map[string]any) {
+func (rt *jsPlatform) Move(x, y float64)                { move(x, y) }
+func (rt *jsPlatform) Line(x, y float64)                { line(x, y) }
+func (rt *jsPlatform) Rect(x, y float64)                { rect(x, y) }
+func (rt *jsPlatform) Circle(r float64)                 { circle(r) }
+func (rt *jsPlatform) Width(w float64)                  { width(w) }
+func (rt *jsPlatform) Color(s string)                   { color(s) }
+func (rt *jsPlatform) Clear(color string)               { clear(color) }
+func (rt *jsPlatform) Gridn(unit float64, color string) { gridn(unit, color) }
+func (rt *jsPlatform) Stroke(s string)                  { stroke(s) }
+func (rt *jsPlatform) Fill(s string)                    { fill(s) }
+func (rt *jsPlatform) Dash(segments []float64)          { dash(floatsToString(segments)) }
+func (rt *jsPlatform) Linecap(s string)                 { linecap(s) }
+func (rt *jsPlatform) Text(s string)                    { text(s) }
+func (rt *jsPlatform) Font(props map[string]any) {
 	// We don't use encoding/json here as it adds more than 100K to evy.wasm.
 	pairs := make([]string, 0, len(props))
 	for key, value := range props {
@@ -64,7 +64,7 @@ func (rt *jsRuntime) Font(props map[string]any) {
 	font(jsonProps)
 }
 
-func (rt *jsRuntime) Poly(vertices [][]float64) {
+func (rt *jsPlatform) Poly(vertices [][]float64) {
 	vStrings := make([]string, len(vertices))
 	for i, vertex := range vertices {
 		vStrings[i] = fmt.Sprintf("%f %f", vertex[0], vertex[1])
@@ -72,7 +72,7 @@ func (rt *jsRuntime) Poly(vertices [][]float64) {
 	poly(strings.Join(vStrings, " "))
 }
 
-func (rt *jsRuntime) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
+func (rt *jsPlatform) Ellipse(x, y, rX, rY, rotation, startAngle, endAngle float64) {
 	ellipse(x, y, rX, rY, rotation, startAngle, endAngle)
 }
 

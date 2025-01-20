@@ -1785,6 +1785,11 @@ func testBuiltins() Builtins {
 			},
 			ReturnType: STRING_TYPE,
 		},
+		"rand1": {
+			Name:       "rand1",
+			Params:     []*Var{},
+			ReturnType: NUM_TYPE,
+		},
 	}
 	eventHandlers := map[string]*EventHandlerStmt{
 		"down": {

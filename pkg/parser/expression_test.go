@@ -73,6 +73,10 @@ func TestParseTopLevelExpression(t *testing.T) {
 		`print s[1]`:                  "print(any((s[1])))",
 		"print map2[s]":               "print(any((map2[s])))",
 
+		// niladic
+		`print rand1`:       "print(any(rand1()))",
+		`print rand1 rand1`: "print(any(rand1()), any(rand1()))",
+
 		// // Index expression
 		"arr[1]":        "(arr[1])",
 		"arr2[1][2]":    "((arr2[1])[2])",
@@ -298,5 +302,77 @@ func TestParseTopLevelExpressionErr(t *testing.T) {
 		assertParseError(t, parser, input)
 		got := parser.errors.Truncate(1)
 		assert.Equal(t, wantErr, got.Error(), "input: %s\nerrors:\n%s", input, parser.errors)
+	}
+}
+
+func TestParseNiladic(t *testing.T) {
+	inputs := map[string]string{
+		"rand1":       "print rand1",
+		"rand1-twice": "print rand1 rand1",
+		"rand1-expr":  "print rand1+10",
+		"rand1-toplevelexpr": `
+n := rand1+0.5
+print n
+`,
+		"rand1-toplevelexpr-space": `
+if rand1 > 0.5
+	print "big"
+end
+`,
+		"custom1": `
+func answer:string
+	return "42"
+end
+
+print answer`,
+	}
+
+	for name, input := range inputs {
+		t.Run(name, func(t *testing.T) {
+			parser := newParser(input, testBuiltins())
+			_ = parser.parse()
+			assertNoParseError(t, parser, input)
+		})
+	}
+}
+
+func TestParseNiladicErr(t *testing.T) {
+	type inputWithError struct {
+		input      string
+		wantErrMsg string
+	}
+	inputs := map[string]inputWithError{
+		"rand1-group": {
+			input:      "print (rand1 100)",
+			wantErrMsg: `line 1 column 14: expected ")", got ""`,
+		},
+		"custom1": {
+			input: `
+func answer
+	print "42"
+end
+
+len answer`,
+			wantErrMsg: `line 6 column 5: "len" takes 1st argument of type any, found none`,
+		},
+		"custom1-variadic": {
+			input: `
+func answer
+	print "42"
+end
+
+print answer`,
+			wantErrMsg: `line 6 column 7: "print" takes variadic arguments of type any, found none`,
+		},
+	}
+
+	for name, tc := range inputs {
+		t.Run(name, func(t *testing.T) {
+			parser := newParser(tc.input, testBuiltins())
+			_ = parser.parse()
+			assertParseError(t, parser, tc.input)
+			gotErr := parser.errors.Truncate(1)
+			assert.Equal(t, tc.wantErrMsg, gotErr.Error())
+		})
 	}
 }

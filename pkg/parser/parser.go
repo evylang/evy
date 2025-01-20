@@ -564,7 +564,7 @@ func (p *parser) isFuncCall(tok *lexer.Token) bool {
 }
 
 func (p *parser) parseFunCallStatement() Node {
-	fc := p.parseFuncCall().(*FuncCall)
+	fc := p.parseFuncCall(true).(*FuncCall) // top-level funcCall
 	p.assertEOL()
 	fcs := &FuncCallStmt{token: fc.token, FuncCall: fc}
 	p.recordComment(fcs)

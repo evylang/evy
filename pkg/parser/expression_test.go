@@ -353,7 +353,7 @@ func answer
 end
 
 len answer`,
-			wantErrMsg: `line 6 column 5: "len" takes 1st argument of type any, found none`,
+			wantErrMsg: `line 6 column 5: cannot use "answer" as 1st argument, it has no return value`,
 		},
 		"custom1-variadic": {
 			input: `
@@ -362,7 +362,7 @@ func answer
 end
 
 print answer`,
-			wantErrMsg: `line 6 column 7: "print" takes variadic arguments of type any, found none`,
+			wantErrMsg: `line 6 column 7: cannot use "answer" as argument, it has no return value`,
 		},
 	}
 

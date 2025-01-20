@@ -564,7 +564,7 @@ func (p *parser) isFuncCall(tok *lexer.Token) bool {
 }
 
 func (p *parser) parseFunCallStatement() Node {
-	fc := p.parseFuncCall().(*FuncCall)
+	fc := p.parseFuncCall(true).(*FuncCall) // top-level funcCall
 	p.assertEOL()
 	fcs := &FuncCallStmt{token: fc.token, FuncCall: fc}
 	p.recordComment(fcs)
@@ -581,6 +581,9 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 			argType := arg.Type()
 			if !paramType.accepts(argType) {
 				msg := fmt.Sprintf("%q takes variadic arguments of type %s, found %s", funcName, paramType, argType)
+				if fc, ok := arg.(*FuncCall); ok && argType == NONE_TYPE {
+					msg = fmt.Sprintf("cannot use %q as argument, it has no return value", fc.FuncDef.Name)
+				}
 				p.appendErrorForToken(msg, arg.Token())
 			} else {
 				args[i] = wrapAny(arg, paramType)
@@ -602,6 +605,9 @@ func (p *parser) assertArgTypes(decl *FuncDefStmt, args []Node) {
 		argType := arg.Type()
 		if !paramType.accepts(argType) {
 			msg := fmt.Sprintf("%q takes %s argument of type %s, found %s", funcName, ordinalize(i+1), paramType, argType)
+			if fc, ok := arg.(*FuncCall); ok && argType == NONE_TYPE {
+				msg = fmt.Sprintf("cannot use %q as %s argument, it has no return value", fc.FuncDef.Name, ordinalize(i+1))
+			}
 			p.appendErrorForToken(msg, arg.Token())
 		} else {
 			args[i] = wrapAny(arg, paramType)

@@ -49,20 +49,22 @@ var precedences = map[lexer.TokenType]precedence{
 
 func (p *parser) parseTopLevelExpr() Node {
 	tok := p.cur
-	if tok.Type == lexer.IDENT && p.funcs[tok.Literal] != nil {
-		return p.parseFuncCall()
+	if tok.Type == lexer.IDENT && p.funcs[tok.Literal] != nil && !p.funcs[tok.Literal].isNiladic() {
+		return p.parseFuncCall(true)
 	}
 	return p.parseExpr(lowestPrec)
 }
 
-func (p *parser) parseFuncCall() Node {
+func (p *parser) parseFuncCall(isTopLevel bool) Node {
 	fc := &FuncCall{token: p.cur, Name: p.cur.Literal}
 	p.advance() // advance past function name IDENT
 	funcDef := p.funcs[fc.Name]
 	funcDef.isCalled = true
 	fc.FuncDef = funcDef
-	fc.Arguments = p.parseExprList()
-	p.assertArgTypes(fc.FuncDef, fc.Arguments)
+	if isTopLevel || !funcDef.isNiladic() {
+		fc.Arguments = p.parseExprList()
+		p.assertArgTypes(fc.FuncDef, fc.Arguments)
+	}
 	return fc
 }
 
@@ -70,7 +72,7 @@ func (p *parser) parseExpr(prec precedence) Node {
 	var left Node
 	switch p.cur.Type {
 	case lexer.IDENT:
-		left = p.lookupVar()
+		left = p.parseIdentExpr()
 	case lexer.STRING_LIT, lexer.NUM_LIT, lexer.TRUE, lexer.FALSE, lexer.LBRACKET, lexer.LCURLY:
 		left = p.parseLiteral()
 	case lexer.BANG, lexer.MINUS:
@@ -120,6 +122,14 @@ func (p *parser) isAtExprEnd() bool {
 		return true
 	}
 	return p.isAtEOL()
+}
+
+func (p *parser) parseIdentExpr() Node {
+	funcDef := p.funcs[p.cur.Literal]
+	if funcDef != nil && funcDef.isNiladic() {
+		return p.parseFuncCall(false) // not a top-level func call
+	}
+	return p.lookupVar()
 }
 
 func (p *parser) parseUnaryExpr() Node {

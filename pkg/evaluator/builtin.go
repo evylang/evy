@@ -696,7 +696,7 @@ func randFunc(_ *scope, args []value) (value, error) {
 }
 
 var rand1Decl = &parser.FuncDefStmt{
-	Name:       "rand",
+	Name:       "rand1",
 	Params:     []*parser.Var{},
 	ReturnType: parser.NUM_TYPE,
 }

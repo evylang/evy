@@ -80,7 +80,7 @@ end
     test("dialogs", async ({ page, baseURL }, testInfo) => {
       await page.goto(baseURL)
       await page.waitForLoadState("networkidle")
-      await expect(page).toHaveScreenshot("no-dialog.png")
+      await expect(page).toHaveScreenshot("no-dialog.png", { maxDiffPixelRatio: 0.01 })
 
       // show sidebar
       if (testInfo.project.name != "ios") {

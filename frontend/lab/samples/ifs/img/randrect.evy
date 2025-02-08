@@ -1,19 +1,11 @@
 fill (hsl 270 100 50 10)
 width 0.2
 for range 60
-    x := roundedRand1 * 100
-    y := roundedRand1 * 100
-    s1 := roundedRand1 * 25 + 2
-    s2 := roundedRand1 * 25 + 2
+    x := (rand1) * 100
+    y := (rand1) * 100
+    s1 := (rand1) * 25 + 2
+    s2 := (rand1) * 25 + 2
 
     move x-s1*0.5 y-s2*0.5
     rect s1 s2
-end
-
-// roundedRand1 is a rounding rand1 function, to avoid rounding differences on
-// Mac and Linux.
-func roundedRand1:num
-    r := rand1 * 1024
-    r = round r
-    return r / 1024
 end

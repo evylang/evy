@@ -90,7 +90,14 @@ func (rt *GraphicsPlatform) transformY(y float64) float64 {
 }
 
 func (rt *GraphicsPlatform) scale(s float64) float64 {
-	return scaleFactor * s
+	// The float64 cast here acts as a barrier against a fused multiply/
+	// subtraction ARM64 instruction so that this multiply and a subtraction
+	// done by the caller of this function are not fused into a single ARM64
+	// instruction. This causes rounding differences when it is not used
+	// and causes the generated SVG files to have slight differences depending
+	// on which platform it is run.
+	// https://go.dev/ref/spec#Floating_point_operators
+	return float64(scaleFactor * s)
 }
 
 func (rt *GraphicsPlatform) nonDefaultAttr() Attr {

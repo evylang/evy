@@ -21,7 +21,7 @@ lint: lint-go lint-sh lint-node check-fmt-evy conform
 ## Full clean build and up-to-date checks as run on CI for local execution
 ci: check-uptodate .WAIT all
 
-check-uptodate: clean .WAIT tidy fmt doc docs learn lab
+check-uptodate: clean .WAIT install-npm-deps .WAIT tidy fmt doc docs learn lab
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files

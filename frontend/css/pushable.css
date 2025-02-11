@@ -1,0 +1,152 @@
+/* See https://www.joshwcomeau.com/animation/3d-button/ */
+.pushable {
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  outline-offset: 4px;
+  transition: filter 250ms;
+  text-decoration: none;
+
+  & .shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background: hsl(0deg 0% 0% / 35%);
+    will-change: transform;
+    transform: translateY(2px);
+    transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+    box-shadow: 0 0 2px 0 hsl(0deg 0% 0% / 35%);
+  }
+
+  & .edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(
+      to left,
+      hsl(0deg 0% 37%) 0%,
+      hsl(0deg 0% 50%) 6%,
+      hsl(0deg 0% 50%) 94%,
+      hsl(0deg 0% 37%) 100%
+    );
+  }
+
+  & .front {
+    display: block;
+    position: relative;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: Inter, sans-serif;
+    text-align: center;
+    color: hsl(0deg 0% 33%);
+    background: hsl(0deg 0% 90%);
+    will-change: transform;
+    transform: translateY(-4px);
+    transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+
+  &:hover {
+    filter: brightness(104%);
+  }
+
+  &:hover .front {
+    transform: translateY(-6px);
+    transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+  }
+
+  &:active .front {
+    transform: translateY(-1px);
+    transition: transform 34ms;
+  }
+
+  &:hover .shadow {
+    transform: translateY(4px);
+    transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+  }
+
+  &:active .shadow {
+    transform: translateY(1px);
+    transition: transform 34ms;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.pushable.tall {
+  & .front {
+    transform: translateY(-6px);
+  }
+
+  &:hover .front {
+    transform: translateY(-9px);
+  }
+
+  &:active .front {
+    transform: translateY(-2px);
+  }
+
+  & .shadow {
+    transform: translateY(2px);
+  }
+
+  &:hover .shadow {
+    transform: translateY(4px);
+  }
+
+  &:active .shadow {
+    transform: translateY(2px);
+  }
+}
+
+.pushable .shadow.light {
+  background: hsl(0deg 0% 0% / 20%);
+  box-shadow: 0 0 2px 0 hsl(0deg 0% 0% / 20%);
+}
+
+.pushable .front.rainbow {
+  color: white;
+  letter-spacing: 0.2em;
+  background: linear-gradient(
+    270deg,
+    hsl(0deg 90% 67%) 0,
+    hsl(25deg 75% 57%) 5%,
+    hsl(35deg 75% 57%) 10%,
+    hsl(65deg 40% 47%) 17%,
+    hsl(162deg 27% 52%) 22%,
+    hsl(223deg 36% 58%) 30%,
+    hsl(292deg 59% 62%) 40%,
+    hsl(0deg 90% 67%) 50%,
+    hsl(25deg 75% 57%) 55%,
+    hsl(35deg 75% 57%) 60%,
+    hsl(65deg 40% 47%) 67%,
+    hsl(162deg 27% 52%) 72%,
+    hsl(223deg 36% 58%) 80%,
+    hsl(292deg 59% 62%) 90%,
+    hsl(0deg 90% 67%) 100%
+  );
+  animation: slide-background 4s linear infinite;
+  background-size: 200%;
+  background-position: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes slide-background {
+    to {
+      background-position: 0%;
+    }
+  }
+}

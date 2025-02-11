@@ -259,7 +259,7 @@ async function handlePrimaryClick() {
     return
   }
   // on output view, stopped
-  document.querySelector("#run-mobile").innerText = "Run"
+  document.querySelector("#run-mobile .front").innerText = "Run"
   const nextScreen = editorHidden ? "view-notes" : "view-code"
   slide(nextScreen)
 }
@@ -300,12 +300,12 @@ async function start() {
   editor.update({ errorLines: {} })
   clearOutput()
 
-  const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mobile")
+  const runButton = document.querySelector("#run .front")
+  const runButtonMob = document.querySelector("#run-mobile .front")
   runButton.innerText = "Stop"
-  runButton.classList.add("running")
+  runButton.classList.add("rainbow")
   runButtonMob.innerText = "Stop"
-  runButtonMob.classList.add("running")
+  runButtonMob.classList.add("rainbow")
   actions = "fmt,ui,eval"
   go.run(wasmInst)
 }
@@ -335,8 +335,8 @@ function afterStop() {
   jsReadInitialised = false
   wasmInst = undefined
 
-  const runButton = document.querySelector("#run")
-  runButton.classList.remove("running")
+  const runButton = document.querySelector("#run .front")
+  runButton.classList.remove("rainbow")
   runButton.innerText = "Run"
   updateMobilePrimaryButton()
 
@@ -345,9 +345,9 @@ function afterStop() {
 }
 
 function updateMobilePrimaryButton() {
-  const classList = document.querySelector("#run-mobile")
-  classList.classList.remove("running")
-  classList.innerText = mobilePrimaryButtonText()
+  const runButtonMob = document.querySelector("#run-mobile .front")
+  runButtonMob.classList.remove("rainbow")
+  runButtonMob.innerText = mobilePrimaryButtonText()
 }
 
 function mobilePrimaryButtonText() {

@@ -870,7 +870,7 @@ function fill(ptr, len) {
 // dash is exported to evy go/wasm.
 function dash(ptr, len) {
   const s = memToString(ptr, len)
-  const nums = s.split(" ").map(Number).map(transformX)
+  const nums = s === "" ? [] : s.split(" ").map(Number).map(transformX)
   canvas.ctx.setLineDash(nums)
 }
 

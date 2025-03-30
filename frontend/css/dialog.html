@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="resets.css" type="text/css" />
     <link rel="stylesheet" href="root.css" type="text/css" />
     <link rel="stylesheet" href="icons.css" type="text/css" />
-    <link rel="stylesheet" href="primary.css" type="text/css" />
+    <link rel="stylesheet" href="pushable.css" type="text/css" />
     <link rel="stylesheet" href="dialog.css" type="text/css" />
     <script type="module">
       showDialog.addEventListener("click", () => dialog.showModal())
@@ -35,9 +35,21 @@
     </style>
   </head>
   <body>
-    <button id="showDialog" class="primary">Show Dialog</button>
-    <button id="showLargeDialog" class="primary">Show Large Dialog</button>
-    <button id="showAboutDialog" class="primary">Show About Dialog</button>
+    <button id="showDialog" class="pushable">
+      <span class="shadow"></span>
+      <span class="edge"></span>
+      <span class="front">Show Dialog</span>
+    </button>
+    <button id="showLargeDialog" class="pushable">
+      <span class="shadow"></span>
+      <span class="edge"></span>
+      <span class="front">Show Large Dialog</span>
+    </button>
+    <button id="showAboutDialog" class="pushable">
+      <span class="shadow"></span>
+      <span class="edge"></span>
+      <span class="front">Show About Dialog</span>
+    </button>
     <dialog id="dialog">
       <form method="dialog">
         <header>
@@ -46,7 +58,11 @@
         </header>
         <main>
           <p>Default dialog content</p>
-          <button class="primary">Done</button>
+          <button class="pushable">
+            <span class="shadow"></span>
+            <span class="edge"></span>
+            <span class="front">Done</span>
+          </button>
         </main>
       </form>
     </dialog>
@@ -66,7 +82,11 @@
             Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
             mollit anim id est laborum.
           </p>
-          <button class="primary">Done</button>
+          <button class="pushable">
+            <span class="shadow"></span>
+            <span class="edge"></span>
+            <span class="front">Done</span>
+          </button>
         </main>
       </form>
     </dialog>
@@ -92,7 +112,11 @@
             with conventional languages, Evy is designed to make real programming as fun and easy as
             possible.
           </p>
-          <button class="primary">Done</button>
+          <button class="pushable">
+            <span class="shadow"></span>
+            <span class="edge"></span>
+            <span class="front">Done</span>
+          </button>
         </main>
       </form>
     </dialog>

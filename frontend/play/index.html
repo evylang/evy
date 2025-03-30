@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/resets.css" type="text/css" />
     <link rel="stylesheet" href="css/root.css" type="text/css" />
     <link rel="stylesheet" href="css/elements.css" type="text/css" />
-    <link rel="stylesheet" href="css/primary.css" type="text/css" />
+    <link rel="stylesheet" href="css/pushable.css" type="text/css" />
     <link rel="stylesheet" href="css/icons.css" type="text/css" />
     <link rel="stylesheet" href="css/header.css" type="text/css" />
     <link rel="stylesheet" href="./css/switch.css" type="text/css" />
@@ -117,10 +117,12 @@
           <div class="run desktop">
             <button
               id="run"
-              class="primary loading"
+              class="pushable loading"
               onclick="document.querySelector('#dialog-loading').showModal()"
             >
-              Run
+              <span class="shadow light"></span>
+              <span class="edge"></span>
+              <span class="front">Run</span>
             </button>
           </div>
         </div>
@@ -129,10 +131,12 @@
       <div class="run mobile">
         <button
           id="run-mobile"
-          class="primary loading"
+          class="pushable loading"
           onclick="document.querySelector('#dialog-loading').showModal()"
         >
-          Run
+          <span class="shadow light"></span>
+          <span class="edge"></span>
+          <span class="front">Run</span>
         </button>
       </div>
     </div>
@@ -198,7 +202,11 @@
           <label for="share-url">Sharable URL</label>
           <input type="text" id="share-url" />
         </div>
-        <button class="primary" id="copy">Copy</button>
+        <button class="pushable" id="copy">
+          <span class="shadow"></span>
+          <span class="edge"></span>
+          <span class="front">Copy</span>
+        </button>
       </main>
     </dialog>
 
@@ -211,7 +219,11 @@
         </header>
         <main>
           <p>Hold tight, getting the editor and compiler ready. 🧘</p>
-          <button class="primary">Ok</button>
+          <button class="pushable">
+            <span class="shadow"></span>
+            <span class="edge"></span>
+            <span class="front">OK</span>
+          </button>
         </main>
       </form>
     </dialog>
@@ -239,7 +251,11 @@
             with conventional languages, Evy is designed to make real programming as fun and easy as
             possible.
           </p>
-          <button class="primary">Done</button>
+          <button class="pushable">
+            <span class="shadow"></span>
+            <span class="edge"></span>
+            <span class="front">Done</span>
+          </button>
         </main>
       </form>
     </dialog>

@@ -10,10 +10,8 @@
   /* colors (all themes) */
   --color-accent: hsl(201deg 100% 42%);
   --color-accent-hover: hsl(201deg 100% 63%);
-  --primary-button-color: hsl(0deg 0% 33%);
-  --primary-button-color-disabled: hsl(0deg 0% 33% / 50%);
-  --primary-button-background: hsl(0deg 0% 92%);
-  --primary-button-background-hover: hsl(0deg 0% 80%);
+  --button-color: hsl(0deg 0% 33%);
+  --button-color-disabled: hsl(0deg 0% 33% / 50%);
 
   /* dark theme colors (default without theme toggle) */
   --background: hsl(210deg 5% 15%); /* main  */

@@ -82,7 +82,7 @@ button.arrow {
   width: 28px;
 }
 button.arrow:not(:disabled):hover {
-  background: var(--primary-button-color);
+  background: var(--button-color);
   color: var(--color-accent-hover);
 }
 button.arrow:disabled {
@@ -520,8 +520,7 @@ dialog .err,
 
 /* --- Run ----------------------------------------------------------- */
 .run {
-  padding: 8px;
-  padding-bottom: 12px;
+  padding: 14px 8px 8px;
 }
 
 .run.mobile {
@@ -542,43 +541,9 @@ button#run-mobile {
   width: 100%;
 }
 
-button#run:disabled,
-button#run-mobile:disabled,
-button#run.loading,
-button#run-mobile.loading {
-  color: var(--primary-button-color-disabled);
-  box-shadow:
-    0 4px 0 hsl(0deg 0% 60%),
-    0 16px 12px -8px hsl(0deg 0% 0% / 30%),
-    inset 0 -2px 1px 1px hsl(0deg 0% 60%);
-}
-
-button.running#run,
-button.running#run-mobile,
-button.running#run:hover,
-button.running#run:active,
-button.running#run-mobile:hover,
-button.running#run-mobile:active {
-  color: var(--run-button-color-active);
-  letter-spacing: 0.2em;
-  transition: 0s;
-  background: linear-gradient(
-    270deg,
-    hsl(0deg 100% 67%) 0,
-    hsl(47deg 22% 52%) 20%,
-    hsl(105deg 37% 46%) 35%,
-    hsl(162deg 27% 52%) 55%,
-    hsl(223deg 36% 58%) 70%,
-    hsl(292deg 59% 62%) 90%,
-    hsl(0deg 100% 67%) 100%
-  );
-  animation: slide-background 1s linear infinite;
-}
-
-@keyframes slide-background {
-  to {
-    background-position: calc(var(--output-width) - 17px);
-  }
+button#run.loading .front,
+button#run-mobile.loading .front {
+  color: var(--button-color-disabled);
 }
 
 /* --- Sample selection modal ---------------------------------------- */

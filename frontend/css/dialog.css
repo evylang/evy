@@ -74,7 +74,7 @@ dialog main h2 {
   color: var(--color-dimmed);
 }
 
-dialog main button.primary {
+dialog main button.pushable {
   width: min(800px, 100%);
   margin-top: 30px;
 }
@@ -107,7 +107,7 @@ dialog.large p {
   margin-bottom: 2rem;
 }
 
-dialog.large main button.primary {
+dialog.large main button.pushable {
   margin-top: 0;
 }
 
@@ -132,7 +132,7 @@ dialog.large main button.primary {
     border-radius: 0;
   }
 
-  dialog.large main button.primary {
+  dialog.large main button.pushable {
     margin-top: 32px;
   }
 }

@@ -1,0 +1,181 @@
+background := (hsl 210 5 15) // near black
+hue := 310
+sat := 80
+light := 40
+radf := pi / 180
+
+x0 := 56
+y0 := 35
+l := 40
+cx := 25
+cy := 55
+drag := false
+
+draw
+
+func draw
+    clear background
+    drawText
+    drawColorBox
+    drawWheel
+    drawSquare
+end
+
+on down x:num y:num
+    drag = true
+    update x y
+    draw
+end
+
+on up
+    drag = false
+end
+
+on move x:num y:num
+    if drag
+        update x y
+        draw
+    end
+end
+
+func update x:num y:num
+    th := 3.5
+    dx := cx - x
+    dy := cy - y
+    if (abs x-x0) < th and y - y0 > 0 and y - y0 < l
+        sat = (y - y0) / l * 100
+    else if (abs y-y0) < th and x - x0 > 0 and x - x0 < l
+        light = (x - x0) / l * 100
+    else if x >= x0 and x <= (x0 + l) and y >= y0 and y <= (y0 + l)
+        sat = (y - y0) / l * 100
+        light = (x - x0) / l * 100
+    else if (sqrt (dx * dx + dy * dy)) <= 20 + th
+        hue = ((atan2 dx dy) * 180 / pi) + 180
+    end
+end
+
+func drawText
+    x := 31
+    y := 8
+    font {size:5 style:"normal" family:"Fira Code, monospace"}
+    width 0.2
+    fill (hsl 27 100 74) // orange
+    move x y
+    text "hsl"
+    fill (hsl 204 100 75) // light blue
+    x = x + 6
+    w := 12
+    move x y
+    text (sprintf "%5.0f" hue)
+    if sat != 100 or light != 50
+        move x+w y
+        text (sprintf "%5.0f" sat)
+        if light != 50
+            move x+w*2 y
+            text (sprintf "%5.0f" light)
+        end
+    end
+
+    y = 78
+    move 21 y
+    text "Hue"
+
+    move 62 y-52
+    text "Lightness"
+
+    x = 48
+    y = y - 1
+    w = 5
+    s := "Saturation"
+    for i := range (len s)
+        move x y-i*w
+        text s[i]
+    end
+end
+
+func drawColorBox
+    x := 10
+    y := 7
+    w := 16
+
+    width 0.5
+    stroke "white"
+    fill background
+    move x y
+    rect w w
+
+    color (hsl hue sat light)
+    move x+1 y+1
+    rect w-2 w-2
+end
+
+func drawWheel
+    width 0.4
+    for i := range 360
+        rad := radf * (-i + 90)
+        color (hsl i)
+        x := cx + (cos rad) * 19
+        y := cy + (sin rad) * 19
+        move cx cy
+        line x y
+    end
+
+    stroke "white"
+    fill "none"
+    move cx cy
+    circle 20
+
+    stroke "white"
+    fill background
+
+    drawHue
+end
+
+func drawHue
+    rad := radf * (-hue + 90)
+    x := cx + (cos rad) * 19
+    y := cy + (sin rad) * 19
+    move x y
+    circle 3.5
+    color (hsl hue)
+    circle 2.5
+end
+
+func drawSquare
+    steps := 20
+    for ys := range steps
+        y := y0 + ys / steps * l
+        for xs := range steps
+            x := x0 + xs / steps * l
+            color (hsl hue ys/steps*100 xs/steps*100)
+            move x+1 y+1
+            rect l/steps l/steps
+        end
+    end
+
+    color "white"
+    move x0 y0
+    line x0 y0+l+1
+    move x0 y0
+    line x0+l+1 y0
+    drawLight
+    drawSat
+end
+
+func drawSat
+    move x0 y0+l*0.01*sat
+    stroke "white"
+    fill background
+    circle 3.5
+    color (hsl hue sat 50)
+    circle 2.5
+end
+
+func drawLight
+    move x0+l*0.01*light y0
+    stroke "white"
+    fill background
+    circle 3.5
+    color (hsl 0 0 light)
+    circle 2.5
+end

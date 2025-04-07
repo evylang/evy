@@ -1,0 +1,8 @@
+fill "white"
+for x := range 0 100 12
+    for y := range 0 100 12
+        width (x + y)/40
+        move x y
+        circle 6
+    end
+end

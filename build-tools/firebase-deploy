@@ -20,14 +20,18 @@ main() {
 	if [[ "${channel}" == "live" ]]; then
 		local domain
 		domain=$(get_domain "${environ}")
-		go run ./build-tools/site-gen --cache-bust --domain="${domain}" frontend out/firebase/public
+		go run ./build-tools/site-gen --cache-bust --domain="${domain}" frontend out/firebase/public/apex
+		go run ./build-tools/site-gen --cache-bust --domain="${domain}" --sub-domain=learn frontend/learn out/firebase/public/learn
+		go run ./build-tools/site-gen --cache-bust --domain="${domain}" --sub-domain=docs frontend/docs out/firebase/public/docs
 		# `firebase deploy` must be used with live channel
 		firebase --config out/firebase/firebase.json --project "${environ}" deploy --only hosting
 		on_ci && make_env_urls "${environ}" >>"$GITHUB_ENV"
 		exit 0
 	fi
 
-	go run ./build-tools/site-gen frontend out/firebase/public
+	go run ./build-tools/site-gen frontend out/firebase/public/apex
+	go run ./build-tools/site-gen --sub-domain=learn frontend/learn out/firebase/public/learn
+	go run ./build-tools/site-gen --sub-domain=docs frontend/docs out/firebase/public/docs
 	# `firebase hosting:channel:deploy` must be used with preview/non-live channels
 	result=$(firebase --json --config out/firebase/firebase.json --project "${environ}" hosting:channel:deploy "${channel}")
 	check_deploy_error "${result}"
@@ -157,7 +161,7 @@ make_env_urls() {
 	# Generate URLs for the deployment environment for a live firebase site, with an
 	# APEX url and a bunch of subdomain URLS.
 
-	local domain subdomains=(ai discord docs learn play)
+	local domain subdomains=(discord docs gallery lab learn play)
 	domain=$(get_domain "${env}")
 
 	printf 'BASEURL_APEX=https://%s\n' "${domain}"
@@ -170,9 +174,10 @@ make_pr_urls() {
 	local json_result="$1"
 	# The following jq command generates the following output from a firebase deployment result:
 	# BASEURL_APEX=https://evy-lang-stage--dev-mtnwzsbm.web.app
-	# BASEURL_AI=https://evy-lang-stage--dev-bta34sbm.web.app
 	# BASEURL_DISCORD=https://evy-lang-stage-discord--dev-pap726z0.web.app
 	# BASEURL_DOCS=https://evy-lang-stage-docs--dev-62qb1rk7.web.app
+	# BASEURL_GALLERY=https://evy-lang-stage-gallery--dev-24xiu90a.web.app
+	# BASEURL_LAB=https://evy-lang-stage-lab--dev-12kbj4k8.web.app
 	# BASEURL_LEARN=https://evy-lang-stage-learn--dev-txkb2kn8.web.app
 	# BASEURL_PLAY=https://evy-lang-stage-play--dev-t9r8zjux.web.app
 	jq -r '.result.[] | "BASEURL_\(.target | ascii_upcase)=\(.url)"' <<<"${json_result}"

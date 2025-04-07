@@ -25,16 +25,16 @@ func delete:[]any s:string d:string
     return [result true]
 end
 
-func test
-    assert ["bcd" false] (delete "abcde" "ae")
-    assert ["acdef" false] (delete "abcdef" "b")
-    assert ["cdedc" true] (delete "abcdedcba" "ab")
-    assert ["dik" false] (delete "dwik" "w")
-    assert ["" true] (delete "a" "a")
-    assert ["abcdedcba" true] (delete "abcdedcba" "")
-    assert ["abcdedcba" true] (delete "abcdedcba" "v")
-    assert ["abba" true] (delete "vabba" "v")
-    assert ["" true] (delete "mamma" "mia")
+func testAll
+    test ["bcd" false] (delete "abcde" "ae")
+    test ["acdef" false] (delete "abcdef" "b")
+    test ["cdedc" true] (delete "abcdedcba" "ab")
+    test ["dik" false] (delete "dwik" "w")
+    test ["" true] (delete "a" "a")
+    test ["abcdedcba" true] (delete "abcdedcba" "")
+    test ["abcdedcba" true] (delete "abcdedcba" "v")
+    test ["abba" true] (delete "vabba" "v")
+    test ["" true] (delete "mamma" "mia")
 end
 
-test
+testAll

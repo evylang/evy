@@ -1,0 +1,7 @@
+width 10
+c:string
+
+c = hsl 30+200
+color c
+move 30 0
+line 30 100

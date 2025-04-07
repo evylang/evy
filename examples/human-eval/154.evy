@@ -17,13 +17,13 @@ func contains:bool s:string sub:string
     return false
 end
 
-func test
-    assert false (contains "xyzw" "xyw")
-    assert true (contains "yello" "ell")
-    assert false (contains "whattup" "ptut")
-    assert true (contains "efef" "fee")
-    assert false (contains "abab" "aabb")
-    assert true (contains "winemtt" "tinem")
+func testAll
+    test false (contains "xyzw" "xyw")
+    test true (contains "yello" "ell")
+    test false (contains "whattup" "ptut")
+    test true (contains "efef" "fee")
+    test false (contains "abab" "aabb")
+    test true (contains "winemtt" "tinem")
 end
 
-test
+testAll

@@ -14,17 +14,17 @@ let jsReadInitialised = false
 let stopped = true
 let animationStart
 let sampleData
+let currentSample = "welcome"
 let actions = "fmt,ui,eval"
 let editor
 let errors = false
 let editorHidden = false
+let notesHidden = true
 
 // --- Initialize ------------------------------------------------------
 
-await initWasm()
-initUI()
-initCanvas()
-initThemeToggle("#dark-theme", "theme")
+await Promise.all([initWasm(), initUI()])
+await format()
 
 // --- Wasm ------------------------------------------------------------
 
@@ -35,7 +35,7 @@ async function initWasm() {
   const runButtonMob = document.querySelector("#run-mobile")
   runButton.onclick = handleRun
   runButton.classList.remove("loading")
-  runButtonMob.onclick = handleMobRun
+  runButtonMob.onclick = handlePrimaryClick
   runButtonMob.classList.remove("loading")
 }
 
@@ -232,28 +232,63 @@ async function handleRun() {
   stopped ? start() : stop()
 }
 
-// handleMobRun handles three states for mobile devices:
-// run -> stop -> code
-async function handleMobRun() {
-  if (editorHidden) {
+// handlePrimaryClick handles view states (mobile, code, output) on mobile.
+async function handlePrimaryClick() {
+  // single column layout: run <-> stop
+  if (editorHidden && notesHidden) {
     handleRun()
     return
   }
-  if (onCodeScreen()) {
+  const view = getView()
+  if (view == "view-notes" && !editorHidden) {
+    await slide("view-code")
+    toggleNotesButtonVisiblity(true)
+    return
+  }
+  if (view === "view-notes" || view === "view-code") {
     // we need to wait for the slide transition to finish otherwise
     // el.focus() in jsRead() messes up the layout
-    await slide()
+    await slide("view-output")
+    toggleNotesButtonVisiblity(true)
     start()
     return
   }
-  // on output screen
-  if (stopped) {
-    const runButtonMob = document.querySelector("#run-mobile")
-    runButtonMob.innerText = "Run"
-    slide()
+  // on output view, running
+  if (!stopped) {
+    stop()
     return
   }
-  stop()
+  // on output view, stopped
+  document.querySelector("#run-mobile").innerText = "Run"
+  const nextScreen = editorHidden ? "view-notes" : "view-code"
+  slide(nextScreen)
+}
+
+function getView() {
+  const cl = document.querySelector("main.main").classList
+  if (cl.contains("view-output")) return "view-output"
+  if (cl.contains("view-code")) return "view-code"
+  if (cl.contains("view-notes")) return "view-notes"
+}
+
+function showNotes() {
+  if (notesHidden) return
+  if (!stopped) stop()
+  slide("view-notes")
+  toggleNotesButtonVisiblity(false)
+}
+
+function toggleNotesButtonVisiblity(show) {
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (!showNotesBtn) return
+  const hamburgerBtn = document.querySelector("#hamburger")
+  if (!notesHidden && show) {
+    showNotesBtn.classList.remove("hidden")
+    hamburgerBtn.classList.add("hidden")
+    return
+  }
+  showNotesBtn.classList.add("hidden")
+  hamburgerBtn.classList.remove("hidden")
 }
 
 // start calls evy wasm/go main(). It parses, formats and evaluates evy
@@ -301,36 +336,48 @@ function afterStop() {
   wasmInst = undefined
 
   const runButton = document.querySelector("#run")
-  const runButtonMob = document.querySelector("#run-mobile")
   runButton.classList.remove("running")
   runButton.innerText = "Run"
-  runButtonMob.classList.remove("running")
-  runButtonMob.innerText = onCodeScreen() ? "Run" : "Code"
+  updateMobilePrimaryButton()
 
   const readEl = document.querySelector("#read")
   document.activeElement === readEl && readEl.blur()
 }
 
-function onCodeScreen() {
-  return !document.querySelector("main").classList.contains("view-output")
+function updateMobilePrimaryButton() {
+  const classList = document.querySelector("#run-mobile")
+  classList.classList.remove("running")
+  classList.innerText = mobilePrimaryButtonText()
 }
 
-async function slide() {
-  const el = document.querySelector("main")
+function mobilePrimaryButtonText() {
+  if (editorHidden && notesHidden) return "Run"
+  const view = getView()
+  if (view === "view-notes" && !editorHidden) return "Code"
+  if (view === "view-notes" && editorHidden) return "Run"
+  if (view === "view-code") return "Run"
+  // output screen
+  if (editorHidden) return "Notes"
+  return "Code"
+}
+
+async function slide(view) {
+  const el = document.querySelector("main.main")
   const cl = el.classList
   return new Promise((resolve) => {
     el.ontransitionend = () => setTimeout(resolve, 100)
     el.onanimationend = () => cl.remove("animate")
     cl.add("animate")
-    onCodeScreen() ? cl.add("view-output") : cl.remove("view-output")
+    setView(view)
   })
 }
 
-async function stopAndSlide() {
-  if (!onCodeScreen()) {
-    await slide()
-  }
-  stop()
+function setView(view) {
+  const cl = document.querySelector("main.main").classList
+  const viewClasses = ["view-code", "view-notes", "view-output"]
+  viewClasses.map((c) => cl.remove(c))
+  cl.add(view)
+  updateMobilePrimaryButton()
 }
 
 function clearOutput() {
@@ -341,35 +388,71 @@ function clearOutput() {
 // --- UI: initialization ----------------------------------------------
 
 async function initUI() {
+  initCanvas()
+  initThemeToggle("#dark-theme", "theme")
   document.addEventListener("keydown", ctrlEnterListener)
-  await fetchSamples()
   window.addEventListener("hashchange", handleHashChange)
   document.querySelector("#modal-close").onclick = hideModal
-  document.querySelector("#share").onclick = share
   document.querySelector("#sidebar-about").onclick = showAbout
   document.querySelector("#sidebar-share").onclick = share
   document.querySelector("#sidebar-icon-share").onclick = share
-  handleHashChange()
+  const shareBtn = document.querySelector("#share")
+  if (shareBtn) shareBtn.onclick = share
+  const showNotesBtn = document.querySelector("#show-notes")
+  if (showNotesBtn) showNotesBtn.onclick = showNotes
+  await fetchSamples()
+  await handleHashChangeNoFormat() // Evy wasm for formatting might not be ready yet
   initModal()
   initSidebar()
-  initDialog()
+  initShareDialog()
 }
 
 async function fetchSamples() {
   const resp = await fetch("samples/samples.json")
   sampleData = await resp.json()
   sampleData.byID = {}
+  let previous = null
   for (const section of sampleData.sections) {
+    const listedSamples = section.samples.filter((s) => !s.unlisted)
+    const sectionTotal = listedSamples.length
+    let index = 1
     for (const sample of section.samples) {
-      sampleData.byID[sample.id] = { ...sample, sectionTitle: section.title, sectionID: section.id }
+      const sampleByID = {
+        ...sample,
+        sectionTitle: section.title,
+        sectionID: section.id,
+      }
+      sampleData.byID[sample.id] = sampleByID
+      if (sample.unlisted) {
+        continue
+      }
+      sampleByID.sectionTotal = sectionTotal
+      sampleByID.sectionIndex = index
+      sampleByID.previous = previous
+      if (previous) {
+        sampleData.byID[previous].next = sample.id
+      }
+      previous = sample.id
+      index++
     }
   }
 }
 
 function ctrlEnterListener(e) {
-  if ((e.metaKey || e.ctrlKey) && event.key === "Enter") {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
     document.querySelector(".editor textarea").blur()
     handleRun()
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === "a") {
+    e.preventDefault()
+    editor?.selectAll()
+  }
+}
+
+function escListener(e) {
+  if (e.key === "Escape") {
+    hideModal()
+    hideSidebar()
   }
 }
 
@@ -381,32 +464,156 @@ function ctrlEnterListener(e) {
 // Then, it loads new source code depending on URL hash contents.
 // Finally it updates editor.
 async function handleHashChange() {
+  await handleHashChangeNoFormat()
+  await format()
+}
+
+async function handleHashChangeNoFormat() {
   hideModal()
-  await stopAndSlide() // go to code screen for new code
+  await stop() // go to code screen for new code
   let opts = parseHash()
   if (!opts.source && !opts.sample && !opts.content) {
-    if (hasEditorSession()) {
-      !editor && initEditor()
-      editor.loadSession()
+    if (sessionStorage.getItem("evy-editor") !== null) {
+      loadSession()
       return
     }
-    opts = { sample: "welcome" }
-    history.replaceState({}, "", "#welcome")
+    const sample = "welcome"
+    opts = { sample, editor: sampleData?.byID[sample]?.editor }
+    history.replaceState({}, "", "#" + sample)
   }
-  const { source, crumbs } = await fetchSourceWithCrumbs(opts)
+  const { source, notes } = await fetchSourceWithNotes(opts)
+  updateNotes(notes)
+  updateEditor(source, opts)
+  updateSampleTitle()
+  resetView()
+  clearOutput()
+}
 
+function loadSession() {
+  currentSample = "<UNSET>"
+  !editor && initEditor()
+  editor.loadSession()
+  loadNotes()
+  toggleEditorVisibility(true)
+  resetView() // on mobile go to Notes view or Code view if no notes available.
+}
+
+// resetView resets the view based on content availability, on mobile only.
+// If notes are available, navigates to the notes view.
+// If no notes but the editor is present, switches to the code view.
+// Otherwise, defaults to the output view
+async function resetView() {
+  const mainClassList = document.querySelector("main.main").classList
+  mainClassList.add("no-translate-transition")
+  toggleNotesButtonVisiblity(false)
+  if (!notesHidden) {
+    setView("view-notes")
+  } else if (!editorHidden) {
+    setView("view-code")
+  } else {
+    setView("view-output")
+  }
+  // sleep for 0.3 seconds, otherwise translate transition kicks in.
+  await new Promise((r) => setTimeout(r, 300))
+  mainClassList.remove("no-translate-transition")
+}
+
+function updateNotes(notes) {
+  hasNotes(notes) ? addNotes(notes) : removeNotes()
+}
+
+function hasNotes(notes) {
+  return !!notes && !!document.querySelector("#notes")
+}
+
+function removeNotes() {
+  notesHidden = true
+  const notesEl = document.querySelector("#notes")
+  if (!notesEl) return
+  notesEl.classList.add("hidden")
+  notesEl.innerHTML = ""
+  sessionStorage.removeItem("evy-sample-id")
+}
+
+function addNotes(notes) {
+  notesHidden = false
+  const notesEl = document.querySelector("#notes")
+  notesEl.classList.remove("hidden")
+  notesEl.innerHTML = notes
+  sessionStorage.setItem("evy-sample-id", currentSample)
+
+  // hide all notes after first "next" button:
+  // <p><button class="next-btn">Next</button></p>
+  let el = notesEl.querySelector(".next-btn")?.parentElement?.nextElementSibling
+  while (el) {
+    el.classList.add("hidden")
+    el = el.nextElementSibling
+  }
+  notesEl.querySelectorAll(".next-btn").forEach((btn) => {
+    btn.onclick = handleNotesNextClick
+  })
+  notesEl.querySelectorAll(".language-evy").forEach((el) => {
+    el.innerHTML = highlightEvy(el.textContent)
+  })
+  notesEl.querySelectorAll("a").forEach((el) => {
+    el.target = "_blank"
+  })
+  notesEl.querySelectorAll("img[title='evy:edit']").forEach((img) => {
+    img.onclick = handleNotesImgEditClick
+    img.title = "Click to edit"
+    img.style.cursor = "pointer"
+  })
+  notesEl.scrollTo(0, 0)
+}
+
+async function loadNotes() {
+  const sampleID = sessionStorage.getItem("evy-sample-id")
+  const sample = sampleData.byID[sampleID]
+  if (!sample?.notes) {
+    removeNotes()
+    return
+  }
+  currentSample = sampleID
+
+  const notesURL = `samples/${sample.sectionID}/${sample.id}.htmlf`
+  const notes = await fetchText(notesURL)
+  addNotes(notes)
+  toggleEditorVisibility(sample.editor !== "none")
+}
+
+function handleNotesNextClick(e) {
+  const btn = e.target
+  let el = btn?.parentElement?.nextElementSibling
+  // show until following "next" button or end
+  while (el && !el.classList.contains("next-btn")) {
+    el.classList.remove("hidden")
+    if (el.querySelector(".next-btn")) break
+    el = el.nextElementSibling
+  }
+  const top = btn.offsetTop + btn.offsetHeight
+  document.querySelector("#notes").scrollTo({ top, behavior: "smooth" })
+}
+
+async function handleNotesImgEditClick(e) {
+  const img = e.target
+  const url = img.src.replace(".svg", ".evy")
+  const evyImgSource = await fetchText(url)
+  editor.update({ value: evyImgSource, errorLines: {} })
+}
+
+function updateEditor(content, opts) {
   !editor && initEditor()
   editor.onUpdate(null)
-  editor.update({ value: source, errorLines: {} })
-
+  editor.update({ value: content, errorLines: {} })
   document.querySelector(".editor-wrap").scrollTo(0, 0)
-  crumbs && updateBreadcrumbs(crumbs)
-  clearOutput()
-  await format()
   editor.onUpdate(clearHash)
-  editorHidden = opts.editor === "none"
+  toggleEditorVisibility(opts.editor !== "none")
+}
+
+function toggleEditorVisibility(isVisible) {
+  editorHidden = !isVisible
   const classList = document.querySelector(".editor-wrap").classList
-  editorHidden ? classList.add("hidden") : classList.remove("hidden")
+  isVisible ? classList.remove("hidden") : classList.add("hidden")
 }
 
 // parseHash parses URL fragment into object e.g.:
@@ -426,42 +633,47 @@ function parseHash() {
     // shortcut for evy.dev#abc loading evy.dev/samples/draw/abc.evy
     const sample = entries[0][0]
     if (sampleData && sampleData.byID[sample]) {
-      return { sample }
+      return { sample, editor: sampleData.byID[sample].editor }
     }
   }
   return Object.fromEntries(entries)
 }
 
-async function fetchSourceWithCrumbs({ content, sample, source }) {
-  if (content) {
-    const src = await decode(content)
-    return { source: src }
+async function fetchSourceWithNotes({ content, sample, source }) {
+  if (sample) {
+    const s = sampleData.byID[sample]
+    currentSample = sample
+    return await fetchSample(s)
   }
-  if (source) {
-    const src = await fetchSource(source)
-    return { source: src }
-  }
-  // sample ID is set
-  const s = sampleData.byID[sample]
-  const crumbs = [s.sectionTitle, s.title]
-  const url = `samples/${s.sectionID}/${sample}.evy`
-  const src = await fetchSource(url)
-  return { crumbs, source: src }
+  currentSample = "<UNSET>"
+  const src = await (content ? decode(content) : fetchText(source))
+  return { source: src }
 }
 
-async function fetchSource(url) {
-  let source
+async function fetchSample(sample) {
+  const evyURL = `samples/${sample.sectionID}/${sample.id}.evy`
+  if (!sample.notes) {
+    const source = await fetchText(evyURL)
+    return { source }
+  }
+  const notesURL = sample.notes && `samples/${sample.sectionID}/${sample.id}.htmlf`
+  const [source, notes] = await Promise.all([fetchText(evyURL), fetchText(notesURL)])
+  return { source, notes }
+}
+
+async function fetchText(url) {
+  let text
   try {
     const response = await fetch(url)
     if (response.status < 200 || response.status > 299) {
       throw new Error("invalid response status", response.status)
     }
-    source = await response.text()
+    text = await response.text()
   } catch (err) {
-    console.error(err)
-    source = "Oops! Could not load source code."
+    console.error(err, url)
+    text = `Oops! Could not load sample.`
   }
-  return source
+  return text
 }
 
 function clearHash() {
@@ -658,7 +870,7 @@ function fill(ptr, len) {
 // dash is exported to evy go/wasm.
 function dash(ptr, len) {
   const s = memToString(ptr, len)
-  const nums = s.split(" ").map(Number).map(transformX)
+  const nums = s === "" ? [] : s.split(" ").map(Number).map(transformX)
   canvas.ctx.setLineDash(nums)
 }
 
@@ -784,12 +996,13 @@ function clamp(val, min, max) {
 }
 
 function initEditor() {
-  editor = new Editor(".editor", { sessionKey: "evy-editor", highlighter: highlightEvy })
+  const options = {
+    highlighter: highlightEvy,
+    id: "evy-editor",
+    sessionKey: "evy-editor",
+  }
+  editor = new Editor(".editor", options)
   document.querySelector(".editor-wrap").classList.remove("noscrollbar")
-}
-
-function hasEditorSession() {
-  return !!sessionStorage.getItem("evy-editor")
 }
 
 // --- eventHandlers, evy `on` -----------------------------------------
@@ -807,7 +1020,7 @@ function registerEventHandler(ptr, len) {
     c.onpointermove = (e) => exp.onMove(logicalX(e), logicalY(e))
     c.onmouseleave = (e) => exp.onMove(...leaveXY(e)) // pointer can leave in middle of canvas
   } else if (s === "key") {
-    unfocusRunBotton()
+    unfocusRunButton()
     document.addEventListener("keydown", keydownListener)
   } else if (s === "input") {
     addInputHandlers()
@@ -818,7 +1031,7 @@ function registerEventHandler(ptr, len) {
   }
 }
 
-function unfocusRunBotton() {
+function unfocusRunButton() {
   const runButton = document.querySelector("#run")
   const runButtonMob = document.querySelector("#run-mobile")
   document.activeElement === runButton && runButton.blur()
@@ -826,7 +1039,8 @@ function unfocusRunBotton() {
 }
 
 function keydownListener(e) {
-  if (e.target.id == "code") return // skip for source code input
+  if (e.target.id == "evy-editor") return // skip for source code input
+  document.querySelector(".output").focus()
   const { ptr, len } = stringToMem(e.key)
   wasmInst.exports.onKey(ptr, len)
 }
@@ -893,12 +1107,16 @@ function initModal() {
     }
     modalMain.appendChild(sectionEl)
   }
-  updateBreadcrumbs([sampleData.sections[0].title, sampleData.sections[0].samples[0].title])
+  document.querySelector("#sample-selector").onclick = showSamples
+  document.querySelector("#sample-previous").onclick = showPreviousSample
+  document.querySelector("#sample-next").onclick = showNextSample
+  updateSampleTitle()
 }
 
 function hideModal() {
   const el = document.querySelector("#modal")
   el.classList.add("hidden")
+  document.removeEventListener("keydown", escListener)
 }
 
 function showSamples() {
@@ -906,21 +1124,45 @@ function showSamples() {
   samples.classList.remove("hidden")
   const modal = document.querySelector("#modal")
   modal.classList.remove("hidden")
+  samples.querySelectorAll("a").forEach((a) => a.classList.remove("highlight"))
+  samples.querySelector(`a[href$="#${currentSample}"]`)?.classList.add("highlight")
+  document.addEventListener("keydown", escListener)
 }
 
-function updateBreadcrumbs(crumbs) {
-  const ul = document.querySelector("header ul.breadcrumbs")
-  const breadcrumbs = crumbs.map((c) => breadcrumb(c))
-  ul.replaceChildren(...breadcrumbs)
+function showPreviousSample() {
+  if (sampleData.byID[currentSample].previous) {
+    currentSample = sampleData.byID[currentSample].previous
+    history.pushState({}, "", `#${currentSample}`)
+    handleHashChange()
+  }
 }
 
-function breadcrumb(s) {
-  const btn = document.createElement("button")
-  btn.textContent = s
-  btn.onclick = () => showSamples()
-  const li = document.createElement("li")
-  li.appendChild(btn)
-  return li
+function showNextSample() {
+  if (sampleData.byID[currentSample].next) {
+    currentSample = sampleData.byID[currentSample].next
+    history.pushState({}, "", `#${currentSample}`)
+    handleHashChange()
+  }
+}
+
+function updateSampleTitle() {
+  const titleDiv = document.querySelector("#sample-title")
+  const indexDiv = document.querySelector("#sample-index")
+  const prevButton = document.querySelector("#sample-previous")
+  const nextButton = document.querySelector("#sample-next")
+
+  const sample = sampleData.byID[currentSample]
+  titleDiv.textContent = sample?.title || sampleData.defaultTitle
+  if (!sample || sample.unlisted) {
+    indexDiv.classList.add("hidden")
+    prevButton.disabled = true
+    nextButton.disabled = true
+    return
+  }
+  indexDiv.textContent = `${sample.sectionIndex}/${sample.sectionTotal}`
+  indexDiv.classList.remove("hidden")
+  prevButton.disabled = !sample.previous
+  nextButton.disabled = !sample.next
 }
 
 // --- UI: sidebar --------------------------------------------
@@ -934,11 +1176,13 @@ function showSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = "none"
   document.querySelector("#sidebar").classList.remove("hidden")
   document.addEventListener("click", handleOutsideSidebarClick)
+  document.addEventListener("keydown", escListener)
 }
 function hideSidebar() {
   document.querySelector(".editor textarea").style.pointerEvents = ""
   document.querySelector("#sidebar").classList.add("hidden")
   document.removeEventListener("click", handleOutsideSidebarClick)
+  document.removeEventListener("keydown", escListener)
 }
 function handleOutsideSidebarClick(e) {
   const sidebar = document.querySelector("#sidebar")
@@ -949,15 +1193,18 @@ function handleOutsideSidebarClick(e) {
 
 // --- UI: dialog --------------------------------------------
 
-function initDialog() {
-  const input = document.querySelector("#dialog-share .copy input")
+function initShareDialog() {
+  const shareDialog = document.querySelector("#dialog-share")
+  const input = shareDialog.querySelector(".copy input")
   input.onclick = input.select
-  const copyButton = document.querySelector("#dialog-share .copy button")
+  const closeButton = shareDialog.querySelector(".icon-close")
+  closeButton.onclick = () => shareDialog.close()
+  const copyButton = shareDialog.querySelector("#copy")
   copyButton.onclick = () => {
     const url = input.value
     navigator.clipboard.writeText(url)
     input.value = "Copied!"
-    setTimeout(() => (input.value = url), 2000)
+    setTimeout(() => shareDialog.close(), 500)
   }
 }
 
@@ -971,7 +1218,7 @@ function showAbout() {
 
 async function share() {
   hideSidebar()
-  const note = document.querySelector("#dialog-share .note")
+  const note = document.querySelector("#dialog-share .dialog-note")
   await format()
   errors ? note.classList.remove("hidden") : note.classList.add("hidden")
   const baseurl = window.location.origin + window.location.pathname

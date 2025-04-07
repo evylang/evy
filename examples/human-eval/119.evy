@@ -33,19 +33,19 @@ func valid:bool s:string
     return depth == 0
 end
 
-func test
-    assert "Yes" (matchParens ["()(" ")"])
-    assert "No" (matchParens [")" ")"])
-    assert "No" (matchParens ["(()(())" "())())"])
-    assert "Yes" (matchParens [")())" "(()()("])
-    assert "Yes" (matchParens ["(())))" "(()())(("])
-    assert "No" (matchParens ["()" "())"])
-    assert "Yes" (matchParens ["(()(" "()))()"])
-    assert "No" (matchParens ["((((" "((())"])
-    assert "No" (matchParens [")(()" "(()("])
-    assert "No" (matchParens [")(" ")("])
-    assert "Yes" (matchParens ["(" ")"])
-    assert "Yes" (matchParens [")" "("])
+func testAll
+    test "Yes" (matchParens ["()(" ")"])
+    test "No" (matchParens [")" ")"])
+    test "No" (matchParens ["(()(())" "())())"])
+    test "Yes" (matchParens [")())" "(()()("])
+    test "Yes" (matchParens ["(())))" "(()())(("])
+    test "No" (matchParens ["()" "())"])
+    test "Yes" (matchParens ["(()(" "()))()"])
+    test "No" (matchParens ["((((" "((())"])
+    test "No" (matchParens [")(()" "(()("])
+    test "No" (matchParens [")(" ")("])
+    test "Yes" (matchParens ["(" ")"])
+    test "Yes" (matchParens [")" "("])
 end
 
-test
+testAll

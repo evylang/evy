@@ -52,7 +52,7 @@ type exerciseFrontmatter struct {
 func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 	buf := &bytes.Buffer{}
 	md.Walk(m.Doc, md.RewriteLink)
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	printComposition(buf, m.Frontmatter.Composition)
 	for _, d := range validDifficulties {
 		for _, question := range m.QuestionsByDifficulty[d] {
@@ -75,6 +75,11 @@ func (m *ExerciseModel) ToHTML(withMarked bool) (string, error) {
 // Name returns the name of the exercise model derived from the first heading.
 func (m *ExerciseModel) Name() string {
 	return m.name
+}
+
+// Document returns the markdown ast root node.
+func (m *ExerciseModel) Document() *markdown.Document {
+	return m.Doc
 }
 
 func (m *ExerciseModel) buildQuestions() error {

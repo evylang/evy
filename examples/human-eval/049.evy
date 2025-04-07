@@ -12,14 +12,14 @@ func modpn:num n:num p:num
     return result
 end
 
-func test
-    assert 3 (modpn 3 5)
-    assert 2 (modpn 1101 101)
-    assert 1 (modpn 0 101)
-    assert 8 (modpn 3 11)
-    assert 1 (modpn 100 101)
-    assert 4 (modpn 30 5)
-    assert 3 (modpn 31 5)
+func testAll
+    test 3 (modpn 3 5)
+    test 2 (modpn 1101 101)
+    test 1 (modpn 0 101)
+    test 8 (modpn 3 11)
+    test 1 (modpn 100 101)
+    test 4 (modpn 30 5)
+    test 3 (modpn 31 5)
 end
 
-test
+testAll

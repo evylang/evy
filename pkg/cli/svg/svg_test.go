@@ -34,7 +34,7 @@ func TestGolden(t *testing.T) {
 					Stroke:          "red",
 					StrokeWidth:     &testStrokeWidth,
 					StrokeLinecap:   "butt",
-					StorkeDashArray: "3 5",
+					StrokeDashArray: "3 5",
 				},
 			}},
 		},

@@ -1,0 +1,26 @@
+<h1>Sequential Execution Explained</h1>
+<p><em>Doing things step-by-step.</em></p>
+<p>
+  A computer program executes commands sequentially, that is to say it follows instructions one at a
+  time. It can't skip steps or go back and forth. If it does, it'll get confused and won't work.
+</p>
+<p>
+  This is like following a recipe. You can't just start cooking at the end. You have to start at the
+  beginning and follow the steps in order. If you skip steps or go back and forth, you might not end
+  up with what you wanted.
+</p>
+<p>Here is an evy program that prints two lines of text to the screen:</p>
+<pre><code>print &quot;Hello world! 👋🌏&quot;
+print &quot;How are you today?&quot;
+</code></pre>
+<p>
+  First, the program prints <code>Hello world! 👋🌏</code>, after that it prints
+  <code>How are you today?</code>. The order always stays the same:
+</p>
+<pre><code>Hello world!  👋🌏
+How are you today?
+</code></pre>
+<p>
+  <a href="print/print.html">📖 The <code>print</code> command</a> |
+  <a href="print/index.html">Skip to exercise</a>
+</p>

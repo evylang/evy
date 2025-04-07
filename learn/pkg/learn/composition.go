@@ -111,6 +111,7 @@ func (q questionsByDifficulty) PrintHTML(buf *bytes.Buffer) {
 // we start the exercise.
 //
 // TODO: Use exercise round robin strategy for question selection for quiz and unittest.
+// TODO: Add `group` field to frontmatter. Only one question per groups can be picked per exercise/quiz.
 func GenerateQuestionSet(questionsByDifficulty questionsByDifficulty, composition []DifficultyCount) []*QuestionModel {
 	permByDifficulty := map[string][]int{}
 	for difficulty, quesitons := range questionsByDifficulty {

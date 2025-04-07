@@ -23,12 +23,12 @@ func isPrime:bool n:num
     return true
 end
 
-func test
-    assert 5 (largestPrimeFactor 15)
-    assert 3 (largestPrimeFactor 27)
-    assert 7 (largestPrimeFactor 63)
-    assert 11 (largestPrimeFactor 330)
-    assert 29 (largestPrimeFactor 13195)
+func testAll
+    test 5 (largestPrimeFactor 15)
+    test 3 (largestPrimeFactor 27)
+    test 7 (largestPrimeFactor 63)
+    test 11 (largestPrimeFactor 330)
+    test 29 (largestPrimeFactor 13195)
 end
 
-test
+testAll

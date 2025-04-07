@@ -1,0 +1,8 @@
+<h1>👋🌏 Hello World!</h1>
+<p>Check out the program on the right 👉.</p>
+<p>Hit <strong>Run</strong> to see the result!</p>
+<p>Can you change the program to print <strong>your name</strong>? ⭐</p>
+<p>
+  Check out the docs for more info on the
+  <a href="/docs/builtins.html#print"><code>print</code></a> command.
+</p>

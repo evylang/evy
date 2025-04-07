@@ -2,12 +2,12 @@
   "course1": {
     "name": "Course 1",
     "partialID": "course1",
-    "maxScore": 60,
+    "maxScore": 70,
     "units": {
       "unit1": {
         "name": "Unit 1: Demo Unit",
         "partialID": "unit1",
-        "maxScore": 60,
+        "maxScore": 70,
         "exercises": {
           "cls": {
             "partialID": "cls",
@@ -26,6 +26,17 @@
           },
           "exercise-parse-error": {
             "partialID": "exercise-parse-error",
+            "type": "exercise",
+            "maxScore": 10,
+            "composition": [
+              {
+                "difficulty": "easy",
+                "count": 2
+              }
+            ]
+          },
+          "exercise-text": {
+            "partialID": "exercise-text",
             "type": "exercise",
             "maxScore": 10,
             "composition": [
@@ -71,15 +82,15 @@
             "composition": [
               {
                 "difficulty": "easy",
-                "count": 1
+                "count": 2
               },
               {
                 "difficulty": "medium",
                 "count": 2
               },
               {
-                "difficulty": "hard",
-                "count": 2
+                "difficulty": "easy",
+                "count": 1
               }
             ]
           },
@@ -166,8 +177,9 @@
           "exercise1",
           "exercise-txtar",
           "exercise-parse-error",
-          "shape",
+          "exercise-text",
           "quiz1",
+          "shape",
           "text",
           "cls",
           "quiz2",

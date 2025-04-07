@@ -22,12 +22,12 @@ func decode:string str:string
     return result
 end
 
-func test
-    assert "" (encode "")
-    assert "" (decode "")
-    assert "fg" (encode "ab")
-    assert "ab" (decode "fg")
-    assert abc (decode (encode abc))
+func testAll
+    test "" (encode "")
+    test "" (decode "")
+    test "fg" (encode "ab")
+    test "ab" (decode "fg")
+    test abc (decode (encode abc))
 end
 
-test
+testAll

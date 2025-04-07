@@ -42,10 +42,12 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"time"
 
@@ -60,7 +62,7 @@ import (
 
 // Globals overridden by linker flags on release build.
 var (
-	version = "v0.0.0"
+	version = ""
 )
 
 // Errors returned by the Evy tool.
@@ -74,6 +76,7 @@ var (
 	//go:embed build-tools/default-embed
 	content    embed.FS
 	contentDir = "build-tools/default-embed"
+	fullBuild  = false
 )
 
 const description = `
@@ -94,20 +97,51 @@ type app struct {
 func main() {
 	kopts := []kong.Option{
 		kong.Description(description),
-		kong.Vars{"version": version},
+		kong.Vars{"version": getVersion()},
 	}
 	kctx := kong.Parse(&app{}, kopts...)
 	kctx.FatalIfErrorf(kctx.Run())
 }
 
+func getVersion() string {
+	if version == "" {
+		version = getBuildInfoVersion()
+	}
+	if !fullBuild {
+		version += "-slim"
+	}
+	return version
+}
+
+func getBuildInfoVersion() string {
+	var mainVersion, revision string
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if info.Main.Version != "" && info.Main.Version != "(devel)" {
+			mainVersion = info.Main.Version
+		}
+		settings := map[string]string{}
+		for _, s := range info.Settings {
+			settings[s.Key] = s.Value
+		}
+		revision = settings["vcs.revision"]
+		if revision != "" && settings["vcs.modified"] == "true" {
+			revision += "-dirty"
+		}
+	}
+	return cmp.Or(mainVersion, revision, "unknown")
+}
+
 type runCmd struct {
-	Source             string `arg:"" help:"Source file. Default: stdin." default:"-"`
-	SkipSleep          bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
-	SVGOut             string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
-	SVGStyle           string `help:"Style of top-level SVG element." placeholder:"STYLE"`
-	NoAssertionSummary bool   `short:"s" help:"Do not print assertion summary, only report failed assertion(s)."`
-	FailFast           bool   `help:"Stop execution on first failed assertion."`
-	Txtar              string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
+	Source        string `arg:"" help:"Source file. Default: stdin." default:"-"`
+	SkipSleep     bool   `help:"Skip evy sleep command." env:"EVY_SKIP_SLEEP"`
+	SVGOut        string `help:"Output drawing to SVG file. Stdout: -." placeholder:"FILE"`
+	SVGStyle      string `help:"Style of top-level SVG element." placeholder:"STYLE"`
+	SVGWidth      string `help:"Width of SVG file." placeholder:"WIDTH"`
+	SVGHeight     string `help:"Height of SVG file." placeholder:"HEIGHT"`
+	NoTestSummary bool   `short:"s" help:"Do not print test summary, only report failed tests."`
+	FailFast      bool   `help:"Stop execution on first failed test."`
+	Txtar         string `short:"t" help:"Read source from txtar file and select select given filename" placeholder:"MEMBER"`
+	RandSeed      int64  `help:"Seed for random number generation (0 means random seed)."`
 }
 
 type fmtCmd struct {
@@ -151,11 +185,13 @@ func (c *runCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	rt := cli.NewRuntime(c.runtimeOptions()...)
-
+	rt := cli.NewPlatform(c.platformOptions()...)
+	if c.RandSeed != 0 {
+		evaluator.RandSource = rand.New(rand.NewSource(c.RandSeed)) //nolint:gosec // not for security
+	}
 	eval := evaluator.NewEvaluator(rt)
-	eval.AssertInfo.NoAssertionSummary = c.NoAssertionSummary
-	eval.AssertInfo.FailFast = c.FailFast
+	eval.TestInfo.NoTestSummary = c.NoTestSummary
+	eval.TestInfo.FailFast = c.FailFast
 	evyErr := eval.Run(string(b))
 	if !errors.As(evyErr, &parser.Errors{}) {
 		// even if there was an evaluator error, we want to write as much of the SVG that was produced.
@@ -167,7 +203,6 @@ func (c *runCmd) Run() error {
 
 func (c *runCmd) fileBytes() ([]byte, error) {
 	if c.Txtar != "" && filepath.Ext(c.Source) != ".txtar" {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return nil, errors.New("txtar member specified but source file is not a txtar archive")
 	}
 	b, err := fileBytes(c.Source)
@@ -181,21 +216,20 @@ func (c *runCmd) fileBytes() ([]byte, error) {
 				return file.Data, nil
 			}
 		}
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return nil, fmt.Errorf("file %q not found in txtar archive", c.Txtar)
 	}
 	return b, nil
 }
 
-func (c *runCmd) runtimeOptions() []cli.Option {
+func (c *runCmd) platformOptions() []cli.Option {
 	opts := []cli.Option{cli.WithSkipSleep(c.SkipSleep)}
 	if c.SVGOut != "" {
-		opts = append(opts, cli.WithSVG(c.SVGStyle))
+		opts = append(opts, cli.WithSVG(c.SVGStyle, c.SVGWidth, c.SVGHeight))
 	}
 	return opts
 }
 
-func (c *runCmd) writeSVG(rt *cli.Runtime) error {
+func (c *runCmd) writeSVG(rt *cli.Platform) error {
 	if c.SVGOut == "" {
 		return nil
 	}
@@ -300,7 +334,7 @@ func (c *fmtCmd) fmtTxtarFile(filename string) error {
 }
 
 func writeAtomically(b []byte, filename string) error {
-	tempFile, err := os.CreateTemp("", "evy")
+	tempFile, err := os.CreateTemp(filepath.Dir(filename), "evy")
 	if err != nil {
 		return fmt.Errorf("%s: %w", filename, err)
 	}
@@ -391,7 +425,6 @@ func validateExportDir(force bool, name string) error {
 		if force {
 			return nil
 		}
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("%q is not empty, use --force", name)
 	}
 	return err
@@ -477,6 +510,8 @@ func (c *compileCmd) Run() error {
 		return err
 	}
 	bc := comp.Bytecode()
+	fmt.Println("Num globals:", bc.GlobalCount)
+	fmt.Println("Num locals:", bc.LocalCount)
 	fmt.Println("Constants:")
 	for i, c := range bc.Constants {
 		fmt.Printf("%d: %v\n", i, c)

@@ -1,0 +1,82 @@
+{
+  "defaultTitle": "Labs",
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome", "title": "👋 Welcome", "notes": true, "editor": "none" },
+        { "id": "helloworld", "title": "👋🌏 Hello World", "notes": true },
+        { "id": "worm", "title": "🐛 Worm", "notes": true },
+        { "id": "coords", "title": "🎯 Coordinates", "notes": true, "editor": "none" },
+        { "id": "coords-code", "title": "🎯 Coordinates", "unlisted": true },
+        { "id": "circles", "title": "🇵🇼 Circles", "notes": true },
+        { "id": "var", "title": "🧮 Variables", "notes": true },
+        { "id": "loop", "title": "💫 Loops", "notes": true },
+        { "id": "move", "title": "🟣🚚 Moving Dot", "notes": true }
+      ]
+    },
+    {
+      "id": "loops",
+      "title": "Loops",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome-loops", "title": "👋💫 Welcome", "notes": true, "editor": "none" },
+        { "id": "string", "title": "🧵 Strings", "notes": true },
+        { "id": "target-show", "title": "🎯📺 Target", "notes": true, "editor": "none" },
+        { "id": "target", "title": "🎯🫵 Target", "notes": true },
+        { "id": "sequence", "title": "🔢 Sequences", "notes": true },
+        { "id": "hsl", "title": "🤹 HSL colors", "notes": true, "editor": "none" },
+        { "id": "hsl-code", "title": "🤹 HSL colors", "unlisted": true },
+        { "id": "gradient-show", "title": "🌈📺  Gradient", "notes": true, "editor": "none" },
+        { "id": "gradient", "title": "🌈🫵  Gradient", "notes": true }
+      ]
+    },
+    {
+      "id": "ifs",
+      "title": "If Statements",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome-ifs", "title": "👋 Welcome", "notes": true, "editor": "none" },
+        { "id": "chat", "title": "💬 Chat", "notes": true },
+        { "id": "stars", "title": "✨ Stars", "notes": true },
+        { "id": "pi", "title": "🥧 Pi", "notes": true },
+        { "id": "alpha", "title": "🌈 Transparency", "notes": true },
+        { "id": "rectangles", "title": "🪟 Rectangles", "notes": true },
+        { "id": "pulse-show", "title": "🧿📺 Pulse", "notes": true, "editor": "none" },
+        { "id": "pulse", "title": "🧿🫵 Pulse", "notes": true }
+      ]
+    },
+    {
+      "id": "forloops",
+      "title": "For Loops",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome-forloops", "title": "👋💫 Welcome", "notes": true, "editor": "none" },
+        { "id": "forwhile", "title": "👯 While & for", "notes": true },
+        { "id": "zebra", "title": "🦓 Zebra", "notes": true },
+        { "id": "forcircles", "title": "🟢 Circles", "notes": true },
+        { "id": "forsequence", "title": "🔢 Sequences", "notes": true },
+        { "id": "bubble", "title": "🫧 Bubble", "notes": true },
+        { "id": "lines-show", "title": "🌐📺 Lines", "notes": true, "editor": "none" },
+        { "id": "lines", "title": "🌐🫵 Lines", "notes": true }
+      ]
+    },
+    {
+      "id": "games",
+      "title": "Games",
+      "emoji": "",
+      "samples": [
+        { "id": "welcome-games", "title": "👋 Welcome", "notes": true, "editor": "none" },
+        { "id": "events", "title": "🎪 Events", "notes": true },
+        { "id": "coin", "title": "🪙 Coin Toss", "notes": true },
+        { "id": "paint", "title": "🎨 Paint", "notes": true },
+        { "id": "guess", "title": "🎲 Guess", "notes": true },
+        { "id": "animate", "title": "🟢 On animate", "notes": true },
+        { "id": "bounce", "title": "🏓 Bounce", "notes": true },
+        { "id": "game", "title": "👾 Game", "notes": true }
+      ]
+    }
+  ]
+}

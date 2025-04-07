@@ -26,11 +26,11 @@ func triples:num n:num
     return result
 end
 
-func test
-    assert 1 (triples 5)
-    assert 4 (triples 6)
-    assert 36 (triples 10)
-    assert 53361 (triples 100)
+func testAll
+    test 1 (triples 5)
+    test 4 (triples 6)
+    test 36 (triples 10)
+    test 53361 (triples 100)
 end
 
-test
+testAll

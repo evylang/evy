@@ -26,14 +26,14 @@ func between:[]string p1:string p2:string
     return planets[lookup[p1] + 1:lookup[p2]]
 end
 
-func test
-    assert ["Saturn" "Uranus"] (between "Jupiter" "Neptune")
-    assert ["Venus"] (between "Earth" "Mercury")
-    assert ["Venus" "Earth" "Mars" "Jupiter" "Saturn"] (between "Mercury" "Uranus")
-    assert ["Earth" "Mars" "Jupiter" "Saturn" "Uranus"] (between "Neptune" "Venus")
-    assert [] (between "Earth" "Earth")
-    assert [] (between "Mars" "Earth")
-    assert [] (between "Jupiter" "Makemake")
+func testAll
+    test ["Saturn" "Uranus"] (between "Jupiter" "Neptune")
+    test ["Venus"] (between "Earth" "Mercury")
+    test ["Venus" "Earth" "Mars" "Jupiter" "Saturn"] (between "Mercury" "Uranus")
+    test ["Earth" "Mars" "Jupiter" "Saturn" "Uranus"] (between "Neptune" "Venus")
+    test [] (between "Earth" "Earth")
+    test [] (between "Mars" "Earth")
+    test [] (between "Jupiter" "Makemake")
 end
 
-test
+testAll

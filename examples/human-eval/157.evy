@@ -12,18 +12,18 @@ func rightAngle:bool a:num b:num c:num
     return a2 + b2 == c2 or a2 + c2 == b2 or b2 + c2 == a2
 end
 
-func test
-    assert true (rightAngle 3 4 5)
-    assert false (rightAngle 1 2 3)
-    assert true (rightAngle 10 6 8)
-    assert false (rightAngle 2 2 2)
-    assert true (rightAngle 7 24 25)
-    assert false (rightAngle 10 5 7)
-    assert true (rightAngle 5 12 13)
-    assert true (rightAngle 15 8 17)
-    assert true (rightAngle 48 55 73)
-    assert false (rightAngle 1 1 1)
-    assert false (rightAngle 2 2 10)
+func testAll
+    test true (rightAngle 3 4 5)
+    test false (rightAngle 1 2 3)
+    test true (rightAngle 10 6 8)
+    test false (rightAngle 2 2 2)
+    test true (rightAngle 7 24 25)
+    test false (rightAngle 10 5 7)
+    test true (rightAngle 5 12 13)
+    test true (rightAngle 15 8 17)
+    test true (rightAngle 48 55 73)
+    test false (rightAngle 1 1 1)
+    test false (rightAngle 2 2 10)
 end
 
-test
+testAll

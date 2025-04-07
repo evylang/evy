@@ -1,0 +1,32 @@
+<h1>🦓 Zebra Stripes</h1>
+<p>⭐ Can you guess what the program's output?</p>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<p>⭐ Can you change the program to use a <code>for</code> loop?</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">for y := range ❓ ❓ ❓
+  move 30 y
+  rect 40 7
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<p>⭐ Can you <em>animate</em> the stripes with <code>sleep 0.2</code>?</p>
+<p><button class="next-btn">Next</button></p>
+<p>
+  ⭐ Can you make the animation go the <em>opposite</em> direction by changing the
+  <code>range</code> values?
+</p>
+<p><button class="next-btn">Next</button></p>
+<p>⭐ Can you use <code>hsl</code> to create a green-to-red gradient animation like below?</p>
+<p><img src="samples/forloops/img/zebra.gif" alt="Animate rainbow zebra crossing" /></p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">for ❓ range 98 -1 -❓
+    color (hsl y)
+    // ...
+end
+</code></pre>
+</details>

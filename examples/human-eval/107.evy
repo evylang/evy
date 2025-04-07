@@ -46,15 +46,15 @@ func isPalindrome:bool n:num
     return true
 end
 
-func test
-    assert [8 13] (palindromeCount 123)
-    assert [4 6] (palindromeCount 12)
-    assert [1 2] (palindromeCount 3)
-    assert [6 8] (palindromeCount 63)
-    assert [5 6] (palindromeCount 25)
-    assert [4 6] (palindromeCount 19)
-    assert [4 5] (palindromeCount 9)
-    assert [0 1] (palindromeCount 1)
+func testAll
+    test [8 13] (palindromeCount 123)
+    test [4 6] (palindromeCount 12)
+    test [1 2] (palindromeCount 3)
+    test [6 8] (palindromeCount 63)
+    test [5 6] (palindromeCount 25)
+    test [4 6] (palindromeCount 19)
+    test [4 5] (palindromeCount 9)
+    test [0 1] (palindromeCount 1)
 end
 
-test
+testAll

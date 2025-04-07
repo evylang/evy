@@ -1,0 +1,18 @@
+background := hsl 0 0 0 1
+s := 0.1
+r := 1
+width 1
+clear "black"
+fill "none"
+stroke "blue"
+
+move 50 50
+while true
+    clear background
+    circle r
+    r = r + s
+    if r < 1 or r > 45
+        s = -s
+    end
+    sleep 0.001
+end

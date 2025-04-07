@@ -14,10 +14,10 @@ func filterInts:[]num values:[]any
     return result
 end
 
-func test
-    assert [] (filterInts [])
-    assert [4 9] (filterInts [4 {} [] 23.2 9 "adasd"])
-    assert [3 3 3] (filterInts [3 "c" 3 3 "a" "b"])
+func testAll
+    test [] (filterInts [])
+    test [4 9] (filterInts [4 {} [] 23.2 9 "adasd"])
+    test [3 3 3] (filterInts [3 "c" 3 3 "a" "b"])
 end
 
-test
+testAll

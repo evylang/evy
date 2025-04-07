@@ -1,0 +1,13 @@
+<form id="q-rhyme-inverted-61" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the program that generates this output:</p>
+  <pre><code>Bugs like hugs.
+👾🐛🥰
+</code></pre>
+  <p>Program:</p>
+  <textarea name="answer" rows="3" cols="35">
+
+print "👾🐛🥰"
+</textarea
+  >
+</form>

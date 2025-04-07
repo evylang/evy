@@ -59,7 +59,7 @@ func (m *CourseModel) buildUnits() error {
 func (m *CourseModel) ToHTML(_ bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	if err := m.printUnitBadgesHTML(buf); err != nil {
 		return "", err
 	}
@@ -71,21 +71,29 @@ func (m *CourseModel) Name() string {
 	return m.name
 }
 
+// Document returns the markdown ast root node.
+func (m *CourseModel) Document() *markdown.Document {
+	return m.Doc
+}
+
 func (m *CourseModel) printUnitBadgesHTML(buf *bytes.Buffer) error {
 	courseDir := filepath.Dir(m.Filename())
+	buf.WriteString(`<div class="badges">` + "\n")
+
 	for _, unit := range m.Units {
 		buf.WriteString("<h2>")
 		h, ok := unit.Doc.Blocks[0].(*markdown.Heading)
 		if !ok {
 			buf.WriteString("Unit:" + unit.Filename() + "\n")
 		} else {
-			h.Text.PrintHTML(buf)
+			buf.WriteString(markdown.ToHTML(h.Text))
 		}
 		buf.WriteString("</h2>\n")
 		if err := unit.printBadgesHTML(buf, courseDir); err != nil {
 			return err
 		}
 	}
+	buf.WriteString("</div>\n")
 	return nil
 }
 

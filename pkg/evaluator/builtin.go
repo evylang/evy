@@ -16,18 +16,23 @@ type builtin struct {
 	Decl *parser.FuncDefStmt
 }
 
+type global struct {
+	parserVar *parser.Var
+	val       value
+}
+
 type builtins struct {
 	Funcs         map[string]builtin
 	EventHandlers map[string]*parser.EventHandlerStmt
-	Globals       map[string]*parser.Var
-	Runtime       Runtime
+	Globals       map[string]global
+	Platform      Platform
 }
 
 // BuiltinDecls returns the signatures of all built-in functions and
 // event handlers, as well as predefined global variables, for use by
 // the [parser.Parse] function.
 func BuiltinDecls() parser.Builtins {
-	b := newBuiltins(&UnimplementedRuntime{})
+	b := newBuiltins(&UnimplementedPlatform{})
 	return builtinsDeclsFromBuiltins(b)
 }
 
@@ -36,16 +41,20 @@ func builtinsDeclsFromBuiltins(b builtins) parser.Builtins {
 	for name, builtin := range b.Funcs {
 		funcs[name] = builtin.Decl
 	}
+	globals := make(map[string]*parser.Var, len(b.Globals))
+	for name, global := range b.Globals {
+		globals[name] = global.parserVar
+	}
 	return parser.Builtins{
 		Funcs:         funcs,
 		EventHandlers: b.EventHandlers,
-		Globals:       b.Globals,
+		Globals:       globals,
 	}
 }
 
 type builtinFunc func(scope *scope, args []value) (value, error)
 
-func newBuiltins(rt Runtime) builtins {
+func newBuiltins(rt Platform) builtins {
 	funcs := map[string]builtin{
 		"read":   {Func: readFunc(rt.Read), Decl: readDecl},
 		"cls":    {Func: clsFunc(rt.Cls), Decl: emptyDecl("cls")},
@@ -74,10 +83,10 @@ func newBuiltins(rt Runtime) builtins {
 		"has": {Func: builtinFunc(hasFunc), Decl: hasDecl},
 		"del": {Func: builtinFunc(delFunc), Decl: delDecl},
 
-		"sleep":  {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
-		"exit":   {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
-		"panic":  {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
-		"assert": {Func: assertFunc, Decl: assertDecl},
+		"sleep": {Func: sleepFunc(rt.Sleep), Decl: sleepDecl},
+		"exit":  {Func: builtinFunc(exitFunc), Decl: numDecl("exit")},
+		"panic": {Func: builtinFunc(panicFunc), Decl: stringDecl("panic")},
+		"test":  {Func: testFunc, Decl: testDecl},
 
 		"rand":  {Func: builtinFunc(randFunc), Decl: randDecl},
 		"rand1": {Func: builtinFunc(rand1Func), Decl: rand1Decl},
@@ -138,15 +147,25 @@ func newBuiltins(rt Runtime) builtins {
 		"input":   {Name: "input", Params: inputParams},
 		"animate": {Name: "animate", Params: numParam},
 	}
-	globals := map[string]*parser.Var{
-		"err":    {Name: "err", T: parser.BOOL_TYPE},
-		"errmsg": {Name: "errmsg", T: parser.STRING_TYPE},
+	globals := map[string]global{
+		"err": {
+			parserVar: &parser.Var{Name: "err", T: parser.BOOL_TYPE},
+			val:       &boolVal{V: false},
+		},
+		"errmsg": {
+			parserVar: &parser.Var{Name: "errmsg", T: parser.STRING_TYPE},
+			val:       &stringVal{V: ""},
+		},
+		"pi": {
+			parserVar: &parser.Var{Name: "pi", T: parser.NUM_TYPE},
+			val:       &numVal{V: math.Pi},
+		},
 	}
 	return builtins{
 		EventHandlers: eventHandlers,
 		Funcs:         funcs,
 		Globals:       globals,
-		Runtime:       rt,
+		Platform:      rt,
 	}
 }
 
@@ -532,25 +551,25 @@ func panicFunc(_ *scope, args []value) (value, error) {
 	return nil, PanicError(s)
 }
 
-var assertDecl = &parser.FuncDefStmt{
-	Name:          "assert",
+var testDecl = &parser.FuncDefStmt{
+	Name:          "test",
 	VariadicParam: &parser.Var{Name: "a", T: parser.ANY_TYPE},
 	ReturnType:    parser.NONE_TYPE,
 }
 
-func assertFunc(_ *scope, args []value) (value, error) {
-	if err := validateAssertArgs(args); err != nil {
+func testFunc(_ *scope, args []value) (value, error) {
+	if err := validateTestArgs(args); err != nil {
 		return nil, err
 	}
 	if len(args) == 1 {
 		if !args[0].(*anyVal).V.(*boolVal).V {
-			return nil, fmt.Errorf(`%w: not true`, ErrAssert)
+			return nil, fmt.Errorf(`%w: not true`, ErrTest)
 		}
 	} else {
 		want := args[0]
 		got := args[1]
 		if !same(want, got) {
-			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrAssert, want.Repr(), got.Repr(), assertMessage(args))
+			return nil, fmt.Errorf("%w: want != got: %v != %v%s", ErrTest, want.Repr(), got.Repr(), testMessage(args))
 		}
 	}
 	return nil, nil
@@ -628,24 +647,24 @@ func sameMap(want, got *mapVal) bool {
 	return true
 }
 
-func validateAssertArgs(args []value) error {
+func validateTestArgs(args []value) error {
 	if len(args) == 0 {
-		return fmt.Errorf(`%w: "assert" expects at least one argument`, ErrBadArguments)
+		return fmt.Errorf(`%w: "test" expects at least one argument`, ErrBadArguments)
 	}
 	if len(args) == 1 {
 		if _, ok := args[0].(*anyVal).V.(*boolVal); !ok {
-			return fmt.Errorf(`%w: "assert" with one argument expects bool argument`, ErrBadArguments)
+			return fmt.Errorf(`%w: "test" with one argument expects bool argument`, ErrBadArguments)
 		}
 	}
 	if len(args) > 2 {
 		if _, ok := args[2].(*anyVal).V.(*stringVal); !ok {
-			return fmt.Errorf(`%w: "assert" with three or more argument expects third argument to be string message`, ErrBadArguments)
+			return fmt.Errorf(`%w: "test" with three or more argument expects third argument to be string message`, ErrBadArguments)
 		}
 	}
 	return nil
 }
 
-func assertMessage(args []value) string {
+func testMessage(args []value) string {
 	if len(args) <= 2 {
 		return ""
 	}
@@ -663,25 +682,27 @@ var randDecl = &parser.FuncDefStmt{
 	ReturnType: parser.NUM_TYPE,
 }
 
-// We need to manually seed for tinygo 0.28.1.
-var randsource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
+// RandSource is the source used by the rand1 and rand builtins. By default it
+// is initialized with the current time. It is exported so it can be overridden
+// by a fixed seed to generate deterministic output.
+var RandSource = rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec
 
 func randFunc(_ *scope, args []value) (value, error) {
 	upper := args[0].(*numVal).V
-	if upper <= 0 || upper > 2147483647 { // [1, 2^31-1]
-		return nil, fmt.Errorf(`%w: "rand %0.f" not in range 1 to 2147483647`, ErrBadArguments, upper)
+	if upper < 1 || upper > 2147483647 { // [1, 2^31-1]
+		return nil, fmt.Errorf(`%w: "rand %v" not in range 1 to 2147483647`, ErrBadArguments, upper)
 	}
-	return &numVal{V: float64(randsource.Int31n(int32(upper)))}, nil
+	return &numVal{V: float64(RandSource.Int31n(int32(upper)))}, nil
 }
 
 var rand1Decl = &parser.FuncDefStmt{
-	Name:       "rand",
+	Name:       "rand1",
 	Params:     []*parser.Var{},
 	ReturnType: parser.NUM_TYPE,
 }
 
 func rand1Func(_ *scope, _ []value) (value, error) {
-	return &numVal{V: randsource.Float64()}, nil
+	return &numVal{V: RandSource.Float64()}, nil
 }
 
 var hslDecl = &parser.FuncDefStmt{

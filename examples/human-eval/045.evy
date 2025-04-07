@@ -5,10 +5,10 @@ func triangleArea:num s:num h:num
 
 end
 
-func test
-    assert 7.5 (triangleArea 5 3)
-    assert 2 (triangleArea 2 2)
-    assert 40 (triangleArea 10 8)
+func testAll
+    test 7.5 (triangleArea 5 3)
+    test 2 (triangleArea 2 2)
+    test 40 (triangleArea 10 8)
 end
 
-test
+testAll

@@ -13,10 +13,10 @@ func intersperse:[]num numbers:[]num delimeter:num
     return result
 end
 
-func test
-    assert [] (intersperse [] 7)
-    assert [5 8 6 8 3 8 2] (intersperse [5 6 3 2] 8)
-    assert [2 2 2 2 2] (intersperse [2 2 2] 2)
+func testAll
+    test [] (intersperse [] 7)
+    test [5 8 6 8 3 8 2] (intersperse [5 6 3 2] 8)
+    test [2 2 2 2 2] (intersperse [2 2 2] 2)
 end
 
-test
+testAll

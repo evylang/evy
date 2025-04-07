@@ -23,15 +23,15 @@ func count:[]num n:num
     return [evens odds]
 end
 
-func test
-    assert [0 1] (count 7)
-    assert [1 1] (count -78)
-    assert [2 2] (count 3452)
-    assert [3 3] (count 346211)
-    assert [3 3] (count -345821)
-    assert [1 0] (count -2)
-    assert [2 3] (count -45347)
-    assert [1 0] (count 0)
+func testAll
+    test [0 1] (count 7)
+    test [1 1] (count -78)
+    test [2 2] (count 3452)
+    test [3 3] (count 346211)
+    test [3 3] (count -345821)
+    test [1 0] (count -2)
+    test [2 3] (count -45347)
+    test [1 0] (count 0)
 end
 
-test
+testAll

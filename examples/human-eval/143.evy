@@ -35,14 +35,14 @@ func isPrime:bool n:num
     return true
 end
 
-func test
-    assert "is" (primeWords "This is a test")
-    assert "go for" (primeWords "lets go for swimming")
-    assert "there is no place" (primeWords "there is no place available here")
-    assert "Hi am Hussein" (primeWords "Hi I am Hussein")
-    assert "go for it" (primeWords "go for it")
-    assert "" (primeWords "here")
-    assert "is" (primeWords "here is")
+func testAll
+    test "is" (primeWords "This is a test")
+    test "go for" (primeWords "lets go for swimming")
+    test "there is no place" (primeWords "there is no place available here")
+    test "Hi am Hussein" (primeWords "Hi I am Hussein")
+    test "go for it" (primeWords "go for it")
+    test "" (primeWords "here")
+    test "is" (primeWords "here is")
 end
 
-test
+testAll

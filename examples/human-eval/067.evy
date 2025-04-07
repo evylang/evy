@@ -15,14 +15,14 @@ func mangoCount:num str:string total:num
     return total - apples - oranges
 end
 
-func test
-    assert 8 (mangoCount "5 apples and 6 oranges" 19)
-    assert 10 (mangoCount "5 apples and 6 oranges" 21)
-    assert 2 (mangoCount "0 apples and 1 oranges" 3)
-    assert 2 (mangoCount "1 apples and 0 oranges" 3)
-    assert 95 (mangoCount "2 apples and 3 oranges" 100)
-    assert 0 (mangoCount "2 apples and 3 oranges" 5)
-    assert 19 (mangoCount "1 apples and 100 oranges" 120)
+func testAll
+    test 8 (mangoCount "5 apples and 6 oranges" 19)
+    test 10 (mangoCount "5 apples and 6 oranges" 21)
+    test 2 (mangoCount "0 apples and 1 oranges" 3)
+    test 2 (mangoCount "1 apples and 0 oranges" 3)
+    test 95 (mangoCount "2 apples and 3 oranges" 100)
+    test 0 (mangoCount "2 apples and 3 oranges" 5)
+    test 19 (mangoCount "1 apples and 100 oranges" 120)
 end
 
-test
+testAll

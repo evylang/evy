@@ -18,17 +18,17 @@ func findShorter:[]string arr1:[]string arr2:[]string
     return arr2
 end
 
-func test
-    assert [] (findShorter [] [])
-    assert ["hi" "hi"] (findShorter ["hi" "admin"] ["hi" "hi"])
-    assert ["hi" "admin"] (findShorter ["hi" "admin"] ["hi" "hi" "admin" "project"])
-    assert ["4"] (findShorter ["4"] ["1" "2" "3" "4" "5"])
-    assert ["hI" "Hi"] (findShorter ["hi" "admin"] ["hI" "Hi"])
-    assert ["hI" "hi" "hi"] (findShorter ["hi" "admin"] ["hI" "hi" "hi"])
-    assert ["hi" "admin"] (findShorter ["hi" "admin"] ["hI" "hi" "hii"])
-    assert [] (findShorter [] ["this"])
-    assert [] (findShorter ["this"] [])
+func testAll
+    test [] (findShorter [] [])
+    test ["hi" "hi"] (findShorter ["hi" "admin"] ["hi" "hi"])
+    test ["hi" "admin"] (findShorter ["hi" "admin"] ["hi" "hi" "admin" "project"])
+    test ["4"] (findShorter ["4"] ["1" "2" "3" "4" "5"])
+    test ["hI" "Hi"] (findShorter ["hi" "admin"] ["hI" "Hi"])
+    test ["hI" "hi" "hi"] (findShorter ["hi" "admin"] ["hI" "hi" "hi"])
+    test ["hi" "admin"] (findShorter ["hi" "admin"] ["hI" "hi" "hii"])
+    test [] (findShorter [] ["this"])
+    test [] (findShorter ["this"] [])
 
 end
 
-test
+testAll

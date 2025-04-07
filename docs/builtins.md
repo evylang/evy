@@ -11,7 +11,7 @@ key.
 
 For a more formal definition of the Evy syntax, see the
 [Language Specification](spec.md), and for an intuitive understanding
-see [syntax by example](syntax_by_example.md).
+see [syntax by example](syntax-by-example.md).
 
 #### Table of Contents
 
@@ -24,7 +24,7 @@ see [syntax by example](syntax_by_example.md).
 3. [**Map**](#map)  
    [has](#has), [del](#del)
 4. [**Program control**](#program-control)  
-   [sleep](#sleep), [exit](#exit), [panic](#panic), [assert](#assert)
+   [sleep](#sleep), [exit](#exit), [panic](#panic), [test](#test)
 5. [**Conversion**](#conversion)  
    [str2num](#str2num), [str2bool](#str2bool)
 6. [**Errors**](#errors)  
@@ -34,7 +34,7 @@ see [syntax by example](syntax_by_example.md).
 8. [**Random**](#random)  
    [rand](#rand), [rand1](#rand1)
 9. [**Math**](#math)  
-   [min](#min), [max](#max), [abs](#abs), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [sin](#sin), [cos](#cos), [atan2](#atan2)
+   [min](#min), [max](#max), [abs](#abs), [floor](#floor), [ceil](#ceil), [round](#round), [pow](#pow), [log](#log), [sqrt](#sqrt), [pi](#pi), [sin](#sin), [cos](#cos), [atan2](#atan2)
 10. [**Graphics**](#graphics)  
     [move](#move), [line](#line), [rect](#rect), [circle](#circle), [color](#color), [colour](#colour), [hsl](#hsl), [width](#width), [clear](#clear), [grid](#grid), [gridn](#gridn), [poly](#poly), [ellipse](#ellipse), [stroke](#stroke), [fill](#fill), [dash](#dash), [linecap](#linecap), [text](#text), [font](#font)
 11. [**Event Handlers**](#event-handlers)  
@@ -433,6 +433,9 @@ with `del` while iterating with a `for … range` loop.
 `sleep` can be used to create delays in Evy programs. For example, you
 could use sleep to create a countdown timer.
 
+In the [browser platform](spec.md#platforms) `sleep` pauses a minimum of 1
+millisecond.
+
 #### Example
 
 ```evy
@@ -508,75 +511,75 @@ line 4 column 5: scale must be positive
 The `panic` function takes a single argument, which is the error message
 that the program will print before it terminates with exit status 1.
 
-### `assert`
+### `test`
 
-`assert` is used to check if a condition is true or two values – `want` and
+`test` is used to check if a condition is true or two values – `want` and
 `got` – are the same. If the condition is not true or the two values are not
-the same, the program will print the failed assertion and terminate with exit
+the same, the program will print the failed test and terminate with exit
 status 1.
 
-`assert` optionally takes a message or a formatted message with arguments to
-print along with the failed assertion as a third and following arguments:
+`test` optionally takes a message or a format string with arguments to
+print along with the failed test as a third and following arguments:
 
 #### Example
 
 ```evy:err
 answer := 6 * 9
-assert 42 answer "answer is 42 not %v" answer
+test 42 answer "answer is 42 not %v" answer
 ```
 
 Output
 
 ```evy:output
-❌ 1 failed assertion
-✔️ 0 passed assertions
-line 2 column 11: failed assertion: want != got: 42 != 54 (answer is 42 not 54)
+❌ 1 failed test
+✔️ 0 passed tests
+line 2 column 9: failed test: want != got: 42 != 54 (answer is 42 not 54)
 ```
 
 #### Reference
 
-    assert cond:bool
-    assert want:any got:any [msg:string [argsany...]]
+    test cond:bool
+    test want:any got:any [msg:string [argsany...]]
 
-The `assert` function takes either a single boolean argument `cond`
+The `test` function takes either a single boolean argument `cond`
 and ensures it is `true`, or two arguments `want` and `got`, in that order,
 and ensures they are the same.
 
 In the case of the single argument, the argument must be of type `bool`.
-`assert` verifies that this argument has the value `true`. If `cond` is false,
-`assert` terminates the program execution and prints the failed assertion.
+`test` verifies that this argument has the value `true`. If `cond` is false,
+`test` terminates the program execution and prints the failed test.
 
-In the case of two arguments, `want` and `got`, `assert` verifies
-the arguments are the same. If they are not the same `assert` terminates the
-program execution and prints the failed assertion.
+In the case of two arguments, `want` and `got`, `test` verifies
+the arguments are the same. If they are not the same `test` terminates the
+program execution and prints the failed test.
 
 **Sameness** of `want` and `got` means either `want == got` or `want` and
 `got` are composite values, arrays or maps, containing the same values.
 `want` can be of a more _specific_ type than `got` as long as their values
-are the same. For example, the following assertion holds true even though
+are the same. For example, the following test holds true even though
 `want` is of type `[][]num` and `got` is of type `[]any`.
 
 ```evy
 got:[]any
 got = [[1] [2 3]]
-assert [[1] [2 3]] got
+test [[1] [2 3]] got
 ```
 
 In the case of three arguments, the third argument is a message of type
-`string` that is printed if the assertion fails.
+`string` that is printed if the test fails.
 
 In case of four or more arguments, the third argument is a _format string_
 with _specifiers_. The remaining arguments are the arguments are used to
 replace these specifiers, see [`sprintf`](#sprintf) for details on
-formatting. This means the following two assertions are equivalent.
+formatting. This means the following two tests are equivalent.
 
 ```evy
 val := 2
-assert 1 val "val is %v" val
-assert 1 val (sprintf "val is %v" val)
+test 1 val "val is %v" val
+test 1 val (sprintf "val is %v" val)
 ```
 
-Using `assert` with four or more arguments is a convenience compared to adding
+Using `test` with four or more arguments is a convenience compared to adding
 an inline call to `sprintf`.
 
 ## Conversion
@@ -1413,6 +1416,12 @@ Output
 The `sqrt` function returns the positive square root of the number
 argument `n`.
 
+### `pi`
+
+`pi` is a global variable with the value of the mathematical constant [π].
+
+[π]: https://en.wikipedia.org/wiki/Pi
+
 ### `sin`
 
 `sin` returns the sine of the given angle in radians.
@@ -1420,7 +1429,6 @@ argument `n`.
 #### Example
 
 ```evy
-pi := 3.14159265
 print (sin 0.5*pi)
 ```
 
@@ -1443,7 +1451,6 @@ The `sin` function returns the sine of the given angle `n` in radians.
 #### Example
 
 ```evy
-pi := 3.14159265
 print (cos pi)
 ```
 
@@ -1467,7 +1474,6 @@ ray from the origin to the point `x y`.
 #### Example
 
 ```evy
-pi := 3.14159265
 rad := atan2 1 1
 degrees := rad * 180 / pi
 printf "rad: %.2f degrees: %.2f" rad degrees

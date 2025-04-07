@@ -1,0 +1,65 @@
+<h1>🟢 Circles</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Circles with <code>for</code> Loops</h2>
+<p>Use <code>for</code> loops and circles to create your own unique drawing.</p>
+<p>🧪 Experiment with colors, sizes, and positions.</p>
+<ul>
+  <li>Can you use <code>hsl</code> and transparency in your creation?</li>
+  <li>Can you add randomness?</li>
+  <li>Can you animate your creation?</li>
+</ul>
+<h3>Need ideas?</h3>
+<p><strong>Click</strong> on the images below for their Evy code.</p>
+<table>
+  <thead>
+    <tr>
+      <th>
+        <img
+          src="samples/forloops/img/circle-outline.svg"
+          alt="Circle with different outline"
+          title="evy:edit"
+        />
+      </th>
+      <th>
+        <img src="samples/forloops/img/circle-wig.svg" alt="Circle in wig shape" title="evy:edit" />
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img
+          src="samples/forloops/img/circle-rand.svg"
+          alt="Circle with random radius"
+          title="evy:edit"
+        />
+      </td>
+      <td>
+        <img src="samples/forloops/img/circle-cat.svg" alt="Cat made of circles" title="evy:edit" />
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Move the Cat Eyes 👀</h2>
+<p>Use the code from the cat sample above and make its eyes move:</p>
+<p><img src="samples/forloops/img/cat.gif" alt="Black cat with moving yellow eyes" /></p>
+<details>
+  <summary>Hint</summary>
+  <p>
+    Wrap the whole cat drawing in a <code>for</code> loop and modify the <code>// eyes</code> block:
+  </p>
+  <pre><code class="language-evy">for x := range 1000
+  // ...
+  // eyes
+  offset := x % 12 / 8
+  move 31+offset 70
+  circle 2
+  move 49+offset 70
+  // ...
+end
+</code></pre>
+</details>

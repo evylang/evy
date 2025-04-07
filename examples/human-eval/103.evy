@@ -20,19 +20,19 @@ func avg:any n:num m:num
     return "0b" + result
 end
 
-func test
-    assert "0b11" (avg 1 5)
-    assert "0b1010" (avg 7 13)
-    assert "0b1111001011" (avg 964 977)
-    assert "0b1111100101" (avg 996 997)
-    assert "0b1011000010" (avg 560 851)
-    assert "0b101101110" (avg 185 546)
-    assert "0b110101101" (avg 362 496)
-    assert "0b1001110010" (avg 350 902)
-    assert "0b11010111" (avg 197 233)
-    assert -1 (avg 7 5)
-    assert -1 (avg 5 1)
-    assert "0b101" (avg 5 5)
+func testAll
+    test "0b11" (avg 1 5)
+    test "0b1010" (avg 7 13)
+    test "0b1111001011" (avg 964 977)
+    test "0b1111100101" (avg 996 997)
+    test "0b1011000010" (avg 560 851)
+    test "0b101101110" (avg 185 546)
+    test "0b110101101" (avg 362 496)
+    test "0b1001110010" (avg 350 902)
+    test "0b11010111" (avg 197 233)
+    test -1 (avg 7 5)
+    test -1 (avg 5 1)
+    test "0b101" (avg 5 5)
 end
 
-test
+testAll

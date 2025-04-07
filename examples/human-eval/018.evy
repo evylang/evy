@@ -14,11 +14,11 @@ func findTimes:num str:string sub:string
     return times
 end
 
-func test
-    assert 0 (findTimes "" "x")
-    assert 4 (findTimes "xyxyxyx" "x")
-    assert 4 (findTimes "cacacacac" "cac")
-    assert 1 (findTimes "john doe" "john")
+func testAll
+    test 0 (findTimes "" "x")
+    test 4 (findTimes "xyxyxyx" "x")
+    test 4 (findTimes "cacacacac" "cac")
+    test 1 (findTimes "john doe" "john")
 end
 
-test
+testAll

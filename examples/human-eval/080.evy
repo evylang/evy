@@ -22,15 +22,15 @@ func happy:bool s:string
     return true
 end
 
-func test
-    assert false (happy "a")
-    assert false (happy "aa")
-    assert true (happy "abcd")
-    assert false (happy "aabb")
-    assert true (happy "adb")
-    assert false (happy "xyy")
-    assert true (happy "iopaxpoi")
-    assert false (happy "iopaxioi")
+func testAll
+    test false (happy "a")
+    test false (happy "aa")
+    test true (happy "abcd")
+    test false (happy "aabb")
+    test true (happy "adb")
+    test false (happy "xyy")
+    test true (happy "iopaxpoi")
+    test false (happy "iopaxioi")
 end
 
-test
+testAll

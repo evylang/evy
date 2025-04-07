@@ -18,12 +18,12 @@ func sortNumbers:string numbers:string
     return join arr " "
 end
 
-func test
-    assert "" (sortNumbers "")
-    assert "three" (sortNumbers "three")
-    assert "three five nine" (sortNumbers "three five nine")
-    assert "zero four five seven eight nine" (sortNumbers "five zero four seven nine eight")
-    assert "zero one two three four five six" (sortNumbers "six five four three two one zero")
+func testAll
+    test "" (sortNumbers "")
+    test "three" (sortNumbers "three")
+    test "three five nine" (sortNumbers "three five nine")
+    test "zero four five seven eight nine" (sortNumbers "five zero four seven nine eight")
+    test "zero one two three four five six" (sortNumbers "six five four three two one zero")
 end
 
-test
+testAll

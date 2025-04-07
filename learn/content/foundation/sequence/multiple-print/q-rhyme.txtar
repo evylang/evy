@@ -1,0 +1,22 @@
+-- a.evy --
+print "Bugs like hugs." //levy:blank
+print "👾🐛🥰"
+-- b.evy --
+print "Colors clash"
+print "with a splash." //levy:blank
+print "💻🌈⛲️"
+-- c.evy --
+print "The early bird"
+print "finds the bug." //levy:blank
+print "🐥🪳🐛"
+-- d.evy --
+print "🦊👗🐞"
+print "Fox in dress" //levy:blank
+print "finds bugs for less."
+-- e.evy --
+print "Foxes build boxes." //levy:blank
+print "🎁"
+-- f.evy --
+print "Smart cookies" //levy:blank
+print "code together." //levy:blank
+print "🍪💻"

@@ -20,14 +20,14 @@ func filter:num nums:[]num
     return result
 end
 
-func test
-    assert 0 (filter [5 -2 1 -5])
-    assert 1 (filter [15 -73 14 -15])
-    assert 2 (filter [33 -2 -3 45 21 109])
-    assert 4 (filter [43 -12 93 125 121 109])
-    assert 3 (filter [71 -2 -33 75 21 19])
-    assert 0 (filter [1])
-    assert 0 (filter [])
+func testAll
+    test 0 (filter [5 -2 1 -5])
+    test 1 (filter [15 -73 14 -15])
+    test 2 (filter [33 -2 -3 45 21 109])
+    test 4 (filter [43 -12 93 125 121 109])
+    test 3 (filter [71 -2 -33 75 21 19])
+    test 0 (filter [1])
+    test 0 (filter [])
 end
 
-test
+testAll

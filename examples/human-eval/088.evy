@@ -31,14 +31,14 @@ func sort arr:[]num asc:bool
     end
 end
 
-func test
-    assert [] (sortArray [])
-    assert [5] (sortArray [5])
-    assert [0 1 2 3 4 5] (sortArray [2 4 3 0 1 5])
-    assert [6 5 4 3 2 1 0] (sortArray [2 4 3 0 1 5 6])
-    assert [1 2] (sortArray [2 1])
-    assert [0 11 15 32 42 87] (sortArray [15 42 87 32 11 0])
-    assert [23 21 14 11] (sortArray [21 14 23 11])
+func testAll
+    test [] (sortArray [])
+    test [5] (sortArray [5])
+    test [0 1 2 3 4 5] (sortArray [2 4 3 0 1 5])
+    test [6 5 4 3 2 1 0] (sortArray [2 4 3 0 1 5 6])
+    test [1 2] (sortArray [2 1])
+    test [0 11 15 32 42 87] (sortArray [15 42 87 32 11 0])
+    test [23 21 14 11] (sortArray [21 14 23 11])
 end
 
-test
+testAll

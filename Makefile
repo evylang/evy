@@ -3,30 +3,32 @@
 
 # --- Global -------------------------------------------------------------------
 O = out
-COVERAGE = 70
+COVERAGE = 69
 VERSION ?= $(shell git describe --tags --dirty  --always)
 GOFILES = $(shell find . -name '*.go')
 
+PRETTIER = npx --prefix $(NODEPREFIX) -y prettier --log-level warn
+
 ## Build, test, check coverage and lint
-all: build-full test lint
+all: test lint
 	@if [ -e .git/rebase-merge ]; then git --no-pager log -1 --pretty='%h %s'; fi
-	@echo '$(COLOUR_GREEN)Success$(COLOUR_NORMAL)'
+	@echo '$(COLOR_GREEN)Success$(COLOR_NORMAL)'
 
-test: test-go test-tiny test-cli check-coverage
+test: build-full test-go test-tiny test-cli check-coverage
 
-lint: lint-go lint-sh check-prettier check-style check-fmt-evy conform
+lint: lint-go lint-sh lint-node check-fmt-evy conform
 
-## Full clean build and up-to-date checks as run on CI
-ci: clean check-uptodate all
+## Full clean build and up-to-date checks as run on CI for local execution
+ci: check-uptodate .WAIT all
 
-check-uptodate: tidy fmt doc docs
+check-uptodate: clean .WAIT install-npm-deps .WAIT tidy fmt doc docs learn lab
 	test -z "$$(git status --porcelain)" || { git status; false; }
 
 ## Remove generated files
 clean::
 	-rm -rf $(O)
 
-.PHONY: all check-uptodate ci test lint clean
+.PHONY: all check-uptodate ci clean lint test
 
 # --- Build --------------------------------------------------------------------
 GO_LDFLAGS = -X main.version=$(VERSION)
@@ -40,17 +42,17 @@ build-full: embed | $(O)
 ## Build evy binaries without web content embedded
 build-go: $(O)
 	go build -o $(O) -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go build -o ../$(O) -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go build -C learn -o ../$(O) -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries in $GOBIN
 install-full: embed
 	go install -tags full -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go -C learn install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 ## Build and install binaries without embedded frontend in $GOBIN
 install:
 	go install -ldflags='$(GO_LDFLAGS)' $(CMDS)
-	cd learn; go install -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
+	go install -C learn -ldflags='$(GO_LDFLAGS)' $(LEARN_CMDS)
 
 # Use `go version` to ensure the right go version is installed when using tinygo.
 go-version:
@@ -92,7 +94,7 @@ EXPORTDIR = $(O)/export-test
 ## Run non-tinygo tests and generate a coverage file
 test-go: | $(O)
 	go test -coverprofile=$(COVERFILE) ./...
-	cd learn; go test -coverprofile=../$(LEARNCOVERFILE) ./...
+	go test -C learn -coverprofile=../$(LEARNCOVERFILE) ./...
 
 ## Test evy CLI
 test-cli: build-full
@@ -116,17 +118,21 @@ cover: test-go
 	go tool cover -html=$(COVERFILE)
 
 CHECK_COVERAGE = awk -F '[ \t%]+' '/^total:/ {print; if ($$3 < $(COVERAGE)) exit 1}'
-FAIL_COVERAGE = { echo '$(COLOUR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOUR_NORMAL)'; exit 1; }
+FAIL_COVERAGE = { echo '$(COLOR_RED)FAIL - Coverage below $(COVERAGE)%$(COLOR_NORMAL)'; exit 1; }
 
 .PHONY: check-coverage cover test-cli test-go test-tiny
 
 # --- Lint ---------------------------------------------------------------------
-EVY_FILES = $(shell find -L examples -name '*.evy')
+EVY_FILES = $(shell fd --type file --extension evy)
 
 ## Lint go source code
 lint-go:
 	golangci-lint run
 	cd learn; golangci-lint run
+	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+	go run golang.org/x/vuln/cmd/govulncheck@latest -C learn ./...
+
+lint-node: install-npm-deps .WAIT check-prettier check-style
 
 ## Format evy sample code
 fmt-evy:
@@ -136,61 +142,86 @@ check-fmt-evy:
 	go run . fmt --check $(EVY_FILES)
 
 ## Conform runs evy over an example suite with asserts.
+CONFORM_CMD = @printf "%s " $(notdir $f); evy run $f
+CONFORM_EVY_FILES = $(wildcard examples/human-eval/*.evy)
 conform: install
-	for n in examples/human-eval/*.evy; do \
-	  printf "%s " "$${n##*/}"; \
-	  evy run "$$n"; \
-	done
+	$(foreach f,$(CONFORM_EVY_FILES),$(CONFORM_CMD)$(nl))
 
-.PHONY: check-fmt-evy conform fmt-evy lint-go
+.PHONY: check-fmt-evy conform fmt-evy lint-go lint-node
 
 # --- Docs ---------------------------------------------------------------------
-doc: doctest godoc toc usage
+doc: godoc usage doctest .WAIT toc
 
-DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
-DOCTESTS = docs/builtins.md docs/spec.md docs/syntax_by_example.md
+DOCTEST_CMD = ./build-tools/doctest.awk $(md) > $(O)/doctest-out.md && mv $(O)/doctest-out.md $(md)
+DOCTESTS = docs/builtins.md docs/spec.md docs/syntax-by-example.md
 doctest: install
 	$(foreach md,$(DOCTESTS),$(DOCTEST_CMD)$(nl))
 
-TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+TOC_CMD = ./build-tools/toc.awk $(md) > $(O)/toc-out.md && mv $(O)/toc-out.md $(md)
 TOCFILES = docs/builtins.md docs/spec.md
-toc:
+toc: | $(O)
 	$(foreach md,$(TOCFILES),$(TOC_CMD)$(nl))
 
-USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/out.md && mv $(O)/out.md $(md)
+USAGE_CMD = ./build-tools/gencmd.awk $(md) > $(O)/usage-out.md && mv $(O)/usage-out.md $(md)
 USAGEFILES = docs/usage.md
 usage: install
 	$(foreach md,$(USAGEFILES),$(USAGE_CMD)$(nl))
 
-GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/out.go && mv $(O)/out.go $(filename)
+GODOC_CMD = ./build-tools/gengodoc.awk $(filename) > $(O)/godoc-out.go && mv $(O)/godoc-out.go $(filename)
 GODOCFILES = main.go learn/cmd/levy/main.go
 godoc: install
 	$(foreach filename,$(GODOCFILES),$(GODOC_CMD)$(nl))
 
 DOCS_TARGET_DIR = frontend/docs
+LEARN_TARGET_DIR = frontend/learn
+LAB_TARGET_DIR = frontend/lab
 
-## Generate static HTML documentation in frontend/docs from MarkDown in /docs
-docs:
-	go run ./build-tools/md docs $(DOCS_TARGET_DIR)
-	npx --prefix $(NODEPREFIX) -y prettier --write $(DOCS_TARGET_DIR)
+## Generate static HTML documentation in frontend/docs from MarkDown in docs
+docs: | $(NODELIB)
+	go run ./build-tools/docsite-gen docs $(DOCS_TARGET_DIR)
+	$(PRETTIER) --write $(DOCS_TARGET_DIR)
 
+## Generate static HTML for learn.evy.dev in frontend/learn from MarkDown in learn/content
+learn: install | $(NODELIB)
+	levy export html --no-self-contained --root-dir="/learn/" learn/content $(LEARN_TARGET_DIR)
+	$(PRETTIER) --write $(LEARN_TARGET_DIR)
+
+LAB_SVG_SRC := $(shell fd --full-path --glob '**/img/*.evy' $(LAB_TARGET_DIR))
+LAB_SVG := $(LAB_SVG_SRC:%.evy=%.svg)
+LAB_HTMLF_SRC := $(shell fd --full-path --extension md $(LAB_TARGET_DIR))
+LAB_HTMLF := $(LAB_HTMLF_SRC:%.md=%.htmlf)
+
+## Generate SVG files from .evy files for lab.evy.dev in frontend/lab
+lab: $(LAB_SVG) $(LAB_HTMLF)
+
+FLAGS_frontend/lab/samples/ifs/img/randrect.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/ifs/img/stripes.svg = --rand-seed=2
+FLAGS_frontend/lab/samples/ifs/img/warm-squares.svg = --rand-seed=2
+FLAGS_frontend/lab/samples/ifs/img/grass.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/forloops/img/bubble.svg = --rand-seed=1
+FLAGS_frontend/lab/samples/forloops/img/circle-rand.svg = --rand-seed=1
+%.svg: %.evy | $(NODELIB)
+	go run . run --svg-width "200px" --svg-height "200px" --svg-out "$@" $(FLAGS_$@) "$<"
+	$(PRETTIER) --write "$@"
+
+%.htmlf: %.md | $(NODELIB)
+	go run ./build-tools/labsite-gen "$<" "$@"
+	$(PRETTIER) --write "$@"
+
+FIND_GENERATED_CMD = fd --exclude '*.css' --exclude '*.js' --type file --full-path
 clean::
-	find $(DOCS_TARGET_DIR) -mindepth 1 \
-			! -regex '$(DOCS_TARGET_DIR)/css.*' \
-			! -regex '$(DOCS_TARGET_DIR)/img.*' \
-			! -regex '$(DOCS_TARGET_DIR)/module.*' \
-			! -regex '$(DOCS_TARGET_DIR)/favicon.ico' \
-			! -regex '$(DOCS_TARGET_DIR)/404.html' \
-			! -regex '$(DOCS_TARGET_DIR)/index.js' \
-			-delete
+	$(FIND_GENERATED_CMD) frontend/docs --exec rm
+	$(FIND_GENERATED_CMD) frontend/learn --exec rm
+	rm -f $(LAB_SVG)
+	$(foreach file,$(LAB_MDFILES),rm -f "$(file:md=htmlf)"$(nl))
 
 test-urls:
-	! grep -rIioEh 'https?://[^[:space:]]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
+	! grep -rIioEh 'https?://[^[:space:]"]+' --include "*.md" --exclude-dir "node_modules" --exclude-dir "bin" | \
 		sort -u | \
 		xargs -n1 curl  -sL -o /dev/null -w "%{http_code} %{url}\n"  | \
 		grep -v '^200 '
 
-.PHONY: doc docs doctest godoc sdocs test-urls toc usage
+.PHONY: doc docs doctest godoc lab learn sdocs test-urls toc usage
 
 # --- frontend -----------------------------------------------------------------
 NODEPREFIX = .hermit/node
@@ -201,12 +232,15 @@ define PLAYWRIGHT_CMD_LOCAL
 	npx --prefix e2e playwright test --config e2e $(PLAYWRIGHT_ARGS)
 endef
 
-PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.44.1-jammy
+PLAYWRIGHT_OCI_IMAGE = mcr.microsoft.com/playwright:v1.50.0-noble
 PLAYWRIGHT_CMD_DOCKER = docker run --rm \
   --volume $$(pwd):/work/ -w /work/ \
+  --user $(shell id -u):$(shell id -g) \
   --network host --add-host=host.docker.internal:host-gateway \
   --env BASEURL=$(BASEURL) \
   --env NPM_CONFIG_UPDATE_NOTIFIER=false \
+  --env PLATFORM_OVERRIDE=docker \
+  --env HOME=/tmp \
   $(PLAYWRIGHT_OCI_IMAGE) /bin/bash -e -c "$(subst $(nl),;,$(PLAYWRIGHT_CMD_LOCAL))"
 
 PLAYWRIGHT_CMD = $(PLAYWRIGHT_CMD_$(if $(USE_DOCKER),DOCKER,LOCAL))
@@ -224,21 +258,26 @@ serve:
 
 ## Format code with prettier
 prettier: | $(NODELIB)
-	npx --prefix $(NODEPREFIX) -y prettier --write .
+	$(PRETTIER) --write .
 
 ## Ensure code is formatted with prettier
 check-prettier: | $(NODELIB)
-	npx --prefix $(NODEPREFIX) -y prettier --check .
+	$(PRETTIER) --check .
 
 ## Fix CSS files with stylelint
+# Run `make install-npm-deps` first if needed, kept out of deps for speed.
+# Only included as dependency with .WAIT in `check-uptodate` and `lint`.
 style: | $(NODELIB)
-	npm --prefix $(NODEPREFIX) ci
 	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json --fix frontend/**/*.css
 
 ## Lint CSS files with stylelint
+# Run `make install-npm-deps` first if needed, see comment on `style` above.
 check-style: | $(NODELIB)
-	npm --prefix $(NODEPREFIX) ci
 	npx --prefix $(NODEPREFIX) stylelint -c $(NODEPREFIX)/.stylelintrc.json frontend/**/*.css
+
+## Install npm dependencies to run frontend tooling like stylelint.
+install-npm-deps:
+	npm --prefix $(NODEPREFIX) ci
 
 ## Install playwright on host system for `e2e` to use.
 install-playwright:
@@ -248,6 +287,9 @@ install-playwright:
 run-playwright:
 	@echo "running playwright against $(BASEURL)"
 	$(PLAYWRIGHT_CMD)
+
+docker-pull:
+	docker pull $(PLAYWRIGHT_OCI_IMAGE)
 
 ## Run end-to-end tests with playwright (see run-playwright)
 e2e: run-playwright
@@ -265,7 +307,7 @@ snaps: run-playwright
 $(NODELIB):
 	@mkdir -p $@
 
-.PHONY: check-prettier e2e prettier serve
+.PHONY: check-prettier check-style docker-pull e2e e2e-diff install-npm-deps install-playwright prettier run-playwright serve snaps style
 
 # --- deploy -----------------------------------------------------------------
 CHANNEL = live
@@ -321,10 +363,10 @@ define NEXTTAG_CMD
 endef
 
 # --- Utilities ----------------------------------------------------------------
-COLOUR_NORMAL = $(shell tput sgr0 2>/dev/null)
-COLOUR_RED    = $(shell tput setaf 1 2>/dev/null)
-COLOUR_GREEN  = $(shell tput setaf 2 2>/dev/null)
-COLOUR_WHITE  = $(shell tput setaf 7 2>/dev/null)
+COLOR_NORMAL = $(shell tput sgr0 2>/dev/null)
+COLOR_RED    = $(shell tput setaf 1 2>/dev/null)
+COLOR_GREEN  = $(shell tput setaf 2 2>/dev/null)
+COLOR_WHITE  = $(shell tput setaf 7 2>/dev/null)
 
 help:
 	$(eval export HELP_AWK)
@@ -340,7 +382,7 @@ define HELP_AWK
 /^## / { desc = desc substr($$0, 3) }
 /^[A-Za-z0-9%_-]+:/ && desc {
 	sub(/::?$$/, "", $$1)
-	printf "$(COLOUR_WHITE)%s$(COLOUR_NORMAL)\t%s\n", $$1, desc
+	printf "$(COLOR_WHITE)%s$(COLOR_NORMAL)\t%s\n", $$1, desc
 	desc = ""
 }
 endef

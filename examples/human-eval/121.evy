@@ -14,14 +14,14 @@ func solve:num nums:[]num
     return result
 end
 
-func test
-    assert 12 (solve [5 8 7 1])
-    assert 9 (solve [3 3 3 3 3])
-    assert 0 (solve [30 13 24 321])
-    assert 5 (solve [5 9])
-    assert 0 (solve [2 4 8])
-    assert 23 (solve [30 13 23 32])
-    assert 3 (solve [3 13 2 9])
+func testAll
+    test 12 (solve [5 8 7 1])
+    test 9 (solve [3 3 3 3 3])
+    test 0 (solve [30 13 24 321])
+    test 5 (solve [5 9])
+    test 0 (solve [2 4 8])
+    test 23 (solve [30 13 23 32])
+    test 3 (solve [3 13 2 9])
 end
 
-test
+testAll

@@ -1,0 +1,8 @@
+fill "white"
+
+on move x:num y:num
+    move x y
+    circle 9
+end
+
+print "⬆ Touch or mouse here ⬆"

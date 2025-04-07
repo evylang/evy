@@ -26,12 +26,12 @@ func parseMusic:[]num music:string
     return beats
 end
 
-func test
-    assert [] (parseMusic "")
-    assert [4 4 4 4] (parseMusic "o o o o")
-    assert [1 1 1 1] (parseMusic ".| .| .| .|")
-    assert [2 2 1 1 4 4 4 4] (parseMusic "o| o| .| .| o o o o")
-    assert [2 1 2 1 4 2 4 2] (parseMusic "o| .| o| .| o o| o o|")
+func testAll
+    test [] (parseMusic "")
+    test [4 4 4 4] (parseMusic "o o o o")
+    test [1 1 1 1] (parseMusic ".| .| .| .|")
+    test [2 2 1 1 4 4 4 4] (parseMusic "o| o| .| .| o o o o")
+    test [2 1 2 1 4 2 4 2] (parseMusic "o| .| o| .| o o| o o|")
 end
 
-test
+testAll

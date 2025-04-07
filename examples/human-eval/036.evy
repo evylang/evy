@@ -19,15 +19,15 @@ func fizzBuzz:num n:num
     return result
 end
 
-func test
-    assert 0 (fizzBuzz 50)
-    assert 2 (fizzBuzz 78)
-    assert 3 (fizzBuzz 79)
-    assert 3 (fizzBuzz 100)
-    assert 6 (fizzBuzz 200)
-    assert 192 (fizzBuzz 4000)
-    assert 639 (fizzBuzz 10000)
-    assert 8026 (fizzBuzz 100000)
+func testAll
+    test 0 (fizzBuzz 50)
+    test 2 (fizzBuzz 78)
+    test 3 (fizzBuzz 79)
+    test 3 (fizzBuzz 100)
+    test 6 (fizzBuzz 200)
+    test 192 (fizzBuzz 4000)
+    test 639 (fizzBuzz 10000)
+    test 8026 (fizzBuzz 100000)
 end
 
-test
+testAll

@@ -15,12 +15,12 @@ func specialFact:num n:num
     return result
 end
 
-func test
-    assert 2 (specialFact 2)
-    assert 288 (specialFact 4)
-    assert 34560 (specialFact 5)
-    assert 125411328000 (specialFact 7)
-    assert 1 (specialFact 1)
+func testAll
+    test 2 (specialFact 2)
+    test 288 (specialFact 4)
+    test 34560 (specialFact 5)
+    test 125411328000 (specialFact 7)
+    test 1 (specialFact 1)
 end
 
-test
+testAll

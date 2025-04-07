@@ -1,0 +1,18 @@
+<h1>🐛 Make a Worm</h1>
+<ol>
+  <li><strong>Run</strong> this program.</li>
+  <li><strong>Create</strong> some cool output.</li>
+  <li>
+    <strong>Change</strong> this program to draw a circle with
+    <ul>
+      <li>⭐ your favorite <strong>color</strong></li>
+      <li>⭐ a slightly different <strong>size</strong></li>
+      <li>
+        ⭐ a different <strong>outline color</strong>. Use the
+        <a href="/docs/builtins.html#stroke"><code>stroke</code></a> command.
+      </li>
+    </ul>
+  </li>
+</ol>
+<h2>🧪 Explore and experiment!</h2>
+<p>You don't need to understand all the code to make changes.</p>

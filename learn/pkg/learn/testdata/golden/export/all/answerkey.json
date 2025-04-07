@@ -45,6 +45,80 @@
           "single": "b"
         }
       },
+      "exercise-text": {
+        "q-print1": {
+          "text": "print \"cookies coding crew\""
+        },
+        "q-print1-inverted": {
+          "text": "peppy pixel parade"
+        },
+        "q-print2": {
+          "text": "print \"1, 2,\"\nprint \"Robots say moo.\"\nprint \"🤖🐄\"\n"
+        },
+        "q-print2-inverted": {
+          "text": "⏰\nWake up\n🍰\nEat breakfast\n⚡️\nWrite code\n"
+        },
+        "q-print3": {
+          "text": "print \"One, two,\"\nprint \"bugs, shoo.\"\nprint \"🐜🐛🧹\"\n"
+        },
+        "q-print3-inverted": {
+          "text": "One, two,\nbugs, shoo.\n🐜🐛🧹\n"
+        },
+        "q-print4-48": {
+          "text": "print \"Smart cookies\" //levy:blank\nprint \"code together.\" //levy:blank\nprint \"💻🔪🍪\"\n"
+        },
+        "q-print4-6d": {
+          "text": "print \"Foxes build boxes.\" //levy:blank\nprint \"🎁\"\n"
+        },
+        "q-print4-6e": {
+          "text": "print \"Colors clash\"\nprint \"with a splash.\" //levy:blank\nprint \"💻🌈⛲️\"\n"
+        },
+        "q-print4-c0": {
+          "text": "print \"🦊👗🐞\"\nprint \"Fox in dress\" //levy:blank\nprint \"finds bugs for less.\"\n"
+        },
+        "q-print4-df": {
+          "text": "print \"The early bird\"\nprint \"finds the bug.\" //levy:blank\nprint \"🐥🪳🐛\"\n"
+        },
+        "q-print4-empty-1b5": {
+          "text": "print \"🦊👗🐞\"\nprint \"Fox in dress\" //levy:blank\nprint \"finds bugs for less.\"\n"
+        },
+        "q-print4-empty-887": {
+          "text": "print \"Smart cookies\" //levy:blank\nprint \"code together.\" //levy:blank\nprint \"💻🔪🍪\"\n"
+        },
+        "q-print4-empty-a01": {
+          "text": "print \"Foxes build boxes.\" //levy:blank\nprint \"🎁\"\n"
+        },
+        "q-print4-empty-da6": {
+          "text": "print \"Bugs like hugs.\" //levy:blank\nprint \"👾🐛🥰\"\n"
+        },
+        "q-print4-empty-daf": {
+          "text": "print \"The early bird\"\nprint \"finds the bug.\" //levy:blank\nprint \"🐥🪳🐛\"\n"
+        },
+        "q-print4-empty-e3f": {
+          "text": "print \"Colors clash\"\nprint \"with a splash.\" //levy:blank\nprint \"💻🌈⛲️\"\n"
+        },
+        "q-print4-f5": {
+          "text": "print \"Bugs like hugs.\" //levy:blank\nprint \"👾🐛🥰\"\n"
+        },
+        "q-print4-inverted-1a": {
+          "text": "Colors clash\nwith a splash.\n💻🌈⛲️\n"
+        },
+        "q-print4-inverted-27": {
+          "text": "🦊👗🐞\nFox in dress\nfinds bugs for less.\n"
+        },
+        "q-print4-inverted-5b": {
+          "text": "Smart cookies\ncode together.\n💻🔪🍪\n"
+        },
+        "q-print4-inverted-d7": {
+          "text": "Foxes build boxes.\n🎁\n"
+        },
+        "q-print4-inverted-dd": {
+          "text": "The early bird\nfinds the bug.\n🐥🪳🐛\n"
+        },
+        "q-print4-inverted-ea": {
+          "text": "Bugs like hugs.\n👾🐛🥰\n"
+        }
+      },
       "exercise-txtar": {
         "q-banana-0e": {
           "single": "a"

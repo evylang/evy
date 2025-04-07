@@ -16,14 +16,14 @@ func hasCloseElements:bool numbers:[]num threshold:num
     return false
 end
 
-func test
-    assert true (hasCloseElements [1 2 3.9 4 5 2.2] 0.3)
-    assert false (hasCloseElements [1 2 3.9 4 5 2.2] 0.05)
-    assert true (hasCloseElements [1 2 5.9 4 5] 0.95)
-    assert false (hasCloseElements [1 2 5.9 4 5] 0.8)
-    assert true (hasCloseElements [1 2 3 4 5 2] 0.1)
-    assert true (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 1)
-    assert false (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 0.5)
+func testAll
+    test true (hasCloseElements [1 2 3.9 4 5 2.2] 0.3)
+    test false (hasCloseElements [1 2 3.9 4 5 2.2] 0.05)
+    test true (hasCloseElements [1 2 5.9 4 5] 0.95)
+    test false (hasCloseElements [1 2 5.9 4 5] 0.8)
+    test true (hasCloseElements [1 2 3 4 5 2] 0.1)
+    test true (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 1)
+    test false (hasCloseElements [1.1 2.2 3.1 4.1 5.1] 0.5)
 end
 
-test
+testAll

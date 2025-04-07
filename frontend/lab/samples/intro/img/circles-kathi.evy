@@ -1,0 +1,14 @@
+clear "aqua"
+
+color "white"
+move 62 76
+circle 10
+
+move 45 75
+circle 20
+
+move 25 70
+circle 15
+
+move 28 85
+circle 5

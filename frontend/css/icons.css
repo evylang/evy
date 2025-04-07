@@ -3,6 +3,10 @@
   SVG source files are located at /img/icon/*.svg.
   Encoding tool: https://yoksel.github.io/url-encoder/
 */
+.icon-back {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath d='M10.78 19.03a.75.75 0 0 1-1.06 0l-6.25-6.25a.75.75 0 0 1 0-1.06l6.25-6.25a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L5.81 11.5h14.44a.75.75 0 0 1 0 1.5H5.81l4.97 4.97a.75.75 0 0 1 0 1.06Z'%3E%3C/path%3E%3C/svg%3E");
+}
+
 .icon-close {
   mask: url("data:image/svg+xml,%3Csvg fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke-linecap='round' stroke-width='2'%3E%3Cpath d='M4,4 L20,20' /%3E%3Cpath d='M4,20 L20,4' /%3E%3C/g%3E%3C/svg%3E%0A");
 }
@@ -43,6 +47,7 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 142.5 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke-linecap='round' stroke-width='25' fill='none'%3E%3Cpath d='M12.5,12.5 h0' stroke='hsl(49deg 100%25 50%25) ' /%3E%3Cpath d='M50,12.5 h80' stroke='hsl(336deg 78%25 64%25)' /%3E%3Cpath d='M12.5,50 h0' stroke='hsl(7deg 66%25 56%25)' /%3E%3Cpath d='M50,50 h42.5' stroke='hsl(201deg 100%25 63%25)' /%3E%3Cpath d='M12.5,87.5 h0' stroke='hsl(150deg 50%25 47%25) ' /%3E%3Cpath d='M50,87.5 h72.5' stroke='hsl(234deg 48%25 51%25)' /%3E%3C/g%3E%3C/svg%3E");
 }
 
+.icon-back,
 .icon-chevron,
 .icon-close,
 .icon-copy,

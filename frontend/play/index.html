@@ -45,10 +45,20 @@
         </a>
       </div>
       <div class="center">
-        <ul class="breadcrumbs">
-          <li><button>Tour</button></li>
-          <li><button>Welcome</button></li>
-        </ul>
+        <button id="sample-previous" class="arrow">
+          <svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1.4L3.4 6L8 10.6L6.6 12L0.6 6L6.6 0L8 1.4Z" fill="currentColor" />
+          </svg>
+        </button>
+        <button id="sample-selector">
+          <div id="sample-index">1/6</div>
+          <div id="sample-title">Welcome</div>
+        </button>
+        <button id="sample-next" class="arrow">
+          <svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 1.4L4.6 6L0 10.6L1.4 12L7.4 6L1.4 0L0 1.4Z" fill="currentColor" />
+          </svg>
+        </button>
       </div>
       <div class="right">
         <button class="desktop share" id="share">
@@ -60,7 +70,7 @@
     </header>
 
     <div class="max-width-wrapper">
-      <main class="main">
+      <main class="main view-code">
         <div class="editor-wrap noscrollbar">
           <div class="editor language-evy" style="padding-left: calc(2ch + 1.5rem)">
             <!-- These editor sample contents are replaced by JS, once evy toolchain and editor are ready. -->
@@ -93,10 +103,10 @@
             </pre>
           </div>
         </div>
-        <div class="output">
+        <div class="output" tabindex="0">
           <div class="canvas"><canvas id="canvas"></canvas></div>
           <div class="read hidden">
-            <label>input&gt;</label>
+            <label for="read">input&gt;</label>
             <textarea id="read" rows="1"></textarea>
           </div>
           <div class="input slider hidden">
@@ -133,10 +143,10 @@
       </header>
       <ul>
         <li><button id="sidebar-about">About Evy</button></li>
+        <li><a href="/lab" target="_blank">Labs</a></li>
         <li><a href="/docs" target="_blank">Docs</a></li>
         <li><a href="/discord" target="_blank">Discord</a></li>
-        <li><a href="https://github.com/evylang/evy" target="_blank">GitHub</a></li>
-        <li><a href="https://github.com/evylang/evy/wiki/gallery" target="_blank">Gallery</a></li>
+        <li><a href="/gallery" target="_blank">Gallery</a></li>
         <li><a href="https://github.com/sponsors/evylang" target="_blank">Sponsor</a></li>
         <li class="mobile"><button id="sidebar-share">Share</button></li>
       </ul>
@@ -160,7 +170,7 @@
       </ul>
     </nav>
 
-    <!-- Modal evy code sample selection, showed on breadcrumb click -->
+    <!-- Modal evy code sample selection, showed on sample modal click -->
     <div id="modal" class="hidden">
       <header class="topnav">
         <button id="modal-close" class="icon-close"></button>
@@ -178,20 +188,18 @@
 
     <!-- Evy sharing dialog -->
     <dialog id="dialog-share">
-      <form method="dialog">
-        <header>
-          <h1>Share</h1>
-          <button class="icon-close"></button>
-        </header>
-        <main>
-          <p class="note hidden">⚠️ Code has <span class="err">errors</span>!</p>
-          <div class="copy">
-            <input type="text" value="/play#gzipped+and+base64+encoded+evy+code+content" />
-            <button type="button" class="icon-copy"></button>
-          </div>
-          <button class="primary">Done</button>
-        </main>
-      </form>
+      <header>
+        <h1>Share</h1>
+        <button class="icon-close"></button>
+      </header>
+      <main>
+        <p class="dialog-note hidden">⚠️ Code has <span class="err">errors</span>!</p>
+        <div class="copy">
+          <label for="share-url">Sharable URL</label>
+          <input type="text" id="share-url" />
+        </div>
+        <button class="primary" id="copy">Copy</button>
+      </main>
     </dialog>
 
     <!-- Evy loading dialog -->

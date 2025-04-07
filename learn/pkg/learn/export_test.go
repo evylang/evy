@@ -21,6 +21,7 @@ func TestExportAll(t *testing.T) {
 		WriteAnswerKey:    true,
 		WithAnswersMarked: true,
 		WriteCatalog:      true,
+		SelfContained:     true,
 	}
 	err := Export(srcdir, destdir, opts, WithPrivateKey(testKeyPrivate))
 	assert.NoError(t, err)
@@ -33,7 +34,8 @@ func TestExportHTMLNoPrivateKey(t *testing.T) {
 	goldendir := "testdata/golden/export/html-no-private-key"
 
 	opts := ExportOptions{
-		WriteHTML: true,
+		WriteHTML:     true,
+		SelfContained: true,
 	}
 	err := Export(srcdir, destdir, opts, WithIgnoreSealed())
 	assert.NoError(t, err)

@@ -595,6 +595,37 @@ func TestIf(t *testing.T) {
 			x = x`,
 			wantStackTop: makeValue(t, 1),
 		},
+		{
+			name: "local scope",
+			input: `x := 1
+			if false
+				x := 2
+				x = x + 1
+			else if false
+				x := 3
+				x = x + 1
+			else if false
+				x := 4
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "shadowing",
+			input: `x := 3
+			if true
+				x := 2
+				x = x
+			end
+			if x == 3
+				// this branch should be taken,
+				// we think it isn't because shadowing isn't implemented:
+				x = 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -650,6 +681,19 @@ func TestWhile(t *testing.T) {
 				end
 				x = x + 1
 				break
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local scope",
+			input: `
+			x := 1
+			while true
+				x := 5
+				if x == 5
+					break
+				end
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 1),
@@ -759,6 +803,16 @@ func TestStepRange(t *testing.T) {
 			end
 			x = x`,
 			wantStackTop: makeValue(t, 15),
+		},
+		{
+			name: "local scope",
+			input: `x := 1
+			for i := range 5
+				x := i
+				x = x + 1
+			end
+			x = x`,
+			wantStackTop: makeValue(t, 1),
 		},
 	}
 	for _, tt := range tests {
@@ -965,6 +1019,44 @@ func TestStringRange(t *testing.T) {
 func TestScope(t *testing.T) {
 	tests := []testCase{
 		{
+			name: "define and resolve local",
+			input: `x := 0
+			if true
+				y := 1
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 1),
+		},
+		{
+			name: "local shadows global",
+			input: `x := 5
+			if true
+				x := 1
+				x = x + 1
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 5),
+		},
+		{
+			// test that stack operations (y + 3) does not overwrite the
+			// local y on the stack. The local y should be in position 0
+			// on the stack and y + 3 should be computed in position 1 and
+			// 2, with the result left in position 1. y should be unchanged.
+			name: "local stack no overlap",
+			input: `x := 0
+			if true
+				y := 2
+				x = y + 3
+				x = y
+			end
+			x = x
+			`,
+			wantStackTop: makeValue(t, 2),
+		},
+		{
 			name: "shadow outer variable",
 			input: `x := "global"
 			if x == "global"
@@ -1027,6 +1119,20 @@ func TestScope(t *testing.T) {
 			`,
 			wantStackTop: makeValue(t, "a"),
 		},
+		{
+			name: "local loop",
+			input: `
+			func sum:num args:num...
+				total := 0
+				for arg := range args
+					total = total + arg
+				end
+				return total
+			end
+			x := sum 1 2 3 4
+			`,
+			wantStackTop: makeValue(t, 10),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1055,10 +1161,10 @@ func TestFunctions(t *testing.T) {
 			name: "with args",
 			input: `
 			func sub:num a:num b:num
-    			return a - b
+				return a - b
 			end
 			func add:num a:num b:num
-    			return a + b
+				return a + b
 			end
 			x := add 1 2
 			x = sub x 2
@@ -1068,14 +1174,10 @@ func TestFunctions(t *testing.T) {
 		{
 			name: "variadic arg",
 			input: `
-			func sum:num args:num...
-				total := 0
-				for arg := range args
-					total = total + arg
-				end
-				return total
+			func last:num args:num...
+				return args[-1]
 			end
-			x := (sum 1 3) + (sum 2 4)
+			x := last 1 2 3 4 10
 			`,
 			wantStackTop: makeValue(t, 10),
 		},

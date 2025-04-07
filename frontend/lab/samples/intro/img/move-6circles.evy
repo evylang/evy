@@ -1,0 +1,6 @@
+color "purple"
+
+for i := range 0 101 20
+    move i 50
+    circle 10
+end

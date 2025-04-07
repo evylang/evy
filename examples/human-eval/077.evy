@@ -17,15 +17,15 @@ func iscube:bool n:num
     return (round n2) == n
 end
 
-func test
-    assert true (iscube 1)
-    assert false (iscube 2)
-    assert true (iscube -1)
-    assert true (iscube 64)
-    assert false (iscube 180)
-    assert true (iscube 1000)
-    assert true (iscube 0)
-    assert false (iscube 1729)
+func testAll
+    test true (iscube 1)
+    test false (iscube 2)
+    test true (iscube -1)
+    test true (iscube 64)
+    test false (iscube 180)
+    test true (iscube 1000)
+    test true (iscube 0)
+    test false (iscube 1729)
 end
 
-test
+testAll

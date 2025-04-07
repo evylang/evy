@@ -36,23 +36,23 @@ func validateDate:bool d:string
     return true
 end
 
-func test
-    assert true (validateDate "03-11-2000")
-    assert false (validateDate "15-01-2012")
-    assert false (validateDate "04-0-2040")
-    assert true (validateDate "06-04-2020")
-    assert true (validateDate "01-01-2007")
-    assert false (validateDate "03-32-2011")
-    assert false (validateDate "")
-    assert false (validateDate "04-31-3000")
-    assert true (validateDate "06-06-2005")
-    assert false (validateDate "21-31-2000")
-    assert true (validateDate "04-12-2003")
-    assert false (validateDate "04122003")
-    assert false (validateDate "20030412")
-    assert false (validateDate "2003-04")
-    assert false (validateDate "2003-04-12")
-    assert false (validateDate "04-2003")
+func testAll
+    test true (validateDate "03-11-2000")
+    test false (validateDate "15-01-2012")
+    test false (validateDate "04-0-2040")
+    test true (validateDate "06-04-2020")
+    test true (validateDate "01-01-2007")
+    test false (validateDate "03-32-2011")
+    test false (validateDate "")
+    test false (validateDate "04-31-3000")
+    test true (validateDate "06-06-2005")
+    test false (validateDate "21-31-2000")
+    test true (validateDate "04-12-2003")
+    test false (validateDate "04122003")
+    test false (validateDate "20030412")
+    test false (validateDate "2003-04")
+    test false (validateDate "2003-04-12")
+    test false (validateDate "04-2003")
 end
 
-test
+testAll

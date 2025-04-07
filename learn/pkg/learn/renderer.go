@@ -11,6 +11,7 @@ import (
 
 	"evylang.dev/evy/pkg/cli"
 	"evylang.dev/evy/pkg/evaluator"
+	"evylang.dev/evy/pkg/md"
 	"evylang.dev/evy/pkg/parser"
 	"golang.org/x/tools/txtar"
 	"rsc.io/markdown"
@@ -38,8 +39,8 @@ const (
 	SVGOutput
 )
 
-// NewRenderer converts a markdown code block, image or link into an
-// Renderer.
+// AsRenderer converts a markdown code block, image or link into a Renderer if
+// possible.
 //
 // Markdown code blocks with an `evy` info tag are interpreted as Evy source
 // code that can generate text or image/SVG output. Code blocks with an empty
@@ -56,8 +57,8 @@ const (
 //	evy:source | evy:svg | evy:text
 //
 // Code blocks, links and images that don't meet the conditions listed above
-// are ignored. In this case NewRenderer returns nil, nil.
-func NewRenderer(block markdown.Block, field fieldType, filename string) (Renderer, error) {
+// are ignored. In this case AsRenderer returns nil, nil.
+func AsRenderer(block markdown.Block, field fieldType, filename string) (Renderer, error) {
 	if cb, ok := block.(*markdown.CodeBlock); ok {
 		return rendererFromCodeblock(cb)
 	}
@@ -82,21 +83,21 @@ func rendererFromInline(inline markdown.Inline, field fieldType, filename string
 	mdImg, ok := inline.(*markdown.Image)
 	if ok && strings.HasSuffix(mdImg.URL, ".evy.svg") {
 		if err := ensureField(mdImg.Inner, field); err != nil {
-			return nil, fmt.Errorf("%w (image: %s)", err, inlineToString(mdImg))
+			return nil, fmt.Errorf("%w (image: %s)", err, md.Undecorate(mdImg))
 		}
 		return newSVGContentFromFile(filepath.Join(filepath.Dir(filename), mdImg.URL))
 	}
 	link, ok := inline.(*markdown.Link)
 	if ok && strings.HasPrefix(link.Title, "evy:") {
 		if err := ensureField(link.Inner, field); err != nil {
-			return nil, fmt.Errorf("%w (link: %s)", err, inlineToString(link))
+			return nil, fmt.Errorf("%w (link: %s)", err, md.Undecorate(link))
 		}
 		ResultType, err := getResultTypeFromLink(link)
 		if err != nil {
-			return nil, fmt.Errorf("%w (link: %s)", err, inlineToString(link))
+			return nil, fmt.Errorf("%w (link: %s)", err, md.Undecorate(link))
 		}
-		filename := filepath.Join(filepath.Dir(filename), link.URL)
-		return newRendererFromEvyFile(filename, ResultType)
+		targetFilename := filepath.Join(filepath.Dir(filename), link.URL)
+		return newRendererFromEvyFile(targetFilename, ResultType)
 	}
 	if inlineCode, ok := inline.(*markdown.Code); ok {
 		content := inlineCode.Text + "\n"
@@ -109,18 +110,12 @@ func ensureField(inner []markdown.Inline, field fieldType) error {
 	if len(inner) != 1 {
 		return fmt.Errorf("%w: found %d inner elements, expected 1", ErrBadMarkdownStructure, len(inner))
 	}
-	got := inlineToString(inner[0])
+	got := md.Undecorate(inner[0])
 	want := fieldTypeToString[field]
 	if got != want {
 		return fmt.Errorf("%w: expected %q text, found %q", ErrBadMarkdownStructure, want, got)
 	}
 	return nil
-}
-
-func inlineToString(inline markdown.Inline) string {
-	b := &bytes.Buffer{}
-	inline.PrintText(b)
-	return b.String()
 }
 
 // SVGContent represents SVG image content.
@@ -178,8 +173,26 @@ func (s *evySource) RenderOutput() string {
 // RenderHTML prints evy source code.
 func (s *evySource) RenderHTML(buf *bytes.Buffer) {
 	buf.WriteString(`<pre><code class="language-evy">`)
-	buf.WriteString(s.source)
+	buf.WriteString(removeCommentTags(s.source))
 	buf.WriteString("</code></pre>\n")
+}
+
+func removeCommentTags(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimSuffix(line, " //levy:blank")
+	}
+	return strings.Join(lines, "\n")
+}
+
+func removeTaggedPrint(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if strings.HasSuffix(line, " //levy:blank") && strings.HasPrefix(line, "print ") {
+			lines[i] = "print"
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func newTxtarContent(filename string, resultType ResultType) (Renderer, error) {
@@ -270,6 +283,19 @@ func newRendererFromEvyBytes(b []byte, resultType ResultType) Renderer {
 	return &evySource{source: string(b)}
 }
 
+func newRendererFromEvyBytesWithBlanked(b []byte, resultType ResultType) Renderer {
+	src := string(b)
+	switch resultType {
+	case SVGOutput:
+		content := runEvy(removeTaggedPrint(src), SVGOutput)
+		return SVGContent(content)
+	case TextOutput:
+		content := runEvy(removeTaggedPrint(src), TextOutput)
+		return TextContent(content)
+	}
+	return &evySource{source: string(b)}
+}
+
 func getResultTypeFromLink(link *markdown.Link) (ResultType, error) {
 	u := link.URL
 	if strings.HasPrefix(u, "https://") || strings.HasPrefix(u, "http://") {
@@ -320,9 +346,9 @@ func runEvy(source string, t ResultType) string {
 		cli.WithSkipSleep(true),
 		cli.WithOutputWriter(textWriter),
 		cli.WithCls(textWriter.Reset),
-		cli.WithSVG("" /* root style */),
+		cli.WithSVG("", "", "" /* root style, width, height */),
 	}
-	rt := cli.NewRuntime(opts...)
+	rt := cli.NewPlatform(opts...)
 	eval := evaluator.NewEvaluator(rt)
 	err := eval.Run(source)
 	if err != nil {

@@ -8,12 +8,12 @@ func sum:num n:num
     return n * (n + 1) / 2
 end
 
-func test
-    assert 1 (sum 1)
-    assert 21 (sum 6)
-    assert 66 (sum 11)
-    assert 465 (sum 30)
-    assert 5050 (sum 100)
+func testAll
+    test 1 (sum 1)
+    test 21 (sum 6)
+    test 66 (sum 11)
+    test 465 (sum 30)
+    test 5050 (sum 100)
 end
 
-test
+testAll

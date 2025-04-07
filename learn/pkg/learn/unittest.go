@@ -76,7 +76,7 @@ func (m *UnittestModel) buildExercises() error {
 func (m *UnittestModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)
@@ -87,6 +87,11 @@ func (m *UnittestModel) ToHTML(withAnswersMarked bool) (string, error) {
 // Name returns the name of the unit test model: "Unit test <UNIT-NAME>".
 func (m *UnittestModel) Name() string {
 	return m.name
+}
+
+// Document returns the markdown ast root node.
+func (m *UnittestModel) Document() *markdown.Document {
+	return m.Doc
 }
 
 func (m *UnittestModel) parseFrontmatterMD() error {

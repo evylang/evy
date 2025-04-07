@@ -1,0 +1,11 @@
+i:num
+
+while i < 100000
+    x := rand1
+    y := rand1
+    move x*100 y*100
+
+    circle 0.2
+
+    i = i + 1
+end

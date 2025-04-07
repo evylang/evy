@@ -1,0 +1,87 @@
+<h1>🔢 Sequences</h1>
+<h2>⭐ Warm Up</h2>
+<p>Can you write a program that prints the numbers from <code>0</code> to <code>9</code>?</p>
+<h3><code>while</code> loop structure</h3>
+<pre><code class="language-evy">while loop_condition
+    loop_body
+    // …
+end
+</code></pre>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+while x &lt;= ❓
+    print x
+    x = x + ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Number Sequences</h2>
+<p>Write programs that generate the first 20 numbers of the following sequences:</p>
+<ul>
+  <li>
+    <p><code>0</code>, <code>2</code>, <code>4</code>, <code>6</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>4</code>, <code>7</code>, <code>10</code>, …</p>
+  </li>
+  <li>
+    <p><code>20</code>, <code>18.5</code>, <code>17</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>2</code>, <code>4</code>, <code>8</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>10</code>, <code>100</code>, <code>1000</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>0.5</code>, <code>0.25</code>, <code>0.125</code>, …</p>
+  </li>
+  <li>
+    <p><code>1</code>, <code>3</code>, <code>6</code>, <code>10</code>, …</p>
+  </li>
+</ul>
+<p>
+  Use <em>two different</em> variables to track the count used in the loop condition and the printed
+  sequence number.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+a:num
+while x &lt;= ❓
+    print a
+    a =  ❓
+    x = x + ❓
+end
+</code></pre>
+</details>
+<details>
+  <summary>Answer</summary>
+  <p>The solution for 20th number is</p>
+  <ul>
+    <li>38</li>
+    <li>58</li>
+    <li>-8.5</li>
+    <li>524288</li>
+    <li>10000000000000000000</li>
+    <li>0.0000019073486328125</li>
+    <li>210</li>
+  </ul>
+</details>
+<details>
+  <summary>Docs</summary>
+  <p>
+    The first 3 sequences are <strong>arithmetic sequences</strong> where you add the same amount to
+    get from one number to the next.
+  </p>
+  <p>
+    The next 3 sequences are <strong>geometric sequences</strong> where you multiply by the same
+    amount to get from one number to the next.
+  </p>
+  <p>
+    The last sequence is the <strong>triangle sequence</strong> where each number is the sum of the
+    previous number and its position in the sequence.
+  </p>
+</details>

@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Exercise 4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡️</text></svg>" />
+    <style>
+      body {
+        padding: 8px 32px;
+        margin: 0;
+      }
+      fieldset {
+        display: grid;
+        grid-template: repeat(2, min-content) / repeat(2, min-content);
+        grid-auto-flow: column;
+        column-gap: 32px;
+        row-gap: 8px;
+        border: none;
+      }
+      pre {
+        border: 1px solid silver;
+        padding: 8px 12px;
+        border-radius: 2px;
+        background: whitesmoke;
+        width: fit-content;
+      }
+      fieldset > div {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        border: 1px solid silver;
+        border-radius: 6px;
+        padding: 8px;
+        background: whitesmoke;
+      }
+      fieldset pre {
+        margin: 0;
+        padding: 4px 12px;
+        align-self: center;
+        background: white;
+        border: 1px solid silver;
+      }
+      textarea {
+        display: block;
+        border: 1px solid silver;
+        border-radius: 2px;
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+      form {
+        padding-bottom: 32px;
+      }
+      form svg {
+        width: 200px;
+        height: 200px;
+        border: 1px solid silver;
+      }
+      form.difficulty-easy:after {
+        content: "Difficulty: 🌶️";
+      }
+      form.difficulty-medium:after {
+        content: "Difficulty: 🌶️🌶️";
+      }
+      form.difficulty-hard:after {
+        content: "Difficulty: 🌶️🌶️🌶️";
+      }
+      form:not(:first-child) {
+        border-top: 1px solid silver;
+      }
+      table {
+        border-collapse: collapse;
+        margin-bottom: 24px;
+      }
+      td {
+        border: 1px solid silver;
+        padding: 4px 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Exercise 4</h1>
+<p>Exercise 4 checks if you can write your own code, it's not a <em>real</em> exercise.</p>
+<h3>Question Composition</h3>
+<table>
+<tr><td >easy 🌶️</td><td>2</td></tr>
+</table>
+<form id=q-print1-inverted class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print &quot;peppy pixel parade&quot;
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print1 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write a program that generates this output:</p>
+<pre><code>cookies coding crew
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print2-inverted class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the output of this program:</p>
+<pre><code class="language-evy">print &quot;⏰&quot;
+print &quot;Wake up&quot;
+print &quot;🍰&quot;
+print &quot;Eat breakfast&quot;
+print &quot;⚡️&quot;
+print &quot;Write code&quot;
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="7" cols="35">
+⏰
+Wake up
+🍰
+
+⚡️
+
+</textarea>
+</form>
+<form id=q-print2 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>1, 2,
+Robots say moo.
+🤖🐄
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+
+
+print "🤖🐄"
+</textarea>
+</form>
+<form id=q-print3-inverted class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the output of this program:</p>
+<pre><code class="language-evy">print "One, two,"
+print "bugs, shoo."
+print "🐜🐛🧹"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="4" cols="35">
+One, two,
+
+🐜🐛🧹
+</textarea>
+</form>
+<form id=q-print3 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>One, two,
+bugs, shoo.
+🐜🐛🧹
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+
+print "bugs, shoo."
+print "🐜🐛🧹"
+</textarea>
+</form>
+<form id=q-print4-empty-da6 class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Bugs like hugs.
+👾🐛🥰
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-empty-e3f class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Colors clash
+with a splash.
+💻🌈⛲️
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-empty-daf class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>The early bird
+finds the bug.
+🐥🪳🐛
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-empty-1b5 class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>🦊👗🐞
+Fox in dress
+finds bugs for less.
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-empty-a01 class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Foxes build boxes.
+🎁
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-empty-887 class="difficulty-easy">
+<h2>Empty test Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Smart cookies
+code together.
+💻🔪🍪
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-ea class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "Bugs like hugs."
+print "👾🐛🥰"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-1a class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "Colors clash"
+print "with a splash."
+print "💻🌈⛲️"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-dd class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "The early bird"
+print "finds the bug."
+print "🐥🪳🐛"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-27 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "🦊👗🐞"
+print "Fox in dress"
+print "finds bugs for less."
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-d7 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "Foxes build boxes."
+print "🎁"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-inverted-5b class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Write the output of this program:</p>
+<pre><code class="language-evy">print "Smart cookies"
+print "code together."
+print "💻🔪🍪"
+</code></pre>
+<p>Output:</p>
+<textarea name="answer" rows="2" cols="35">
+
+</textarea>
+</form>
+<form id=q-print4-f5 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Bugs like hugs.
+👾🐛🥰
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="3" cols="35">
+
+print "👾🐛🥰"
+</textarea>
+</form>
+<form id=q-print4-6e class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Colors clash
+with a splash.
+💻🌈⛲️
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+print "Colors clash"
+
+print "💻🌈⛲️"
+</textarea>
+</form>
+<form id=q-print4-df class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>The early bird
+finds the bug.
+🐥🪳🐛
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+print "The early bird"
+
+print "🐥🪳🐛"
+</textarea>
+</form>
+<form id=q-print4-c0 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>🦊👗🐞
+Fox in dress
+finds bugs for less.
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+print "🦊👗🐞"
+
+print "finds bugs for less."
+</textarea>
+</form>
+<form id=q-print4-6d class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Foxes build boxes.
+🎁
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="3" cols="35">
+
+print "🎁"
+</textarea>
+</form>
+<form id=q-print4-48 class="difficulty-easy">
+<h2>Understanding sequence: <code>print</code></h2>
+<p>Complete the program that generates this output:</p>
+<pre><code>Smart cookies
+code together.
+💻🔪🍪
+</code></pre>
+<p>Program:</p>
+<textarea name="answer" rows="4" cols="35">
+
+
+print "💻🔪🍪"
+</textarea>
+</form>
+
+  </body>
+</html>

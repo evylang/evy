@@ -15,22 +15,6 @@ dialog {
   background: var(--background);
 }
 
-dialog[open] {
-  /* Cannot use opacity because dialog is "display:none"
-    when hidden. Changing this messes with accessibility. */
-  animation: fadein 0.2s ease-in forwards;
-}
-
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 dialog form {
   display: flex;
   flex-direction: column;

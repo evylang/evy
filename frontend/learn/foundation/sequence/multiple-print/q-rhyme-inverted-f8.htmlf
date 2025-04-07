@@ -1,0 +1,15 @@
+<form id="q-rhyme-inverted-f8" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the program that generates this output:</p>
+  <pre><code>Colors clash
+with a splash.
+💻🌈⛲️
+</code></pre>
+  <p>Program:</p>
+  <textarea name="answer" rows="4" cols="35">
+print "Colors clash"
+
+print "💻🌈⛲️"
+</textarea
+  >
+</form>

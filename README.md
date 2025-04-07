@@ -44,15 +44,15 @@ Here is a "hello world" program in Evy
 
 Here are some resources for learning more about Evy:
 
-- [Learn and Practise]\: A guided tour that teaches you programming using Evy.
-- [Syntax by Example](docs/syntax_by_example.md): A collection of examples that illustrate the Evy syntax.
+- [Syntax by Example](docs/syntax-by-example.md): A collection of examples that illustrate the Evy syntax.
 - [Built-in Documentation](docs/builtins.md): Details on built-in functions and events in Evy.
 - [Language Specification](docs/spec.md): A formal definition of the Evy syntax and language.
+- [Interactive Labs]: A guided tour with challenges that teaches you programming using Evy.
 
 For questions and discussions, join the [Evy community] on Discord.
 
 [Evy community]: https://discord.evy.dev
-[Learn and Practise]: https://github.com/evylang/evy/wiki
+[Interactive Labs]: https://lab.evy.dev
 
 ## 📦 Installation
 
@@ -79,7 +79,7 @@ Use [Homebrew] to install `evy`.
 The Evy interpreter is written in [Go] and built using the Go and
 [TinyGo] compilers. TinyGo targets [WebAssembly], which allows Evy
 source code to be parsed and run in a web browser. The browser
-runtime is written in plain JavaScript without the use of frameworks.
+platform is written in plain JavaScript without the use of frameworks.
 
 To build the Evy source code, [clone] this repository and
 [activate Hermit] in your terminal. Then, build the sources with
@@ -132,16 +132,16 @@ directory by installing [Hermit shell hooks] with
 
 Evy would not be here today without the help of many people.
 
-- [camh]\: Thank you for your support, guidance, generosity and endless patience.
-- [Jason]\: Thank you for donating the Evy website design. It is beautiful!
-- [@ckaser]\: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
-- [@fcostin]\: Thank you for the [Splash of Trig] sample, your wisdom and your willingness to help.
-- [@starkcoffee], [@alecthomas], [@loislambeth]\: Thank you for your insights, support, and encouragement. I am grateful for your friendship!
+- [camh]: Thank you for your support, guidance, generosity and endless patience.
+- [Jason]: Thank you for donating the Evy website design. It is beautiful!
+- [@chkas]: Thank you for creating the fantastic [easylang] language, which was a major inspiration for Evy.
+- [@fcostin]: Thank you for the [Splash of Trig] sample, your wisdom and your willingness to help.
+- [@starkcoffee], [@alecthomas], [@loislambeth]: Thank you for your insights, support, and encouragement. I am grateful for your friendship!
 - My daughter Mali: Thank you for being keen to learn programming and for testing Evy with me.
 
 [camh]: https://github.com/camh-
 [Jason]: https://twitter.com/jasonstrachan
-[@ckaser]: https://github.com/ckaser
+[@chkas]: https://github.com/chkas
 [easylang]: https://easylang.online/
 [@fcostin]: https://github.com/fcostin
 [Splash of Trig]: https://play.evy.dev#splashtrig

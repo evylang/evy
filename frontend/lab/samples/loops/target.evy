@@ -1,0 +1,7 @@
+width 2
+stroke "red"
+move 50 50
+r:num
+r = 46
+
+circle r

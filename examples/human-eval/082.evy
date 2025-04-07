@@ -18,23 +18,23 @@ func primeLength:bool s:string
     return true
 end
 
-func test
-    assert true (primeLength "Hello")
-    assert true (primeLength "abcdcba")
-    assert true (primeLength "kittens")
-    assert false (primeLength "orange")
-    assert true (primeLength "wow")
-    assert true (primeLength "world")
-    assert true (primeLength "MadaM")
-    assert true (primeLength "Wow")
-    assert false (primeLength "")
-    assert true (primeLength "HI")
-    assert true (primeLength "go")
-    assert false (primeLength "gogo")
-    assert false (primeLength "aaaaaaaaaaaaaaa")
-    assert true (primeLength "Madam")
-    assert false (primeLength "M")
-    assert false (primeLength "0")
+func testAll
+    test true (primeLength "Hello")
+    test true (primeLength "abcdcba")
+    test true (primeLength "kittens")
+    test false (primeLength "orange")
+    test true (primeLength "wow")
+    test true (primeLength "world")
+    test true (primeLength "MadaM")
+    test true (primeLength "Wow")
+    test false (primeLength "")
+    test true (primeLength "HI")
+    test true (primeLength "go")
+    test false (primeLength "gogo")
+    test false (primeLength "aaaaaaaaaaaaaaa")
+    test true (primeLength "Madam")
+    test false (primeLength "M")
+    test false (primeLength "0")
 end
 
-test
+testAll

@@ -44,16 +44,16 @@ func strength:num s:string
     return result
 end
 
-func test
-    assert "Watashi.eIGHt8OKe" (strongest "Watashi" ["tEN" "niNE" "eIGHt8OKe"])
-    assert "Boku123.YEs.WeCaNe" (strongest "Boku123" ["nani" "NazeDa" "YEs.WeCaNe" "32145tggg"])
-    assert "__YESIMHERE.NuLl__" (strongest "__YESIMHERE" ["t" "eMptY" "nothing" "zeR00" "NuLl__" "123NoooneB321"])
-    assert "K.TAR" (strongest "K" ["Ta" "TAR" "t234An" "cosSo"])
-    assert "__HAHA.123" (strongest "__HAHA" ["Tab" "123" "781345" "-_-"])
-    assert "YameRore.okIWILL123" (strongest "YameRore" ["HhAas" "okIWILL123" "WorkOut" "Fails" "-_-"])
-    assert "finNNalLLly.WoW" (strongest "finNNalLLly" ["Die" "NowW" "Wow" "WoW"])
-    assert "_.Bb" (strongest "_" ["Bb" "91245"])
-    assert "Sp.671235" (strongest "Sp" ["671235" "Bb"])
+func testAll
+    test "Watashi.eIGHt8OKe" (strongest "Watashi" ["tEN" "niNE" "eIGHt8OKe"])
+    test "Boku123.YEs.WeCaNe" (strongest "Boku123" ["nani" "NazeDa" "YEs.WeCaNe" "32145tggg"])
+    test "__YESIMHERE.NuLl__" (strongest "__YESIMHERE" ["t" "eMptY" "nothing" "zeR00" "NuLl__" "123NoooneB321"])
+    test "K.TAR" (strongest "K" ["Ta" "TAR" "t234An" "cosSo"])
+    test "__HAHA.123" (strongest "__HAHA" ["Tab" "123" "781345" "-_-"])
+    test "YameRore.okIWILL123" (strongest "YameRore" ["HhAas" "okIWILL123" "WorkOut" "Fails" "-_-"])
+    test "finNNalLLly.WoW" (strongest "finNNalLLly" ["Die" "NowW" "Wow" "WoW"])
+    test "_.Bb" (strongest "_" ["Bb" "91245"])
+    test "Sp.671235" (strongest "Sp" ["671235" "Bb"])
 end
 
-test
+testAll

@@ -178,9 +178,9 @@ func hybridEncrypt(publicKey *rsa.PublicKey, plaintext []byte) ([]byte, error) {
 	// First 3 bytes are RSA ciphertext length, so we can separate all the
 	// pieces later.
 	ciphertext := make([]byte, 3)
-	ciphertext[0] = 1 // Version
-	binary.BigEndian.PutUint16(ciphertext[1:], uint16(len(rsaCiphertext)))
-	ciphertext = append(ciphertext, rsaCiphertext...) //nolint:makezero // We want to initialize the first 3 bytes and then append, this is correct.
+	ciphertext[0] = 1                                                      // Version
+	binary.BigEndian.PutUint16(ciphertext[1:], uint16(len(rsaCiphertext))) //nolint:gosec // we are just going to be lax about overflow errors at the moment
+	ciphertext = append(ciphertext, rsaCiphertext...)                      //nolint:makezero // We want to initialize the first 3 bytes and then append, this is correct.
 
 	// SessionKey is only used once, so zero nonce is ok.
 	zeroNonce := make([]byte, gcm.NonceSize())

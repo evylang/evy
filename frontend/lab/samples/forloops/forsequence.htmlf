@@ -1,0 +1,20 @@
+<h1>🔢 Sequences with <code>for</code></h1>
+<p>⭐ Write 5 <code>for</code> loops that generate the following sequences:</p>
+<ul>
+  <li><code>0</code>, <code>1</code>, <code>2</code></li>
+  <li><code>1</code>, <code>2</code>, <code>3</code></li>
+  <li><code>1</code>, <code>4</code>, <code>7</code></li>
+  <li><code>8</code>, <code>5</code>, <code>2</code></li>
+  <li><code>-1</code>, <code>-4</code>, <code>-7</code></li>
+</ul>
+<details>
+  <summary>Hint</summary>
+  <p>
+    You only need to find the correct <code>START</code>, <code>STOP</code> and
+    <code>STEP</code> values in:
+  </p>
+  <pre><code class="language-evy">for x := range START STOP STEP
+  print x
+end
+</code></pre>
+</details>

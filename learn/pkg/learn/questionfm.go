@@ -7,7 +7,7 @@ import (
 type questionFrontmatter struct {
 	Type              frontmatterType `yaml:"type,omitempty"` // question
 	Difficulty        difficulty      `yaml:"difficulty,omitempty"`
-	AnswerType        answerType      `yaml:"answer-type,omitempty"` // single-choice, multiple-choice, free-text, multiple-free-texts, program
+	AnswerType        answerType      `yaml:"answer-type,omitempty"` // single-choice, multiple-choice, text, multiple-texts, program
 	GenerateQuestions string          `yaml:"generate-questions,omitempty"`
 	Answer            string          `yaml:"answer,omitempty"`
 	SealedAnswer      string          `yaml:"sealed-answer,omitempty"`
@@ -23,9 +23,6 @@ func (f *questionFrontmatter) validate() error {
 	}
 	if f.Answer != "" && f.SealedAnswer != "" {
 		return fmt.Errorf("%w: sealed and unsealed answer found, only one allowed", ErrInvalidFrontmatter)
-	}
-	if f.GenerateQuestions != "" && f.AnswerType != "single-choice" {
-		return fmt.Errorf("%w: answers can only be generated for single-choice answer-type", ErrInvalidFrontmatter)
 	}
 	if f.GenerateQuestions != "" && f.Answer != "" {
 		return fmt.Errorf("%w: answer field must be empty when generating questions", ErrInvalidFrontmatter)

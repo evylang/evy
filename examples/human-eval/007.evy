@@ -20,11 +20,11 @@ func contains:bool haystack:string needle:string
     return false
 end
 
-func test
-    assert [] (filter [] "john")
-    assert ["xxx" "xxxAAA" "xxx"] (filter ["xxx" "asd" "xxy" "john doe" "xxxAAA" "xxx"] "xxx")
-    assert ["xxx" "aaaxxy" "xxxAAA" "xxx"] (filter ["xxx" "asd" "aaaxxy" "john doe" "xxxAAA" "xxx"] "xx")
-    assert ["grunt" "prune"] (filter ["grunt" "trumpet" "prune" "gruesome"] "run")
+func testAll
+    test [] (filter [] "john")
+    test ["xxx" "xxxAAA" "xxx"] (filter ["xxx" "asd" "xxy" "john doe" "xxxAAA" "xxx"] "xxx")
+    test ["xxx" "aaaxxy" "xxxAAA" "xxx"] (filter ["xxx" "asd" "aaaxxy" "john doe" "xxxAAA" "xxx"] "xx")
+    test ["grunt" "prune"] (filter ["grunt" "trumpet" "prune" "gruesome"] "run")
 end
 
-test
+testAll

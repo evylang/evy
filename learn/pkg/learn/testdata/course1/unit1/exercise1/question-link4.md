@@ -1,7 +1,7 @@
 ---
 type: question
 difficulty: easy # "easy", "medium", "hard", "retriable"
-answer-type: multiple-choice # single-choice, multiple-choice, free-text, multiple-free-texts, program
+answer-type: multiple-choice # single-choice, multiple-choice, text, multiple-texts, program
 answer: b, c
 ---
 

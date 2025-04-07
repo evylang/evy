@@ -1,0 +1,52 @@
+<h1>🌈🫵 Gradient</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Use a Variable</h2>
+<p>
+  Can you replace the value <code>30</code> with a variable in 3 places? We will iterate over this
+  variable in a following step.
+</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">x:num
+x = 30
+c = hsl ❓+200
+color c
+move ❓ 100
+// One more to replace
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Use a Loop</h2>
+<p>Can you use this variable to create a loop from 0 to 100 with a step of 10?</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">while x &lt;= ❓
+    c = hsl __
+    color c
+    move __
+    line __
+    x = x + ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Animation</h2>
+<p>Can you animate the lines with the <code>sleep</code> command?</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">while x &lt;= __
+    // ...
+    sleep ❓
+    x = x + __
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Animation Smoothing</h2>
+<p>
+  Can you reduce the line <code>width</code>, <code>sleep</code> and loop increment to create a
+  smooth gradient?
+</p>

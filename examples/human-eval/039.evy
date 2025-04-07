@@ -32,17 +32,17 @@ func isPrime:bool n:num
     return true
 end
 
-func test
-    assert 2 (primeFib 1)
-    assert 3 (primeFib 2)
-    assert 5 (primeFib 3)
-    assert 13 (primeFib 4)
-    assert 89 (primeFib 5)
-    assert 233 (primeFib 6)
-    assert 1597 (primeFib 7)
-    assert 28657 (primeFib 8)
-    assert 514229 (primeFib 9)
-    assert 433494437 (primeFib 10)
+func testAll
+    test 2 (primeFib 1)
+    test 3 (primeFib 2)
+    test 5 (primeFib 3)
+    test 13 (primeFib 4)
+    test 89 (primeFib 5)
+    test 233 (primeFib 6)
+    test 1597 (primeFib 7)
+    test 28657 (primeFib 8)
+    test 514229 (primeFib 9)
+    test 433494437 (primeFib 10)
 end
 
-test
+testAll

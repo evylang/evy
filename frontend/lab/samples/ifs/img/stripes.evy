@@ -1,0 +1,33 @@
+colors := [
+    "midnightblue"
+    "darkblue"
+    "mediumblue"
+    "blue"
+    "royalblue"
+    "cornflowerblue"
+    "lightblue"
+    "mistyrose"
+    "lightpink"
+    "lightcoral"
+    "indianred"
+    "brown"
+    "darkred"
+    "maroon"
+]
+cnt := (len colors) - 1
+w := 0.3
+for x := range 0 100 w
+    setColor x
+    move x 0
+    rect w 100
+end
+
+func setColor x:num
+    p := (rand1) + 0.5
+    idx := x * cnt / 100
+    idx = round idx+0.5
+    idx = idx * p
+    idx = round idx+0.1
+    idx = min idx cnt
+    color colors[round idx]
+end

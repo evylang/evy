@@ -10,14 +10,14 @@
 // compilation step. This is a straightforward way to implement an
 // interpreter, but it trades off execution performance for simplicity.
 //
-// The [Evaluator] uses different [Runtime] implementations to target
-// different environments. For example, there is a JS/[WASM] runtime for
+// The [Evaluator] uses different [Platform] implementations to target
+// different environments. For example, there is a JS/[WASM] platform for
 // the browser, which has full support for all graphics built-in
 // functions. There is also a command line environment, which does not
 // have graphics functions support.
 //
 // The [NewEvaluator] function creates a new [Evaluator] for a given
-// [Runtime]. The evaluator can then be used by either:
+// [Platform]. The evaluator can then be used by either:
 //   - Passing an Evy program directly to the [Evaluator.Run] function.
 //   - Passing the pre-generated AST to the [Evaluator.Eval] function.
 //

@@ -1,0 +1,20 @@
+<h1>🌱 Foundation</h1>
+<p>
+  Programming is for everyone! You don't have to have a specific background or education. You just
+  need curiosity and the willingness to try.
+</p>
+<p>
+  In this course, you'll learn how to make the computer follow your instructions one by one,
+  creating your first graphics! You'll work with different types of data like numbers and text, and
+  even teach your programs to make choices and repeat actions.
+</p>
+<p>Let's get started! 🚀</p>
+<h3>Units</h3>
+<ul>
+  <li><a href="sequence/index.html">Unit 1: Sequential Execution</a></li>
+</ul>
+<div class="badges">
+  <h2>Sequential Execution</h2>
+  <a href="sequence/print/index.html">🔲</a>
+  <a href="sequence/multiple-print/index.html">🔲</a>
+</div>

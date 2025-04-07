@@ -1,0 +1,14 @@
+<h1>🧿 Pulse</h1>
+<p>Hit <strong>Run</strong> to see a pulsing shape 🧿👉.</p>
+<h2>Observe the animation</h2>
+<ul>
+  <li>What shape is being drawn?</li>
+  <li>What color is it?</li>
+  <li>How do you think the color fading effect is achieved?</li>
+</ul>
+<h2>Think about the code:</h2>
+<ul>
+  <li>Where might an <code>if</code> statement be needed in this animation?</li>
+  <li>What other programming concept might be used here?</li>
+</ul>
+<p>Let's explore!</p>

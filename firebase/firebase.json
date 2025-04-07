@@ -6,7 +6,7 @@
   "hosting": [
     {
       "target": "apex",
-      "public": "public",
+      "public": "public/apex",
       "headers": [
         {
           "source": "**/*.*.@(js|css|woff2|svg)",
@@ -23,6 +23,11 @@
           "source": "/evy-2401.pdf",
           "destination": "https://raw.githubusercontent.com/evylang/evy/v0.1.25/docs/papers/evy-2401.pdf",
           "type": 301
+        },
+        {
+          "source": "/send",
+          "destination": "https://docs.google.com/forms/d/e/1FAIpQLSeGSw3Ot3Ha-ElvVbu361MovzroNaGv1fjQq8geS1fs9Kookg/viewform",
+          "type": 301
         }
       ],
       "rewrites": [
@@ -33,16 +38,27 @@
       ]
     },
     {
-      "target": "ai",
-      "public": "public/ai"
-    },
-    {
       "target": "discord",
-      "public": "public/discord"
+      "public": "public/apex/discord"
     },
     {
       "target": "docs",
-      "public": "public/docs"
+      "public": "public/apex/docs"
+    },
+    {
+      "target": "gallery",
+      "public": "public/apex/gallery"
+    },
+    {
+      "target": "lab",
+      "public": "public/apex/lab",
+      "redirects": [
+        {
+          "source": "/playlist",
+          "destination": "https://www.youtube.com/playlist?list=PLSSU-Bb3IOxe-15D2NCvwtvvEDqZT-epV",
+          "type": 301
+        }
+      ]
     },
     {
       "target": "learn",
@@ -50,7 +66,7 @@
     },
     {
       "target": "play",
-      "public": "public/play",
+      "public": "public/apex/play",
       "rewrites": [
         {
           "source": "/version",

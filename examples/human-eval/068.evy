@@ -46,15 +46,15 @@ func pluck:[]num nums:[]num
     return [val idx]
 end
 
-func test
-    assert [2 1] (pluck [4 2 3])
-    assert [2 1] (pluck [1 2 3])
-    assert [] (pluck [])
-    assert [0 1] (pluck [5 0 3 0 4 2])
-    assert [0 3] (pluck [1 2 3 0 5 3])
-    assert [4 1] (pluck [5 4 8 4 8])
-    assert [6 1] (pluck [7 6 7 1])
-    assert [] (pluck [7 9 7 1])
+func testAll
+    test [2 1] (pluck [4 2 3])
+    test [2 1] (pluck [1 2 3])
+    test [] (pluck [])
+    test [0 1] (pluck [5 0 3 0 4 2])
+    test [0 3] (pluck [1 2 3 0 5 3])
+    test [4 1] (pluck [5 4 8 4 8])
+    test [6 1] (pluck [7 6 7 1])
+    test [] (pluck [7 9 7 1])
 end
 
-test
+testAll

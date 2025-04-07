@@ -20,21 +20,21 @@ func minSum:num nums:[]num
     return ms
 end
 
-func test
-    assert -5 (minSum [2 3 -4 1 -2 4])
-    assert -7 (minSum [2 -1 1 -6 2 3 -4 1 -3 4])
-    assert 1 (minSum [2 3 4 1 2 4])
-    assert -6 (minSum [-1 -2 -3])
-    assert -14 (minSum [-1 -2 -3 2 -10])
-    assert -10000000000000000 (minSum [-10000000000000000])
-    assert 0 (minSum [0 10 20 1000000])
-    assert -6 (minSum [-1 -2 -3 10 -5])
-    assert -6 (minSum [100 -1 -2 -3 10 -5])
-    assert 3 (minSum [10 11 13 8 3 4])
-    assert -33 (minSum [100 -33 32 -1 0 -2])
-    assert -10 (minSum [-10])
-    assert 7 (minSum [7])
-    assert -1 (minSum [1 -1])
+func testAll
+    test -5 (minSum [2 3 -4 1 -2 4])
+    test -7 (minSum [2 -1 1 -6 2 3 -4 1 -3 4])
+    test 1 (minSum [2 3 4 1 2 4])
+    test -6 (minSum [-1 -2 -3])
+    test -14 (minSum [-1 -2 -3 2 -10])
+    test -10000000000000000 (minSum [-10000000000000000])
+    test 0 (minSum [0 10 20 1000000])
+    test -6 (minSum [-1 -2 -3 10 -5])
+    test -6 (minSum [100 -1 -2 -3 10 -5])
+    test 3 (minSum [10 11 13 8 3 4])
+    test -33 (minSum [100 -33 32 -1 0 -2])
+    test -10 (minSum [-10])
+    test 7 (minSum [7])
+    test -1 (minSum [1 -1])
 end
 
-test
+testAll

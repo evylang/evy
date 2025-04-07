@@ -1,0 +1,8 @@
+i:num
+i = 0
+
+while i < 10
+    print i
+    sleep 0.5 // wait 0.5 seconds
+    i = i + 1
+end

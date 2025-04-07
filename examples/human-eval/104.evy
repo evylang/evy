@@ -37,11 +37,11 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [1 15 33] (oddDigits [15 33 1422 1])
-    assert [] (oddDigits [152 323 1422 10])
-    assert [111 151] (oddDigits [12345 2033 111 151])
-    assert [31 135] (oddDigits [135 103 31])
+func testAll
+    test [1 15 33] (oddDigits [15 33 1422 1])
+    test [] (oddDigits [152 323 1422 10])
+    test [111 151] (oddDigits [12345 2033 111 151])
+    test [31 135] (oddDigits [135 103 31])
 end
 
-test
+testAll

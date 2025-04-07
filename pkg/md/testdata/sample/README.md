@@ -4,7 +4,7 @@
 
 ### Heading 3
 
-[link](https://exmpale.com)
+[link](README.md)
 
 ```evy
 print "code block sample"

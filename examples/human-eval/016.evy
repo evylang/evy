@@ -10,12 +10,12 @@ func countDistinctCharacters:num str:string
     return len set
 end
 
-func test
-    assert 0 (countDistinctCharacters "")
-    assert 5 (countDistinctCharacters "abcde")
-    assert 5 (countDistinctCharacters "abcde"+"cade"+"CADE")
-    assert 1 (countDistinctCharacters "aaaaAAAAaaaa")
-    assert 5 (countDistinctCharacters "Jerry jERRY JeRRRY")
+func testAll
+    test 0 (countDistinctCharacters "")
+    test 5 (countDistinctCharacters "abcde")
+    test 5 (countDistinctCharacters "abcde"+"cade"+"CADE")
+    test 1 (countDistinctCharacters "aaaaAAAAaaaa")
+    test 5 (countDistinctCharacters "Jerry jERRY JeRRRY")
 end
 
-test
+testAll

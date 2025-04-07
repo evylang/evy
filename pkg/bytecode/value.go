@@ -240,7 +240,7 @@ type funcVal struct {
 	// function.
 	Instructions Instructions
 	// NumLocals is the number of locals declared in this function,
-	// it is used to create a whole in the vm stack when running
+	// it is used to create a hole in the vm stack when running
 	// the function so that it can use the stack directly for locals.
 	NumLocals int
 }

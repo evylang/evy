@@ -1,0 +1,34 @@
+<form id="q-error-inverted" class="difficulty-easy">
+  <h2>Parse errors</h2>
+  <p>Which program does <em>not</em> causes any parse errors?</p>
+  <p>Select all correct answers:</p>
+  <fieldset>
+    <div>
+      <label>a<input type="checkbox" value="a" name="answer" /> </label>
+      <pre><code class="language-evy">print "banana 🍌"
+</code></pre>
+    </div>
+    <div>
+      <label>b<input type="checkbox" value="b" name="answer" /> </label>
+      <pre><code class="language-evy">print "🍌 banana
+</code></pre>
+    </div>
+    <div>
+      <label>c<input type="checkbox" value="c" name="answer" /> </label>
+      <pre><code class="language-evy">print "print 🍌 banana"
+</code></pre>
+    </div>
+    <div>
+      <label>d<input type="checkbox" value="d" name="answer" /> </label>
+      <pre><code class="language-evy">print "print banana 🍌"
+</code></pre>
+    </div>
+  </fieldset>
+  <blockquote>
+    <p>
+      A <strong>parse error</strong>, also known as a syntax error or compilation error, happens
+      when your code doesn't follow Evy's language rules. A parse error prevents the computer from
+      understanding and executing your program.
+    </p>
+  </blockquote>
+</form>

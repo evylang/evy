@@ -1,0 +1,50 @@
+func px x:num y:num c:string
+    move x*10 y*10
+    fill c
+    rect 10 10
+end
+
+clear "black"
+width 0.5
+// row 0 (bottom)
+px 0 0 "orange"
+px 1 0 "orange"
+px 2 0 "cyan"
+px 3 0 "cyan"
+px 4 0 "cyan"
+px 5 0 "cyan"
+px 6 0 "blue"
+px 7 0 "blue"
+px 8 0 "blue"
+// row 1
+px 0 1 "orange"
+px 1 1 "gold"
+px 2 1 "gold"
+px 3 1 "darkmagenta"
+px 4 1 "forestgreen"
+px 5 1 "forestgreen"
+px 6 1 "blue"
+px 7 1 "gold"
+px 8 1 "gold"
+// row 2
+px 0 2 "orange"
+px 1 2 "gold"
+px 2 2 "gold"
+px 3 2 "darkmagenta"
+px 4 2 "darkmagenta"
+px 5 2 "forestgreen"
+px 6 2 "forestgreen"
+px 7 2 "gold"
+px 8 2 "gold"
+// row 3
+px 3 3 "darkmagenta"
+px 4 3 "red"
+px 5 3 "red"
+// row 4
+px 3 4 "red"
+px 4 4 "red"
+// vertical block of 4 on right
+px 9 4 "cyan"
+px 9 5 "cyan"
+px 9 6 "cyan"
+px 9 7 "cyan"

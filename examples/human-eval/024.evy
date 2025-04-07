@@ -9,12 +9,12 @@ func largestDivisor:num n:num
     return -1
 end
 
-func test
-    assert 1 (largestDivisor 3)
-    assert 1 (largestDivisor 7)
-    assert 5 (largestDivisor 10)
-    assert 50 (largestDivisor 100)
-    assert 7 (largestDivisor 49)
+func testAll
+    test 1 (largestDivisor 3)
+    test 1 (largestDivisor 7)
+    test 5 (largestDivisor 10)
+    test 50 (largestDivisor 100)
+    test 7 (largestDivisor 49)
 end
 
-test
+testAll

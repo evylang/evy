@@ -1,0 +1,13 @@
+clear "black"
+
+color "white"
+move 60 0
+rect 1 100
+
+width 1
+fill "black"
+move 32 8
+rect 38 38
+
+move 53 66
+rect 20 20

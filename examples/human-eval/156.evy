@@ -22,21 +22,21 @@ func toRoman:string n:num
     return result
 end
 
-func test
-    assert "xix" (toRoman 19)
-    assert "clii" (toRoman 152)
-    assert "ccli" (toRoman 251)
-    assert "cdxxvi" (toRoman 426)
-    assert "d" (toRoman 500)
-    assert "i" (toRoman 1)
-    assert "iv" (toRoman 4)
-    assert "xliii" (toRoman 43)
-    assert "xc" (toRoman 90)
-    assert "xciv" (toRoman 94)
-    assert "dxxxii" (toRoman 532)
-    assert "cm" (toRoman 900)
-    assert "cmxciv" (toRoman 994)
-    assert "m" (toRoman 1000)
+func testAll
+    test "xix" (toRoman 19)
+    test "clii" (toRoman 152)
+    test "ccli" (toRoman 251)
+    test "cdxxvi" (toRoman 426)
+    test "d" (toRoman 500)
+    test "i" (toRoman 1)
+    test "iv" (toRoman 4)
+    test "xliii" (toRoman 43)
+    test "xc" (toRoman 90)
+    test "xciv" (toRoman 94)
+    test "dxxxii" (toRoman 532)
+    test "cm" (toRoman 900)
+    test "cmxciv" (toRoman 994)
+    test "m" (toRoman 1000)
 end
 
-test
+testAll

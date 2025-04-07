@@ -1,4 +1,5 @@
 {
+  "defaultTitle": "Samples",
   "sections": [
     {
       "id": "tour",
@@ -18,9 +19,9 @@
       "title": "Drawing",
       "emoji": "🎨",
       "samples": [
-        { "id": "circle-rect", "title": "Circle and Rectangle" },
+        { "id": "circle-rect", "title": "Circle & Rectangle" },
         { "id": "lines", "title": "Lines" },
-        { "id": "poly", "title": "Polygon and Polyline" },
+        { "id": "poly", "title": "Polygon & Polyline" },
         { "id": "fill", "title": "Stroke and Fill" },
         { "id": "linestyle", "title": "Line Styles" },
         { "id": "text", "title": "Text" }
@@ -45,7 +46,9 @@
       "samples": [
         { "id": "ellipse", "title": "Watermelon Ellipse" },
         { "id": "draw", "title": "Draw" },
-        { "id": "coords", "title": "Coordinates" }
+        { "id": "coords", "title": "Coordinates" },
+        { "id": "life", "title": "Game of Life" },
+        { "id": "graph", "title": "Zoomable Graph" }
       ]
     },
     {
@@ -56,6 +59,7 @@
         { "id": "rand", "title": "Guess my Number" },
         { "id": "hanoi", "title": "Towers of Hanoi" },
         { "id": "tictactoe", "title": "Tic Tac Toe" },
+        { "id": "dodger", "title": "Alien Dodger" },
         { "id": "tictactoetext", "title": "Text Tic Tac Toe", "unlisted": true }
       ]
     }

@@ -1,0 +1,65 @@
+<h1>🇵🇼 Circles</h1>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What do you think will happen when you run it?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Circles in corner</h2>
+<p>Can you move the circle center to each corner?</p>
+<details>
+  <summary>Demo</summary>
+  <table>
+    <thead>
+      <tr>
+        <th><img src="samples/intro/img/circles-top-left.svg" alt="Quarter circle top left" /></th>
+        <th>
+          <img src="samples/intro/img/circles-top-right.svg" alt="Quarter circle top right" />
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <img src="samples/intro/img/circles-bottom-left.svg" alt="Quarter circle bottom left" />
+        </td>
+        <td>
+          <img src="samples/intro/img/circles-bottom-right.svg" alt="Quarter circle bottom right" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Create Your Own Circles</h2>
+<p>
+  Draw 2-4 circles on the canvas using any colors you like. The circles can be fully or partially
+  visible.
+</p>
+<details>
+  <summary>Samples</summary>
+  <table>
+    <thead>
+      <tr>
+        <th><img src="samples/intro/img/circles-anika.svg" alt="Three circles of same size" /></th>
+        <th>
+          <img
+            src="samples/intro/img/circles-mali.svg"
+            alt="Three large overlapping circles in warm colors"
+          />
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><img src="samples/intro/img/circles-camh.svg" alt="Overlapping circles" /></td>
+        <td><img src="samples/intro/img/circles-kathi.svg" alt="Cloud made from circles" /></td>
+      </tr>
+    </tbody>
+  </table>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Flag Quiz</h2>
+<p>Which country has this flag? 🇵🇼</p>
+<details>
+  <summary>Answer</summary>
+  <p><a href="https://en.wikipedia.org/wiki/Palau">Palau</a></p>
+</details>

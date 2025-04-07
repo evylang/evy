@@ -7,15 +7,15 @@ func isSum:bool n:num
     return n % 2 == 0 and n >= 8
 end
 
-func test
-    assert false (isSum 4)
-    assert false (isSum 6)
-    assert true (isSum 8)
-    assert true (isSum 10)
-    assert false (isSum 11)
-    assert true (isSum 12)
-    assert false (isSum 13)
-    assert true (isSum 16)
+func testAll
+    test false (isSum 4)
+    test false (isSum 6)
+    test true (isSum 8)
+    test true (isSum 10)
+    test false (isSum 11)
+    test true (isSum 12)
+    test false (isSum 13)
+    test true (isSum 16)
 end
 
-test
+testAll

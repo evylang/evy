@@ -1,0 +1,19 @@
+<h1>🌐📺 Lines</h1>
+<p><strong>Run</strong> the program and observe animated lines.</p>
+<p>For this program we need two <strong>nested</strong> <code>for</code> loops.</p>
+<p>⭐ How would you go about writing this program?</p>
+<details>
+  <summary>Hint</summary>
+  <ul>
+    <li>
+      <p>Break down your problem into smaller bits.</p>
+    </li>
+    <li>
+      <p>Create a <em>static</em> image with 10 lines (see picture below).</p>
+    </li>
+    <li>
+      <p>What needs to change to turn the static image into an animation?</p>
+      <p><img src="samples/forloops/img/10-lines.svg" alt="Static lines" /></p>
+    </li>
+  </ul>
+</details>

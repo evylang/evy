@@ -14,12 +14,12 @@ func closest:num s:string
     return round n
 end
 
-func test
-    assert 10 (closest "10")
-    assert 15 (closest "14.5")
-    assert -16 (closest "-15.5")
-    assert 15 (closest "15.3")
-    assert 0 (closest "0")
+func testAll
+    test 10 (closest "10")
+    test 15 (closest "14.5")
+    test -16 (closest "-15.5")
+    test 15 (closest "15.3")
+    test 0 (closest "0")
 end
 
-test
+testAll

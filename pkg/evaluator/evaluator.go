@@ -14,11 +14,11 @@ import (
 //   - ErrStopped is returned when the program has been stopped externally.
 //   - ErrPanic and errors wrapping ErrPanic report runtime errors, such as an index out of bounds error.
 //   - ErrInternal and errors wrapping ErrInternal report internal errors of the evaluator or AST. These errors should not occur.
-//   - ErrAssert and errors wrapping ErrAssert for failed assertions.
+//   - ErrTest and errors wrapping ErrTest for failed tests.
 var (
 	ErrStopped = errors.New("stopped")
 
-	ErrAssert = errors.New("failed assertion")
+	ErrTest = errors.New("failed test")
 
 	ErrPanic         = errors.New("panic")
 	ErrIndexValue    = fmt.Errorf("%w: index not an integer", ErrPanic)
@@ -64,7 +64,7 @@ func (e PanicError) Error() string {
 // Unwrap returns the ErrPanic sentinel error so that it can be used in
 //
 //	errors.Is(err, evaluator.ErrPanic)
-func (e *PanicError) Unwrap() error {
+func (e PanicError) Unwrap() error {
 	return ErrPanic
 }
 
@@ -90,17 +90,17 @@ func newErr(node parser.Node, err error) *Error {
 	return &Error{Token: node.Token(), err: err}
 }
 
-// AssertionErrors is an Evy evaluator error list associated with multiple
-// failed assertions.
-type AssertionErrors []error
+// TestErrors is an Evy evaluator error list associated with multiple
+// failed tests.
+type TestErrors []error
 
 // Unwrap returns the wrapped error.
-func (e AssertionErrors) Unwrap() []error {
+func (e TestErrors) Unwrap() []error {
 	return e
 }
 
-// Error prints all assertion errors separated by newline.
-func (e AssertionErrors) Error() string {
+// Error prints all test errors separated by newline.
+func (e TestErrors) Error() string {
 	s := make([]string, len(e))
 	for i, err := range e {
 		s[i] = err.Error()
@@ -108,22 +108,20 @@ func (e AssertionErrors) Error() string {
 	return strings.Join(s, "\n")
 }
 
-// NewEvaluator creates a new Evaluator for a given [Runtime]. Runtimes
-// target different environments, such as the browser or the command
-// line.
-func NewEvaluator(rt Runtime) *Evaluator {
+// NewEvaluator creates a new Evaluator for a given [Platform].
+// Platforms target different environments, such as the browser or the
+// command line.
+func NewEvaluator(rt Platform) *Evaluator {
 	builtins := newBuiltins(rt)
 	scope := newScope()
 	for _, global := range builtins.Globals {
-		t := global.Type()
-		z := zero(t)
-		scope.set(global.Name, z)
+		scope.set(global.parserVar.Name, global.val)
 	}
 	return &Evaluator{
 		builtins: builtins,
 		scope:    scope,
 		global:   scope,
-		yielder:  builtins.Runtime.Yielder(),
+		yielder:  builtins.Platform.Yielder(),
 	}
 }
 
@@ -141,7 +139,7 @@ type Evaluator struct {
 	// https://github.com/tinygo-org/tinygo/issues/2735.
 	Stopped           bool
 	EventHandlerNames []string
-	AssertInfo        AssertInfo
+	TestInfo          TestInfo
 
 	yielder       Yielder // Yield to give JavaScript/browser events a chance to run.
 	builtins      builtins
@@ -173,19 +171,19 @@ func (e *Evaluator) Run(input string) error {
 	return e.Eval(prog)
 }
 
-// Yielder is a runtime-implemented mechanism that causes the
-// evaluation process to periodically give up control to the runtime.
-// The Yield method of the Yielder interface is called at the
-// beginning of each evaluation step. This allows the runtime to
-// handle external tasks, such as processing events. For a sample
-// implementation, see the sleepingYielder of the browser environment
-// in the pkg/wasm directory.
+// Yielder is a platform-implemented mechanism that causes the
+// evaluation process to periodically give up control to the platform.
+// The Yield method of the Yielder interface is called at the beginning
+// of each evaluation step. This allows the platform to handle external
+// tasks, such as processing events. For a sample implementation, see
+// the sleepingYielder of the browser environment in the pkg/wasm
+// directory.
 type Yielder interface {
 	Yield()
 }
 
 // Eval evaluates a [parser.Program], which is the root node of the AST.
-// The program's statements are evaluated in order. If a runtime panic
+// The program's statements are evaluated in order. If a platform panic
 // occurs, a wrapped [ErrPanic] is returned. If an internal error
 // occurs, a wrapped [ErrInternal] is returned. Evaluation is also
 // stopped if the built-in exit function is called, which results in an
@@ -193,12 +191,12 @@ type Yielder interface {
 // true, evaluation is stopped and [ErrStopped] is returned.
 func (e *Evaluator) Eval(prog *parser.Program) error {
 	_, err := e.eval(prog)
-	e.AssertInfo.Report(e.builtins.Runtime.Print)
+	e.TestInfo.Report(e.builtins.Platform.Print)
 	if err != nil {
 		return err
 	}
-	if len(e.AssertInfo.errors) != 0 {
-		return AssertionErrors(e.AssertInfo.errors)
+	if len(e.TestInfo.errors) != 0 {
+		return TestErrors(e.TestInfo.errors)
 	}
 	return err
 }
@@ -434,16 +432,16 @@ func (e *Evaluator) evalFunccall(funcCall *parser.FuncCall) (value, error) {
 	builtin, ok := e.builtins.Funcs[funcCall.Name]
 	if ok {
 		val, err := builtin.Func(e.scope, args)
-		if funcCall.Name == "assert" {
-			e.AssertInfo.total++
-			if errors.Is(err, ErrAssert) {
+		if funcCall.Name == "test" {
+			e.TestInfo.total++
+			if errors.Is(err, ErrTest) {
 				token := funcCall.Arguments[0]
 				if len(funcCall.Arguments) > 1 {
 					token = funcCall.Arguments[1]
 				}
-				assertErr := newErr(token, err)
-				e.AssertInfo.errors = append(e.AssertInfo.errors, assertErr)
-				if !e.AssertInfo.FailFast {
+				testErr := newErr(token, err)
+				e.TestInfo.errors = append(e.TestInfo.errors, testErr)
+				if !e.TestInfo.FailFast {
 					err = nil
 				}
 			}

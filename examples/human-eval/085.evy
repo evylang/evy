@@ -10,11 +10,11 @@ func add:num nums:[]num
     return result
 end
 
-func test
-    assert 88 (add [4 88])
-    assert 122 (add [4 5 6 7 2 122])
-    assert 0 (add [4 0 6 7])
-    assert 12 (add [4 4 6 8])
+func testAll
+    test 88 (add [4 88])
+    test 122 (add [4 5 6 7 2 122])
+    test 0 (add [4 0 6 7])
+    test 12 (add [4 4 6 8])
 end
 
-test
+testAll

@@ -43,18 +43,18 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [-4 -3 5] (maxArr [-3 -4 5] 3)
-    assert [4 4] (maxArr [4 -4 4] 2)
-    assert [2] (maxArr [-3 2 1 2 -1 -2 1] 1)
-    assert [2 20 123] (maxArr [123 -123 20 0 1 2 -3] 3)
-    assert [0 1 2 20] (maxArr [-123 20 0 1 2 -3] 4)
-    assert [-13 -8 0 0 3 5 15] (maxArr [5 15 0 3 -13 -8 0] 7)
-    assert [3 5] (maxArr [-1 0 2 5 3 -10] 2)
-    assert [5] (maxArr [1 0 5 -7] 1)
-    assert [-4 4] (maxArr [4 -4] 2)
-    assert [-10 10] (maxArr [-10 10] 2)
-    assert [] (maxArr [1 2 3 -23 243 -400 0] 0)
+func testAll
+    test [-4 -3 5] (maxArr [-3 -4 5] 3)
+    test [4 4] (maxArr [4 -4 4] 2)
+    test [2] (maxArr [-3 2 1 2 -1 -2 1] 1)
+    test [2 20 123] (maxArr [123 -123 20 0 1 2 -3] 3)
+    test [0 1 2 20] (maxArr [-123 20 0 1 2 -3] 4)
+    test [-13 -8 0 0 3 5 15] (maxArr [5 15 0 3 -13 -8 0] 7)
+    test [3 5] (maxArr [-1 0 2 5 3 -10] 2)
+    test [5] (maxArr [1 0 5 -7] 1)
+    test [-4 4] (maxArr [4 -4] 2)
+    test [-10 10] (maxArr [-10 10] 2)
+    test [] (maxArr [1 2 3 -23 243 -400 0] 0)
 end
 
-test
+testAll

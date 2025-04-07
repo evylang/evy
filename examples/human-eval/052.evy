@@ -10,13 +10,13 @@ func below:bool nums:[]num t:num
     return true
 end
 
-func test
-    assert true (below [1 2 4 10] 100)
-    assert false (below [1 20 4 10] 5)
-    assert true (below [1 20 4 10] 21)
-    assert true (below [1 20 4 10] 22)
-    assert true (below [1 8 4 10] 11)
-    assert false (below [1 8 4 10] 10)
+func testAll
+    test true (below [1 2 4 10] 100)
+    test false (below [1 20 4 10] 5)
+    test true (below [1 20 4 10] 21)
+    test true (below [1 20 4 10] 22)
+    test true (below [1 8 4 10] 11)
+    test false (below [1 8 4 10] 10)
 end
 
-test
+testAll

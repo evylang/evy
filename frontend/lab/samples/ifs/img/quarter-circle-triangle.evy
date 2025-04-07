@@ -1,0 +1,31 @@
+clear "black"
+color "red"
+circle 100
+
+dash 1 1
+width 0.5
+color "black"
+line 60 80
+line 60 0.5
+line 0 0.5
+
+dash
+move 60 80
+color "white"
+fill "black"
+circle 1
+move 0.5 0.5
+circle 1
+move 60 0.5
+circle 1
+
+color "black"
+width 0.1
+font {align:"center" baseline:"bottom" size:8}
+move 30 3
+text "a = 0.6"
+font {align:"left" baseline:"bottom" size:8}
+move 63 20
+text "b = 0.8"
+move 10 45
+text "c = 1"

@@ -16,11 +16,11 @@ func fib4:num n:num
     return result[-1]
 end
 
-func test
-    assert 4 (fib4 5)
-    assert 28 (fib4 8)
-    assert 104 (fib4 10)
-    assert 386 (fib4 12)
+func testAll
+    test 4 (fib4 5)
+    test 28 (fib4 8)
+    test 104 (fib4 10)
+    test 386 (fib4 12)
 end
 
-test
+testAll

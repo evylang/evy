@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"evylang.dev/evy/pkg/md"
+	"rsc.io/markdown"
 )
 
 // ExportOptions contains options for exporting answer key and HTML files.
@@ -17,8 +18,9 @@ type ExportOptions struct {
 	WriteAnswerKey    bool
 	WriteHTML         bool
 	WithAnswersMarked bool
-	WithHeadLinks     bool /* CSS, JS, Favicon links vs standalone embeds*/
+	SelfContained     bool /* CSS, JS, Favicon links vs standalone embeds*/
 	WriteCatalog      bool
+	RootDir           string
 }
 
 func (opts ExportOptions) validate() error {
@@ -27,6 +29,15 @@ func (opts ExportOptions) validate() error {
 	}
 	if !opts.WriteHTML && opts.WithAnswersMarked {
 		return fmt.Errorf("%w: WithAnswersMarked requires WriteHTML", ErrInvalidExportOptions)
+	}
+	if !opts.WriteHTML && opts.SelfContained {
+		return fmt.Errorf("%w: SelfContained requires WriteHTML", ErrInvalidExportOptions)
+	}
+	if !opts.SelfContained && !strings.HasPrefix(opts.RootDir, "/") {
+		return fmt.Errorf(`%w: RootDir must be an absolute path starting with "/", got %q`, ErrInvalidExportOptions, opts.RootDir)
+	}
+	if !opts.SelfContained && !strings.HasSuffix(opts.RootDir, "/") {
+		return fmt.Errorf(`%w: RootDir must be an absolute path ending with "/", got %q`, ErrInvalidExportOptions, opts.RootDir)
 	}
 	return nil
 }
@@ -152,38 +163,83 @@ func writeHTMLFiles(models []model, srcDir, destDir string, opts ExportOptions) 
 	if _, err := md.Copy(srcDir, destDir); err != nil {
 		return err
 	}
+	sidebarLookup, err := newSidebarLookup(models, opts.RootDir)
+	if err != nil {
+		return err
+	}
+
 	for _, model := range models {
-		qmodel, ok := model.(*QuestionModel)
-		if ok && qmodel.hasSubQuestions() {
-			continue
-		}
-		mdFile, err := filepath.Rel(srcDir, model.Filename())
-		if err != nil {
-			return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
-		}
-		htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
-		content, err := model.ToHTML(opts.WithAnswersMarked)
-		if err != nil {
-			return err
-		}
-		tmplData := newTmplData(mdFile, model.Name(), content, opts.WithHeadLinks)
-		if err := writeHTMLFile(htmlFile, tmplData); err != nil {
+		dir := filepath.Dir(model.Filename())
+		sidebar := sidebarLookup[dir]
+		if err := writeHTMLFile(model, sidebar, srcDir, destDir, opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func writeHTMLFile(htmlFile string, tmplData tmplData) error {
+func writeHTMLFile(model model, sidebarContent string, srcDir, destDir string, opts ExportOptions) error {
+	qmodel, ok := model.(*QuestionModel)
+	if ok && qmodel.hasSubQuestions() {
+		return nil
+	}
+	mdFile, err := filepath.Rel(srcDir, model.Filename())
+	if err != nil {
+		return fmt.Errorf("%w: %w: %s", ErrInconsistentMdoel, err, model.Filename())
+	}
+	content, err := model.ToHTML(opts.WithAnswersMarked)
+	if err != nil {
+		return err
+	}
+	htmlFile := filepath.Join(destDir, md.HTMLFilename(mdFile))
+	if !opts.SelfContained {
+		// write .htmlf HTML-Fragment file used with Sidebar mini-SPA.
+		if err := os.WriteFile(htmlFile+"f", []byte(content), 0o666); err != nil {
+			return fmt.Errorf("%w: cannot write HTML Fragment file", err)
+		}
+		if ok { // .(*QuestionModel)
+			return nil // We're done if we're working with a QuestionModel, no standalone HTML is needed.
+		}
+	}
+	tmplData := newTmplData(mdFile, model.Name(), sidebarContent, content)
 	out, err := os.Create(htmlFile)
 	if err != nil {
 		return err
 	}
-	if err := tmpl.Execute(out, tmplData); err != nil {
-		out.Close() //nolint:errcheck,gosec // we're returning the more important error
-		return err
+	defer out.Close() //nolint:errcheck // we're returning the more important error
+	if opts.SelfContained {
+		return selfContainedTemplate.Execute(out, tmplData)
 	}
-	return out.Close()
+	return learnTemplate.Execute(out, tmplData)
+}
+
+func newSidebarLookup(models []model, deployRootDir string) (map[string]string, error) {
+	lookup := map[string]string{}
+	for _, m := range models {
+		if course, ok := m.(*CourseModel); ok {
+			sidebar, err := newSidebar(course, deployRootDir)
+			if err != nil {
+				return nil, err
+			}
+			dir := filepath.Dir(course.Filename())
+			lookup[dir] = markdown.ToHTML(sidebar)
+		}
+	}
+	for _, m := range models {
+		if _, ok := m.(*CourseModel); ok {
+			continue
+		}
+		modelDir := filepath.Dir(m.Filename())
+		dir := modelDir
+		for dir != "." && dir != "/" {
+			if _, ok := lookup[dir]; ok {
+				lookup[modelDir] = lookup[dir]
+				break
+			}
+			dir = filepath.Dir(dir)
+		}
+	}
+	return lookup, nil
 }
 
 func writeAnswerKeyFile(models []model, answerKeyFile string) error {
@@ -235,8 +291,9 @@ func writeCatalogFile(models []model, catalogFile string) error {
 var tmplFS embed.FS
 
 var (
-	tmplFuncMap = template.FuncMap{"indent": indent}
-	tmpl        = template.Must(template.New("learn.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/learn.html.tmpl"))
+	tmplFuncMap           = template.FuncMap{"indent": indent}
+	selfContainedTemplate = template.Must(template.New("self-contained.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/self-contained.html.tmpl"))
+	learnTemplate         = template.Must(template.New("learn.html.tmpl").Funcs(tmplFuncMap).ParseFS(tmplFS, "tmpl/learn.html.tmpl"))
 )
 
 func indent(indentCount int, s string) string {
@@ -252,24 +309,22 @@ func indent(indentCount int, s string) string {
 }
 
 type tmplData struct {
-	Root          string
-	Title         string
-	Content       string
-	DefaultCSS    string
-	CSSFiles      []string
-	WithHeadLinks bool
+	Root       string
+	Title      string
+	Content    string
+	Sidebar    string
+	DefaultCSS string
 }
 
 //go:embed tmpl/default.css
 var defaultCSS string
 
-func newTmplData(mdFile, title, content string, withHeadLinks bool) tmplData {
+func newTmplData(mdFile, title, sidebarContent, content string) tmplData {
 	return tmplData{
-		Root:          md.ToRoot(mdFile),
-		Title:         title,
-		Content:       content,
-		DefaultCSS:    defaultCSS,
-		CSSFiles:      []string{"index.css"},
-		WithHeadLinks: withHeadLinks,
+		Root:       md.ToRoot(mdFile),
+		Title:      title,
+		Content:    content,
+		Sidebar:    sidebarContent,
+		DefaultCSS: defaultCSS,
 	}
 }

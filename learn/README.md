@@ -41,7 +41,7 @@ It currently supports the following sub-commands:
 Try it with
 
     make install
-    levy export all --ignore-sealed pkg/learn/testdata/course1 out
+    levy export all --ignore-sealed --self-contained pkg/learn/testdata/course1 out
     levy seal pkg/learn/testdata/course1/unit1/exercise1/question1.md
 
 For sample error messages in case of failed verification, try

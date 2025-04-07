@@ -14,25 +14,25 @@ type (
 
 var (
 	validFrontmatterTypes = []string{"course", "unit", "unittest", "quiz", "exercise", "question"}
-	validAnswerTypes      = []string{"single-choice", "multiple-choice", "free-text", "multiple-free-texts", "program"}
+	validAnswerTypes      = []string{"single-choice", "multiple-choice", "text", "multiple-texts", "program"}
 	validDifficulties     = []string{"easy", "medium", "hard", "retriable"}
 	validVerifications    = []string{"match" /* default */, "none", "parse-error", "no-parse-error"}
 )
 
-func (s frontmatterType) MarshalText() ([]byte, error) {
-	return marshalText("type", string(s), validFrontmatterTypes)
+func (s *frontmatterType) MarshalText() ([]byte, error) {
+	return marshalText("type", string(*s), validFrontmatterTypes)
 }
 
-func (s answerType) MarshalText() ([]byte, error) {
-	return marshalText("answer-type", string(s), validAnswerTypes)
+func (s *answerType) MarshalText() ([]byte, error) {
+	return marshalText("answer-type", string(*s), validAnswerTypes)
 }
 
-func (s difficulty) MarshalText() ([]byte, error) {
-	return marshalText("difficulty", string(s), validDifficulties)
+func (s *difficulty) MarshalText() ([]byte, error) {
+	return marshalText("difficulty", string(*s), validDifficulties)
 }
 
-func (s verification) MarshalText() ([]byte, error) {
-	return marshalText("difficulty", string(s), validVerifications)
+func (s *verification) MarshalText() ([]byte, error) {
+	return marshalText("difficulty", string(*s), validVerifications)
 }
 
 func marshalText(fieldName, str string, validStrings []string) ([]byte, error) {

@@ -1,0 +1,4 @@
+for i := range 0 100 2
+    move i 0
+    line 100 i+2
+end

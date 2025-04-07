@@ -21,20 +21,20 @@ func isPower:bool x:num n:num
     return false
 end
 
-func test
-    assert true (isPower 1 1)
-    assert true (isPower 1 12)
-    assert false (isPower 12 1)
-    assert true (isPower 16 2)
-    assert false (isPower 143214 16)
-    assert true (isPower 4 2)
-    assert true (isPower 9 3)
-    assert true (isPower 16 4)
-    assert false (isPower 24 2)
-    assert false (isPower 128 4)
-    assert false (isPower 12 6)
-    assert true (isPower 1 1)
-    assert true (isPower 1 12)
+func testAll
+    test true (isPower 1 1)
+    test true (isPower 1 12)
+    test false (isPower 12 1)
+    test true (isPower 16 2)
+    test false (isPower 143214 16)
+    test true (isPower 4 2)
+    test true (isPower 9 3)
+    test true (isPower 16 4)
+    test false (isPower 24 2)
+    test false (isPower 128 4)
+    test false (isPower 12 6)
+    test true (isPower 1 1)
+    test true (isPower 1 12)
 end
 
-test
+testAll

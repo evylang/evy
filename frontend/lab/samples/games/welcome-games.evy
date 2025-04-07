@@ -1,0 +1,65 @@
+level := 0
+
+x := 50
+y := 0
+
+gold := 0
+orange := 50
+red := 0
+
+on animate
+    // Print new level
+    if y < 0.1
+        level = level + 1
+        print "Level" level
+    end
+
+    // Update
+    y = (y + 0.1) % 100
+    gold = (gold + 0.3) % 110
+    orange = 100 - (100 - orange + 0.5) % 120
+    red = (red + 0.7) % 130
+
+    // Draw
+    clear
+    move x y
+    text "👾" // size around 7x5
+    color "gold" // arrows
+    move gold 30
+    text "▶▶"
+    color "orange"
+    move orange 50
+    text "◀◀"
+    color "orangered"
+    move red 70
+    text "▶▶"
+
+    // Check collision
+    if (abs x-gold) < 6 and (abs y-30) < 4.5
+        print "🟡 Game over."
+        exit 0
+    else if (abs x-orange) < 6 and (abs y-50) < 4.5
+        print "🟠 Game over."
+        exit 0
+    else if (abs x-red) < 6 and (abs y-70) < 4.5
+        print "🔴 Game over."
+        exit 0
+    end
+end
+
+on key k:string
+    // introduce next gen to vi keys
+    if k == "ArrowLeft" or k == "h"
+        x = (x + 99) % 100
+    else if k == "ArrowRight" or k == "l"
+        x = (x + 1) % 100
+    end
+end
+
+on down xd:num _:num
+    if xd < 20
+        x = (x + 99) % 100
+    else if xd > 80
+        x = (x + 1) % 100
+    end
+end

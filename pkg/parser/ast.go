@@ -142,6 +142,10 @@ func (f *FuncDefStmt) Type() *Type {
 	return f.ReturnType
 }
 
+func (f *FuncDefStmt) isNiladic() bool {
+	return len(f.Params) == 0 && f.VariadicParam == nil
+}
+
 // EventHandlerStmt is an AST node that represents an event handler
 // definition. It includes the handler body, such as:
 //

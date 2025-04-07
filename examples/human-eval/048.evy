@@ -13,14 +13,14 @@ func isPalindrome:bool str:string
     return true
 end
 
-func test
-    assert true (isPalindrome "")
-    assert true (isPalindrome "aba")
-    assert true (isPalindrome "aaaaa")
-    assert false (isPalindrome "zbcd")
-    assert true (isPalindrome "xywyx")
-    assert false (isPalindrome "xywyz")
-    assert false (isPalindrome "xywzx")
+func testAll
+    test true (isPalindrome "")
+    test true (isPalindrome "aba")
+    test true (isPalindrome "aaaaa")
+    test false (isPalindrome "zbcd")
+    test true (isPalindrome "xywyx")
+    test false (isPalindrome "xywyz")
+    test false (isPalindrome "xywzx")
 end
 
-test
+testAll

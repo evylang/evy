@@ -1,0 +1,28 @@
+<h1>On Animate</h1>
+<p>
+  The <code>animate</code> event handler is called periodically, typically about 60 times per
+  second.
+</p>
+<p>It lets you create animations and handle user input simultaneously.</p>
+<h2>⭐ Intro</h2>
+<p><strong>Read</strong> the code. What might happen when it's run?</p>
+<p><strong>Run</strong> the code. Was it what you expected?</p>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Color and Trail</h2>
+<p>Note how the circle leaves a trail? Let's remove it.</p>
+<p>Change the circle to your favorite color.</p>
+<p>
+  Consider updating <code>fill</code> and <code>stroke</code> color as well as <code>width</code>.
+</p>
+<details>
+  <summary>Hint</summary>
+  <p>Use <code>clear</code> at the beginning of the <code>animate</code> event handler.</p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Fading Trail</h2>
+<p>Try leaving a fading trail behind.</p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">clear (hsl 0 0 100 5)
+</code></pre>
+</details>

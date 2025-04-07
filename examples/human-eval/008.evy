@@ -12,12 +12,12 @@ func sumProduct:[]num numbers:[]num
     return [sum_value prod_value]
 end
 
-func test
-    assert [0 1] (sumProduct [])
-    assert [3 1] (sumProduct [1 1 1])
-    assert [100 0] (sumProduct [100 0])
-    assert [15 105] (sumProduct [3 5 7])
-    assert [10 10] (sumProduct [10])
+func testAll
+    test [0 1] (sumProduct [])
+    test [3 1] (sumProduct [1 1 1])
+    test [100 0] (sumProduct [100 0])
+    test [15 105] (sumProduct [3 5 7])
+    test [10 10] (sumProduct [10])
 end
 
-test
+testAll

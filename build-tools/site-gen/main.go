@@ -3,22 +3,23 @@
 // Usage: site-gen <src-dir> <dest-dir> <domain>
 //
 // When deploying to firebase (any other hosting site), we need to make a few
-// changes to the HTML, CSS and JS files in the site:
-//   - Replace href/values with leading paths of /ai, /discord, /docs, /learn
-//     and /play with a subdomain instead, so /docs/foo with
-//     docs.<domain>/foo
+// changes to the HTML, CSS, JS and WASM files in the site (HTML files have
+// extensions .html and .htmlf):
+//   - Replace href/values with leading paths of /SUBDOMAIN, path with /, e.g. for
+//     SUBDOMAIN "learn" /learn/banana becomes /banana. Replace all paths to subdomain
+//     as above for "apex" subdomain.
 //   - Rename .css, .js and .wasm files to include a short-sha of the SHA256 of the
-//     contents of the file and update any references to those files in .html
+//     contents of the file and update any references to those files in HTML
 //     files to include the filename with the short-sha. This is to perform
 //     cache busting when the files change.
-//   - Update the importmap in .html files to include the short-sha in the
+//   - Update the importmap in HTML files to include the short-sha in the
 //     javascript imports.
 //     e.g. "./module/editor.js": "./module/editor.js"
 //     becomes "./module/editor.js": "./module/editor.1a2b3c4d.js"
 //   - Copy .js files with their original filename so that clients that do
 //     not support import map can still import the .js files. They miss out
 //     on cache busting and may need to sometimes force-reload.
-//   - Update the wasmImports map in .html files to include the short-sha in
+//   - Update the wasmImports map in HTML files to include the short-sha in
 //     wasm imports. The wasmImports allows for cache busting hashed filenames
 //     for wasm files. The replacements are of the same form as the importmap.
 //
@@ -46,10 +47,11 @@ import (
 type app struct {
 	CacheBust bool   `help:"Rename .css, .js, and .wasm files to include short hash"`
 	Domain    string `help:"Rewrite top-level paths to subdomains"`
+	SubDomain string `help:"Skip URL rewrites for subdomain. Map /subdomain/PATH paths to /PATH." enum:"apex,discord,docs,gallery,lab,learn,play" default:"apex"`
 	SrcDir    string `arg:"" required:""`
 	DestDir   string `arg:"" required:""`
 
-	skippedFiles []string
+	htmlFiles    []string
 	renamedFiles map[string]string
 }
 
@@ -95,7 +97,7 @@ func (a *app) copyTree() error {
 
 		switch mode := d.Type() & fs.ModeType; mode {
 		case fs.ModeDir:
-			return os.Mkdir(destfile, 0o777)
+			return os.MkdirAll(destfile, 0o777)
 		case fs.ModeSymlink:
 			if err := checkSymlink(srcfile); err != nil {
 				return err
@@ -104,7 +106,6 @@ func (a *app) copyTree() error {
 		case 0: // normal file
 			return a.handleFile(filename)
 		default:
-			//nolint:goerr113 // dynamic errors in package main is ok
 			return fmt.Errorf("unknown file type: %s: %s", mode, srcfile)
 		}
 	})
@@ -123,11 +124,9 @@ func checkSymlink(srcfile string) error {
 	}
 	mode := fi.Mode() & fs.ModeType
 	if mode == fs.ModeDir {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("symlink dirs not allowed: %s", srcfile)
 	}
 	if mode != 0 {
-		//nolint:goerr113 // dynamic errors in package main is ok
 		return fmt.Errorf("symlink to unknown file type: %s: %s", mode, srcfile)
 	}
 	return nil
@@ -135,7 +134,7 @@ func checkSymlink(srcfile string) error {
 
 // handleFile checks the extension of filename and processes it according
 // to the rules of this program:
-// - Record .html filename for later processing.
+// - Record HTML files for later processing.
 // - Copy .js, .css and .wasm files with a hash in their name.
 // - Copy .js and all other files with their original name.
 func (a *app) handleFile(filename string) error {
@@ -143,8 +142,8 @@ func (a *app) handleFile(filename string) error {
 	destfile := filepath.Join(a.DestDir, filename)
 	ext := filepath.Ext(filename)
 
-	if ext == ".html" {
-		a.skippedFiles = append(a.skippedFiles, filename)
+	if ext == ".html" || ext == ".htmlf" {
+		a.htmlFiles = append(a.htmlFiles, filename)
 		return nil
 	}
 	if a.CacheBust && (ext == ".js" || ext == ".css" || ext == ".wasm") {
@@ -155,7 +154,6 @@ func (a *app) handleFile(filename string) error {
 		basename := strings.TrimSuffix(filepath.Base(filename), ext)
 		target := basename + "." + shortSha + ext
 		if _, ok := a.renamedFiles[filename]; ok {
-			//nolint:goerr113 // dynamic errors in package main is ok
 			return fmt.Errorf("duplicate filename: %s", srcfile)
 		}
 		a.renamedFiles[filename] = target
@@ -171,7 +169,7 @@ func (a *app) handleFile(filename string) error {
 }
 
 func (a *app) copyHTMLFiles() error {
-	for _, filename := range a.skippedFiles {
+	for _, filename := range a.htmlFiles {
 		in, out, err := openInOut(filepath.Join(a.SrcDir, filename), filepath.Join(a.DestDir, filename))
 		if err != nil {
 			return err
@@ -234,8 +232,7 @@ func copyFile(src, dest string) error {
 }
 
 var (
-	subdomainRE = regexp.MustCompile(`(href|value)="/(ai|discord|docs|learn|play)`)
-	apexRE      = regexp.MustCompile(`(href|value)="/`) // Needs to come *after* subdomainRE replacements.
+	apexRE      = regexp.MustCompile(`(href|value)="/"`) // Needs to come *after* subdomainRE replacements.
 	jscssRefRE  = regexp.MustCompile(`(href|src)="(.*\.(?:css|js))"`)
 	importmapRE = regexp.MustCompile(`"(.*\.js)": "(.*\.js)"`)
 	wasmmapRE   = regexp.MustCompile(`"(.*\.wasm)": "(.*\.wasm)"`)
@@ -243,9 +240,9 @@ var (
 
 // updateHTMLFile reads an HTML file from `r` and writes it to `w` making the
 // following alterations:
-//   - href and value attributes referencing /ai, /discord, /docs, /learn and /play
-//     are transformed to top-level domains - ai.<domain>, discord.<domain>,
-//     etc.
+//   - href and value attributes referencing /discord, /docs, /gallery, /lab,
+//     /learn and /play are transformed to top-level domains - discord.<domain>,
+//     docs.<domain>, etc.
 //   - href and src attributes referencing .css or .js files that have been
 //     renamed to include their hash are updated to that name with the hash
 //   - The .js files referenced in an importmap are updated if the referenced
@@ -256,13 +253,20 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 	inImportmap := false
 	inWASMImports := false
 	scanner := bufio.NewScanner(r)
+	subDomainRE := newSubDomainRE(a.SubDomain)
+	subApexRE := newSubApexRE(a.SubDomain)
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Rewrite top-level path to subdomain reference
+		// Rewrite top-level path stating with /subdomain/ to /
+		if a.SubDomain != "apex" {
+			line = subApexRE.ReplaceAllString(line, `$1="/`)
+		}
+
+		// Rewrite top-level path to subDomain reference
 		if a.Domain != "" {
-			line = subdomainRE.ReplaceAllString(line, `$1="https://$2.`+a.Domain)
-			line = apexRE.ReplaceAllString(line, `$1="https://`+a.Domain+"/")
+			line = subDomainRE.ReplaceAllString(line, `$1="https://$2.`+a.Domain)
+			line = apexRE.ReplaceAllString(line, `$1="https://`+a.Domain+`/"`)
 		}
 
 		if a.CacheBust {
@@ -295,6 +299,27 @@ func (a *app) updateHTMLFile(w io.Writer, r io.Reader, filename string) error {
 		}
 	}
 	return scanner.Err()
+}
+
+func newSubDomainRE(subDomain string) *regexp.Regexp {
+	if subDomain == "apex" {
+		return regexp.MustCompile(`(href|value)="/(discord|docs|gallery|lab|learn|play)`)
+	}
+	var subs []string
+	for _, s := range []string{"discord", "docs", "gallery", "lab", "learn", "play"} {
+		if s != subDomain {
+			subs = append(subs, s)
+		}
+	}
+	subDomains := strings.Join(subs, "|")
+	return regexp.MustCompile(`(href|value)="/(` + subDomains + `)`)
+}
+
+func newSubApexRE(subDomain string) *regexp.Regexp {
+	if subDomain == "apex" {
+		return nil
+	}
+	return regexp.MustCompile(`(href|value)="/` + subDomain + "/")
 }
 
 func updateRefs(filename, line string, renamedFiles map[string]string) string {

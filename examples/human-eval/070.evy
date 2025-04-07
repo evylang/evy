@@ -34,16 +34,16 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [1 4 2 3] (strangeSort [1 2 3 4])
-    assert [5 9 6 8 7] (strangeSort [5 6 7 8 9])
-    assert [1 5 2 4 3] (strangeSort [1 2 3 4 5])
-    assert [1 9 5 8 6 7] (strangeSort [5 6 7 8 9 1])
-    assert [5 5 5 5] (strangeSort [5 5 5 5])
-    assert [] (strangeSort [])
-    assert [1 8 2 7 3 6 4 5] (strangeSort [1 2 3 4 5 6 7 8])
-    assert [-5 5 -5 5 0 2 2 2] (strangeSort [0 2 2 2 5 5 -5 -5])
-    assert [111111] (strangeSort [111111])
+func testAll
+    test [1 4 2 3] (strangeSort [1 2 3 4])
+    test [5 9 6 8 7] (strangeSort [5 6 7 8 9])
+    test [1 5 2 4 3] (strangeSort [1 2 3 4 5])
+    test [1 9 5 8 6 7] (strangeSort [5 6 7 8 9 1])
+    test [5 5 5 5] (strangeSort [5 5 5 5])
+    test [] (strangeSort [])
+    test [1 8 2 7 3 6 4 5] (strangeSort [1 2 3 4 5 6 7 8])
+    test [-5 5 -5 5 0 2 2 2] (strangeSort [0 2 2 2 5 5 -5 -5])
+    test [111111] (strangeSort [111111])
 end
 
-test
+testAll

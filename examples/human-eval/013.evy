@@ -10,11 +10,11 @@ func gcd:num a:num b:num
     return a
 end
 
-func test
-    assert 1 (gcd 3 7)
-    assert 5 (gcd 10 15)
-    assert 7 (gcd 49 14)
-    assert 12 (gcd 144 60)
+func testAll
+    test 1 (gcd 3 7)
+    test 5 (gcd 10 15)
+    test 7 (gcd 49 14)
+    test 12 (gcd 144 60)
 end
 
-test
+testAll

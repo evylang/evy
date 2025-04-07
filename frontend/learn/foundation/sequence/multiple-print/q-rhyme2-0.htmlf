@@ -1,0 +1,9 @@
+<form id="q-rhyme2-0" class="difficulty-hard">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Write code that creates this output:</p>
+  <pre><code>Clever code,
+problems explode.
+</code></pre>
+  <p>Program:</p>
+  <textarea name="answer" rows="2" cols="35"> </textarea>
+</form>

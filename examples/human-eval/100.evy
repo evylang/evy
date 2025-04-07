@@ -14,12 +14,12 @@ func makePile:[]num n:num
     return arr
 end
 
-func test
-    assert [3 5 7] (makePile 3)
-    assert [4 6 8 10] (makePile 4)
-    assert [5 7 9 11 13] (makePile 5)
-    assert [6 8 10 12 14 16] (makePile 6)
-    assert [8 10 12 14 16 18 20 22] (makePile 8)
+func testAll
+    test [3 5 7] (makePile 3)
+    test [4 6 8 10] (makePile 4)
+    test [5 7 9 11 13] (makePile 5)
+    test [6 8 10 12 14 16] (makePile 6)
+    test [8 10 12 14 16 18 20 22] (makePile 8)
 end
 
-test
+testAll

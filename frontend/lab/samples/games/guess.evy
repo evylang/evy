@@ -1,0 +1,13 @@
+msg := "Guess a number between 0 and 9"
+print msg
+number := rand 10
+
+on key k:string
+    guess := str2num k
+    if err
+        print "Invalid number" k
+        return
+    end
+    print "You guessed" guess
+    print "The number is" number
+end

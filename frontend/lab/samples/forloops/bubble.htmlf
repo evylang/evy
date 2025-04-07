@@ -1,0 +1,33 @@
+<h1>🫧 Bubble</h1>
+<p>
+  ⭐ Create a program of a rising, <code>&quot;skyblue&quot;</code> bubble with radius
+  <code>5</code>.
+</p>
+<ul>
+  <li>move it from <code>50 0</code> to <code>50 110</code> using a <code>for</code> loop.</li>
+  <li>increment the y-coordinate by <code>0.5</code></li>
+  <li>animate it with a sleep for <code>0.02</code> seconds.</li>
+</ul>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">for y := range 0 110 ❓
+  clear
+  move 50 y
+  circle 5
+  sleep ❓
+end
+</code></pre>
+</details>
+<p><button class="next-btn">Next</button></p>
+<p>⭐ Add randomness to the x-coordinate of the bubble.</p>
+<p>Change the x-coordinate by a maximum of ± 2 of its previous value.</p>
+<p><img src="samples/forloops/img/bubble.gif" alt="Animated bubble" /></p>
+<details>
+  <summary>Hint</summary>
+  <pre><code class="language-evy">//...
+r := rand 5 // 0..4
+x = x + r - 2
+move x y
+//...
+</code></pre>
+</details>

@@ -9,6 +9,18 @@
       "options": {
         "parser": "html"
       }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "printWidth": 110
+      }
+    },
+    {
+      "files": "*.htmlf",
+      "options": {
+        "parser": "html"
+      }
     }
   ]
 }

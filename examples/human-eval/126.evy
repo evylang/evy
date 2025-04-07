@@ -49,20 +49,20 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert true (isSorted [5])
-    assert true (isSorted [1 2 3 4 5])
-    assert false (isSorted [1 3 2 4 5])
-    assert true (isSorted [1 2 3 4 5 6])
-    assert true (isSorted [1 2 3 4 5 6 7])
-    assert false (isSorted [1 3 2 4 5 6 7])
-    assert true (isSorted [])
-    assert true (isSorted [1])
-    assert false (isSorted [3 2 1])
-    assert false (isSorted [1 2 2 2 3 4])
-    assert false (isSorted [1 2 3 3 3 4])
-    assert true (isSorted [1 2 2 3 3 4])
-    assert true (isSorted [1 2 3 4])
+func testAll
+    test true (isSorted [5])
+    test true (isSorted [1 2 3 4 5])
+    test false (isSorted [1 3 2 4 5])
+    test true (isSorted [1 2 3 4 5 6])
+    test true (isSorted [1 2 3 4 5 6 7])
+    test false (isSorted [1 3 2 4 5 6 7])
+    test true (isSorted [])
+    test true (isSorted [1])
+    test false (isSorted [3 2 1])
+    test false (isSorted [1 2 2 2 3 4])
+    test false (isSorted [1 2 3 3 3 4])
+    test true (isSorted [1 2 2 3 3 4])
+    test true (isSorted [1 2 3 4])
 end
 
-test
+testAll

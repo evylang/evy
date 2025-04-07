@@ -1,0 +1,13 @@
+# 🧵 Strings
+
+Run the program on the right and see if you understand its code.
+
+⭐ Use a loop to write a program that prints:
+
+```
+tick...
+tick...
+tick...
+tick...
+BOOM!
+```

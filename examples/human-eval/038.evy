@@ -34,13 +34,13 @@ func group3:[]string s:string
     return result
 end
 
-func test
+func testAll
     s := "lorem ipsum"
-    assert s (decode (encode s))
-    assert "bca" (encode "abc")
-    assert "abc" (decode "bca")
-    assert "bcad" (encode "abcd")
-    assert "abcd" (decode "bcad")
+    test s (decode (encode s))
+    test "bca" (encode "abc")
+    test "abc" (decode "bca")
+    test "bcad" (encode "abcd")
+    test "abcd" (decode "bcad")
 end
 
-test
+testAll

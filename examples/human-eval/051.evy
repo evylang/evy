@@ -16,14 +16,14 @@ func removeVowels:string str:string
     return result
 end
 
-func test
-    assert "" (removeVowels "")
-    assert "bcdfghjklm" (removeVowels "abcdefghijklm")
-    assert "fdcb" (removeVowels "fedcba")
-    assert "" (removeVowels "eeeee")
-    assert "cB" (removeVowels "acBAA")
-    assert "cB" (removeVowels "EcBOO")
-    assert "ybcd" (removeVowels "ybcd")
+func testAll
+    test "" (removeVowels "")
+    test "bcdfghjklm" (removeVowels "abcdefghijklm")
+    test "fdcb" (removeVowels "fedcba")
+    test "" (removeVowels "eeeee")
+    test "cB" (removeVowels "acBAA")
+    test "cB" (removeVowels "EcBOO")
+    test "ybcd" (removeVowels "ybcd")
 end
 
-test
+testAll

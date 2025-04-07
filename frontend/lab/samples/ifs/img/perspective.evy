@@ -1,0 +1,19 @@
+move 0 45
+rect 43 0.2
+move 80 45
+rect 20 0.2
+
+move 43 45
+rect 1 7
+
+move 46 41
+rect 2 16
+
+move 50 32
+rect 4 32
+
+move 58 20
+rect 9 58
+
+move 74 5
+rect 15 90

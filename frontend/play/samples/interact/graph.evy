@@ -1,0 +1,320 @@
+// Interactive plotting with zoom and pan.
+
+HOME_XMIN := -1.1
+HOME_XMAX := 5.9
+HOME_YMIN := -3.5
+HOME_YMAX := 3.5
+xMin:num
+xMax:num
+yMin:num
+yMax:num
+
+// The plot function is called to plot a mathematical function
+// on the zoomable graph paper.
+// Change this to plot different functions.
+func plot
+    color "red"
+    step := (xMax - xMin) / 100
+    stop := xMax + step
+    y := sin xMin
+    gmove xMin y
+    for x := range xMin stop step
+        y = sin x
+        gline x y
+    end
+end
+
+// ---------------------✂-------------------------
+// generic zoomable graphing paper, setup and even handlers
+
+xScale:num
+yScale:num
+xTick:num
+yTick:num
+originHidden:bool
+
+isDrag := false
+xDrag := 0
+yDrag := 0
+
+// initialize
+zoomHome
+
+func zoomHome
+    homeXScale := 100 / (HOME_XMAX - HOME_XMIN)
+    homeYScale := 100 / (HOME_YMAX - HOME_YMIN)
+    update HOME_XMIN HOME_YMIN homeXScale homeYScale
+    draw
+end
+
+func draw
+    clear
+    drawGraphPaper
+    plot
+    drawButtons
+end
+
+func update xMin1:num yMin1:num xScale1:num yScale1:num
+    xMin = xMin1
+    yMin = yMin1
+    xScale = xScale1
+    yScale = yScale1
+    // derived
+    w := 100 / xScale // graphing paper width
+    h := 100 / yScale // graphing paper height
+    xMax = xMin + w
+    yMax = yMin + h
+    xTick = calcTick w
+    yTick = calcTick h
+    originHidden = xMin > 0 or xMax < 0 or yMin > 0 or yMax < 0
+end
+
+func drawGraphPaper
+    drawGrid xTick/5 yTick/5 0.05 "gainsboro"
+    drawGrid xTick yTick 0.1 "dimgrey"
+    drawAxes
+end
+
+func drawGrid xdist:num ydist:num w:num hue:string
+    width w
+    color hue
+    start := roundUp xMin xdist
+    stop := xMax + xdist
+    for x := range start stop xdist
+        gv x yMin yMax
+    end
+    start = roundUp yMin ydist
+    stop = yMax + ydist
+    for y := range start stop ydist
+        gh xMin xMax y
+    end
+end
+
+func drawAxes
+    width 0.2
+    color (hsl 0 0 20)
+    drawAxesLines
+    drawXLabels
+    drawYLabels
+end
+
+func drawAxesLines
+    gh xMin xMax 0 // x-Axis
+    gv 0 yMin yMax // y-Axis
+    if !originHidden
+        font {baseline:"alphabetic" align:"left" size:2}
+        gtextnumf 0.05*xTick 0.05*yTick 0 "%v"
+    end
+end
+
+func drawXLabels
+    y := yMin // labels on very bottom if x-axis not visible
+    if yMin <= 0 and yMax > 0
+        y = 0 // x-axis visible
+    end
+    font {baseline:"alphabetic" align:"center" size:2}
+    start := roundUp xMin xTick
+    stop := xMax + xTick
+    tl := 0.025 * yTick
+    for x := range start stop xTick
+        gv x y-tl y+tl
+        // don't double label origin
+        if (abs x) > xTick / 2 or originHidden
+            gtextnum x y+2*tl x (xMax - xMin)
+        end
+    end
+end
+
+func drawYLabels
+    font {baseline:"middle" align:"left" size:2}
+    x := xMin // labels on very left if y-axis not visible
+    if xMin <= 0 and xMax > 0
+        x = 0 // y-axis visible
+    end
+    start := roundUp yMin yTick
+    stop := yMax + yTick
+    tl := 0.025 * xTick
+    for y := range start stop yTick
+        gh x-tl x+tl y
+        // don't double label origin
+        if (abs y) > yTick / 2 or originHidden
+            gtextnum x+2*tl y y (yMax - yMin)
+        end
+    end
+end
+
+func drawButtons
+    fill "gainsboro"
+    stroke "darkgrey"
+    width 0.3
+
+    move 93 93
+    rect 6 6
+
+    move 93 85
+    rect 6 6
+
+    move 93 79
+    rect 6 6
+
+    // labels
+    color "grey"
+    font {baseline:"alphabetic" align:"left" size:3}
+
+    move 94.1 94.6
+    text "🏠"
+
+    font {baseline:"alphabetic" align:"left" size:6}
+    move 94.2 86.1
+    text "+"
+    move 94.2 80.1
+    text "-"
+end
+
+on down x:num y:num
+    if inHomeButton x y
+        zoomHome
+    else if inZoomInButton x y
+        zoomIn
+    else if inZoomOutButton x y
+        zoomOut
+    else
+        setDragState true x y
+    end
+end
+
+on move x:num y:num
+    drag x y
+end
+
+on up
+    setDragState false 0 0
+    draw
+end
+
+func inHomeButton:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 93 and y <= 99
+end
+
+func inZoomInButton:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 85 and y <= 91
+end
+
+func inZoomOutButton:bool x:num y:num
+    return x >= 93 and x <= 99 and y >= 79 and y <= 85
+end
+
+func zoomIn
+    zoom 2
+end
+
+func zoomOut
+    zoom 0.5
+end
+
+func zoom f:num
+    xd := (xMax - xMin) * (f - 1) / (2 * f)
+    yd := (yMax - yMin) * (f - 1) / (2 * f)
+    update xMin+xd yMin+yd xScale*f yScale*f
+end
+
+func setDragState d:bool x:num y:num
+    isDrag = d
+    xDrag = x
+    yDrag = y
+end
+
+func drag x:num y:num
+    if isDrag
+        update xMin+(xDrag - x)/xScale yMin+(yDrag - y)/yScale xScale yScale
+        setDragState true x y
+        draw
+    end
+end
+
+func calcTick:num extend:num
+    d := log10 extend/10
+    f := d - (floor d)
+    if f > 0.15 and f < 0.42
+        return 2 * (pow 10 (round d))
+    else if f >= 0.42 and f < 0.5
+        return 5 * (pow 10 (round d))
+    else if f >= 0.5 and f < 0.78
+        return 0.5 * (pow 10 (round d))
+    end
+    return pow 10 (round d)
+end
+
+func gmove x:num y:num
+    move (ex x) (ey y)
+end
+
+func gline x:num y:num
+    line (ex x) (ey y)
+end
+
+// vertical line
+func gv x:num y1:num y2:num
+    gmove x y1
+    gline x y2
+end
+
+// horizontal line
+func gh x1:num x2:num y:num
+    gmove x1 y
+    gline x2 y
+end
+
+func gtextnum x:num y:num n:num extend:num
+    p := 0
+    lg := floor (log10 extend/10)
+    if lg < 0
+        p = abs (lg)
+    end
+    fstr := sprintf "%%.%0.ff" p
+    gtextnumf x y n fstr
+end
+
+func gtextnumf x:num y:num n:num fstr:string
+    gmove x y
+    text (sprintf fstr n)
+end
+
+func roundUp:num n:num multiple:num
+    r := (abs n) % multiple
+    if r == 0
+        return n
+    end
+    if n > 0
+        return n + multiple - r
+    end
+    return -(-n + multiple - r)
+end
+
+func log10:num n:num
+    return (log n) / (log 10)
+end
+
+// ex is the evy x coordinate (0, 100) for a given
+// graphing x coordinate graphX (xMin, xMin+extend).
+func ex:num graphX:num
+    return xScale * (graphX - xMin)
+end
+
+// ey is the evy y coordinate (0, 100) for a  given
+// graphing y coordinate graphY (yMin, yMin+extend).
+func ey:num graphY:num
+    return yScale * (graphY - yMin)
+end
+
+// gx is the grpahing x coordinate (xMin, xMin+extend)
+// for a gvien evy x coordinate evyX (0, 100)
+func gx:num evyX:num
+    return xMin + evyX / xScale
+end
+
+// gy is the grpahing y coordinate (yMin, yMin+extend)
+// for a gvien evy y coordinate evyY(0, 100)
+func gy:num evyY:num
+    return yMin + evyY / yScale
+end

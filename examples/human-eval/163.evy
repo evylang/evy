@@ -14,11 +14,11 @@ func generate:[]num a:num b:num
     return result
 end
 
-func test
-    assert [2 4 6 8] (generate 2 10)
-    assert [2 4 6 8] (generate 10 2)
-    assert [2 4 6 8] (generate 132 2)
-    assert [] (generate 17 89)
+func testAll
+    test [2 4 6 8] (generate 2 10)
+    test [2 4 6 8] (generate 10 2)
+    test [2 4 6 8] (generate 132 2)
+    test [] (generate 17 89)
 end
 
-test
+testAll

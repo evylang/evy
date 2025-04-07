@@ -11,11 +11,11 @@ func getPositive:[]num nums:[]num
     return result
 end
 
-func test
-    assert [4 5 6] (getPositive [-1 -2 4 5 6])
-    assert [5 3 2 3 3 9 123 1] (getPositive [5 3 -5 2 3 3 9 0 123 1 -10])
-    assert [] (getPositive [-1 -2])
-    assert [] (getPositive [])
+func testAll
+    test [4 5 6] (getPositive [-1 -2 4 5 6])
+    test [5 3 2 3 3 9 123 1] (getPositive [5 3 -5 2 3 3 9 0 123 1 -10])
+    test [] (getPositive [-1 -2])
+    test [] (getPositive [])
 end
 
-test
+testAll

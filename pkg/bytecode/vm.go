@@ -47,11 +47,11 @@ func NewVM(bytecode *Bytecode) *VM {
 	frames[0] = mainFrame
 	return &VM{
 		constants:   bytecode.Constants,
-		globals:     make([]value, GlobalsSize),
 		frames:      frames,
 		framesIndex: 1,
+		globals:     make([]value, GlobalsSize),
 		stack:       make([]value, StackSize),
-		sp:          0,
+		sp:          bytecode.LocalCount, // leave space for locals at top of stack.
 	}
 }
 
@@ -78,9 +78,8 @@ func (vm *VM) Run() error {
 			err = vm.push(vm.globals[globalIndex])
 		case OpGetLocal:
 			idx := ReadUint16(ins[ip+1:])
-			vm.currentFrame().ip += 2
 			frame := vm.currentFrame()
-
+			frame.ip += 2
 			err = vm.push(vm.stack[frame.base+int(idx)])
 		case OpSetGlobal:
 			globalIndex := ReadUint16(ins[ip+1:])
@@ -93,7 +92,7 @@ func (vm *VM) Run() error {
 		case OpSetLocal:
 			idx := ReadUint16(ins[ip+1:])
 			frame := vm.currentFrame()
-			vm.currentFrame().ip += 2
+			frame.ip += 2
 			vm.stack[frame.base+int(idx)] = vm.pop()
 		case OpAdd:
 			right, left := vm.popBinaryNums()

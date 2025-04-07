@@ -1,0 +1,8 @@
+-- a.evy --
+print "bug 🪲"
+-- b.evy --
+print "🪲 bug
+-- c.evy --
+Print "print 🪲 bug"
+-- d.evy --
+print print bug 🪲"

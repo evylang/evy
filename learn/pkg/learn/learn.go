@@ -48,6 +48,7 @@ type model interface {
 	ToHTML(withAnswersMarked bool) (string, error)
 	Name() string
 	Filename() string
+	Document() *markdown.Document
 }
 
 type plainMD struct {
@@ -58,7 +59,7 @@ type plainMD struct {
 
 func (p *plainMD) ToHTML(_ bool) (string, error) {
 	md.Walk(p.doc, md.RewriteLink)
-	return markdown.ToHTML(p.doc), nil
+	return toHTML(p.doc), nil
 }
 
 func (p *plainMD) Name() string {
@@ -67,6 +68,10 @@ func (p *plainMD) Name() string {
 
 func (p *plainMD) Filename() string {
 	return p.filename
+}
+
+func (p *plainMD) Document() *markdown.Document {
+	return p.doc
 }
 
 func newPlainMD(mdString, filename string) (*plainMD, error) {
@@ -121,7 +126,7 @@ func newModelWithFrontmatter(mdFile, frontmatterString, mdString string, opts []
 	case "course":
 		return NewCourseModel(mdFile, opts...)
 	}
-	return nil, fmt.Errorf("unsupported frontmatter type %q", string(fm.Type)) //nolint:err113 // dynamic errors in main are fine.
+	return nil, fmt.Errorf("%w: unsupported frontmatter type %q", ErrInvalidFrontmatter, string(fm.Type))
 }
 
 type baseFrontmatter struct {

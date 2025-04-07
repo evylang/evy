@@ -75,7 +75,7 @@ func (m *QuizModel) buildExercises() error {
 func (m *QuizModel) ToHTML(withAnswersMarked bool) (string, error) {
 	md.Walk(m.Doc, md.RewriteLink)
 	buf := &bytes.Buffer{}
-	m.Doc.PrintHTML(buf)
+	printHTML(m.Doc, buf)
 	if withAnswersMarked {
 		printComposition(buf, m.Frontmatter.Composition)
 		m.QuestionsByDifficulty.PrintHTML(buf)
@@ -86,6 +86,11 @@ func (m *QuizModel) ToHTML(withAnswersMarked bool) (string, error) {
 // Name returns the name of the quiz model: "Quiz N <UNIT-NAME>".
 func (m *QuizModel) Name() string {
 	return m.name
+}
+
+// Document returns the markdown ast root node.
+func (m *QuizModel) Document() *markdown.Document {
+	return m.Doc
 }
 
 func (m *QuizModel) parseFrontmatterMD() error {

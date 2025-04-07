@@ -16,15 +16,15 @@ func shift:string x:num n:num
     return result
 end
 
-func test
-    assert "1" (shift 1 1)
-    assert "1" (shift 1 3)
-    assert "0111" (shift 1110 30)
-    assert "001" (shift 100 2)
-    assert "12" (shift 12 2)
-    assert "79" (shift 97 8)
-    assert "21" (shift 12 1)
-    assert "11" (shift 11 101)
+func testAll
+    test "1" (shift 1 1)
+    test "1" (shift 1 3)
+    test "0111" (shift 1110 30)
+    test "001" (shift 100 2)
+    test "12" (shift 12 2)
+    test "79" (shift 97 8)
+    test "21" (shift 12 1)
+    test "11" (shift 11 101)
 end
 
-test
+testAll

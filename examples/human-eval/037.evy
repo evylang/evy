@@ -35,10 +35,10 @@ func sort arr:[]num
     end
 end
 
-func test
-    assert [1 2 3] (sortEven [1 2 3])
-    assert [-10 3 -5 2 -3 3 5 0 9 1 123] (sortEven [5 3 -5 2 -3 3 9 0 123 1 -10])
-    assert [-12 8 3 4 5 2 12 11 23 -10] (sortEven [5 8 -12 4 23 2 3 11 12 -10])
+func testAll
+    test [1 2 3] (sortEven [1 2 3])
+    test [-10 3 -5 2 -3 3 5 0 9 1 123] (sortEven [5 3 -5 2 -3 3 9 0 123 1 -10])
+    test [-12 8 3 4 5 2 12 11 23 -10] (sortEven [5 8 -12 4 23 2 3 11 12 -10])
 end
 
-test
+testAll

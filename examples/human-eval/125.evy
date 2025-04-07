@@ -24,15 +24,15 @@ func splitWords:any s:string
     return result
 end
 
-func test
-    assert ["Hello" "world!"] (splitWords "Hello world!")
-    assert ["Hello" "world!"] (splitWords "Hello,world!")
-    assert ["Hello" "world,!"] (splitWords "Hello world,!")
-    assert ["Hello,Hello,world" "!"] (splitWords "Hello,Hello,world !")
-    assert 3 (splitWords "abcdef")
-    assert 2 (splitWords "aaabb")
-    assert 1 (splitWords "aaaBb")
-    assert 0 (splitWords "")
+func testAll
+    test ["Hello" "world!"] (splitWords "Hello world!")
+    test ["Hello" "world!"] (splitWords "Hello,world!")
+    test ["Hello" "world,!"] (splitWords "Hello world,!")
+    test ["Hello,Hello,world" "!"] (splitWords "Hello,Hello,world !")
+    test 3 (splitWords "abcdef")
+    test 2 (splitWords "aaabb")
+    test 1 (splitWords "aaaBb")
+    test 0 (splitWords "")
 end
 
-test
+testAll

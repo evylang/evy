@@ -17,14 +17,14 @@ func fib3:num n:num
     return result[-1]
 end
 
-func test
-    assert 1 (fib3 2)
-    assert 0 (fib3 1)
-    assert 4 (fib3 5)
-    assert 24 (fib3 8)
-    assert 81 (fib3 10)
-    assert 274 (fib3 12)
-    assert 927 (fib3 14)
+func testAll
+    test 1 (fib3 2)
+    test 0 (fib3 1)
+    test 4 (fib3 5)
+    test 24 (fib3 8)
+    test 81 (fib3 10)
+    test 274 (fib3 12)
+    test 927 (fib3 14)
 end
 
-test
+testAll

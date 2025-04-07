@@ -1,0 +1,287 @@
+:root {
+  --gap: 12px;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 768px) {
+}
+
+/* --- Notes ----------------------------------------------------- */
+.notes {
+  background: var(--background);
+  border-radius: 6px;
+  border: var(--editor-border);
+  font-family: var(--font-family);
+  overflow-y: auto;
+  height: 100%;
+  padding: 8px 16px var(--editor-padding-bottom) 16px;
+  scroll-behavior: smooth;
+  position: relative;
+  &:not(.notes:has(+ .editor-wrap.hidden)):after {
+    content: "";
+    display: block;
+    height: 90%;
+  }
+}
+
+.notes h1 {
+  color: var(--color);
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+}
+.notes :is(h2, h3) {
+  color: var(--color);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+.notes h3 {
+  font-size: 0.875rem;
+}
+
+.notes h4 {
+  color: var(--color-slightly-dimmed);
+}
+
+.notes p,
+.notes td {
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+}
+/* Reduce margin bottom if code block follows */
+.notes p:has(+ pre) {
+  margin-bottom: 8px;
+}
+
+.notes strong {
+  color: var(--color);
+}
+
+.notes ul,
+.notes ol {
+  margin: 4px 16px 16px;
+}
+
+.notes li {
+  color: var(--color-dimmed);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.notes a {
+  color: var(--color-accent);
+  &:hover,
+  &:hover code {
+    color: var(--color-accent-hover);
+  }
+  & > code {
+    color: var(--color-accent);
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.notes code {
+  padding: 0.25em;
+  font-size: 0.875em;
+  background-color: var(--background-inline-code);
+  border-radius: 4px;
+  color: var(--color);
+}
+
+.notes pre {
+  margin: 16px 0 24px;
+  padding: 16px;
+  border-left: 6px solid var(--border-color);
+  overflow-x: auto;
+  background: var(--background-code);
+  & code {
+    padding: 0;
+    background: none;
+    margin-bottom: 24px;
+    user-select: none;
+  }
+}
+
+.notes img {
+  width: 16rem;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+/* --- Notes table ----------------------------------------------- */
+.notes table {
+  border-collapse: collapse;
+  margin: 16px 0;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  &.hidden {
+    display: none;
+  }
+}
+.notes tr:not(:first-child) {
+  border-top: 1px solid var(--border-color);
+}
+.notes th {
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--color-slightly-dimmed);
+}
+.notes :is(th, td) {
+  text-align: left;
+  line-height: 2;
+  padding: 2px 24px;
+  &:first-child {
+    padding-left: 0px;
+  }
+  &:has(img) {
+    padding: 2px;
+    border: none;
+  }
+}
+.notes table img {
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.notes details {
+  margin-bottom: 12px;
+  & pre {
+    margin: 0 0 8px;
+  }
+
+  &[open] {
+    margin-bottom: 16px;
+    & summary + * {
+      margin-top: 8px;
+    }
+  }
+}
+
+/* --- Notes details, next buttons-------------------------------- */
+.notes :is(summary, .next-btn) {
+  background: none;
+  border: 1px solid var(--color-accent-hover);
+  color: var(--color-accent-hover);
+  border-radius: 10px;
+  padding: 4px;
+  min-width: 100px;
+  margin-left: auto;
+  margin-right: 0;
+  display: block;
+  width: fit-content;
+  text-align: center;
+  font-size: 1rem;
+  &.hidden {
+    display: none;
+  }
+}
+/* Remove <details> triangle */
+.notes summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* --- Notes custom classes -------------------------------------- */
+a.youtube {
+  margin: 32px 16px;
+  display: block;
+  & img {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+  }
+}
+
+#hamburger div {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color);
+}
+/* --- Notes responsive tweaks ---------------------------------- */
+@media (hover: hover) {
+  .notes summary,
+  .notes .next-btn {
+    &:hover,
+    &:hover code {
+      color: hsl(201deg 100% 78%);
+      border-color: hsl(201deg 100% 78%);
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .notes {
+    padding-top: 16px;
+    width: var(--editor-width);
+  }
+  /* 3 column layout */
+  .main:not(:has(> .hidden)) {
+    width: 300vw;
+    &.view-notes {
+      translate: 0;
+    }
+    &.view-code {
+      translate: -100vw;
+    }
+    &.view-output {
+      translate: -200vw;
+    }
+  }
+  /* 2 column layout */
+  .main:has(> .hidden) {
+    &.view-notes,
+    &.view-code {
+      translate: 0;
+    }
+    &.view-output {
+      translate: -100vw;
+    }
+  }
+  /* 1 column layout */
+  .main:has(> .notes.hidden):has(> .editor-wrap.hidden) {
+    &.view-output {
+      translate: 0;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    gap: var(--gap);
+    padding: 16px var(--gap);
+  }
+  /* 2 column layout */
+  .max-width-wrapper {
+    --col-width: calc(min(var(--canvas-size), calc(32rem)) + var(--gap));
+    max-width: calc(var(--col-width) * 2 + var(--gap));
+    & > main > * {
+      --2col-width: calc(100% / 2 - var(--gap) * 1.5);
+      width: var(--2col-width);
+    }
+  }
+  /* 3 column layout */
+  .max-width-wrapper:not(:has(.main > .hidden)) {
+    max-width: calc(var(--col-width) * 3);
+    & > main > * {
+      --3col-width: calc(100% / 3 - var(--gap) * 1.3);
+      width: var(--3col-width);
+    }
+  }
+  .output .canvas {
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    height: unset;
+  }
+}

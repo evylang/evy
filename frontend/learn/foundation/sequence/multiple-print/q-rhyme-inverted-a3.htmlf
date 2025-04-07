@@ -1,0 +1,15 @@
+<form id="q-rhyme-inverted-a3" class="difficulty-medium">
+  <h2>Sequential <code>print</code> command</h2>
+  <p>Complete the program that generates this output:</p>
+  <pre><code>The early bird
+finds the bug.
+🐥🪳🐛
+</code></pre>
+  <p>Program:</p>
+  <textarea name="answer" rows="4" cols="35">
+print "The early bird"
+
+print "🐥🪳🐛"
+</textarea
+  >
+</form>

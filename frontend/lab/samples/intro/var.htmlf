@@ -1,0 +1,27 @@
+<h1>🧮 Variables</h1>
+<h2>⭐ Intro</h2>
+<p><em>Don't run the code yet!</em></p>
+<ul>
+  <li>
+    What will the first two <a href="/docs/builtins.html#print"><code>print</code></a> commands
+    show?
+  </li>
+  <li>What about the last two?</li>
+</ul>
+<p>Now, <strong>Run</strong> the code. Did the output match your expectation?</p>
+<details>
+  <summary>Docs</summary>
+  <p>In Evy, we create a variable and its type with the pattern:</p>
+  <pre><code class="language-evy">name:type
+</code></pre>
+  <p>Let's <em>declare</em> the variable <code>x</code>, which can only store a number value:</p>
+  <pre><code class="language-evy">x:num
+</code></pre>
+  <p>Now we can <em>assign</em> a value to it using the equality sign <code>=</code>:</p>
+  <pre><code class="language-evy">x = 3 + 4
+</code></pre>
+  <p>📌 A variable <em>must</em> be declared before it can be used.</p>
+</details>
+<p><button class="next-btn">Next</button></p>
+<h2>⭐ Your Turn</h2>
+<p>Can you print your name and your age using variables?</p>

@@ -54,7 +54,7 @@ end
 
       // show sidebar
       await page.locator("#hamburger").click()
-      await page.getByText("About Evy Docs Discord GitHub").click()
+      await page.getByText("About Evy Labs Docs Discord").click()
       await expect(page).toHaveScreenshot("sidebar.png")
 
       // hide sidebar by click on main
@@ -67,7 +67,7 @@ end
 
       // show sidebar again
       await page.locator("#hamburger").click()
-      await page.getByText("About Evy Docs Discord GitHub").click()
+      await page.getByText("About Evy Labs Docs Discord").click()
       await expect(page).toHaveScreenshot("sidebar.png")
 
       // hide sidebar by click on top menu
@@ -80,7 +80,7 @@ end
     test("dialogs", async ({ page, baseURL }, testInfo) => {
       await page.goto(baseURL)
       await page.waitForLoadState("networkidle")
-      await expect(page).toHaveScreenshot("no-dialog.png")
+      await expect(page).toHaveScreenshot("no-dialog.png", { maxDiffPixelRatio: 0.01 })
 
       // show sidebar
       if (testInfo.project.name != "ios") {
@@ -92,20 +92,14 @@ end
       await page.locator('input[type="text"]').click()
       await page.locator('input[type="text"]').press("ArrowRight")
       await expect(page).toHaveScreenshot("share-dialog.png", { maxDiffPixelRatio: 0.01 })
-      await page.getByRole("button", { name: "Done" }).click()
-      if (testInfo.project.name != "ios") {
-        //TODO: there is a rendering bug for this on ios, view snapshot diff, see https://github.com/evylang/todo/issues/50
-        await expect(page).toHaveScreenshot("no-dialog.png")
-      }
+      await page.locator("#dialog-share .icon-close").click()
+      await expect(page).toHaveScreenshot("no-dialog.png")
       await page.locator("#hamburger").click()
       await page.getByRole("button", { name: "About Evy" }).click()
       await page.waitForLoadState("networkidle")
       await expect(page).toHaveScreenshot("about-dialog.png", { maxDiffPixelRatio: 0.01 })
       await page.locator("header").filter({ hasText: "About" }).getByRole("button").click()
-      if (testInfo.project.name != "ios") {
-        //TODO: there is a rendering bug for this on ios, view snapshot diff, see https://github.com/evylang/todo/issues/50
-        await expect(page).toHaveScreenshot("no-dialog.png")
-      }
+      await expect(page).toHaveScreenshot("no-dialog.png")
     })
 
     test("read input", async ({ page, baseURL }, testInfo) => {

@@ -26,11 +26,11 @@ func convert:string n:num
     return "db" + result + "db"
 end
 
-func test
-    assert "db0db" (convert 0)
-    assert "db100000db" (convert 32)
-    assert "db1100111db" (convert 103)
-    assert "db1111db" (convert 15)
+func testAll
+    test "db0db" (convert 0)
+    test "db100000db" (convert 32)
+    test "db1100111db" (convert 103)
+    test "db1111db" (convert 15)
 end
 
-test
+testAll

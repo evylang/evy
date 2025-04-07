@@ -69,7 +69,8 @@ type exportCmd struct {
 	IgnoreSealed      bool   `short:"i" help:"Only export answerkey and add solution to unsealed answers. Suitable if private key not available."`
 	PrivateKey        string `short:"k" help:"Secret private key to decrypt sealed answers." env:"EVY_LEARN_PRIVATE_KEY"`
 	WithAnswersMarked bool   `short:"m" help:"Include marked answers in HTML output. Cannot be used with export target answerkey."`
-	WithHeadLinks     bool   `short:"l" help:"Use .css files rather than embedded CSS for standalone HTML. Same with scripts and favicon."`
+	SelfContained     bool   `short:"c" help:"Ensure .html files are self-contained (embed CSS, JS, Favicon)." negatable:""`
+	RootDir           string `short:"r" default:"/" help:"Root directory for HTML links, e.g. /learn/."`
 }
 
 type verifyCmd struct {
@@ -93,14 +94,15 @@ type unsealCmd struct {
 
 func (c *exportCmd) Run() error {
 	if c.WithAnswersMarked && c.ExportType != "all" && c.ExportType != "html" {
-		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`) //nolint:err113 // dynamic errors in main are fine.
+		return errors.New(`--with-marked can only be used with all "all" and "html" export targets`)
 	}
 	exportOptions := learn.ExportOptions{
 		WriteHTML:         c.ExportType == "html" || c.ExportType == "all",
 		WriteAnswerKey:    c.ExportType == "answerkey" || c.ExportType == "all",
 		WriteCatalog:      c.ExportType == "catalog" || c.ExportType == "all",
 		WithAnswersMarked: c.WithAnswersMarked,
-		WithHeadLinks:     c.WithHeadLinks,
+		SelfContained:     c.SelfContained,
+		RootDir:           c.RootDir,
 	}
 	modelOptions := getOptions(c.IgnoreSealed, c.PrivateKey)
 	return learn.Export(c.Srcdir, c.Destdir, exportOptions, modelOptions...)

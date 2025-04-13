@@ -623,7 +623,7 @@ func (c *Compiler) compileFuncDef(def *parser.FuncDefStmt) (int, error) {
 	if err := c.Compile(def.Body); err != nil {
 		return 0, err
 	}
-	numLocals := c.symbolTable.index
+	numLocals := c.symbolTable.nestedMaxIndex
 	c.leaveScope()
 	// reset the bytecode
 	compiledFn := funcVal{

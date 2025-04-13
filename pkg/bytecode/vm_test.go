@@ -1,6 +1,7 @@
 package bytecode
 
 import (
+	"bytes"
 	"math"
 	"testing"
 
@@ -1221,6 +1222,54 @@ func TestFunctions(t *testing.T) {
 	}
 }
 
+func TestBuiltin(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantOut string
+	}{
+		{
+			name:    "print",
+			input:   `print 1`,
+			wantOut: "1\n",
+		},
+		{
+			name:    "print variadic",
+			input:   `print 1 "-" 2`,
+			wantOut: "1 - 2\n",
+		},
+		{
+			name: "print var",
+			input: `x := true
+			print x "-" 2`,
+			wantOut: "true - 2\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := &testRT{}
+			program, err := parser.Parse(tt.input, BuiltinDecls(rt))
+			assert.NoError(t, err, "unexpected parse error")
+			comp := NewCompiler(rt)
+			err = comp.Compile(program)
+			assert.NoError(t, err, "unexpected compile error")
+			bytecode := comp.Bytecode()
+			vm := NewVM(bytecode)
+			err = vm.Run()
+			assert.NoError(t, err, "runtime error")
+			assert.Equal(t, tt.wantOut, rt.b.String())
+		})
+	}
+}
+
+type testRT struct {
+	b bytes.Buffer
+}
+
+func (rt *testRT) Print(s string) {
+	rt.b.WriteString(s)
+}
+
 type pair struct {
 	k string
 	v any
@@ -1230,9 +1279,10 @@ func compileBytecode(t *testing.T, input string) *Bytecode {
 	t.Helper()
 	// add x = x to the input so it parses correctly
 	input += "\nx = x"
-	program, err := parser.Parse(input, parser.Builtins{})
+	rt := &testRT{}
+	program, err := parser.Parse(input, BuiltinDecls(rt))
 	assert.NoError(t, err, "unexpected parse error")
-	comp := NewCompiler()
+	comp := NewCompiler(rt)
 	err = comp.Compile(program)
 	assert.NoError(t, err, "unexpected compile error")
 	bc := comp.Bytecode()

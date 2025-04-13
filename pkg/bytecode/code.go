@@ -127,6 +127,8 @@ const (
 	OpCall
 	// OpReturn reprents a return keyword.
 	OpReturn
+	// OpGetBuiltin represents a call to a builtin function.
+	OpGetBuiltin
 )
 
 var (
@@ -191,6 +193,7 @@ var definitions = map[Opcode]*OpDefinition{
 	OpIterRange:   {"OpIterRange", []int{2}}, // operand: hasLoopVar
 	OpCall:        {"OpCall", []int{2}},
 	OpReturn:      {"OpReturn", nil},
+	OpGetBuiltin:  {"OpGetBuiltin", []int{2}},
 }
 
 // OpDefinition defines a name and expected operand width for each OpCode.

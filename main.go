@@ -501,11 +501,12 @@ func (c *compileCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	ast, err := parser.Parse(string(b), parser.Builtins{})
+	rt := cli.NewPlatform()
+	ast, err := parser.Parse(string(b), bytecode.BuiltinDecls(rt))
 	if err != nil {
 		return fmt.Errorf("%w: %w", errParse, truncateError(err))
 	}
-	comp := bytecode.NewCompiler()
+	comp := bytecode.NewCompiler(rt)
 	if err := comp.Compile(ast); err != nil {
 		return err
 	}

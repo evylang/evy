@@ -2,6 +2,7 @@ package bytecode
 
 import (
 	"fmt"
+	"reflect"
 
 	"evylang.dev/evy/pkg/parser"
 )
@@ -28,6 +29,7 @@ var (
 // Compiler is responsible for turning a parsed evy program into
 // bytecode.
 type Compiler struct {
+	builtins  builtins
 	constants []value
 	// functions is a globally unique map of function names to their
 	// corresponding index in the constants
@@ -40,6 +42,7 @@ type Compiler struct {
 
 // Bytecode represents raw evy bytecode.
 type Bytecode struct {
+	Builtins     builtins
 	Constants    []value
 	Instructions Instructions
 	GlobalCount  int
@@ -47,8 +50,9 @@ type Bytecode struct {
 }
 
 // NewCompiler returns a new compiler.
-func NewCompiler() *Compiler {
+func NewCompiler(rt Platform) *Compiler {
 	return &Compiler{
+		builtins:    newBuiltins(rt),
 		functions:   map[string]int{},
 		symbolTable: NewSymbolTable(),
 	}
@@ -56,7 +60,7 @@ func NewCompiler() *Compiler {
 
 // Compile accepts an AST node and renders it to bytecode internally.
 func (c *Compiler) Compile(node parser.Node) error {
-	if node == nil {
+	if node == nil || reflect.ValueOf(node).IsNil() {
 		return c.emit(OpNone)
 	}
 	switch node := node.(type) {
@@ -134,6 +138,10 @@ func (c *Compiler) Compile(node parser.Node) error {
 		if err := c.emit(OpMap, len(node.Pairs)); err != nil {
 			return err
 		}
+	case *parser.Any:
+		if err := c.Compile(node.Value); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -141,6 +149,7 @@ func (c *Compiler) Compile(node parser.Node) error {
 // Bytecode renders the compiler instructions into Bytecode.
 func (c *Compiler) Bytecode() *Bytecode {
 	return &Bytecode{
+		Builtins:     c.builtins,
 		Instructions: c.instructions,
 		Constants:    c.constants,
 		GlobalCount:  c.symbolTable.index,
@@ -534,10 +543,14 @@ func (c *Compiler) compileVar(variable *parser.Var) error {
 	if !ok {
 		return fmt.Errorf("%w %s", ErrUndefinedVar, variable.Name)
 	}
-	if symbol.Scope == GlobalScope {
+	switch symbol.Scope {
+	case BuiltinScope:
+		return c.emit(OpGetBuiltin, symbol.Index)
+	case GlobalScope:
 		return c.emit(OpGetGlobal, symbol.Index)
+	default:
+		return c.emit(OpGetLocal, symbol.Index)
 	}
-	return c.emit(OpGetLocal, symbol.Index)
 }
 
 func (c *Compiler) compileIndexExpression(expr *parser.IndexExpression) error {
@@ -571,12 +584,18 @@ func (c *Compiler) emitSetVar(symbol Symbol) error {
 }
 
 func (c *Compiler) compileFuncCall(call *parser.FuncCall) error {
-	fnIdx, err := c.compileFuncDef(call.FuncDef)
-	if err != nil {
-		return err
-	}
-	if err := c.emit(OpConstant, fnIdx); err != nil {
-		return err
+	if i := c.getBuiltinByName(call.Name); i != -1 {
+		if err := c.emit(OpGetBuiltin, i); err != nil {
+			return err
+		}
+	} else {
+		fnIdx, err := c.compileFuncDef(call.FuncDef)
+		if err != nil {
+			return err
+		}
+		if err := c.emit(OpConstant, fnIdx); err != nil {
+			return err
+		}
 	}
 	variadic := call.FuncDef.VariadicParam
 	if variadic == nil {
@@ -642,4 +661,13 @@ func (c *Compiler) compileReturn(stmt *parser.ReturnStmt) error {
 		return err
 	}
 	return c.emit(OpReturn)
+}
+
+func (c *Compiler) getBuiltinByName(name string) int {
+	for i, def := range c.builtins.Funcs {
+		if def.Name == name {
+			return i
+		}
+	}
+	return -1
 }

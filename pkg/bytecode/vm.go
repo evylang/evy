@@ -25,10 +25,14 @@ var (
 	// ErrBadRepetition is returned when the right-hand side of the array
 	// repetition operator is invalid; i.e. negative or not an integer.
 	ErrBadRepetition = fmt.Errorf("%w: bad repetition count", ErrPanic)
+	// ErrUnexpectedCallee is returned when an OpCall target cannot be
+	// case into one of funcVal or builtinVal.
+	ErrUnexpectedCallee = fmt.Errorf("%w: unexpected function callee, expected function or builtin", ErrPanic)
 )
 
 // VM is responsible for executing evy programs from bytecode.
 type VM struct {
+	builtins    builtins
 	constants   []value
 	frames      []*frame
 	framesIndex int
@@ -46,6 +50,7 @@ func NewVM(bytecode *Bytecode) *VM {
 	frames := make([]*frame, MaxFrames)
 	frames[0] = mainFrame
 	return &VM{
+		builtins:    bytecode.Builtins,
 		constants:   bytecode.Constants,
 		frames:      frames,
 		framesIndex: 1,
@@ -81,6 +86,11 @@ func (vm *VM) Run() error {
 			frame := vm.currentFrame()
 			frame.ip += 2
 			err = vm.push(vm.stack[frame.base+int(idx)])
+		case OpGetBuiltin:
+			builtinIndex := ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
+			definition := vm.builtins.Funcs[builtinIndex]
+			err = vm.push(definition.Func)
 		case OpSetGlobal:
 			globalIndex := ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
@@ -314,12 +324,15 @@ func (vm *VM) Run() error {
 		case OpCall:
 			numArgs := int(ReadUint16(ins[ip+1:]))
 			vm.currentFrame().ip += 2
-			fn := vm.peekFuncVal(numArgs)
-			frame := newFrame(fn, vm.sp-numArgs)
-			vm.pushFrame(frame)
-			// create a hole on the stack for the local args of the fn
-			// to be stored in
-			vm.sp = frame.base + fn.NumLocals
+			callee := vm.stack[vm.sp-1-numArgs]
+			switch callee := callee.(type) {
+			case funcVal:
+				vm.callFunction(callee, numArgs)
+			case builtinFunc:
+				return vm.callBuiltin(callee, numArgs)
+			default:
+				return ErrUnexpectedCallee
+			}
 		case OpReturn:
 			retVal := vm.pop()
 			frame := vm.popFrame()
@@ -331,6 +344,27 @@ func (vm *VM) Run() error {
 		}
 	}
 	return nil
+}
+
+func (vm *VM) callFunction(fn funcVal, numArgs int) {
+	frame := newFrame(fn, vm.sp-numArgs)
+	vm.pushFrame(frame)
+	// create a hole on the stack for the local args of the fn
+	// to be stored in
+	vm.sp = frame.base + fn.NumLocals
+}
+
+func (vm *VM) callBuiltin(fn builtinFunc, numArgs int) error {
+	args := vm.stack[vm.sp-numArgs : vm.sp]
+	result, err := fn(args...)
+	if err != nil {
+		return err
+	}
+	vm.sp = vm.sp - numArgs - 1
+	if result == nil {
+		result = noneVal{}
+	}
+	return vm.push(result)
 }
 
 // lastPoppedStackElem returns the last element that was
@@ -347,22 +381,6 @@ func (vm *VM) push(o value) error {
 	vm.stack[vm.sp] = o
 	vm.sp++
 	return nil
-}
-
-func (vm *VM) peek(offset int) value {
-	return vm.stack[vm.sp-1-offset]
-}
-
-// peekFuncVal peeks an element from the stack and casts it to an funcVal
-// before returning the value. If elem is not a funcVal then it will error.
-func (vm *VM) peekFuncVal(offset int) funcVal {
-	elem := vm.peek(offset)
-	val, ok := elem.(funcVal)
-	if !ok {
-		panic(fmt.Errorf("%w: expected to peek funcVal but got %s",
-			ErrInternal, elem.Type()))
-	}
-	return val
 }
 
 func (vm *VM) pop() value {

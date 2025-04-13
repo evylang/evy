@@ -4,6 +4,8 @@ package bytecode
 type SymbolScope string
 
 const (
+	// BuiltinScope is reserved for builtin functions.
+	BuiltinScope SymbolScope = "BUILTIN"
 	// GlobalScope is the top level scope of an evy program.
 	GlobalScope SymbolScope = "GLOBAL"
 	// LocalScope is any local scope in an evy program, it is distinct
@@ -104,6 +106,13 @@ func (s *SymbolTable) Define(name string) Symbol {
 	} else {
 		symbol.Scope = LocalScope
 	}
+	s.store[name] = symbol
+	return symbol
+}
+
+// DefineBuiltin adds a builtin symbol to the table.
+func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
+	symbol := Symbol{Name: name, Index: index, Scope: BuiltinScope}
 	s.store[name] = symbol
 	return symbol
 }

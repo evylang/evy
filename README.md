@@ -128,6 +128,16 @@ directory by installing [Hermit shell hooks] with
 [Hermit]: https://cashapp.github.io/hermit
 [Hermit shell hooks]: https://cashapp.github.io/hermit/usage/shell/#shell-hooks
 
+## <img src="frontend/img/aboriginal-flag.v1.svg" style="height:1em"> Acknowledgement of Country
+
+As the creator of Evy, I extend my deep gratitude to the Wurundjeri Woi-wurrung
+people of the Kulin Nation, on whose unceded lands and waters this project was
+imagined and built. I am inspired by the traditions of the world's oldest living
+culture—rich with storytelling, learning, and custodianship—and I feel
+privileged to learn from their enduring connection to Country. I pay my profound
+respects to their Elders past, present, and emerging. This always was, and
+always will be, Aboriginal land.
+
 ## 🙏 Thanks
 
 Evy would not be here today without the help of many people.

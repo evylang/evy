@@ -1,12 +1,9 @@
-for i := range 0 100 0.1
+color "red"
+
+for x := range 0 100 0.1
     clear
-    dot i 50
+    move x 50
+    circle 10
 
     sleep 0.01
-end
-
-func dot x:num y:num
-    color "red"
-    move x y
-    circle 10
 end
